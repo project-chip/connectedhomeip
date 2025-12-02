@@ -145,10 +145,8 @@ static constexpr size_t kModeSelectMaxEnpointCount =
 static void timerCallback(System::Layer *, void * callbackContext);
 static void sceneModeSelectCallback(EndpointId endpoint);
 using ModeSelectEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
-using ModeSelectTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<
-    kModeSelectMaxEnpointCount,
-    scenes::CodegenEndpointToIndex<ModeSelect::Id, MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT,
-                                   kModeSelectMaxEnpointCount>>;
+using ModeSelectTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<scenes::CodegenEndpointToIndex<
+    ModeSelect::Id, MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT, kModeSelectMaxEnpointCount>>;
 
 class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 {

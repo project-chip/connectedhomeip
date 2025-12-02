@@ -35,7 +35,6 @@ static constexpr size_t kOnOffMaxEndpointCount =
 static void sceneOnOffCallback(EndpointId endpoint);
 using OnOffEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
 using OnOffTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<
-    kOnOffMaxEndpointCount,
     scenes::CodegenEndpointToIndex<OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT, kOnOffMaxEndpointCount>>;
 
 #if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS

@@ -141,13 +141,13 @@ public:
     /// @brief Helper struct that allows clusters that do not have an existing mechanism for doing
     ///        asynchronous work to perform scene transitions over some period of time.
     ///
-    /// Internally maintains an array of `MaxEndpointCount` items and uses the given `Finder` structure
+    /// Internally maintains an array of `Finder::kMaxEndpointCount` items and uses the given `Finder` structure
     /// to convert an endpoint ID into a 0-based index into the internal array using a
     /// `bool Finder::EndpointIdToIndex(EndpointId, uint16_t&)` call.
-    template <size_t MaxEndpointCount, typename Finder>
+    template <typename Finder>
     struct TransitionTimeInterface
     {
-        EmberEventControl sceneHandlerEventControls[MaxEndpointCount];
+        EmberEventControl sceneHandlerEventControls[Finder::kMaxEndpointCount];
 
         TransitionTimeInterface(void (*callback)(EndpointId)) : mCallback(callback) {}
 
@@ -189,7 +189,7 @@ public:
 
     static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
-    DefaultSceneHandlerImpl() = default;
+    DefaultSceneHandlerImpl()           = default;
     ~DefaultSceneHandlerImpl() override = default;
 
     /// @brief Encodes an attribute value list into a TLV structure and resizes the buffer to the size of the encoded data
