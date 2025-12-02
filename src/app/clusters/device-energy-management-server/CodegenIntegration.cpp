@@ -57,14 +57,14 @@ bool Instance::HasFeature(Feature aFeature) const
     return mCluster.Cluster().Features().Has(aFeature);
 }
 
-// The current implementation already manually instanciates and initializes the cluster, so no need for the codegen integration.
-void MatterDeviceEnergyManagementClusterInitCallback(EndpointId endpointId) {}
-void MatterDeviceEnergyManagementClusterShutdownCallback(EndpointId endpointId) {}
-
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// The current implementation already manually instantiates and initializes the cluster, so no need for the codegen integration.
+void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId) {}
+void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId) {}
 
 // Legacy callback stubs
 void MatterDeviceEnergyManagementPluginServerInitCallback() {}

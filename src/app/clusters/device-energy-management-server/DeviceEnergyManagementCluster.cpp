@@ -43,7 +43,7 @@ DataModel::ActionReturnStatus AddResponseOnError(const DataModel::InvokeRequest 
     {
         handler->AddStatus(request.path, status.GetStatusCode());
     }
-    return status.GetUnderlyingError();
+    return status;
 }
 
 bool IsWithinRange(const int64_t power, const uint32_t duration,
@@ -298,7 +298,10 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
     }
 
     ESAStateEnum ESAState = mDelegate->GetESAState();
-    VerifyOrReturnError(ESAState == ESAStateEnum::kOnline || ESAState == ESAStateEnum::kPowerAdjustActive, Status::InvalidInState);
+    if (ESAState != ESAStateEnum::kOnline && ESAState != ESAStateEnum::kPowerAdjustActive)
+    {
+        return AddResponseOnError(request, handler, Status::InvalidInState);
+    }
 
     // Call on delegate to start the power adjustment if the ESAState PowerAdjustActive, the delegate might refuse the adjustment
     // The delegate is responsible of updating its PowerAdjustmentCapability's cause to the new cause if the adjustment is accepted
