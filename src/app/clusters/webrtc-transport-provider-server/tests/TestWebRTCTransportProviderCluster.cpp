@@ -370,7 +370,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestDelegateHandleProvideICECandidate
     std::vector<ICECandidateStruct> testCandidates;
 
     ICECandidateStruct candidate1;
-    candidate1.candidate = chip::CharSpan("candidate1", 10);
+    candidate1.candidate = "candidate1"_span;
     testCandidates.push_back(candidate1);
 
     ICECandidateStruct candidate2;
