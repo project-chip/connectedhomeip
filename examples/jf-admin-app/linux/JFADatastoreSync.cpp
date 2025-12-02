@@ -179,6 +179,20 @@ public:
                         aclList, pairingCommand, OnWriteSuccessResponse, OnWriteFailureResponse);
                 }
             }
+            else if constexpr (std::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>)
+            {
+                attributeId = Attributes::GroupKeySetList::Id;
+
+                {
+                    // Invoke GroupKeyManagement::Commands::KeySetWrite on the device
+                    chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type keySetWrite;
+                    keySetWrite.groupKeySet.groupKeySetID = cbContext->objectToWrite.groupKeySetID;
+
+                    chip::Controller::ClusterBase groupsCluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+                    err = groupsCluster.InvokeCommand(keySetWrite, pairingCommand, OnCommandResponse, OnCommandFailure);
+                }
+            }
             else
             {
                 ChipLogError(Controller, "Unknown type for attribute mapping");
@@ -338,4 +352,72 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
                                                                          &pairingCommand->mOnDeviceConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+JFADatastoreSync::SyncNode(NodeId nodeId,
+                           const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
+                           std::function<void()> onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>>
+        pairingCommand =
+            std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>>(
+                nodeId, groupKeySet, onSuccess);
+
+    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchEndpointList(
+    NodeId nodeId,
+    std::function<void(CHIP_ERROR,
+                       const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "FetchEndpointList not implemented - node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchEndpointGroupList(
+    NodeId nodeId,
+    std::function<void(
+        CHIP_ERROR, const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "FetchEndpointGroupIDList not implemented - node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchEndpointBindingList(
+    NodeId nodeId,
+    std::function<void(
+        CHIP_ERROR, const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "FetchEndpointBindingList not implemented - node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchGroupKeySetList(
+    NodeId nodeId,
+    std::function<void(CHIP_ERROR,
+                       const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "FetchGroupKeySetList not implemented - node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchACLList(
+    NodeId nodeId,
+    std::function<void(CHIP_ERROR,
+                       const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "FetchACLList not implemented - node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
