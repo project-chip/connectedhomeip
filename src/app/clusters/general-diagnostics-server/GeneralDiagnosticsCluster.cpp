@@ -16,8 +16,8 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
@@ -277,13 +277,15 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return encoder.Encode(isTestEventTriggersEnabled);
     }
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
-        auto interactionModel = InteractionModelEngine::GetInstance();
-        auto sessionManager = interactionModel->GetExchangeManager()->GetSessionManager();
+        auto interactionModel                                    = InteractionModelEngine::GetInstance();
+        auto sessionManager                                      = interactionModel->GetExchangeManager()->GetSessionManager();
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
-            .currentSubscriptions = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-            .currentSubscriptionsForFabric = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
-            .totalSubscriptionsEstablished = interactionModel->GetReportScheduler()->GetTotalSubscriptionsEstablished(),
-            .totalInteractionModelMessagesSent = sessionManager->GetIMMessagesSent(),
+            .currentSubscriptions =
+                static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+            .currentSubscriptionsForFabric         = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(
+                ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
+            .totalSubscriptionsEstablished         = interactionModel->GetReportScheduler()->GetTotalSubscriptionsEstablished(),
+            .totalInteractionModelMessagesSent     = sessionManager->GetIMMessagesSent(),
             .totalInteractionModelMessagesReceived = sessionManager->GetIMMessagesReceived(),
         };
         return encoder.Encode(load);

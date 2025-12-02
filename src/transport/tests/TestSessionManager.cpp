@@ -1092,11 +1092,11 @@ TEST_F(TestSessionManager, TestMessageStats)
     err = sessionManager.PrepareMessage(aliceToBobSession.Get().Value(), payloadHeader, std::move(buffer), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    //Send message to itself, this means a message is both sent and received
+    // Send message to itself, this means a message is both sent and received
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    //Verify final stats results
+    // Verify final stats results
     mContext.DrainAndServiceIO();
     EXPECT_EQ(sessionManager.GetIMMessagesSent(), static_cast<uint32_t>(1));
     EXPECT_EQ(sessionManager.GetIMMessagesReceived(), static_cast<uint32_t>(1));

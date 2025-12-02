@@ -1234,8 +1234,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         SessionHandle session(groupSession);
 
         CountMessagesReceived(session, payloadHeader);
-        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, session,
-                               SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
+        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, session, SessionMessageDelegate::DuplicateMessage::No,
+                               std::move(msg));
     }
     else
     {
@@ -1346,14 +1346,18 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
     return CHIP_NO_ERROR;
 }
 
-void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader) {
-    if(payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id) {
+void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
+    {
         mMessageStats.InteractionModelMessagesReceived++;
     }
 }
 
-void SessionManager::CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader) {
-    if(payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id) {
+void SessionManager::CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
+    {
         mMessageStats.InteractionModelMessagesSent++;
     }
 }

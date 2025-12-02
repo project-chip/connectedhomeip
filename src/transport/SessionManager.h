@@ -547,10 +547,11 @@ private:
         kPayloadIsUnencrypted,
     };
 
-    struct MessageStats {
-        public:
-            uint32_t InteractionModelMessagesReceived = 0;
-            uint32_t InteractionModelMessagesSent = 0;
+    struct MessageStats
+    {
+    public:
+        uint32_t InteractionModelMessagesReceived = 0;
+        uint32_t InteractionModelMessagesSent     = 0;
     };
 
     System::Layer * mSystemLayer               = nullptr;
