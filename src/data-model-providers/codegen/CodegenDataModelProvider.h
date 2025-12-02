@@ -55,7 +55,8 @@ public:
 
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
     {
-        VerifyOrDie(!mContext.has_value()); // can't change once started
+        VerifyOrReturn(delegate != mPersistentStorageDelegate); // no-op change is silently allowed for now,
+        VerifyOrDie(!mContext.has_value());                     // otherwise can't change once started.
         mPersistentStorageDelegate = delegate;
     }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
