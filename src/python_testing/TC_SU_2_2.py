@@ -192,10 +192,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        # Clear provider KVS after test to avoid interference with subsequent tests
-        self.clear_kvs()
+        # Clear provider KVS (self.KVS_PATH) after test to avoid interference with subsequent tests
+        self.clear_kvs(kvs_path_prefix=self.KVS_PATH)
 
-        await self.clear_ota_providers(self.default_controller, self.dut_node_id)
+        # await self.clear_ota_providers(self.default_controller, self.dut_node_id)
         self.terminate_provider()
         super().teardown_test()
 
@@ -262,18 +262,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             provider_node_id=provider_node_id,
             requestor_node_id=requestor_node_id
         )
-
-        # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
-        logger.info(f'{step_number}: Prerequisite #3.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
-
-        # Prerequisite #4.0 - Current DefaultOTAProviders on Requestor
-        # Clear any existing providers first
-        await self.clear_ota_providers(controller, requestor_node_id)
-        logger.info("Cleared existing DefaultOTAProviders on Requestor")
-
-        # Add the test provider
-        await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
-        logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
@@ -655,7 +643,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         self.step(4)
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Prerequisites - Setup Provider_S4
+        # [STEP_4]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s4 = "[STEP_4]"
         logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -701,17 +689,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
-            expiryLengthSeconds=900,  # 15 min
-            breadcrumb=1
-        )
-        resp = await self.send_single_cmd(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            cmd=cmd
-        )
-        logger.info(f'{step_number_s4}: Step #4.0 - Called ArmFailSafe to extend interaction window: {resp}')
-
         logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
         resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')

@@ -327,24 +327,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        requestor_existing_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
         # Create OTA ACL entries (both directions)
         await self.create_acl_entry(
             dev_ctrl=controller,
             provider_node_id=provider_node_id,
             requestor_node_id=requestor_node_id
-        )
-
-        await self.create_acl_entry(
-            dev_ctrl=controller,
-            provider_node_id=requestor_node_id,
-            requestor_node_id=provider_node_id
         )
 
         # Read updated ACLs
@@ -355,24 +342,13 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        requestor_current_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
         # Combine original + new entries
         combined_provider_acls = provider_existing_acls + provider_current_acls
-        combined_requestor_acls = requestor_existing_acls + requestor_current_acls
 
         # Write back ACLs
         await self.write_acl(controller, provider_node_id, combined_provider_acls)
-        await self.write_acl(controller, requestor_node_id, combined_requestor_acls)
 
-        logger.info(
-            f"OTA ACLs extended between provider {provider_node_id} and requestor {requestor_node_id}"
-        )
+        logger.info(f'OTA ACLs extended between provider {provider_node_id}')
 
     async def write_acl(self, controller, node_id, acl):
         """
@@ -415,12 +391,21 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
 
-    def clear_kvs(self):
+    def clear_kvs(self, kvs_path_prefix: str = None):
         """
-         Temporary cleanup of provider KVS files at the tmp path.
+        Remove all temporary KVS files matching a given prefix.
+
+        Args:
+            kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
+            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files
 
         Returns:
             None
         """
         import subprocess
-        subprocess.run("rm -rf /tmp/chip_kvs*", shell=True)
+
+        if kvs_path_prefix is None:
+            kvs_path_prefix = "/tmp/chip_kvs"
+        subprocess.run(f"rm -rf {kvs_path_prefix}*", shell=True)
+
+        logger.info(f'Removed KVS files matching: {kvs_path_prefix}*')
