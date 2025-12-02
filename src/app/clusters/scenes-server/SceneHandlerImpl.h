@@ -182,6 +182,7 @@ public:
         {
             uint16_t index;
             VerifyOrReturnValue(Finder::EndpointIdToIndex(endpoint, index), nullptr);
+            VerifyOrReturnValue(index < eventControlArray.size(), nullptr); // Finder should guarantee this, just double-check
             return &eventControlArray[index];
         }
     };
@@ -189,7 +190,7 @@ public:
     static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
     DefaultSceneHandlerImpl() = default;
-    ~DefaultSceneHandlerImpl() override{};
+    ~DefaultSceneHandlerImpl() override = default;
 
     /// @brief Encodes an attribute value list into a TLV structure and resizes the buffer to the size of the encoded data
     /// @param aVlist[in] Attribute value list to encode
