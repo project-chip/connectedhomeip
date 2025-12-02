@@ -23,7 +23,10 @@ chip_test_suite("tests") {
   output_name = "libAddressResolveTests"
 
   if (chip_address_resolve_strategy == "default") {
-    test_sources = [ "TestAddressResolve_DefaultImpl.cpp" ]
+    test_sources = [
+      "TestAddressResolve_DefaultImpl.cpp",
+      "TestNodeAddressCache.cpp",
+    ]
   }
 
   public_deps = [
