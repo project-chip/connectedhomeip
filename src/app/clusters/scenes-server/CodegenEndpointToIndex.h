@@ -29,7 +29,7 @@ struct CodegenEndpointToIndex {
     static bool EndpointIdToIndex(EndpointId endpointId, uint16_t & index)
     {
         uint16_t idx = emberAfGetClusterServerEndpointIndex(endpointId, ClusterId, FixedEndpointCount);
-        if (index >= MaxIndexCount) {
+        if (idx >= MaxIndexCount) {
             return false;
         }
         index = idx;
