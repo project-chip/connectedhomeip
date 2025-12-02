@@ -35,8 +35,27 @@
 
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "sl_simple_rgb_pwm_led.h"
+#include "sl_simple_rgb_pwm_led_instances.h"
+#define SL_SIMPLE_LED_INSTANCE(x) (&sl_simple_rgb_pwm_led_rgb_led0)
+#define SL_SIMPLE_LED_COUNT 1
+#define SL_LED_INIT_INTANCES() sl_simple_rgb_pwm_led_init_instances();
+#define SL_LED_GET_STATE(x) sl_led_get_state(&(x->led_common))
+#define SL_LED_TURN_ON(x) sl_led_turn_on(&(x->led_common))
+#define SL_LED_TURN_OFF(x) sl_led_turn_off(&(x->led_common))
+#define SL_LED_TOGGLE(x) sl_led_toggle(&(x->led_common))
+#else
 #include "sl_simple_led_instances.h"
+#define SL_LED_INIT_INTANCES() sl_simple_led_init_instances();
+#define SL_LED_GET_STATE(x) sl_simple_led_get_state(const_cast<sl_led_t *>(x))
+#define SL_LED_TURN_ON(x) sl_simple_led_turn_on(const_cast<sl_led_t *>(x))
+#define SL_LED_TURN_OFF(x) sl_simple_led_turn_off(const_cast<sl_led_t *>(x))
+#define SL_LED_TOGGLE(x) sl_simple_led_toggle(const_cast<sl_led_t *>(x))
+
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 }
+
 #endif
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
@@ -96,7 +115,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    NvmInit();
+    TEMPORARY_RETURN_IGNORED NvmInit();
 #ifdef _SILICON_LABS_32B_SERIES_2
     // Read the cause of last reset.
     mRebootCause = RMU_ResetCauseGet();
@@ -193,7 +212,7 @@ CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, s
 #ifdef ENABLE_WSTK_LEDS
 void SilabsPlatform::InitLed(void)
 {
-    sl_simple_led_init_instances();
+    SL_LED_INIT_INTANCES();
 }
 
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
@@ -203,7 +222,7 @@ CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    (state) ? sl_led_turn_on(SL_SIMPLE_LED_INSTANCE(led)) : sl_led_turn_off(SL_SIMPLE_LED_INSTANCE(led));
+    (state) ? SL_LED_TURN_ON(SL_SIMPLE_LED_INSTANCE(led)) : SL_LED_TURN_OFF(SL_SIMPLE_LED_INSTANCE(led));
     return CHIP_NO_ERROR;
 }
 
@@ -213,8 +232,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
     {
         return false;
     }
-
-    return sl_led_get_state(SL_SIMPLE_LED_INSTANCE(led));
+    return SL_LED_GET_STATE(SL_SIMPLE_LED_INSTANCE(led));
 }
 
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
@@ -223,7 +241,7 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    sl_led_toggle(SL_SIMPLE_LED_INSTANCE(led));
+    SL_LED_TOGGLE(SL_SIMPLE_LED_INSTANCE(led));
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
@@ -235,6 +253,23 @@ void SilabsPlatform::StartScheduler()
     sl_system_kernel_start();
 }
 #endif
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+bool SilabsPlatform::GetRGBLedState(uint8_t led)
+{
+    return SL_LED_GET_STATE(SL_SIMPLE_LED_INSTANCE(led));
+}
+CHIP_ERROR SilabsPlatform::SetLedColor(uint8_t led, uint8_t red, uint8_t green, uint8_t blue)
+{
+    sl_led_set_rgb_color(SL_SIMPLE_LED_INSTANCE(led), red, green, blue);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b)
+{
+    sl_led_get_rgb_color(SL_SIMPLE_LED_INSTANCE(led), &r, &g, &b);
+    return CHIP_NO_ERROR;
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(const sl_button_t * handle)

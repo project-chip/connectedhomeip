@@ -1870,13 +1870,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -1940,13 +1945,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2010,13 +2020,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2080,13 +2095,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -2149,13 +2169,18 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePathBuilder.Node(1)
+            .Endpoint(2)
+            .Cluster(3)
+            .Attribute(4)
+            .ListIndex(5)
+            .EndOfAttributePathIB();
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        TEMPORARY_RETURN_IGNORED attributePathListBuilder.EndOfAttributePathIBs();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        TEMPORARY_RETURN_IGNORED subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);

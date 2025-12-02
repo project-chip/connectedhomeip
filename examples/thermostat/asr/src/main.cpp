@@ -70,7 +70,7 @@ int main(void)
     vTaskStartScheduler();
 
     chip::Platform::MemoryShutdown();
-    PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask();
     PlatformMgr().Shutdown();
 
     // Should never get here.

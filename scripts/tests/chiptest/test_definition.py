@@ -22,9 +22,12 @@ import tempfile
 import threading
 import time
 import typing
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
+
+from .runner import SubprocessInfo
 
 log = logging.getLogger(__name__)
 
@@ -36,11 +39,11 @@ TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 
 class App:
 
-    def __init__(self, runner, command: typing.List[str]):
+    def __init__(self, runner, subproc: SubprocessInfo):
         self.process = None
         self.outpipe = None
         self.runner = runner
-        self.command = command
+        self.subproc = subproc
         self.cv_stopped = threading.Condition()
         self.stopped = True
         self.lastLogIndex = 0
@@ -49,7 +52,7 @@ class App:
         self.killed = False
 
     def __repr__(self) -> str:
-        return f'App[{self.command!r} - status {self.returncode}]'
+        return repr(self.subproc)
 
     @property
     def returncode(self):
@@ -68,7 +71,7 @@ class App:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, _ = self.__startServer()
-            self.waitForAnyAdvertisement()
+            self.waitForApplicationUp()
             self.__updateSetUpCode()
             with self.cv_stopped:
                 self.stopped = False
@@ -100,11 +103,14 @@ class App:
 
         return True
 
-    def waitForAnyAdvertisement(self):
-        self.__waitFor("mDNS service published:", self.process, self.outpipe)
+    def waitForApplicationUp(self):
+        # Watch for both mDNS advertisement start as well as event loop start.
+        # These two messages can appear in any order depending on the implementation.
+        # Waiting for both makes the startup detection more robust.
+        self.__waitFor(["mDNS service published:", "APP STATUS: Starting event loop"])
 
-    def waitForMessage(self, message, timeoutInSeconds=10):
-        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
+    def waitForMessage(self, message: str, timeoutInSeconds: int = 10):
+        self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
         return True
 
     def kill(self):
@@ -132,7 +138,7 @@ class App:
                     self.cv_stopped.wait()
 
     def __startServer(self):
-        app_cmd = self.command + ['--interface-id', str(-1)]
+        subproc = self.subproc.with_args('--interface-id', '-1')
 
         if not self.options:
             log.debug("Executing application under test with default args")
@@ -140,35 +146,43 @@ class App:
             log.debug("Executing application under test with the following args:")
             for key, value in self.options.items():
                 log.debug("   %s: %s", key, value)
-                app_cmd = app_cmd + [key, value]
+                subproc = subproc.with_args(key, value)
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
-        return self.runner.RunSubprocess(app_cmd, name='APP ', wait=False)
+        return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
-        log.debug("Waiting for '%s'", waitForString)
+    def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: int = 10):
+        """
+        Wait for all provided pattern strings to appear in the process output pipe (capture log).
+        """
+        logging.debug('Waiting for all patterns %r', patterns)
 
         start_time = time.monotonic()
-        ready, self.lastLogIndex = outpipe.CapturedLogContains(
-            waitForString, self.lastLogIndex)
-        if ready:
-            self.lastLogIndex += 1
 
-        while not ready:
-            if server_process.poll() is not None:
-                died_str = ("Server died while waiting for %s, returncode %d" %
-                            (waitForString, server_process.returncode))
-                log.error(died_str)
+        def allPatternsFound() -> int | None:
+            lastLogIndex = self.lastLogIndex
+            for p in patterns:
+                found, index = self.outpipe.CapturedLogContains(p, self.lastLogIndex)
+                if not found:
+                    return None
+                lastLogIndex = max(lastLogIndex, index)
+
+            return lastLogIndex
+
+        lastLogIndex = allPatternsFound()
+        while lastLogIndex is None:
+            if self.process.poll() is not None:
+                died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
+                logging.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception('Timeout while waiting for %s' % waitForString)
+                raise Exception(f'Timeout while waiting for {patterns!r}')
             time.sleep(0.1)
-            ready, self.lastLogIndex = outpipe.CapturedLogContains(
-                waitForString, self.lastLogIndex)
-            if ready:
-                self.lastLogIndex += 1
 
-        log.debug("Success waiting for: '%s'", waitForString)
+            lastLogIndex = allPatternsFound()
+
+        self.lastLogIndex = lastLogIndex + 1
+        logging.debug('Success waiting for: %r', patterns)
 
     def __updateSetUpCode(self):
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
@@ -196,6 +210,7 @@ class App:
                 self.process.wait(10)
             self.process = None
             self.outpipe = None
+            self.lastLogIndex = 0
         return True
 
 
@@ -217,23 +232,23 @@ class TestTarget(Enum):
 
 @dataclass
 class ApplicationPaths:
-    chip_tool: typing.List[str]
-    all_clusters_app: typing.List[str]
-    lock_app: typing.List[str]
-    fabric_bridge_app: typing.List[str]
-    ota_provider_app: typing.List[str]
-    ota_requestor_app: typing.List[str]
-    tv_app: typing.List[str]
-    bridge_app: typing.List[str]
-    lit_icd_app: typing.List[str]
-    microwave_oven_app: typing.List[str]
-    matter_repl_yaml_tester_cmd: typing.List[str]
-    chip_tool_with_python_cmd: typing.List[str]
-    rvc_app: typing.List[str]
-    network_manager_app: typing.List[str]
-    energy_gateway_app: typing.List[str]
-    energy_management_app: typing.List[str]
-    closure_app: typing.List[str]
+    chip_tool: SubprocessInfo
+    all_clusters_app: SubprocessInfo
+    lock_app: SubprocessInfo
+    fabric_bridge_app: SubprocessInfo
+    ota_provider_app: SubprocessInfo
+    ota_requestor_app: SubprocessInfo
+    tv_app: SubprocessInfo
+    bridge_app: SubprocessInfo
+    lit_icd_app: SubprocessInfo
+    microwave_oven_app: SubprocessInfo
+    matter_repl_yaml_tester_cmd: SubprocessInfo
+    chip_tool_with_python_cmd: SubprocessInfo
+    rvc_app: SubprocessInfo
+    network_manager_app: SubprocessInfo
+    energy_gateway_app: SubprocessInfo
+    energy_management_app: SubprocessInfo
+    closure_app: SubprocessInfo
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
@@ -267,7 +282,7 @@ class ApplicationPaths:
             (
                 # This path varies, however it is a fixed python tool so it may be ok
                 self.chip_tool_with_python_cmd,
-                os.path.basename(self.chip_tool_with_python_cmd[-1]),
+                self.chip_tool_with_python_cmd.path.name,
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
@@ -361,7 +376,7 @@ class TestDefinition:
         """Get a human readable list of tags applied to this test"""
         return ", ".join([t.to_s() for t in self.tags])
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str,
+    def Run(self, runner, apps_register, apps: ApplicationPaths, pics_file: str,
             timeout_seconds: typing.Optional[int], dry_run=False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: typing.Optional[int] = None,
@@ -377,55 +392,55 @@ class TestDefinition:
 
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
-                target_app = paths.all_clusters_app
+                target_app = apps.all_clusters_app
             elif self.target == TestTarget.TV:
-                target_app = paths.tv_app
+                target_app = apps.tv_app
             elif self.target == TestTarget.LOCK:
-                target_app = paths.lock_app
+                target_app = apps.lock_app
             elif self.target == TestTarget.FABRIC_SYNC:
-                target_app = paths.fabric_bridge_app
+                target_app = apps.fabric_bridge_app
             elif self.target == TestTarget.OTA:
-                target_app = paths.ota_requestor_app
+                target_app = apps.ota_requestor_app
             elif self.target == TestTarget.BRIDGE:
-                target_app = paths.bridge_app
+                target_app = apps.bridge_app
             elif self.target == TestTarget.LIT_ICD:
-                target_app = paths.lit_icd_app
+                target_app = apps.lit_icd_app
             elif self.target == TestTarget.MWO:
-                target_app = paths.microwave_oven_app
+                target_app = apps.microwave_oven_app
             elif self.target == TestTarget.RVC:
-                target_app = paths.rvc_app
+                target_app = apps.rvc_app
             elif self.target == TestTarget.NETWORK_MANAGER:
-                target_app = paths.network_manager_app
+                target_app = apps.network_manager_app
             elif self.target == TestTarget.ENERGY_GATEWAY:
-                target_app = paths.energy_gateway_app
+                target_app = apps.energy_gateway_app
             elif self.target == TestTarget.ENERGY_MANAGEMENT:
-                target_app = paths.energy_management_app
+                target_app = apps.energy_management_app
             elif self.target == TestTarget.CLOSURE:
-                target_app = paths.closure_app
+                target_app = apps.closure_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
 
             if not dry_run:
-                for command, key in paths.items_with_key():
+                for command, key in apps.items_with_key():
                     # Do not add chip-tool or matter-repl-yaml-tester-cmd to the register
-                    if (command == paths.chip_tool
-                            or command == paths.matter_repl_yaml_tester_cmd
-                            or command == paths.chip_tool_with_python_cmd):
+                    if (command == apps.chip_tool
+                            or command == apps.matter_repl_yaml_tester_cmd
+                            or command == apps.chip_tool_with_python_cmd):
                         continue
 
                     # Skip items where we don't actually have a path.  This can
                     # happen if the relevant application does not exist.  It's
                     # non-fatal as long as we are not trying to run any tests that
                     # need that application.
-                    if command[-1] is None:
+                    if command is None:
                         continue
 
                     # For the app indicated by self.target, give it the 'default' key to add to the register
                     if command == target_app:
                         key = 'default'
                     if ble_controller_app is not None:
-                        command += ["--ble-controller", str(ble_controller_app), "--wifi"]
+                        command = command.with_args("--ble-controller", str(ble_controller_app), "--wifi")
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -457,10 +472,9 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = (paths.matter_repl_yaml_tester_cmd
-                              + ['--setup-code', setupCode]
-                              + ['--yaml-path', self.run_name]
-                              + ["--pics-file", pics_file])
+                python_cmd = apps.matter_repl_yaml_tester_cmd.with_args(
+                    '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
+
                 if dry_run:
                     log.info(shlex.join(python_cmd))
                 else:
@@ -468,22 +482,30 @@ class TestDefinition:
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 pairing_server_args = []
+
                 if ble_controller_tool is not None:
-                    pairing_cmd = paths.chip_tool_with_python_cmd + [
-                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE]
+                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
+                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
                     pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 else:
-                    pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
+                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
+
                 if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                    pairing_cmd += ['--icd-registration', 'true']
-                test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
-                server_args = ['--server_path', paths.chip_tool[-1]] + \
-                    ['--server_arguments', 'interactive server' +
-                        (' --interface-id -1' if test_runtime == TestRunTime.CHIP_TOOL_PYTHON else '') +
-                        (' ' if len(tool_storage_args) else '') + ' '.join(tool_storage_args) +
-                        (' ' if len(pairing_server_args) else '') + ' '.join(pairing_server_args)]
-                pairing_cmd += server_args
-                test_cmd += server_args
+                    pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
+
+                test_cmd = apps.chip_tool_with_python_cmd.with_args('tests', self.run_name, '--PICS', pics_file)
+
+                interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
+
+                if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                    interactive_server_args = interactive_server_args + ['--interface-id', '-1']
+
+                server_args = (
+                    '--server_path', str(apps.chip_tool.path),
+                    '--server_arguments', ' '.join(interactive_server_args))
+
+                pairing_cmd = pairing_cmd.with_args(*server_args)
+                test_cmd = test_cmd.with_args(*server_args)
 
                 if dry_run:
                     log.info(shlex.join(pairing_cmd))

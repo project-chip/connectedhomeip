@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("general-diagnostics-server") {
   sources = [
-    "general-diagnostics-cluster.cpp",
-    "general-diagnostics-cluster.h",
+    "GeneralDiagnosticsCluster.cpp",
+    "GeneralDiagnosticsCluster.h",
   ]
 
   public_deps = [

@@ -77,7 +77,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
 
         basedir = os.path.dirname(file_image_list)
 
-        with open(file_image_list, 'rt') as f:
+        with open(file_image_list) as f:
             for name in f.readlines():
                 name = name.strip()
 
