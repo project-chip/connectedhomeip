@@ -21,7 +21,7 @@ import re
 import subprocess
 import threading
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Literal
 
 log = logging.getLogger(__name__)
@@ -137,10 +137,10 @@ class SubprocessInfo:
         self.path = pathlib.Path(self.path)
 
     def with_args(self, *args: str):
-        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
+        return replace(self, args=self.args + tuple(args))
 
     def wrap_with(self, *args: str):
-        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
+        return replace(self, wrapper=tuple(args) + self.wrapper)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
