@@ -39,7 +39,6 @@
 
 import asyncio
 import logging
-import time
 
 import test_plan_support
 from mobly import asserts
@@ -51,13 +50,6 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 
 
 class TC_I_2_4(MatterBaseTest):
-    # Wait for a new report to be received or at maximum wait_time seconds
-    def wait_for_identify_time_report_or_timeout(self, handler, attribute, pre_count, wait_time):
-        timeout = time.time() + wait_time
-        while pre_count == handler.attribute_report_counts[attribute]:
-            if time.time() >= timeout:
-                break
-
     def desc_TC_I_2_4(self) -> str:
         return "[TC-I-2.4] Reporting requirements with server as DUT"
 
@@ -67,53 +59,45 @@ class TC_I_2_4(MatterBaseTest):
         return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
                 TestStep(2, "Set up a subscription wildcard subscription for the Identify Cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false",
                          "Subscription successfully established"),
-                TestStep(3, "TH stores the reported values of IdentifyTime in all incoming reports for IdentifyTime attribute, that contains data in reportedIdentifyTimeValuesList, over a period of 15 seconds."),
-                TestStep(4, f"{THwrite} IdentifyTime attribute to 5.", test_plan_support.verify_success()),
-                TestStep(5, f"{THwrite} IdentifyTime attribute to 10.", test_plan_support.verify_success()),
-                TestStep(6, "Wait for 12 seconds"),
-                TestStep(7, "TH verifies reportedIdentifyTimeValuesList contains three entries",
-                         "reportedIdentifyTimeValuesList has 3 entries in the list"),
-                TestStep(8, "TH verifies the first entry in reportedIdentifyTimeValuesList is 5",
-                         "The first entry in reportedIdentifyTimeValuesList is equal to 5 (+/- 1)"),
-                TestStep(9, "TH verifies the second entry in reportedIdentifyTimeValuesList is 10",
-                         "The second entry in reportedIdentifyTimeValuesList is equal to 10 (+/- 1)"),
-                TestStep(10, "TH verifies the third entry in reportedIdentifyTimeValuesList is 0",
-                         "The third entry in reportedIdentifyTimeValuesList is equal to 0"),
-                TestStep(11, "TH clears the reportedIdentifyTimeValuesList"),
-                TestStep(12, f"{THwrite} IdentifyTime attribute to 5.", test_plan_support.verify_success()),
-                TestStep(13, f"{THwrite} IdentifyTime attribute to 0.", test_plan_support.verify_success()),
-                TestStep(14, "Wait for 1 seconds"),
-                TestStep(15, "TH verifies reportedIdentifyTimeValuesList contains two entries",
-                         "reportedIdentifyTimeValuesList has 2 entries in the list"),
-                TestStep(16, "TH verifies the first entry in reportedIdentifyTimeValuesList is 5",
-                         "The first entry in reportedIdentifyTimeValuesList is equal to 5 (+/- 1)"),
-                TestStep(17, "TH verifies the second entry in reportedIdentifyTimeValuesList is 0",
-                         "The second entry in reportedIdentifyTimeValuesList is equal to 0"),
-                TestStep(18, "TH clears the reportedIdentifyTimeValuesList"),
-                TestStep(19, f"{THcommand} Identify command with the value of IdentifyTime field set to 5",
+                TestStep(3, f"{THwrite} IdentifyTime attribute to 30.", test_plan_support.verify_success()),
+                TestStep(4, "TH waits for the report and verifies the received report has a value of 30",
+                         "The received report is equal to 30 (+/- 1)"),
+                TestStep(5, f"{THwrite} IdentifyTime attribute to 35.", test_plan_support.verify_success()),
+                TestStep(6, "TH waits for the report and verifies the received report has a value of 35",
+                         "The received report is equal to 35 (+/- 1)"),
+                TestStep(7, f"{THwrite} IdentifyTime attribute to 5.", test_plan_support.verify_success()),
+                TestStep(8, "TH waits for the report and verifies the received report has a value of 5",
+                         "The received report is equal to 5 (+/- 1)"),
+                TestStep(9, "TH waits for the report and verifies the received report has a value of 0",
+                         "The received report is equal to 0"),
+                TestStep(10, f"{THwrite} IdentifyTime attribute to 35.", test_plan_support.verify_success()),
+                TestStep(11, "TH waits for the report and verifies the received report has a value of 35",
+                         "The received report is equal to 35 (+/- 1)"),
+                TestStep(12, f"{THwrite} IdentifyTime attribute to 0.", test_plan_support.verify_success()),
+                TestStep(13, "TH waits for the report and verifies the received report has a value of 0",
+                         "The received report is equal to 0"),
+                TestStep(14, f"{THcommand} Identify command with the value of IdentifyTime field set to 30",
                          test_plan_support.verify_success()),
-                TestStep(20, f"{THcommand} Identify command with the value of IdentifyTime field set to 10",
+                TestStep(15, "TH waits for the report and verifies the received report has a value of 30",
+                         "The received report is equal to 30 (+/- 1)"),
+                TestStep(16, f"{THcommand} Identify command with the value of IdentifyTime field set to 35",
                          test_plan_support.verify_success()),
-                TestStep(21, "Wait for 12 seconds"),
-                TestStep(22, "TH verifies reportedIdentifyTimeValuesList contains three entries",
-                         "reportedIdentifyTimeValuesList has 3 entries in the list"),
-                TestStep(23, "TH verifies the first entry in reportedIdentifyTimeValuesList is 5",
-                         "The first entry in reportedIdentifyTimeValuesList is equal to 5 (+/- 1)"),
-                TestStep(24, "TH verifies the second entry in reportedIdentifyTimeValuesList is 10"),
-                TestStep(25, "TH verifies the third entry in reportedIdentifyTimeValuesList is 0",
-                         "The third entry in reportedIdentifyTimeValuesList is equal to 0"),
-                TestStep(26, "TH clears the reportedIdentifyTimeValuesList"),
-                TestStep(27, f"{THcommand} Identify command with the value of IdentifyTime field set to 5",
+                TestStep(17, "TH waits for the report and verifies the received report has a value of 35",
+                         "The received report is equal to 35 (+/- 1)"),
+                TestStep(18, f"{THcommand} Identify command with the value of IdentifyTime field set to 5",
                          test_plan_support.verify_success()),
-                TestStep(28, f"{THcommand} Identify command with the value of IdentifyTime field set to 0",
+                TestStep(19, "TH waits for the report and verifies the received report has a value of 5",
+                         "The received report is equal to 5 (+/- 1)"),
+                TestStep(20, "TH waits for the report and verifies the received report has a value of 0",
+                         "The received report is equal to 0"),
+                TestStep(21, f"{THcommand} Identify command with the value of IdentifyTime field set to 35",
                          test_plan_support.verify_success()),
-                TestStep(29, "Wait for 1 seconds"),
-                TestStep(30, "TH verifies reportedIdentifyTimeValuesList contains two entries",
-                         "reportedIdentifyTimeValuesList has 2 entries in the list"),
-                TestStep(31, "TH verifies the first entry in reportedIdentifyTimeValuesList is 5",
-                         "The first entry in reportedIdentifyTimeValuesList is equal to 5 (+/- 1)"),
-                TestStep(32, "TH verifies the second entry in reportedIdentifyTimeValuesList is 0",
-                         "The second entry in reportedIdentifyTimeValuesList is equal to 0"),
+                TestStep(22, "TH waits for the report and verifies the received report has a value of 35",
+                         "The received report is equal to 35 (+/- 1)"),
+                TestStep(23, f"{THcommand} Identify command with the value of IdentifyTime field set to 0",
+                         test_plan_support.verify_success()),
+                TestStep(24, "TH waits for the report and verifies the received report has a value of 0",
+                         "The received report is equal to 0"),
                 ]
 
     def pics_TC_I_2_4(self) -> list[str]:
@@ -132,158 +116,164 @@ class TC_I_2_4(MatterBaseTest):
         cluster = Clusters.Identify
 
         self.step(2)
-        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=cluster.Attributes.IdentifyTime)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         # Verify Q requirements for IdentifyTime attribute by write to IdentifyTime
 
         self.step(3)
-        reportedIdentifyTimeValuesList = []
+        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(30), endpoint_id=endpoint)
+        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(4)
-        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
-        # Ensure one update report for this above change is received before continuing
-        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime, pre_count, 1)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    30, delta=1, msg="Unexpected first IdentifyTime report")
+        sub_handler.reset()
 
         self.step(5)
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(10), endpoint_id=endpoint)
+        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(6)
-        logging.info("Test waits for 12 seconds")
-        await asyncio.sleep(12)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
 
         self.step(7)
-        count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
-        asserts.assert_equal(count, 3, "Unexpected number of IdentifyTime reports")
-
-        self.step(8)
-        reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
-        asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
-
-        self.step(9)
-        asserts.assert_almost_equal(reportedIdentifyTimeValuesList[1].value,
-                                    10, delta=1, msg="Unexpected second IdentifyTime report")
-
-        self.step(10)
-        asserts.assert_equal(reportedIdentifyTimeValuesList[2].value, 0, "Unexpected last IdentifyTime report")
-
-        self.step(11)
-        # reports are stored by the handler, so just reset so we get a clean look
-        sub_handler.reset()
-        reportedIdentifyTimeValuesList.clear()
-
-        self.step(12)
-        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
-        # Ensure one update report for this above change is received before continuing
-        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime, pre_count, 1)
 
-        self.step(13)
+        self.step(8)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    5, delta=1, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
+
+        self.step(9)
+        logging.info("Test wait for report of IdentifyTime at 0")
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
+                             [0].value, 0, "Unexpected last IdentifyTime report")
+        sub_handler.reset()
+
+        self.step(10)
+        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint)
+        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+
+        self.step(11)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
+
+        self.step(12)
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
-        self.step(14)
-        logging.info("Test waits for 1 seconds")
-        await asyncio.sleep(1)
+        self.step(13)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
 
-        self.step(15)
-        count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
-        asserts.assert_equal(count, 2, "Unexpected number of IdentifyTime reports")
-
-        self.step(16)
-        reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
-        asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
-
-        self.step(17)
-        asserts.assert_equal(reportedIdentifyTimeValuesList[1].value, 0, "Unexpected last IdentifyTime report")
+        # Verify the received value is as expected
+        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                             0, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
 
         # Verify Q requirements for IdentifyTime attribute by invoke of Identify command
 
-        self.step(18)
-        # reports are stored by the handler, so just reset so we get a clean look
+        self.step(14)
+        try:
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=30), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        self.step(15)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    30, delta=1, msg="Unexpected first IdentifyTime report")
         sub_handler.reset()
-        reportedIdentifyTimeValuesList.clear()
+
+        self.step(16)
+        try:
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=35), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        self.step(17)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
+
+        self.step(18)
+        try:
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
         self.step(19)
-        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
-        try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-        # Ensure one update report for this above change is received before continuing
-        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime, pre_count, 1)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    5, delta=1, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
 
         self.step(20)
-        try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=10), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        logging.info("Test wait for report of IdentifyTime at 0")
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
+                             [0].value, 0, "Unexpected last IdentifyTime report")
+        sub_handler.reset()
 
         self.step(21)
-        logging.info("Test waits for 12 seconds")
-        await asyncio.sleep(12)
-
-        self.step(22)
-        count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
-        asserts.assert_equal(count, 3, "Unexpected number of IdentifyTime reports")
-
-        self.step(23)
-        reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
-        asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
-
-        self.step(24)
-        asserts.assert_almost_equal(reportedIdentifyTimeValuesList[1].value,
-                                    10, delta=1, msg="Unexpected second IdentifyTime report")
-
-        self.step(25)
-        asserts.assert_equal(reportedIdentifyTimeValuesList[2].value, 0, "Unexpected last IdentifyTime report")
-
-        self.step(26)
-        # reports are stored by the handler, so just reset so we get a clean look
-        sub_handler.reset()
-        reportedIdentifyTimeValuesList.clear()
-
-        self.step(27)
-        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=35), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
-        # Ensure one update report for this above change is received before continuing
-        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime, pre_count, 1)
 
-        self.step(28)
+        self.step(22)
+
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
+
+        # Verify the received value is as expected
+        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
+
+        self.step(23)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=0), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(29)
-        logging.info("Test waits for 1 seconds")
-        await asyncio.sleep(1)
+        self.step(24)
+        sub_handler.wait_for_attribute_report(timeout_sec=30)
 
-        self.step(30)
-        count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
-        asserts.assert_equal(count, 2, "Unexpected number of IdentifyTime reports")
-
-        self.step(31)
-        reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
-        asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
-
-        self.step(32)
-        asserts.assert_equal(reportedIdentifyTimeValuesList[1].value, 0, "Unexpected last IdentifyTime report")
+        # Verify the received value is as expected
+        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                             0, msg="Unexpected second IdentifyTime report")
+        sub_handler.reset()
 
 
 if __name__ == "__main__":
