@@ -24,7 +24,7 @@ from matter.testing.matter_asserts import assert_valid_uint8
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 log = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+log.setLevel(logging.INFO)
 
 PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET = "1111111122222222"
 
