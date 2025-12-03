@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
