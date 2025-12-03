@@ -75,7 +75,7 @@ class NFCReader:
         It expects the first NDEF record to be a URI record.
 
         Args:
-            none.
+            This function takes no arguments.
 
         Returns:
             str: The decoded NDEF record data.
