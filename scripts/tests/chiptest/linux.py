@@ -28,7 +28,7 @@ import subprocess
 import sys
 import threading
 import time
-from typing import IO, Any
+from typing import IO, Any, TypeAlias
 
 import sdbus
 
@@ -261,6 +261,12 @@ class BluetoothMock(subprocess.Popen[str]):
         self.wait()
 
 
+DbusAnyT: TypeAlias = (bool | int | float | str | bytes
+                       | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
+                       | "DictVariantT")
+DictVariantT = dict[str, tuple[str, DbusAnyT]]
+
+
 class WpaSupplicantMock(threading.Thread):
     """Mock server for WpaSupplicant D-Bus API.
 
@@ -281,12 +287,12 @@ class WpaSupplicantMock(threading.Thread):
         path = "/fi/w1/wpa_supplicant1"
 
         @sdbus.dbus_method_async("a{sv}", "o")
-        async def CreateInterface(self, args: Any) -> str:
+        async def CreateInterface(self, args: DictVariantT) -> str:
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
         @sdbus.dbus_method_async("s", "o")
-        async def GetInterface(self, name: Any) -> str:
+        async def GetInterface(self, name: str) -> str:
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
@@ -301,20 +307,20 @@ class WpaSupplicantMock(threading.Thread):
             self.mock = mock
 
         @sdbus.dbus_method_async("s")
-        async def AutoScan(self, arg: Any):
+        async def AutoScan(self, arg: str) -> None:
             pass
 
         @sdbus.dbus_method_async("a{sv}")
-        async def Scan(self, args: Any):
+        async def Scan(self, args: DictVariantT) -> None:
             pass
 
         @sdbus.dbus_method_async("a{sv}", "o")
-        async def AddNetwork(self, args: Any):
+        async def AddNetwork(self, args: DictVariantT) -> str:
             # Always return our pre-defined mock network.
             return WpaSupplicantMock.WpaNetwork.path
 
         @sdbus.dbus_method_async("o")
-        async def SelectNetwork(self, path: str):
+        async def SelectNetwork(self, path: str) -> None:
             async def associate():
                 # Mock AP association process.
                 await self.State.set_async("associating")
@@ -325,19 +331,19 @@ class WpaSupplicantMock(threading.Thread):
             asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
-        async def RemoveNetwork(self, path: Any):
+        async def RemoveNetwork(self, path: str) -> None:
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
-        async def RemoveAllNetworks(self):
+        async def RemoveAllNetworks(self) -> None:
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
-        async def Disconnect(self):
+        async def Disconnect(self) -> None:
             pass
 
         @sdbus.dbus_method_async()
-        async def SaveConfig(self):
+        async def SaveConfig(self) -> None:
             pass
 
         @sdbus.dbus_property_async("s")
@@ -345,7 +351,7 @@ class WpaSupplicantMock(threading.Thread):
             return self.state
 
         @State.setter_private
-        def State_setter(self, value: str):
+        def State_setter(self, value: str) -> None:
             self.state = value
 
         @sdbus.dbus_property_async("o")
@@ -353,11 +359,11 @@ class WpaSupplicantMock(threading.Thread):
             return self.current_network
 
         @CurrentNetwork.setter_private
-        def CurrentNetwork_setter(self, value: str):
+        def CurrentNetwork_setter(self, value: str) -> None:
             self.current_network = value
 
         @sdbus.dbus_property_async("s")
-        def CurrentAuthMode(self):
+        def CurrentAuthMode(self) -> str:
             return "WPA2-PSK"
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
@@ -370,7 +376,7 @@ class WpaSupplicantMock(threading.Thread):
             self.mock = mock
 
         @sdbus.dbus_property_async("a{sv}")
-        def Properties(self):
+        def Properties(self) -> DictVariantT:
             return {"ssid": ("s", self.mock.ssid)}
 
         @sdbus.dbus_property_async("b")
@@ -378,7 +384,7 @@ class WpaSupplicantMock(threading.Thread):
             return self.enabled
 
         @Enabled.setter
-        def Enabled_setter(self, value: bool):
+        def Enabled_setter(self, value: bool) -> None:
             self.enabled = value
 
     async def startup(self):
