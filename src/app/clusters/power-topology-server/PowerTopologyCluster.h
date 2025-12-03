@@ -67,7 +67,7 @@ public:
 
 private:
     PowerTopology::Delegate & mDelegate;
-    BitMask<PowerTopology::Feature> mFeatureFlags;
+    const BitMask<PowerTopology::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
 };
 

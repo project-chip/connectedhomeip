@@ -51,10 +51,8 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestInstanceLifecycle)
 {
     MockPowerTopologyDelegate mockDelegate;
     BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-    BitMask<OptionalAttributes> optionalAttrs(OptionalAttributes::kOptionalAttributeAvailableEndpoints,
-                                              OptionalAttributes::kOptionalAttributeActiveEndpoints);
 
-    Instance instance(kTestEndpointId, mockDelegate, features, optionalAttrs);
+    Instance instance(kTestEndpointId, mockDelegate, features);
 
     // Test initialization
     EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
@@ -74,9 +72,7 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestHasFeatureAPI)
     // Test HasFeature with multiple features
     {
         BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-        BitMask<OptionalAttributes> optionalAttrs(OptionalAttributes::kOptionalAttributeAvailableEndpoints,
-                                                  OptionalAttributes::kOptionalAttributeActiveEndpoints);
-        Instance instance(kTestEndpointId, mockDelegate, features, optionalAttrs);
+        Instance instance(kTestEndpointId, mockDelegate, features);
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
         EXPECT_TRUE(instance.HasFeature(Feature::kSetTopology));
@@ -90,8 +86,7 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestHasFeatureAPI)
     // Test HasFeature with single feature
     {
         BitMask<Feature> features(Feature::kNodeTopology);
-        BitMask<OptionalAttributes> noOptionalAttrs;
-        Instance instance(kTestEndpointId, mockDelegate, features, noOptionalAttrs);
+        Instance instance(kTestEndpointId, mockDelegate, features);
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
         EXPECT_TRUE(instance.HasFeature(Feature::kNodeTopology));
@@ -110,9 +105,7 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestSupportsOptAttrAPI)
     // Test with all optional attributes
     {
         BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-        BitMask<OptionalAttributes> optionalAttrs(OptionalAttributes::kOptionalAttributeAvailableEndpoints,
-                                                  OptionalAttributes::kOptionalAttributeActiveEndpoints);
-        Instance instance(kTestEndpointId, mockDelegate, features, optionalAttrs);
+        Instance instance(kTestEndpointId, mockDelegate, features);
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
         EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
@@ -124,8 +117,7 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestSupportsOptAttrAPI)
     // Test with no optional attributes
     {
         BitMask<Feature> features(Feature::kNodeTopology);
-        BitMask<OptionalAttributes> noOptionalAttrs;
-        Instance instance(kTestEndpointId, mockDelegate, features, noOptionalAttrs);
+        Instance instance(kTestEndpointId, mockDelegate, features);
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
         EXPECT_FALSE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
@@ -137,8 +129,7 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestSupportsOptAttrAPI)
     // Test with only AvailableEndpoints
     {
         BitMask<Feature> features(Feature::kSetTopology);
-        BitMask<OptionalAttributes> optionalAttrs(OptionalAttributes::kOptionalAttributeAvailableEndpoints);
-        Instance instance(kTestEndpointId, mockDelegate, features, optionalAttrs);
+        Instance instance(kTestEndpointId, mockDelegate, features);
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
         EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
@@ -154,13 +145,10 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestMultipleInstancesOnDi
     MockPowerTopologyDelegate mockDelegate2;
 
     BitMask<Feature> features1(Feature::kSetTopology);
-    BitMask<OptionalAttributes> optionalAttrs1(OptionalAttributes::kOptionalAttributeAvailableEndpoints);
-    Instance instance1(kTestEndpointId, mockDelegate1, features1, optionalAttrs1);
+    Instance instance1(kTestEndpointId, mockDelegate1, features1);
 
     BitMask<Feature> features2(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-    BitMask<OptionalAttributes> optionalAttrs2(OptionalAttributes::kOptionalAttributeAvailableEndpoints,
-                                               OptionalAttributes::kOptionalAttributeActiveEndpoints);
-    Instance instance2(kTestEndpointId + 1, mockDelegate2, features2, optionalAttrs2);
+    Instance instance2(kTestEndpointId + 1, mockDelegate2, features2);
 
     // Initialize both instances
     EXPECT_EQ(instance1.Init(), CHIP_NO_ERROR);
@@ -184,11 +172,9 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestInstanceConstructorAP
 
     // Test that Instance constructor accepts the expected parameters
     BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-    BitMask<OptionalAttributes> optionalAttrs(OptionalAttributes::kOptionalAttributeAvailableEndpoints,
-                                              OptionalAttributes::kOptionalAttributeActiveEndpoints);
 
     // This test verifies the backwards compatibility of the Instance constructor signature
-    Instance instance(kTestEndpointId, mockDelegate, features, optionalAttrs);
+    Instance instance(kTestEndpointId, mockDelegate, features);
 
     EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
     EXPECT_TRUE(instance.HasFeature(Feature::kSetTopology));

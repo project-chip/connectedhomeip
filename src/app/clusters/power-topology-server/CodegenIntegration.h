@@ -39,8 +39,7 @@ enum class OptionalAttributes : uint32_t
 class Instance
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
-             BitMask<OptionalAttributes> aOptionalAttributes) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature) :
         mCluster(PowerTopologyCluster::Config{
             .endpointId = aEndpointId,
             .delegate   = aDelegate,
@@ -53,7 +52,7 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+    // bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
 private:
     RegisteredServerCluster<PowerTopologyCluster> mCluster;
