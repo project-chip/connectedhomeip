@@ -179,7 +179,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                     "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
-                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not larger than or equal to zero")
+                    asserts.assert_true(unit_range.min >= 0, "UnitRange.min is not larger than or equal to zero")
                     asserts.assert_true(unit_range.min <= unit_range.max <= 32767,
                                         "UnitRange.max is not in the expected range [UnitRange.Min:32767]")
 

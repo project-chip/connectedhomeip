@@ -195,19 +195,19 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
 
     if crl_signer_delegator:
         result_signer = verify_cert(crl_signer, crl_signer_delegator)
-        if not result_signer == CertVerificationResult.SUCCESS:
+        if result_signer != CertVerificationResult.SUCCESS:
             logging.debug(
                 f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
             return False
 
         result_delegator = verify_cert(crl_signer_delegator, paa)
-        if not result_delegator == CertVerificationResult.SUCCESS:
+        if result_delegator != CertVerificationResult.SUCCESS:
             logging.debug(
                 f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result_delegator.name}")
             return False
         return True
     result = verify_cert(crl_signer, paa)
-    if not result == CertVerificationResult.SUCCESS:
+    if result != CertVerificationResult.SUCCESS:
         logging.debug(
             f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
         return False
@@ -883,9 +883,9 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
     if use_local_data:
         dcld_client = LocalFilesDclClient(crls, certificates, revocation_points_response)
     elif use_main_net_http or use_test_net_http:
-        dcld_client = RestDclClient(True if use_test_net_http else False)
+        dcld_client = RestDclClient(bool(use_test_net_http))
     else:
-        dcld_client = NodeDclClient(use_main_net_dcld or use_test_net_dcld, True if use_test_net_dcld else False)
+        dcld_client = NodeDclClient(use_main_net_dcld or use_test_net_dcld, bool(use_test_net_dcld))
 
     revocation_point_list = dcld_client.get_revocation_points()
     revocation_set = []
