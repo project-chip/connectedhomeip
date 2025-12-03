@@ -77,7 +77,7 @@ struct BaseEntryCount : public PersistableData<kPersistentBufferEntryCountBytes>
     CHIP_ERROR Load(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
         CHIP_ERROR err = PersistableData::Load(storage);
-        return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err; // NOT_FOUND is OK; DataAccessor::Load already called Clear()
+        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND); // NOT_FOUND is OK; DataAccessor::Load already called Clear()
     }
 };
 
