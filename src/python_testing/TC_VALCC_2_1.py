@@ -50,7 +50,7 @@ class TC_VALCC_2_1(MatterBaseTest):
         return "[TC-VALCC-2.1] Attributes with DUT as Server"
 
     def steps_TC_VALCC_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read attribute list to determine supported attributes"),
             TestStep(3, "Read OpenDuration attribute, if supported"),
@@ -65,13 +65,11 @@ class TC_VALCC_2_1(MatterBaseTest):
             TestStep(12, "Read ValveFault attribute, if supported"),
             TestStep(13, "Read LevelStep attribute, if supported")
         ]
-        return steps
 
     def pics_TC_VALCC_2_1(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

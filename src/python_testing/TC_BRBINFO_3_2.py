@@ -50,7 +50,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         return "[TC-BRBINFO-3.2] Attributes with DUT as Server"
 
     def steps_TC_BRBINFO_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads ConfigurationVersion and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
@@ -58,15 +58,13 @@ class TC_BRBINFO_3_2(MatterBaseTest):
             TestStep(3, "TH reads ConfigurationVersion from the DUT (same endpoint as in step 1)",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
         ]
-        return steps
 
     def pics_TC_BRBINFO_3_2(self) -> list[str]:
-        pics = [
+        return [
             "BRBINFO.S",
             "BRBINFO.S.A.A0018",
             "BRBINFO.S.M.DeviceConfigurationChange",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

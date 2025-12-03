@@ -102,7 +102,7 @@ class TC_ICDM_3_1(MatterBaseTest):
         return "[TC-ICDM-3.1] Register/Unregister Clients with DUT as Server"
 
     def steps_TC_ICDM_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the FeatureMap. If the CIP feature is not supported on the cluster, skip all remaining steps"),
             TestStep("2a", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster."),
@@ -122,14 +122,12 @@ class TC_ICDM_3_1(MatterBaseTest):
             TestStep(15, "TH reads from the DUT the RegisteredClients attribute."),
             TestStep(16, "TH sends UnregisterClient command with the CheckInNodeID from Step 6."),
         ]
-        return steps
 
     def pics_TC_ICDM_3_1(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
         ]
-        return pics
 
     #
     # ICDM 3.1 Test Body

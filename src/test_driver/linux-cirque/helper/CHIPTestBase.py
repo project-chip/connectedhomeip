@@ -311,7 +311,7 @@ class CHIPVirtualHome:
             raise AssertionError
 
     def assertEqual(self, val1, val2, note=None):
-        if not (val1 == val2):
+        if val1 != val2:
             if note:
                 self.logger.error(note)
             raise AssertionError
@@ -371,7 +371,7 @@ class CHIPVirtualHome:
 
     def save_device_logs(self):
         timestamp = int(time.time())
-        log_dir = os.environ.get("DEVICE_LOG_DIR", None)
+        log_dir = os.environ.get("DEVICE_LOG_DIR")
         if log_dir is not None and not os.path.exists(log_dir):
             os.makedirs("logs")
 

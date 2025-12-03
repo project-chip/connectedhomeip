@@ -76,7 +76,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         return "[TC_CLCTRL_6_1] Event Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_6_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "TH reads TestEventTriggerEnabled attribute from General Diagnostics Cluster."),
@@ -142,13 +142,11 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("9k", "TH sends command MoveTo with Position = MoveToFullyOpen."),
             TestStep("9l", "Verify that the DUT has emitted the SecureStateChanged event."),
         ]
-        return steps
 
     def pics_TC_CLCTRL_6_1(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

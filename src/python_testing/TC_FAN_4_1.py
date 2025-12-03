@@ -73,6 +73,7 @@ class TC_FAN_4_1(MatterBaseTest):
             return [mode.kOff, mode.kHigh]
 
         asserts.fail(f"Unknown FanModeSequence {fan_mode_sequence}")
+        return None
 
     def _sub_step(self, start_step: int, attribute_to_set: str, value: str, verify_mode: str, verify_percent: str, verify_speed: str, spd_check: bool = False):
         spd = ""

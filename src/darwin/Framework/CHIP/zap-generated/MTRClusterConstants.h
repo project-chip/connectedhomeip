@@ -1034,6 +1034,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000006,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000007,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000008,
+    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeDeviceLoadStatusID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,

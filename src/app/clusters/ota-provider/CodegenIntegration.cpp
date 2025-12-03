@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/static-cluster-config/OtaSoftwareUpdateProvider.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

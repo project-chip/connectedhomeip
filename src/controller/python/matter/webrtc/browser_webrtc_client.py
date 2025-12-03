@@ -72,8 +72,7 @@ class BrowserWebRTCClient:
 
     async def get_peer_connection_state(self):
         event = "GET_PEER_CONNECTION_STATE"
-        state = await self.send_message(event)
-        return state
+        return await self.send_message(event)
 
     def on_gathering_complete(self, callback):
         self.event_callbacks["GATHERING_STATE_COMPLETE"] = callback

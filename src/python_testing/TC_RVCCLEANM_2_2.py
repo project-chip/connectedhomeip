@@ -71,29 +71,24 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
             endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def read_run_supported_modes(self) -> Clusters.Objects.RvcRunMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        return ret
 
     async def read_clean_supported_modes(self) -> Clusters.Objects.RvcCleanMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcCleanMode,
             Clusters.RvcCleanMode.Attributes.SupportedModes)
-        return ret
 
     async def read_feature_map_attribute(self):
-        ret = await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
-                                                           Clusters.RvcCleanMode.Attributes.FeatureMap)
-        return ret
+        return await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
+                                                            Clusters.RvcCleanMode.Attributes.FeatureMap)
 
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
 
     async def send_run_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):

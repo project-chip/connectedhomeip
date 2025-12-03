@@ -18,7 +18,7 @@ from typing import List, Optional
 
 from matter.idl.matter_idl_types import Cluster, Idl, ParseMetaData
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class IdlPostProcessor:
@@ -93,7 +93,7 @@ class Context:
         if name in self.abstract_base_clusters:
             # This does NOT seem unique ... this seems like a bug
             # See this currently with Label-Cluster.xml and Label-Cluster-LabelCluster.xml ...
-            LOGGER.warning("Duplicate defined base cluster: %s", name)
+            log.warning("Duplicate defined base cluster: %s", name)
             return self.abstract_base_clusters[name]
 
         cluster = Cluster(name=name, code=-1, parse_meta=parse_meta)
@@ -125,7 +125,7 @@ class Context:
             if where:
                 msg = msg + " at " + where
 
-            LOGGER.warning(msg)
+            log.warning(msg)
             self._not_handled.add(path)
 
     def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):

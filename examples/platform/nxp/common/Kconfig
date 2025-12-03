@@ -290,6 +290,12 @@ if CHIP_APP_OTA_REQUESTOR
 
 endif # CHIP_APP_OTA_REQUESTOR
 
+config CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
+	bool "Registration of simple test event trigger delegate"
+	default y if CHIP_ENABLE_ICD_SUPPORT
+	help
+	  Enable registration of a simple test event trigger delegate, ONLY enable it for matter certification testing.
+
 config CHIP_APP_RPC
     bool "App RPC"
     help

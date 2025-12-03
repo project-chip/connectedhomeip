@@ -218,13 +218,12 @@ class TC_CGEN_2_2(MatterBaseTest):
 
     def pics_TC_CGEN_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "CGEN.S"
         ]
-        return pics
 
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, 'Commissioning, already done', is_commissioning=True),
             TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
@@ -291,7 +290,6 @@ class TC_CGEN_2_2(MatterBaseTest):
                      so the failsafe is required to time out at this point, despite having been re-armed in step 42.'''),
             TestStep(44, 'TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster.'),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_CGEN_2_2(self):
@@ -696,11 +694,10 @@ class TC_CGEN_2_2(MatterBaseTest):
             logger.info(f'Step #38: {run_type} - Bypass steps from #38 onward ONLY in CI.')
             self.mark_all_remaining_steps_skipped(39)
             return
-        else:
-            t_start = time.time()
+        t_start = time.time()
 
-            # Get the current time and format it for logging
-            logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start')
+        # Get the current time and format it for logging
+        logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start')
 
         self.step(39)
         # Reused TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate

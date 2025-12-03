@@ -2762,6 +2762,7 @@ private:
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
 | * TestEventTriggersEnabled                                          | 0x0008 |
+| * DeviceLoadStatus                                                  | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -21087,6 +21088,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "device-load-status", Attributes::DeviceLoadStatus::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -21116,6 +21118,8 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
             Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "test-event-triggers-enabled", 0, 1, Attributes::TestEventTriggersEnabled::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type>>(
+            Id, "device-load-status", Attributes::DeviceLoadStatus::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -21138,6 +21142,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "device-load-status", Attributes::DeviceLoadStatus::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

@@ -73,13 +73,11 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                              "errorStateID(%s) should equal %s" % (operational_error.errorStateID, expected_error))
 
     async def send_run_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
-                                         endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+                                          endpoint=self.endpoint)
 
     async def send_pause_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.Pause(), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.Pause(), endpoint=self.endpoint)
 
     def TC_RVCOPSTATE_2_1(self) -> list[str]:
         return ["RVCOPSTATE.S"]
@@ -165,7 +163,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             logging.info("OperationalState: %s" % (operational_state))
 
-            in_range = (0x80 <= operational_state and operational_state <= 0xBF)
+            in_range = 0x80 <= operational_state <= 0xBF
             asserts.assert_true(operational_state in defined_states or in_range, "OperationalState has an invalid ID value!")
 
             if self.check_pics("RVCOPSTATE.S.M.ST_STOPPED"):

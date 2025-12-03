@@ -95,21 +95,19 @@ class TC_WebRTCR_2_4(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from DUT"),
             TestStep(2, "Trigger {TH_Server} to send an Answer to DUT"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_4(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.C01.Rsp",   # Answer command
         ]
-        return pics
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.

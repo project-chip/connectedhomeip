@@ -325,13 +325,13 @@ void ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Optional
 
     if (Features().Has(Feature::kImportedEnergy))
     {
-        SetCumulativeEnergyImported(energyImported);
+        TEMPORARY_RETURN_IGNORED SetCumulativeEnergyImported(energyImported);
         event.energyImported = energyImported;
     }
 
     if (Features().Has(Feature::kExportedEnergy))
     {
-        SetCumulativeEnergyExported(energyExported);
+        TEMPORARY_RETURN_IGNORED SetCumulativeEnergyExported(energyExported);
         event.energyExported = energyExported;
     }
 
@@ -347,13 +347,13 @@ void ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Optional<E
 
     if (Features().Has(Feature::kImportedEnergy))
     {
-        SetPeriodicEnergyImported(energyImported);
+        TEMPORARY_RETURN_IGNORED SetPeriodicEnergyImported(energyImported);
         event.energyImported = energyImported;
     }
 
     if (Features().Has(Feature::kExportedEnergy))
     {
-        SetPeriodicEnergyExported(energyExported);
+        TEMPORARY_RETURN_IGNORED SetPeriodicEnergyExported(energyExported);
         event.energyExported = energyExported;
     }
 

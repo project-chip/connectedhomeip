@@ -907,10 +907,10 @@ server cluster A = 1 { /* Test comment */ }
                               ]),
                     ],
                     structs=[
+                        global_struct,
                         Struct(name="MyStruct", fields=[
                             Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE)],
-                        ),
-                        global_struct,
+                        )
                     ],
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE, definition=Field(
@@ -973,9 +973,9 @@ server cluster A = 1 { /* Test comment */ }
                     enums=[global_enum],
                     bitmaps=[global_bitmap],
                     structs=[
-                        global_struct3,
-                        global_struct2,
                         global_struct1,
+                        global_struct2,
+                        global_struct3,
                     ],
                     attributes=[
                         Attribute(

@@ -339,7 +339,7 @@ CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttri
 
         TLV::TLVReader reader;
         reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         Optional<DataVersion> dataVersion;
         if (path.hasDataVersion == 1)
         {

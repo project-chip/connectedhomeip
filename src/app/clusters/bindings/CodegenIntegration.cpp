@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/bindings/binding-cluster.h>
+#include <app/clusters/bindings/BindingCluster.h>
 #include <app/static-cluster-config/Binding.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

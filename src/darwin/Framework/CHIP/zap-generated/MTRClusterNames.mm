@@ -1667,6 +1667,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TestEventTriggersEnabled";
             break;
 
+        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeDeviceLoadStatusID:
+            result = @"DeviceLoadStatus";
+            break;
+
         case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

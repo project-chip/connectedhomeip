@@ -36,7 +36,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
-#include "FakeWifiDriver.h"
+#include "FakeDrivers.h"
 
 namespace {
 
@@ -114,7 +114,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     {
         WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
         writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(true);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(false);
 
         // no notification if enable fails
         context.ChangeListener().DirtyList().clear();

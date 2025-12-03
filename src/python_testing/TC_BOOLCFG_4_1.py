@@ -48,7 +48,7 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         return "[TC-BOOLCFG-4.1] AlarmsSupported attribute with DUT as Server"
 
     def steps_TC_BOOLCFG_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
             TestStep(3, "Read AlarmsSupported attribute"),
@@ -57,13 +57,11 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
             TestStep("5a", "Verify AlarmsSupported attribute bit 1"),
             TestStep("5b", "Verify AlarmsSupported attribute bit 1"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_4_1(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

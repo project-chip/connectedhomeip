@@ -56,18 +56,17 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 class TC_IDM_1_4(MatterBaseTest):
 
     def steps_TC_IDM_1_4(self) -> list[TestStep]:
-        steps = [TestStep(1, "Get remote node's MaxPathsPerInvoke", is_commissioning=True),
-                 TestStep(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU"),
-                 TestStep(3, "Sending two InvokeRequests with identical paths"),
-                 TestStep(4, "Sending two InvokeRequests with unique paths, but identical CommandRefs"),
-                 TestStep(5, "Verify DUT responds to InvokeRequestMessage containing two valid paths"),
-                 TestStep(6, "Verify DUT responds to InvokeRequestMessage containing one valid paths, and one InvokeRequest to unsupported endpoint"),
-                 TestStep(7, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true, but never sending preceding Timed Invoke Action"),
-                 TestStep(8, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true"),
-                 TestStep(9, "Verify DUT supports extended Data Model Testing feature in General Diagnostics Cluster"),
-                 TestStep(10, "Verify DUT has TestEventTriggersEnabled attribute set to true in General Diagnostics Cluster"),
-                 TestStep(11, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
-        return steps
+        return [TestStep(1, "Get remote node's MaxPathsPerInvoke", is_commissioning=True),
+                TestStep(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU"),
+                TestStep(3, "Sending two InvokeRequests with identical paths"),
+                TestStep(4, "Sending two InvokeRequests with unique paths, but identical CommandRefs"),
+                TestStep(5, "Verify DUT responds to InvokeRequestMessage containing two valid paths"),
+                TestStep(6, "Verify DUT responds to InvokeRequestMessage containing one valid paths, and one InvokeRequest to unsupported endpoint"),
+                TestStep(7, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true, but never sending preceding Timed Invoke Action"),
+                TestStep(8, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true"),
+                TestStep(9, "Verify DUT supports extended Data Model Testing feature in General Diagnostics Cluster"),
+                TestStep(10, "Verify DUT has TestEventTriggersEnabled attribute set to true in General Diagnostics Cluster"),
+                TestStep(11, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
 
     @async_test_body
     async def test_TC_IDM_1_4(self):
@@ -145,13 +144,12 @@ class TC_IDM_1_4(MatterBaseTest):
         if max_paths_per_invoke == 1:
             self.mark_all_remaining_steps_skipped(3)
             return
-        else:
-            asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
-                                "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
-                                "the --hex-arg flag as PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>, "
-                                "e.g. --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
+        asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
+                            "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
+                            "the --hex-arg flag as PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>, "
+                            "e.g. --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
-            await self.remaining_batch_commands_test_steps(False)
+        await self.remaining_batch_commands_test_steps(False)
 
     async def remaining_batch_commands_test_steps(self, dummy_value):
         dev_ctrl = self.default_controller

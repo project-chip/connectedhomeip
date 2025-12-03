@@ -54,7 +54,7 @@ class MinimalRepresentationChecker(DeviceConformanceTests):
             representation[endpoint_id] = {}
             for cluster_id, cluster in endpoint.items():
                 minimal = ClusterMinimalElements()
-                if cluster_id not in self.xml_clusters.keys():
+                if cluster_id not in self.xml_clusters:
                     continue
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
@@ -73,7 +73,7 @@ class MinimalRepresentationChecker(DeviceConformanceTests):
 
                 # All optional attributes
                 for attribute_id, attribute in cluster.items():
-                    if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
+                    if attribute_id not in self.xml_clusters[cluster_id].attributes:
                         if attribute_id > 0xFFFF:
                             # MEI
                             minimal.attribute_ids.append(attribute_id)

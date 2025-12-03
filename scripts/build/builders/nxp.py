@@ -28,10 +28,9 @@ class NxpOsUsed(Enum):
     def OsEnv(self):
         if self == NxpOsUsed.ZEPHYR:
             return 'zephyr'
-        elif self == NxpOsUsed.FREERTOS:
+        if self == NxpOsUsed.FREERTOS:
             return 'freertos'
-        else:
-            raise Exception('Unknown OS type: %r' % self)
+        raise Exception('Unknown OS type: %r' % self)
 
 
 class NxpBuildSystem(Enum):
@@ -41,10 +40,9 @@ class NxpBuildSystem(Enum):
     def BuildSystem(self):
         if self == NxpBuildSystem.GN:
             return 'gn'
-        elif self == NxpBuildSystem.CMAKE:
+        if self == NxpBuildSystem.CMAKE:
             return 'cmake'
-        else:
-            raise Exception('Unknown build system: %r' % self)
+        raise Exception('Unknown build system: %r' % self)
 
 
 class NxpBoard(Enum):
@@ -57,36 +55,32 @@ class NxpBoard(Enum):
     def Name(self, os_env):
         if self == NxpBoard.RT1060:
             return 'rt1060'
-        elif self == NxpBoard.RT1170:
+        if self == NxpBoard.RT1170:
             return 'rt1170'
-        elif self == NxpBoard.RW61X:
+        if self == NxpBoard.RW61X:
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'frdm_rw612'
-            else:
-                return 'rw61x'
-        elif self == NxpBoard.MCXW71:
+            return 'rw61x'
+        if self == NxpBoard.MCXW71:
             return 'mcxw71'
-        elif self == NxpBoard.MCXW72:
+        if self == NxpBoard.MCXW72:
             return 'mcxw72'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: %r' % self)
 
     def FolderName(self, os_env):
         if self == NxpBoard.RT1060:
             return 'rt/rt1060'
-        elif self == NxpBoard.RT1170:
+        if self == NxpBoard.RT1170:
             return 'rt/rt1170'
-        elif self == NxpBoard.RW61X:
+        if self == NxpBoard.RW61X:
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
-            else:
-                return 'rt/rw61x'
-        elif self == NxpBoard.MCXW71:
+            return 'rt/rw61x'
+        if self == NxpBoard.MCXW71:
             return 'mcxw71'
-        elif self == NxpBoard.MCXW72:
+        if self == NxpBoard.MCXW72:
             return 'mcxw72'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: %r' % self)
 
 
 class NxpBoardVariant(Enum):
@@ -107,47 +101,43 @@ class NxpApp(Enum):
     def ExampleName(self):
         if self == NxpApp.LIGHTING:
             return 'lighting-app'
-        elif self == NxpApp.CONTACT:
+        if self == NxpApp.CONTACT:
             return "contact-sensor-app"
-        elif self == NxpApp.ALLCLUSTERS:
+        if self == NxpApp.ALLCLUSTERS:
             return "all-clusters-app"
-        elif self == NxpApp.LAUNDRYWASHER:
+        if self == NxpApp.LAUNDRYWASHER:
             return "laundry-washer-app"
-        elif self == NxpApp.THERMOSTAT:
+        if self == NxpApp.THERMOSTAT:
             return "thermostat"
-        elif self == NxpApp.LOCK_APP:
+        if self == NxpApp.LOCK_APP:
             return "lock-app"
-        elif self == NxpApp.UNIT_TEST:
+        if self == NxpApp.UNIT_TEST:
             return "unit-test"
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def NameSuffix(self):
         if self == NxpApp.LIGHTING:
             return 'light-example'
-        elif self == NxpApp.CONTACT:
+        if self == NxpApp.CONTACT:
             return 'contact-example'
-        elif self == NxpApp.ALLCLUSTERS:
+        if self == NxpApp.ALLCLUSTERS:
             return "all-cluster-example"
-        elif self == NxpApp.LAUNDRYWASHER:
+        if self == NxpApp.LAUNDRYWASHER:
             return "laundry-washer-example"
-        elif self == NxpApp.THERMOSTAT:
+        if self == NxpApp.THERMOSTAT:
             return "thermostat-example"
-        elif self == NxpApp.LOCK_APP:
+        if self == NxpApp.LOCK_APP:
             return "lock-example"
-        elif self == NxpApp.UNIT_TEST:
+        if self == NxpApp.UNIT_TEST:
             return "unit-test-example"
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board, os_env, build_system):
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
             if (self.ExampleName() == "unit-test"):
                 return os.path.join(root, 'src', 'test_driver', 'nxp')
-            else:
-                return os.path.join(root, 'examples', self.ExampleName(), 'nxp')
-        else:
-            return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp')
+        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
 
 class NxpLogLevel(Enum):
@@ -167,7 +157,7 @@ class NxpBuilder(GnBuilder):
                  board: NxpBoard = NxpBoard.MCXW71,
                  board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
-                 build_system: NxpBuildSystem = NxpBuildSystem.GN,
+                 build_system: NxpBuildSystem = NxpBuildSystem.CMAKE,
                  low_power: bool = False,
                  smu2: bool = False,
                  enable_factory_data: bool = False,
@@ -235,25 +225,21 @@ class NxpBuilder(GnBuilder):
             case NxpBoard.RW61X:
                 if self.os_env is NxpOsUsed.FREERTOS:
                     return "frdmrw612"
-                else:
-                    return "frdm_rw612"
+                return "frdm_rw612"
             case NxpBoard.RT1060:
                 if board_variant is NxpBoardVariant.EVKC:
                     return "evkcmimxrt1060"
-                else:
-                    return "evkbmimxrt1060"
+                return "evkbmimxrt1060"
             case NxpBoard.RT1170:
                 return "evkbmimxrt1170"
             case NxpBoard.MCXW71:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
-                else:
-                    return "mcxw71evk"
+                return "mcxw71evk"
             case NxpBoard.MCXW72:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw72"
-                else:
-                    return "mcxw72evk"
+                return "mcxw72evk"
 
             case _:
                 raise Exception("Unknown NXP board")
@@ -339,16 +325,6 @@ class NxpBuilder(GnBuilder):
                 flag_board_variant = "board_version=\"frdm\""
                 args.append(flag_board_variant)
 
-        if self.iw416_transceiver:
-            args.append('iw416_transceiver=true')
-
-        if self.w8801_transceiver:
-            # BLE not supported on this transceiver
-            args.append('w8801_transceiver=true chip_enable_ble=false')
-
-        if self.iwx12_transceiver:
-            args.append('iwx12_transceiver=true')
-
         return args
 
     def CmakeBuildFlags(self):
@@ -394,9 +370,7 @@ class NxpBuilder(GnBuilder):
         if self.board == NxpBoard.MCXW72:
             flags.append('-Dcore_id=cm33_core0')
 
-        build_flags = " ".join(flags)
-
-        return build_flags
+        return " ".join(flags)
 
     def get_conf_file(self):
         thread_type = "mtd" if self.enable_mtd else "ftd"
@@ -416,8 +390,7 @@ class NxpBuilder(GnBuilder):
         prj_file_abs_path = os.path.dirname(os.path.realpath(__file__)) + "/../../../examples/platform/nxp/config/" + prj_file
         if os.path.isfile(prj_file_abs_path):
             return prj_file
-        else:
-            raise Exception("Configuration not supported, no conf file available: %s" % prj_file_abs_path)
+        raise Exception("Configuration not supported, no conf file available: %s" % prj_file_abs_path)
 
     def generate(self):
         if self.build_system is NxpBuildSystem.CMAKE:

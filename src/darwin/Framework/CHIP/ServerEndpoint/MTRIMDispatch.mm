@@ -17,7 +17,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-table.h>
 #include <app/util/privilege-storage.h>

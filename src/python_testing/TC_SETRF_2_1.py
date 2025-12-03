@@ -70,7 +70,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
 
     def steps_TC_SETRF_2_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      "DUT is commissioned.", is_commissioning=True),
             TestStep("2", "TH reads from the DUT the TariffInfo attribute.", """
@@ -317,8 +317,6 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                      - If defaultRandomizationTypeValue is 0x04 (RandomNegative), Verify that the DUT response contains an int16 value less or equal 0;
                      - If defaultRandomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive), Verify that the DUT response contains an int16 value greater or equal 0."""),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_SETRF_2_1(self):

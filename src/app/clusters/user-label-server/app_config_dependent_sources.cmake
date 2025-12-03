@@ -23,6 +23,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/user-label-cluster.cpp"
-    "${CLUSTER_DIR}/user-label-cluster.h"
+    "${CLUSTER_DIR}/UserLabelCluster.cpp"
+    "${CLUSTER_DIR}/UserLabelCluster.h"
 )

@@ -63,7 +63,7 @@ class TC_ACL_2_11(MatterBaseTest):
         return "[TC-ACL-2.11] Verification of Managed Device feature"
 
     def steps_TC_ACL_2_11(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning (already done) and precondition checks", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 AccessControl cluster CommissioningARL attribute"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute"),
@@ -77,7 +77,6 @@ class TC_ACL_2_11(MatterBaseTest):
                      "AccessRestrictionReviewUpdate event is received"),
             TestStep(8, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute", "ARL is empty")
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_11(self):

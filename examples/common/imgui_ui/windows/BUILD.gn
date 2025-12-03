@@ -20,6 +20,10 @@ source_set("windows") {
   sources = [ "window.h" ]
 }
 
+source_set("accessor_updaters") {
+  sources = [ "accessor_updaters.h" ]
+}
+
 static_library("connectivity") {
   sources = [
     "connectivity.cpp",
@@ -69,6 +73,54 @@ static_library("light") {
   # TODO: this is because on-off-server.h is generally only available
   #       in the app and we do not want to directly bind to lighting-app
   check_includes = false
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("humidity_measurement") {
+  sources = [
+    "humidity_measurement.cpp",
+    "humidity_measurement.h",
+  ]
+
+  deps = [
+    ":accessor_updaters",
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("temperature_measurement") {
+  sources = [
+    "temperature_measurement.cpp",
+    "temperature_measurement.h",
+  ]
+
+  deps = [
+    ":accessor_updaters",
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("fan_control") {
+  sources = [
+    "fan_control.cpp",
+    "fan_control.h",
+  ]
+
+  deps = [
+    ":accessor_updaters",
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }

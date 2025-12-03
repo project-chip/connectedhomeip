@@ -16,7 +16,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
+#include <app/clusters/time-format-localization-server/TimeFormatLocalizationCluster.h>
 
 #include <app/ConcreteClusterPath.h>
 #include <app/clusters/testing/AttributeTesting.h>

@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <controller/CHIPDeviceController.h>
 
 // Forward declaration

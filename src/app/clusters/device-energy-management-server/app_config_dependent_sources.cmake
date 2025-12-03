@@ -18,5 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/DeviceEnergyManagementTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/DeviceEnergyManagementCluster.cpp"
+    "${CLUSTER_DIR}/DeviceEnergyManagementDelegate.h"
     "${CLUSTER_DIR}/device-energy-management-server.h"
 )

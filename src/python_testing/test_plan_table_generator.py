@@ -91,6 +91,7 @@ def main(filename, classname, test):
     s += '|===\n'
 
     print(s)
+    return None
 
 
 if __name__ == "__main__":

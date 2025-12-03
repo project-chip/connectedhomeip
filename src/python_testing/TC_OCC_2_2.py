@@ -51,18 +51,16 @@ class TC_OCC_2_2(MatterBaseTest):
         return "[TC-OCC-2.2] OccupancySensorTypeBitmap and OccupancySensorType interdependency with server as DUT"
 
     def steps_TC_OCC_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read OccupancySensorType attribute selection based on FeatureMap Bitmap."),
             TestStep(3, "Read OccupancySensorTypeBitmap attribute selection based on FeatureMap Bitmap.")
         ]
-        return steps
 
     def pics_TC_OCC_2_2(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_2_2(self):

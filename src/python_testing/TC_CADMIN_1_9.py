@@ -61,8 +61,7 @@ class TC_CADMIN_1_9(CADMINBaseTest):
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
                 filter=params.randomDiscriminator
             )
-        errcode = PyChipError.from_code(ctx.exception.err)
-        return errcode
+        return PyChipError.from_code(ctx.exception.err)
 
     async def CommissionAttempt(self, params: CustomCommissioningParameters, expectedErrCode: int):
         if expectedErrCode == 3:

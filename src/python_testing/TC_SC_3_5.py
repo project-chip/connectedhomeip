@@ -75,13 +75,12 @@ class TC_SC_3_5(MatterBaseTest):
         return "[TC-SC-3.5] CASE Error Handling [DUT_Initiator] "
 
     def pics_TC_SC_3_5(self) -> list[str]:
-        pics = [
+        return [
             "MCORE.ROLE.COMMISSIONER",
         ]
-        return pics
 
     def steps_TC_SC_3_5(self) -> list[TestStep]:
-        steps = [
+        return [
 
             TestStep("precondition", "TH_SERVER has been commissioned to TH_CLIENT", is_commissioning=True),
 
@@ -127,7 +126,6 @@ class TC_SC_3_5(MatterBaseTest):
 
 
         ]
-        return steps
 
     def start_th_server(self):
 

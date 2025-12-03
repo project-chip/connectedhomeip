@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("operational-credentials-server") {
   sources = [
-    "operational-credentials-cluster.cpp",
-    "operational-credentials-cluster.h",
+    "OperationalCredentialsCluster.cpp",
+    "OperationalCredentialsCluster.h",
   ]
 
   public_deps = [

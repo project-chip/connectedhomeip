@@ -54,7 +54,7 @@ class TC_OCC_2_3(MatterBaseTest):
         return "[TC-OCC-2.3] HoldTime Backward Compatibility Test with server as DUT"
 
     def steps_TC_OCC_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH", is_commissioning=True),
             TestStep(2, "TH reads the FeatureMap attribute on the endpoint for use in later steps."),
             TestStep(3, "TH checks DUT HoldTime attribute support in the AttributeList attribute. If DUT doesn't support HoldTime attribute, skip the rest of this test case."),
@@ -67,13 +67,11 @@ class TC_OCC_2_3(MatterBaseTest):
             TestStep("8a", "If DUT FeatureMap has PHY, and PhysicalContactOccupiedToUnoccupiedDelay is supported, then TH writes HoldTimeMin to HoldTime attribute, otherwise skip 8a, 8b."),
             TestStep("8b", "TH writes DUT PhysicalContactOccupiedToUnoccupiedDelay attribute with HoldTimeMax, then TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay and HoldTime attributes."),
         ]
-        return steps
 
     def pics_TC_OCC_2_3(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_2_3(self):

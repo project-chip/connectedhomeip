@@ -50,7 +50,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.1] Attributes with DUT as Server"
 
     def steps_TC_AVSUM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read and verify that one of MTILT, MPAN, MZOOM, or DPTZ is supported"),
             TestStep(3, "Read and verify ZoomMax attribute, if supported"),
@@ -66,13 +66,11 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             TestStep(13, "Ensure that a video stream has been allocated, store the streamID"),
             TestStep(14, "Read the DPTZStreams attribute. Verify the streamIDs are unique, and the allocated streamID is present"),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_1(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.CameraAvSettingsUserLevelManagement))
     async def test_TC_AVSUM_2_1(self):

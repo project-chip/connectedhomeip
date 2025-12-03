@@ -55,7 +55,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.endpoint = 0
 
     def steps_TC_WHM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
@@ -71,7 +71,6 @@ class TC_WHM_2_1(MatterBaseTest):
             TestStep(13, "Send ChangeToMode command with NewMode set to an invalid mode"),
             TestStep(14, "Read CurrentMode attribute"),
         ]
-        return steps
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WaterHeaterMode

@@ -66,9 +66,8 @@ class TC_CGEN_2_4(MatterBaseTest):
 
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
-            params = await self.th1.OpenCommissioningWindow(
+            return await self.th1.OpenCommissioningWindow(
                 nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)

@@ -219,8 +219,9 @@ void TestCommissioningWindowManager::ServiceEvents()
 {
     DrainAndServiceIO();
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
-                                                  (intptr_t) nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t) -> void { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
+        (intptr_t) nullptr);
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 

@@ -417,7 +417,7 @@ CHIP_ERROR NXPConfig::MapRamStorageStatus(rsError rsStatus)
 bool NXPConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
-    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVSValue))
+    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_App))
     {
         return true;
     }

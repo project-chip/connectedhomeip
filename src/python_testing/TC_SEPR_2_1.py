@@ -64,14 +64,13 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     def pics_TC_SEPR_2_1(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "SEPR.S"
         ]
-        return pics
 
     def steps_TC_SEPR_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the TariffUnit attribute.",
@@ -83,8 +82,6 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
             TestStep("5", "TH reads from the DUT the PriceForecast attribute.",
                      "Verify that the DUT response contains a list of CommodityPriceStruct entries"),
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_1(self):

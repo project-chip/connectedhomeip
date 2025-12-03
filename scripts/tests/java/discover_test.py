@@ -20,12 +20,15 @@
 import argparse
 import logging
 import queue
+import shlex
 import subprocess
 import threading
 import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
+
+log = logging.getLogger(__name__)
 
 
 class DiscoverTest:
@@ -52,14 +55,14 @@ class DiscoverTest:
 
     def TestCmdCommissionables(self):
         java_command = self.command + ['discover', 'commissionables']
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
     def RunTest(self):
-        logging.info("Testing discovering commissionables devices")
+        log.info("Testing discovering commissionables devices")
 
         if self.command_name == 'commissionables':
             code = self.TestCmdCommissionables()

@@ -36,7 +36,7 @@
 #ifdef BOARD_ENABLE_I2C
 #include "wiced_hal_i2c.h"
 #endif
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>

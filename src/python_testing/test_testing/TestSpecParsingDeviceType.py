@@ -120,7 +120,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
-        asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
+        asserts.assert_true(self.device_type_id in device_type, "device type id not found in returned data")
         asserts.assert_equal(device_type[self.device_type_id].revision, self.revision, "Unexpected revision")
         asserts.assert_equal(len(device_type[self.device_type_id].server_clusters),
                              len(self.clusters), "Unexpected number of clusters")
@@ -137,7 +137,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
-        asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
+        asserts.assert_true(self.device_type_id in device_type, "device type id not found in returned data")
         asserts.assert_equal(device_type[self.device_type_id].revision, self.revision, "Unexpected revision")
         asserts.assert_equal(len(device_type[self.device_type_id].server_clusters), len(clusters), "Unexpected number of clusters")
 
@@ -438,7 +438,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
 
     @run_against_all_spec_revisions
     def test_all_device_types(self):
-        for id in self.xml_device_types.keys():
+        for id in self.xml_device_types:
             self.create_good_device(id)
             success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
             for p in problems:

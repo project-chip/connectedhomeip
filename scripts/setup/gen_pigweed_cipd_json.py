@@ -20,6 +20,8 @@ import json
 import logging
 import platform
 
+log = logging.getLogger(__name__)
+
 _LIST_OF_PACKAGES_TO_EXCLUDE = {
     'fuchsia/third_party/rust/',
     'infra/3pp/tools/renode',
@@ -49,7 +51,7 @@ def generate_new_cipd_package_json(input, output, extra):
     # Filter it for the given platform and append any resulting packages
     my_platform = platform.system().lower()
 
-    logging.info("Loading extra packages for %s", my_platform)
+    log.info("Loading extra packages for '%s'", my_platform)
 
     # Extra chain because extra is a list of lists like:
     # [['darwin:path1'], ['windows:path2']]
@@ -57,10 +59,10 @@ def generate_new_cipd_package_json(input, output, extra):
         inject_platform, path = item.split(':', 1)
 
         if inject_platform.lower() != my_platform:
-            logging.info("Skipping: %s (i.e. %s)", inject_platform.lower(), path)
+            log.info("Skipping: '%s' (i.e. %s)", inject_platform.lower(), path)
             continue
 
-        logging.info("Appending: %s for this platform", path)
+        log.info("Appending: '%s' for this platform", path)
 
         with open(path) as ins:
             for package in json.load(ins).get('packages'):
@@ -70,7 +72,7 @@ def generate_new_cipd_package_json(input, output, extra):
     with open(output, 'w') as f:
         json.dump(new_packages, f, indent=2)
 
-    logging.debug("PACKAGES:\n%s\n", json.dumps(new_packages, indent=2))
+    log.debug("PACKAGES:\n%s\n", json.dumps(new_packages, indent=2))
 
 
 def main():

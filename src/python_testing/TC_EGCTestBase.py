@@ -79,5 +79,4 @@ class ElectricalGridConditionsTestBaseHelper:
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
             return matter_epoch + delta_from_epoch
-        else:
-            return None
+        return None

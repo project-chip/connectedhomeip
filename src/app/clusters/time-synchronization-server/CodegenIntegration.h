@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 
 namespace chip::app::Clusters::TimeSynchronization {
 

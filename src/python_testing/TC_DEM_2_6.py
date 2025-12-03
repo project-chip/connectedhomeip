@@ -66,15 +66,14 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_6(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             # Depends on Feature 05 (ForecastAdjustment) & Feature 02 (StateForecastReporting)
             "DEM.S.F05", "DEM.S.F02"
         ]
-        return pics
 
     def steps_TC_DEM_2_6(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -148,8 +147,6 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
             TestStep("23", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_DEM_2_6(self):

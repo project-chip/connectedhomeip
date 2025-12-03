@@ -287,7 +287,7 @@ class YamlLoader:
         value = content.get(key)
         if isinstance(expected_type, tuple) and type(value) not in expected_type:
             raise TestStepInvalidTypeError(content, key, expected_type)
-        elif not isinstance(expected_type, tuple) and type(value) is not expected_type:
+        if not isinstance(expected_type, tuple) and type(value) is not expected_type:
             raise TestStepInvalidTypeError(content, key, expected_type)
 
     def __rule_node_id_and_group_id_are_mutually_exclusive(self, content):

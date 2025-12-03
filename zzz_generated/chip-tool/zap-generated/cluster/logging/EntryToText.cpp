@@ -943,6 +943,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveNetworkFaults";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id:
             return "TestEventTriggersEnabled";
+        case chip::app::Clusters::GeneralDiagnostics::Attributes::DeviceLoadStatus::Id:
+            return "DeviceLoadStatus";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::AcceptedCommandList::Id:

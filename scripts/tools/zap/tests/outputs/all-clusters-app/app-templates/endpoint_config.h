@@ -1535,8 +1535,9 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000005, 0, ZAP_TYPE(ARRAY),                                                                     \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ReplacementProductList */                      \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                  /* FeatureMap */                 \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */            \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Activated Carbon Filter Monitoring (server) */                                                    \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(PERCENT),                                                                   \
@@ -1553,8 +1554,9 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000005, 0, ZAP_TYPE(ARRAY),                                                                     \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ReplacementProductList */                      \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                  /* FeatureMap */                 \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */            \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Boolean State Configuration (server) */                                                           \
         { ZAP_MIN_MAX_DEFAULTS_INDEX(8), 0x00000000, 1, ZAP_TYPE(INT8U),                                                           \
@@ -1562,14 +1564,18 @@
               ZAP_ATTRIBUTE_MASK(READABLE) },                                                    /* CurrentSensitivityLevel */     \
         { ZAP_SIMPLE_DEFAULT(3), 0x00000001, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* SupportedSensitivityLevels */  \
         { ZAP_SIMPLE_DEFAULT(2), 0x00000002, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* DefaultSensitivityLevel */     \
-        { ZAP_EMPTY_DEFAULT(), 0x00000003, 1, ZAP_TYPE(BITMAP8), ZAP_ATTRIBUTE_MASK(READABLE) }, /* AlarmsActive */                \
-        { ZAP_EMPTY_DEFAULT(), 0x00000004, 1, ZAP_TYPE(BITMAP8), ZAP_ATTRIBUTE_MASK(READABLE) }, /* AlarmsSuppressed */            \
+        { ZAP_EMPTY_DEFAULT(), 0x00000003, 1, ZAP_TYPE(BITMAP8),                                                                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* AlarmsActive */                                \
+        { ZAP_EMPTY_DEFAULT(), 0x00000004, 1, ZAP_TYPE(BITMAP8),                                                                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* AlarmsSuppressed */                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000005, 1, ZAP_TYPE(BITMAP8),                                                                   \
-          ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(READABLE) },                               /* AlarmsEnabled */         \
-        { ZAP_SIMPLE_DEFAULT(0x03), 0x00000006, 1, ZAP_TYPE(BITMAP8), ZAP_ATTRIBUTE_MASK(READABLE) },  /* AlarmsSupported */       \
-        { ZAP_SIMPLE_DEFAULT(0), 0x00000007, 2, ZAP_TYPE(BITMAP16), ZAP_ATTRIBUTE_MASK(READABLE) },    /* SensorFault */           \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                      /* AlarmsEnabled */          \
+        { ZAP_SIMPLE_DEFAULT(0x03), 0x00000006, 1, ZAP_TYPE(BITMAP8), ZAP_ATTRIBUTE_MASK(READABLE) }, /* AlarmsSupported */        \
+        { ZAP_EMPTY_DEFAULT(), 0x00000007, 2, ZAP_TYPE(BITMAP16),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                       /* SensorFault */           \
         { ZAP_SIMPLE_DEFAULT(0x0F), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },      /* ClusterRevision */       \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Valve Configuration and Control (server) */                                                       \
         { ZAP_SIMPLE_DEFAULT(0xFFFFFFFF), 0x00000000, 4, ZAP_TYPE(ELAPSED_S),                                                      \
@@ -2982,9 +2988,6 @@
     const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
         (EmberAfGenericClusterFunction) MatterColorControlClusterServerShutdownCallback,                                           \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayOccupancySensingServer[] = {                                                  \
-        (EmberAfGenericClusterFunction) emberAfOccupancySensingClusterServerInitCallback,                                          \
     };
 
 // clang-format off
@@ -4295,7 +4298,7 @@
       .clusterId = 0x00000071, \
       .attributes = ZAP_ATTRIBUTE_INDEX(425), \
       .attributeCount = 8, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 188 ), \
@@ -4308,7 +4311,7 @@
       .clusterId = 0x00000072, \
       .attributes = ZAP_ATTRIBUTE_INDEX(433), \
       .attributeCount = 8, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 190 ), \
@@ -4321,7 +4324,7 @@
       .clusterId = 0x00000080, \
       .attributes = ZAP_ATTRIBUTE_INDEX(441), \
       .attributeCount = 10, \
-      .clusterSize = 14, \
+      .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ), \
@@ -4608,8 +4611,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(735), \
       .attributeCount = 5, \
       .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOccupancySensingServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -4907,8 +4910,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(1008), \
       .attributeCount = 5, \
       .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOccupancySensingServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -4950,7 +4953,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 28, 187 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 73, 3415 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(28), 73, 3404 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 101 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
@@ -4964,7 +4967,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3703)
+#define ATTRIBUTE_MAX_SIZE (3692)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)

@@ -101,8 +101,8 @@ void ApplicationInit()
 
     SuccessOrDie(JFAMgr().Init(Server::GetInstance()));
     SuccessOrDie(JFADSync().Init(Server::GetInstance()));
-    Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
-    Server::GetInstance().GetJointFabricDatastore().SetDelegate(&JFADSync());
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetJointFabricDatastore().SetDelegate(&JFADSync());
 
     SuccessOrDie(PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 }

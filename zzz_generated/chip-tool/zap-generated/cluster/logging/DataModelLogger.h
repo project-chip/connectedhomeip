@@ -144,6 +144,9 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,

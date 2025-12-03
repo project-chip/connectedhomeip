@@ -19,6 +19,8 @@
 #include "DeviceCallbacks.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "shell_extension/launch.h"
+#include "shell_extension/openthread_cli_register.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -428,6 +430,13 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "esp_event_loop_create_default()  failed: %s", esp_err_to_name(err));
         return;
     }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+#if CONFIG_OPENTHREAD_CLI
+    chip::RegisterOpenThreadCliCommands();
+#endif
+    chip::LaunchShell();
+#endif
 
     CHIP_ERROR chip_err = CHIP_NO_ERROR;
 

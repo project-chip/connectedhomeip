@@ -107,7 +107,15 @@ source_set("actions-cluster-test-srcs") {
 }
 
 source_set("scenes-table-test-srcs") {
+  # TODO: this should be a dependency on
+  # "${chip_root}/src/app/clusters/scenes-server:scenes" once it is ember-decoupled
+  # (i.e. can be compiled stand-alone)
+  # we would also need to fix capping logic tests, as those are taken from ember integration
+  # currently.
   sources = [
+    "${chip_root}/src/app/clusters/scenes-server/AttributeValuePairValidator.h",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",

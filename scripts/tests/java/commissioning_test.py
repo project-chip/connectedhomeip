@@ -20,12 +20,15 @@
 import argparse
 import logging
 import queue
+import shlex
 import subprocess
 import threading
 import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
+
+log = logging.getLogger(__name__)
 
 
 class CommissioningTest:
@@ -70,7 +73,7 @@ class CommissioningTest:
 
     def TestCmdOnnetworkLong(self, nodeid, setuppin, discriminator, timeout):
         java_command = self.command + ['pairing', 'onnetwork-long', nodeid, setuppin, discriminator, timeout]
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
@@ -78,7 +81,7 @@ class CommissioningTest:
 
     def TestCmdAlreadyDiscovered(self, nodeid, setuppin, address, port, timeout):
         java_command = self.command + ['pairing', 'already-discovered', nodeid, setuppin, address, port, timeout]
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
@@ -86,7 +89,7 @@ class CommissioningTest:
 
     def TestCmdAddressPaseOnly(self, nodeid, setuppin, address, port, timeout):
         java_command = self.command + ['pairing', 'address-paseonly', nodeid, setuppin, address, port, timeout]
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
@@ -95,7 +98,7 @@ class CommissioningTest:
     def TestCmdCode(self, nodeid, setup_payload, discover_once, use_only_onnetwork_discovery, timeout):
         java_command = self.command + ['pairing', 'code', nodeid, setup_payload, timeout,
                                        '--discover-once', discover_once, '--use-only-onnetwork-discovery', use_only_onnetwork_discovery]
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
@@ -103,22 +106,22 @@ class CommissioningTest:
 
     def RunTest(self):
         if self.command_name == 'onnetwork-long':
-            logging.info("Testing pairing onnetwork-long")
+            log.info("Testing pairing onnetwork-long")
             code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing onnetwork-long failed with error {code}")
         elif self.command_name == 'already-discovered':
-            logging.info("Testing pairing already-discovered")
+            log.info("Testing pairing already-discovered")
             code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing already-discovered failed with error {code}")
         elif self.command_name == 'address-paseonly':
-            logging.info("Testing pairing address-paseonly")
+            log.info("Testing pairing address-paseonly")
             code = self.TestCmdAddressPaseOnly(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing address-paseonly failed with error {code}")
         elif self.command_name == 'code':
-            logging.info("Testing pairing setup-code")
+            log.info("Testing pairing setup-code")
             code = self.TestCmdCode(self.nodeid, self.setup_payload, self.discover_once,
                                     self.use_only_onnetwork_discovery, self.timeout)
             if code != 0:

@@ -22,7 +22,17 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+#include <imgui_ui/ui.h>
+#include <imgui_ui/windows/connectivity.h>
+#include <imgui_ui/windows/fan_control.h>
+#include <imgui_ui/windows/humidity_measurement.h>
+#include <imgui_ui/windows/qrcode.h>
+#include <imgui_ui/windows/temperature_measurement.h>
+#endif
+
 #define AIR_PURIFIER_ENDPOINT 1
+#define FAN_CONTROL_ENDPOINT 1
 #define AIR_QUALITY_SENSOR_ENDPOINT 2
 #define TEMPERATURE_SENSOR_ENDPOINT 3
 #define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 4
@@ -68,6 +78,18 @@ int main(int argc, char * argv[])
         return -1;
     }
 
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+    example::Ui::ImguiUi ui;
+
+    ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::FanControl>(chip::EndpointId(FAN_CONTROL_ENDPOINT)));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::HumidityMeasurement>(chip::EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT)));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::TemperatureMeasurement>(chip::EndpointId(TEMPERATURE_SENSOR_ENDPOINT)));
+    ChipLinuxAppMainLoop(&ui);
+#else
     ChipLinuxAppMainLoop();
+#endif
+
     return 0;
 }

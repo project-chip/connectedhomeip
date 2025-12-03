@@ -46,9 +46,8 @@ from matter.testing.matter_testing import TestStep, async_test_body, default_mat
 class TC_CADMIN_1_22_24(CADMINBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
-            params = await self.th1.OpenCommissioningWindow(
+            return await self.th1.OpenCommissioningWindow(
                 nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)

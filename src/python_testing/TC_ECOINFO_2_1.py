@@ -79,6 +79,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
     async def setup_class(self):
         super().setup_class()
 
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -86,6 +87,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             await self._setup_ci_prerequisites()
 
     def teardown_class(self):
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -105,7 +108,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
         if not dut_fsa_stdin_pipe:
             asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)

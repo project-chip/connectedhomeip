@@ -92,7 +92,7 @@ static bool EnsureWiFiIsStarted()
 
 void CleanShutdown()
 {
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
     chip::Server::GetInstance().Shutdown();
     chip::DeviceLayer::PlatformMgr().Shutdown();
@@ -138,12 +138,14 @@ PyChipError pychip_server_native_init()
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("RpiMatterDali"); // Use default device name (CHIP-XXXX)
-    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
-    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(
+        "RpiMatterDali"); // Use default device name (CHIP-XXXX)
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice,
+                                                                                    false);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

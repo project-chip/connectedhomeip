@@ -110,8 +110,7 @@ class TC_FAN_2_1(MatterBaseTest):
         elif fan_mode_sequence == 5:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh]
 
-        fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
-        return fan_modes
+        return [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
     def pics_TC_FAN_2_1(self) -> list[str]:
         return ["FAN.S"]

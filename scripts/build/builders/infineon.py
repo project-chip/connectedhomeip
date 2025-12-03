@@ -28,38 +28,35 @@ class InfineonApp(Enum):
     def ExampleName(self):
         if self == InfineonApp.LOCK:
             return 'lock-app'
-        elif self == InfineonApp.LIGHT:
+        if self == InfineonApp.LIGHT:
             return 'lighting-app'
-        elif self == InfineonApp.ALL_CLUSTERS:
+        if self == InfineonApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+        if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
             return 'chip-psoc6-lock-example'
-        elif self == InfineonApp.LIGHT:
+        if self == InfineonApp.LIGHT:
             return 'chip-psoc6-lighting-example'
-        elif self == InfineonApp.ALL_CLUSTERS:
+        if self == InfineonApp.ALL_CLUSTERS:
             return 'chip-psoc6-clusters-example'
-        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+        if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-psoc6-clusters-minimal-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == InfineonApp.LOCK:
             return 'lock_app.flashbundle.txt'
-        elif self == InfineonApp.ALL_CLUSTERS:
+        if self == InfineonApp.ALL_CLUSTERS:
             return 'clusters_app.flashbundle.txt'
-        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+        if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'clusters_minimal_app.flashbundle.txt'
-        elif self == InfineonApp.LIGHT:
+        if self == InfineonApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'infineon/psoc6')
@@ -71,6 +68,7 @@ class InfineonBoard(Enum):
     def GnArgName(self):
         if self == InfineonBoard.PSOC6BOARD:
             return 'CY8CKIT-062S2-43012'
+        raise Exception('Unknown board type: %r' % self)
 
 
 class InfineonBuilder(GnBuilder):

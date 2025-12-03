@@ -67,7 +67,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 continue
             pics = pics_mapper(self.xml_clusters[cluster_id].pics, element_id)
 
-            if cluster_id not in self.endpoint.keys():
+            if cluster_id not in self.endpoint:
                 # This cluster is not on this endpoint
                 required = False
             elif element_id in self.endpoint[cluster_id][attribute_id_of_element_list]:

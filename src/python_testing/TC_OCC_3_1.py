@@ -73,7 +73,7 @@ class TC_OCC_3_1(MatterBaseTest):
         return "[TC-OCC-3.1] Primary functionality with server as DUT"
 
     def steps_TC_OCC_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH.", is_commissioning=True),
             TestStep(2, "If HoldTime is supported, TH writes HoldTime attribute to 10 sec on DUT."),
             TestStep(3, "Prompt operator to await until DUT occupancy changes to unoccupied state."),
@@ -85,13 +85,11 @@ class TC_OCC_3_1(MatterBaseTest):
             TestStep("7a", "TH reads Occupancy attribute from DUT. Verify occupancy changed to unoccupied and Occupancy attribute was reported as unoccupied."),
             TestStep("7b", "If supported, verify OccupancyChangedEvent was reported as unoccupied."),
         ]
-        return steps
 
     def pics_TC_OCC_3_1(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_3_1(self):

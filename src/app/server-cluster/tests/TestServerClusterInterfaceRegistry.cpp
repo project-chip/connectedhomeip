@@ -100,7 +100,7 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
-        DefaultServerCluster::Startup(context);
+        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
         mStartupCalls++;
         return CHIP_ERROR_CANCELLED;
     }

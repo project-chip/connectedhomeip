@@ -16,6 +16,15 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/on-off-server.cpp"
+    "${CLUSTER_DIR}/codegen/level-control-integration.cpp"
+    "${CLUSTER_DIR}/codegen/level-control-integration.h"
+    "${CLUSTER_DIR}/codegen/mode-base-integration.cpp"
+    "${CLUSTER_DIR}/codegen/mode-base-integration.h"
+    "${CLUSTER_DIR}/codegen/mode-select-integration.cpp"
+    "${CLUSTER_DIR}/codegen/mode-select-integration.h"
+    "${CLUSTER_DIR}/codegen/on-off-server.cpp"
+    "${CLUSTER_DIR}/codegen/on-off-server.h"
     "${CLUSTER_DIR}/on-off-server.h"
+    "${CLUSTER_DIR}/codegen/scenes-integration.cpp"
+    "${CLUSTER_DIR}/codegen/scenes-integration.h"
 )

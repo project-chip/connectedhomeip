@@ -80,6 +80,21 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         ChipLogError(Camera, "CameraDeviceInterface not initialized for AllocatePushTransport");
         return Status::Failure;
     }
+
+    if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
+    {
+        const auto cmafInterface = transportOptions.containerOptions.CMAFContainerOptions.Value().CMAFInterface;
+
+        if (!IsCMAFInterfaceSupported(cmafInterface))
+        {
+            ChipLogError(Camera, "PushAvStreamTransportManager, Unsupported CMAF interface type: %u",
+                         static_cast<uint16_t>(cmafInterface));
+            return Status::Failure;
+        }
+
+        ChipLogDetail(Camera, "PushAvStreamTransportManager, CMAF interface selected: %u", static_cast<uint16_t>(cmafInterface));
+    }
+
     mTransportOptionsMap[connectionID] = transportOptions;
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
@@ -284,6 +299,27 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     mTransportMap[connectionID]->TriggerTransport(activationReason);
 
     return Status::Success;
+}
+
+bool PushAvStreamTransportManager::IsCMAFInterfaceSupported(CMAFInterfaceEnum cmafInterface) const
+{
+    // CMAF interface 1 and DASH (interface 2) are supported in the current implementation
+    switch (cmafInterface)
+    {
+    case CMAFInterfaceEnum::kInterface1:
+        return true;
+    case CMAFInterfaceEnum::kInterface2DASH:
+        ChipLogDetail(Camera,
+                      "DASH interface enabled - WARNING: This is still provisional and full compliance to CMAF ingest "
+                      "interface-2: DASH may not be available");
+        return true;
+    case CMAFInterfaceEnum::kInterface2HLS:
+        return false;
+    case CMAFInterfaceEnum::kUnknownEnumValue:
+        return false;
+    default:
+        return false;
+    }
 }
 
 void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,

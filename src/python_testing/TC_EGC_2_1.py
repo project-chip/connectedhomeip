@@ -62,7 +62,7 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         return ["EGC.S"]
 
     def steps_TC_EGC_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the LocalGenerationAvailable attribute.",
@@ -72,7 +72,6 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
             TestStep("4", "TH reads from the DUT the ForecastConditions attribute.",
                      "Verify that the DUT response contains a list of ElectricalGridConditionsStruct entries"),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalGridConditions))
     async def test_TC_EGC_2_1(self):

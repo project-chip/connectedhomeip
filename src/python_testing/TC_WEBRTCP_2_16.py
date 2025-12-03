@@ -56,7 +56,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.16] Validate ProvideOffer resource exhaustion - PROVISIONAL"
 
     def steps_TC_WEBRTCP_2_16(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
@@ -65,10 +65,9 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             TestStep(3, "TH sends an additional ProvideOffer command beyond DUT's capacity",
                      "DUT responds with RESOURCE_EXHAUSTED status code"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_16(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
             "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
@@ -76,7 +75,6 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

@@ -58,7 +58,7 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EEM.S", "EEM.S.F02", "EEM.S.F00"]
 
     def steps_TC_EEM_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -72,8 +72,6 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify the read is successful and that the value is greater than the value measured in step 4a."),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EEM_2_2(self):

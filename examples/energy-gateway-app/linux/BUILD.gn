@@ -20,10 +20,7 @@ import("${chip_root}/third_party/imgui/imgui.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
-if (chip_enable_pw_rpc) {
-  import("//build_overrides/pigweed.gni")
-  import("$dir_pw_build/target_types.gni")
-}
+import("//build_overrides/pigweed.gni")
 
 config("includes") {
   include_dirs = [
@@ -53,6 +50,7 @@ executable("chip-energy-gateway-app") {
   ]
 
   deps = [
+    "$dir_pw_containers:vector",
     "${chip_root}/examples/energy-gateway-app/energy-gateway-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",

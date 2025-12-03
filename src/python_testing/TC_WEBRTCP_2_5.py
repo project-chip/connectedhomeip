@@ -57,7 +57,7 @@ class TC_WebRTCP_2_5(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no audio or video id => expect INVALID_COMMAND"),
@@ -74,13 +74,12 @@ class TC_WebRTCP_2_5(MatterBaseTest, WEBRTCPTestBase):
             TestStep(13, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
             TestStep(14, "Send EndSession with valid WebRTCSessionID => expect SUCCESS"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_5(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
@@ -90,7 +89,6 @@ class TC_WebRTCP_2_5(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

@@ -99,24 +99,22 @@ class TC_WebRTCR_2_7(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
             TestStep(4, "Activate fault injection on TH_SERVER to empty candidate list of the ICECandidates command"),
             TestStep(5, "Trigger TH_SERVER to send ICECandidates command with empty candidate list to DUT"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_7(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.C02.Rsp",   # ICECandidates command
         ]
-        return pics
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.

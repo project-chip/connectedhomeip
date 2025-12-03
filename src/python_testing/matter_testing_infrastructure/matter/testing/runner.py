@@ -308,8 +308,7 @@ def _find_test_class():
 
     def get_subclasses(cls: Any):
         subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
-        subclasses = [c for c in subclasses if c.__name__ != cls.__name__]
-        return subclasses
+        return [c for c in subclasses if c.__name__ != cls.__name__]
 
     def has_subclasses(cls: Any):
         return get_subclasses(cls) != []
@@ -1023,7 +1022,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value").lower() == "true" else False
+        value = match.group("truth_value").lower() == "true"
     else:
         value = int(match.group("decimal_value")) != 0
 

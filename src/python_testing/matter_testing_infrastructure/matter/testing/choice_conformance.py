@@ -49,7 +49,7 @@ def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]
 
 def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> list[ChoiceConformanceProblemNotice]:
     all_features = [uint(1 << i) for i in range(32)]
-    all_features = [f for f in all_features if f in xml_clusters[cluster_id].features.keys()]
+    all_features = [f for f in all_features if f in xml_clusters[cluster_id].features]
 
     # Other pieces of the 10.2 test check for unknown features, so just remove them here to check choice conformance
     counts: dict[Choice, int] = {}

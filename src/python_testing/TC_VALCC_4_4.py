@@ -52,7 +52,7 @@ class TC_VALCC_4_4(MatterBaseTest):
         return "[TC-VALCC-4.4] AutoCloseTime functionality with (synchronized time) DUT as Server"
 
     def steps_TC_VALCC_4_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Verify TimeSync feature is supported"),
@@ -71,13 +71,11 @@ class TC_VALCC_4_4(MatterBaseTest):
             TestStep(13, "Send Close command"),
             TestStep(14, "Read AutoCloseTime attribute"),
         ]
-        return steps
 
     def pics_TC_VALCC_4_4(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -107,8 +105,7 @@ class TC_VALCC_4_4(MatterBaseTest):
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)

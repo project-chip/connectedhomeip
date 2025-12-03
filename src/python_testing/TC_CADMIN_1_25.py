@@ -47,8 +47,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabrics
+        return await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
 
     def steps_TC_CADMIN_1_25(self) -> list[TestStep]:
         return [

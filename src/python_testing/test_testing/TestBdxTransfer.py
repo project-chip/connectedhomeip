@@ -38,6 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import os
 import random
 
@@ -186,10 +187,8 @@ class TestBdxTransfer(MatterBaseTest):
                 bdx_future.cancel()
 
             # Clean up the temporary log file used in this iteration.
-            try:
+            with contextlib.suppress(FileNotFoundError):
                 os.remove(filename)
-            except FileNotFoundError:
-                pass
 
 
 if __name__ == "__main__":

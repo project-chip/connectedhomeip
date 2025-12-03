@@ -58,10 +58,9 @@ def dynamic_invoke_return(*args, **argv):
     print(f'invoke call {invoke_call_count}')
     if invoke_call_count == 1:  # Commission node with no prior request, return failure - step 5
         return None
-    elif invoke_call_count == 2:  # Commission node over pase - return unsupported access - step 7
+    if invoke_call_count == 2:  # Commission node over pase - return unsupported access - step 7
         return reverse_open
-    else:
-        raise InteractionModelError(Status.Failure)
+    raise InteractionModelError(Status.Failure)
 
 
 def dynamic_event_return(*args, **argv):
@@ -72,15 +71,14 @@ def dynamic_event_return(*args, **argv):
 
     if event_call_count == 1:  # reading events, start empty - no events
         return []
-    elif event_call_count == 2:  # read event with filter - expect empty
+    if event_call_count == 2:  # read event with filter - expect empty
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
             requestID=0x1234567812345678, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
-    else:
-        raise InteractionModelError(Status.Failure)
+    raise InteractionModelError(Status.Failure)
 
 
 def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:

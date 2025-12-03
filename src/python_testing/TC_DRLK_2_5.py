@@ -54,7 +54,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         return 1
 
     def steps_TC_DRLK_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "Commissioning already done.", is_commissioning=True),
             TestStep("1", "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute.",
                      "Verify that TH is able to read the attribute successfully."),
@@ -82,8 +82,6 @@ class TC_DRLK_2_5(MatterBaseTest):
             TestStep("11", "TH sends GetWeekDaySchedule Command to DUT.", "Verify that the DUT sends NOT_FOUND response."),
             TestStep("12", "TH sends ClearUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),
         ]
-
-        return steps
 
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:

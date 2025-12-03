@@ -28,6 +28,8 @@ from typing import Optional
 import click
 import coloredlogs  # type: ignore
 
+log = logging.getLogger(__name__)
+
 profile_output_folder = "out/profiling_fuzztest"
 coverage_report_output_folder = "out/coverage_fuzztest"
 
@@ -72,7 +74,7 @@ def list_fuzz_test_binaries():
     """Lists all compiled fuzz tests in the 'out' directory"""
     build_dir = "out"
     if not os.path.isdir(build_dir):
-        logging.error(f"Error: Build directory '{build_dir}' does not exist.")
+        log.error("Error: Build directory '%s' does not exist.", build_dir)
         return []
 
     fuzz_tests = []
@@ -85,7 +87,7 @@ def list_fuzz_test_binaries():
 def get_fuzz_test_cases(context):
     """Executes the fuzz test binary (i.e. Fuzz Test Suite) with --list_fuzz_tests to print the list of all available FUZZ_TESTs (i.e. Test Cases)"""
     try:
-        logging.debug(f"\nfuzz_test_path = {context.fuzz_test_binary_path}\n")
+        log.debug("\nfuzz_test_path = '%s'\n", context.fuzz_test_binary_path)
 
         # workaround: we add this to supress creation of "default.profraw" which we don't need at this stage
         env = os.environ.copy()
@@ -96,9 +98,8 @@ def get_fuzz_test_cases(context):
         if output:
             return re.findall(r'test:\s*(\S+)', output)
 
-        else:
-            logging.info("No FUZZ_TESTs (TestCases) found in {context.fuzz_test_binary_path}")
-            raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
+        log.info("No FUZZ_TESTs (TestCases) found in '%s'", context.fuzz_test_binary_path)
+        raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
 
     except Exception as e:
         raise Exception(f"Error executing {context.fuzz_test_binary_path}: {e}")
@@ -138,7 +139,7 @@ def run_fuzz_test(context):
     try:
         if context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
             subprocess.run([context.fuzz_test_binary_path], env=env, check=True)
-            logging.info("Fuzz Test Suite executed in Unit Test Mode.\n")
+            log.info("Fuzz Test Suite executed in Unit Test Mode.\n")
         elif context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
             cmd_args = [context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"]
             # Use Popen instead of run() so we can always terminate cleanly and avoid profraw file issues
@@ -148,7 +149,7 @@ def run_fuzz_test(context):
                 raise subprocess.CalledProcessError(process.returncode, cmd_args)
 
     except KeyboardInterrupt:
-        logging.info("\nFuzzing Interrupted by the user \n")
+        log.info("\nFuzzing Interrupted by the user \n")
         if context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
             process.terminate()
             process.wait()
@@ -177,12 +178,12 @@ def generate_coverage_report(context, output_dir_arg):
     lcov_trace_file = f"{build_profile_folder}/{context.coverage_output_base_name}.info"
 
     if not os.path.exists(profraw_file):
-        logging.error(f"Profile raw file not found: {profraw_file}")
+        log.error("Profile raw file not found: '%s'", profraw_file)
         return False
 
     # Step1 Merge the profile data
     subprocess.run(["llvm-profdata", "merge", "-sparse", profraw_file, "-o", profdata_file], check=True)
-    logging.debug(f"Profile data merged into {profdata_file}")
+    log.debug("Profile data merged into '%s'", profdata_file)
 
     # Step2 Exports coverage data into lcov trace file format.
     cmd = [
@@ -208,7 +209,7 @@ def generate_coverage_report(context, output_dir_arg):
     with open(lcov_trace_file, "w") as file:
         subprocess.run(cmd, stdout=file, stderr=file)
 
-    logging.debug("Data exported into lcov trace format")
+    log.debug("Data exported into lcov trace format")
 
     # Step3 Generate the coverage report
     cmd = ["genhtml"]
@@ -227,37 +228,37 @@ def generate_coverage_report(context, output_dir_arg):
     cmd.append(f"{coverage_subfolder}")
     cmd.append(f"{lcov_trace_file}")
 
-    logging.info(f"Generating Coverage Report into: {coverage_subfolder}/index.html\n...Please wait...\n")
+    log.info("Generating Coverage Report into: '%s/index.html'\n...Please wait...\n", coverage_subfolder)
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except FileNotFoundError:
-        logging.error("genhtml not found. Please install lcov to generate the HTML coverage report")
-        return
+        log.error("genhtml not found. Please install lcov to generate the HTML coverage report")
+        return None
 
-    logging.info("Coverage report Generated.")
+    log.info("Coverage report Generated.")
+    return None
 
 
 def run_script_in_interactive_mode():
 
     fuzz_tests = list_fuzz_test_binaries()
     if not fuzz_tests:
-        logging.error("No pigweed-based FuzzTests found in the 'out' directory.\n")
-        logging.info("FuzzTests can be built using build_examples.py, for example:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build \n")
+        log.error("No pigweed-based FuzzTests found in the 'out' directory.\n")
+        log.info("FuzzTests can be built using build_examples.py, for example:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build \n")
         raise ValueError
 
     # ==== Choose FuzzTest Binary ====
     while True:
         print("=" * 70 + "\n")
-        logging.info("INTERACTIVE MODE: Choose a FuzzTest Binary to Run:\n")
+        log.info("INTERACTIVE MODE: Choose a FuzzTest Binary to Run:\n")
         for i, fuzz_test in enumerate(fuzz_tests, start=1):
-            logging.info(f"\t{i}. {fuzz_test}")
+            log.info("\t%d. '%s'", i, fuzz_test)
 
         fuzz_choice = click.prompt("Enter the number of the fuzz test binary to run", type=int)
 
         if 1 <= fuzz_choice <= len(fuzz_tests):
             break
-        else:
-            logging.error("Invalid choice for fuzz test binary. Please try again")
+        log.error("Invalid choice for fuzz test binary. Please try again")
 
     selected_fuzz = fuzz_tests[fuzz_choice - 1]
     context = FuzzTestContext(
@@ -268,20 +269,19 @@ def run_script_in_interactive_mode():
     )
 
     if not context.is_coverage_instrumented:
-        logging.error(
-            f"\nFuzzTest Not coverage instrumented: No coverage report will be generated for: '{context.fuzz_test_binary_path}'\n")
-        logging.error("for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
-        logging.info("Continuing...")
+        log.error("\nFuzzTest Not coverage instrumented: No coverage report will be generated for: '%s'\n", context.fuzz_test_binary_path)
+        log.error("for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
+        log.info("Continuing...")
 
     test_cases = get_fuzz_test_cases(context)
 
     # ==== Choose Test Case (FUZZ_TEST) ====
     while True:
         print("=" * 70 + "\n")
-        logging.info("AVAILABLE TEST CASES --> Choose a number to run in 'Continuous Mode', continues until interrupted:\n")
+        log.info("AVAILABLE TEST CASES --> Choose a number to run in 'Continuous Mode', continues until interrupted:\n")
         for i, case in enumerate(test_cases, start=1):
-            logging.info(f"\t{i}. {case}")
-        logging.info("\nUNIT_TEST_MODE: Enter 0 to run all test cases in Unit Test Mode (just a few seconds of each FUZZ_TEST(testcase)\n")
+            log.info("\t%d. '%s'", i, case)
+        log.info("\nUNIT_TEST_MODE: Enter 0 to run all test cases in Unit Test Mode (just a few seconds of each FUZZ_TEST(testcase)\n")
 
         choice = click.prompt("Enter the number of the test case to run", type=int)
 
@@ -290,12 +290,11 @@ def run_script_in_interactive_mode():
             context.selected_fuzz_test_case = test_cases[choice - 1]
             break
 
-        elif choice == 0:
+        if choice == 0:
             context.run_mode = FuzzTestMode.UNIT_TEST_MODE
             break
 
-        else:
-            logging.info("Invalid choice. Please try again")
+        log.info("Invalid choice. Please try again")
 
     return context
 
@@ -304,16 +303,16 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
     fuzz_tests = list_fuzz_test_binaries()
 
     if help or not fuzz_test:
-        logging.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory (each Binary can have multiple FUZZ_TESTs/TestCases): \n")
+        log.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory (each Binary can have multiple FUZZ_TESTs/TestCases): \n")
         previous_build_target_dir = ""
         for test in fuzz_tests:
             build_target_dir = get_build_target_from_fuzztest_path(test)
             if build_target_dir != previous_build_target_dir:
                 is_coverage_build = "-coverage" in build_target_dir
                 if is_coverage_build:
-                    logging.info("\n----------- Coverage-instrumented FuzzTests -----------\n")
+                    log.info("\n----------- Coverage-instrumented FuzzTests -----------\n")
                 else:
-                    logging.info("\n----------- FuzzTests without coverage-instrumentation -----------\n")
+                    log.info("\n----------- FuzzTests without coverage-instrumentation -----------\n")
                 previous_build_target_dir = build_target_dir
             print(f"   {test}")
         print("\n")
@@ -328,15 +327,14 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
     )
 
     if not context.is_coverage_instrumented:
-        logging.error(
-            f"\nFuzzTest Not coverage instrumented: No coverage report will be generated for: '{context.fuzz_test_binary_path}'\n")
-        logging.error("for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
-        logging.info("Continuing...")
+        log.error("\nFuzzTest Not coverage instrumented: No coverage report will be generated for: '%s'\n", context.fuzz_test_binary_path)
+        log.error("for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
+        log.info("Continuing...")
 
     test_cases = get_fuzz_test_cases(context)
 
     if (list_test_cases or not test_case) and test_cases:
-        logging.info(f"\nList of Testcases (i.e. FUZZ_TESTs) for {context.fuzz_test_binary_name}: \n")
+        log.info("\nList of Testcases (i.e. FUZZ_TESTs) for '%s': \n", context.fuzz_test_binary_name)
         for case in test_cases:
             print(f"  {case}")
         print("\n")
@@ -379,14 +377,14 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
     )
 
     if help or not fuzz_test:
-        logging.info("\nThis Script:")
-        logging.info("1. Runs Google FuzzTests in CONTINUOUS_FUZZ_MODE or UNIT_TEST_MODE")
-        logging.info("2. Automatically generates HTML Coverage Report if FuzzTest is coverage-instrumented.\n")
-        logging.info("WARNING: This Script is designed to work with FuzzTests built using build_examples.py")
+        log.info("\nThis Script:")
+        log.info("1. Runs Google FuzzTests in CONTINUOUS_FUZZ_MODE or UNIT_TEST_MODE")
+        log.info("2. Automatically generates HTML Coverage Report if FuzzTest is coverage-instrumented.\n")
+        log.info("WARNING: This Script is designed to work with FuzzTests built using build_examples.py")
         print("=" * 70 + "\n")
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
-        logging.info("\nCoverage Report Generation requires: llvm-profdata, llvm-cov, and genhtml (part of lcov package)")
+        log.info("\nCoverage Report Generation requires: llvm-profdata, llvm-cov, and genhtml (part of lcov package)")
         print("\n" + "=" * 70 + "\n")
 
     # ==== Run Script in Interactive or non-interactive mode ====
@@ -397,8 +395,8 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
             context = run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help)
 
     except Exception as e:
-        logging.error(e)
-        logging.error("\nPlease Try Again.")
+        log.exception(e)
+        log.error("\nPlease Try Again.")
         sys.exit(0)
 
     # ==== Run FuzzTest and Generate Coverage Report ====
@@ -411,12 +409,12 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
         # Continuous Fuzzing Mode Stoppped by User
         should_generate_coverage = True
     except ValueError as e:
-        logging.error(e)
+        log.exception(e)
 
     if should_generate_coverage and context.is_coverage_instrumented:
         generate_coverage_report(context, output)
     else:
-        logging.info("Skipping coverage report generation")
+        log.info("Skipping coverage report generation")
 
 
 if __name__ == "__main__":

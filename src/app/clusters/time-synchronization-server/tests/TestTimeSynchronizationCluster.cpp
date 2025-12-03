@@ -18,7 +18,7 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/TimeSynchronization/Attributes.h>

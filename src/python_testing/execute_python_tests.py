@@ -44,8 +44,9 @@ def load_env_from_yaml(file_path):
     Args:
         file_path (str): The path to the YAML file containing the environment variables.
     """
-    for key, value in yaml.full_load(open(file_path, "r")).items():
-        os.environ[key] = value
+    with open(file_path) as f:
+        for key, value in yaml.full_load(f).items():
+            os.environ[key] = value
 
 
 @click.command()
@@ -91,7 +92,8 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str],
     # Define the base command to run tests
     base_command = os.path.join(chip_root, "scripts/tests/run_python_test.py")
 
-    metadata = yaml.full_load(open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")))
+    with open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")) as f:
+        metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # Get all .py files in the directory

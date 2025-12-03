@@ -58,7 +58,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         return [self.check_pics("TSTAT.S")]
 
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
             TestStep("2b", "Test Harness Client then attempts Writes OccupiedCoolingSetpoint to a value below the MinCoolSetpointLimit"),
@@ -97,8 +97,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
             TestStep("17", "Sets OccupiedCoolingSetpoint to default value"),
             TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_TSTAT_2_2(self):

@@ -168,9 +168,7 @@ def _read_ndef_length(reader_connection_object):
     _check_transmission_status(sw1, sw2, "read NDEF length")
 
     # Convert 2-byte big-endian length to integer
-    length = (data[0] << 8) + data[1]
-
-    return length
+    return (data[0] << 8) + data[1]
 
 
 def _read_ndef_data(reader_connection_object, length: int) -> bytes:
@@ -260,10 +258,8 @@ def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
                 #
                 # Ignore the identifier code and read the URI string
                 if hasattr(record, 'data') and record.data and len(record.data) > 1:
-                    uri_string = record.data[1:].decode("utf-8")
-                    return uri_string
-                else:
-                    raise ValueError("NDEF URI record payload is missing or too short")
+                    return record.data[1:].decode("utf-8")
+                raise ValueError("NDEF URI record payload is missing or too short")
         # If we get here, no URI record was found
         raise ValueError("No NDEF URI record found in message")
     finally:
@@ -308,5 +304,4 @@ def connect_read_nfc_tag_data(nfc_reader_index: int) -> str:
     asserts.assert_greater(len(available_nfc_readers), nfc_reader_index,
                            f"Invalid NFC reader index {nfc_reader_index} provided by user as the Number of "
                            f"NFC Readers available is {len(available_nfc_readers)}")
-    nfc_tag_data = _read_nfc_tag_data(available_nfc_readers, nfc_reader_index)
-    return nfc_tag_data
+    return _read_nfc_tag_data(available_nfc_readers, nfc_reader_index)

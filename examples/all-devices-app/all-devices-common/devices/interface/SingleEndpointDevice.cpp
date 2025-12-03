@@ -42,10 +42,10 @@ CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint,
 
 void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider)
 {
-    provider.RemoveEndpoint(mEndpointId);
+    TEMPORARY_RETURN_IGNORED provider.RemoveEndpoint(mEndpointId);
     if (mDescriptorCluster.IsConstructed())
     {
-        provider.RemoveCluster(&mDescriptorCluster.Cluster());
+        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mDescriptorCluster.Cluster());
         mDescriptorCluster.Destroy();
     }
 }

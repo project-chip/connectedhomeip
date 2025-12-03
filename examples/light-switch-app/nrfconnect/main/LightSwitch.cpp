@@ -62,7 +62,8 @@ void LightSwitch::InitiateActionSwitch(Action mAction)
             return;
         }
         data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
-        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler,
+                                                                         reinterpret_cast<intptr_t>(data));
     }
 }
 
@@ -83,13 +84,14 @@ void LightSwitch::DimmerChangeBrightness()
         }
         data->Value   = (uint8_t) sBrightness;
         data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
-        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler,
+                                                                         reinterpret_cast<intptr_t>(data));
     }
 }
 
 void LightSwitch::GenericSwitchInitialPress()
 {
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         // Press moves Position from 0 (idle) to 1 (press)
         uint8_t newPosition = 1;
 
@@ -101,7 +103,7 @@ void LightSwitch::GenericSwitchInitialPress()
 
 void LightSwitch::GenericSwitchReleasePress()
 {
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         // Release moves Position from 1 (press) to 0 (idle)
         uint8_t previousPosition = 1;
         uint8_t newPosition      = 0;

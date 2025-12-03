@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/AttributeTesting.h>

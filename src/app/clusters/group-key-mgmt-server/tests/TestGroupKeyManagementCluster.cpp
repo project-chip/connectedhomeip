@@ -15,7 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
+#include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>

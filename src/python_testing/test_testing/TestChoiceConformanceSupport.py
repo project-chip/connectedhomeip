@@ -159,7 +159,7 @@ class TestConformanceSupport(MatterBaseTest):
         self.all_id_combos = []
         combos = []
         for r in range(1, num_elements + 1):
-            combos.extend(list(itertools.combinations(ids, r)))
+            combos.extend(itertools.combinations(ids, r))
         for combo in combos:
             # The first three IDs are all O.a, so we need exactly one for the conformance to be valid
             expected_failures = set()

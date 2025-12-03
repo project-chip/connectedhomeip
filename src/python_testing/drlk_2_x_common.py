@@ -108,7 +108,7 @@ class DRLK_COMMON:
 
     async def read_and_verify_pincode_length(self, attribute, failure_message: str, min_range=0, max_range=255):
         pin_code_length = await self.read_drlk_attribute_expect_success(attribute=attribute)
-        verify_pin_code_length = True if min_range <= pin_code_length <= max_range else False
+        verify_pin_code_length = min_range <= pin_code_length <= max_range
         asserts.assert_true(verify_pin_code_length, f"{failure_message}, got value {pin_code_length}")
         return pin_code_length
 

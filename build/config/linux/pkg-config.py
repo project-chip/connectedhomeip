@@ -120,8 +120,7 @@ def RewritePath(path, strip_prefix, sysroot):
             path = path[len(strip_prefix):]
         path = path.lstrip('/')
         return os.path.join(sysroot, path)
-    else:
-        return path
+    return path
 
 
 def main():
@@ -203,7 +202,7 @@ def main():
             print("Error from pkg-config.")
             return 1
         sys.stdout.write(dridriverdir.strip())
-        return
+        return None
 
     cmd = [options.pkg_config, "--cflags", "--libs"]
 

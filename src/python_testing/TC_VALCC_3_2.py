@@ -51,7 +51,7 @@ class TC_VALCC_3_2(MatterBaseTest):
         return "[TC-VALCC-3.2] Basic level functionality with DUT as Server"
 
     def steps_TC_VALCC_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT if required", is_commissioning=True),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
@@ -67,13 +67,11 @@ class TC_VALCC_3_2(MatterBaseTest):
             TestStep(9, "Read CurrentState, CurrentLevel, TargetState and TargetLevel attributes",
                      "CurrentState is Closed, CurrentLevel is 0, TargetState is NULL, TargetLevel is NULL"),
         ]
-        return steps
 
     def pics_TC_VALCC_3_2(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

@@ -63,10 +63,20 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t reason)
     {
         bootReason = BootReasonType::kSoftwareReset;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        OtaImgState_t img_state = OTA_GetImgState();
-        if (img_state == OtaImgState_RunCandidate)
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        bool otaDone   = false;
+
+        err = ReadConfigValue(NXPConfig::kConfigKey_AppOTADone, otaDone);
+        if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        {
+            SuccessOrLog(err, DeviceLayer, "Failed to read OTA completion flag");
+        }
+
+        if (otaDone)
         {
             bootReason = BootReasonType::kSoftwareUpdateCompleted;
+            ReturnErrorAndLogOnFailure(WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, false), DeviceLayer,
+                                       "Failed to store OTA completion flag");
         }
 #endif
     }
@@ -84,7 +94,9 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t reason)
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
-    /* Empty implementation*/
+    ReturnErrorAndLogOnFailure(WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, true), DeviceLayer,
+                               "Failed to store OTA completion flag");
+
     return CHIP_NO_ERROR;
 }
 

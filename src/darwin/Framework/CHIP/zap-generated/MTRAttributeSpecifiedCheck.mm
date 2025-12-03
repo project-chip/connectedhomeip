@@ -950,6 +950,9 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
     case Attributes::TestEventTriggersEnabled::Id: {
         return YES;
     }
+    case Attributes::DeviceLoadStatus::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

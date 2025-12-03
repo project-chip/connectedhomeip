@@ -58,7 +58,7 @@ class TC_SC_3_4(MatterBaseTest):
         return "[TC-SC-3.4] CASE Error Handling [DUT_Responder] "
 
     def steps_TC_SC_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
 
             TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT", is_commissioning=True),
 
@@ -99,7 +99,6 @@ class TC_SC_3_4(MatterBaseTest):
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),
 
         ]
-        return steps
 
     async def reestablish_CASE_and_verify_DUT_Fails_with_Error(self, expectedErrorName):
         ''' Session should be evicted or terminated before calling this method, such as using MarkSessionForEviction()'''

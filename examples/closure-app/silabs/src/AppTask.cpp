@@ -83,7 +83,7 @@ CHIP_ERROR AppTask::AppInit()
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Closure-App");
+    TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) "Closure-App");
     GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
 
@@ -161,7 +161,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 // Check if an action is already in progress
                 if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())

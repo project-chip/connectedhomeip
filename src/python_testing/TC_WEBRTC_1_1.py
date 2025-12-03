@@ -50,7 +50,7 @@ from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -78,7 +78,6 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-        return steps
 
     def desc_TC_WEBRTC_1_1(self) -> str:
         return "[TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session"

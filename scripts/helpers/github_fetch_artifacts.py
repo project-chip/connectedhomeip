@@ -24,6 +24,8 @@ import requests
 # Artifacts can be fetched using:
 #   curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/project-chip/connectedhomeip/actions/artifacts
 
+log = logging.getLogger(__name__)
+
 
 class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
 
@@ -56,7 +58,7 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
 
     def downloadBlob(self):
         url = self.archive_download_url
-        logging.info('Fetching: %r' % url)
+        log.info("Fetching: %r", url)
 
         status, headers, _ = self._requester.requestBlob('GET', url)
 
@@ -71,7 +73,7 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
 
     def delete(self):
         """Delete this artifact."""
-        logging.warning('DELETING artifact ' + self.url)
+        log.warning("DELETING artifact '%s'", self.url)
         self._requester.requestJsonAndCheck('DELETE', self.url)
 
 

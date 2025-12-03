@@ -28,18 +28,16 @@ class BouffalolabApp(Enum):
     def ExampleName(self):
         if self == BouffalolabApp.LIGHT:
             return 'lighting-app'
-        elif self == BouffalolabApp.CONTACT:
+        if self == BouffalolabApp.CONTACT:
             return 'contact-sensor-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
             return ('chip-%s-lighting-example' % chip_name)
-        elif self == BouffalolabApp.CONTACT:
+        if self == BouffalolabApp.CONTACT:
             return ('chip-%s-contact-sensor-example' % chip_name)
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
 
 class BouffalolabBoard(Enum):
@@ -56,22 +54,21 @@ class BouffalolabBoard(Enum):
 
         if self == BouffalolabBoard.BL602DK:
             return 'BL602DK'
-        elif self == BouffalolabBoard.BL616DK:
+        if self == BouffalolabBoard.BL616DK:
             return 'BL616DK'
-        elif self == BouffalolabBoard.BL704LDK:
+        if self == BouffalolabBoard.BL704LDK:
             return 'BL704LDK'
-        elif self == BouffalolabBoard.BL706DK:
+        if self == BouffalolabBoard.BL706DK:
             return 'BL706DK'
-        elif self == BouffalolabBoard.BL602_IoT_Matter_V1:
+        if self == BouffalolabBoard.BL602_IoT_Matter_V1:
             return 'BL602-IoT-Matter-V1'
-        elif self == BouffalolabBoard.BL602_NIGHT_LIGHT:
+        if self == BouffalolabBoard.BL602_NIGHT_LIGHT:
             return 'BL602-NIGHT-LIGHT'
-        elif self == BouffalolabBoard.XT_ZB6_DevKit:
+        if self == BouffalolabBoard.XT_ZB6_DevKit:
             return 'XT-ZB6-DevKit'
-        elif self == BouffalolabBoard.BL706_NIGHT_LIGHT:
+        if self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: %r' % self)
 
 
 class BouffalolabThreadType(Enum):
@@ -202,12 +199,12 @@ class BouffalolabBuilder(GnBuilder):
             self.argsOpt.append('chip_system_config_use_openthread_inet_endpoints=true')
             self.argsOpt.append('chip_with_lwip=false')
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
-            self.argsOpt.append(f'openthread_package_version="7e32165be"')
+            self.argsOpt.append('openthread_package_version="7e32165be"')
 
             if enable_thread_type == BouffalolabThreadType.THREAD_FTD:
-                self.argsOpt.append(f'chip_openthread_ftd=true')
+                self.argsOpt.append('chip_openthread_ftd=true')
             else:
-                self.argsOpt.append(f'chip_openthread_ftd=false')
+                self.argsOpt.append('chip_openthread_ftd=false')
 
             if not use_matter_openthread:
                 if bouffalo_chip in {"bl702", "bl702l"}:
@@ -245,10 +242,10 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt.append(f"enable_heap_monitoring={str(enable_heap_monitoring).lower()}")
         if enable_debug_coredump:
-            self.argsOpt.append(f"enable_debug_coredump=true")
+            self.argsOpt.append("enable_debug_coredump=true")
             self.argsOpt.append(f"coredump_binary_id={int(time.time())}")
 
-        self.argsOpt.append(f"chip_generate_link_map_file=true")
+        self.argsOpt.append("chip_generate_link_map_file=true")
 
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])

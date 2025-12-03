@@ -349,8 +349,8 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
 
         self.step("7.1")
-        has_origin_vid = 9 in cd.keys()
-        has_origin_pid = 10 in cd.keys()
+        has_origin_vid = 9 in cd
+        has_origin_pid = 10 in cd
         if has_origin_pid != has_origin_vid:
             asserts.fail("Found one of origin PID or VID in CD but not both")
 
@@ -378,7 +378,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
             self.mark_current_step_skipped()
 
         self.step(8)
-        has_paa_list = 11 in cd.keys()
+        has_paa_list = 11 in cd
 
         if has_paa_list:
             akids = [ext.value.key_identifier for ext in parsed_pai.extensions if ext.oid == ExtensionOID.AUTHORITY_KEY_IDENTIFIER]
@@ -405,7 +405,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
                 certs[ski] = pub
 
-        asserts.assert_true(subject_key_identifier in certs.keys(), "Subject key identifier not found in CD certs")
+        asserts.assert_true(subject_key_identifier in certs, "Subject key identifier not found in CD certs")
         try:
             certs[subject_key_identifier].verify(signature=signature_cd, data=cd_tlv,
                                                  signature_algorithm=ec.ECDSA(hashes.SHA256()))
@@ -419,7 +419,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(len(returned_nonce), 32, "Returned nonce is incorrect size")
 
         self.step(11)
-        has_firmware_information = 4 in decoded.keys()
+        has_firmware_information = 4 in decoded
         if has_firmware_information:
             try:
                 int(decoded[4], 16)

@@ -128,6 +128,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
+        self.dut_fsa_stdin = None
         self.th_fsa_controller = None
         self.th_server = None
         self.storage = None
@@ -184,7 +185,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = 5544
         self.th_server_discriminator = self.th_fsa_bridge_discriminator + 1
@@ -202,6 +203,8 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             timeout=30)
 
     def teardown_class(self):
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_fsa_controller is not None:
             self.th_fsa_controller.terminate()
         if self.th_server is not None:

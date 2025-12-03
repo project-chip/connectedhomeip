@@ -51,7 +51,7 @@ class TC_VALCC_4_1(MatterBaseTest):
         return "[TC-VALCC-4.1] Duration functionality with DUT as Server"
 
     def steps_TC_VALCC_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send Open command with duration set to 60"),
             TestStep(3, "Read OpenDuration attribute"),
@@ -62,13 +62,11 @@ class TC_VALCC_4_1(MatterBaseTest):
             TestStep(8, "Read OpenDuration attribute"),
             TestStep(9, "Read RemainingDuration attribute"),
         ]
-        return steps
 
     def pics_TC_VALCC_4_1(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

@@ -109,13 +109,22 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
 
     VerifyOrReturnError(GetWiFiDriver() != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
-    /* Command accepts running with SSID and password as parameters */
-    VerifyOrReturnError((argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
+    /* Command accepts running with SSID and password (optional) as parameters */
+    VerifyOrReturnError((argc == 1 || argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
-    ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
-
-    VerifyOrReturnError(IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
+    VerifyOrReturnError(!ssidSpan.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    ByteSpan passwordSpan;
+    if (argc == 2)
+    {
+        passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
+        VerifyOrReturnError(!passwordSpan.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        // If no password is provided, use an empty password
+        passwordSpan = ByteSpan();
+    }
 
     ChipLogProgress(Shell, "Adding/Updating network %s", argv[0]);
 
@@ -150,7 +159,7 @@ void RegisterWiFiCommands()
 {
     static constexpr Command subCommands[] = {
         { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]" },
-        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> <psk>" },
+        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> [<psk>]" },
         { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
     };
 

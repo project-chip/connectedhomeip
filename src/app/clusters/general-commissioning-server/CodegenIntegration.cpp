@@ -17,7 +17,7 @@
  */
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>

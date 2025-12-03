@@ -73,14 +73,13 @@ def parse_paa_root_certs(cmdpipe, paa_list):
         line = cmdpipe.stdout.readline()
         if not line:
             break
-        else:
-            if b': ' in line:
-                key, value = line.split(b': ')
-                result[key.strip(b' -').decode("utf-8")
-                       ] = value.strip().decode("utf-8")
-                parse_paa_root_certs.counter += 1
-                if parse_paa_root_certs.counter % 2 == 0:
-                    paa_list.append(copy.deepcopy(result))
+        if b': ' in line:
+            key, value = line.split(b': ')
+            result[key.strip(b' -').decode("utf-8")
+                   ] = value.strip().decode("utf-8")
+            parse_paa_root_certs.counter += 1
+            if parse_paa_root_certs.counter % 2 == 0:
+                paa_list.append(copy.deepcopy(result))
 
 
 def write_cert(certificate, subject):
@@ -109,16 +108,15 @@ def parse_paa_root_cert_from_dcld(cmdpipe):
         line = cmdpipe.stdout.readline()
         if not line:
             break
-        else:
-            if b'pemCert: |' in line:
-                while True:
-                    line = cmdpipe.stdout.readline()
-                    certificate += line.strip(b' \t').decode("utf-8")
-                    if b'-----END CERTIFICATE-----' in line:
-                        break
-            if b'subjectAsText:' in line:
-                subject = line.split(b': ')[1].strip().decode("utf-8")
-                break
+        if b'pemCert: |' in line:
+            while True:
+                line = cmdpipe.stdout.readline()
+                certificate += line.strip(b' \t').decode("utf-8")
+                if b'-----END CERTIFICATE-----' in line:
+                    break
+        if b'subjectAsText:' in line:
+            subject = line.split(b': ')[1].strip().decode("utf-8")
+            break
 
     return (certificate, subject)
 

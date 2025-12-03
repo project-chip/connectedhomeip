@@ -76,7 +76,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
         return "[TC-MWOCTRL-2.1] Primary functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the MaxCookTime attribute and check limits",
                      "Verify that the DUT response contains an elapsed-s value between 1 and 86400 inclusive. Save value as MaxCookTime."
@@ -97,13 +97,11 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
             TestStep(11, "Set the CookTime attribute to 0", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(12, "Set the CookTime attribute to MaxCookTime+1", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_1(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

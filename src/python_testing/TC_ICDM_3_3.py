@@ -132,7 +132,7 @@ class TC_ICDM_3_3(MatterBaseTest):
         return "[TC-ICDM-3.3] Register/Unregister Clients with DUT as Server"
 
     def steps_TC_ICDM_3_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute."),
             TestStep("1b", "TH sends UnregisterClient command with CheckInNodeID1, where CheckInNodeID1 can be any random node ID."),
@@ -155,15 +155,13 @@ class TC_ICDM_3_3(MatterBaseTest):
             TestStep("8c", "TH sends UnregisterClient command with the CheckInNodeID8 from Step 8a and a valid wrong VerificationKey10."),
             TestStep("8d", "TH sends UnregisterClient command with the CheckInNodeID8 and VerificationKey8 from Step 8a."),
         ]
-        return steps
 
     def pics_TC_ICDM_3_3(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F00"
         ]
-        return pics
 
     #
     # ICDM 3.3 Test Body

@@ -282,8 +282,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type>>(
             nodeId, endpointGroupIDEntry, onSuccess);
 
-    GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                &pairingCommand->mOnDeviceConnectionFailureCallback);
+    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
 }
@@ -299,8 +299,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type>>(
             nodeId, nodeKeySetEntry, onSuccess);
 
-    GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                &pairingCommand->mOnDeviceConnectionFailureCallback);
+    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
 }
@@ -316,8 +316,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>(
             nodeId, bindingEntry, onSuccess);
 
-    GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                &pairingCommand->mOnDeviceConnectionFailureCallback);
+    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
 }
@@ -334,8 +334,8 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
             std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>>(
                 nodeId, aclEntry, onSuccess);
 
-    GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                &pairingCommand->mOnDeviceConnectionFailureCallback);
+    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
 }

@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <lib/support/BitFlags.h>
+#include <optional>
 #include <system/SystemLayerImpl.h>
 
 namespace chip {
@@ -42,6 +43,11 @@ public:
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> active, Optional<System::Clock::Milliseconds32> idle)
     {
         return mData->SetModeDurations(active, idle);
+    }
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> active, std::optional<System::Clock::Seconds32> idle,
+                                std::optional<System::Clock::Seconds32> shortIdle)
+    {
+        return mData->SetModeDurations(active, idle, shortIdle);
     }
     System::Clock::Milliseconds32 GetSitSlowPollMaximum() { return mData->kSitIcdSlowPollMaximum; }
 

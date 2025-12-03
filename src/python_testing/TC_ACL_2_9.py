@@ -61,8 +61,11 @@ class TC_ACL_2_9(MatterBaseTest):
     def desc_TC_ACL_2_9(self) -> str:
         return "[TC-ACL-2.9] Cluster access"
 
+    def pics_TC_ACL_2_9(self) -> list[str]:
+        return ['ACL.S.A0001']
+
     def steps_TC_ACL_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
@@ -121,7 +124,6 @@ class TC_ACL_2_9(MatterBaseTest):
                 "TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                 "TH1 removes TH2 fabric using th2_idx"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_9(self):

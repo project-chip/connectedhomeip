@@ -16,7 +16,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>

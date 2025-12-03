@@ -70,7 +70,7 @@ class TC_ICDM_3_4(MatterBaseTest):
         return "[TC-ICDM-3.4] ICDCounter Persistence with DUT as Server"
 
     def steps_TC_ICDM_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the ICDCounter attribute."),
             TestStep("2a", "Power cycle DUT."),
@@ -79,15 +79,13 @@ class TC_ICDM_3_4(MatterBaseTest):
                             IcdCounter2 is greater or equal to IcdCounter1. \
                             ICDCounter attribute can roll over. If the attribute rolls over, it will be greater or equal to 0.")
         ]
-        return steps
 
     def pics_TC_ICDM_3_4(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F00"
         ]
-        return pics
 
     #
     # ICDM 3.4 Test Body

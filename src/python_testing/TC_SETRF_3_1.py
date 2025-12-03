@@ -71,7 +71,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
 
     def steps_TC_SETRF_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      "DUT is commissioned to TH.", is_commissioning=True),
             TestStep("2", "Set up a subscription to the Commodity Tariff cluster attributes: MinIntervalFloor: 0, MaxIntervalCeiling: 10",
@@ -409,8 +409,6 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             TestStep("44", "TH removes the subscription the Commodity Tariff cluster.", """
                      Subscription successfully removed."""),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_SETRF_3_1(self):
