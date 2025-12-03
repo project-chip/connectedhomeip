@@ -139,9 +139,8 @@ class IsolatedNetworkNamespace:
         "ip netns del app-{index}",
     ]
 
-    def __init__(self, index: int = 0, setup_app_link_up: bool = True,
-                 setup_tool_link_up: bool = True, app_link_name: str = 'eth-app',
-                 tool_link_name: str = 'eth-tool', unshared: bool = False):
+    def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
+                 wait_for_dad: bool = True, app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool', unshared: bool = False):
 
         if not unshared:
             # If not running in an unshared network namespace yet, try
@@ -159,12 +158,13 @@ class IsolatedNetworkNamespace:
             self.setup_app_link_up(wait_for_dad=False)
         if setup_tool_link_up:
             self._setup_tool_link_up(wait_for_dad=False)
-        self._wait_for_duplicate_address_detection()
+        if wait_for_dad:
+            self.wait_for_duplicate_address_detection()
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind):
         return "{}-{}".format(kind.name.lower(), self.index)
 
-    def _wait_for_duplicate_address_detection(self):
+    def wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
@@ -183,12 +183,12 @@ class IsolatedNetworkNamespace:
     def setup_app_link_up(self, wait_for_dad: bool = True):
         self._run(*self.COMMANDS_APP_LINK_UP)
         if wait_for_dad:
-            self._wait_for_duplicate_address_detection()
+            self.wait_for_duplicate_address_detection()
 
     def _setup_tool_link_up(self, wait_for_dad: bool = True):
         self._run(*self.COMMANDS_TOOL_LINK_UP)
         if wait_for_dad:
-            self._wait_for_duplicate_address_detection()
+            self.wait_for_duplicate_address_detection()
 
     def _run(self, *command: str):
         for c in command:

@@ -241,6 +241,10 @@ def cmd_list(context: click.Context) -> None:
         print("%s%s" % (test.name, tags))
 
 
+class Terminatable(typing.Protocol):
+    def terminate(self) -> None: ...
+
+
 @main.command(
     'run', help='Execute the tests')
 @click.option(
@@ -414,90 +418,98 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     ble_controller_app = None
     ble_controller_tool = None
-
-    if sys.platform == 'linux':
-        ns = chiptest.linux.IsolatedNetworkNamespace(
-            index=0,
-            # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-            setup_app_link_up=not ble_wifi,
-            # Change the app link name so the interface will be recognized as WiFi or Ethernet
-            # depending on the commissioning method used.
-            app_link_name='wlx-app' if ble_wifi else 'eth-app',
-            unshared=context.obj.in_unshare)
-
-        if ble_wifi:
-            bus = chiptest.linux.DBusTestSystemBus()
-            bluetooth = chiptest.linux.BluetoothMock()
-            wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
-            ble_controller_app = 0   # Bind app to the first BLE controller
-            ble_controller_tool = 1  # Bind tool to the second BLE controller
-
-        executor = chiptest.linux.LinuxNamespacedExecutor(ns)
-    elif sys.platform == 'darwin':
-        executor = chiptest.darwin.DarwinExecutor()
-    else:
-        log.warning("No platform-specific executor for '%s'", sys.platform)
-        executor = Executor()
-
-    runner = chiptest.runner.Runner(executor=executor)
-
-    log.info("Each test will be executed %d times", iterations)
-
-    apps_register = AppsRegister()
-    apps_register.init()
+    to_terminate: list[Terminatable] = []
 
     def cleanup() -> None:
-        apps_register.uninit()
-        if sys.platform == 'linux':
-            if ble_wifi:
-                wifi.terminate()
-                bluetooth.terminate()
-                bus.terminate()
-            ns.terminate()
-
-    for i in range(iterations):
-        log.info("Starting iteration %d", i+1)
-        observed_failures = 0
-        for test in context.obj.tests:
-            if context.obj.include_tags:
-                if not (test.tags & context.obj.include_tags):
-                    log.debug("Test '%s' not included", test.name)
-                    continue
-
-            if context.obj.exclude_tags:
-                if test.tags & context.obj.exclude_tags:
-                    log.debug("Test '%s' excluded", test.name)
-                    continue
-
-            test_start = time.monotonic()
+        for item in reversed(to_terminate):
             try:
-                if context.obj.dry_run:
-                    log.info("Would run test: '%s'", test.name)
-                else:
-                    log.info("%-20s - Starting test", test.name)
-                test.Run(
-                    runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                    test_runtime=context.obj.runtime,
-                    ble_controller_app=ble_controller_app,
-                    ble_controller_tool=ble_controller_tool,
-                )
-                if not context.obj.dry_run:
+                log.info("Cleaning up %s", item.__class__.__name__)
+                item.terminate()
+            except Exception as e:
+                log.error("Encountered error during cleanup: %s", e, exc_info=True)
+        to_terminate.clear()
+
+    try:
+        if sys.platform == 'linux':
+            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+                index=0,
+                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+                setup_app_link_up=not ble_wifi,
+                # Change the app link name so the interface will be recognized as WiFi or Ethernet
+                # depending on the commissioning method used.
+                app_link_name='wlx-app' if ble_wifi else 'eth-app',
+                unshared=context.obj.in_unshare,
+                wait_for_dad=False))
+            ns.wait_for_duplicate_address_detection()
+
+            if ble_wifi:
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                ble_controller_app = 0   # Bind app to the first BLE controller
+                ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+            executor = chiptest.linux.LinuxNamespacedExecutor(ns)
+        elif sys.platform == 'darwin':
+            executor = chiptest.darwin.DarwinExecutor()
+        else:
+            log.warning("No platform-specific executor for '%s'", sys.platform)
+            executor = Executor()
+
+        runner = chiptest.runner.Runner(executor=executor)
+
+        log.info("Each test will be executed %d times", iterations)
+
+        to_terminate.append(apps_register := AppsRegister())
+        apps_register.init()
+
+        for i in range(iterations):
+            log.info("Starting iteration %d", i+1)
+            observed_failures = 0
+            for test in context.obj.tests:
+                if context.obj.include_tags:
+                    if not (test.tags & context.obj.include_tags):
+                        log.debug("Test '%s' not included", test.name)
+                        continue
+
+                if context.obj.exclude_tags:
+                    if test.tags & context.obj.exclude_tags:
+                        log.debug("Test '%s' excluded", test.name)
+                        continue
+
+                test_start = time.monotonic()
+                try:
+                    if context.obj.dry_run:
+                        log.info("Would run test: '%s'", test.name)
+                    else:
+                        log.info("%-20s - Starting test", test.name)
+                    test.Run(
+                        runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
+                        test_runtime=context.obj.runtime,
+                        ble_controller_app=ble_controller_app,
+                        ble_controller_tool=ble_controller_tool,
+                    )
+                    if not context.obj.dry_run:
+                        test_end = time.monotonic()
+                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
+                except Exception:
                     test_end = time.monotonic()
-                    log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-            except Exception:
-                test_end = time.monotonic()
-                log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                observed_failures += 1
-                if not keep_going:
-                    cleanup()
-                    sys.exit(2)
+                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
+                    observed_failures += 1
+                    if not keep_going:
+                        cleanup()
+                        sys.exit(2)
 
-        if observed_failures != expected_failures:
-            log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
-            cleanup()
-            sys.exit(2)
-
-    cleanup()
+            if observed_failures != expected_failures:
+                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+                cleanup()
+                sys.exit(2)
+    except KeyboardInterrupt:
+        log.info("Interrupting execution on user request")
+    except Exception as e:
+        log.error("Caught exception during test execution: %s", e, exc_info=True)
+    finally:
+        cleanup()
 
 
 # On Linux, allow an execution shell to be prepared

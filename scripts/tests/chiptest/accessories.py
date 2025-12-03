@@ -50,6 +50,9 @@ class AppsRegister:
     def uninit(self):
         self.__stopXMLRPCServer()
 
+    def terminate(self):
+        self.uninit()
+
     @property
     def accessories(self):
         """List of registered accessory applications."""
