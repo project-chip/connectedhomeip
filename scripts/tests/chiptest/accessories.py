@@ -18,7 +18,6 @@ from __future__ import annotations
 import filecmp
 import functools
 import logging
-import os
 import subprocess
 import sys
 import threading
@@ -31,8 +30,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-_DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+_DEFAULT_CHIP_ROOT = Path(__file__).parent.parent.parent.parent.absolute()
 
 PORT = 9000
 if sys.platform == 'linux':
@@ -91,7 +89,7 @@ class AppsRegister:
 
     @with_accessories_lock
     def remove_all(self):
-        self._accessories = {}
+        self._accessories.clear()
 
     @with_accessories_lock
     def get(self, name: str):
@@ -99,39 +97,32 @@ class AppsRegister:
 
     @with_accessories_lock
     def kill(self, name: str):
-        accessory = self._accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             accessory.kill()
 
     @with_accessories_lock
     def kill_all(self):
-        ok = True
-        for accessory in self._accessories.values():
-            # make sure to do kill() on all of our apps, even if some of them returned False
-            ok = accessory.kill() and ok
-        return ok
+        # Make sure to do kill() on all of our apps, even if some of them returned False
+        results = [accessory.kill() for accessory in self._accessories.values()]
+        return all(results)
 
     @with_accessories_lock
     def start(self, name: str, args: list[str]) -> bool:
-        accessory = self._accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
             # key-value pair, e.g. [option1, value1, option2, value2, ...]
-            options = self._create_command_line_options(args)
-            return accessory.start(options)
+            return accessory.start(self._create_command_line_options(args))
         return False
 
     @with_accessories_lock
     def stop(self, name: str) -> bool:
-        accessory = self._accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             return accessory.stop()
         return False
 
     @with_accessories_lock
     def reboot(self, name: str) -> bool:
-        accessory = self._accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             return accessory.stop() and accessory.start()
         return False
 
@@ -142,15 +133,13 @@ class AppsRegister:
 
     @with_accessories_lock
     def factory_reset(self, name: str) -> bool:
-        accessory = self._accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             return accessory.factoryReset()
         return False
 
     @with_accessories_lock
     def wait_for_message(self, name: str, message: list[str], timeoutInSeconds: float = 10) -> bool:
-        accessory = self._accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
             # comprise the entire message to wait for
             return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
@@ -163,8 +152,8 @@ class AppsRegister:
             rawFile.write(rawImageContent)
 
         # Add an OTA header to the raw file
-        otaImageTool = _DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
-        cmd = [otaImageTool, 'create', '-v', vid, '-p', pid, '-vn', '2',
+        otaImageTool = _DEFAULT_CHIP_ROOT / 'src/app/ota_image_tool.py'
+        cmd = [str(otaImageTool), 'create', '-v', vid, '-p', pid, '-vn', '2',
                '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
         s = subprocess.Popen(cmd)
         s.wait()
@@ -173,18 +162,16 @@ class AppsRegister:
         return True
 
     def compare_files(self, file1: str | Path, file2: str | Path) -> bool:
-        if filecmp.cmp(file1, file2, shallow=False) is False:
+        if not filecmp.cmp(file1, file2, shallow=False):
             raise Exception('Files %s and %s do not match' % (file1, file2))
         return True
 
     def create_file(self, filePath: str | Path, fileContent: str) -> bool:
-        with open(filePath, 'w') as rawFile:
-            rawFile.write(fileContent)
+        Path(filePath).write_text(fileContent)
         return True
 
     def delete_file(self, filePath: str | Path) -> bool:
-        if os.path.exists(filePath):
-            os.remove(filePath)
+        Path(filePath).unlink(missing_ok=True)
         return True
 
     def _start_xmlrpc_server(self):
@@ -207,14 +194,12 @@ class AppsRegister:
     def _stop_xmlrpc_server(self):
         self.server.shutdown()
 
-    def _create_command_line_options(self, args: list[str]) -> dict[str, str]:
-        if not args:
-            return {}
-
-        # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
-        if (len(args) % 2) != 0:
+    @staticmethod
+    def _create_command_line_options(args: list[str]) -> dict[str, str]:
+        try:
+            # Create a dictionary from the key-value pair list
+            return dict(zip(args[::2], args[1::2], strict=True))
+        except ValueError:
+            # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
             log.warning("Unexpected command line options %r - not key/value pairs (odd length)", args)
             return {}
-
-        # Create a dictionary from the key-value pair list
-        return {args[i]: args[i+1] for i in range(0, len(args), 2)}
