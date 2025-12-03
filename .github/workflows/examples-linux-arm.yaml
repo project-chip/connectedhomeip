@@ -68,7 +68,7 @@ jobs:
                   ; \
                   do
                     ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target $target build"
-                    echo "Cleaning out directory of of size: $(du -sh out)"
+                    echo "Cleaning out directory of size: $(du -sh out)"
                     rm -rf out
                   done
             - name: CCache statistics
