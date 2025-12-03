@@ -478,6 +478,11 @@ jobs:
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
+            - name: Install ccache
+              run: |
+                brew install ccache
+            - name: Verify ccache installation
+              run: which ccache
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
