@@ -55,9 +55,9 @@ class TC_BINFO_3_1(MatterBaseTest):
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads ProductAppearance from the DUT.",
-                     "ProductAppearance.Finish Value has to be between a range of [min=Other(0), ""max=Fabric(5)]"),
+                     "ProductAppearance.Finish Value has to be between a range of [min=Other(0), max=Fabric(5)]"),
             TestStep(2, "TH reads ProductAppearance from the DUT.",
-                     "ProductAppearance.PrimaryColor Value has to be between a range of [min=Black(0), max=Gold(20) ]"),
+                     "ProductAppearance.PrimaryColor Value has to be between a range of [min=Black(0), max=Gold(20)]"),
             TestStep(3, "TH reads ProductAppearance from the DUT.",
                      "ProductAppearance.Finish Value has to be equal to PIXIT.BINFO.Finish"),
             TestStep(4, "TH reads ProductAppearance from the DUT.",
@@ -91,7 +91,7 @@ class TC_BINFO_3_1(MatterBaseTest):
         # Read ProductAppearance once and reuse for all steps since the attribute value doesn't change
         product_appearance = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Objects.BasicInformation, attribute=attributes.ProductAppearance)
-        logger.info(f"Product Apppearance: {product_appearance}")
+        logger.info(f"Product Appearance: {product_appearance}")
         asserts.assert_is_not_none(product_appearance, "ProductAppearance attribute read failed")
 
         self.step(1)
@@ -106,16 +106,13 @@ class TC_BINFO_3_1(MatterBaseTest):
         # Vendor specific test: This step should verify the actual Finish value matches PIXIT.BINFO.Finish
         # For example, if PIXIT.BINFO.Finish is satin(2), the test should verify finish == 2
         asserts.assert_equal(product_appearance.finish, self.pixit_finish,
-                             (f"ProductAppearance.Finish ({product_appearance.finish}) "
-                              f"does not match PIXIT.BINFO.Finish ({self.pixit_finish})\n"
-                              "Please verify the PIXIT.BINFO.Finish setting and try again."))
+                             f"ProductAppearance.Finish ({product_appearance.finish}) does not match PIXIT.BINFO.Finish ({self.pixit_finish}")
 
         self.step(4)
         # Vendor specific test: This step should verify the actual PrimaryColor value matches PIXIT.BINFO.PrimaryColor
         # For example, if PIXIT.BINFO.PrimaryColor is purple(5), the test should verify primaryColor == 5
         asserts.assert_equal(product_appearance.primaryColor, self.pixit_primary_color,
-                             (f"ProductAppearance.PrimaryColor ({product_appearance.primaryColor}) "
-                              f"does not match PIXIT.BINFO.PrimaryColor ({self.pixit_primary_color})\n"))
+                             f"ProductAppearance.PrimaryColor ({product_appearance.primaryColor}) does not match PIXIT.BINFO.PrimaryColor ({self.pixit_primary_color})")
 
 
 if __name__ == "__main__":
