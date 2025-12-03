@@ -385,7 +385,7 @@ class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
     TestSceneHandler() : DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
-    ~TestSceneHandler() override {}
+    ~TestSceneHandler() override = default;
 
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
