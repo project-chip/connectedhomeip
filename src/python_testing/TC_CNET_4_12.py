@@ -233,17 +233,17 @@ class TC_CNET_4_12(MatterBaseTest):
 
         # All required endpoint and Threads dataset are set and assigned, Thread dataset as str
         log.info('Precondition: All required arguments are set and assigned, Thread dataset as str: '
-                    f'THREADS_ENDPOINT = {endpoint}, '
-                    f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
-                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
+                 f'THREADS_ENDPOINT = {endpoint}, '
+                 f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
+                 f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
         # thread_dataset_1_bytes = bytes.fromhex(thread_dataset_1)
         thread_dataset_1_bytes = thread_dataset_1
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
         # All required arguments are set and assigned, Thread dataset as bytes
         log.info('Precondition: All required arguments are set and assigned, Thread dataset as bytes: '
-                    f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
-                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
+                 f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
+                 f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
 
         # Validate the operational dataset structure (for both datasets)
         log.info("Precondition: Validating THREAD operational datasets")
@@ -254,8 +254,8 @@ class TC_CNET_4_12(MatterBaseTest):
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
         log.info('Precondition: NetworkID : '
-                    f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
-                    f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
+                 f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
+                 f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
 
         # Read the ConnectMaxTimeSeconds attribute after attempting to connect
         connect_max_time_seconds = await self.read_single_attribute_check_success(
