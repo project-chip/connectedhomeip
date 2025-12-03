@@ -36,14 +36,14 @@ void MatterSampleMeiPluginServerInitCallback()
 
 void MatterSampleMeiPluginServerShutdownCallback()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance());
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance());
     AttributeAccessInterfaceRegistry::Instance().Unregister(&SampleMeiServer::Instance());
 }
 
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Creating Sample MEI cluster, Ep %d", endpoint);
-    SampleMeiServer::Instance().RegisterEndpoint(endpoint);
+    TEMPORARY_RETURN_IGNORED SampleMeiServer::Instance().RegisterEndpoint(endpoint);
 }
 
 void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
@@ -51,7 +51,7 @@ void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
     // There's currently no whole-cluster shutdown callback. That would trigger
     // call to `Shutdown`. Thus ep-based shutdown calls `UnregisterEndpoint`
     ChipLogProgress(Zcl, "Shutting down Sample MEI cluster, Ep %d", endpoint);
-    SampleMeiServer::Instance().UnregisterEndpoint(endpoint);
+    TEMPORARY_RETURN_IGNORED SampleMeiServer::Instance().UnregisterEndpoint(endpoint);
 }
 
 // *****************************************************************************

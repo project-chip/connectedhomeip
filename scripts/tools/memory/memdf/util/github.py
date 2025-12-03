@@ -130,15 +130,13 @@ class Gh:
 
         assert self.ghapi
         try:
-            page = 0
-            for i in ghapi.all.paged(
+            for page, i in enumerate(ghapi.all.paged(
                     self.ghapi.actions.list_artifacts_for_repo,
-                    per_page=per_page):
+                    per_page=per_page)):
                 if not i.artifacts:
                     break
                 for a in i.artifacts:
                     yield a
-                page += 1
                 log.debug("ASP: artifact page %d of %d", page, page_limit)
                 if page_limit and page >= page_limit:
                     break

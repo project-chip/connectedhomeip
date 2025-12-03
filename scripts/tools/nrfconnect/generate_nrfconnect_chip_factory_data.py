@@ -313,7 +313,7 @@ class FactoryDataGenerator:
             sys.exit(-1)
 
         try:
-            json_file = open(self._args.output+".json", "w+")
+            json_file = open(self._args.output+".json", "w+")  # noqa: SIM115
         except FileNotFoundError:
             print("Cannot create JSON file in this location: {}".format(self._args.output+".json"))
             sys.exit(-1)
