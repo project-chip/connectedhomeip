@@ -330,7 +330,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                 if endpoint == newly_added_endpoint and attribute == cadmin_attr.WindowStatus:
                     if value != th_server_direct_cadmin[cadmin_attr.WindowStatus]:
                         log.info("Window status is %r, waiting for %r", value,
-                                     th_server_direct_cadmin[cadmin_attr.WindowStatus])
+                                 th_server_direct_cadmin[cadmin_attr.WindowStatus])
                         continue
                     cadmin_sub_new_data = True
                     break

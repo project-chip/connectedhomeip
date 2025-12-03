@@ -132,7 +132,7 @@ class TC_RR_1_1(MatterBaseTest):
         has_user_labels = len(endpoints_with_user_label_list) > 0
         if has_user_labels:
             log.info("--> User label cluster present on endpoints %s" %
-                         ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
+                     ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
         else:
             log.info("--> User label cluster not present on any endpoitns")
 
@@ -330,7 +330,7 @@ class TC_RR_1_1(MatterBaseTest):
             # Send the UpdateLabel command
             label = ("%d" % fabric.fabricIndex) * 32
             log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" %
-                         (fabric.fabricIndex, label, client_name))
+                     (fabric.fabricIndex, label, client_name))
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))
 
             # Read back
@@ -464,7 +464,7 @@ class TC_RR_1_1(MatterBaseTest):
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
             log.error("Missing reports from the following clients: %s" %
-                          ", ".join([name for name, value in all_changes.items() if value is False]))
+                      ", ".join([name for name, value in all_changes.items() if value is False]))
             sub_test_failed = True
         else:
             log.info("Got successful reports from all clients, meaning all concurrent CASE sessions worked")
@@ -581,8 +581,8 @@ class TC_RR_1_1(MatterBaseTest):
             log.info("Read Heap info after stress test")
             high_watermark_after, current_usage_after = await self.read_heap_statistics(dev_ctrl)
             log.info("=== Heap Usage Diagnostics ===\nHigh watermark: {} (before) / {} (after)\n"
-                         "Current usage: {} (before) / {} (after)".format(high_watermark_before, high_watermark_after,
-                                                                          current_usage_before, current_usage_after))
+                     "Current usage: {} (before) / {} (after)".format(high_watermark_before, high_watermark_after,
+                                                                      current_usage_before, current_usage_after))
 
     def random_string(self, length) -> str:
         rnd = self._pseudo_random_generator

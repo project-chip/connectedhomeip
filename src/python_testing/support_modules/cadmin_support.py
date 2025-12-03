@@ -435,7 +435,7 @@ class CADMINBaseTest(MatterBaseTest):
             # Not on last attempt, wait and retry
             if attempt < max_attempts - 1:
                 log.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
-                             f"attempt {attempt+1}/{max_attempts}")
+                         f"attempt {attempt+1}/{max_attempts}")
                 await asyncio.sleep(delay_sec)
             else:
                 # Final retry attempt failed

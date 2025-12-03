@@ -85,7 +85,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                         # Check if this attribute requires timed write using the must_use_timed_write class property
                         if attr_type.must_use_timed_write:
                             log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                         f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
                             return endpoint_id, attr_type
 
         log.warning("No timed write attributes found on device")

@@ -165,7 +165,7 @@ class TC_SC_3_6(MatterBaseTest):
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
 
         log.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
-                     num_fabrics_to_commission)
+                 num_fabrics_to_commission)
 
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
@@ -301,7 +301,7 @@ class TC_SC_3_6(MatterBaseTest):
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
             log.error("Missing reports from the following clients: %s" %
-                          ", ".join([name for name, value in all_changes.items() if value is False]))
+                      ", ".join([name for name, value in all_changes.items() if value is False]))
             failed = True
         else:
             log.info("Got successful reports from all clients, meaning all concurrent CASE sessions worked")

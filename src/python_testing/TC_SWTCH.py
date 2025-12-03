@@ -263,7 +263,7 @@ class TC_SwitchTests(MatterBaseTest):
         time_remaining = timeout_sec
 
         logger.info(f"Waiting {timeout_sec:.1f} seconds for no more events for "
-                     f"cluster {expected_cluster} on endpoint {endpoint_id}")
+                    f"cluster {expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)
