@@ -120,8 +120,7 @@ class TC_I_2_4(MatterBaseTest):
         # Verify Q requirements for IdentifyTime attribute by write to IdentifyTime
 
         self.step(3)
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(30), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(30), endpoint_id=endpoint, expect_success=True)
 
         self.step(4)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -132,8 +131,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(5)
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint, expect_success=True)
 
         self.step(6)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -144,8 +142,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(7)
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint, expect_success=True)
 
         self.step(8)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -164,8 +161,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(10)
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint, expect_success=True)
 
         self.step(11)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -176,8 +172,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(12)
-        result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint, expect_success=True)
 
         self.step(13)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
