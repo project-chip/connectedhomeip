@@ -85,7 +85,7 @@ class TC_BINFO_3_1(MatterBaseTest):
     @async_test_body
     async def test_TC_BINFO_3_1(self):
         self.step(0)
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
         attributes = Clusters.BasicInformation.Attributes
 
         # Read ProductAppearance once and reuse for all steps since the attribute value doesn't change
