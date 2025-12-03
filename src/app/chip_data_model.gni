@@ -205,6 +205,8 @@ template("chip_data_model") {
     # and those include scenes bits, so we add all dependencies here
     sources += [
       "${_app_root}/clusters/scenes-server/AttributeValuePairValidator.h",
+      "${_app_root}/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
+      "${_app_root}/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
       "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
       "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
       "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
