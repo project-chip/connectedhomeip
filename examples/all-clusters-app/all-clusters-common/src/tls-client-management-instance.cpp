@@ -279,7 +279,8 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
         {
             numInFabric++;
             auto & endpointStruct = endpoint.mEndpoint;
-            if (endpointStruct.hostname.data_equal(provisionReq.hostname) && (endpointStruct.port == provisionReq.port))
+            if (endpointStruct.hostname.data_equal(provisionReq.hostname) && (endpointStruct.port == provisionReq.port) &&
+                (provisionReq.endpointID.IsNull() || provisionReq.endpointID.Value() != endpointStruct.endpointID))
             {
                 installedCheck = ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointAlreadyInstalled);
                 return CHIP_ERROR_BAD_REQUEST;
