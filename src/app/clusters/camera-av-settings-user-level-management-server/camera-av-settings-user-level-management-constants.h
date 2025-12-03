@@ -27,10 +27,6 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-using MPTZStructType       = Structs::MPTZStruct::Type;
-using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
-using DPTZStruct           = Structs::DPTZStruct::Type;
-
 constexpr int16_t kPanMinMinValue  = -180;
 constexpr int16_t kPanMinMaxValue  = 0;
 constexpr int16_t kPanMaxMinValue  = 1;
@@ -50,17 +46,25 @@ constexpr uint8_t kDefaultZoom = 1;
 constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
+class PhysicalPTZCallback
+{
+public:
+    PhysicalPTZCallback()                                                               = default;
+    virtual ~PhysicalPTZCallback()                                                      = default;
+    virtual void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) = 0;
+};
+
 struct MPTZPresetHelper
 {
 private:
     uint8_t mPresetID;
     std::string mName;
-    MPTZStructType mMptzPosition;
+    CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mMptzPosition;
 
 public:
     virtual ~MPTZPresetHelper() = default;
     MPTZPresetHelper() {}
-    MPTZPresetHelper(uint8_t aPreset, CharSpan aName, MPTZStructType aPosition)
+    MPTZPresetHelper(uint8_t aPreset, CharSpan aName, CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type aPosition)
     {
         SetPresetID(aPreset);
         SetName(aName);
@@ -75,8 +79,8 @@ public:
     uint8_t GetPresetID() const { return mPresetID; }
     void SetPresetID(uint8_t aPreset) { mPresetID = aPreset; }
 
-    MPTZStructType GetMptzPosition() const { return mMptzPosition; }
-    void SetMptzPosition(MPTZStructType aPosition) { mMptzPosition = aPosition; }
+    CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type GetMptzPosition() const { return mMptzPosition; }
+    void SetMptzPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type aPosition) { mMptzPosition = aPosition; }
 };
 
 } // namespace CameraAvSettingsUserLevelManagement

@@ -90,7 +90,7 @@ public:
     chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 

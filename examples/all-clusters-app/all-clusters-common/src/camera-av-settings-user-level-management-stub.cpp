@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CodegenIntegration.h>
 #include <camera-av-settings-user-level-management-instance.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -158,7 +158,7 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> & dptzStreams)
 {
     dptzStreams.clear();
     return CHIP_NO_ERROR;
@@ -204,6 +204,7 @@ void AVSettingsUserLevelManagementDelegate::OnPhysicalMoveCompleted(Protocols::I
     }
 }
 
+/**
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
 {
     VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.
@@ -221,20 +222,9 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
-    BitFlags<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
 
     gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
-        kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
+        kEndpointId, *gDelegate.get(), avsumFeatures, appMaxPresets);
     TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom
@@ -244,3 +234,4 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
     TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
 }
+**/

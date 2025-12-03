@@ -18,14 +18,16 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <clusters/CameraAvSettingsUserLevelManagement/Metadata.h>
+
 
 using namespace chip;
 using namespace chip::app;
@@ -40,23 +42,23 @@ namespace app {
 namespace Clusters {
 
 CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId, 
-                                                                         BitFlags<Feature> aFeatures) :
+                                                                                   BitFlags<Feature> aFeatures) :
     mEndpointId(aEndpointId), mFeatures(aFeatures) {}
 
 
 CameraAvSettingsUserLevelMgmtServerLogic::~CameraAvSettingsUserLevelMgmtServerLogic() {}
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Init()
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Startup()
 {
+    ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: Startup");
     // Make sure mandated Features are set
     //
     VerifyOrReturnError(HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) ||
-                            HasFeature(Feature::kMechanicalZoom) || HasFeature(Feature::kDigitalPTZ),
+                        HasFeature(Feature::kMechanicalZoom) || HasFeature(Feature::kDigitalPTZ),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
-                                     "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. At least one of "
-                                     "Mechanical Pan, Tilt, Zoom or Digital PTZ must be supported",
-                                     mEndpointId));
+                                     "CameraAVSettingsUserLevelMgmt: Feature configuration error. At least one of "
+                                     "Mechanical Pan, Tilt, Zoom or Digital PTZ must be supported"));
 
     // Set up our defaults
     SetPan(MakeOptional(kDefaultPan));
@@ -80,9 +82,50 @@ bool CameraAvSettingsUserLevelMgmtServerLogic::HasFeature(Feature aFeature) cons
     return mFeatures.Has(aFeature);
 }
 
-bool CameraAvSettingsUserLevelMgmtServerLogic::SupportsOptAttr(OptionalAttributes aOptionalAttr) const
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) 
 {
-    return mOptionalAttrs.Has(aOptionalAttr);
+    if ((HasFeature(Feature::kMechanicalPan)) || (HasFeature(Feature::kMechanicalTilt)) || (HasFeature(Feature::kMechanicalZoom)))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::MPTZSetPosition::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::MPTZRelativeMove::kMetadataEntry }));
+    }
+
+    if (HasFeature(Feature::kMechanicalPresets))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::MPTZMoveToPreset::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::MPTZSavePreset::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::MPTZRemovePreset::kMetadataEntry }));
+    }
+
+    if (HasFeature(Feature::kDigitalPTZ))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::DPTZSetViewport::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::DPTZRelativeMove::kMetadataEntry }));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: Attributes");
+
+    // All attributes are set dependent on the Feature Flags
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom), MPTZPosition::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalPresets), MaxPresets::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalPan), MPTZPresets::kMetadataEntry },
+        { HasFeature(Feature::kDigitalPTZ), DPTZStreams::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalZoom), ZoomMax::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalTilt), TiltMin::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalTilt), TiltMax::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalPan), PanMin::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalPan), PanMax::kMetadataEntry },
+        { HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom), MovementState::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
 void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeId)
@@ -90,7 +133,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeI
     MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, aAttributeId);
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(const MPTZStructType & mptzPosition)
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -99,19 +142,19 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(const MPT
     writer.Init(bufferSpan);
     ReturnErrorOnFailure(mptzPosition.Encode(writer, TLV::AnonymousTag()));
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
+    //auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
+    return CHIP_NO_ERROR; //GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(MPTZStructType & mptzPosition)
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
+    //auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
+    //ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
 
@@ -353,7 +396,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::RemoveMoveCapableVideoStream(uint
 bool CameraAvSettingsUserLevelMgmtServerLogic::KnownVideoStreamID(uint16_t aVideoStreamID)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
-                           [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
+                           [aVideoStreamID](const DPTZStruct::Type & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
 
     return (it == mDptzStreams.end() ? false : true);
 }
@@ -383,7 +426,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID()
         }
 
         auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
-                               [=](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == nextIDToCheck; });
+                               [=](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == nextIDToCheck; });
         if (it == mMptzPresetHelpers.end())
         {
             mCurrentPresetID = nextIDToCheck;
@@ -404,7 +447,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeMPTZPresets(At
         {
             // Get the details to encode from the preset helper
             //
-            MPTZPresetStructType presetStruct;
+            MPTZPresetStruct::Type presetStruct;
             std::string name      = mptzPresets.GetName();
             uint8_t preset        = mptzPresets.GetPresetID();
             presetStruct.presetID = preset;
@@ -435,7 +478,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Load MPTZPosition
-    MPTZStructType storedMPTZPosition;
+    MPTZStruct::Type storedMPTZPosition;
     err = LoadMPTZPosition(storedMPTZPosition);
     if (err == CHIP_NO_ERROR)
     {
@@ -756,7 +799,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // We have presets, check that the received ID is a valid preset ID
     //
     auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
-                           [preset](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == preset; });
+                           [preset](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == preset; });
 
     if (it == mMptzPresetHelpers.end())
     {
@@ -828,7 +871,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // Does the preset equate to an already known stored preset? If so we're updating that one rather than creating a new one
     //
     auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
-                           [presetToUse](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
+                           [presetToUse](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
 
     // If the current preset ID results in an entry from the current known set and there was a provided preset then we're updating
     // an existing preset.  Only check for exhausting max presets if we're NOT updating.
@@ -861,7 +904,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     // Capture the current MPTZ values in the preset
     //
-    MPTZPresetHelper aMptzPresetHelper;
+    CameraAvSettingsUserLevelManagement::MPTZPresetHelper aMptzPresetHelper;
 
     aMptzPresetHelper.SetPresetID(presetToUse);
     aMptzPresetHelper.SetName(presetName);
@@ -912,7 +955,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // Is the provided ID known to us?
     //
     auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
-                           [presetToRemove](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToRemove; });
+                           [presetToRemove](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToRemove; });
 
     if (it == mMptzPresetHelpers.end())
     {
@@ -1037,10 +1080,3 @@ void CameraAvSettingsUserLevelMgmtServerLogic::OnPhysicalMovementComplete(Status
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-/** @brief Camera AV Settings User Level Management Cluster Server Init
- *
- * Server Init
- *
- */
-void MatterCameraAvSettingsUserLevelManagementPluginServerInitCallback() {}

@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "camera-av-settings-user-level-management-server.cpp",
-  "camera-av-settings-user-level-management-server.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]

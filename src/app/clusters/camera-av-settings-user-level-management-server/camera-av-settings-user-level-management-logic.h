@@ -19,9 +19,14 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-constants.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-delegate.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <string>
 #include <vector>
 
@@ -29,7 +34,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class CameraAvSettingsUserLevelMgmtServerLogic : public PhysicalPTZCallback
+class CameraAvSettingsUserLevelManagementDelegate;
+
+class CameraAvSettingsUserLevelMgmtServerLogic : public CameraAvSettingsUserLevelManagement::PhysicalPTZCallback
 {
 public:
     /**
@@ -42,10 +49,10 @@ public:
      *                                           instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId, BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures );
+    CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId, BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures);
     ~CameraAvSettingsUserLevelMgmtServerLogic();
 
-    void SetDelegate(CameraAvSettingsUserLevelmanagementDelegate * delegate)
+    void SetDelegate(CameraAvSettingsUserLevelManagementDelegate * delegate)
     {
         mDelegate = delegate;
         if (mDelegate == nullptr)
@@ -53,6 +60,8 @@ public:
             ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Trying to set delegate to null")
         }
     }
+
+    EndpointId mEndpointId = kInvalidEndpointId;
 
     BitFlags<CameraAvSettingsUserLevelManagement::Feature> mFeatures;
 
@@ -64,22 +73,33 @@ public:
 
     // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially overwritten by the delegate. 
     // Exception is MaxPresets that is an F quality attribute and assigned by the constructor
-    const uint8_t mMaxPresets;
-    int16_t mPanMin  = kPanMinMinValue;
-    int16_t mPanMax  = kPanMaxMaxValue;
-    int16_t mTiltMin = kTiltMinMinValue;
-    int16_t mTiltMax = kTiltMaxMaxValue;
-    uint8_t mZoomMax = kZoomMaxMaxValue;
+    const uint8_t mMaxPresets = 5;
+    int16_t mPanMin  = CameraAvSettingsUserLevelManagement::kPanMinMinValue;
+    int16_t mPanMax  = CameraAvSettingsUserLevelManagement::kPanMaxMaxValue;
+    int16_t mTiltMin = CameraAvSettingsUserLevelManagement::kTiltMinMinValue;
+    int16_t mTiltMax = CameraAvSettingsUserLevelManagement::kTiltMaxMaxValue;
+    uint8_t mZoomMax = CameraAvSettingsUserLevelManagement::kZoomMaxMaxValue;
 
     CameraAvSettingsUserLevelManagement::PhysicalMovementEnum mMovementState;
 
-    CHIP_ERROR Init();
+    std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> mMptzPresetHelpers;
+    std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;
+
+    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR Startup();
 
     // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
     // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
     void Shutdown();
 
     bool HasFeature(CameraAvSettingsUserLevelManagement::Feature aFeature) const;
+
+    // Returns the commands accepted depending on the Feature Flags that are set
+    CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
+
+    // Returns supported depending on the Feature Flags that are set
+    CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
     // Attribute Accessors and Mutators
     CHIP_ERROR SetTiltMin(int16_t aTiltMin);
@@ -174,12 +194,9 @@ public:
     // Is a command already being processed
     bool IsMoving() const { return mMovementState == CameraAvSettingsUserLevelManagement::PhysicalMovementEnum::kMoving; }
 
-private:
-    CameraAvSettingsUserLevelmanagementDelegate * mDelegate = nullptr;
-    EndpointId mEndpointId;
 
-    std::vector<MPTZPresetHelper> mMptzPresetHelpers;
-    std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;
+private:
+    CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
@@ -190,15 +207,13 @@ private:
     CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
     CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
 
-    CHIP_ERROR StoreMPTZPosition(const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mptzPosition);
+    CHIP_ERROR StoreMPTZPosition(const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition);
     CHIP_ERROR LoadMPTZPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition);
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.
      */
     void LoadPersistentAttributes();    
-
-
 
     /**
      * Helper function that manages preset IDs
@@ -220,7 +235,6 @@ private:
     void MarkDirty(AttributeId aAttributeId);
 };
 
-} // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

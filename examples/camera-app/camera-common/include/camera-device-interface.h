@@ -20,7 +20,7 @@
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
 #include "webrtc-provider-controller.h"
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
@@ -135,7 +135,7 @@ public:
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
-    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
 
     // Getter for ZoneManagement Delegate
     virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;

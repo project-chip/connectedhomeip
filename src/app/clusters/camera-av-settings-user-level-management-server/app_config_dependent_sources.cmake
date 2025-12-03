@@ -20,5 +20,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/camera-av-settings-user-level-management-cluster.h"
     "${CLUSTER_DIR}/camera-av-settings-user-level-management-logic.cpp"
     "${CLUSTER_DIR}/camera-av-settings-user-level-management-logic.h"    
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-delegate.h"    
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

@@ -19,7 +19,7 @@
 #pragma once
 
 #include "camera-device-interface.h"
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -30,7 +30,7 @@ namespace CameraAvSettingsUserLevelManagement {
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVSettingsUserLevelManager : public Delegate
+class CameraAVSettingsUserLevelManager : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
     CameraAVSettingsUserLevelManager()  = default;
@@ -41,7 +41,7 @@ public:
     bool CanChangeMPTZ() override;
 
     CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) override;
-    CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams) override;
+    CHIP_ERROR LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams) override;
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     /**
