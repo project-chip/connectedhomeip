@@ -501,17 +501,26 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
     cleanup()
 
 
-# On linux, allow an execution shell to be prepared
+# On Linux, allow an execution shell to be prepared
 if sys.platform == 'linux':
     @main.command(
         'shell',
-        help=('Execute a bash shell in the environment (useful to test '
-              'network namespaces)'))
+        help=('Execute a bash shell in the environment (useful to test network namespaces)'))
+    @click.option(
+        '--ns-index',
+        type=click.IntRange(min=0),
+        help='Index of Linux network namespace'
+    )
     @click.pass_context
-    def cmd_shell(context: click.Context) -> None:
+    def cmd_shell(context: click.Context, ns_index: int | None) -> None:
         assert isinstance(context.obj, RunContext)
-        chiptest.linux.IsolatedNetworkNamespace(unshared=context.obj.in_unshare)
-        os.execvpe("bash", ["bash"], os.environ.copy())
+
+        if ns_index is None:
+            ns_index = 0
+        chiptest.linux.IsolatedNetworkNamespace(ns_index, unshared=context.obj.in_unshare)
+
+        shell = os.environ.get("SHELL", "bash")
+        os.execvpe(shell, [shell], os.environ.copy())
 
 
 if __name__ == '__main__':
