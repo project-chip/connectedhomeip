@@ -201,13 +201,19 @@ class IsolatedNetworkNamespace:
 
         self._executed_commands: list[NetworkLinkCmd] = []
 
-        self._setup_links()
-        if rpc_link_up:
-            self._rpc_link_up(wait_for_dad=False)
-        if app_link_up:
-            self.app_link_up(wait_for_dad=False)
-        if tool_link_up:
-            self._tool_link_up(wait_for_dad=False)
+        try:
+            self._setup_links()
+            if rpc_link_up:
+                self._rpc_link_up(wait_for_dad=False)
+            if app_link_up:
+                self.app_link_up(wait_for_dad=False)
+            if tool_link_up:
+                self._tool_link_up(wait_for_dad=False)
+        except Exception as e:
+            # Ensure that we leave a clean state on any exception.
+            self.terminate()
+            raise e
+
         if wait_for_dad:
             self.wait_for_duplicate_address_detection()
 
