@@ -25,10 +25,10 @@ if(matter_enable_ota_requestor)
     APPEND ${list_chip_main_sources}
 
     # OTARequestor
-    ${chip_dir}/sr/app/clusters/ota-requestor/BDXDownloader.cpp
-    ${chip_dir}/sr/app/clusters/ota-requestor/DefaultOTARequestor.cpp
-    ${chip_dir}/sr/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
-    ${chip_dir}/sr/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
   )
 endif(matter_enable_ota_requestor)
