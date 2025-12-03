@@ -150,11 +150,17 @@ class IsolatedNetworkNamespace:
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
 
-        self._setup()
-        if setup_app_link_up:
-            self._setup_app_link_up(wait_for_dad=False)
-        if setup_tool_link_up:
-            self._setup_tool_link_up(wait_for_dad=False)
+        try:
+            self._setup()
+            if setup_app_link_up:
+                self._setup_app_link_up(wait_for_dad=False)
+            if setup_tool_link_up:
+                self._setup_tool_link_up(wait_for_dad=False)
+        except Exception as e:
+            # Ensure that we leave a clean state on any exception.
+            self.terminate()
+            raise e
+
         if wait_for_dad:
             self.wait_for_duplicate_address_detection()
 
