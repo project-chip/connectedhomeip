@@ -37,7 +37,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 
 import test_plan_support
