@@ -25,6 +25,7 @@ from mobly import asserts
 import matter.testing.nfc
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
+from mobly import signals
 
 logger = logging.getLogger(__name__)
 
@@ -95,13 +96,8 @@ class TC_DD_1_5(MatterBaseTest):
         ###########
         self.step("3")
 
-        try:
+        with asserts.assert_raises(signals.TestFailure):
             reader.write_ndef_uri("MT:-24J029Q00OC0000000")
-            raise RuntimeError("Error! write_ndef_uri() did not fail as expected.")
-
-        except Exception:
-            # Exception was expected, so pass
-            pass
 
         # Check that NDEF content is unchanged
         nfc_tag_content_after_write = reader.read_nfc_tag_data()
