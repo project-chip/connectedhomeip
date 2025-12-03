@@ -19,6 +19,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/AttributeValuePairValidator.h"
     "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.cpp"
     "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.h"
+    "${CLUSTER_DIR}/CodegenEndpointToIndex.h"
     "${CLUSTER_DIR}/ExtensionFieldSets.h"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.cpp"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.h"

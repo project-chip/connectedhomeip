@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "zap-generated/gen_config.h"
 #include <app/clusters/on-off-server/codegen/scenes-integration.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
@@ -20,7 +21,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
-#include <app/clusters/scenes-server/scenes-server.h>
+#include <app/clusters/scenes-server/CodegenEndpointToIndex.h> // nogncheck
+#include <app/clusters/scenes-server/scenes-server.h>          // nogncheck
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -32,10 +34,9 @@ static constexpr size_t kOnOffMaxEndpointCount =
     MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static void sceneOnOffCallback(EndpointId endpoint);
-using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
-using OnOffTransitionTimeInterface =
-    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEndpointCount,
-                                                             MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
+using OnOffEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
+using OnOffTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<
+    scenes::CodegenEndpointToIndex<OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT, kOnOffMaxEndpointCount>>;
 
 #if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
@@ -126,7 +127,7 @@ public:
     }
 
 private:
-    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(OnOff::Id, sceneOnOffCallback);
+    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(sceneOnOffCallback);
 };
 static DefaultOnOffSceneHandler sOnOffSceneHandler;
 

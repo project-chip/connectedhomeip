@@ -15,6 +15,7 @@ app_config_dependent_sources = [
   "AttributeValuePairValidator.h",
   "CodegenAttributeValuePairValidator.cpp",
   "CodegenAttributeValuePairValidator.h",
+  "CodegenEndpointToIndex.h",
   "ExtensionFieldSets.h",
   "ExtensionFieldSetsImpl.cpp",
   "ExtensionFieldSetsImpl.h",
