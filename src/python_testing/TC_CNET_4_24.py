@@ -150,6 +150,22 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
 
 
 class TC_CNET_4_24(MatterBaseTest):
+    """
+    [TC-CNET-4.24] [Thread] Network Commissioning Success After Connection Failures [DUT-Server]
+
+    Example Usage:
+        To run the test case, use the following command:
+
+        ```bash
+        python src/python_testing/TC_CNET_4_24.py --commissioning-method ble-thread -d <discriminator> -p <passcode> \
+               --endpoint <endpoint_value> --thread-dataset-hex <dataset_value>
+        ```
+
+        Where `<endpoint_value>` should be replaced with the actual endpoint
+        number for the Network Commissioning cluster on the DUT, and
+        `<dataset_value>` should be replaced with the Thread Operational Dataset
+        in hexadecimal format.
+    """
 
     async def _validate_network_config_response(
         self,
@@ -279,12 +295,46 @@ class TC_CNET_4_24(MatterBaseTest):
         # Network Commissioning cluster is always on root endpoint (0) during commissioning
         endpoint = ROOT_ENDPOINT_ID
 
-        # Save correct credentials (used by commissioning framework and for final connection)
+        # Save correct Thread operational dataset from test config (used by commissioning framework and for final connection)
+        correct_thread_dataset = self.matter_test_config.thread_operational_dataset
+        logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
-        # Create incorrect credentials for test commands
+        # Create incorrect Thread operational datasets for testing
+        # First incorrect dataset: completely invalid/non-existent network (truncated/malformed)
+        incorrect_thread_dataset_1 = bytes.fromhex("1111111122222222")
+        logger.info(f" --- Incorrect Thread dataset 1 (invalid/truncated): {incorrect_thread_dataset_1.hex()}")
+
+        # Second incorrect dataset: valid format but with modified Extended PAN ID to create a non-existent network
+        incorrect_thread_dataset_2 = bytearray(correct_thread_dataset)
+
+        # Find and modify the Extended PAN ID TLV in the dataset
+        # Extended PAN ID: Type=0x02, Length=0x08, Value=8 bytes
+        i = 0
+        while i < len(incorrect_thread_dataset_2) - 1:
+            tlv_type = incorrect_thread_dataset_2[i]
+            tlv_length = incorrect_thread_dataset_2[i + 1]
+
+            if tlv_type == 0x02:  # Extended PAN ID
+                # Modify the Extended PAN ID value to create a non-existent network
+                # XOR the bytes to change them while maintaining valid format
+                for j in range(8):
+                    if i + 2 + j < len(incorrect_thread_dataset_2):
+                        incorrect_thread_dataset_2[i + 2 + j] ^= 0xFF
+                logger.info(f" --- Modified Extended PAN ID in dataset 2")
+                break
+
+            i += 2 + tlv_length
+
+        incorrect_thread_dataset_2 = bytes(incorrect_thread_dataset_2)
+        logger.info(f" --- Incorrect Thread dataset 2 (modified Extended PAN ID): {incorrect_thread_dataset_2.hex()}")
 
         # Step 0: TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(0)
+
+        # Temporarily use incorrect Thread operational dataset during auto-commissioning to prevent automatic Thread connection
+        # This ensures the DUT doesn't connect to Thread during the automated commissioning steps,
+        # allowing the test to manually verify incorrect and correct credential handling
+        self.matter_test_config.thread_operational_dataset = incorrect_thread_dataset_1
 
         # Skip CommissioningComplete to manually configure Thread with incorrect then correct credentials
         self.default_controller.SetSkipCommissioningComplete(True)
@@ -292,7 +342,11 @@ class TC_CNET_4_24(MatterBaseTest):
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
 
-        await self.commission_devices()
+        try:
+            await self.commission_devices()
+        finally:
+            # Restore correct Thread operational dataset for later use
+            self.matter_test_config.thread_operational_dataset = correct_thread_dataset
 
         # Extend fail-safe to 300 seconds to allow time for credential testing
         await self.send_single_cmd(
@@ -302,19 +356,18 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         logger.info(" --- Extended fail-safe timer to 300 seconds")
 
-        # Get correct Thread operational dataset from test config
-        correct_thread_dataset = self.matter_test_config.thread_operational_dataset
-        logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
+        # TH reads FeatureMap attribute from the DUT and verifies if DUT supports Thread on endpoint 0
+        feature_map = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.FeatureMap,
+        )
 
-        # Create incorrect Thread operational datasets for testing
-        # First incorrect dataset: completely invalid/non-existent network
-        incorrect_thread_dataset_1 = bytes.fromhex("1111111122222222")
-        logger.info(f" --- Incorrect Thread dataset 1 (invalid): {incorrect_thread_dataset_1.hex()}")
-
-        # Second incorrect dataset: valid format but different network (will not be found)
-        incorrect_thread_dataset_2 = bytes.fromhex(
-            "0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd00000000000100051000112233445566778899aabbccddeeff030e4f70656e5468726561642d31323334010200000410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0f7f8")
-        logger.info(f" --- Incorrect Thread dataset 2 (wrong network): {incorrect_thread_dataset_2.hex()}")
+        if not (feature_map & cnet.Bitmaps.Feature.kThreadNetworkInterface):
+            logger.info(" --- Device does not support Thread on endpoint 0, skipping remaining steps")
+            self.skip_all_remaining_steps(1)
+            return
 
         # Step 1: TH reads Networks attribute and removes all configured networks
         self.step(1)
