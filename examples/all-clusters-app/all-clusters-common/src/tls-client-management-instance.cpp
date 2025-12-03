@@ -279,6 +279,9 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
         {
             numInFabric++;
             auto & endpointStruct = endpoint.mEndpoint;
+            // A host/port collision is detected if we are either:
+            //  - provisioning a new endpoint (endpointID is null)
+            //  - updating an existing endpoint, but the colliding endpoint is not the one being updated.
             if (endpointStruct.hostname.data_equal(provisionReq.hostname) && (endpointStruct.port == provisionReq.port) &&
                 (provisionReq.endpointID.IsNull() || provisionReq.endpointID.Value() != endpointStruct.endpointID))
             {
