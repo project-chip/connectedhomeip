@@ -27,7 +27,7 @@
 namespace chip::Tracing {
 
 namespace {
-// Contains the registerted tracing backends. Modifications of the backend array
+// Contains the registered tracing backends. Modifications of the backend array
 // are protected by the Matter stack lock, but iteration can happen from any
 // thread at any time.
 //
