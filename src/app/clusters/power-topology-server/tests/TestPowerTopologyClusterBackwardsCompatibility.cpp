@@ -98,47 +98,6 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestHasFeatureAPI)
     }
 }
 
-TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestSupportsOptAttrAPI)
-{
-    MockPowerTopologyDelegate mockDelegate;
-
-    // Test with all optional attributes
-    {
-        BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-        Instance instance(kTestEndpointId, mockDelegate, features);
-        EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
-
-        EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
-        EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveEndpoints));
-
-        instance.Shutdown();
-    }
-
-    // Test with no optional attributes
-    {
-        BitMask<Feature> features(Feature::kNodeTopology);
-        Instance instance(kTestEndpointId, mockDelegate, features);
-        EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
-
-        EXPECT_FALSE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
-        EXPECT_FALSE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveEndpoints));
-
-        instance.Shutdown();
-    }
-
-    // Test with only AvailableEndpoints
-    {
-        BitMask<Feature> features(Feature::kSetTopology);
-        Instance instance(kTestEndpointId, mockDelegate, features);
-        EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
-
-        EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
-        EXPECT_FALSE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveEndpoints));
-
-        instance.Shutdown();
-    }
-}
-
 TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestMultipleInstancesOnDifferentEndpoints)
 {
     MockPowerTopologyDelegate mockDelegate1;
@@ -179,8 +138,6 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestInstanceConstructorAP
     EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
     EXPECT_TRUE(instance.HasFeature(Feature::kSetTopology));
     EXPECT_TRUE(instance.HasFeature(Feature::kDynamicPowerFlow));
-    EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints));
-    EXPECT_TRUE(instance.SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveEndpoints));
     instance.Shutdown();
 }
 

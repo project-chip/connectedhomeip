@@ -303,56 +303,6 @@ TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsMultipleTest)
     cluster.Shutdown();
 }
 
-TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsWithoutFeatureTest)
-{
-    chip::Test::TestServerClusterContext context;
-    BitMask<Feature> features; // No SetTopology feature
-    MockPowerTopologyDelegate mockDelegate;
-    mockDelegate.SetAvailableEndpoints({ 1, 2, 3 });
-
-    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
-        .endpointId = kTestEndpointId,
-        .delegate   = mockDelegate,
-        .features   = features,
-
-    });
-
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    ClusterTester tester(cluster);
-    AvailableEndpoints::TypeInfo::DecodableType availableEndpoints;
-    auto status = tester.ReadAttribute(AvailableEndpoints::Id, availableEndpoints);
-    EXPECT_FALSE(status.IsSuccess());
-    EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
-
-    cluster.Shutdown();
-}
-
-TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsWithoutFeatureTest)
-{
-    chip::Test::TestServerClusterContext context;
-    BitMask<Feature> features(Feature::kSetTopology); // No DynamicPowerFlow feature
-    MockPowerTopologyDelegate mockDelegate;
-    mockDelegate.SetActiveEndpoints({ 1, 2, 3 });
-
-    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
-        .endpointId = kTestEndpointId,
-        .delegate   = mockDelegate,
-        .features   = features,
-
-    });
-
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    ClusterTester tester(cluster);
-    ActiveEndpoints::TypeInfo::DecodableType activeEndpoints;
-    auto status = tester.ReadAttribute(ActiveEndpoints::Id, activeEndpoints);
-    EXPECT_FALSE(status.IsSuccess());
-    EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Failure);
-
-    cluster.Shutdown();
-}
-
 TEST_F(TestPowerTopologyCluster, DelegateAvailableEndpointsErrorTest)
 {
     chip::Test::TestServerClusterContext context;

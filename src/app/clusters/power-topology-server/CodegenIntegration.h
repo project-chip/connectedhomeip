@@ -30,12 +30,6 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 
-enum class OptionalAttributes : uint32_t
-{
-    kOptionalAttributeAvailableEndpoints = 0x1,
-    kOptionalAttributeActiveEndpoints    = 0x2,
-};
-
 class Instance
 {
 public:
@@ -52,7 +46,6 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
-    // bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
 private:
     RegisteredServerCluster<PowerTopologyCluster> mCluster;

@@ -46,19 +46,6 @@ bool Instance::HasFeature(Feature aFeature) const
     return mCluster.Cluster().Features().Has(aFeature);
 }
 
-// bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
-// {
-//     switch (aOptionalAttrs)
-//     {
-//     case OptionalAttributes::kOptionalAttributeAvailableEndpoints:
-//         return mCluster.Cluster().OptionalAttributes().IsSet(Attributes::AvailableEndpoints::Id);
-//     case OptionalAttributes::kOptionalAttributeActiveEndpoints:
-//         return mCluster.Cluster().OptionalAttributes().IsSet(Attributes::ActiveEndpoints::Id);
-//     default:
-//         return false;
-//     }
-// }
-
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

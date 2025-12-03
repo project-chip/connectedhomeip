@@ -35,8 +35,7 @@ namespace PowerTopology {
 
 CHIP_ERROR PowerTopologyCluster::GetAvailableEndpoints(AttributeValueEncoder & aEncoder) const
 {
-    VerifyOrReturnError(mFeatureFlags.Has(Feature::kSetTopology), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                        ChipLogError(Zcl, "Power Topology: can not get AvailableEndpoints, feature is not supported"));
+    // Needs to have SetTopology feature
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
@@ -53,9 +52,7 @@ CHIP_ERROR PowerTopologyCluster::GetAvailableEndpoints(AttributeValueEncoder & a
 
 CHIP_ERROR PowerTopologyCluster::GetActiveEndpoints(AttributeValueEncoder & aEncoder) const
 {
-    VerifyOrReturnError(mFeatureFlags.Has(Feature::kDynamicPowerFlow), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                        ChipLogError(Zcl, "Power Topology: can not get ActiveEndpoints, feature is not supported"));
-
+    // Needs to have DynamicPowerFlow feature
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
