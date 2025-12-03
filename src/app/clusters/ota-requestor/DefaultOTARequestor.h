@@ -112,10 +112,7 @@ public:
     }
 
     // Unregister a previously-registered event handler
-    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override
-    {
-        return mEventHandlers.Unregister(endpointId);
-    }
+    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override { return mEventHandlers.Unregister(endpointId); }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
