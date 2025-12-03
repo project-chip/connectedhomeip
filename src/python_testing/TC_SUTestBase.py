@@ -57,12 +57,12 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             setup_pincode (int, optional): Setup pincode for the provider process. Defaults to 20202021.
             discriminator (int, optional): Discriminator for the provider process. Defaults to 1234.
             port (int, optional): Port for the provider process. Defaults to 5541.
-            storage_dir (str, optional): Storage dir for the provider proccess. Defaults to '/tmp'.
+            storage_dir (str, optional): Storage dir for the provider process. Defaults to '/tmp'.
             extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
-            timeout (int): Timeout to wait for the expected output. Defaults to 30 seconds
+            timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
         logger.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
         # Image to launch
@@ -153,7 +153,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Args:
             controller (ChipDeviceCtrl): Controller to write the providers.
-            provider_node_id (int): Node where the provider is localted.
+            provider_node_id (int): Node where the provider is located.
             requestor_node_id (int): Node of the requestor to write the providers.
             endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
         """
@@ -309,9 +309,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    async def extend_ota_acls(self, controller: ChipDeviceCtrl, provider_node_id, requestor_node_id):
+    async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
         """
-        Extend ACLs on both Provider and Requestor to allow OTA interaction.
+        Extend ACLs on Provider to allow interaction with the Requestor.
         Preserves existing ACLs to avoid overwriting.
 
         Args:
@@ -327,27 +327,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        requestor_existing_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Create OTA ACL entries (both directions)
-
-        # Requestor is allowed to access OTA cluster on the Provider (Requestor > Provider)
+        # Create OTA ACL, the Requestor is allowed to access on the Provider
         await self.create_acl_entry(
             dev_ctrl=controller,
             provider_node_id=provider_node_id,      # write ACLs on the Provider
-            requestor_node_id=requestor_node_id     # the Requestor gets access
-        )
-
-        # Provider is allowed to access OTA cluster on the Requestor (Provider > Requestor)
-        await self.create_acl_entry(
-            dev_ctrl=controller,
-            provider_node_id=requestor_node_id,     # write ACLs on the Requestor
-            requestor_node_id=provider_node_id      # the Provider gets access
+            requestor_node_id=requestor_node_id     # allow access from the Requestor
         )
 
         # Read updated ACLs
@@ -358,26 +342,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        requestor_current_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
         # Combine original + new entries
         combined_provider_acls = provider_existing_acls + provider_current_acls
-        combined_requestor_acls = requestor_existing_acls + requestor_current_acls
 
         # Write back ACLs
         await self.write_acl(controller, provider_node_id, combined_provider_acls)
-        await self.write_acl(controller, requestor_node_id, combined_requestor_acls)
 
-        logger.info(
-            f"OTA ACLs extended between provider {provider_node_id} and requestor {requestor_node_id}"
-        )
+        logger.info(f'OTA ACLs extended between provider {provider_node_id}')
 
-    async def write_acl(self, controller: ChipDeviceCtrl, node_id: int, acl: list):
+    async def write_acl(self, controller, node_id, acl):
         """
         Write the ACL list to a device.
 
@@ -388,9 +361,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Returns:
             True if successful.
-
-        Raises:
-            AssertionError: If ACL write fails.
         """
         result = await controller.WriteAttribute(
             nodeId=node_id,
