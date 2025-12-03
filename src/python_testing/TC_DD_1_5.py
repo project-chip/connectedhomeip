@@ -17,11 +17,12 @@
 
 # Test excluded from CI
 
-import logging
 import asyncio
-import matter.testing.nfc
+import logging
 
 from mobly import asserts
+
+import matter.testing.nfc
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
 

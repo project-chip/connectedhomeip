@@ -1,11 +1,11 @@
-import logging
 import asyncio
+import logging
 import threading
 import time
+
 import ndef
 import smartcard
 import smartcard.CardMonitoring
-
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

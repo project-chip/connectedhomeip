@@ -17,10 +17,9 @@
 
 import logging
 
-import matter.testing.nfc
-
 from mobly import asserts
 
+import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
