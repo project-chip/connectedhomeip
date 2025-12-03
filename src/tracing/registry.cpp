@@ -27,18 +27,25 @@
 namespace chip::Tracing {
 
 namespace {
-// Contains the registerted tracing backends. The invariant enforced by
-// Register/Unregister is that all valid backends come before any nullptr
-// entries. The special value kNoBackendMarker is used to indicate a slot that
-// is empty, but is not at the end of the array (i.e. there are valid backends
-// after it). The array is typed as void * to accommodate the special marker
-// value; all other non-null values are valid Backend * pointers. Modifications
-// of the backend array are protected by the Matter stack lock, but iteration
-// can happen from any thread at any time.
+// Contains the registerted tracing backends. Modifications of the backend array
+// are protected by the Matter stack lock, but iteration can happen from any
+// thread at any time.
+//
+// Depending on the size of the array, we optimize iteration by stopping on
+// the first nullptr entry; in this case Register/Unregister enforce the invariant
+// that all valid backends come before any nullptr entries. The special value
+// kNoBackendMarker is used to indicate a slot that is empty, but is not at the
+// end of the array (i.e. there are valid backends after it). The array is typed as
+// void * to accommodate the special marker value; all other non-null values are
+// valid Backend * pointers.
 std::atomic<void *> gTracingBackends[CHIP_CONFIG_MAX_TRACING_BACKENDS]{};
 
-// A non-null marker value that differs from any valid Backend *.
-inline constexpr void * kNoBackendMarker = &gTracingBackends;
+// If we support only one backend the early stopping logic is not needed.
+inline constexpr bool kStopOnNullptr = (CHIP_CONFIG_MAX_TRACING_BACKENDS > 1);
+
+// A marker value that differs from any valid Backend *, and from nullptr if we
+// want to be able to stop iteration early. Otherwise it is just nullptr.
+inline constexpr void * kNoBackendMarker = kStopOnNullptr ? &gTracingBackends : nullptr;
 
 template <typename Fn>
 void ForEachBackend(Fn && fn)
@@ -46,7 +53,7 @@ void ForEachBackend(Fn && fn)
     for (auto & slot : gTracingBackends)
     {
         void * backend = slot.load(std::memory_order_acquire);
-        VerifyOrReturn(backend != nullptr);
+        VerifyOrReturn(!kStopOnNullptr || backend != nullptr);
         if (backend != kNoBackendMarker)
         {
             fn(*static_cast<Backend *>(backend));
@@ -58,6 +65,8 @@ void ForEachBackend(Fn && fn)
 // so iteration can stop as early as possible.
 void OptimizeBackends()
 {
+    VerifyOrReturn(kStopOnNullptr);
+
     for (int i = CHIP_CONFIG_MAX_TRACING_BACKENDS - 1; i >= 0; --i)
     {
         auto & slot    = gTracingBackends[i];
