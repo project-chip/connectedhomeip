@@ -39,6 +39,8 @@ import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_CGEN_2_1(MatterBaseTest):
     def desc_TC_CGEN_2_1(self) -> str:

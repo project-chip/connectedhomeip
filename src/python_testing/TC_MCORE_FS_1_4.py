@@ -75,6 +75,8 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from matter.testing.tasks import Subprocess
 
+log = logging.getLogger(__name__)
+
 
 class FabricSyncApp(Subprocess):
 

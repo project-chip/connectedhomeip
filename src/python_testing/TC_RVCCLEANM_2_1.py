@@ -46,6 +46,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 # This test requires several additional command line arguments
 # run with
 # --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>

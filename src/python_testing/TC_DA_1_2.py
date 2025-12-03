@@ -60,6 +60,8 @@ from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from matter.tlv import TLVReader
 
+log = logging.getLogger(__name__)
+
 
 def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
     rdn = list(filter(lambda rdn: oid_dotted_str in rdn.oid.dotted_string, cert.subject))

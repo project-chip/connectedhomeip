@@ -32,6 +32,8 @@ from TC_TLS_Utils import TLSUtils
 from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
 
+log = logging.getLogger(__name__)
+
 
 class PushAvServerProcess(Subprocess):
     """Class for starting Push AV Server in a subprocess"""

@@ -43,6 +43,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_OCC_2_3(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):

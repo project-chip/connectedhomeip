@@ -44,6 +44,8 @@ from TC_WEBRTCRTestBase import WEBRTCRTestBase
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_WebRTCR_2_4(WEBRTCRTestBase):
     def setup_class(self):

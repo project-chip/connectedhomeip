@@ -70,6 +70,8 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
 

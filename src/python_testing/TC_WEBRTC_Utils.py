@@ -18,6 +18,8 @@ import logging
 
 from matter.clusters import CameraAvStreamManagement
 
+log = logging.getLogger(__name__)
+
 
 class WebRTCTestHelper:
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):

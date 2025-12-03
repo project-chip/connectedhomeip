@@ -46,6 +46,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_SEAR_1_3(MatterBaseTest):
     def __init__(self, *args):

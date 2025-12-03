@@ -23,6 +23,8 @@ import sys
 
 import click
 
+log = logging.getLogger(__name__)
+
 CHIP_ROOT = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../../..'))
 RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, 'scripts/tests')

@@ -46,6 +46,8 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
 def state_enum_to_text(state_enum):

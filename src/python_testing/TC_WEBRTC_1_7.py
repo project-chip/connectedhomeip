@@ -49,6 +49,8 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_7(self) -> list[TestStep]:

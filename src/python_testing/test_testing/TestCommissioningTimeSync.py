@@ -25,6 +25,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
+log = logging.getLogger(__name__)
+
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly

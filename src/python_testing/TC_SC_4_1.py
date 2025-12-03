@@ -75,6 +75,8 @@ import matter.clusters as Clusters
 from matter.testing.commissioning import get_setup_payload_info_config
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 '''
 Purpose
 The purpose of this test case is to verify that a device is able to

@@ -53,6 +53,8 @@ from matter.testing.basic_composition import arls_populated
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_ACL_2_11(MatterBaseTest):
 

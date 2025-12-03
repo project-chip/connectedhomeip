@@ -28,6 +28,8 @@ import click
 import coloredlogs
 import yaml
 
+log = logging.getLogger(__name__)
+
 # Function to load --app argument environment variables from a file
 
 

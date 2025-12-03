@@ -42,6 +42,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 def acl_subject(cat: int) -> int:
     return 0xFFFFFFFD00000000 | cat

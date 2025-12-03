@@ -41,6 +41,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_VALCC_4_3(MatterBaseTest):
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):

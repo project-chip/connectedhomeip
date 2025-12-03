@@ -21,6 +21,8 @@ import websockets
 
 from matter.testing.matter_testing import MatterBaseTest
 
+log = logging.getLogger(__name__)
+
 # WebSocket server URI for sending commands to the DUT
 SERVER_URI = "ws://localhost:9002"
 

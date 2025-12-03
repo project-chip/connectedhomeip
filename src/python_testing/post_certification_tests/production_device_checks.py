@@ -57,6 +57,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 
+log = logging.getLogger(__name__)
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 

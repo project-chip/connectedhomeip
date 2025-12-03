@@ -36,6 +36,8 @@ from matter.testing.commissioning import CustomCommissioningParameters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 
+log = logging.getLogger(__name__)
+
 
 class CommissioningWindowOption(IntEnum):
     ORIGINAL_SETUP_CODE = 0  # kOriginalSetupCode: Original commissioning window (PASE)

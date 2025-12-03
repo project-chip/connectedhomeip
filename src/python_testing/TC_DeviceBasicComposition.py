@@ -211,6 +211,8 @@ from matter.testing.taglist_and_topology_test import (create_device_type_list_fo
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 def get_vendor_id(mei: int) -> int:
     """Get the vendor ID portion (MEI prefix) of an overall MEI."""

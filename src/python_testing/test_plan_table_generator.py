@@ -26,6 +26,8 @@ import click
 from matter.testing.matter_testing import MatterTestConfig
 from matter.testing.runner import generate_mobly_test_config
 
+log = logging.getLogger(__name__)
+
 
 def indent_multiline(multiline: str, num_spaces: int) -> str:
     ''' Indents subsequent lines of a multiline string by num_spaces spaces'''

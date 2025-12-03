@@ -27,6 +27,8 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
                                            run_if_endpoint_matches)
 
+log = logging.getLogger(__name__)
+
 
 class TC_CNET_4_4(MatterBaseTest):
     def steps_TC_CNET_4_4(self):

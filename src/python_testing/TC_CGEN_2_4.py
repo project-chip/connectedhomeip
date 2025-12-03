@@ -50,6 +50,8 @@ from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # Commissioning stage numbers - we should find a better way to match these to the C++ code
 # TODO: https://github.com/project-chip/connectedhomeip/issues/36629
 kArmFailsafe = 3

@@ -43,6 +43,8 @@ from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_SOIL_2_2(MatterBaseTest):
     async def read_soil_attribute_expect_success(self, endpoint, attribute):

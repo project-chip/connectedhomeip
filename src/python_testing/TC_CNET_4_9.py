@@ -26,6 +26,8 @@ from matter.testing.matter_asserts import assert_non_empty_string, is_valid_bool
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
                                            run_if_endpoint_matches)
 
+log = logging.getLogger(__name__)
+
 
 class TC_CNET_4_9(MatterBaseTest):
     """

@@ -42,6 +42,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
+log = logging.getLogger(__name__)
+
 
 class TC_VALCC_4_4(MatterBaseTest):
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):

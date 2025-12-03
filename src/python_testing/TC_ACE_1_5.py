@@ -44,6 +44,8 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_ACE_1_5(MatterBaseTest):
 

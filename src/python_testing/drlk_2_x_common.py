@@ -27,6 +27,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import matchers
 
+log = logging.getLogger(__name__)
+
 
 class DRLK_COMMON:
     async def read_drlk_attribute_expect_success(self, attribute):

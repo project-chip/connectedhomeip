@@ -45,6 +45,8 @@ from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:

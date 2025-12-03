@@ -59,6 +59,8 @@ from matter.testing.pics import accepted_cmd_pics_str
 from matter.tlv import TLVReader
 from matter.utils import CommissioningBuildingBlocks
 
+log = logging.getLogger(__name__)
+
 nest_asyncio.apply()
 
 

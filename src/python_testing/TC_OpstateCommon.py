@@ -32,6 +32,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import TestStep
 
+log = logging.getLogger(__name__)
+
 
 def get_pid(name):
     pid = None

@@ -42,6 +42,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 ''' Integration test of batch commands using UnitTesting Cluster
 
 This test is meant to test cases not covered in IDM_1_4 as a result of not being able to control

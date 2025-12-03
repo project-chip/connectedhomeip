@@ -65,6 +65,8 @@ from matter.testing.problem_notices import AttributePathLocation, ClusterPathLoc
 from matter.testing.spec_parsing import XmlCluster
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 class AccessTestType(Enum):
     READ = auto()

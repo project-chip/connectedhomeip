@@ -43,6 +43,8 @@ from TC_CHIMETestBase import CHIMETestBase
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 

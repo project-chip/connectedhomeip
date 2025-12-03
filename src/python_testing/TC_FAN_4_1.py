@@ -48,6 +48,8 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
+log = logging.getLogger(__name__)
+
 
 class TC_FAN_4_1(MatterBaseTest):
     def desc_TC_FAN_4_1(self) -> str:

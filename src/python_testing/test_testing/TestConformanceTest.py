@@ -30,6 +30,8 @@ from matter.testing.problem_notices import AttributePathLocation, CommandPathLoc
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
 
+log = logging.getLogger(__name__)
+
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
     # Really simple device with one endpoint that includes scenes management, which is provisional

@@ -43,6 +43,8 @@ from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class HelloTest(MatterBaseTest):
     # This example test does not include the step_ and desc_ markers

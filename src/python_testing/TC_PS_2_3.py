@@ -43,6 +43,8 @@ import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_PS_2_3(MatterBaseTest):
 

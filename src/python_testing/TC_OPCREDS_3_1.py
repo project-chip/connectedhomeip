@@ -47,6 +47,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from matter.tlv import TLVReader, TLVWriter
 
+log = logging.getLogger(__name__)
+
 
 class TC_OPCREDS_3_1(MatterBaseTest):
     async def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeId: int, dev_ctrl: ChipDeviceCtrl = None):

@@ -46,6 +46,8 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
                                            matchers)
 
+log = logging.getLogger(__name__)
+
 
 class RvcStatusEnum(enum.IntEnum):
     # TODO remove this class once InvalidInMode response code is implemented in python SDK

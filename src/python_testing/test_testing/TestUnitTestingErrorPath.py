@@ -42,6 +42,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 """ Integration test for error path returns via the UnitTesting cluster.
 """
 

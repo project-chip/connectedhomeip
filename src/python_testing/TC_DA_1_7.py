@@ -51,6 +51,8 @@ import matter.clusters as Clusters
 from matter.testing.conversions import bytes_from_hex, hex_from_bytes
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # Those are SDK samples that are known to be non-production.
 FORBIDDEN_AKID = [
     bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),

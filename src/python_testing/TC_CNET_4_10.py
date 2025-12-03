@@ -25,6 +25,8 @@ from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # Thread TLV Type mapping for operational dataset parsing
 THREAD_TLV_TYPE_MAP = {
     0x00: "Channel",

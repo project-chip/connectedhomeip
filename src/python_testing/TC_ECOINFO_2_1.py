@@ -72,6 +72,8 @@ from matter.testing.commissioning import SetupParameters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 class TC_ECOINFO_2_1(MatterBaseTest):
 

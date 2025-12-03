@@ -48,6 +48,8 @@ from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, Mat
                                            default_matter_test_main)
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:

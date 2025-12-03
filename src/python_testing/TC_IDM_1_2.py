@@ -48,6 +48,8 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
     cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]

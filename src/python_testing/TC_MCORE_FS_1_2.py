@@ -76,6 +76,8 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
 

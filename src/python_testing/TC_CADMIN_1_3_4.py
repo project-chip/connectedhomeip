@@ -57,6 +57,8 @@ from matter.exceptions import ChipStackError
 from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from matter.tlv import TLVReader
 
+log = logging.getLogger(__name__)
+
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 

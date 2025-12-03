@@ -41,6 +41,8 @@ from matter.testing.matter_asserts import assert_valid_map8, assert_valid_uint16
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 class TC_CLDIM_2_1(MatterBaseTest):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):

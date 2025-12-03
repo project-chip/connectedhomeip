@@ -44,6 +44,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # These below variables are used to test the AccessControl cluster
 # Extension attribute and come from the test plan here:
 # https://github.com/CHIP-Specifications/chip-test-plans/blob/59e8c45b8e7c24d5ce130b166520ff4f7bd935b6/src/cluster/AccessControl.adoc#tc-acl-2-10-persistence

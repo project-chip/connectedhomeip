@@ -46,6 +46,8 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                            default_matter_test_main)
 
+log = logging.getLogger(__name__)
+
 triggerProtected = 0x0104000000000001
 triggerDisengaged = 0x0104000000000002
 triggerClear = 0x0104000000000004

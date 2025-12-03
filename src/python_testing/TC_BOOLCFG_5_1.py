@@ -44,6 +44,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 sensorTrigger = 0x0080_0000_0000_0000
 sensorUntrigger = 0x0080_0000_0000_0001
 

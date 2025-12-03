@@ -49,6 +49,8 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""

@@ -53,6 +53,8 @@ from matter.interaction_model import Status as StatusEnum
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
+log = logging.getLogger(__name__)
+
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to
 #       the trigger the subscriptions not re-opening a new CASE session
