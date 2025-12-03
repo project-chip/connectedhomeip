@@ -87,7 +87,7 @@ def load_env_from_yaml(file_path):
 @click.option(
     "--save-failures-to",
     type=str,
-    help="Save the names of failed tests to the specified file.",
+    help="Save the names of failed tests to the specified file. Only effective when used together with --keep-going; without --keep-going, failures cause immediate exit and are not written to the file.",
 )
 @click.option(
     "--script-list-file",
