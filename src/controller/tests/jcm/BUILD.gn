@@ -33,8 +33,6 @@ chip_test_suite("jcm") {
 
   test_sources = [ "TestJCMCommissioner.cpp" ]
 
-  defines = [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1" ]
-
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
@@ -45,6 +43,7 @@ chip_test_suite("jcm") {
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/controller",
     "${chip_root}/src/controller/jcm:jcm",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
