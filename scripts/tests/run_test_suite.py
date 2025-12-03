@@ -434,7 +434,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not ble_wifi,
+                app_link_up=not ble_wifi,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if ble_wifi else 'eth-app',
