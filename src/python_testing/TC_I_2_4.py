@@ -156,7 +156,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(9)
-        logging.info("Test wait for report of IdentifyTime at 0")
+        logging.info("Test waits for report of IdentifyTime at 0")
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
@@ -235,7 +235,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(20)
-        logging.info("Test wait for report of IdentifyTime at 0")
+        logging.info("Test waits for report of IdentifyTime at 0")
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
