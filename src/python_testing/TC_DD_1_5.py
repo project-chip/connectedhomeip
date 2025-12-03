@@ -20,12 +20,11 @@
 import asyncio
 import logging
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.testing.nfc
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
-from mobly import signals
 
 logger = logging.getLogger(__name__)
 
