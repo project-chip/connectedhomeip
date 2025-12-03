@@ -51,7 +51,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         return "[TC_CLDIM_2_1] Attributes with DUT as Server"
 
     def steps_TC_CLDIM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "Read feature map determine supported features"),
             TestStep(3, "Read CurrentState attribute, if supported"),
@@ -67,13 +67,11 @@ class TC_CLDIM_2_1(MatterBaseTest):
             TestStep(13, "Read ModulationType attribute, if supported"),
             TestStep(14, "Read LatchControlModes attribute, if supported"),
         ]
-        return steps
 
     def pics_TC_CLDIM_2_1(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -181,7 +179,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                     "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
-                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not larger than or equal to zero")
+                    asserts.assert_true(unit_range.min >= 0, "UnitRange.min is not larger than or equal to zero")
                     asserts.assert_true(unit_range.min <= unit_range.max <= 32767,
                                         "UnitRange.max is not in the expected range [UnitRange.Min:32767]")
 

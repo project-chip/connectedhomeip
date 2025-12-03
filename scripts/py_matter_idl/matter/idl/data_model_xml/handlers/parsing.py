@@ -21,7 +21,7 @@ from xml.sax.xmlreader import AttributesImpl
 from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -44,8 +44,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
             if parsed & (1 << (bits - 1)):
                 parsed -= 1 << bits
         return parsed
-    else:
-        return int(value)
+    return int(value)
 
 
 def ParseOptionalInt(value: str) -> Optional[int]:
@@ -204,7 +203,7 @@ def AttributesToField(attrs: AttributesImpl) -> Field:
         #       specifically) WITHOUT re-stating things like types
         #
         # https://github.com/csa-data-model/projects/issues/365
-        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        log.error("Attribute '%s' has no type", attrs['name'])
         attr_type = "sint32"
     t = ParseType(attr_type)
 
@@ -226,8 +225,7 @@ def AttributesToBitFieldConstantEntry(attrs: AttributesImpl) -> ConstantEntry:
         #       diff
         # Issue: https://github.com/csa-data-model/projects/issues/347
 
-        LOGGER.error(
-            f"Constant {attrs['name']} has no bit value (may be multibit)")
+        log.error("Constant '%s' has no bit value (may be multibit)", attrs['name'])
         return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=0)
 
     assert "bit" in attrs
@@ -244,7 +242,7 @@ def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
     else:
         # TODO: we should NOT have this, however we are now lenient
         # to bad input data
-        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        log.error("Attribute '%s' has no type", attrs['name'])
         attr_type = "sint32"
 
     t = ParseType(attr_type)
@@ -270,8 +268,7 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
         elif attrs["priority"] == "debug":
             priority = EventPriority.DEBUG
         elif attrs["priority"] == "desc":
-            LOGGER.warning("Found an event with 'desc' priority: %s",
-                           list(attrs.items()))
+            log.warning("Found an event with 'desc' priority: '%s'", attrs.items())
             priority = EventPriority.CRITICAL
         else:
             raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
@@ -288,14 +285,13 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
 def StringToAccessPrivilege(value: str) -> AccessPrivilege:
     if value == "view":
         return AccessPrivilege.VIEW
-    elif value == "operate":
+    if value == "operate":
         return AccessPrivilege.OPERATE
-    elif value == "manage":
+    if value == "manage":
         return AccessPrivilege.MANAGE
-    elif value == "admin":
+    if value == "admin":
         return AccessPrivilege.ADMINISTER
-    else:
-        raise Exception("UNKNOWN privilege level: %r" % value)
+    raise Exception("UNKNOWN privilege level: %r" % value)
 
 
 def AttributesToCommand(attrs: AttributesImpl) -> Command:
@@ -303,7 +299,7 @@ def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "name" in attrs
 
     if "response" not in attrs:
-        LOGGER.warning(f"Command {attrs['name']} has no response set.")
+        log.warning("Command '%s' has no response set.", attrs['name'])
         # Matter IDL has no concept of "no response sent"
         # Example is DoorLock::"Operating Event Notification"
         #

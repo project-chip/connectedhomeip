@@ -89,7 +89,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
         if isinstance(value, bytes):
             return base64.b64encode(value).decode("UTF-8")
-        elif isinstance(value, list):
+        if isinstance(value, list):
             value = [ConvertValue(item) for item in value]
         elif isinstance(value, dict):
             value = MatterTlvToJson(value)

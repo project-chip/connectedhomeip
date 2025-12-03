@@ -42,6 +42,7 @@ class IMXApp(Enum):
             return 'all-clusters-minimal-app/linux'
         if self == IMXApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        raise Exception('Unknown app type: %r' % self)
 
     def OutputNames(self):
         if self == IMXApp.CHIP_TOOL:

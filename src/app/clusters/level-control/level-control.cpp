@@ -138,21 +138,6 @@ public:
     DefaultLevelControlSceneHandler() = default;
     ~DefaultLevelControlSceneHandler() override {}
 
-    // Default function for LevelControl cluster, only puts the LevelControl cluster ID in the span if supported on the caller
-    // endpoint
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        if (emberAfContainsServer(endpoint, LevelControl::Id) && clusterBuffer.size() >= 1)
-        {
-            clusterBuffer[0] = LevelControl::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
-
     // Default function for LevelControl cluster, only checks if LevelControl is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {

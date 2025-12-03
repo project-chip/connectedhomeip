@@ -23,6 +23,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/operational-credentials-cluster.h"
-    "${CLUSTER_DIR}/operational-credentials-cluster.cpp"
+    "${CLUSTER_DIR}/OperationalCredentialsCluster.h"
+    "${CLUSTER_DIR}/OperationalCredentialsCluster.cpp"
 )
