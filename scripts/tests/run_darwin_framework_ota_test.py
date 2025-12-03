@@ -9,7 +9,7 @@ from subprocess import PIPE
 import click
 from chiptest.accessories import AppsRegister
 from chiptest.darwin import DarwinExecutor
-from chiptest.runner import Runner, SubprocessInfo
+from chiptest.runner import Runner, SubprocessInfo, SubprocessKind
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
 
@@ -115,10 +115,10 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
 
     if darwin_framework_tool is not None:
-        darwin_framework_tool = SubprocessInfo(kind='tool', path=darwin_framework_tool)
+        darwin_framework_tool = SubprocessInfo(kind=SubprocessKind.TOOL, path=darwin_framework_tool)
 
     if ota_requestor_app is not None:
-        ota_requestor_app = SubprocessInfo(kind='app', path=ota_requestor_app,
+        ota_requestor_app = SubprocessInfo(kind=SubprocessKind.APP, path=ota_requestor_app,
                                            args=('--otaDownloadPath', ota_destination_file))
 
     runner = Runner(executor=DarwinExecutor())

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import logging
 import os
 import pathlib
@@ -22,7 +23,6 @@ import subprocess
 import threading
 import typing
 from dataclasses import dataclass, replace
-from typing import Literal
 
 log = logging.getLogger(__name__)
 
@@ -124,11 +124,15 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
+class SubprocessKind(enum.Enum):
+    APP = enum.auto()
+    TOOL = enum.auto()
+    RPC = enum.auto()
+
+
 @dataclass
 class SubprocessInfo:
-    # Restricted as this identifies the name of the network namespace in an executor implementing
-    # test case isolation.
-    kind: Literal['app', 'tool']
+    kind: SubprocessKind
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
