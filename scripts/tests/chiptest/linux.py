@@ -190,19 +190,20 @@ class IsolatedNetworkNamespace:
         if wait_for_dad:
             self.wait_for_duplicate_address_detection()
 
-    def _run(self, command: str):
-        command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name,
-                                 index=self.index)
-        log.debug("Executing: '%s'", command)
-        if subprocess.run(command.split()).returncode != 0:
-            log.error("Failed to execute '%s'", command)
-            log.error("Are you using --privileged if running in docker?")
-            sys.exit(1)
+    def _run(self, *command: str):
+        for c in command:
+            c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
+            log.debug("Executing: '%s'", c)
+            if subprocess.run(c.split()).returncode != 0:
+                raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
-        for command in self.COMMANDS_TERMINATE:
-            self._run(command)
+        """Execute all down commands in reverse order gracefully omitting errors."""
+        for cmd in self.COMMANDS_TERMINATE:
+            try:
+                self._run(cmd)
+            except Exception as e:
+                log.warning("Encountered error during namespace termination: %s", e, exc_info=True)
 
 
 class LinuxNamespacedExecutor(Executor):
