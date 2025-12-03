@@ -17,16 +17,18 @@
 
 #include <tracing/registry.h>
 
+#include <lib/support/logging/CHIPLogging.h>
+
 namespace chip::Tracing {
 
 void Register(Backend & backend)
 {
-    /* no-op if tracing is disabled */
+    ChipLogProgress(NotSpecified, "Ignoring tracing backend registration because tracing is disabled");
 }
 
 void Unregister(Backend & backend)
 {
-    /* no-op if tracing is disabled */
+    /* no-op */
 }
 
 } // namespace chip::Tracing
