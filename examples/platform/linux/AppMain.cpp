@@ -784,13 +784,24 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
+struct LinuxCommonCaseDeviceServerInitParams final : public chip::CommonCaseDeviceServerInitParams
+{
+    LinuxCommonCaseDeviceServerInitParams()
+    {
+        SuccessOrDie(InitializeStaticResourcesBeforeServerInit());
+        dataModelProvider = app::CodegenDataModelProviderInstance(persistentStorageDelegate);
+    }
+};
+
+chip::CommonCaseDeviceServerInitParams & ChipLinuxDefaultServerInitParams()
+{
+    static LinuxCommonCaseDeviceServerInitParams sInitParams;
+    return sInitParams;
+}
+
+void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplementation * impl)
 {
     gMainLoopImplementation = impl;
-
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
