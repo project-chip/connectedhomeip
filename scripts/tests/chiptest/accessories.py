@@ -42,13 +42,13 @@ else:
 
 class AppsRegister:
     def __init__(self) -> None:
-        self.__accessories: dict[str, App] = {}
+        self._accessories: dict[str, App] = {}
 
     def init(self):
-        self.__startXMLRPCServer()
+        self._start_xmlrpc_server()
 
     def uninit(self):
-        self.__stopXMLRPCServer()
+        self._stop_xmlrpc_server()
 
     def terminate(self):
         self.uninit()
@@ -56,75 +56,73 @@ class AppsRegister:
     @property
     def accessories(self):
         """List of registered accessory applications."""
-        return self.__accessories.values()
+        return self._accessories.values()
 
     def add(self, name: str, accessory: App):
-        self.__accessories[name] = accessory
+        self._accessories[name] = accessory
 
     def remove(self, name: str):
-        self.__accessories.pop(name)
+        self._accessories.pop(name)
 
-    def removeAll(self):
-        self.__accessories = {}
+    def remove_all(self):
+        self._accessories = {}
 
     def get(self, name: str):
-        return self.__accessories[name]
+        return self._accessories[name]
 
     def kill(self, name: str):
-        accessory = self.__accessories[name]
+        accessory = self._accessories[name]
         if accessory:
             accessory.kill()
 
-    def killAll(self):
+    def kill_all(self):
         ok = True
-        for accessory in self.__accessories.values():
+        for accessory in self._accessories.values():
             # make sure to do kill() on all of our apps, even if some of them returned False
             ok = accessory.kill() and ok
         return ok
 
     def start(self, name: str, args: list[str]) -> bool:
-        accessory = self.__accessories[name]
+        accessory = self._accessories[name]
         if accessory:
             # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
             # key-value pair, e.g. [option1, value1, option2, value2, ...]
-            options = self.__createCommandLineOptions(args)
+            options = self._create_command_line_options(args)
             return accessory.start(options)
         return False
 
     def stop(self, name: str) -> bool:
-        accessory = self.__accessories[name]
+        accessory = self._accessories[name]
         if accessory:
             return accessory.stop()
         return False
 
     def reboot(self, name: str) -> bool:
-        accessory = self.__accessories[name]
+        accessory = self._accessories[name]
         if accessory:
             return accessory.stop() and accessory.start()
         return False
 
-    def factoryResetAll(self):
-        for accessory in self.__accessories.values():
+    def factory_reset_all(self):
+        for accessory in self._accessories.values():
             accessory.factoryReset()
 
-    def factoryReset(self, name: str) -> bool:
-        accessory = self.__accessories[name]
+    def factory_reset(self, name: str) -> bool:
+        accessory = self._accessories[name]
         if accessory:
             return accessory.factoryReset()
         return False
 
-    def waitForMessage(self, name: str, message: list[str],
-                       timeoutInSeconds: float = 10) -> bool:
-        accessory = self.__accessories[name]
+    def wait_for_message(self, name: str, message: list[str], timeoutInSeconds: float = 10) -> bool:
+        accessory = self._accessories[name]
         if accessory:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
             # comprise the entire message to wait for
             return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
-    def createOtaImage(self, otaImageFilePath: str, rawImageFilePath: str,
-                       rawImageContent: str, vid: str = '0xDEAD',
-                       pid: str = '0xBEEF') -> bool:
+    def create_ota_image(self, otaImageFilePath: str, rawImageFilePath: str, rawImageContent: str,
+                         vid: str = '0xDEAD', pid: str = '0xBEEF') -> bool:
         # Write the raw image content
         with open(rawImageFilePath, 'w') as rawFile:
             rawFile.write(rawImageContent)
@@ -139,42 +137,42 @@ class AppsRegister:
             raise Exception('Cannot create OTA image file')
         return True
 
-    def compareFiles(self, file1: str | Path, file2: str | Path) -> bool:
+    def compare_files(self, file1: str | Path, file2: str | Path) -> bool:
         if filecmp.cmp(file1, file2, shallow=False) is False:
             raise Exception('Files %s and %s do not match' % (file1, file2))
         return True
 
-    def createFile(self, filePath: str | Path, fileContent: str) -> bool:
+    def create_file(self, filePath: str | Path, fileContent: str) -> bool:
         with open(filePath, 'w') as rawFile:
             rawFile.write(fileContent)
         return True
 
-    def deleteFile(self, filePath: str | Path) -> bool:
+    def delete_file(self, filePath: str | Path) -> bool:
         if os.path.exists(filePath):
             os.remove(filePath)
         return True
 
-    def __startXMLRPCServer(self):
+    def _start_xmlrpc_server(self):
         self.server = SimpleXMLRPCServer((IP, PORT))
 
         # Typeshed issue: https://github.com/python/typeshed/issues/4837
         self.server.register_function(self.start, 'start')  # type: ignore[arg-type]
         self.server.register_function(self.stop, 'stop')  # type: ignore[arg-type]
         self.server.register_function(self.reboot, 'reboot')  # type: ignore[arg-type]
-        self.server.register_function(self.factoryReset, 'factoryReset')  # type: ignore[arg-type]
-        self.server.register_function(self.waitForMessage, 'waitForMessage')  # type: ignore[arg-type]
-        self.server.register_function(self.compareFiles, 'compareFiles')  # type: ignore[arg-type]
-        self.server.register_function(self.createOtaImage, 'createOtaImage')  # type: ignore[arg-type]
-        self.server.register_function(self.createFile, 'createFile')  # type: ignore[arg-type]
-        self.server.register_function(self.deleteFile, 'deleteFile')  # type: ignore[arg-type]
+        self.server.register_function(self.factory_reset, 'factoryReset')  # type: ignore[arg-type]
+        self.server.register_function(self.wait_for_message, 'waitForMessage')  # type: ignore[arg-type]
+        self.server.register_function(self.compare_files, 'compareFiles')  # type: ignore[arg-type]
+        self.server.register_function(self.create_ota_image, 'createOtaImage')  # type: ignore[arg-type]
+        self.server.register_function(self.create_file, 'createFile')  # type: ignore[arg-type]
+        self.server.register_function(self.delete_file, 'deleteFile')  # type: ignore[arg-type]
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
-    def __stopXMLRPCServer(self):
+    def _stop_xmlrpc_server(self):
         self.server.shutdown()
 
-    def __createCommandLineOptions(self, args: list[str]) -> dict[str, str]:
+    def _create_command_line_options(self, args: list[str]) -> dict[str, str]:
         if not args:
             return {}
 
