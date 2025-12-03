@@ -345,8 +345,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_1]: Step #1.3 - Start tasks to track OTA attributes:
         # UpdateState and UpdateStateProgress (updateAvailable sequence) with validations
         # ------------------------------------------------------------------------------------
-
-        await subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=60.0)
+        subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=60.0)
         logger.info(f'{step_number}: Step #1.3 - UpdateState (Available sequence) matcher has completed.')
         await subscription_attr.cancel()
 
@@ -465,7 +464,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
 
         # Wait for the 120s minimum interval to complete (overall task timeout is 150s)
-        await subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=150.0)
+        subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=150.0)
         logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
         await subscription_attr_state_busy.cancel()
 
@@ -585,7 +584,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # UpdateState (updateNotAvailable sequence) with validation
         # ------------------------------------------------------------------------------------
 
-        await subscription_attr_state_updatenotavailable.await_all_expected_report_matches([matcher_not_available_state_obj], timeout_sec=150.0)
+        subscription_attr_state_updatenotavailable.await_all_expected_report_matches(
+            [matcher_not_available_state_obj], timeout_sec=150.0)
         logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
         await subscription_attr_state_updatenotavailable.cancel()
 
@@ -710,7 +710,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
 
         # Wait until the final state (Downloading) is reached or timeout (3.5 min)
-        await subscription_attr_state_busy_180s.await_all_expected_report_matches([matcher_busy_state_delayed_180s_obj], timeout_sec=210.0)
+        subscription_attr_state_busy_180s.await_all_expected_report_matches(
+            [matcher_busy_state_delayed_180s_obj], timeout_sec=210.0)
         logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
         await subscription_attr_state_busy_180s.cancel()
 
