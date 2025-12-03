@@ -23,7 +23,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class DEMTestBase:
@@ -31,7 +31,7 @@ class DEMTestBase:
     async def read_dem_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
         cluster = Clusters.Objects.DeviceEnergyManagement
         full_attr = getattr(cluster.Attributes, attribute)
-        logger.info(f"endpoint {endpoint} full_attr {full_attr}")
+        log.info(f"endpoint {endpoint} full_attr {full_attr}")
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
 
     async def check_dem_attribute(self, attribute, expected_value, endpoint: int = None):
@@ -192,19 +192,19 @@ class DEMTestBase:
 
     def print_forecast(self, forecast):
         for index, slot in enumerate(forecast.slots):
-            logger.info(
+            log.info(
                 f"   [{index}] MinDuration: {slot.minDuration} MaxDuration: {slot.maxDuration} DefaultDuration: {slot.defaultDuration}")
-            logger.info(f"       ElapseSlotTime: {slot.elapsedSlotTime} RemainingSlotTime: {slot.remainingSlotTime}")
-            logger.info(
+            log.info(f"       ElapseSlotTime: {slot.elapsedSlotTime} RemainingSlotTime: {slot.remainingSlotTime}")
+            log.info(
                 f"       SlotIsPausable: {slot.slotIsPausable} MinPauseDuration: {slot.minPauseDuration} MaxPauseDuration: {slot.maxPauseDuration}")
-            logger.info(f"       ManufacturerESAState: {slot.manufacturerESAState}")
-            logger.info(f"       NominalPower: {slot.nominalPower} MinPower: {slot.minPower} MaxPower: {slot.maxPower}")
-            logger.info(f"       MinPowerAdjustment: {slot.minPowerAdjustment} MaxPowerAdjustment: {slot.maxPowerAdjustment}")
-            logger.info(
+            log.info(f"       ManufacturerESAState: {slot.manufacturerESAState}")
+            log.info(f"       NominalPower: {slot.nominalPower} MinPower: {slot.minPower} MaxPower: {slot.maxPower}")
+            log.info(f"       MinPowerAdjustment: {slot.minPowerAdjustment} MaxPowerAdjustment: {slot.maxPowerAdjustment}")
+            log.info(
                 f"       MinDurationAdjustment: {slot.minDurationAdjustment} MaxDurationAdjustment: {slot.maxDurationAdjustment}")
             if slot.costs is not None:
                 for cost_index, cost in enumerate(slot):
-                    logger.info(
+                    log.info(
                         f"   Cost: [{cost_index}]  CostType:{cost.costType} Value: {cost.value} DecimalPoints: {cost.decimalPoints} Currency: {cost.currency}")
 
     def get_current_utc_time_in_seconds(self):

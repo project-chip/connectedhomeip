@@ -47,7 +47,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = Clusters.DoorLock
 
@@ -174,7 +174,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             asserts.assert_equal(expected_status, Status.Success)
             return attribute_value
         except Exception as e:
-            logger.error(e)
+            log.error(e)
             asserts.assert_equal(expected_status, Status.Success,
                                  f"Error reading attributes, response={attribute_value}")
 
@@ -249,7 +249,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            logger.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception(f"Got exception when performing SetAliroReaderConfig {e}")
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def get_credentials_status(self, credentialIndex: int, credentialType: cluster.Enums.CredentialTypeEnum,
@@ -273,7 +273,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                      f"User Index is not matching, UserIndex={response.userIndex}")
                 return response
         except InteractionModelError as e:
-            logger.error(e)
+            log.error(e)
             asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
 
     async def set_credential_cmd(self, credential_enum: Clusters.DoorLock.Enums.CredentialTypeEnum, credentialIndex,
@@ -300,7 +300,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(response.status == expected_status,
                                     "Error sending SetCredential command, status={}".format(str(response.status)))
             except InteractionModelError as e:
-                logger.exception(e)
+                log.exception(e)
                 asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
 
     async def read_and_validate_lock_event_change(self, verify_lock_data_type, priority, operation_source,
@@ -337,7 +337,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                            timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            logger.exception(e)
+            log.exception(e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def clear_all_aliro_credential(self):
@@ -468,7 +468,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logger.exception(e)
+                log.exception(e)
                 asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
 
         # step 13
@@ -584,14 +584,14 @@ class TC_DRLK_2_13(MatterBaseTest):
                 endpoint=self.app_cluster_endpoint,
                 cluster=Clusters.Objects.DoorLock,
                 attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
-        logger.info(f"After reading  attribute NumberOfCredentialsSupportedPerUser we get"
+        log.info(f"After reading  attribute NumberOfCredentialsSupportedPerUser we get"
                     f" value {self.numberofcredentialsupportedperuser} ")
         self.step("28b")
         await self.clear_all_aliro_credential()
         await self.send_clear_user_cmd(user_index=1)
         if self.pics_guard(self.check_pics("DRLK.S.A001c") and self.check_pics("DRLK.S.A0088")):
             if self.max_aliro_keys_supported > self.numberofcredentialsupportedperuser:
-                logger.info(
+                log.info(
                     "Skipping execution from Step 29a to step 35 since 'max_aliro_keys_supported > numberofcredentialsupportedperuser' as per test plan spec")
                 self.mark_all_remaining_steps_skipped("29a")
                 return
@@ -610,10 +610,10 @@ class TC_DRLK_2_13(MatterBaseTest):
                         endpoint=self.app_cluster_endpoint,
                         timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
-                    logger.exception(e)
+                    log.exception(e)
                     asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
             self.step("29b")
-            logger.info("setting 'start_credential_index' to value 1 ")
+            log.info("setting 'start_credential_index' to value 1 ")
             start_credential_index = 1
             credentials_data = self.alirononevictableendpointkey
             while 1:
@@ -628,7 +628,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                   userStatus=NullValue,
                                                   userType=NullValue)
                     start_credential_index += 1
-                    logger.info(f"The updated value of start_credential_index is {start_credential_index}")
+                    log.info(f"The updated value of start_credential_index is {start_credential_index}")
                 else:
                     break
             self.step("30")

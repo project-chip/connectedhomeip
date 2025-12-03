@@ -56,7 +56,7 @@ class OrderEnum(Enum):
     Descending = 2
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_3_2(MatterBaseTest):
@@ -129,17 +129,17 @@ class TC_FAN_3_2(MatterBaseTest):
 
     def log_scenario(self, value_range, order) -> None:
         # Logging support info
-        logger.info("[FC] ====================================================================")
+        log.info("[FC] ====================================================================")
 
         # Logging initial FanMode state
         init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-        logger.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
+        log.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
 
         # Logging the scenario being tested
-        logger.info(
+        log.info(
             f"[FC] *** Update SpeedSetting {order.name.lower()}, verify PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent")
-        logger.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
-        logger.info("[FC]")
+        log.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
+        log.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
         cluster = Clusters.FanControl
@@ -158,10 +158,10 @@ class TC_FAN_3_2(MatterBaseTest):
 
     def log_results(self) -> None:
         for sub in self.subscriptions:
-            logger.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
+            log.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
             for q in sub.attribute_queue.queue:
-                logger.info(f"[FC] {q.attribute.__name__}: {q.value}")
-            logger.info("[FC]")
+                log.info(f"[FC] {q.attribute.__name__}: {q.value}")
+            log.info("[FC]")
 
     def verify_attribute_progression(self, order: OrderEnum, invalid_in_state_occurred: bool) -> None:
         # Setup
@@ -196,9 +196,9 @@ class TC_FAN_3_2(MatterBaseTest):
             correct_progression = all(comp(a, b) for a, b in zip(values, values[1:]))
             asserts.assert_true(correct_progression, f"[FC] {sub._expected_attribute.__name__}: {shared_str}")
 
-        logger.info(
+        log.info(
             f"[FC] All attribute values progressed as expected ({order.name.lower()} order - current value {comp_str} than previous value).")
-        logger.info("[FC]")
+        log.info("[FC]")
 
     async def testing_scenario_update_speed_setting(self, order) -> None:
         # Setup
@@ -232,7 +232,7 @@ class TC_FAN_3_2(MatterBaseTest):
             if not invalid_in_state_occurred:
                 if write_status == Status.InvalidInState:
                     invalid_in_state_occurred = True
-                    logger.info(f"[FC] InvalidInState occurred for SpeedSetting attribute write ({value_to_write})")
+                    log.info(f"[FC] InvalidInState occurred for SpeedSetting attribute write ({value_to_write})")
 
         # Log results of attribute reports per subscription
         self.log_results()

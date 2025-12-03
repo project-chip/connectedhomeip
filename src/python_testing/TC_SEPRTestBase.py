@@ -27,7 +27,7 @@ from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class CommodityPriceTestBaseHelper:
@@ -115,7 +115,7 @@ class CommodityPriceTestBaseHelper:
         else:
             asserts.assert_is_none(struct.description)
 
-        logger.info(f"PRICE: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : Price: {struct.price} / PriceLevel: {struct.priceLevel} / Description: {struct.description}")
+        log.info(f"PRICE: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : Price: {struct.price} / PriceLevel: {struct.priceLevel} / Description: {struct.description}")
 
         if details & cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents:
             if struct.components is not None:
@@ -148,7 +148,7 @@ class CommodityPriceTestBaseHelper:
         if struct.tariffComponentID is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
 
-        logger.info(
+        log.info(
             f"  Component: price: {struct.price} source: {struct.source}, desc: {struct.description} tariffComponentID: {struct.tariffComponentID}")
 
     async def send_get_detailed_price_request(self, endpoint=None,
