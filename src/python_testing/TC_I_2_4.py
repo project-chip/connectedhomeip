@@ -128,7 +128,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    30, delta=1, msg="Unexpected first IdentifyTime report")
+                                    30, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(5)
@@ -140,7 +140,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(7)
@@ -152,7 +152,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    5, delta=1, msg="Unexpected second IdentifyTime report")
+                                    5, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(9)
@@ -160,7 +160,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-                             [0].value, 0, "Unexpected last IdentifyTime report")
+                             [0].value, 0, "Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(10)
@@ -172,7 +172,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(12)
@@ -184,7 +184,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                             0, msg="Unexpected second IdentifyTime report")
+                             0, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         # Verify Q requirements for IdentifyTime attribute by invoke of Identify command
@@ -201,7 +201,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    30, delta=1, msg="Unexpected first IdentifyTime report")
+                                    30, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(16)
@@ -216,7 +216,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(18)
@@ -231,7 +231,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    5, delta=1, msg="Unexpected second IdentifyTime report")
+                                    5, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(20)
@@ -239,7 +239,7 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-                             [0].value, 0, "Unexpected last IdentifyTime report")
+                             [0].value, 0, "Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(21)
@@ -255,7 +255,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Unexpected second IdentifyTime report")
+                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(23)
@@ -270,7 +270,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                             0, msg="Unexpected second IdentifyTime report")
+                             0, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
 
