@@ -21,6 +21,7 @@
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <app/InteractionModelEngine.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -50,6 +51,12 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        InteractionModelEngine *interactionModel = InteractionModelEngine::GetInstance();
+        GeneralDiagnosticsCluster::Context clusterContext = {
+            .interactionModelEngine = interactionModel,
+            .sessionManager = interactionModel->GetExchangeManager()->GetSessionManager(),
+            .reportScheduler = interactionModel->GetReportScheduler(),
+        };
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         const GeneralDiagnosticsFunctionsConfig functionsConfig
@@ -69,9 +76,9 @@ public:
             .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), functionsConfig);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), clusterContext, functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap));
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), clusterContext);
 #endif
         return gServer.Registration();
     }

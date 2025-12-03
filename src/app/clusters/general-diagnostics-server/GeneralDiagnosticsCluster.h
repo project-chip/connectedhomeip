@@ -49,10 +49,18 @@ public:
                                         //       it will be forced as mandatory by the cluster constructor
                                         >;
 
-    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
+    // Injected dependencies for the cluster
+    struct Context {
+        InteractionModelEngine * interactionModelEngine;
+        SessionManager * sessionManager;
+        reporting::ReportScheduler * reportScheduler;
+    };
+
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags, Context context) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
-        mFeatureFlags(featureFlags)
+        mFeatureFlags(featureFlags),
+        mClusterContext(std::move(context))
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -126,6 +134,7 @@ protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
     BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
+    Context mClusterContext;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
@@ -133,8 +142,9 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
                                               const BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                                              const Context context,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags),
+        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, context),
         mFunctionConfig(functionsConfig)
     {}
 

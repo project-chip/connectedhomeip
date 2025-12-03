@@ -21,6 +21,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <app/InteractionModelEngine.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -68,7 +69,16 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mAdministratorCommissioningCluster.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
-    mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{});
+    InteractionModelEngine *interactionModel = InteractionModelEngine::GetInstance();
+    mGeneralDiagnosticsCluster.Create(
+        GeneralDiagnosticsCluster::OptionalAttributeSet{}, 
+        BitFlags<GeneralDiagnostics::Feature>{}, 
+        GeneralDiagnosticsCluster::Context {
+            .interactionModelEngine = interactionModel,
+            .sessionManager = interactionModel->GetExchangeManager()->GetSessionManager(),
+            .reportScheduler = interactionModel->GetReportScheduler(),
+        }
+    );
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create();

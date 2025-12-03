@@ -277,18 +277,20 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return encoder.Encode(isTestEventTriggersEnabled);
     }
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
-        InteractionModelEngine * interactionModel            = InteractionModelEngine::GetInstance();
-        SessionManager * sessionManager                      = interactionModel->GetExchangeManager()->GetSessionManager();
-        const SessionManager::MessageStats messageStatistics = sessionManager->GetMessageStats();
         static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
                       "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
+        VerifyOrReturnError(mClusterContext.interactionModelEngine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mClusterContext.sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mClusterContext.reportScheduler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        const SessionManager::MessageStats messageStatistics = mClusterContext.sessionManager->GetMessageStats();
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
             .currentSubscriptions =
-                static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-            .currentSubscriptionsForFabric         = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(
+                static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+            .currentSubscriptionsForFabric         = static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(
                 ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
-            .totalSubscriptionsEstablished         = interactionModel->GetReportScheduler()->GetTotalSubscriptionsEstablished(),
+            .totalSubscriptionsEstablished         = mClusterContext.reportScheduler->GetTotalSubscriptionsEstablished(),
             .totalInteractionModelMessagesSent     = messageStatistics.InteractionModelMessagesSent,
             .totalInteractionModelMessagesReceived = messageStatistics.InteractionModelMessagesReceived,
         };
