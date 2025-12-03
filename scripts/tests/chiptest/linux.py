@@ -32,7 +32,7 @@ from typing import IO, Any, Union
 
 import sdbus
 
-from .runner import Executor, LogPipe, SubprocessInfo
+from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
@@ -161,8 +161,8 @@ class IsolatedNetworkNamespace:
             self._setup_tool_link_up(wait_for_dad=False)
         self._wait_for_duplicate_address_detection()
 
-    def netns_for_subprocess(self, subproc: SubprocessInfo):
-        return "{}-{}".format(subproc.kind, self.index)
+    def netns_for_subprocess_kind(self, kind: SubprocessKind):
+        return "{}-{}".format(kind.name.lower(), self.index)
 
     def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
@@ -210,7 +210,7 @@ class LinuxNamespacedExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None,
             stdout: IO[Any] | LogPipe | None = None,
             stderr: IO[Any] | LogPipe | None = None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess(subproc))
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
         return super().run(wrapped, stdin, stdout, stderr)
 
 

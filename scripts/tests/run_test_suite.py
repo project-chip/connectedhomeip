@@ -22,14 +22,13 @@ import time
 import typing
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
 
 import chiptest
 import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import Executor, SubprocessInfo
+from chiptest.runner import Executor, SubprocessInfo, SubprocessKind
 from chiptest.test_definition import TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -159,7 +158,7 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
 
     chip_tool_info: SubprocessInfo | None = None
     if chip_tool is not None:
-        chip_tool_info = SubprocessInfo(kind='tool', path=chip_tool)
+        chip_tool_info = SubprocessInfo(kind=SubprocessKind.TOOL, path=chip_tool)
     elif runtime != TestRunTime.MATTER_REPL_PYTHON:
         paths_finder = PathsFinder()
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
@@ -168,7 +167,7 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
             chip_tool_path = paths_finder.get('darwin-framework-tool')
 
         if chip_tool_path is not None:
-            chip_tool_info = SubprocessInfo(kind='tool', path=Path(chip_tool_path))
+            chip_tool_info = SubprocessInfo(kind=SubprocessKind.TOOL, path=Path(chip_tool_path))
 
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.MATTER_REPL_PYTHON:
@@ -356,35 +355,35 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     paths_finder = PathsFinder()
 
-    def build_app(arg_value: Path | None, kind: Literal['app', 'tool'], key: str) -> SubprocessInfo | None:
+    def build_app(arg_value: Path | None, kind: SubprocessKind, key: str) -> SubprocessInfo | None:
         log.debug("Constructing app %s...", key)
         app_path = arg_value if arg_value is not None else paths_finder.get(key)
         return None if app_path is None else SubprocessInfo(kind=kind, path=Path(app_path))
 
-    all_clusters_app_info = build_app(all_clusters_app, 'app', 'chip-all-clusters-app')
-    lock_app_info = build_app(lock_app, 'app', 'chip-lock-app')
-    fabric_bridge_app_info = build_app(fabric_bridge_app, 'app', 'fabric-bridge-app')
-    ota_provider_app_info = build_app(ota_provider_app, 'app', 'chip-ota-provider-app')
-    ota_requestor_app_info = build_app(ota_requestor_app, 'app', 'chip-ota-requestor-app')
-    tv_app_info = build_app(tv_app, 'app', 'chip-tv-app')
-    bridge_app_info = build_app(bridge_app, 'app', 'chip-bridge-app')
-    lit_icd_app_info = build_app(lit_icd_app, 'app', 'lit-icd-app')
-    microwave_oven_app_info = build_app(microwave_oven_app, 'app', 'chip-microwave-oven-app')
-    rvc_app_info = build_app(rvc_app, 'app', 'chip-rvc-app')
-    network_manager_app_info = build_app(network_manager_app, 'app', 'matter-network-manager-app')
-    energy_gateway_app_info = build_app(energy_gateway_app, 'app', 'chip-energy-gateway-app')
-    energy_management_app_info = build_app(energy_management_app, 'app', 'chip-energy-management-app')
-    closure_app_info = build_app(closure_app, 'app', 'closure-app')
+    all_clusters_app_info = build_app(all_clusters_app, SubprocessKind.APP, 'chip-all-clusters-app')
+    lock_app_info = build_app(lock_app, SubprocessKind.APP, 'chip-lock-app')
+    fabric_bridge_app_info = build_app(fabric_bridge_app, SubprocessKind.APP, 'fabric-bridge-app')
+    ota_provider_app_info = build_app(ota_provider_app, SubprocessKind.APP, 'chip-ota-provider-app')
+    ota_requestor_app_info = build_app(ota_requestor_app, SubprocessKind.APP, 'chip-ota-requestor-app')
+    tv_app_info = build_app(tv_app, SubprocessKind.APP, 'chip-tv-app')
+    bridge_app_info = build_app(bridge_app, SubprocessKind.APP, 'chip-bridge-app')
+    lit_icd_app_info = build_app(lit_icd_app, SubprocessKind.APP, 'lit-icd-app')
+    microwave_oven_app_info = build_app(microwave_oven_app, SubprocessKind.APP, 'chip-microwave-oven-app')
+    rvc_app_info = build_app(rvc_app, SubprocessKind.APP, 'chip-rvc-app')
+    network_manager_app_info = build_app(network_manager_app, SubprocessKind.APP, 'matter-network-manager-app')
+    energy_gateway_app_info = build_app(energy_gateway_app, SubprocessKind.APP, 'chip-energy-gateway-app')
+    energy_management_app_info = build_app(energy_management_app, SubprocessKind.APP, 'chip-energy-management-app')
+    closure_app_info = build_app(closure_app, SubprocessKind.APP, 'closure-app')
 
-    matter_repl_yaml_tester_info = build_app(matter_repl_yaml_tester, 'tool',
+    matter_repl_yaml_tester_info = build_app(matter_repl_yaml_tester, SubprocessKind.TOOL,
                                              'yamltest_with_matter_repl_tester.py')
     if matter_repl_yaml_tester_info is not None:
         matter_repl_yaml_tester_info = matter_repl_yaml_tester_info.wrap_with('python3')
 
     if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        chip_tool_with_python_info = build_app(chip_tool_with_python, 'tool', 'darwinframeworktool.py')
+        chip_tool_with_python_info = build_app(chip_tool_with_python, SubprocessKind.TOOL, 'darwinframeworktool.py')
     else:
-        chip_tool_with_python_info = build_app(chip_tool_with_python, 'tool', 'chiptool.py')
+        chip_tool_with_python_info = build_app(chip_tool_with_python, SubprocessKind.TOOL, 'chiptool.py')
 
     if chip_tool_with_python_info is not None:
         chip_tool_with_python_info = chip_tool_with_python_info.wrap_with('python3')

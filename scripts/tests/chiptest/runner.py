@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import enum
 import logging
 import os
 import pathlib
@@ -24,7 +25,7 @@ import subprocess
 import threading
 import typing
 from dataclasses import dataclass, replace
-from typing import IO, TYPE_CHECKING, Any, Literal, Protocol
+from typing import IO, TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
@@ -136,11 +137,15 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
+class SubprocessKind(enum.Enum):
+    APP = enum.auto()
+    TOOL = enum.auto()
+    RPC = enum.auto()
+
+
 @dataclass
 class SubprocessInfo:
-    # Restricted as this identifies the name of the network namespace in an executor implementing
-    # test case isolation.
-    kind: Literal['app', 'tool']
+    kind: SubprocessKind
     path: pathlib.Path
     wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
