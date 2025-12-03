@@ -524,9 +524,9 @@ class TestDefinition:
             loggedCapturedLogs = True
             raise
         finally:
-            ok = apps_register.killAll()
-            apps_register.factoryResetAll()
-            apps_register.removeAll()
+            ok = apps_register.kill_all()
+            apps_register.factory_reset_all()
+            apps_register.remove_all()
             if tool_storage_dir is not None:
                 shutil.rmtree(tool_storage_dir, ignore_errors=True)
             # If loggedCapturedLogs then we are already throwing, so no need to
