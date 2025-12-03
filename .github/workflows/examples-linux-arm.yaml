@@ -65,6 +65,7 @@ jobs:
                         linux-arm64-fabric-sync-no-ble-clang
                         linux-arm64-camera-controller-clang
                         linux-arm64-camera-clang
+                  ;
                   do
                     ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target $target build"
                     echo "Cleaning out directory of of size: $(du -sh $out)"
