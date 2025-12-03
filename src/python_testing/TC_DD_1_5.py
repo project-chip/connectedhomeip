@@ -60,7 +60,6 @@ class TC_DD_1_5(MatterBaseTest):
     async def test_TC_DD_1_5(self):
 
         reader = matter.testing.nfc.NFCReader()
-        asserts.assert_is_not_none(reader, "No connected NFC reader found")
 
         ###########
         self.step("1")

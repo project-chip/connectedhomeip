@@ -45,7 +45,6 @@ class TC_DD_3_23(MatterBaseTest):
 
         nfc_reader_index = self.user_params.get("NFC_Reader_index", 0)
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
-        asserts.assert_is_not_none(reader, f"NFC reader not found at index {nfc_reader_index}")
 
         nfc_tag_data = reader.read_nfc_tag_data()
         logger.info(f"NFC Tag data : '{nfc_tag_data}'")
