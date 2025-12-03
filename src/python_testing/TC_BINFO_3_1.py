@@ -1,0 +1,122 @@
+#
+#    Copyright (c) 2025 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 0
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --int-arg PIXIT.BINFO.Finish:2
+#       --int-arg PIXIT.BINFO.PrimaryColor:5
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
+
+import logging
+
+from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+logger = logging.getLogger(__name__)
+
+
+class TC_BINFO_3_1(MatterBaseTest):
+
+    def desc_TC_BINFO_3_1(self) -> str:
+        return "12.3.3. [TC-BINFO-3.1] Appearance Attribute DUT as Server"
+
+    def steps_TC_BINFO_3_1(self) -> list[TestStep]:
+        return [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "TH reads ProductAppearance from the DUT.",
+                     "ProductAppearance.Finish Value has to be between a range of [min=Other(0), ""max=Fabric(5)]"),
+            TestStep(2, "TH reads ProductAppearance from the DUT.",
+                     "ProductAppearance.PrimaryColor Value has to be between a range of [min=Black(0), max=Gold(20) ]"),
+            TestStep(3, "TH reads ProductAppearance from the DUT.",
+                     "ProductAppearance.Finish Value has to be equal to PIXIT.BINFO.Finish"),
+            TestStep(4, "TH reads ProductAppearance from the DUT.",
+                     "ProductAppearance.PrimaryColor Value has to be equal to PIXIT.BINFO.PrimaryColor"),
+        ]
+
+    def pics_TC_BINFO_3_1(self) -> list[str]:
+        return ["BINFO.S"]
+
+    @async_test_body
+    async def setup_test(self):
+        """Validate required PIXIT parameters before test execution."""
+        asserts.assert_true("PIXIT.BINFO.Finish" in self.matter_test_config.global_test_params,
+                            "PIXIT.BINFO.Finish must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BINFO.Finish:<finish_value>")
+        self.pixit_finish = self.matter_test_config.global_test_params["PIXIT.BINFO.Finish"]
+
+        asserts.assert_true("PIXIT.BINFO.PrimaryColor" in self.matter_test_config.global_test_params,
+                            "PIXIT.BINFO.PrimaryColor must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BINFO.PrimaryColor:<primary_color_value>")
+        self.pixit_primary_color = self.matter_test_config.global_test_params["PIXIT.BINFO.PrimaryColor"]
+
+        super().setup_test()
+
+    @async_test_body
+    async def test_TC_BINFO_3_1(self):
+        self.step(0)
+        endpoint = self.get_endpoint(default=0)
+        attributes = Clusters.BasicInformation.Attributes
+
+        # Read ProductAppearance once and reuse for all steps since the attribute value doesn't change
+        product_appearance = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.BasicInformation, attribute=attributes.ProductAppearance)
+        logger.info(f"Product Apppearance: {product_appearance}")
+        asserts.assert_is_not_none(product_appearance, "ProductAppearance attribute read failed")
+
+        self.step(1)
+        asserts.assert_greater_equal(product_appearance.finish, 0, "Finish value is below minimum range")
+        asserts.assert_less_equal(product_appearance.finish, 5, "Finish value is above maximum range")
+
+        self.step(2)
+        asserts.assert_greater_equal(product_appearance.primaryColor, 0, "PrimaryColor value is below minimum range")
+        asserts.assert_less_equal(product_appearance.primaryColor, 20, "PrimaryColor value is above maximum range")
+
+        self.step(3)
+        # Vendor specific test: This step should verify the actual Finish value matches PIXIT.BINFO.Finish
+        # For example, if PIXIT.BINFO.Finish is satin(2), the test should verify finish == 2
+        asserts.assert_equal(product_appearance.finish, self.pixit_finish,
+                             (f"ProductAppearance.Finish ({product_appearance.finish}) "
+                              f"does not match PIXIT.BINFO.Finish ({self.pixit_finish})\n"
+                              "Please verify the PIXIT.BINFO.Finish setting and try again."))
+
+        self.step(4)
+        # Vendor specific test: This step should verify the actual PrimaryColor value matches PIXIT.BINFO.PrimaryColor
+        # For example, if PIXIT.BINFO.PrimaryColor is purple(5), the test should verify primaryColor == 5
+        asserts.assert_equal(product_appearance.primaryColor, self.pixit_primary_color,
+                             (f"ProductAppearance.PrimaryColor ({product_appearance.primaryColor}) "
+                              f"does not match PIXIT.BINFO.PrimaryColor ({self.pixit_primary_color})\n"))
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
