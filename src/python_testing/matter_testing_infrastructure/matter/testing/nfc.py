@@ -386,7 +386,7 @@ def _write_ndef_record(connection, record):
     # The maximum length per APDU is usually 255 bytes; split if needed
     offset = 0
     while offset < ndef_length:
-        chunk = ndef_message[offset:offset+0xFF]
+        chunk = ndef_message[offset:offset+MAX_SHORT_APDU_LENGTH]
         chunk_len = len(chunk)
         WRITE_NDEF = [0x00, 0xD6, (offset + 2) >> 8, (offset + 2) & 0xFF, chunk_len] + list(chunk)
         _, sw1, sw2 = connection.transmit(WRITE_NDEF)
