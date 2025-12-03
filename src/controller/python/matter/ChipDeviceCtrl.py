@@ -1496,23 +1496,19 @@ class ChipDeviceControllerBase():
             await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
                 self.devCtrl, nodeId, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
                 timeoutMs)
+        except:
+            # Ensure we clean up the future if CallAsync fails (e.g. timeout).
+            # This signals the callback (which might fire later) that we are no longer interested.
+            future.cancel()
+            raise
 
-            # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
-            # In that case the Future has already been set it will return immediately
-            if timeoutMs is not None:
-                timeout = float(timeoutMs) / 1000
-                await asyncio.wait_for(future, timeout=timeout)
-            else:
-                await future
-        finally:
-            # Ensure we clean up the future if we stop waiting for it (e.g. timeout or cancellation).
-            # This does NOT suppress failures. If the operation failed or timed out, the
-            # exception will still propagate.
-            # We only cancel if the future is still pending. This signals the callback
-            # (which might fire later) that we are no longer interested, preventing
-            # "Future exception was never retrieved" errors.
-            if not future.done():
-                future.cancel()
+        # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
+        # In that case the Future has already been set it will return immediately
+        if timeoutMs is not None:
+            timeout = float(timeoutMs) / 1000
+            await asyncio.wait_for(future, timeout=timeout)
+        else:
+            await future
 
         return DeviceProxyWrapper(future.result(), DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
