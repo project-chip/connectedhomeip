@@ -58,7 +58,7 @@ class TC_CGEN_2_9(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
-        logging.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
+        log.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
 
         fabrics: list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
             dev_ctrl=commissioner,
@@ -67,7 +67,7 @@ class TC_CGEN_2_9(MatterBaseTest):
             attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
             fabricFiltered=False)
 
-        logging.info(f"Fabrics table on DUT: {fabrics}")
+        log.info(f"Fabrics table on DUT: {fabrics}")
 
         # Re-order the list of fabrics so that the test harness admin fabric is removed last
         commissioner_fabric = next((fabric for fabric in fabrics if fabric.fabricIndex == commissioner_fabric_index_on_dut), None)
@@ -75,7 +75,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         fabrics.append(commissioner_fabric)
 
         for fabric in fabrics:
-            logging.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
+            log.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
             response: Clusters.OperationalCredentials.Commands.NOCResponse = await commissioner.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=ROOT_ENDPOINT_ID,

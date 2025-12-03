@@ -138,7 +138,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server = AppServerSubprocess(
             self.th_server_app,
@@ -158,7 +158,7 @@ class TC_SC_3_5(MatterBaseTest):
             nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
         new_random_passcode = params.setupPinCode
         await asyncio.sleep(1)
-        logging.info("OpenCommissioningWindow complete")
+        log.info("OpenCommissioningWindow complete")
 
         return new_random_passcode
 
@@ -195,7 +195,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         self.step("precondition")
         await self.th_client.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=self.th_server_passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.th_server_discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         self.step("1a")
         th_server_passcode = await self.open_commissioning_window()

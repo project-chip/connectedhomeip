@@ -62,7 +62,7 @@ class TC_WebRTCR_2_3(WEBRTCRTestBase):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021

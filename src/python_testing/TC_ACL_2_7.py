@@ -59,13 +59,13 @@ class TC_ACL_2_7(MatterBaseTest):
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered):
         """Helper method to validate events for a TH"""
-        logging.info(f"Found {len(events)} events for {controller_name}")
+        log.info(f"Found {len(events)} events for {controller_name}")
 
         found_valid_events = 0
         found_other_event = False
 
         for event in events:
-            logging.info(f"Examining event: {str(event)}")
+            log.info(f"Examining event: {str(event)}")
             if hasattr(event, 'Data') and hasattr(event.Data, 'changeType'):
                 if expected_node_id == self.th1.nodeId:
                     # Check for expected field values
@@ -137,7 +137,7 @@ class TC_ACL_2_7(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info("CurrentFabricIndex F1: %s", str(f1))
+        log.info("CurrentFabricIndex F1: %s", str(f1))
 
         self.step(3)
         # TH1 puts DUT into commissioning mode, TH2 is created and commissions DUT using admin node ID
@@ -156,13 +156,13 @@ class TC_ACL_2_7(MatterBaseTest):
         self.step(4)
         # Read CurrentFabricIndex again after TH2 commissioning
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info("CurrentFabricIndex F2: %s", str(f2))
+        log.info("CurrentFabricIndex F2: %s", str(f2))
 
         self.step(5)
         # TH1 writes Extension attribute with D_OK_EMPTY
         extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_EMPTY)
-        logging.info(f"TH1 writing extension with data {D_OK_EMPTY.hex()}")
+        log.info(f"TH1 writing extension with data {D_OK_EMPTY.hex()}")
 
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension]
@@ -170,7 +170,7 @@ class TC_ACL_2_7(MatterBaseTest):
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))]
         )
-        logging.info("Write result: %s", str(result))
+        log.info("Write result: %s", str(result))
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -178,7 +178,7 @@ class TC_ACL_2_7(MatterBaseTest):
         # TH2 writes Extension attribute with D_OK_SINGLE
         extension_th2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
-        logging.info(f"TH2 writing extension with data {D_OK_SINGLE.hex()}")
+        log.info(f"TH2 writing extension with data {D_OK_SINGLE.hex()}")
 
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension_th2]
@@ -186,7 +186,7 @@ class TC_ACL_2_7(MatterBaseTest):
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))]
         )
-        logging.info("Write result: %s", str(result))
+        log.info("Write result: %s", str(result))
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -199,7 +199,7 @@ class TC_ACL_2_7(MatterBaseTest):
         result_filtered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr,
         )
-        logging.info("TH1 read result (fabricFiltered=True): %s", str(result_filtered))
+        log.info("TH1 read result (fabricFiltered=True): %s", str(result_filtered))
         asserts.assert_equal(len(result_filtered), 1, "Should have exactly one extension when fabric filtered")
 
         endpoint_data = [r for r in result_filtered if r.fabricIndex == f1]
@@ -213,7 +213,7 @@ class TC_ACL_2_7(MatterBaseTest):
             dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=extension_attr,
             fabric_filtered=False
         )
-        logging.info("TH1 read result (fabricFiltered=False): %s", str(result_unfiltered))
+        log.info("TH1 read result (fabricFiltered=False): %s", str(result_unfiltered))
         asserts.assert_greater(len(result_unfiltered), 1, "Should have at least two extensions when not fabric filtered")
         # Check that the TH2 extension data is empty
         endpoint_data_th2 = [r for r in result_unfiltered if r.fabricIndex == f2]
@@ -225,7 +225,7 @@ class TC_ACL_2_7(MatterBaseTest):
         result2_filtered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=extension_attr,
         )
-        logging.info("TH2 read result (fabricFiltered=True): %s", str(result2_filtered))
+        log.info("TH2 read result (fabricFiltered=True): %s", str(result2_filtered))
         asserts.assert_equal(len(result2_filtered), 1, "Should have exactly one extension when fabric filtered")
 
         endpoint_data2 = [r for r in result2_filtered if r.fabricIndex == f2]
@@ -238,7 +238,7 @@ class TC_ACL_2_7(MatterBaseTest):
             dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=extension_attr,
             fabric_filtered=False
         )
-        logging.info("TH2 read result (fabricFiltered=False): %s", str(result2_unfiltered))
+        log.info("TH2 read result (fabricFiltered=False): %s", str(result2_unfiltered))
         asserts.assert_greater(len(result2_unfiltered), 1, "Should have at least two extensions when not fabric filtered")
         # Check that the TH1 extension data is empty
         endpoint_data_th1 = [r for r in result2_unfiltered if r.fabricIndex == f1]
@@ -288,7 +288,7 @@ class TC_ACL_2_7(MatterBaseTest):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
         result = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
-        logging.info("RemoveFabric command result: %s", str(result))
+        log.info("RemoveFabric command result: %s", str(result))
         asserts.assert_equal(
             result.statusCode, 0, "RemoveFabric command should have succeeded")
 

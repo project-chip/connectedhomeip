@@ -76,7 +76,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
         #####################################################################################################################################
         #

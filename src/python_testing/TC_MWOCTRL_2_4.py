@@ -93,7 +93,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
         only_watts_supported = feature_map == features.kPowerInWatts
 
         if not only_watts_supported:
-            logging.info("PowerInWatts is not supported so skipping the rest of the tests.")
+            log.info("PowerInWatts is not supported so skipping the rest of the tests.")
             self.mark_all_remaining_steps_skipped(2)
             return
 
@@ -103,7 +103,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
 
         self.step(3)
         selectedWattIndex = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
-        logging.info("SelectedWattIndex is %s" % selectedWattIndex)
+        log.info("SelectedWattIndex is %s" % selectedWattIndex)
         asserts.assert_true(selectedWattIndex >= 0 and selectedWattIndex < len(
             supportedWattsList), "SelectedWattIndex is out of range")
 

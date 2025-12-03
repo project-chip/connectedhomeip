@@ -117,7 +117,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
         if not is_positioning_supported:
-            logging.info("Positioning feature is not supported. Skipping remaining steps.")
+            log.info("Positioning feature is not supported. Skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
@@ -133,7 +133,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
         # STEP 2e: If Latching feature is not supported or state is unlatched, skip steps 2f to 2k
         self.step("2e")
         if (not is_latching_supported) or (not initial_state.latch):
-            logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2f to 2k.")
+            log.info("Latching feature is not supported or state is unlatched. Skipping steps 2f to 2k.")
             self.mark_step_range_skipped("2f", "2k")
         else:
             # STEP 2f: Read LatchControlModes attribute
@@ -144,7 +144,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
             self.step("2g")
             sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes is manual unlatching. Skipping step 2h.")
+                log.info("LatchControlModes is manual unlatching. Skipping step 2h.")
                 self.skip_step("2h")
             else:
                 # STEP 2h: Send SetTarget command with Latch=False
@@ -160,7 +160,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
             # STEP 2i: If LatchControlModes is remote unlatching, skip step 2j
             self.step("2i")
             if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes is remote unlatching. Skipping step 2j.")
+                log.info("LatchControlModes is remote unlatching. Skipping step 2j.")
                 self.skip_step("2j")
             else:
                 # STEP 2j: Manually unlatch the device

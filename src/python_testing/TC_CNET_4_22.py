@@ -68,12 +68,12 @@ class TC_CNET_4_22(MatterBaseTest):
         asserts.assert_true(thread_interfaces is not None, "There are not any Thread interfaces available")
         asserts.assert_true(len(thread_interfaces) > 0, "Expected to find at least one Thread network")
 
-        logging.info(f"Threads: {thread_interfaces}")
+        log.info(f"Threads: {thread_interfaces}")
 
         # Each element in the ThreadScanResults list will have the following fields:
         for thread_interface in thread_interfaces:
 
-            logging.info(f"Thread interface: {thread_interface}")
+            log.info(f"Thread interface: {thread_interface}")
 
             # PanId with a range of 0 to 65534 (2**16-2)
             assert_int_in_range(thread_interface.panId, 0, 65534, "PanId")
@@ -128,7 +128,7 @@ class TC_CNET_4_22(MatterBaseTest):
         cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=empty_octstr, breadcrumb=1)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
-        logging.info(f"Scan network response: {scan_network_response}")
+        log.info(f"Scan network response: {scan_network_response}")
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
         # NetworkingStatus field value is Success
@@ -155,7 +155,7 @@ class TC_CNET_4_22(MatterBaseTest):
         cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=NullValue, breadcrumb=2)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
-        logging.info(f"Scan network response: {scan_network_response}")
+        log.info(f"Scan network response: {scan_network_response}")
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
         # NetworkingStatus field value is Success
@@ -184,7 +184,7 @@ class TC_CNET_4_22(MatterBaseTest):
         cmd = Clusters.NetworkCommissioning.Commands.ScanNetworks(ssid=random_ASCII, breadcrumb=3)
         scan_network_response = await self.send_single_cmd(cmd=cmd)
 
-        logging.info(f"Scan network response: {scan_network_response}")
+        log.info(f"Scan network response: {scan_network_response}")
 
         # Verify that DUT sends ScanNetworksResponse command to the TH with the following fields:
         # NetworkingStatus field value is Success

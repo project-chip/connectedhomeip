@@ -253,7 +253,7 @@ class TC_FAN_4_1(MatterBaseTest):
                 asserts.assert_not_equal(percent_setting, 0, "Incorrect percent setting")
 
             self.step(step_num + 3)
-            logging.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
+            log.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
             await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)

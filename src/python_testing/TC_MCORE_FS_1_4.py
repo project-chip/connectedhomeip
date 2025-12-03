@@ -161,7 +161,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_fsa_bridge_address = "::1"
         self.th_fsa_bridge_port = 5543
@@ -305,7 +305,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             ))
 
         # Get the endpoint number for just added TH_SERVER_NO_UID.
-        logging.info("Endpoints on TH_FSA_BRIDGE: old=%s, new=%s", th_fsa_bridge_endpoints, th_fsa_bridge_endpoints_new)
+        log.info("Endpoints on TH_FSA_BRIDGE: old=%s, new=%s", th_fsa_bridge_endpoints, th_fsa_bridge_endpoints_new)
         asserts.assert_true(th_fsa_bridge_endpoints_new.issuperset(th_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = th_fsa_bridge_endpoints_new - th_fsa_bridge_endpoints
@@ -320,7 +320,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             endpoint=th_fsa_bridge_th_server_endpoint)
         asserts.assert_true(matchers.is_type(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
+        log.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
 
         self.step(3)
 
@@ -395,7 +395,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         ))
 
         # Get the endpoint number for just synced TH_SERVER_NO_UID.
-        logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
+        log.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
@@ -409,7 +409,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             endpoint=dut_fsa_bridge_th_server_endpoint)
         asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
+        log.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
 
         # Make sure that the UniqueID on the DUT_FSA_BRIDGE is the same as the one on the DUT_FSA_BRIDGE.
         asserts.assert_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,

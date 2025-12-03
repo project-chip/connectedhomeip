@@ -43,17 +43,17 @@ def run_single_test(otaimage: str, otaimage_version: int) -> int:
         OTA_TOOL_DIR, 'ota_image_tool.py'))
     extract_cmd = str(ota_tool) + ' extract ' + str(ota_image) + ' ' + str(ota_image_bin)
     status = subprocess.call(extract_cmd, shell=True)
-    logging.info("Extract image : " + str(status))
+    log.info("Extract image : " + str(status))
     if status != 0:
-        logging.error(f"Failed to extract the image from {ota_image}")
+        log.error(f"Failed to extract the image from {ota_image}")
         exit(1)
-    logging.info(f"Image extracted into {ota_image_bin}")
+    log.info(f"Image extracted into {ota_image_bin}")
 
     # Mod update
     cmd_mod = "chmod +x " + str(ota_image_bin)
     status = subprocess.call(cmd_mod, shell=True)
     if status != 0:
-        logging.info(f"Failed to change +x permission on the image  {ota_image_bin}")
+        log.info(f"Failed to change +x permission on the image  {ota_image_bin}")
         exit(1)
 
     app_args = ' --discriminator 1234 '
@@ -89,22 +89,22 @@ def run_single_test(otaimage: str, otaimage_version: int) -> int:
 @click.option('--otaimagesversions', '-v', multiple=True, type=(int))
 def main(otaimages: str, otaimagesversions: int):
     if len(otaimages) == 0 or otaimagesversions == 0:
-        logging.error("Must provide at least one image to verify")
+        log.error("Must provide at least one image to verify")
         exit(1)
     if len(otaimages) != len(otaimagesversions):
-        logging.error("Provided non matching images to provided versions")
+        log.error("Provided non matching images to provided versions")
     passes = []
     main_status = 0
     for index in range(len(otaimages)):
         otaimage = otaimages[index]
         otaimage_version = otaimagesversions[index]
-        logging.info(f"Verifying the image {otaimage} has the reported version {otaimage_version}")
+        log.info(f"Verifying the image {otaimage} has the reported version {otaimage_version}")
         status = run_single_test(otaimage=otaimage, otaimage_version=otaimage_version)
         passes.append((otaimage, otaimage_version, status))
 
     for iter in passes:
         if iter[2] != 0:
-            logging.error(f"Image version missmatched for ota image: {iter[0]} expected: {iter[1]}")
+            log.error(f"Image version missmatched for ota image: {iter[0]} expected: {iter[1]}")
             main_status = 1
 
     sys.exit(main_status)

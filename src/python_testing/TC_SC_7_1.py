@@ -124,7 +124,7 @@ class TC_SC_7_1(MatterBaseTest):
                 self.mark_current_step_skipped()
         else:
             if setup_payload_info[0].filter_value == setup_payload_info[1].filter_value and self.matter_test_config.manual_code is not None:
-                logging.warning("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
+                log.warning("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
             asserts.assert_not_equal(
                 setup_payload_info[0].filter_value, setup_payload_info[1].filter_value, "Devices are using the same discriminator values")
 

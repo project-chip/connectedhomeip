@@ -102,17 +102,17 @@ class TC_OCC_3_2(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        logging.info(
+        log.info(
             f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
-        logging.info(f"Attribute list: {attribute_list}")
-        logging.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
-        logging.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
-        logging.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
+        log.info(f"Attribute list: {attribute_list}")
+        log.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
+        log.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
+        log.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
 
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)
@@ -147,7 +147,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
-            logging.info("No HoldTime attribute supports. Terminate this test case")
+            log.info("No HoldTime attribute supports. Terminate this test case")
             self.mark_all_remaining_steps_skipped("4b")
             return
 

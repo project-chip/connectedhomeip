@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
 class TC_ACL_2_9(MatterBaseTest):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
         result = await self.th2.ReadAttribute(self.dut_node_id, [(0, attribute)])
-        logging.info(f"Result: {result}")
+        log.info(f"Result: {result}")
         value = result[0][Clusters.Objects.AccessControl][attribute]
         asserts.assert_greater_equal(
             value,

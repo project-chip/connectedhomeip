@@ -52,7 +52,7 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
                 nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
 
         except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
+            log.exception('Error running OpenCommissioningWindow %s', e)
             asserts.fail('Failed to open commissioning window')
 
     def pics_TC_CADMIN_1_22(self) -> list[str]:

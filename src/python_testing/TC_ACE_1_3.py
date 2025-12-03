@@ -144,7 +144,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat2v1 = cat2_id | 0x0001
         cat2v2 = cat2_id | 0x0002
         cat2v3 = cat2_id | 0x0003
-        logging.info('cat1v1 0x%x', cat1v1)
+        log.info('cat1v1 0x%x', cat1v1)
 
         self.step(1)
 

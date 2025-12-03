@@ -98,16 +98,16 @@ class TC_VALCC_4_4(MatterBaseTest):
 
         self.step("2b")
         if not is_ts_feature_supported:
-            logging.info("TimeSync feature not supported skipping test case")
+            log.info("TimeSync feature not supported skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
                 self.step(step.test_plan_number)
-                logging.info("Test step skipped")
+                log.info("Test step skipped")
 
             return
 
-        logging.info("Test step skipped")
+        log.info("Test step skipped")
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
@@ -123,7 +123,7 @@ class TC_VALCC_4_4(MatterBaseTest):
                 pass
 
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(4)
         try:
@@ -167,7 +167,7 @@ class TC_VALCC_4_4(MatterBaseTest):
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
             asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(10)
         try:

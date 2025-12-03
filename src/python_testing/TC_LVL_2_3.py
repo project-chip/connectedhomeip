@@ -127,7 +127,7 @@ class TC_LVL_2_3(MatterBaseTest):
         cmd = Clusters.LevelControl.Commands.MoveToLevelWithOnOff(level=min_level, transitionTime=0)
         await self.send_single_cmd(cmd)
         # NOTE: added this sleep to let the DUT have some time to move
-        logging.info("Test waits for 1 seconds")
+        log.info("Test waits for 1 seconds")
         await asyncio.sleep(1)
 
         self.step(5)
@@ -142,7 +142,7 @@ class TC_LVL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(8)
-        logging.info('Test will now collect data for 30 seconds')
+        log.info('Test will now collect data for 30 seconds')
         await asyncio.sleep(30)
 
         self.step(9)
@@ -185,7 +185,7 @@ class TC_LVL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(17)
-        logging.info("Test waits for 5 seconds")
+        log.info("Test waits for 5 seconds")
         await asyncio.sleep(5)
 
         self.step(18)
@@ -194,7 +194,7 @@ class TC_LVL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(19)
-        logging.info("Test waits for 20 seconds")
+        log.info("Test waits for 20 seconds")
         await asyncio.sleep(20)
 
         self.step(20)
@@ -203,7 +203,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(21)
         remaining_time = sub_handler.attribute_reports[lvl.Attributes.RemainingTime]
-        logging.info(f'Reamining time reports: {remaining_time}')
+        log.info(f'Reamining time reports: {remaining_time}')
         asserts.assert_less_equal(remaining_time[0].value, 100, "Unexpected first RemainingTime report")
         asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 

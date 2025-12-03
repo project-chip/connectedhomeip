@@ -140,7 +140,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         if filtered_supported_locales:
             value_present_in_supported_locales = random.choice(filtered_supported_locales)
         else:
-            logging.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
+            log.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
             self.mark_all_remaining_steps_skipped(5)
             return
 

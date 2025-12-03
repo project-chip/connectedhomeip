@@ -152,13 +152,13 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("2a")
         attribute_list: typing.List[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        logging.info(f"AttributeList: {attribute_list}")
+        log.info(f"AttributeList: {attribute_list}")
 
         self.step("2b")
         is_countdown_time_supported: bool = attributes.CountdownTime.attribute_id in attribute_list
 
         if not is_countdown_time_supported:
-            logging.info("CountdownTime attribute not supported, skipping test")
+            log.info("CountdownTime attribute not supported, skipping test")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
@@ -172,14 +172,14 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("2e")
         if not is_latching_supported:
-            logging.info("Latching feature not supported, skipping steps related to latching")
+            log.info("Latching feature not supported, skipping steps related to latching")
             self.mark_step_range_skipped("2f", "2m")
         else:
-            logging.info("Latching feature supported, proceeding with latch preparation steps")
+            log.info("Latching feature supported, proceeding with latch preparation steps")
 
             self.step("2f")
             latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-            logging.info(f"LatchControlModes: {latch_control_modes}")
+            log.info(f"LatchControlModes: {latch_control_modes}")
 
             self.step("2g")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -189,27 +189,27 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                 current_latch: bool = NullValue
             else:
                 current_latch: bool = overall_current_state.latch
-            logging.info(f"CurrentLatch: {current_latch}")
+            log.info(f"CurrentLatch: {current_latch}")
 
             self.step("2h")
             if current_latch is False:
-                logging.info("CurrentLatch is False, skipping Latch = False preparation steps")
+                log.info("CurrentLatch is False, skipping Latch = False preparation steps")
                 self.mark_step_range_skipped("2i", "2m")
             else:
-                logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
+                log.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
 
                 self.step("2i")
                 # Check if LatchControlModes Bit 1 is 0
                 if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                     self.skip_step("2j")
                     self.step("2k")
-                    logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
+                    log.info("LatchControlModes Bit 1 is 0, unlatch device manually")
                     self.step("2l")
                     self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
 
                 else:
                     self.step("2j")
-                    logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
+                    log.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                     try:
                         await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
@@ -221,7 +221,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
                 self.step("2m")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
-                logging.info("Latch is now False, proceeding with CountdownTime checks")
+                log.info("Latch is now False, proceeding with CountdownTime checks")
                 sub_handler.reset()
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
@@ -239,15 +239,15 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             current_position = NullValue
         else:
             current_position = overall_current_state.position
-        logging.info(f"CurrentPosition: {current_position}")
+        log.info(f"CurrentPosition: {current_position}")
 
         self.step("4b")
         if current_position == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
-            logging.info("CurrentPosition is FullyClosed, skipping steps 4c and 4d.")
+            log.info("CurrentPosition is FullyClosed, skipping steps 4c and 4d.")
             self.skip_step("4c")
             self.skip_step("4d")
         else:
-            logging.info("CurrentPosition is not FullyClosed, proceeding with Position = FullyClosed preparation steps")
+            log.info("CurrentPosition is not FullyClosed, proceeding with Position = FullyClosed preparation steps")
 
             self.step("4c")
             try:
@@ -274,7 +274,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         current_countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == NullValue or (1 <= current_countdown_time <= countdown_time_max),
                             f"CountdownTime should be between 1 and {countdown_time_max}, or null, got: {current_countdown_time}.")
-        logging.info(f"CurrentCountdownTime: {current_countdown_time}")
+        log.info(f"CurrentCountdownTime: {current_countdown_time}")
 
         self.step("4h")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
@@ -282,20 +282,20 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("4i")
         if current_countdown_time is NullValue:
-            logging.info("CurrentCountdownTime is Null, skipping step 4j.")
+            log.info("CurrentCountdownTime is Null, skipping step 4j.")
             self.skip_step("4j")
         else:
             self.step("4j")
             countdown_time_after_operation: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_equal(countdown_time_after_operation, 0,
                                  f"CountdownTime should be 0 after operation completes, got: {countdown_time_after_operation}.")
-            logging.info(f"CountdownTime after operation: {countdown_time_after_operation}")
+            log.info(f"CountdownTime after operation: {countdown_time_after_operation}")
         sub_handler.reset()
 
         # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
         self.step("5a")
         if current_countdown_time is NullValue:
-            logging.info("CurrentCountdownTime is Null, skipping steps 5b to 5f.")
+            log.info("CurrentCountdownTime is Null, skipping steps 5b to 5f.")
             self.mark_step_range_skipped("5b", "5f")
         else:
             self.step("5b")
@@ -308,14 +308,14 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_before_interruption > 0 and countdown_time_before_interruption <
                                 countdown_time_max, f"CountdownTime before interruption: {countdown_time_before_interruption}.")
-            logging.info(f"CountdownTime before interruption: {countdown_time_before_interruption}")
+            log.info(f"CountdownTime before interruption: {countdown_time_before_interruption}")
 
             self.step("5d")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.Stop())
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Stop command failed: {e}")
-            logging.info("Stop command sent, waiting for MainState to become Stopped")
+            log.info("Stop command sent, waiting for MainState to become Stopped")
 
             self.step("5e")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
@@ -325,7 +325,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             countdown_time_after_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_after_interruption == 0,
                                 f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
-            logging.info(f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}")
+            log.info(f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}")
             sub_handler.reset()
 
 

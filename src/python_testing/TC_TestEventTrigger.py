@@ -161,7 +161,7 @@ class TestEventTrigger(MatterBaseTest):
         has_payload_test_response_command = (
             Clusters.GeneralDiagnostics.Commands.PayloadTestResponse.command_id in generated_commands)
 
-        logging.info(f"Number of supported invoke paths reported: {max_paths_per_invoke}")
+        log.info(f"Number of supported invoke paths reported: {max_paths_per_invoke}")
         if has_multiple_paths_per_invoke:
             asserts.assert_true(has_data_model_test_feature, "Must have DMTEST feature when > 1 invoke paths supported")
 

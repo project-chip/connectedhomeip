@@ -84,7 +84,7 @@ class TC_RR_1_1(MatterBaseTest):
         self._subscriptions = []
 
     def teardown_class(self):
-        logging.info("Teardown: shutting down all subscription to avoid racy callbacks")
+        log.info("Teardown: shutting down all subscription to avoid racy callbacks")
         for subscription in self._subscriptions:
             subscription.Shutdown()
         super().teardown_class()
@@ -121,32 +121,32 @@ class TC_RR_1_1(MatterBaseTest):
 
         # Do a read-out of heap statistics before the test begins
         if check_heap_watermarks:
-            logging.info("Read Heap info before stress test")
+            log.info("Read Heap info before stress test")
             high_watermark_before, current_usage_before = await self.read_heap_statistics(dev_ctrl)
 
         # Make sure all certificates are installed with maximal size
         dev_ctrl.fabricAdmin.certificateAuthority.maximizeCertChains = True
 
-        logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
+        log.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
         endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
         has_user_labels = len(endpoints_with_user_label_list) > 0
         if has_user_labels:
-            logging.info("--> User label cluster present on endpoints %s" %
+            log.info("--> User label cluster present on endpoints %s" %
                          ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
         else:
-            logging.info("--> User label cluster not present on any endpoitns")
+            log.info("--> User label cluster not present on any endpoitns")
 
         # Generate list of all clients names
         client_list = []
 
-        logging.info("Pre-conditions: validate OperationalCredentials.SupportedFabrics >= 5")
+        log.info("Pre-conditions: validate OperationalCredentials.SupportedFabrics >= 5")
         supported_fabrics = await self.read_single_attribute(dev_ctrl,
                                                              node_id=self.dut_node_id,
                                                              endpoint=0,
                                                              attribute=Clusters.OperationalCredentials.Attributes.SupportedFabrics)
         asserts.assert_greater_equal(supported_fabrics, 5)
 
-        logging.info("Pre-conditions: validate BasicInformation.CapabilityMinima.CaseSessionsPerFabric >= 3")
+        log.info("Pre-conditions: validate BasicInformation.CapabilityMinima.CaseSessionsPerFabric >= 3")
         capability_minima = await self.read_single_attribute(dev_ctrl,
                                                              node_id=self.dut_node_id,
                                                              endpoint=0,
@@ -157,12 +157,12 @@ class TC_RR_1_1(MatterBaseTest):
         await self._populate_wildcard()
         supports_vid_verification = Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id in self.stored_global_wildcard.attributes[
             0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.AcceptedCommandList]
-        logging.info(f"Device supports VID verification: {supports_vid_verification}")
+        log.info(f"Device supports VID verification: {supports_vid_verification}")
 
         # Step 1: Commission 5 fabrics with maximized NOC chains. 1a and 1b have already been completed at this time.
-        logging.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
+        log.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
 
-        logging.info("Step 1a/1b: Setup first fabric")
+        log.info("Step 1a/1b: Setup first fabric")
 
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
@@ -191,7 +191,7 @@ class TC_RR_1_1(MatterBaseTest):
         # Insert a fabric to self-test the next step.
         # This is not hidden behind a flag to avoid potential undetected bugs.
         if commissioned_fabric_count == 1:
-            logging.info("Commissioning fabric for TH test.")
+            log.info("Commissioning fabric for TH test.")
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
 
@@ -210,28 +210,28 @@ class TC_RR_1_1(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
         vid_verification_statement = b''
         if supports_vid_verification:
-            logging.info("Step 1c, Set VIDVerificationStatmeent for initial fabric")
+            log.info("Step 1c, Set VIDVerificationStatmeent for initial fabric")
             vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
             await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
         else:
-            logging.info("Skipping VID verification as this is not supported on the device")
+            log.info("Skipping VID verification as this is not supported on the device")
 
         fabric_table_entries_to_check[current_fabric_index] = FabricTableEntryToCheck(
             fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
 
         # Step 1d - Ensure there are no leftover fabrics from another process.
-        logging.info("Step 1d: Remove all other fabrics other than the main one used for the test")
+        log.info("Step 1d: Remove all other fabrics other than the main one used for the test")
         if commissioned_fabric_count > 1:
             fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
             for fabric in fabrics:
-                logging.info(
+                log.info(
                     f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
                 if fabric.fabricIndex == current_fabric_index:
                     continue
 
-                logging.info(f"  -> Removing extra fabric at FabricIndex {fabric.fabricIndex} from device.")
+                log.info(f"  -> Removing extra fabric at FabricIndex {fabric.fabricIndex} from device.")
                 # This is not the test client's fabric, so remove it.
                 await dev_ctrl.SendCommand(
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
@@ -242,10 +242,10 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_equal(commissioned_fabric_count, 1, "Failed to remove extra fabrics from DUT.")
 
         # Prepare clients for subsequent fabrics (step 1e)
-        logging.info("Step 1e: Commission into all remaining fabric entries.")
+        log.info("Step 1e: Commission into all remaining fabric entries.")
         for i in range(num_fabrics_to_commission - 1):
             admin_index = 2 + i
-            logging.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
+            log.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=admin_index)
 
@@ -286,19 +286,19 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_equal(len(client_list), num_fabrics_to_commission *
                              num_controllers_per_fabric, "Must have the right number of clients")
 
-        logging.info("Step 1f: validate fabric table contents for all fabrics so far")
+        log.info("Step 1f: validate fabric table contents for all fabrics so far")
         commissioned_fabric_count = await self.read_single_attribute(
             dev_ctrl, node_id=self.dut_node_id,
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
         asserts.assert_equal(commissioned_fabric_count, num_fabrics_to_commission,
                              "Must have the right number of fabrics commissioned.")
-        logging.info("Reading fabric table")
+        log.info("Reading fabric table")
         fabric_table: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
             dev_ctrl, node_id=self.dut_node_id,
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
 
         for fabric in fabric_table:
-            logging.info(
+            log.info(
                 f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
 
         asserts.assert_equal({f.fabricIndex for f in fabric_table}, set(fabric_table_entries_to_check.keys(
@@ -321,7 +321,7 @@ class TC_RR_1_1(MatterBaseTest):
             self.dut_node_id).localSessionId for client in client_list}
 
         # Step 2: Set the Label field for each fabric and BasicInformation.NodeLabel to 32 characters
-        logging.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
+        log.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
 
         for fabric in fabric_table:
             client_name = generate_controller_name(fabric.fabricIndex, 0)
@@ -329,7 +329,7 @@ class TC_RR_1_1(MatterBaseTest):
 
             # Send the UpdateLabel command
             label = ("%d" % fabric.fabricIndex) * 32
-            logging.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" %
+            log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" %
                          (fabric.fabricIndex, label, client_name))
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))
 
@@ -342,7 +342,7 @@ class TC_RR_1_1(MatterBaseTest):
             asserts.assert_equal(fabric_metadata[0].label, label, "Fabrics[x].label must match what was written")
 
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
-        logging.info(f"Step 2b: Set BasicInformation.NodeLabel to {BEFORE_LABEL}")
+        log.info(f"Step 2b: Set BasicInformation.NodeLabel to {BEFORE_LABEL}")
         await client_list[0].WriteAttribute(self.dut_node_id,
                                             [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
@@ -367,9 +367,9 @@ class TC_RR_1_1(MatterBaseTest):
             Clusters.Descriptor  # All descriptors on all endpoints
         ]
 
-        logging.info("Step 4 and 5 (first part): Establish subscription with all %d clients" % len(client_list))
+        log.info("Step 4 and 5 (first part): Establish subscription with all %d clients" % len(client_list))
         for sub_idx, client in enumerate(client_list):
-            logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+            log.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
             sub = await client.ReadAttribute(
                 nodeId=self.dut_node_id,
@@ -392,7 +392,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_equal(len(self._subscriptions), len(client_list), "Must have the right number of subscriptions")
 
         # Step 6: Read 9 paths and validate success
-        logging.info("Step 6: Read 9 paths (first 9 attributes of Basic Information cluster) and validate success")
+        log.info("Step 6: Read 9 paths (first 9 attributes of Basic Information cluster) and validate success")
 
         large_read_contents = [
             Clusters.BasicInformation.Attributes.DataModelRevision,
@@ -416,7 +416,7 @@ class TC_RR_1_1(MatterBaseTest):
                                 "Must have read back attribute %s" % (attribute.__name__))
 
         # Step 7: Trigger a change on NodeLabel
-        logging.info(
+        log.info(
             "Step 7: Change attribute with one client, await all attributes changed successfully without loss of subscriptions")
         await asyncio.sleep(1)
         await client_list[0].WriteAttribute(self.dut_node_id,
@@ -437,12 +437,12 @@ class TC_RR_1_1(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
-                        logging.info("Got expected attribute change for client %s" % client_name)
+                        log.info("Got expected attribute change for client %s" % client_name)
                         all_changes[client_name] = True
 
                 # We are done waiting when we have accumulated all results
                 if all(all_changes.values()):
-                    logging.info("All clients have reported, done waiting.")
+                    log.info("All clients have reported, done waiting.")
                     break
             except queue.Empty:
                 # No error, we update timeouts and keep going
@@ -451,32 +451,32 @@ class TC_RR_1_1(MatterBaseTest):
             elapsed = time.time() - start_time
             time_remaining = timeout_delay_sec - elapsed
 
-        logging.info("Step 7: Validation of results")
+        log.info("Step 7: Validation of results")
         sub_test_failed = False
 
         for catcher in resub_catchers:
             if catcher.caught_resubscription:
-                logging.error("Client %s saw a resubscription" % catcher.name)
+                log.error("Client %s saw a resubscription" % catcher.name)
                 sub_test_failed = True
             else:
-                logging.info("Client %s correctly did not see a resubscription" % catcher.name)
+                log.info("Client %s correctly did not see a resubscription" % catcher.name)
 
         all_reports_gotten = all(all_changes.values())
         if not all_reports_gotten:
-            logging.error("Missing reports from the following clients: %s" %
+            log.error("Missing reports from the following clients: %s" %
                           ", ".join([name for name, value in all_changes.items() if value is False]))
             sub_test_failed = True
         else:
-            logging.info("Got successful reports from all clients, meaning all concurrent CASE sessions worked")
+            log.info("Got successful reports from all clients, meaning all concurrent CASE sessions worked")
 
         # Determine result of Step 7
         if sub_test_failed:
             asserts.fail("Failed step 7 !")
 
         # Step 8: Validate sessions have not changed by doing a read on NodeLabel from all clients
-        logging.info("Step 8a: Read back NodeLabel directly from all clients")
+        log.info("Step 8a: Read back NodeLabel directly from all clients")
         for sub_idx, client in enumerate(client_list):
-            logging.info("Reading NodeLabel (%d/%d) from controller node %s" % (sub_idx + 1, len(client_list), client.name))
+            log.info("Reading NodeLabel (%d/%d) from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
             label_readback = await self.read_single_attribute(client,
                                                               node_id=self.dut_node_id,
@@ -490,7 +490,7 @@ class TC_RR_1_1(MatterBaseTest):
         # this ensures we have not established any new CASE
         # sessions in this test.
         if check_local_session_id_unchanged:
-            logging.info("Step 8b: Validate that the local CASE session ID hasn't changed")
+            log.info("Step 8b: Validate that the local CASE session ID hasn't changed")
             num_failed_clients = 0
 
             for client in client_list:
@@ -499,12 +499,12 @@ class TC_RR_1_1(MatterBaseTest):
                 total_sessions = client.GetConnectedDeviceSync(self.dut_node_id).numTotalSessions
 
                 if (beginning_session_id != end_session_id):
-                    logging.error(
+                    log.error(
                         f"Test ended with a different session ID created from what we had before for {client.name} "
                         f"(total sessions = {total_sessions})")
                     num_failed_clients = num_failed_clients + 1
                 elif (total_sessions != 1):
-                    logging.error(f"Test ended with more than 1 session for {client.name}")
+                    log.error(f"Test ended with more than 1 session for {client.name}")
                     num_failed_clients = num_failed_clients + 1
 
             if (num_failed_clients > 0):
@@ -514,13 +514,13 @@ class TC_RR_1_1(MatterBaseTest):
         if has_user_labels and not skip_user_label_cluster_steps:
             await self.fill_user_label_list(dev_ctrl, self.dut_node_id)
         else:
-            logging.info("Step 9: Skipped due to no UserLabel cluster instances")
+            log.info("Step 9: Skipped due to no UserLabel cluster instances")
         # Step 10: Reconfig ACL to allow test runner access to Groups clusters on all endpoints.
-        logging.info("Step 10: Reconfiguring ACL to allow access to Groups Clusters")
+        log.info("Step 10: Reconfiguring ACL to allow access to Groups Clusters")
         await self.send_acl(test_step=10, client_by_name=client_by_name, enable_access_to_group_cluster=True, fabric_table=fabric_table)
         # Step 11: Count all group cluster instances
         # and ensure MaxGroupsPerFabric >= 4 * counted_groups_clusters.
-        logging.info("Step 11: Validating groups support minimums")
+        log.info("Step 11: Validating groups support minimums")
         groups_cluster_endpoints: Dict[int, Any] = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.Groups])
         counted_groups_clusters: int = len(groups_cluster_endpoints)
 
@@ -531,7 +531,7 @@ class TC_RR_1_1(MatterBaseTest):
                 node_id=self.dut_node_id,
                 endpoint=0,
                 attribute=Clusters.GroupKeyManagement.Attributes.MaxGroupsPerFabric)
-            logging.info(
+            log.info(
                 f"MaxGroupsPerFabric value: {indicated_max_groups_per_fabric}, number of endpoints with Groups clusters cluster: {counted_groups_clusters}, which are: {list(groups_cluster_endpoints.keys())}")
             if indicated_max_groups_per_fabric < 4 * counted_groups_clusters:
                 asserts.fail("Failed Step 11: MaxGroupsPerFabric < 4 * counted_groups_clusters")
@@ -578,9 +578,9 @@ class TC_RR_1_1(MatterBaseTest):
 
         # Read heap watermarks after the test
         if check_heap_watermarks:
-            logging.info("Read Heap info after stress test")
+            log.info("Read Heap info after stress test")
             high_watermark_after, current_usage_after = await self.read_heap_statistics(dev_ctrl)
-            logging.info("=== Heap Usage Diagnostics ===\nHigh watermark: {} (before) / {} (after)\n"
+            log.info("=== Heap Usage Diagnostics ===\nHigh watermark: {} (before) / {} (after)\n"
                          "Current usage: {} (before) / {} (after)".format(high_watermark_before, high_watermark_after,
                                                                           current_usage_before, current_usage_after))
 
@@ -589,7 +589,7 @@ class TC_RR_1_1(MatterBaseTest):
         return "".join([rnd.choice("abcdef0123456789") for _ in range(length)])[:length]
 
     async def fill_user_label_list(self, dev_ctrl, target_node_id):
-        logging.info("Step 9: Fill UserLabel clusters on each endpoint")
+        log.info("Step 9: Fill UserLabel clusters on each endpoint")
         user_labels = await dev_ctrl.ReadAttribute(target_node_id, [Clusters.UserLabel])
 
         # Build 4 sets of maximized labels
@@ -601,12 +601,12 @@ class TC_RR_1_1(MatterBaseTest):
             clusters = user_labels[endpoint_id]
             for cluster in clusters:
                 if cluster == Clusters.UserLabel:
-                    logging.info("Step 9a: Filling UserLabel cluster on endpoint %d" % endpoint_id)
+                    log.info("Step 9a: Filling UserLabel cluster on endpoint %d" % endpoint_id)
                     statuses = await dev_ctrl.WriteAttribute(target_node_id,
                                                              [(endpoint_id, Clusters.UserLabel.Attributes.LabelList(labels))])
                     asserts.assert_equal(statuses[0].Status, StatusEnum.Success, "Label write must succeed")
 
-                    logging.info("Step 9b: Validate UserLabel cluster contents after write on endpoint %d" % endpoint_id)
+                    log.info("Step 9b: Validate UserLabel cluster contents after write on endpoint %d" % endpoint_id)
                     read_back_labels = await self.read_single_attribute(dev_ctrl,
                                                                         node_id=target_node_id,
                                                                         endpoint=endpoint_id,
@@ -629,7 +629,7 @@ class TC_RR_1_1(MatterBaseTest):
             for group_key_cluster_idx in range(1, keys_per_fabric):
                 group_key_list_idx: int = group_key_cluster_idx - 1
 
-                logging.info("Step 13: Setting group key on fabric %d at index '%d'" % (client_idx+1, group_key_cluster_idx))
+                log.info("Step 13: Setting group key on fabric %d at index '%d'" % (client_idx+1, group_key_cluster_idx))
                 group_keys[client_idx].append(self.build_group_key(client_idx, group_key_cluster_idx, keys_per_fabric))
                 await client.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(
                     group_keys[client_idx][group_key_list_idx]))
@@ -638,7 +638,7 @@ class TC_RR_1_1(MatterBaseTest):
         for client_idx in range(fabrics):
             client: Any = clients[client_idx]
 
-            logging.info("Step 13: Reading back group keys on fabric %d" % (client_idx+1))
+            log.info("Step 13: Reading back group keys on fabric %d" % (client_idx+1))
             resp = await client.SendCommand(self.dut_node_id, 0,
                                             Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
                                             responseType=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse)
@@ -674,7 +674,7 @@ class TC_RR_1_1(MatterBaseTest):
                     groupKeySetID=group_key_map[client_idx][group],
                     fabricIndex=fabric_idx))
 
-            logging.info("Step 14: Setting group key map on fabric %d" % (fabric_idx))
+            log.info("Step 14: Setting group key map on fabric %d" % (fabric_idx))
             await client.WriteAttribute(
                 self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs[client_idx]))])
 
@@ -683,7 +683,7 @@ class TC_RR_1_1(MatterBaseTest):
             client: Any = clients[client_idx]
             fabric_idx: int = fabric_table[client_idx].fabricIndex
 
-            logging.info("Step 14: Reading group key map on fabric %d" % (fabric_idx))
+            log.info("Step 14: Reading group key map on fabric %d" % (fabric_idx))
             group_key_map_readback = await self.read_single_attribute(
                 client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap)
 
@@ -797,10 +797,10 @@ class TC_RR_1_1(MatterBaseTest):
 
             acl = self.build_acl(enable_access_to_group_cluster)
 
-            logging.info(f"Step {test_step}a: Writing ACL entry for fabric {fabric.fabricIndex}")
+            log.info(f"Step {test_step}a: Writing ACL entry for fabric {fabric.fabricIndex}")
             await client.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
 
-            logging.info(f"Step {test_step}b: Validating ACL entry for fabric {fabric.fabricIndex}")
+            log.info(f"Step {test_step}b: Validating ACL entry for fabric {fabric.fabricIndex}")
             acl_readback = await self.read_single_attribute(
                 client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.AccessControl.Attributes.Acl)
             fabric_index = 9999

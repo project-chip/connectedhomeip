@@ -113,7 +113,7 @@ class TC_OCC_3_1(MatterBaseTest):
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
             asserts.assert_equal(holdtime_dut, hold_time, "Hold time read-back does not match hold time written")
         else:
-            logging.info("No HoldTime attribute supports. Will test only occupancy attribute triggering functionality only.")
+            log.info("No HoldTime attribute supports. Will test only occupancy attribute triggering functionality only.")
 
         self.step(3)
 

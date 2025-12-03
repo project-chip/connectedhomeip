@@ -79,7 +79,7 @@ class TC_ACE_1_5(MatterBaseTest):
         await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
-        logging.info('Commissioning complete done. Successful.')
+        log.info('Commissioning complete done. Successful.')
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
 
         self.print_step(4, "TH2 reads its fabric index from the Operational Credentials cluster CurrentFabricIndex attribute")

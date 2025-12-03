@@ -29,7 +29,7 @@ class TestCheckSoftwareVersion(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        logging.info("This log has started")
+        log.info("This log has started")
 
     @async_test_body
     async def test_ota_image_version(self):

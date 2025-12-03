@@ -114,7 +114,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5544
         self.th_server_setup_params = SetupParameters(

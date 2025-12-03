@@ -109,13 +109,13 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
-            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         elif commission_type == "BCM":
             service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
-            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation

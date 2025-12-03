@@ -72,7 +72,7 @@ class EventSpecificChangeCallback:
         """This is the subscription callback when an event is received.
            It checks the if the event is the expected one and then posts it into the queue for later processing."""
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster_id and res.Header.EventId == self._expected_event.event_id:
-            logging.info(
+            log.info(
                 f'Got subscription report for event {self._expected_event.event_id} on cluster {self._expected_cluster_id}: {res.Data}')
             self._q.put(res)
 
@@ -136,15 +136,15 @@ class TC_OPSTATE_BASE():
         for device in device_type_list:
             found = next((mydevice for mydevice in mandatedevicetypes if mydevice["devicetype"] == device.deviceType), None)
             if found is not None:
-                logging.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
+                log.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
                 if found["revision"] <= device.revision:
-                    logging.info("Revision matches")
+                    log.info("Revision matches")
                     return True
-                logging.info("Revision does not match")
+                log.info("Revision does not match")
         return False
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
-        logging.info(f"##### Command {cmd}")
+        log.info(f"##### Command {cmd}")
 
         try:
             return await self.send_single_cmd(cmd=cmd,
@@ -164,11 +164,11 @@ class TC_OPSTATE_BASE():
                              f"Command response ({ret.commandResponseState}) mismatched from expectation for {cmd} on {endpoint}")
 
     async def read_expect_success(self, endpoint, attribute):
-        logging.info(f"##### Read {attribute}")
+        log.info(f"##### Read {attribute}")
         attr_value = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                     cluster=self.test_info.cluster,
                                                                     attribute=attribute)
-        logging.info(f"## {attribute}: {attr_value}")
+        log.info(f"## {attribute}: {attr_value}")
 
         return attr_value
 
@@ -196,8 +196,8 @@ class TC_OPSTATE_BASE():
         attr_value.sort()
         expected_contains.sort()
 
-        logging.info("## Current value: [%s]" % attr_value)
-        logging.info("## Expected value: [%s]" % expected_contains)
+        log.info("## Current value: [%s]" % attr_value)
+        log.info("## Expected value: [%s]" % expected_contains)
 
         for item in expected_contains:
             if item not in attr_value:
@@ -668,8 +668,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
-                logging.info(f" -> New countdown time: {countdown_time}")
+                log.info(f" -> Initial countdown time: {initial_countdown_time}")
+                log.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_less_equal(countdown_time, (initial_countdown_time - wait_time),
                                           f"The countdown time shall have decreased at least {wait_time:.1f} since start command")
 
@@ -806,7 +806,7 @@ class TC_OPSTATE_BASE():
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
-                logging.info(f" -> Initial ountdown time: {initial_countdown_time}")
+                log.info(f" -> Initial ountdown time: {initial_countdown_time}")
                 asserts.assert_true(0 <= initial_countdown_time <= 259200,
                                     f"CountdownTime({initial_countdown_time}) must be between 0 and 259200")
 
@@ -821,8 +821,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
-                logging.info(f" -> New countdown time: {countdown_time}")
+                log.info(f" -> Initial countdown time: {initial_countdown_time}")
+                log.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_equal(countdown_time, initial_countdown_time,
                                      "The countdown time shall be equal since pause command")
 
@@ -1093,7 +1093,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 11: TH waits for initial-countdown-time
         self.step(11)
-        logging.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
+        log.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
         await asyncio.sleep(initial_countdown_time)
 
         # STEP 12: TH sends Stop command to the DUT
@@ -1284,7 +1284,7 @@ class TC_OPSTATE_BASE():
         countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         if countdownTime is not NullValue:
             self.step(5)
-            logging.info('Test will now collect data for 10 seconds')
+            log.info('Test will now collect data for 10 seconds')
             await asyncio.sleep(10)
 
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]

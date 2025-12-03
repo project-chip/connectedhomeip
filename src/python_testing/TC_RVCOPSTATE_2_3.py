@@ -147,7 +147,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        logging.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, expected_state,
                              "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
 
@@ -215,7 +215,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         op_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                      attribute=attributes.OperationalStateList)
 
-        logging.info("OperationalStateList: %s" % (op_state_list))
+        log.info("OperationalStateList: %s" % (op_state_list))
 
         defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                           if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
@@ -227,7 +227,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(4, "Read OperationalState")
         old_opstate_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                        attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % old_opstate_dut)
+        log.info("OperationalState: %s" % old_opstate_dut)
 
         await self.send_pause_cmd_with_check(5, op_errors.kNoError)
 
@@ -237,7 +237,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(7, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.CountdownTime)
-            logging.info("CountdownTime: %s" % initial_countdown_time)
+            log.info("CountdownTime: %s" % initial_countdown_time)
             if initial_countdown_time is not NullValue:
                 in_range = (1 <= initial_countdown_time <= 259200)
             asserts.assert_true(initial_countdown_time is NullValue or in_range,
@@ -248,7 +248,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
             self.print_step(9, "Read CountdownTime attribute")
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
-            logging.info("CountdownTime: %s" % countdown_time)
+            log.info("CountdownTime: %s" % countdown_time)
             asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
                                 "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
             asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) not equal to the initial CountdownTime(%s)"
@@ -261,7 +261,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(12, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                          attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, old_opstate_dut,
                              "OperationalState(%s) should be the state before pause (%s)" % (operational_state, old_opstate_dut))
 

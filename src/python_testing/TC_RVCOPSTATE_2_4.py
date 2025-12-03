@@ -92,7 +92,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        logging.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, expected_state,
                              "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
 

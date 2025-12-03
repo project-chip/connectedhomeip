@@ -397,11 +397,11 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
             if '.der' not in filename:
                 continue
             with open(os.path.join(cd_cert_dir, filename), 'rb') as f:
-                logging.info(f'Parsing CD signing certificate file: {filename}')
+                log.info(f'Parsing CD signing certificate file: {filename}')
                 try:
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
-                    logging.info(f'File {filename} is not a valid certificate, skipping')
+                    log.info(f'File {filename} is not a valid certificate, skipping')
                     pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest

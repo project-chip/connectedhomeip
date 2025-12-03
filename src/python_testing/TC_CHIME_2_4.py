@@ -91,10 +91,10 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no chime sound")
+                log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no chime sound")
                 asserts.assert_equal(user_response.lower(), "y")
             else:
-                logging.info("CHIME 2_4: No response received for no chime sound played user prompt")
+                log.info("CHIME 2_4: No response received for no chime sound played user prompt")
 
         self.step(4)
         await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)
@@ -106,10 +106,10 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of chime sound")
+                log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of chime sound")
                 asserts.assert_equal(user_response.lower(), "y")
             else:
-                logging.info("CHIME 2_4: No response received for chime sound played user prompt")
+                log.info("CHIME 2_4: No response received for chime sound played user prompt")
 
         self.step(6)
         # Use the current selected chime when in CI
@@ -133,11 +133,11 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                 if not found_id:
                     asserts.assert_fail(f"Unknown ChimeID selected: {chosenChimeID}")
                 else:
-                    logging.info(f"CHIME 2_4: selected chime id for longest chime: {chosenChimeID}")
+                    log.info(f"CHIME 2_4: selected chime id for longest chime: {chosenChimeID}")
 
                 longestChimeDurationChime = chosenChimeID
             else:
-                logging.info("CHIME 2_4: No response received for longest ChimeID user prompt")
+                log.info("CHIME 2_4: No response received for longest ChimeID user prompt")
 
         await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, longestChimeDurationChime)
 
@@ -154,10 +154,10 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no more than two chime sounds")
+                log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no more than two chime sounds")
                 asserts.assert_equal(user_response.lower(), "y")
             else:
-                logging.info("CHIME 2_4: No response received for no more than two chime sounds played user prompt")
+                log.info("CHIME 2_4: No response received for no more than two chime sounds played user prompt")
 
         self.step(8)
         myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
@@ -189,10 +189,10 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                                                          prompt_msg_placeholder="y",
                                                          default_value="y")
                 if user_response is not None:
-                    logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of different chime sound")
+                    log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of different chime sound")
                     asserts.assert_equal(user_response.lower(), "y")
                 else:
-                    logging.info("CHIME 2_4: No response received for different chime sound played user prompt")
+                    log.info("CHIME 2_4: No response received for different chime sound played user prompt")
 
         else:
             self.skip_step(9)

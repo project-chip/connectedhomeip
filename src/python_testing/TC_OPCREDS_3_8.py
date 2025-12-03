@@ -390,14 +390,14 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_true(len(root_certs) == 1,
                                 f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
 
-            logging.info("Parsing root certificate for TH1's fabric")
+            log.info("Parsing root certificate for TH1's fabric")
             try:
                 th1_root_parser = MatterCertParser(root_certs[0])
                 th1_root_public_key = th1_root_parser.get_public_key_bytes()
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
-            logging.info("Parsed TH1's RCAC successfully.")
-            logging.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
+            log.info("Parsed TH1's RCAC successfully.")
+            log.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
 
         with test_step(1, description="Commission DUT in TH2's fabric. Cert chain must NOT include ICAC"):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -421,14 +421,14 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
             th2_fabric_index = nocResp.fabricIndex
 
-            logging.info("Parsing root certificate for TH2's fabric")
+            log.info("Parsing root certificate for TH2's fabric")
             try:
                 th2_rcac = MatterCertParser(rcacResp)
                 th2_root_public_key = th2_rcac.get_public_key_bytes()
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
-            logging.info("Parsed TH2's RCAC successfully.")
-            logging.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
+            log.info("Parsed TH2's RCAC successfully.")
+            log.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
@@ -466,7 +466,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
 
                     try:
-                        logging.info(f"Trying to parse NOC for fabric index {fabric_index}")
+                        log.info(f"Trying to parse NOC for fabric index {fabric_index}")
                         noc_cert = MatterCertParser(noc_struct.noc)
                         for tag, value in noc_cert.get_subject_names().items():
                             if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
@@ -475,10 +475,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                     except (ValueError, IndexError, KeyError, TypeError) as e:
                         asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
 
-                    logging.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
-                    logging.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
+                    log.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
+                    log.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
 
-            logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
+            log.info(f"Fabric IDs found: {fabric_ids_from_certs}")
 
             asserts.assert_true(th1_fabric_index in found_fabric_indices,
                                 f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")

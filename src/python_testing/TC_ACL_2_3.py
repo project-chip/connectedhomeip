@@ -84,14 +84,14 @@ class TC_ACL_2_3(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info(f"CurrentFabricIndex F1: {str(f1)}")
+        log.info(f"CurrentFabricIndex F1: {str(f1)}")
 
         self.step(3)
         # Read AccessControlExtension attribute for TH1 value is empty list
         ac_cluster = Clusters.AccessControl
         ac_extension_attr = ac_cluster.Attributes.Extension
         ac_extension_value0 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
-        logging.info(f"AccessControlExtension: {str(ac_extension_value0)}")
+        log.info(f"AccessControlExtension: {str(ac_extension_value0)}")
         asserts.assert_equal(ac_extension_value0, [], "AccessControlExtension is empty list")
 
         self.step(4)
@@ -105,14 +105,14 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list1))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result1)}")
+        log.info(f"Write result: {str(result1)}")
         asserts.assert_equal(
             result1[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(5)
         # Read AccessControlExtension attribute for TH1 value is D_OK_EMPTY
         ac_extension_value1 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
-        logging.info(f"AccessControlExtension: {str(ac_extension_value1)}")
+        log.info(f"AccessControlExtension: {str(ac_extension_value1)}")
         asserts.assert_equal(ac_extension_value1[0].data, D_OK_EMPTY, "AccessControlExtension is D_OK_EMPTY")
 
         self.step(6)
@@ -126,14 +126,14 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list2))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result2)}")
+        log.info(f"Write result: {str(result2)}")
         asserts.assert_equal(
             result2[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(7)
         # Read AccessControlExtension attribute for TH1 value is D_OK_SINGLE
         ac_extension_value2 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
-        logging.info(f"AccessControlExtension: {str(ac_extension_value2)}")
+        log.info(f"AccessControlExtension: {str(ac_extension_value2)}")
         asserts.assert_equal(ac_extension_value2[0].data, D_OK_SINGLE, "AccessControlExtension is D_OK_SINGLE")
 
         self.step(8)
@@ -147,14 +147,14 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list3))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result3)}")
+        log.info(f"Write result: {str(result3)}")
         asserts.assert_equal(
             result3[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(9)
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
         ac_extension_value3 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
-        logging.info(f"AccessControlExtension: {str(ac_extension_value3)}")
+        log.info(f"AccessControlExtension: {str(ac_extension_value3)}")
         asserts.assert_equal(ac_extension_value3[0].data, D_OK_FULL, "AccessControlExtension is D_OK_FULL")
 
         self.step(10)
@@ -168,7 +168,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list4))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result4)}")
+        log.info(f"Write result: {str(result4)}")
         asserts.assert_equal(
             result4[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -183,7 +183,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list5))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result5)}")
+        log.info(f"Write result: {str(result5)}")
         asserts.assert_equal(
             result5[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -198,7 +198,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list6))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result6)}")
+        log.info(f"Write result: {str(result6)}")
         asserts.assert_equal(
             result6[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -213,7 +213,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list7))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result7)}")
+        log.info(f"Write result: {str(result7)}")
         asserts.assert_equal(
             result7[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -228,7 +228,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list8))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result8)}")
+        log.info(f"Write result: {str(result8)}")
         asserts.assert_equal(
             result8[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -243,7 +243,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list9))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result9)}")
+        log.info(f"Write result: {str(result9)}")
         asserts.assert_equal(
             result9[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -258,7 +258,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list10))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result10)}")
+        log.info(f"Write result: {str(result10)}")
         asserts.assert_equal(
             result10[0].Status, Status.ConstraintError, "Write should have returned a CONSTRAINT_ERROR")
 
@@ -277,7 +277,7 @@ class TC_ACL_2_3(MatterBaseTest):
             forceLegacyListEncoding=force_legacy_encoding
         )
 
-        logging.info(f"Write result: {str(result11)}")
+        log.info(f"Write result: {str(result11)}")
         asserts.assert_equal(
             result11[0].Status,
             Status.ConstraintError,
@@ -286,7 +286,7 @@ class TC_ACL_2_3(MatterBaseTest):
         self.step(18)
         # Read AccessControlExtension attribute for TH1 value is D_OK_FULL
         ac_extension_value4 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
-        logging.info(f"AccessControlExtension: {str(ac_extension_value4)}")
+        log.info(f"AccessControlExtension: {str(ac_extension_value4)}")
         if force_legacy_encoding:
             asserts.assert_equal(
                 ac_extension_value4[0].data,
@@ -307,20 +307,20 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list12))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {str(result12)}")
+        log.info(f"Write result: {str(result12)}")
         asserts.assert_equal(
             result12[0].Status, Status.Success, "Write should have returned a SUCCESS")
 
         self.step(20)
         # Read AccessControlExtension attribute for TH1 value is an empty list
         ac_extension_value5 = await self.read_single_attribute_check_success(endpoint=0, cluster=ac_cluster, attribute=ac_extension_attr)
-        logging.info(f"AccessControlExtension: {str(ac_extension_value5)}")
+        log.info(f"AccessControlExtension: {str(ac_extension_value5)}")
         asserts.assert_equal(ac_extension_value5, [], "AccessControlExtension is empty list")
 
         # Re-running test using the legacy list writing mechanism
         if not force_legacy_encoding:
             self.step(21)
-            logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
+            log.info("*** Rerunning test using the legacy list writing mechanism now ***")
         else:
             self.skip_step(21)
 

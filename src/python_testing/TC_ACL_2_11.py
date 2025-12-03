@@ -197,7 +197,7 @@ class TC_ACL_2_11(MatterBaseTest):
                             "Result is not of type ReviewFabricRestrictionsResponse")
 
         self.step(7)
-        logging.info("Please follow instructions provided by the product maker to remove all ARL entries")
+        log.info("Please follow instructions provided by the product maker to remove all ARL entries")
         arru_cb.wait_for_event_report(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
 
         self.step(8)

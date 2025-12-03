@@ -80,7 +80,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             params = await dev_ctrl.OpenCommissioningWindow(
                 nodeId=node_id, timeout=600, iteration=10000, discriminator=longDiscriminator, option=ChipDeviceCtrl.ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin)
         except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
+            log.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
         return (longDiscriminator, params)
 

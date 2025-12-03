@@ -66,7 +66,7 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -137,7 +137,7 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
 
         self.step(1)
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
@@ -171,7 +171,7 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
+        log.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once

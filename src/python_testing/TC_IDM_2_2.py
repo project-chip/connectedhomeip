@@ -309,7 +309,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
-            logging.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
+            log.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
 
     async def _read_unsupported_attribute(self):
         """
@@ -330,7 +330,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 ]
                 if unsupported:
                     unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
-                    logging.info(
+                    log.info(
                         f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
                     # Only request this single attribute
                     result = await self.read_single_attribute_expect_error(
@@ -341,7 +341,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
-                    logging.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
+                    log.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
                     return
 
         # If we get here, we got problems as there should always be at least one unsupported attribute
@@ -364,7 +364,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
-        logging.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
+        log.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
         return results
 
     async def _read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -437,7 +437,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-            logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            log.info(f"Granted TH2 View access to only cluster {cluster_id}")
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
@@ -450,7 +450,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
             # Verify only the allowed cluster is returned
             returned_clusters = list(read_request.attributes[endpoint].keys())
-            logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            log.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
 
             # The allowed cluster should be present
             allowed_cluster_obj = None
@@ -474,9 +474,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 await self.default_controller.WriteAttribute(
                     self.dut_node_id,
                     [(self.endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
-                logging.info("Restored original ACL")
+                log.info("Restored original ACL")
             except Exception as e:
-                logging.error(f"Failed to restore original ACL: {e}")
+                log.error(f"Failed to restore original ACL: {e}")
 
             # Removes TH2 controller
             TH2.Shutdown()
@@ -678,7 +678,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Check if BasicInformation cluster exists before running steps 14-17
         # If it doesn't exist (e.g., non-commissionable node), skip these steps
         if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
-            logging.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
+            log.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
             self.skip_step(14)
             self.skip_step(15)
             self.skip_step(16)
@@ -763,7 +763,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Check if BasicInformation cluster exists before running step 20
         # If it doesn't exist (e.g., non-commissionable node), skip this step
         if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
-            logging.info("BasicInformation cluster not found on endpoint - skipping step 20")
+            log.info("BasicInformation cluster not found on endpoint - skipping step 20")
             self.skip_step(20)
         else:
             self.step(20)

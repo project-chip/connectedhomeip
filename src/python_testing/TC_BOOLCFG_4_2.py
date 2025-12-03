@@ -116,13 +116,13 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
         if attributes.AlarmsEnabled.attribute_id in attribute_list and is_vis_feature_supported:
             enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("3c")
         if attributes.AlarmsEnabled.attribute_id in attribute_list and is_aud_feature_supported:
             enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("3d")
         if attributes.AlarmsEnabled.attribute_id in attribute_list:
@@ -132,7 +132,7 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(4)
         if is_vis_feature_supported or is_aud_feature_supported:
@@ -142,7 +142,7 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(5)
         activeAlarms = 0
@@ -151,35 +151,35 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
             activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_not_equal(activeAlarms, 0, "AlarmsActive is 0")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("6a")
         if is_vis_feature_supported:
             asserts.assert_not_equal(
                 (activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), 0, "Bit 0 in AlarmsActive is not 1")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("6b")
         if not is_vis_feature_supported:
             asserts.assert_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual),
                                  0, "Bit 0 in AlarmsActive is not 0")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("7a")
         if is_aud_feature_supported:
             asserts.assert_not_equal(
                 (activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), 0, "Bit 1 in AlarmsActive is not 1")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("7b")
         if not is_aud_feature_supported:
             asserts.assert_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible),
                                  0, "Bit 1 in AlarmsActive is not 0")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(8)
         if is_vis_feature_supported or is_aud_feature_supported:
@@ -189,14 +189,14 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(9)
         if is_vis_feature_supported or is_aud_feature_supported:
             activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0, "AlarmsActive is not 0")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
 
 if __name__ == "__main__":

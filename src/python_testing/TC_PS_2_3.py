@@ -68,7 +68,7 @@ class TC_PS_2_3(MatterBaseTest):
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(3)
-        logging.info("This test will now wait for 30 seconds.")
+        log.info("This test will now wait for 30 seconds.")
         await asyncio.sleep(30)
 
         counts = sub_handler.attribute_report_counts

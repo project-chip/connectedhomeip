@@ -74,7 +74,7 @@ class TestCheckCommandFlags(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Unexpected error returned by DUT")
 
-        logging.info("Test completed")
+        log.info("Test completed")
 
 
 if __name__ == "__main__":

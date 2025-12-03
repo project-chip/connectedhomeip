@@ -105,7 +105,7 @@ class TestUnitTestingErrorPath(MatterBaseTest):
             attributes=[(1, attributes.ReadFailureCode(int(Status.Failure)))],
         )
 
-        logging.info("Test completed")
+        log.info("Test completed")
 
 
 if __name__ == "__main__":

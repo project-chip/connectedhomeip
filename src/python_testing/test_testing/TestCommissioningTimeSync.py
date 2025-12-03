@@ -114,7 +114,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
     async def commission_stages(self, time_zone: bool, dst: bool, default_ntp: bool, trusted_time_source: bool):
         await self.create_commissioner()
 
-        logging.info(
+        log.info(
             f'Running Commissioning test - time_zone: {time_zone}, dst: {dst}, default_ntp: {default_ntp}, trusted_time_source: {trusted_time_source}')
 
         if time_zone:

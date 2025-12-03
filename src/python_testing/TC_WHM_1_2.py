@@ -111,7 +111,7 @@ class TC_WHM_1_2(MatterBaseTest):
         # derived cluster defined tags
         derivedTags = [tag.value for tag in Clusters.WaterHeaterMode.Enums.ModeTag]
 
-        logging.info("Derived tags: %s" % derivedTags)
+        log.info("Derived tags: %s" % derivedTags)
 
         # According to the Mode spec:
         # At least one entry in the SupportedModes attribute SHALL include the Manual mode tag in the ModeTags field list.
@@ -131,19 +131,19 @@ class TC_WHM_1_2(MatterBaseTest):
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kOff:
                     off_present += 1
                     off_manual_timed_present_in_this_mode += 1
-                    logging.info(
+                    log.info(
                         "Found Off mode tag %s with tag value %s", m.mode, t.value)
 
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kManual:
                     manual_present += 1
                     off_manual_timed_present_in_this_mode += 1
-                    logging.info(
+                    log.info(
                         "Found Manual mode tag %s with tag value %s", m.mode, t.value)
 
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kTimed:
                     timed_present += 1
                     off_manual_timed_present_in_this_mode += 1
-                    logging.info(
+                    log.info(
                         "Found Timed mode tag %s with tag value %s", m.mode, t.value)
 
             asserts.assert_less_equal(off_manual_timed_present_in_this_mode, 1,
@@ -163,7 +163,7 @@ class TC_WHM_1_2(MatterBaseTest):
 
         self.step(3)
         current_mode = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
-        logging.info("CurrentMode: %s" % current_mode)
+        log.info("CurrentMode: %s" % current_mode)
         asserts.assert_true(current_mode in modes,
                             "CurrentMode is not a supported mode!")
 
