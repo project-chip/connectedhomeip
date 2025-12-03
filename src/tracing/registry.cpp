@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,47 +26,45 @@
 
 namespace chip::Tracing {
 
-#if MATTER_TRACING_ENABLED
-
 namespace {
-// Modifications of the backend array are protected by the Matter stack lock,
-// but iteration can happen from any thread at any time. Slots must be filled
-// from the beginning of the array, so iteration can stop at the first nullptr.
-std::atomic<Backend *> gTracingBackends[CHIP_CONFIG_MAX_TRACING_BACKENDS]{};
+// Contains the registerted tracing backends. The invariant enforced by
+// Register/Unregister is that all valid backends come before any nullptr
+// entries. The special value kNoBackendMarker is used to indicate a slot that
+// is empty, but is not at the end of the array (i.e. there are valid backends
+// after it). The array is typed as void * to accommodate the special marker
+// value; all other non-null values are valid Backend * pointers. Modifications
+// of the backend array are protected by the Matter stack lock, but iteration
+// can happen from any thread at any time.
+std::atomic<void *> gTracingBackends[CHIP_CONFIG_MAX_TRACING_BACKENDS]{};
 
-// A marker value to represent an empty slot in the backend array.
-// This avoids having to shift backends in the array when unregistering.
-alignas(Backend) constexpr char gNullBackendStorage{ 0 };
-Backend * NullBackend()
-{
-    return reinterpret_cast<Backend *>(const_cast<char *>(&gNullBackendStorage));
-}
+// A non-null marker value that differs from any valid Backend *.
+inline constexpr void * kNoBackendMarker = &gTracingBackends;
 
 template <typename Fn>
 void ForEachBackend(Fn && fn)
 {
     for (auto & slot : gTracingBackends)
     {
-        Backend * backend = slot.load();
+        void * backend = slot.load(std::memory_order_acquire);
         VerifyOrReturn(backend != nullptr);
-        if (backend != NullBackend())
+        if (backend != kNoBackendMarker)
         {
-            fn(*backend);
+            fn(*static_cast<Backend *>(backend));
         }
     }
 }
 
-// Replace trailing NullBackend() entries with nullptr,
+// Clear trailing kNoBackendMarker entries,
 // so iteration can stop as early as possible.
 void OptimizeBackends()
 {
     for (int i = CHIP_CONFIG_MAX_TRACING_BACKENDS - 1; i >= 0; --i)
     {
         auto & slot    = gTracingBackends[i];
-        auto * backend = slot.load();
-        if (backend == NullBackend())
+        void * backend = slot.load(std::memory_order_acquire);
+        if (backend == kNoBackendMarker)
         {
-            slot.store(nullptr);
+            slot.store(nullptr, std::memory_order_release);
             continue;
         }
         if (backend != nullptr)
@@ -83,12 +81,12 @@ void Register(Backend & aBackend)
     assertChipStackLockedByCurrentThread();
     for (auto & slot : gTracingBackends)
     {
-        Backend * backend = slot.load();
+        void * backend = slot.load(std::memory_order_acquire);
         VerifyOrReturn(backend != &aBackend); // already registered
-        if (backend == nullptr || backend == NullBackend())
+        if (backend == nullptr || backend == kNoBackendMarker)
         {
             aBackend.Open();
-            slot.store(&aBackend);
+            slot.store(&aBackend, std::memory_order_release);
             return;
         }
     }
@@ -100,10 +98,10 @@ void Unregister(Backend & aBackend)
     assertChipStackLockedByCurrentThread();
     for (auto & slot : gTracingBackends)
     {
-        Backend * backend = slot.load();
+        void * backend = slot.load(std::memory_order_acquire);
         if (backend == &aBackend)
         {
-            slot.store(NullBackend());
+            slot.store(kNoBackendMarker, std::memory_order_release);
             aBackend.Close();
             OptimizeBackends();
             return;
@@ -164,19 +162,5 @@ void LogMetricEvent(const ::chip::Tracing::MetricEvent & event)
 }
 
 } // namespace Internal
-
-#else
-
-void Register(Backend & backend)
-{
-    /* no-op if tracing is disabled */
-}
-
-void Unregister(Backend & backend)
-{
-    /* no-op if tracing is disabled */
-}
-
-#endif // MATTER_TRACING_ENABLED
 
 } // namespace chip::Tracing

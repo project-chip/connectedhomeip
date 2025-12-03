@@ -7,7 +7,7 @@ compiled out completely.
 
 ## Types of data
 
-### Low-level Tracing
+### Low-Level Tracing
 
 This is mostly intended for following execution flow and measuring time spent
 for various operations. These traces are either
