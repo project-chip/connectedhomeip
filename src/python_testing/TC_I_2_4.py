@@ -115,7 +115,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(2)
         sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=cluster.Attributes.IdentifyTime)
-        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint, max_interval_sec=30)
 
         # Verify Q requirements for IdentifyTime attribute by write to IdentifyTime
 
