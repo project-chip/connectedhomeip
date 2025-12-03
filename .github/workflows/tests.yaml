@@ -346,6 +346,7 @@ jobs:
                          run \
                          --iterations 1 \
                          --test-timeout-seconds 120 \
+                         --keep-going \
                          --tests-from-file failures_yaml.txt \
                          --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                          --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
@@ -1048,7 +1049,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --keep-going --save-failures-to failures_python.txt' || true
                   if [ -s failures_python.txt ]; then
                       echo "Retrying failed tests from failures_python.txt"
-                      scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --script-list-file failures_python.txt'
+                      scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --script-list-file failures_python.txt --keep-going'
                   fi
 
             - name: Execute Jupyter Notebooks
