@@ -41,11 +41,6 @@ void Instance::Shutdown()
     }
 }
 
-bool Instance::HasFeature(Feature aFeature) const
-{
-    return mCluster.Cluster().Features().Has(aFeature);
-}
-
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

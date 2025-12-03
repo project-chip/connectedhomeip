@@ -45,8 +45,6 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    bool HasFeature(Feature aFeature) const;
-
 private:
     RegisteredServerCluster<PowerTopologyCluster> mCluster;
 };

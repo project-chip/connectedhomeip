@@ -17,6 +17,7 @@
  */
 #include <app/clusters/power-topology-server/PowerTopologyCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/PowerTopology/Metadata.h>
 
 using namespace chip;
@@ -106,9 +107,17 @@ CHIP_ERROR PowerTopologyCluster::Attributes(const ConcreteClusterPath & path,
         ActiveEndpoints::kMetadataEntry,    //
     };
 
-    AttributeListBuilder listBuilder(builder);
+    OptionalAttributeSet<                   //
+        Attributes::AvailableEndpoints::Id, //
+        Attributes::ActiveEndpoints::Id     //
+        >
+        enabledOptionalAttributeSet;
 
-    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mEnabledOptionalAttributes);
+    enabledOptionalAttributeSet.Set<Attributes::AvailableEndpoints::Id>(mFeatureFlags.Has(Feature::kSetTopology));
+    enabledOptionalAttributeSet.Set<Attributes::ActiveEndpoints::Id>(mFeatureFlags.Has(Feature::kDynamicPowerFlow));
+
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), enabledOptionalAttributeSet);
 }
 
 } // namespace PowerTopology

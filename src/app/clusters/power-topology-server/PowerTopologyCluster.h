@@ -18,17 +18,11 @@
 
 #include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/PowerTopology/AttributeIds.h>
 #include <clusters/PowerTopology/ClusterId.h>
 #include <clusters/PowerTopology/Enums.h>
 
 namespace chip::app::Clusters::PowerTopology {
-
-using OptionalAttributesSet = OptionalAttributeSet< //
-    Attributes::AvailableEndpoints::Id,             //
-    Attributes::ActiveEndpoints::Id                 //
-    >;
 
 class PowerTopologyCluster : public DefaultServerCluster
 {
@@ -42,16 +36,9 @@ public:
     };
 
     PowerTopologyCluster(const Config & config) :
-        DefaultServerCluster({ config.endpointId, PowerTopology::Id }), mDelegate(config.delegate), mFeatureFlags(config.features),
-        mEnabledOptionalAttributes([&]() {
-            OptionalAttributesSet attributes;
-            attributes.Set<Attributes::AvailableEndpoints::Id>(config.features.Has(Feature::kSetTopology));
-            attributes.Set<Attributes::ActiveEndpoints::Id>(config.features.Has(Feature::kDynamicPowerFlow));
-            return attributes;
-        }())
+        DefaultServerCluster({ config.endpointId, PowerTopology::Id }), mDelegate(config.delegate), mFeatureFlags(config.features)
     {}
 
-    const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     const BitFlags<PowerTopology::Feature> & Features() const { return mFeatureFlags; }
 
     // Getters - return copies with error checking
@@ -68,7 +55,6 @@ public:
 private:
     PowerTopology::Delegate & mDelegate;
     const BitMask<PowerTopology::Feature> mFeatureFlags;
-    const OptionalAttributesSet mEnabledOptionalAttributes;
 };
 
 } // namespace chip::app::Clusters::PowerTopology
