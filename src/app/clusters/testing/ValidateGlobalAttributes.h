@@ -52,7 +52,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
 ///     cluster - The cluster interface to test.
 ///     expected - A vector containing the expected attribute entries (must include all
 ///                non-global, non-optional attributes).
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<app::DataModel::AttributeEntry> expected);
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected);
 
 /// Compares the accepted commands of a cluster against an expected set.
 ///

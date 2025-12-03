@@ -24,7 +24,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     return IsAttributesListEqualTo(cluster, std::move(attributes));
 }
 
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<app::DataModel::AttributeEntry> expected)
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];

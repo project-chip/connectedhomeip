@@ -35,6 +35,8 @@ namespace chip {
 namespace app {
 namespace Testing {
 
+constexpr FabricIndex kTestFabricIndex = static_cast<FabricIndex>(151);
+
 // Mock class that simulates CommandHandler behavior for unit testing, allowing capture and
 // verification of responses and statuses without real network interactions.
 class MockCommandHandler : public CommandHandler
@@ -127,7 +129,7 @@ public:
 private:
     std::vector<ResponseRecord> mResponses;
     std::vector<StatusRecord> mStatuses;
-    FabricIndex mFabricIndex = kUndefinedFabricIndex; // Default to a clearly test-only fabric index.
+    FabricIndex mFabricIndex = kTestFabricIndex; // Default to a clearly test-only fabric index.
 };
 
 } // namespace Testing
