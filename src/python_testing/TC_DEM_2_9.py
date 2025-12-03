@@ -111,7 +111,7 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
             forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
             asserts.assert_is_not_none(forecast.slots[0].manufacturerESAState)
         else:
-            logging.info('Device does not support StateForecastReporting. Skipping step 4a')
+            logger.info('Device does not support StateForecastReporting. Skipping step 4a')
 
         self.step("4b")
         if feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting:
@@ -122,7 +122,7 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
             asserts.assert_is_not_none(forecast.slots[0].maxPower)
             asserts.assert_is_not_none(forecast.slots[0].nominalEnergy)
         else:
-            logging.info('Device does not support PowerForecastReporting. Skipping step 4b')
+            logger.info('Device does not support PowerForecastReporting. Skipping step 4b')
 
         self.step("5")
         await self.send_test_event_trigger_forecast_clear()

@@ -187,7 +187,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             asserts.assert_equal(matchingZone.twoDCartesianZone.vertices, zoneVertices,
                                  "ZoneVertices of created Zone are mismatched")
         else:
-            logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            logger.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("2")
 
         self.step("2a")
@@ -446,7 +446,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
                 pass
 
         else:
-            logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            logger.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("7")
             self.skip_step("7a")
 
@@ -506,7 +506,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")
                 pass
         else:
-            logging.info("ZoneID1 not created. Test steps skipped")
+            logger.info("ZoneID1 not created. Test steps skipped")
             self.skip_step("8")
             self.skip_step("8a")
             self.skip_step("8b")

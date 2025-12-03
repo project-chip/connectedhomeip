@@ -99,7 +99,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             asserts.assert_true(maxUserDefinedZones >= 5,
                                 "Expected Max value of UserDefinedZones to be least 5")
         else:
-            logging.info("UserDefinedZones Feature not supported. Test steps skipped")
+            logger.info("UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step(2)
 
         self.step(3)
@@ -150,7 +150,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             asserts.assert_true(sensitivity >= 1 and sensitivity <= sensitivityMax,
                                 f"Sensitivity should be between 1 and {sensitivityMax}")
         else:
-            logging.info("PerZoneSensitivity Feature supported. Test steps skipped")
+            logger.info("PerZoneSensitivity Feature supported. Test steps skipped")
             self.skip_step(7)
 
         if self.twoDCartSupported:
@@ -167,7 +167,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             asserts.assert_true(twoDCartesianMax.x == videoSensorParams.sensorWidth - 1 and twoDCartesianMax.y ==
                                 videoSensorParams.sensorHeight - 1, "TwoDCartesianMax should be within the VideoSensorParams dimensions")
         else:
-            logging.info("TWoDCart Feature not supported. Test steps skipped")
+            logger.info("TWoDCart Feature not supported. Test steps skipped")
             self.skip_step(8)
 
 

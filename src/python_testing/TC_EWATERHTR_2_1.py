@@ -113,14 +113,14 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="TankVolume")
         else:
-            logging.info("Skipping step 5 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
+            logger.info("Skipping step 5 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
 
         self.step("6")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="EstimatedHeatRequired")
             asserts.assert_greater_equal(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} >= 0")
         else:
-            logging.info("Skipping step 6 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
+            logger.info("Skipping step 6 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
 
         self.step("7")
         if tp_supported:
@@ -128,7 +128,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             asserts.assert_greater_equal(value, 0, f"Unexpected TankPercentage value - expected {value} >= 0")
             asserts.assert_less_equal(value, 100, f"Unexpected TankPercentage value - expected {value} <= 100")
         else:
-            logging.info("Skipping step 7 as PICS.EWATERHTR.F01(TankPercenage) not supported")
+            logger.info("Skipping step 7 as PICS.EWATERHTR.F01(TankPercenage) not supported")
 
         self.step("8")
         boost_state = await self.read_whm_attribute_expect_success(attribute="BoostState")

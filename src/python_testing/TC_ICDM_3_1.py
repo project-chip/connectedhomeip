@@ -147,7 +147,7 @@ class TC_ICDM_3_1(MatterBaseTest):
             self.step(1)
             featureMap = await self._read_icdm_attribute_expect_success(attributes.FeatureMap)
             if featureMap & features.kCheckInProtocolSupport == 0:
-                logging.info('CheckInProtocolSupport feature (ICDM.S.F00) is not supported, skipping test.')
+                logger.info('CheckInProtocolSupport feature (ICDM.S.F00) is not supported, skipping test.')
                 self.mark_all_remaining_steps_skipped("2a")
                 return
 

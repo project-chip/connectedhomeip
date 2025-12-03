@@ -135,7 +135,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         logger.info("Checking Accuracy meets spec requirements")
         found_active_power = False
         for measurement in accuracy:
-            logging.info(
+            logger.info(
                 f"measurementType:{measurement.measurementType} measured:{measurement.measured} minMeasuredValue:{measurement.minMeasuredValue} maxMeasuredValue:{measurement.maxMeasuredValue}")
 
             # Scan all measurement types to check we have the mandatory kActivePower
@@ -147,7 +147,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                                  "minMeasuredValue must be the same as 1st accuracyRange rangeMin")
 
             for index, range_entry in enumerate(measurement.accuracyRanges):
-                logging.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
+                logger.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
                 asserts.assert_greater(
                     range_entry.rangeMax, range_entry.rangeMin, "rangeMax should be > rangeMin")
                 if index == 0:
@@ -243,7 +243,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
             asserts.assert_is(type(harmonic_currents), list)
             for index, entry in enumerate(harmonic_currents):
-                logging.info(
+                logger.info(
                     f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
                 asserts.assert_greater_equal(entry.order, 1)
                 self.check_value_in_range(
@@ -255,7 +255,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
             asserts.assert_is(type(harmonic_phases), list)
             for index, entry in enumerate(harmonic_phases):
-                logging.info(
+                logger.info(
                     f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
                 asserts.assert_greater_equal(entry.order, 1)
                 self.check_value_in_range(

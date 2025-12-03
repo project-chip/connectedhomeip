@@ -475,7 +475,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 pass
 
         else:
-            logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            logger.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("2")
             self.skip_step("2a")
             self.skip_step("3")

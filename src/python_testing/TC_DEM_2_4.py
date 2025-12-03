@@ -171,7 +171,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
     @async_test_body
     async def test_TC_DEM_2_4(self):
 
-        logging.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
+        logger.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
 
         self.step("1")
         # Commission DUT - already done
@@ -349,7 +349,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPaused)
 
         self.step("18")
-        logging.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
+        logger.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
         await asyncio.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)

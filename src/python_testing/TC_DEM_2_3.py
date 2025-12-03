@@ -148,7 +148,7 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
     @async_test_body
     async def test_TC_DEM_2_3(self):
 
-        logging.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
+        logger.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
 
         self.step("1")
         # Commission DUT - already done

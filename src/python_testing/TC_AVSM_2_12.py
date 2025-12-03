@@ -201,7 +201,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             logger.info(f"Rx'd HDRModeEnabled: {hdrEnabledNew}")
             asserts.assert_equal(hdrEnabledNew, not hdrEnabled, "Value does not match what was written in step 3")
         else:
-            logging.info("HDR Feature not supported. Test steps skipped")
+            logger.info("HDR Feature not supported. Test steps skipped")
             self.skip_step(2)
             self.skip_step(3)
             self.skip_step(4)
@@ -247,7 +247,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             asserts.assert_equal(softLivestreamPrivModeNew, not softLivestreamPrivMode,
                                  "Value does not match what was written in step 9")
         else:
-            logging.info("Privacy Feature not supported. Test steps skipped")
+            logger.info("Privacy Feature not supported. Test steps skipped")
             self.skip_step(5)
             self.skip_step(6)
             self.skip_step(7)

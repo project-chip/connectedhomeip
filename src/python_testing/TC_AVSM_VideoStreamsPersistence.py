@@ -223,7 +223,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
 
         self.step(12)
-        logging.info("Injecting kFault_ClearInMemoryAllocatedVideoStreams on DUT")
+        logger.info("Injecting kFault_ClearInMemoryAllocatedVideoStreams on DUT")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once
@@ -254,7 +254,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "Allocated video streams is not empty")
 
         self.step(14)
-        logging.info("Injecting kFault_LoadPersistentCameraAVSMAttributes on DUT")
+        logger.info("Injecting kFault_LoadPersistentCameraAVSMAttributes on DUT")
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once
         #

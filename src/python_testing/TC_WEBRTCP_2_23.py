@@ -210,7 +210,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
 
         # Valid WebRTC session is established
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            logger.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         logger.info(f"WebRTC session established with session ID: {session_id}")

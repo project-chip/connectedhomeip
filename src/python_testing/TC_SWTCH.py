@@ -229,7 +229,7 @@ class TC_SwitchTests(MatterBaseTest):
         actual_events = []
 
         while time_remaining > 0:
-            logging.info(f"Expecting event {sequence[sequence_idx]} on endpoint {endpoint_id}")
+            logger.info(f"Expecting event {sequence[sequence_idx]} on endpoint {endpoint_id}")
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)
                 expected_event = sequence[sequence_idx]
@@ -239,14 +239,14 @@ class TC_SwitchTests(MatterBaseTest):
                     actual_events.append(event_data)
 
                     if event_data == expected_event:
-                        logging.info(f"Got expected Event {sequence_idx+1}/{len(sequence)}: {event_data}")
+                        logger.info(f"Got expected Event {sequence_idx+1}/{len(sequence)}: {event_data}")
                         sequence_idx += 1
                     else:
                         asserts.assert_equal(event_data, expected_event, msg="Did not get expected event in correct sequence.")
 
                     # We are done waiting when we have accumulated all results.
                     if sequence_idx == len(sequence):
-                        logging.info("Got all expected events, done waiting.")
+                        logger.info("Got all expected events, done waiting.")
                         return
             except queue.Empty:
                 # No error, we update timeouts and keep going
@@ -262,7 +262,7 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for "
+        logger.info(f"Waiting {timeout_sec:.1f} seconds for no more events for "
                      f"cluster {expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
@@ -278,7 +278,7 @@ class TC_SwitchTests(MatterBaseTest):
             elapsed = time.time() - start_time
             time_remaining = timeout_sec - elapsed
 
-        logging.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
+        logger.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
 
     def _received_event(self, event_listener: EventSubscriptionHandler, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
@@ -354,7 +354,7 @@ class TC_SwitchTests(MatterBaseTest):
             self._ask_for_switch_position(endpoint_id, expected_switch_position)
 
             data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
-            logging.info(f"-> SwitchLatched event last received: {data}")
+            logger.info(f"-> SwitchLatched event last received: {data}")
             asserts.assert_equal(data, cluster.Events.SwitchLatched(
                 newPosition=expected_switch_position), "Did not get expected switch position")
 
@@ -363,7 +363,7 @@ class TC_SwitchTests(MatterBaseTest):
                 self.step(6)
             button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
             asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
-            logging.info(f"Checking to see if a report for {expected_switch_position} is received")
+            logger.info(f"Checking to see if a report for {expected_switch_position} is received")
             attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
                                                       expected_switch_position], timeout_sec=post_prompt_settle_delay_seconds)
 
@@ -375,7 +375,7 @@ class TC_SwitchTests(MatterBaseTest):
                     self.skip_step(7)
 
             if num_positions > 2:
-                logging.info("Looping for the other positions")
+                logger.info("Looping for the other positions")
 
         # Step 8: Operator sets switch to first position on the DUT.
         self.step(8)
@@ -391,7 +391,7 @@ class TC_SwitchTests(MatterBaseTest):
         last_event = event_listener.get_last_event()
         asserts.assert_is_not_none(last_event, "Did not get SwitchLatched events since last operator action.")
         last_event_data = last_event.Data
-        logging.info(f"-> SwitchLatched event last received: {last_event_data}")
+        logger.info(f"-> SwitchLatched event last received: {last_event_data}")
         asserts.assert_equal(last_event_data, cluster.Events.SwitchLatched(
             newPosition=expected_switch_position), "Did not get expected switch position")
 
@@ -402,7 +402,7 @@ class TC_SwitchTests(MatterBaseTest):
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
-        logging.info(f"Checking to see if a report for {expected_switch_position} is received")
+        logger.info(f"Checking to see if a report for {expected_switch_position} is received")
         expected_final_value = [AttributeValue(
             endpoint_id, attribute=cluster.Attributes.CurrentPosition, value=expected_switch_position)]
         attrib_listener.await_all_final_values_reported(expected_final_value, timeout_sec=post_prompt_settle_delay_seconds)
@@ -522,7 +522,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
 
         if not has_ms_feature:
-            logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
+            logger.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
             self.mark_all_remaining_steps_skipped("2")
             return
 
@@ -549,23 +549,23 @@ class TC_SwitchTests(MatterBaseTest):
         self._ask_for_long_press(endpoint_id, switch_pressed_position, feature_map)
 
         # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
-        logging.info(
+        logger.info(
             f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
         attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
                                                   switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # - TH expects at least InitialPress with NewPosition = 1
-        logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
+        logger.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
         expected_events = [cluster.Events.InitialPress(newPosition=switch_pressed_position)]
         self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
                                        sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
         # - if MSL feature is supported, expect to see LongPress/LongRelease in that order.
         if not has_msl_feature:
-            logging.info("Since MSL feature unsupported, skipping check for LongPress/LongRelease")
+            logger.info("Since MSL feature unsupported, skipping check for LongPress/LongRelease")
         else:
             # - TH expects report of LongPress, LongRelease in that order.
-            logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for LongPress then LongRelease.")
+            logger.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for LongPress then LongRelease.")
             expected_events = []
             expected_events.append(cluster.Events.LongPress(newPosition=switch_pressed_position))
             expected_events.append(cluster.Events.LongRelease(previousPosition=switch_pressed_position))

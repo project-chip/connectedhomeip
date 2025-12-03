@@ -223,7 +223,7 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
 
         self.step("12a")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        logging.info(forecast)
+        logger.info(forecast)
         asserts.assert_equal(forecast.forecastUpdateReason,
                              Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization)
 

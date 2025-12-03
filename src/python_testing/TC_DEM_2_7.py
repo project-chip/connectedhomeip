@@ -179,7 +179,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
 
         self.step("4b")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        logging.info(forecast)
+        logger.info(forecast)
         asserts.assert_greater(forecast.slots[0].nominalPower, 0)
         asserts.assert_greater(forecast.slots[0].minPower, 0)
         asserts.assert_greater(forecast.slots[0].maxPower, 0)
