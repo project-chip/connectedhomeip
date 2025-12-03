@@ -42,7 +42,6 @@ else:
 
 class AppsRegister:
     def __init__(self) -> None:
-        self._instance = None
         self.__accessories: dict[str, App] = {}
 
     def init(self):
