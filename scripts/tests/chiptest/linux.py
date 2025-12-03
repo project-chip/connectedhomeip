@@ -28,7 +28,7 @@ import subprocess
 import sys
 import threading
 import time
-from typing import IO, Any, TypeAlias
+from typing import IO, Any, Union
 
 import sdbus
 
@@ -261,9 +261,7 @@ class BluetoothMock(subprocess.Popen[str]):
         self.wait()
 
 
-DbusAnyT: TypeAlias = (bool | int | float | str | bytes
-                       | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
-                       | "DictVariantT")
+DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
 
 
