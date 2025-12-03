@@ -56,10 +56,10 @@ public:
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
-        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mFeatures(aFeatures)
+        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mFeatures(aFeatures),
+        mSupportedFormats{ PushAvStreamTransport::SupportedFormatStruct{ PushAvStreamTransport::ContainerFormatEnum::kCmaf,
+                                                                         PushAvStreamTransport::IngestMethodsEnum::kCMAFIngest } }
     {}
-
-    // PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
@@ -198,8 +198,6 @@ public:
     Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
-    // PushAvStreamTransportServerLogic mLogic;
-
     // Previous LOGIC state move to CLUSTER implementation
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
     TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
