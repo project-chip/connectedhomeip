@@ -14,11 +14,13 @@
 #    limitations under the License.
 
 import filecmp
+import functools
 import logging
 import os
 import subprocess
 import sys
 import threading
+from typing import Callable, Concatenate, ParamSpec, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
 log = logging.getLogger(__name__)
@@ -33,9 +35,30 @@ if sys.platform == 'linux':
     IP = '10.10.10.5'
 
 
+S = TypeVar("S", bound="AppsRegister")
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+    """Decorator to acquire self._accessories_lock around instance method calls.
+
+    As _accessories might be accessed either from the chiptest itself and from outside
+    via the XMLRPC server it's good to have it available only under mutex.
+    """
+    @functools.wraps(fn)
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+        if (lock := getattr(self, "_accessories_lock", None)) is None:
+            return fn(self, *args, **kwargs)
+        with lock:
+            return fn(self, *args, **kwargs)
+    return wrapper
+
+
 class AppsRegister:
     def __init__(self) -> None:
         self._accessories = {}
+        self._accessories_lock = threading.RLock()
 
     def init(self):
         self._start_xmlrpc_server()
@@ -44,27 +67,34 @@ class AppsRegister:
         self._stop_xmlrpc_server()
 
     @property
+    @with_accessories_lock
     def accessories(self):
         """List of registered accessory applications."""
         return self._accessories.values()
 
+    @with_accessories_lock
     def add(self, name, accessory):
         self._accessories[name] = accessory
 
+    @with_accessories_lock
     def remove(self, name):
         self._accessories.pop(name)
 
+    @with_accessories_lock
     def remove_all(self):
         self._accessories = {}
 
+    @with_accessories_lock
     def get(self, name):
         return self._accessories[name]
 
+    @with_accessories_lock
     def kill(self, name):
         accessory = self._accessories[name]
         if accessory:
             accessory.kill()
 
+    @with_accessories_lock
     def kill_all(self):
         ok = True
         for accessory in self._accessories.values():
@@ -72,6 +102,7 @@ class AppsRegister:
             ok = accessory.kill() and ok
         return ok
 
+    @with_accessories_lock
     def start(self, name, args):
         accessory = self._accessories[name]
         if accessory:
@@ -81,28 +112,33 @@ class AppsRegister:
             return accessory.start(options)
         return False
 
+    @with_accessories_lock
     def stop(self, name):
         accessory = self._accessories[name]
         if accessory:
             return accessory.stop()
         return False
 
+    @with_accessories_lock
     def reboot(self, name):
         accessory = self._accessories[name]
         if accessory:
             return accessory.stop() and accessory.start()
         return False
 
+    @with_accessories_lock
     def factory_reset_all(self):
         for accessory in self._accessories.values():
             accessory.factoryReset()
 
+    @with_accessories_lock
     def factory_reset(self, name):
         accessory = self._accessories[name]
         if accessory:
             return accessory.factoryReset()
         return False
 
+    @with_accessories_lock
     def wait_for_message(self, name, message, timeoutInSeconds=10):
         accessory = self._accessories[name]
         if accessory:
