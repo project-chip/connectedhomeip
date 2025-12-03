@@ -50,17 +50,18 @@ public:
                                         >;
 
     // Injected dependencies for the cluster
-    struct Context {
+    struct Context
+    {
         InteractionModelEngine * interactionModelEngine;
         SessionManager * sessionManager;
         reporting::ReportScheduler * reportScheduler;
     };
 
-    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags, Context context) :
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                              Context context) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
-        mFeatureFlags(featureFlags),
-        mClusterContext(std::move(context))
+        mFeatureFlags(featureFlags), mClusterContext(std::move(context))
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -141,8 +142,7 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 {
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
-                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags,
-                                              const Context context,
+                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags, const Context context,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
         GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, context),
         mFunctionConfig(functionsConfig)

@@ -16,6 +16,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
@@ -30,7 +31,6 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <app/InteractionModelEngine.h>
 
 namespace {
 
@@ -100,17 +100,17 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
     // so creating one here to be used for the cluster context.
     SessionManager sessionManager;
 
-    GeneralDiagnosticsCluster::Context CreateStandardContext() {
-        InteractionModelEngine *interactionModel = InteractionModelEngine::GetInstance();
+    GeneralDiagnosticsCluster::Context CreateStandardContext()
+    {
+        InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
-        return GeneralDiagnosticsCluster::Context {
+        return GeneralDiagnosticsCluster::Context{
             .interactionModelEngine = interactionModel,
-            .sessionManager = &sessionManager,
-            .reportScheduler = interactionModel->GetReportScheduler(),
+            .sessionManager         = &sessionManager,
+            .reportScheduler        = interactionModel->GetReportScheduler(),
         };
     }
 };
-
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
@@ -124,8 +124,8 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enablePayloadSnapshot = true,
     };
 
-    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet,
-                                                                        BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext(), functionsConfig);
+    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(
+        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext(), functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }

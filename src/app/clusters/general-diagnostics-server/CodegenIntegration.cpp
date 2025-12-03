@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-#include <app/InteractionModelEngine.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -51,11 +51,11 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        InteractionModelEngine *interactionModel = InteractionModelEngine::GetInstance();
+        InteractionModelEngine * interactionModel         = InteractionModelEngine::GetInstance();
         GeneralDiagnosticsCluster::Context clusterContext = {
             .interactionModelEngine = interactionModel,
-            .sessionManager = interactionModel->GetExchangeManager()->GetSessionManager(),
-            .reportScheduler = interactionModel->GetReportScheduler(),
+            .sessionManager         = interactionModel->GetExchangeManager()->GetSessionManager(),
+            .reportScheduler        = interactionModel->GetReportScheduler(),
         };
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)

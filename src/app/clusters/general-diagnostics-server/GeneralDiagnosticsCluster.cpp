@@ -286,11 +286,11 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         const SessionManager::MessageStats messageStatistics = mClusterContext.sessionManager->GetMessageStats();
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
-            .currentSubscriptions =
-                static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-            .currentSubscriptionsForFabric         = static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(
+            .currentSubscriptions = static_cast<uint16_t>(
+                mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+            .currentSubscriptionsForFabric = static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(
                 ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
-            .totalSubscriptionsEstablished         = mClusterContext.reportScheduler->GetTotalSubscriptionsEstablished(),
+            .totalSubscriptionsEstablished = mClusterContext.reportScheduler->GetTotalSubscriptionsEstablished(),
             .totalInteractionModelMessagesSent     = messageStatistics.InteractionModelMessagesSent,
             .totalInteractionModelMessagesReceived = messageStatistics.InteractionModelMessagesReceived,
         };
