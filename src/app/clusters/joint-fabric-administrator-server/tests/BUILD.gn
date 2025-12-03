@@ -24,8 +24,6 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestJCMCommissionee.cpp" ]
 
-  defines = [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1" ]
-
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
