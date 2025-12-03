@@ -130,7 +130,7 @@ class Flasher(firmware_utils.Flasher):
 
     def reset(self):
         """Reset the device."""
-        return self.run_tool('nrfjprog', ['--reset'], name='Reset')
+        return self.run_tool('nrfjprog', ['--pinresetenable'], name='Enable pin reset')
 
     def actions(self):
         """Perform actions on the device according to self.option."""
