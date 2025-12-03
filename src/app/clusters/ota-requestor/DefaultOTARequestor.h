@@ -115,7 +115,6 @@ public:
     CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override
     {
         return mEventHandlers.Unregister(endpointId);
-        ;
     }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
