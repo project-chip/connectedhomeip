@@ -71,8 +71,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     InteractionModelEngine *interactionModel = InteractionModelEngine::GetInstance();
     mGeneralDiagnosticsCluster.Create(
-        GeneralDiagnosticsCluster::OptionalAttributeSet{}, 
-        BitFlags<GeneralDiagnostics::Feature>{}, 
+        GeneralDiagnosticsCluster::OptionalAttributeSet{},
+        BitFlags<GeneralDiagnostics::Feature>{},
         GeneralDiagnosticsCluster::Context {
             .interactionModelEngine = interactionModel,
             .sessionManager = interactionModel->GetExchangeManager()->GetSessionManager(),

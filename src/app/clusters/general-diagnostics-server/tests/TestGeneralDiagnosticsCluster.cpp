@@ -95,14 +95,14 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
-    
-    // No session manager instance can be accessed on the interaction model at this point, 
-    // so creating one here to be used for the cluster context. 
+
+    // No session manager instance can be accessed on the interaction model at this point,
+    // so creating one here to be used for the cluster context.
     SessionManager sessionManager;
-    
+
     GeneralDiagnosticsCluster::Context CreateStandardContext() {
         InteractionModelEngine *interactionModel = InteractionModelEngine::GetInstance();
-        
+
         return GeneralDiagnosticsCluster::Context {
             .interactionModelEngine = interactionModel,
             .sessionManager = &sessionManager,
