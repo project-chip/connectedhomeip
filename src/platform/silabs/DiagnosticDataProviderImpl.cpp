@@ -90,7 +90,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
     if (threadIdTable != nullptr)
     {
-        osThreadEnumerate(threadIdTable, threadCount);
+        threadCount = osThreadEnumerate(threadIdTable, threadCount);
         for (uint32_t tIdIndex = 0; tIdIndex < threadCount; tIdIndex++)
         {
             osThreadId_t tId       = threadIdTable[tIdIndex];
