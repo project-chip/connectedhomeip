@@ -105,40 +105,12 @@ class NetworkBridge(NetworkLinkBase):
 
 
 @dataclasses.dataclass
-class NetworkLink(NetworkLinkBase):
+class NetworkNamespace(NetworkLinkBase):
     index: int
     link_name: str
     bridge: NetworkBridge
     ipv4: str
     ipv6: str | None
-
-    def __post_init__(self):
-        self.switch_name = f"{self.link_name}-sw-{self.index}"
-        self.link_name = f"{self.link_name}-{self.index}"
-
-    @property
-    def setup_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (
-            NetworkLinkCmd(f"ip link add {self.link_name} type veth peer name {self.switch_name}",
-                           f"ip link delete {self.switch_name}"),
-            NetworkLinkCmd(f"ip link set {self.switch_name} master {self.bridge.name}"),
-        )
-
-    @property
-    def link_up_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (
-            NetworkLinkCmd(f"ip addr add {self.ipv4} dev {self.link_name}", f"ip addr del {self.ipv4} dev {self.link_name}"),
-            NetworkLinkCmd(f"ip link set dev {self.link_name} up", f"ip link set dev {self.link_name} down"),
-            NetworkLinkCmd(f"ip link set dev {self.switch_name} up", f"ip link set dev {self.switch_name} down"),
-        ) + (() if self.ipv6 is None else (
-            # Force IPv6 to use ULAs that we control.
-            NetworkLinkCmd(f"ip -6 addr flush {self.link_name}"),
-            NetworkLinkCmd(f"ip -6 a add {self.ipv6} dev {self.link_name}"),
-        ))
-
-
-@dataclasses.dataclass
-class NetworkNamespace(NetworkLink):
     ns_name: str
 
     def __post_init__(self):
@@ -194,7 +166,7 @@ class IsolatedNetworkNamespace:
 
         self.index = index
         self._bridge = NetworkBridge(index, "br1")
-        self._rpc = NetworkLink(index, rpc_link_name, self._bridge, "10.10.10.5/24", None)
+        self._rpc = NetworkNamespace(index, rpc_link_name, self._bridge, "10.10.10.5/24", "fd00:0:1:1::5/64", "rpc")
         self._app = NetworkNamespace(index, app_link_name, self._bridge, "10.10.10.1/24", "fd00:0:1:1::1/64", "app")
         self._tool = NetworkNamespace(index, tool_link_name, self._bridge, "10.10.10.2/24", "fd00:0:1:1::2/64", "tool")
         self._links: list[NetworkLinkBase] = [self._rpc, self._app, self._tool]  # _bridge is handled separately
@@ -218,6 +190,10 @@ class IsolatedNetworkNamespace:
             self.wait_for_duplicate_address_detection()
 
     @property
+    def rpc_ns(self):
+        return self._rpc.ns_name
+
+    @property
     def app_ns(self):
         return self._app.ns_name
 
@@ -227,6 +203,8 @@ class IsolatedNetworkNamespace:
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind):
         match kind:
+            case SubprocessKind.RPC:
+                return self.rpc_ns
             case SubprocessKind.APP:
                 return self.app_ns
             case SubprocessKind.TOOL:

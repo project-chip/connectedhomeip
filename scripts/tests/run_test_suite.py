@@ -16,6 +16,7 @@
 
 import enum
 import logging
+import multiprocessing
 import os
 import sys
 import time
@@ -418,6 +419,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     ble_controller_app = None
     ble_controller_tool = None
+    ns_rpc: str | None = None
     to_terminate: list[Terminatable] = []
 
     def cleanup() -> None:
@@ -441,6 +443,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                 unshared=context.obj.in_unshare,
                 wait_for_dad=False))
             ns.wait_for_duplicate_address_detection()
+            ns_rpc = ns.rpc_ns
 
             if ble_wifi:
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
@@ -460,7 +463,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
         log.info("Each test will be executed %d times", iterations)
 
-        to_terminate.append(apps_register := AppsRegister())
+        to_terminate.append(apps_register := AppsRegister(ns_rpc))
         apps_register.init()
 
         for i in range(iterations):
@@ -535,4 +538,5 @@ if sys.platform == 'linux':
 
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     main(auto_envvar_prefix='CHIP')
