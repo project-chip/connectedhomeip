@@ -18,9 +18,6 @@
 
 #pragma once
 
-
-#include <app/clusters/push-av-stream-transport-server/constants.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
