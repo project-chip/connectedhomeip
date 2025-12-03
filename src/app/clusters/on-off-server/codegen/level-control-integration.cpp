@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/on-off-server/level-control-integration.h>
+#include <app/clusters/on-off-server/codegen/level-control-integration.h>
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
 

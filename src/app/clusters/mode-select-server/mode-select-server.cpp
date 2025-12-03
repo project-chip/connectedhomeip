@@ -34,6 +34,7 @@
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenEndpointToIndex.h>
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
@@ -143,10 +144,9 @@ static constexpr size_t kModeSelectMaxEnpointCount =
 
 static void timerCallback(System::Layer *, void * callbackContext);
 static void sceneModeSelectCallback(EndpointId endpoint);
-using ModeSelectEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
-using ModeSelectTransitionTimeInterface =
-    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kModeSelectMaxEnpointCount,
-                                                             MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT>;
+using ModeSelectEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
+using ModeSelectTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<scenes::CodegenEndpointToIndex<
+    ModeSelect::Id, MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT, kModeSelectMaxEnpointCount>>;
 
 class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -236,8 +236,7 @@ public:
     }
 
 private:
-    ModeSelectTransitionTimeInterface mTransitionTimeInterface =
-        ModeSelectTransitionTimeInterface(ModeSelect::Id, sceneModeSelectCallback);
+    ModeSelectTransitionTimeInterface mTransitionTimeInterface = ModeSelectTransitionTimeInterface(sceneModeSelectCallback);
 };
 static DefaultModeSelectSceneHandler sModeSelectSceneHandler;
 
