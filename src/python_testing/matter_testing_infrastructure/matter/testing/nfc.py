@@ -46,9 +46,10 @@ class NFCReader:
     """
 
     def __init__(self, nfc_reader_index=0):
-        """
-        Connects to the NFC reader at the specified index.
-        :param nfc_reader_index: Index of the NFC reader to use (default: 0)
+        """Connects to the NFC reader at the specified index.
+
+        Args:
+            nfc_reader_index: Index of the NFC reader to use (default: 0).
         """
         reader_list = smartcard.System.readers()
         if not reader_list:
