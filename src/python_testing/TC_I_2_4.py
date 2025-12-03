@@ -194,7 +194,6 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=30), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(15)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -209,7 +208,6 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=35), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(17)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -224,7 +222,6 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(19)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
@@ -247,7 +244,6 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=35), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(22)
 
@@ -263,7 +259,6 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=0), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(24)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
