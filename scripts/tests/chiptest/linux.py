@@ -195,12 +195,16 @@ class IsolatedNetworkNamespace:
             c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
             log.debug("Executing: '%s'", c)
             if subprocess.run(c.split()).returncode != 0:
-                log.error("Failed to execute '%s'", c)
-                log.error("Are you using --privileged if running in docker?")
-                sys.exit(1)
+                # TODO: Properly push stdout/stderr to logger.
+                raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
-        self._run(*self.COMMANDS_TERMINATE)
+        """Execute all down commands in reverse order gracefully omitting errors."""
+        for cmd in reversed(*self.COMMANDS_TERMINATE):
+            try:
+                self._run(cmd)
+            except Exception as e:
+                log.warning("Encountered error during namespace termination: %s", e, exc_info=True)
 
 
 class LinuxNamespacedExecutor(Executor):
