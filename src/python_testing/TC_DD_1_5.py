@@ -27,6 +27,7 @@ from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+
 class TC_DD_1_5(MatterBaseTest):
     def desc_TC_DD_1_5(self) -> str:
         return "[TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT - Commissionee]"
@@ -104,7 +105,6 @@ class TC_DD_1_5(MatterBaseTest):
         # Check that NDEF content is unchanged
         nfc_tag_content_after_write = reader.read_nfc_tag_data()
         asserts.assert_equal(nfc_tag_content, nfc_tag_content_after_write, "Error! NDEF content has been changed!")
-
 
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()

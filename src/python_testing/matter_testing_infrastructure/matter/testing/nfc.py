@@ -65,7 +65,6 @@ class NFCReader:
         self._monitor_manager = None
         logger.info(f"Using NFC reader: {self.reader}")
 
-
     def read_nfc_tag_data(self) -> str:
         """
         Read NDEF data from a tag.
@@ -142,7 +141,6 @@ class NFCReader:
         logger.info(f"Successfully wrote URI '{uri}' to NFC tag.")
         return True
 
-
     def is_onboarding_data(self, ndef_uri: str) -> bool:
         """
         Checks if the NDEF URI string corresponds to a Matter onboarding payload.
@@ -177,7 +175,6 @@ class NFCReader:
         if self._monitor_manager is not None:
             self._monitor_manager.deactivate()
             self._monitor_manager = None
-
 
 
 def _check_transmission_status(sw1: int, sw2: int, operation_name: str):
@@ -370,6 +367,7 @@ def _read_ndef_data(connection, length: int) -> bytes:
         offset += chunk_size
 
     return bytes(data)
+
 
 def _write_ndef_record(connection, record):
 
