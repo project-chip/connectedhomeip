@@ -16,6 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/CodegenEndpointToIndex.h"
     "${CLUSTER_DIR}/ExtensionFieldSets.h"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.cpp"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.h"
