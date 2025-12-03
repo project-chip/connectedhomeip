@@ -54,7 +54,7 @@ TEST_F(TestUnitLocalizationCluster, MigrationTest)
     ConcreteClusterPath clusterPath(kRootEndpointId, UnitLocalization::Id);
     BitFlags<UnitLocalization::Feature> features{ 0 };
 
-    UnitLocalizationCluster cluster(clusterPath, features);
+    UnitLocalizationClusterWithMigration cluster(clusterPath, features);
 
     // Test attributes listing with no features enabled
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
