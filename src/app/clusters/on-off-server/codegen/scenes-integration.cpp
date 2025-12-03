@@ -19,7 +19,8 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/clusters/scenes-server/scenes-server.h> // nogncheck
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
+#include <app/clusters/scenes-server/scenes-server.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -45,7 +46,7 @@ public:
     // As per spec, 1 attribute is scenable in the on off cluster
     static constexpr uint8_t scenableAttributeCount = 1;
 
-    DefaultOnOffSceneHandler()           = default;
+    DefaultOnOffSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
     ~DefaultOnOffSceneHandler() override = default;
 
     // Default function for OnOff cluster, only checks if OnOff is enabled on the endpoint

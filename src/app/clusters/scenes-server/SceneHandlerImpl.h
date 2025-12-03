@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/scenes-server/AttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/types_stub.h>
@@ -188,8 +189,8 @@ public:
 
     static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
-    DefaultSceneHandlerImpl() = default;
-    ~DefaultSceneHandlerImpl() override{};
+    DefaultSceneHandlerImpl(AttributeValuePairValidator & validator) : mValidator(validator) {}
+    ~DefaultSceneHandlerImpl() override = default;
 
     /// @brief Encodes an attribute value list into a TLV structure and resizes the buffer to the size of the encoded data
     /// @param aVlist[in] Attribute value list to encode
@@ -211,8 +212,8 @@ public:
     /// @param serializedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not supported, CHIP_ERROR value
     /// otherwise
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
-                                    MutableByteSpan & serializedBytes) override;
+    CHIP_ERROR SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
+                            MutableByteSpan & serializedBytes) override;
 
     /// @brief Simulates taking data from nvm and loading it in a command object if the cluster is supported by the endpoint
     /// @param endpoint target endpoint
@@ -220,11 +221,12 @@ public:
     /// @param serializedBytes data to deserialize into EFS
     /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not
     /// supported, specific CHIP_ERROR otherwise
-    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                   ExtensionFieldSetType & extensionFieldSet) override;
+    CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                           ExtensionFieldSetType & extensionFieldSet) override;
 
 private:
     AttributeValuePairType mAVPairs[kMaxAvPair];
+    AttributeValuePairValidator & mValidator;
 };
 
 } // namespace scenes

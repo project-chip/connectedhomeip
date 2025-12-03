@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/mock/Constants.h>
@@ -383,7 +384,7 @@ static const MockNodeConfig SceneMockNodeConfig({
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    TestSceneHandler() = default;
+    TestSceneHandler() : DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
     ~TestSceneHandler() override {}
 
     // Default function only checks if endpoint and clusters are valid
