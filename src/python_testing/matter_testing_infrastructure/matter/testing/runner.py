@@ -772,8 +772,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
                          "The payload is read directly from the NFC tag.")
             sys.exit(1)
 
-        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+
+        nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
+        reader = matter.testing.nfc.NFCReader(nfc_reader_index)
+        nfc_tag_data = reader.read_nfc_tag_data()
         args.qr_code.append(nfc_tag_data)
 
     # Populate commissioning config if present, exiting on error
