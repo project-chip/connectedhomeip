@@ -21,9 +21,9 @@ namespace chip::scenes {
 
 /// Converts an endpoint id into a 0-based index using codegen functions.
 ///
-/// ClusterId - the cluster that is used
-/// FixedEndpointCount - the number of fixed endpoints for this cluster in codegen/ember
-/// MaxIndexCount - the number of indexes (return value on success will always be less than this value)
+/// @tparam ClusterId The cluster ID value used for endpoint indexing
+/// @tparam FixedEndpointCount The number of fixed endpoints for this cluster in codegen/ember
+/// @tparam MaxIndexCount The maximum number of indexes (return value on success will always be less than this value)
 template <ClusterId ClusterId, size_t FixedEndpointCount, size_t MaxIndexCount>
 struct CodegenEndpointToIndex
 {
