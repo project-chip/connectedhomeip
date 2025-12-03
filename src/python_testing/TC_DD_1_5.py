@@ -97,7 +97,7 @@ class TC_DD_1_5(MatterBaseTest):
             reader.write_ndef_uri("MT:-24J029Q00OC0000000")
             raise RuntimeError("Error! write_ndef_uri() did not fail as expected.")
 
-        except Exception as e:
+        except Exception:
             # Exception was expected, so pass
             pass
 

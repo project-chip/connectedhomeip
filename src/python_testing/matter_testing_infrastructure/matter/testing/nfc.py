@@ -7,7 +7,6 @@ import smartcard
 import smartcard.CardMonitoring
 
 from mobly import asserts
-from smartcard.System import readers
 
 logger = logging.getLogger(__name__)
 
