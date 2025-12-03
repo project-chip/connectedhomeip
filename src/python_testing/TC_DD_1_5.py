@@ -67,15 +67,14 @@ class TC_DD_1_5(MatterBaseTest):
         ###########
         self.step("1")
 
-        if not self.is_pics_sdk_ci_only:
-            monitoring_task = asyncio.create_task(reader.activate_tag_monitoring())
-            user_input_task = asyncio.create_task(self.wait_for_user_input_async(
-                "Bring in NFC reader at contact over all sides of the DUT packaging. Press enter when done"
-            ))
-            await user_input_task
-            reader.deactivate_tag_monitoring()
-            ndef = await monitoring_task
-            asserts.assert_false(reader.is_onboarding_data(ndef), "Found NFC tag with Onboarding data")
+        monitoring_task = asyncio.create_task(reader.activate_tag_monitoring())
+        user_input_task = asyncio.create_task(self.wait_for_user_input_async(
+            "Bring in NFC reader at contact over all sides of the DUT packaging. Press enter when done"
+        ))
+        await user_input_task
+        reader.deactivate_tag_monitoring()
+        ndef = await monitoring_task
+        asserts.assert_false(reader.is_onboarding_data(ndef), "Found NFC tag with Onboarding data")
 
         ###########
         self.step("2a")
@@ -83,11 +82,11 @@ class TC_DD_1_5(MatterBaseTest):
         ###########
         self.step("2b")
         monitoring_task = asyncio.create_task(reader.activate_tag_monitoring())
-        if not self.is_pics_sdk_ci_only:
-            user_input_task = asyncio.create_task(self.wait_for_user_input_async(
-                "Press enter when steps 2a and 2b are done", ""
-            ))
-            await user_input_task
+        user_input_task = asyncio.create_task(self.wait_for_user_input_async(
+            "Press enter when steps 2a and 2b are done", ""
+        ))
+        await user_input_task
+
         reader.deactivate_tag_monitoring()
         nfc_tag_content = await monitoring_task
         logger.info(f"nfc_tag_content: {nfc_tag_content}")
