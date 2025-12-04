@@ -391,7 +391,7 @@ class TC_CNET_4_24(MatterBaseTest):
         networks_after = await self._read_networks(endpoint)
         asserts.assert_equal(len(networks_after), 0,
                              f"Expected empty network list after cleanup, but found {len(networks_after)} network(s)")
-        logger.info(" --- All networks successfully removed. Ready for manual WiFi configuration tests.")
+        logger.info(" --- All networks successfully removed. Ready for manual Thread configuration tests.")
 
         # Step 2: TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (invalid network), Breadcrumb = 1
         self.step(2)
@@ -463,8 +463,24 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 7: TH reads Networks attribute (verify list is empty)
         self.step(7)
 
+        networks = await self._read_networks(endpoint)
+        logger.info(f" --- Step 7: Networks attribute has {len(networks)} network(s) after removal")
+        asserts.assert_equal(len(networks), 0,
+                             f"Expected Networks list to be empty, but has {len(networks)} network(s)")
+
         # Step 8: TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (valid format but wrong network), Breadcrumb = 4
         self.step(8)
+
+        logger.info(" --- Step 8: Sending AddOrUpdateThreadNetwork with incorrect operational dataset (valid format but wrong network)")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
+                operationalDataset=incorrect_thread_dataset_2,
+                breadcrumb=4
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        await self._validate_network_config_response(response)
 
         # Step 9: TH sends ConnectNetwork command and Breadcrumb = 5
         self.step(9)
