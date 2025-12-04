@@ -34,7 +34,7 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
-LazyRegisteredServerCluster<UnitLocalizationCluster> gServer;
+LazyRegisteredServerCluster<UnitLocalizationClusterWithMigration> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
