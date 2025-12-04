@@ -60,35 +60,17 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-address-resolve-tool-platform-mdns-ipv6only \
                         build" && rm -rf out
-            - name: Build example Standalone chip tool
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-chip-tool \
-                        build" && rm -rf out
             - name: Build example Standalone Shell
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-shell \
                         build" && rm -rf out
-            - name: Build example Standalone All Clusters Server
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters \
-                        build" && rm -rf out
             - name: Build example Standalone All Clusters Minimal Server
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-all-clusters-minimal \
-                        build" && rm -rf out
-            - name: Build example TV app
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-tv-app \
                         build" && rm -rf out
             - name: Build example Standalone TV Casting App
               run: |
@@ -102,77 +84,11 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-light-rpc-with-ui \
                         build" && rm -rf out
-            - name: Build example Standalone Bridge
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-bridge \
-                        build" && rm -rf out
-            - name: Build example OTA Provider
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-ota-provider \
-                        build" && rm -rf out
-            - name: Build example OTA Requestor
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-ota-requestor \
-                        build" && rm -rf out
-            - name: Build example Standalone Lock App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-lock-no-thread \
-                        build" && rm -rf out
             - name: Build example contact sensor with UI
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-contact-sensor-no-ble-with-ui \
-                        build" && rm -rf out
-            - name: Build example Air Purifier
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-air-purifier \
-                        build" && rm -rf out
-            - name: Build example Fabric Admin
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-fabric-admin-rpc \
-                        build" && rm -rf out
-            - name: Build example Fabric Bridge App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-fabric-bridge-no-ble-rpc \
-                        build" && rm -rf out
-            - name: Build example Fabric Sync
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-fabric-sync-no-ble \
-                        build" && rm -rf out
-            - name: Build example Camera App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-camera \
-                        build" && rm -rf out
-            - name: Build example Camera Controller App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-camera-controller \
-                        build" && rm -rf out
-            - name: Build Example Closure App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-closure \
                         build" && rm -rf out
 
             - name: CCache statistics

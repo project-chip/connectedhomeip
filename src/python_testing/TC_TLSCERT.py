@@ -50,6 +50,8 @@ from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.utils import CommissioningBuildingBlocks
 
+log = logging.getLogger(__name__)
+
 
 class TC_TLSCERT(MatterBaseTest):
     def __init__(self, *args, **kwargs):
@@ -404,9 +406,9 @@ class TC_TLSCERT(MatterBaseTest):
             my_caid[i] = response.caid
 
         self.step(5)
-        logging.warning(f"maximum cert {my_max_root_certs}")
+        log.warning(f"maximum cert {my_max_root_certs}")
         for i in range(2, my_max_root_certs + 2):
-            logging.warning(f"Root cert {i}")
+            log.warning(f"Root cert {i}")
             response = await cr2_cmd.send_provision_root_command(certificate=my_root_cert[i])
             cr2_cmd.assert_valid_caid(response.caid)
             my_caid[i] = response.caid
@@ -873,7 +875,7 @@ class TC_TLSCERT(MatterBaseTest):
         return ["TLSCERT.S"]
 
     def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             *self.get_two_fabric_substeps(),
             TestStep(2, "Populate my_nonce[] with 4 distinct, random 32-octet values"),
             TestStep(3, "CR1 sends ClientCSR command with Nonce set to my_nonce[i], for each i in [0..1]",
@@ -915,7 +917,6 @@ class TC_TLSCERT(MatterBaseTest):
                      test_plan_support.verify_success()),
             TestStep(23, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
     async def test_TC_TLSCERT_2_9(self):

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 
 namespace chip {
 namespace app {

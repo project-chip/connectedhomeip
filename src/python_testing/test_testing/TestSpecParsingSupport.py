@@ -93,6 +93,7 @@ def get_access_enum_from_string(access_str: str) -> Clusters.AccessControl.Enums
     if access_str is None:
         return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
     asserts.fail("Unknown access string")
+    return None
 
 
 BASE_CLUSTER_XML_STR = (
@@ -331,7 +332,7 @@ class TestSpecParsingSupport(MatterBaseTest):
                 asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
                 asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
                 asserts.assert_equal(len(xml_cluster.attributes), len(GlobalAttributeIds) + 1, "Unexpected number of attributes")
-                asserts.assert_true(ATTRIBUTE_ID in xml_cluster.attributes.keys(),
+                asserts.assert_true(ATTRIBUTE_ID in xml_cluster.attributes,
                                     "Did not find test attribute in XmlCluster.attributes")
                 asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].read_access,
                                      get_access_enum_from_string(read), "Unexpected read access")
@@ -342,7 +343,7 @@ class TestSpecParsingSupport(MatterBaseTest):
             xml_cluster = parse_cluster(xml)
             asserts.assert_is_not_none(xml_cluster.accepted_commands, "No commands found in cluster")
             asserts.assert_is_not_none(xml_cluster.command_map, "No command map found in cluster")
-            asserts.assert_true(COMMAND_ID in xml_cluster.accepted_commands.keys(),
+            asserts.assert_true(COMMAND_ID in xml_cluster.accepted_commands,
                                 "Did not find test command in XmlCluster.accepted_commands")
             asserts.assert_equal(xml_cluster.accepted_commands[COMMAND_ID].privilege,
                                  get_access_enum_from_string(invoke), "Unexpected invoke privilege")
@@ -354,7 +355,7 @@ class TestSpecParsingSupport(MatterBaseTest):
             asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
             asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
             asserts.assert_equal(len(xml_cluster.attributes), len(GlobalAttributeIds) + 1, "Unexpected number of attributes")
-            asserts.assert_true(ATTRIBUTE_ID in xml_cluster.attributes.keys(),
+            asserts.assert_true(ATTRIBUTE_ID in xml_cluster.attributes,
                                 "Did not find test attribute in XmlCluster.attributes")
             asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].write_optional,
                                  write_support == 'optional', "Unexpected write_optional value")

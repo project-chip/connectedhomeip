@@ -47,7 +47,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +56,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.24] Validate SolicitOffer SFrame configuration handling"
 
     def steps_TC_WEBRTCP_2_24(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
@@ -71,10 +71,9 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
                      "DUT responds with success status code for both deallocate commands"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_24(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.F02",       # SFrame End-to-End Encryption feature
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
@@ -82,7 +81,6 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -104,7 +102,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(1)
         # Allocate Audio and Video streams
-        logger.info("Allocating Audio and Video streams")
+        log.info("Allocating Audio and Video streams")
         audio_stream_id = await self.allocate_one_audio_stream()
         video_stream_id = await self.allocate_one_video_stream()
 
@@ -114,7 +112,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(2)
         # Test: SolicitOffer with unsupported cipher suite
-        logger.info("Testing SolicitOffer with unsupported cipher suite")
+        log.info("Testing SolicitOffer with unsupported cipher suite")
 
         unsupported_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_UNSUPPORTED,
@@ -136,12 +134,12 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.fail("Expected DynamicConstraintError for unsupported cipher suite, but command succeeded")
         except InteractionModelError as e:
-            logger.info(f"Received expected error for unsupported cipher suite: {e}")
+            log.info(f"Received expected error for unsupported cipher suite: {e}")
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         self.step(3)
         # Test: SolicitOffer with incorrect key length for AES-128-GCM (should be 16 bytes)
-        logger.info("Testing SolicitOffer with incorrect key length for AES-128-GCM")
+        log.info("Testing SolicitOffer with incorrect key length for AES-128-GCM")
 
         wrong_length_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_AES_128_GCM,
@@ -163,12 +161,12 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.fail("Expected DynamicConstraintError for incorrect key length, but command succeeded")
         except InteractionModelError as e:
-            logger.info(f"Received expected error for incorrect AES-128 key length: {e}")
+            log.info(f"Received expected error for incorrect AES-128 key length: {e}")
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         self.step(4)
         # Test: SolicitOffer with valid SFrameConfig (AES-128-GCM with 16-byte key)
-        logger.info("Testing SolicitOffer with valid SFrameConfig (AES-128-GCM)")
+        log.info("Testing SolicitOffer with valid SFrameConfig (AES-128-GCM)")
 
         # Create WebRTC manager and peer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
@@ -198,14 +196,14 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         session_id_128 = resp.webRTCSessionID
         asserts.assert_true(session_id_128 >= 0, f"Invalid session ID: {session_id_128}")
-        logger.info(f"DUT allocated WebRTC session ID with AES-128 SFrame: {session_id_128}")
+        log.info(f"DUT allocated WebRTC session ID with AES-128 SFrame: {session_id_128}")
 
         # Register the session ID with the WebRTC manager
         webrtc_manager.session_id_created(session_id_128, self.dut_node_id)
 
         self.step(5)
         # End the session from step 5
-        logger.info(f"Ending WebRTC session {session_id_128}")
+        log.info(f"Ending WebRTC session {session_id_128}")
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -214,14 +212,14 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        logger.info(f"Successfully ended WebRTC session {session_id_128}")
+        log.info(f"Successfully ended WebRTC session {session_id_128}")
 
         # Clean up the WebRTC manager for step 5
         await webrtc_manager.close_all()
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
-        logger.info("Deallocating Audio and Video streams")
+        log.info("Deallocating Audio and Video streams")
 
         # Deallocate audio stream
         await self.send_single_cmd(
@@ -230,7 +228,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        logger.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -239,7 +237,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        logger.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info(f"Successfully deallocated video stream {video_stream_id}")
 
 
 if __name__ == "__main__":

@@ -344,13 +344,13 @@ class TypeLookupContext:
         """
         if name.lower() in ["enum8", "enum16"]:
             return True
-        return any((e.name == name for e in self.all_enums))
+        return any(e.name == name for e in self.all_enums)
 
     def is_struct_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a struct
         """
-        return any((s.name == name for s in self.all_structs))
+        return any(s.name == name for s in self.all_structs)
 
     def is_untyped_bitmap_type(self, name: str):
         """Determine if the given type is a untyped bitmap (just an interger size)."""
@@ -366,7 +366,7 @@ class TypeLookupContext:
         if self.is_untyped_bitmap_type(name):
             return True
 
-        return any((s.name == name for s in self.all_bitmaps))
+        return any(s.name == name for s in self.all_bitmaps)
 
 
 def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
@@ -397,7 +397,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
-    int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    int_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if int_type is not None:
         return int_type
 
@@ -427,7 +427,7 @@ def IsSignedDataType(data_type: DataType) -> bool:
     Returns if the data type is a signed data type of False if the data type can not be found.
     """
     lowercase_name = data_type.name.lower()
-    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if sized_type is None:
         return False
 
@@ -440,7 +440,7 @@ def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
     """
 
     lowercase_name = data_type.name.lower()
-    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if sized_type is None:
         return None
 

@@ -299,7 +299,7 @@ class Flasher(firmware_utils.Flasher):
             type_id = int.from_bytes(bytes_raw[offset: offset + 2], byteorder='little')
             type_len = int.from_bytes(bytes_raw[offset + 2: offset + 4], byteorder='little')
 
-            if 0x8001 == type_id:
+            if type_id == 0x8001:
                 self.args["iv"] = bytes_raw[offset + 4: offset + 4 + type_len]
 
             if offset + 4 + type_len <= raw_len:
@@ -329,14 +329,14 @@ class Flasher(firmware_utils.Flasher):
         mfd_str = ""
         if dict_sec.keys():
             for idx in range(1, 1 + max(dict_sec.keys())):
-                if idx in dict_sec.keys():
+                if idx in dict_sec:
                     mfd_str += dict_sec[idx] + ","
                 else:
                     mfd_str += ","
 
         mfd_str = mfd_str + ":"
         for idx in range(0x8001, 1 + max(dict_raw.keys())):
-            if idx in dict_raw.keys():
+            if idx in dict_raw:
                 mfd_str += dict_raw[idx] + ","
             else:
                 mfd_str += ","
@@ -437,7 +437,7 @@ class Flasher(firmware_utils.Flasher):
                     log.info(line)
 
             fw_ota_images = self.find_file(self.work_dir, r'^FW_OTA.+\.hash$')
-            if not fw_ota_images or 0 == len(fw_ota_images):
+            if not fw_ota_images or len(fw_ota_images) == 0:
                 raise Exception("Failed to generate Bouffalo Lab OTA image.")
 
             os.system("mkdir -p {}/ota_images".format(self.work_dir))
@@ -472,11 +472,11 @@ class Flasher(firmware_utils.Flasher):
                     "psm_download": False,
                     "key_download": False,
                     "data_download": False,
-                    "factory_download": True if self.args["dts"] else False,
-                    "mfd_download": True if self.args["mfd"] else False,
-                    "boot2_download": True if self.args["boot2"] else False,
+                    "factory_download": bool(self.args["dts"]),
+                    "mfd_download": bool(self.args["mfd"]),
+                    "boot2_download": bool(self.args["boot2"]),
                     "ckb_erase_all": "True" if self.args["erase"] else "False",
-                    "partition_download": True if self.args["pt"] else False,
+                    "partition_download": bool(self.args["pt"]),
                     "encrypt": False,
                     "sign": False,
                     "single_download": False,

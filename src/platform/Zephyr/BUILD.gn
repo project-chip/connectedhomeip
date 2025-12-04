@@ -36,6 +36,7 @@ static_library("Zephyr") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DiagnosticDataProviderImplGetter.cpp",
@@ -75,6 +76,17 @@ static_library("Zephyr") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "wifi/ConnectivityManagerImplWiFi.cpp",
+      "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/WiFiManager.cpp",
+      "wifi/WiFiManager.h",
+      "wifi/ZephyrWifiDriver.cpp",
+      "wifi/ZephyrWifiDriver.h",
+    ]
   }
 
   if (chip_malloc_sys_heap) {

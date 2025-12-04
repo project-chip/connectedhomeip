@@ -15,7 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>

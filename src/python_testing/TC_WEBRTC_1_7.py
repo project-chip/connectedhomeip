@@ -49,10 +49,12 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -94,7 +96,6 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-        return steps
 
     def desc_TC_WEBRTC_1_7(self) -> str:
         return "[TC-WEBRTC-1_7] Validate that setting an SDP Offer from multiple test harness controllers successfully initiates multiple WebRTC sessions."
@@ -185,7 +186,7 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
 
         self.step(5)
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         self.step(6)
@@ -249,7 +250,7 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
             asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
 
         if not await webrtc_peer2.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session for controller 2")
+            log.error("Failed to establish webrtc session for controller 2")
             raise Exception("Failed to establish webrtc session for controller 2")
 
         self.step(9)

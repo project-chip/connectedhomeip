@@ -340,7 +340,7 @@ class CommissionableNode(discovery.CommissionableNode):
     def __rich_repr__(self):
         yield "(To Be Commissioned By)", self._devCtrl.name
 
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 
