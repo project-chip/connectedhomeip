@@ -471,12 +471,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1
                     if not keep_going:
-                        cleanup()
                         sys.exit(2)
 
             if observed_failures != expected_failures:
                 log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
-                cleanup()
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")
