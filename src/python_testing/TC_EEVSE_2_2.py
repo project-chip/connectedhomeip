@@ -40,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from datetime import datetime, timedelta, timezone
 
 from mobly import asserts
@@ -52,7 +52,7 @@ from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
@@ -67,7 +67,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -162,8 +162,6 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EEVSE_2_2(self):
 
@@ -183,7 +181,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_basic()
 
         # After a few seconds...
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step("3a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
@@ -248,7 +246,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7")
         # Sleep for the charging duration plus a couple of seconds to check it has stopped
-        time.sleep(charging_duration + 2)
+        await asyncio.sleep(charging_duration + 2)
         # check EnergyTransferredStoped (EvseStopped)
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EnergyTransferStopped)
@@ -296,18 +294,18 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         supported_attributes = await self.get_supported_energy_evse_attributes()
         if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in supported_attributes:
             self.step("9")
-            logging.info("UserMaximumChargeCurrent is supported...")
+            log.info("UserMaximumChargeCurrent is supported...")
             user_max_charge_current = 6000
             await self.write_user_max_charge(1, user_max_charge_current)
 
             self.step("9a")
-            time.sleep(3)
+            await asyncio.sleep(3)
 
             expected_max_charge = min(
                 user_max_charge_current, circuit_capacity)
             await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
         else:
-            logging.info(
+            log.info(
                 "UserMaximumChargeCurrent is NOT supported... skipping.")
             self.mark_step_range_skipped("9", "9a")
 

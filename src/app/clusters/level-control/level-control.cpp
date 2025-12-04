@@ -38,6 +38,7 @@
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
@@ -135,23 +136,8 @@ public:
     // As per spec, 2 attributes are scenable in the level control cluster
     static constexpr uint8_t kLevelMaxScenableAttributes = 2;
 
-    DefaultLevelControlSceneHandler() = default;
-    ~DefaultLevelControlSceneHandler() override {}
-
-    // Default function for LevelControl cluster, only puts the LevelControl cluster ID in the span if supported on the caller
-    // endpoint
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        if (emberAfContainsServer(endpoint, LevelControl::Id) && clusterBuffer.size() >= 1)
-        {
-            clusterBuffer[0] = LevelControl::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
+    DefaultLevelControlSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
+    ~DefaultLevelControlSceneHandler() = default;
 
     // Default function for LevelControl cluster, only checks if LevelControl is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override

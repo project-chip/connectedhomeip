@@ -173,12 +173,8 @@ class PostProcessResponseResult:
         self.entries.append(log)
 
 
-def _value_or_none(data, key):
-    return data[key] if key in data else None
-
-
-def _value_or_config(data, key, config):
-    return data[key] if key in data else config.get(key)
+def _value_or_config(data: dict, key, config):
+    return data.get(key, config.get(key))
 
 
 class EnumType:
@@ -291,45 +287,43 @@ class _TestStepWithPlaceholders:
 
         self._parsing_config_variable_storage = config
 
-        self.label = _value_or_none(test, 'label')
+        self.label = test.get("label")
         self.node_id = _value_or_config(test, 'nodeId', config)
         self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         if not self.command:
             self.command = _value_or_config(test, 'wait', config)
-        self.attribute = _value_or_none(test, 'attribute')
-        self.event = _value_or_none(test, 'event')
+        self.attribute = test.get("attribute")
+        self.event = test.get("event")
         self.endpoint = _value_or_config(test, 'endpoint', config)
-        self.pics = _value_or_none(test, 'PICS')
-        self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
+        self.pics = test.get("PICS")
+        self.is_pics_enabled = pics_checker.check(test.get("PICS"))
 
-        self.identity = _value_or_none(test, 'identity')
-        self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
-        self.min_revision = _value_or_none(test, 'minRevision')
-        self.max_revision = _value_or_none(test, 'maxRevision')
-        self.min_interval = _value_or_none(test, 'minInterval')
-        self.max_interval = _value_or_none(test, 'maxInterval')
-        self.keep_subscriptions = _value_or_none(test, 'keepSubscriptions')
-        self.timed_interaction_timeout_ms = _value_or_none(
-            test, 'timedInteractionTimeoutMs')
-        self.timeout = _value_or_none(test, 'timeout')
-        self.data_version = _value_or_none(
-            test, 'dataVersion')
-        self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
-        self.wait_for = _value_or_none(test, 'wait')
-        self.event_number = _value_or_none(test, 'eventNumber')
-        self.run_if = _value_or_none(test, 'runIf')
-        self.save_response_as = _value_or_none(test, 'saveResponseAs')
+        self.identity = test.get("identity")
+        self.fabric_filtered = test.get("fabricFiltered")
+        self.min_revision = test.get("minRevision")
+        self.max_revision = test.get("maxRevision")
+        self.min_interval = test.get("minInterval")
+        self.max_interval = test.get("maxInterval")
+        self.keep_subscriptions = test.get("keepSubscriptions")
+        self.timed_interaction_timeout_ms = test.get("timedInteractionTimeoutMs")
+        self.timeout = test.get("timeout")
+        self.data_version = test.get("dataVersion")
+        self.busy_wait_ms = test.get("busyWaitMs")
+        self.wait_for = test.get("wait")
+        self.event_number = test.get("eventNumber")
+        self.run_if = test.get("runIf")
+        self.save_response_as = test.get("saveResponseAs")
 
         self.is_attribute = self.__is_attribute_command()
         self.is_event = self.__is_event_command()
 
-        arguments = _value_or_none(test, 'arguments')
+        arguments = test.get("arguments")
         self._convert_single_value_to_values(arguments)
         self.arguments_with_placeholders = arguments
 
-        responses = _value_or_none(test, 'response')
+        responses = test.get("response")
         # Test may expect multiple responses. For example reading events may
         # trigger multiple event responses. Or reading multiple attributes
         # at the same time, may trigger multiple responses too.
@@ -1006,13 +1000,13 @@ class TestStep:
             return result
         # This is different from the case where no response is specified at all, which implies that the step expect
         # a success with any associatied value(s).
-        elif self.responses == [{'values': [{}]}] and len(received_responses_copy):
+        if self.responses == [{'values': [{}]}] and len(received_responses_copy):
             # if there are multiple responses and the test specifies that it does not really care
             # about which values are returned, that is valid too.
             return result
         # Anything more complex where the response field as been defined with some values and the number
         # of expected responses differs from the number of received responses is an error.
-        elif len(received_responses_copy) != 0:
+        if len(received_responses_copy) != 0:
             result.error(check_type, error_failure_wrong_response_number)
 
         return result
@@ -1185,14 +1179,13 @@ class TestStep:
                 if not self._response_value_validation(expected_item, received_item):
                     return False
             return True
-        elif isinstance(expected_value, dict):
+        if isinstance(expected_value, dict):
             for key, expected_item in expected_value.items():
                 received_item = received_value.get(key)
                 if not self._response_value_validation(expected_item, received_item):
                     return False
             return True
-        else:
-            return expected_value == received_value
+        return expected_value == received_value
 
     def _response_constraints_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
@@ -1286,13 +1279,13 @@ class TestStep:
     def _config_variable_substitution(self, value):
         if type(value) is list:
             return [self._config_variable_substitution(entry) for entry in value]
-        elif type(value) is dict:
+        if type(value) is dict:
             mapped_value = {}
             for key in value:
                 mapped_value[key] = self._config_variable_substitution(
                     value[key])
             return mapped_value
-        elif type(value) is str:
+        if type(value) is str:
             # For most tests, a single config variable is used and it can be replaced as in.
             # But some other tests were relying on the fact that the expression was put 'as if' in
             # the generated code and was resolved before being sent over the wire. For such
@@ -1318,8 +1311,7 @@ class TestStep:
             # TODO we should move away from eval. That will mean that we will need to do extra
             # parsing, but it would be safer then just blindly running eval.
             return value if not substitution_occured else eval(value)
-        else:
-            return value
+        return value
 
 
 class YamlTests:

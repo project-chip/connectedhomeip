@@ -29,6 +29,7 @@
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif
 
@@ -46,24 +47,8 @@ public:
     // be updated.
     static constexpr uint8_t kColorControlScenableAttributesCount = 9;
 
-    DefaultColorControlSceneHandler() = default;
-    ~DefaultColorControlSceneHandler() override {}
-
-    // Default function for ColorControl cluster, only puts the ColorControl cluster ID in the span if supported on the caller
-    // endpoint
-    void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        ClusterId * buffer = clusterBuffer.data();
-        if (emberAfContainsServer(endpoint, ColorControl::Id) && clusterBuffer.size() >= 1)
-        {
-            buffer[0] = ColorControl::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
+    DefaultColorControlSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
+    ~DefaultColorControlSceneHandler() override = default;
 
     // Default function for ColorControl cluster, only checks if ColorControl is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
