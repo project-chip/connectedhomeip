@@ -16,16 +16,12 @@
  */
 #pragma once
 
-#include <lib/support/IntrusiveList.h>
 #include <tracing/log_declares.h>
 
 namespace chip {
 namespace Tracing {
 
 /// Represents a generic tracing back-end.
-///
-/// Derived from an intrusive list base as multiple
-/// tracing back-ends may exist per application.
 ///
 /// THREAD SAFETY:
 ///   Implementations of backends are expected to be thread safe as
