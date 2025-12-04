@@ -379,3 +379,268 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
+
+
+# Commissioning Status Detection Functions
+
+async def _establish_pase_session(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    pase_params: dict
+) -> None:
+    """
+    Internal helper to establish PASE session using provided parameters.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID to use for the PASE session
+        pase_params: Parameters for PASE establishment
+                    Format: {'method': 'on-network'|'ble'|'ble-discriminator',
+                            'ip': str (for on-network),
+                            'discriminator': int,
+                            'passcode': int}
+
+    Raises:
+        ValueError: If invalid method or missing required parameters
+        ChipStackError: If PASE establishment fails
+    """
+    method = pase_params.get('method', 'on-network')
+    passcode = pase_params.get('passcode')
+    discriminator = pase_params.get('discriminator')
+
+    if passcode is None:
+        raise ValueError("passcode is required in pase_params")
+
+    if method == 'on-network':
+        # Discover device and connect via IP
+        ip = pase_params.get('ip')
+        if ip:
+            # IP address provided, use it directly
+            LOGGER.info(f"Establishing PASE over IP to {ip}")
+            await dev_ctrl.EstablishPASESessionIP(
+                ipaddr=ip,
+                setupPinCode=passcode,
+                nodeid=node_id
+            )
+        else:
+            # Use mDNS discovery with discriminator
+            if discriminator is None:
+                raise ValueError("Either 'ip' or 'discriminator' required for on-network PASE")
+
+            LOGGER.info(f"Discovering device with discriminator {discriminator}")
+            devices = await dev_ctrl.DiscoverCommissionableNodes(
+                filterType=discovery.FilterType.LONG_DISCRIMINATOR,
+                filter=discriminator,
+                stopOnFirst=True,
+                timeoutSecond=5
+            )
+
+            if not devices:
+                raise ValueError(f"No device found with discriminator {discriminator}")
+
+            # Use first non-link-local address
+            device = devices[0] if isinstance(devices, list) else devices
+            selected_ip = None
+            for addr in device.addresses or []:
+                import ipaddress
+                if not ipaddress.ip_address(addr).is_link_local:
+                    selected_ip = addr
+                    break
+
+            if not selected_ip and device.addresses:
+                # Fall back to first address if no non-link-local found
+                selected_ip = device.addresses[0]
+
+            if not selected_ip:
+                raise ValueError("Device has no usable IP addresses")
+
+            LOGGER.info(f"Establishing PASE over IP to {selected_ip}")
+            await dev_ctrl.EstablishPASESessionIP(
+                ipaddr=selected_ip,
+                setupPinCode=passcode,
+                nodeid=node_id
+            )
+
+    elif method == 'ble' or method == 'ble-discriminator':
+        # BLE connection using discriminator
+        if discriminator is None:
+            raise ValueError("discriminator is required for BLE PASE")
+
+        LOGGER.info(f"Establishing PASE over BLE with discriminator {discriminator}")
+        await dev_ctrl.EstablishPASESessionBLE(
+            setupPinCode=passcode,
+            discriminator=discriminator,
+            nodeid=node_id
+        )
+
+    else:
+        raise ValueError(f"Unknown PASE method: {method}. Use 'on-network', 'ble', or 'ble-discriminator'")
+
+
+async def is_commissioned(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    endpoint: int = 0,
+    pase_params: Optional[dict] = None
+) -> bool:
+    """
+    Check if a device has any commissioned fabrics.
+
+    Uses TrustedRootCertificates attribute from the OperationalCredentials cluster.
+    An empty list indicates the device is not commissioned (factory fresh state).
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        endpoint: Endpoint to query (default 0, where OperationalCredentials cluster resides)
+        pase_params: Optional parameters for establishing PASE if device is not commissioned.
+                    If provided and CASE connection fails, will establish PASE session.
+                    Format: {'method': 'on-network'|'ble-wifi'|'ble-thread',
+                            'ip': str (for on-network),
+                            'discriminator': int,
+                            'passcode': int}
+
+    Returns:
+        True if device has at least one commissioned fabric (one or more root certificates),
+        False if device is factory fresh (no root certificates)
+
+    Raises:
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Note:
+        This function works over both PASE (pre-commissioning) and CASE (post-commissioning) sessions.
+        Connection behavior:
+        - First tries CASE (for commissioned devices)
+        - If CASE fails and pase_params provided, establishes PASE session
+        - PASE is used if a commissioning session is already active
+
+    Example:
+        # Check commissioned device (uses CASE)
+        if await is_commissioned(controller, node_id=1234):
+            LOGGER.info("Device already commissioned")
+
+        # Check factory-fresh device (establishes PASE if needed)
+        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        if await is_commissioned(controller, node_id=1234, pase_params=pase_params):
+            LOGGER.info("Device is commissioned")
+        else:
+            LOGGER.info("Device is factory fresh")
+    """
+    try:
+        # Import locally to avoid potential circular dependencies
+        import matter.clusters as Clusters
+        from matter.exceptions import ChipStackError as ChipStackErrorImport
+
+        # Try to read over existing connection (CASE or active PASE)
+        try:
+            result = await dev_ctrl.ReadAttribute(
+                nodeid=node_id,
+                attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        except ChipStackErrorImport as e:  # chipstack-ok: Need to catch CASE connection failure to attempt PASE fallback
+            # If connection failed and we have PASE parameters, try establishing PASE
+            if pase_params is not None:
+                LOGGER.info(f"CASE connection failed, attempting PASE session establishment: {e}")
+                await _establish_pase_session(dev_ctrl, node_id, pase_params)
+
+                # Retry the read over PASE
+                result = await dev_ctrl.ReadAttribute(
+                    nodeid=node_id,
+                    attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+                )
+            else:
+                # No PASE params provided, re-raise the error
+                raise
+
+        # Extract the trusted root certificates list
+        root_certs = result[endpoint][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
+        ]
+
+        # Device is commissioned if it has any root certificates
+        return len(root_certs) > 0
+
+    except Exception as e:
+        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
+        raise
+
+
+async def get_commissioned_fabric_count(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    endpoint: int = 0,
+    pase_params: Optional[dict] = None
+) -> int:
+    """
+    Get the number of commissioned fabrics on a device.
+
+    Reads the TrustedRootCertificates attribute and returns the count.
+    Each trusted root certificate corresponds to one commissioned fabric.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        endpoint: Endpoint to query (default 0, where OperationalCredentials cluster resides)
+        pase_params: Optional parameters for establishing PASE if device is not commissioned.
+                    Same format as is_commissioned(). See is_commissioned() docstring for details.
+
+    Returns:
+        Number of commissioned fabrics (equals number of trusted root certificates).
+        Returns 0 if device is factory fresh.
+
+    Raises:
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Note:
+        This function works over both PASE (pre-commissioning) and CASE (post-commissioning) sessions.
+        Connection behavior:
+        - First tries CASE (for commissioned devices)
+        - If CASE fails and pase_params provided, establishes PASE session
+
+    Example:
+        # Log fabric count for commissioned device
+        fabric_count = await get_commissioned_fabric_count(controller, node_id=1234)
+        LOGGER.info(f"Device has {fabric_count} commissioned fabric(s)")
+
+        # Check fabric count on factory-fresh device (establishes PASE if needed)
+        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        fabric_count = await get_commissioned_fabric_count(controller, node_id=1234, pase_params=pase_params)
+        assert fabric_count == 0, f"Factory-fresh device should have 0 fabrics, found {fabric_count}"
+    """
+    try:
+        # Import locally to avoid potential circular dependencies
+        import matter.clusters as Clusters
+        from matter.exceptions import ChipStackError as ChipStackErrorImport
+
+        # Try to read over existing connection (CASE or active PASE)
+        try:
+            result = await dev_ctrl.ReadAttribute(
+                nodeid=node_id,
+                attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        except ChipStackErrorImport as e:  # chipstack-ok: Need to catch CASE connection failure to attempt PASE fallback
+            # If connection failed and we have PASE parameters, try establishing PASE
+            if pase_params is not None:
+                LOGGER.info(f"CASE connection failed, attempting PASE session establishment: {e}")
+                await _establish_pase_session(dev_ctrl, node_id, pase_params)
+
+                # Retry the read over PASE
+                result = await dev_ctrl.ReadAttribute(
+                    nodeid=node_id,
+                    attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+                )
+            else:
+                # No PASE params provided, re-raise the error
+                raise
+
+        # Extract the trusted root certificates list
+        root_certs = result[endpoint][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
+        ]
+
+        # Return the count
+        return len(root_certs)
+
+    except Exception as e:
+        LOGGER.error(f"Failed to get fabric count for node {node_id}: {e}")
+        raise

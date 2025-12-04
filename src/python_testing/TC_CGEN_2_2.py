@@ -47,6 +47,8 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackException
 from matter.interaction_model import InteractionModelError
+from matter.testing.commissioning import get_commissioned_fabric_count
+from matter.testing.matter_asserts import assert_fabric_count
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -186,20 +188,19 @@ class TC_CGEN_2_2(MatterBaseTest):
         '''
         if is_first_run:
             self.step(8)
-        trusted_root_list_original_after_wait = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size_after_wait = len(trusted_root_list_original_after_wait)
-        asserts.assert_equal(trusted_root_list_original_size_after_wait, trusted_root_list_original_size,
-                             "Unexpected number of entries in the TrustedRootCertificates table after wait")
+        # Use commissioning assert helper to verify fabric count hasn't changed after failsafe expiry
+        await assert_fabric_count(
+            self.default_controller,
+            self.dut_node_id,
+            trusted_root_list_original_size,
+            description="DUT after failsafe timeout"
+        )
         if is_first_run:
             logger.info(
-                f'Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: {trusted_root_list_original_size_after_wait}')
+                f'Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: {trusted_root_list_original_size}')
         else:
             logger.info(
-                f'Step #12 - Repeated Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: {trusted_root_list_original_size_after_wait}')
+                f'Step #12 - Repeated Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: {trusted_root_list_original_size}')
 
         if is_first_run:
             self.step(9)
@@ -298,12 +299,9 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         # Read the Steps
         self.step(1)
-        trusted_root_list_original = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size = len(trusted_root_list_original)
+        # Use commissioning helper to get fabric count
+        trusted_root_list_original_size = await get_commissioned_fabric_count(
+            self.default_controller, self.dut_node_id)
         logger.info(f'Step #1: The size of the original num_trusted_roots_original list: {trusted_root_list_original_size}')
 
         self.step(2)
@@ -334,22 +332,26 @@ class TC_CGEN_2_2(MatterBaseTest):
         new_root_cert = await self.run_steps_3_to_5(failsafe_expiration_seconds, is_first_run=True)
 
         self.step(6)
+        # Use commissioning assert helper to verify fabric count increased
+        await assert_fabric_count(
+            self.default_controller,
+            self.dut_node_id,
+            trusted_root_list_original_size + 1,
+            description="DUT after adding trusted root certificate"
+        )
+
+        # Still need to read the list to verify the specific certificate was added
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             cluster=self.cluster_opcreds,
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
-
-        # Verify that the trusted root list size has increased by 1
-        asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 1,
-                             "Unexpected number of entries in the TrustedRootCertificates table after update")
 
         # Check if the new certificate is in the updated list
         asserts.assert_in(new_root_cert, trusted_root_list_original_updated,
                           "New root certificate was not added to the trusted root list.")
 
-        logger.info(f'Step #6: The updated size of the num_trusted_roots_original list: {trusted_root_list_original_size_updated}')
+        logger.info(f'Step #6: The updated size of the num_trusted_roots_original list: {trusted_root_list_original_size + 1}')
 
         self.step(7)
         # Step 7 - 'set_failsafe_timer' function is used to force the failsafe timer to expire,
@@ -473,12 +475,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #19 - TH1 Original size of the fabrics list: {fabrics_original_size}')
 
         self.step(20)
-        trusted_roots_list = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_roots_list_size = len(trusted_roots_list)
+        # Use commissioning helper to get fabric count
+        trusted_roots_list_size = await get_commissioned_fabric_count(
+            self.default_controller, self.dut_node_id)
         logger.info(f'Step #20 - TH1 Original size of the trusted_root list: {trusted_roots_list_size}')
 
         self.step(21)
@@ -541,15 +540,14 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "The fabrics list size should match the original fabrics list size.")
 
         self.step(25)
-        trusted_roots_list_updated = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_roots_list_updated_size = len(trusted_roots_list_updated)
-        logger.info(f'Step #25 - TH1 the size of the trusted_roots_list_size_updated: {trusted_roots_list_updated_size}')
-        asserts.assert_equal(trusted_roots_list_updated_size, trusted_roots_list_size,
-                             "The trusted_roots list size should match the original trusted_roots list size.")
+        # Use commissioning assert helper to verify fabric count hasn't changed
+        await assert_fabric_count(
+            self.default_controller,
+            self.dut_node_id,
+            trusted_roots_list_size,
+            description="DUT after incomplete commissioning"
+        )
+        logger.info(f'Step #25 - TH1 the size of the trusted_roots_list_size_updated: {trusted_roots_list_size}')
 
         self.step(26)
         logger.info('Step #26 - Fully commissioned started')
@@ -605,16 +603,15 @@ class TC_CGEN_2_2(MatterBaseTest):
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(31)
-        trusted_root_list_original_updated = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
-        logger.info(f'Step #31 - The updated num_trusted_roots_original: {trusted_root_list_original_size_updated}')
+        # Use commissioning assert helper to verify fabric count increased
         # Verify that the trusted root list size has increased by 1, the trusted root list size is numTrustedRootsOriginal + 2
-        asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
-                             "Unexpected number of entries in the TrustedRootCertificates table after update")
+        await assert_fabric_count(
+            self.default_controller,
+            self.dut_node_id,
+            trusted_root_list_original_size + 2,
+            description="DUT after adding second trusted root certificate"
+        )
+        logger.info(f'Step #31 - The updated num_trusted_roots_original: {trusted_root_list_original_size + 2}')
 
         self.step(32)
         logger.info(f'Step #32: - The maxFailsafe (max_fail_safe): {maxFailsafe}')
@@ -644,16 +641,15 @@ class TC_CGEN_2_2(MatterBaseTest):
         await asyncio.sleep(failsafe_timeout_less_than_max)
 
         self.step(34)
-        trusted_root_list_original_updated = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
-        logger.info(f'Step #34 - The updated num_trusted_roots_original: {trusted_root_list_original_size_updated}')
+        # Use commissioning assert helper to verify fabric count
         # Verify that the trusted root list size is numTrustedRootsOriginal + 2
-        asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
-                             "Step #34 - Unexpected number of entries in the TrustedRootCertificates table after update")
+        await assert_fabric_count(
+            self.default_controller,
+            self.dut_node_id,
+            trusted_root_list_original_size + 2,
+            description="DUT before failsafe expiration"
+        )
+        logger.info(f'Step #34 - The updated num_trusted_roots_original: {trusted_root_list_original_size + 2}')
 
         self.step(35)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_expiration_seconds, breadcrumb=1)
@@ -705,12 +701,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(40)
-        trusted_root_list_original_updated = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
+        # Use commissioning helper to get fabric count
+        trusted_root_list_original_size_updated = await get_commissioned_fabric_count(
+            self.default_controller, self.dut_node_id)
         logger.info(
             f'Step #40: The updated size of the num_trusted_roots_original list is {trusted_root_list_original_size_updated}')
         # Verify that the trusted root list size is numTrustedRootsOriginal + 2
@@ -798,17 +791,15 @@ class TC_CGEN_2_2(MatterBaseTest):
         await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId+1, cmd=cmd)
 
         # The expected number of root certificates should be numTrustedRootsOriginal after removing the fabric
-        trusted_root_list_original_updated = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            cluster=self.cluster_opcreds,
-            attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
-        trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
+        # Use commissioning assert helper to verify fabric count returned to original
+        await assert_fabric_count(
+            self.default_controller,
+            self.dut_node_id,
+            trusted_root_list_original_size,
+            description="DUT after removing TH2 fabric"
+        )
         logger.info(
-            f'Step #44: he updated size of the num_trusted_roots_original list: {trusted_root_list_original_size_updated}')
-        # Verify that the trusted root list size from oririnal trusted root list is 1
-        asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size,
-                             "Unexpected number of entries in the TrustedRootCertificates table after update")
+            f'Step #44: The updated size of the num_trusted_roots_original list: {trusted_root_list_original_size}')
 
 
 if __name__ == "__main__":
