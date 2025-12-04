@@ -100,11 +100,10 @@ protected:
     // Endpoint scene count
     CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count);
 
-    // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
-    virtual uint8_t GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen);
-
-    // wrapper function around emberAfGetClusterCountForEndpoint to allow override when testing
-    virtual uint8_t GetClusterCountFromEndpoint();
+    // List clusters available on the current endpoint. Virtual to allow for more unit test logic.
+    //
+    // TODO: control over this SHOULD be done via the datamodel provider instead (use that for testing).
+    virtual CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder);
 
 private:
     app::DataModel::Provider * mDataModel = nullptr;

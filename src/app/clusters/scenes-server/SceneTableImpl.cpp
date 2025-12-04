@@ -16,8 +16,6 @@
  */
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <cstdlib>
@@ -247,23 +245,18 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
-        // TODO : Once zap supports the scenable quality, implement a GetSceneableClusterCountFromEndpointType function to avoid
-        // over-allocation
-        uint8_t clusterCount = GetClusterCountFromEndpoint();
-        chip::Platform::ScopedMemoryBuffer<ClusterId> cBuffer;
-        VerifyOrReturnError(cBuffer.Calloc(clusterCount), CHIP_ERROR_NO_MEMORY);
-        clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
+        ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> clustersBuilder;
+        ReturnErrorOnFailure(ServerClusters(clustersBuilder));
 
-        Span<ClusterId> cSpan(cBuffer.Get(), clusterCount);
-        for (ClusterId cluster : cSpan)
+        for (const auto & entry : clustersBuilder.TakeBuffer())
         {
             ExtensionFieldSet EFS;
             MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
-            EFS.mID                 = cluster;
+            EFS.mID                 = entry.clusterId;
 
             for (auto & handler : mHandlerList)
             {
-                if (handler.SupportsCluster(mEndpointId, cluster))
+                if (handler.SupportsCluster(mEndpointId, entry.clusterId))
                 {
                     ReturnErrorOnFailure(handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
@@ -319,19 +312,10 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
     return FabricTableImpl::RemoveEndpoint();
 }
 
-/// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
-/// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
-uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
+CHIP_ERROR DefaultSceneTableImpl::ServerClusters(ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder)
 {
-    return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
-}
-
-/// @brief wrapper function around emberAfGetClusterCountForEndpoint to allow testing enforcing a specific count, shimmed in test
-/// configuration because emberAfGetClusterCountForEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated
-/// files
-uint8_t DefaultSceneTableImpl::GetClusterCountFromEndpoint()
-{
-    return emberAfGetClusterCountForEndpoint(mEndpointId);
+    VerifyOrReturnError(mDataModel != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mDataModel->ServerClusters(mEndpointId, builder);
 }
 
 void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
