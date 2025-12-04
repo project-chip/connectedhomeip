@@ -52,7 +52,7 @@ from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
@@ -67,7 +67,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -161,8 +161,6 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EEVSE_2_2(self):
@@ -296,7 +294,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         supported_attributes = await self.get_supported_energy_evse_attributes()
         if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in supported_attributes:
             self.step("9")
-            logging.info("UserMaximumChargeCurrent is supported...")
+            log.info("UserMaximumChargeCurrent is supported...")
             user_max_charge_current = 6000
             await self.write_user_max_charge(1, user_max_charge_current)
 
@@ -307,7 +305,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
                 user_max_charge_current, circuit_capacity)
             await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
         else:
-            logging.info(
+            log.info(
                 "UserMaximumChargeCurrent is NOT supported... skipping.")
             self.mark_step_range_skipped("9", "9a")
 

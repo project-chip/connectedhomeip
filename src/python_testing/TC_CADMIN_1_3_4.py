@@ -57,6 +57,8 @@ from matter.exceptions import ChipStackError
 from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from matter.tlv import TLVReader
 
+log = logging.getLogger(__name__)
+
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
@@ -107,13 +109,13 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
-            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         elif commission_type == "BCM":
             service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
-            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation

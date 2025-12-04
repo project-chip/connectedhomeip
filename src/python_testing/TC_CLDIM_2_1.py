@@ -41,6 +41,8 @@ from matter.testing.matter_asserts import assert_valid_map8, assert_valid_uint16
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 class TC_CLDIM_2_1(MatterBaseTest):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
@@ -51,7 +53,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         return "[TC_CLDIM_2_1] Attributes with DUT as Server"
 
     def steps_TC_CLDIM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "Read feature map determine supported features"),
             TestStep(3, "Read CurrentState attribute, if supported"),
@@ -67,13 +69,11 @@ class TC_CLDIM_2_1(MatterBaseTest):
             TestStep(13, "Read ModulationType attribute, if supported"),
             TestStep(14, "Read LatchControlModes attribute, if supported"),
         ]
-        return steps
 
     def pics_TC_CLDIM_2_1(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -143,7 +143,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(resolution >= 1, "Resolution is less than 1")
             asserts.assert_true(resolution <= 10000, "Resolution is more than 10000")
         else:
-            logging.info("Positioning feature is not supported by the DUT, skipping this step.")
+            log.info("Positioning feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 6: Read StepValue attribute
@@ -155,7 +155,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_true(step_value <= 10000, "StepValue is more than 10000")
             asserts.assert_true(step_value % resolution == 0, "StepValue is not a multiple of Resolution")
         else:
-            logging.info("Positioning feature is not supported by the DUT, skipping this step.")
+            log.info("Positioning feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 7: Read Unit attribute
@@ -167,7 +167,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_less(unit, Clusters.ClosureDimension.Enums.ClosureUnitEnum.kUnknownEnumValue,
                                 f"Unit is not in the expected range [0:{Clusters.ClosureDimension.Enums.ClosureUnitEnum.kUnknownEnumValue.value - 1}]")
         else:
-            logging.info("Unit feature is not supported by the DUT, skipping this step.")
+            log.info("Unit feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 8: Read UnitRange attribute
@@ -181,7 +181,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                     "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
-                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not larger than or equal to zero")
+                    asserts.assert_true(unit_range.min >= 0, "UnitRange.min is not larger than or equal to zero")
                     asserts.assert_true(unit_range.min <= unit_range.max <= 32767,
                                         "UnitRange.max is not in the expected range [UnitRange.Min:32767]")
 
@@ -192,7 +192,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                     asserts.assert_true(1 <= unit_range.max - unit_range.min <= 360,
                                         "UnitRange.max - UnitRange.min is not in the expected range [1:360]")
         else:
-            logging.info("Unit feature is not supported by the DUT, skipping this step.")
+            log.info("Unit feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 9: Read LimitRange attribute
@@ -207,7 +207,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                 "LimitRange.max is not in the expected range [LimitRange.Min:10000]")
             asserts.assert_true(limit_range.max % resolution == 0, "LimitRange.max is not a multiple of Resolution")
         else:
-            logging.info("Limitation feature is not supported by the DUT, skipping this step.")
+            log.info("Limitation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 10: Read TranslationDirection attribute
@@ -219,7 +219,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_less(translation_direction, Clusters.ClosureDimension.Enums.TranslationDirectionEnum.kUnknownEnumValue,
                                 f"TranslationDirection is not in the expected range [0:{Clusters.ClosureDimension.Enums.TranslationDirectionEnum.kUnknownEnumValue.value - 1}]")
         else:
-            logging.info("Translation feature is not supported by the DUT, skipping this step.")
+            log.info("Translation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 11: Read RotationAxis attribute
@@ -231,7 +231,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_less(rotation_axis, Clusters.ClosureDimension.Enums.RotationAxisEnum.kUnknownEnumValue,
                                 f"RotationAxis is not in the expected range [0:{Clusters.ClosureDimension.Enums.RotationAxisEnum.kUnknownEnumValue.value - 1}]")
         else:
-            logging.info("Rotation feature is not supported by the DUT, skipping this step.")
+            log.info("Rotation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 12: Read Overflow attribute
@@ -242,7 +242,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_less(overflow, Clusters.ClosureDimension.Enums.OverflowEnum.kUnknownEnumValue,
                                 f"Overflow is not in the expected range [0:{Clusters.ClosureDimension.Enums.OverflowEnum.kUnknownEnumValue.value - 1}]")
         else:
-            logging.info("Rotation feature is not supported by the DUT, skipping this step.")
+            log.info("Rotation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 13: Read ModulationType attribute
@@ -254,7 +254,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             asserts.assert_less(modulation_type, Clusters.ClosureDimension.Enums.ModulationTypeEnum.kUnknownEnumValue,
                                 f"ModulationType is not in the expected range [0:{Clusters.ClosureDimension.Enums.ModulationTypeEnum.kUnknownEnumValue.value - 1}]")
         else:
-            logging.info("Modulation feature is not supported by the DUT, skipping this step.")
+            log.info("Modulation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
         # STEP 14: Read LatchControlModes attribute
@@ -264,7 +264,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             assert_valid_map8(latch_control_modes, "LatchControlModes")
             asserts.assert_true(0 <= latch_control_modes <= 3, "LatchControlModes is not in the expected range [0:3]")
         else:
-            logging.info("Latching feature is not supported by the DUT, skipping this step.")
+            log.info("Latching feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
 
 

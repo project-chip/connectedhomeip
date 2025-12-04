@@ -43,7 +43,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import logging
 
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
@@ -51,8 +50,6 @@ from TC_EWATERHTRBase import EWATERHTRBase
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 
 class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
@@ -67,7 +64,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "Set up a subscription to all WaterHeaterManagement cluster events"),
@@ -200,8 +197,6 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
             TestStep("27", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EWATERHTR.TESTEVENTTRIGGER for Basic installation Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EWATERHTR_2_2(self):

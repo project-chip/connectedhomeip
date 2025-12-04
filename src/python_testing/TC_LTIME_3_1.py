@@ -45,6 +45,8 @@ from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_LTIME_3_1(MatterBaseTest):
 
@@ -53,13 +55,12 @@ class TC_LTIME_3_1(MatterBaseTest):
 
     def pics_TC_LTIME_3_1(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "LTIME.S"
         ]
-        return pics
 
     def steps_TC_LTIME_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "TH is commissioned with DUT", is_commissioning=True),
             TestStep(1, "TH reads HourFormat attribute from DUT",
                      "Verify that the HourFormat attribute is of Enum8 datatype and that the values are 0 (12hr), 1 (24hr), and 255 (UseActiveLocale) as per the HourFormatEnum in the specification."),
@@ -84,7 +85,6 @@ class TC_LTIME_3_1(MatterBaseTest):
             TestStep(15, "TH writes 50 to ActiveCalendarType attribute",
                      "Verify that the write request shows 0x87 (Constraint Error)."),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
     async def test_TC_LTIME_3_1(self):
@@ -97,7 +97,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(1)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-        logging.info(f"HourFormat {type(hour_format)} with value {hour_format}")
+        log.info(f"HourFormat {type(hour_format)} with value {hour_format}")
         # Validate Enum8
         matter_asserts.assert_valid_uint8(hour_format, description="HourFormat")
         asserts.assert_is_instance(hour_format, self.cluster.Enums.HourFormatEnum, "HourFormat is not type of HourFormatEnum")
@@ -141,7 +141,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(9)
         feature_map = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.FeatureMap)
         if (feature_map & self.cluster.Bitmaps.Feature.kCalendarFormat) == 0:
-            self.skip_all_remaining_steps(10)
+            self.mark_all_remaining_steps_skipped(10)
             return
 
         self.step(10)
@@ -153,7 +153,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(11)
         active_calendar_type = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
-        logging.info(f"Value for {active_calendar_type}")
+        log.info(f"Value for {active_calendar_type}")
         matter_asserts.assert_valid_uint8(active_calendar_type, "ActiveCalendarType")
         asserts.assert_is_instance(active_calendar_type, self.cluster.Enums.CalendarTypeEnum,
                                    "ActiveCalendarType  is not type of CalendarTypeEnum")
@@ -163,7 +163,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(12)
         # Verify the supported calendar types are active (can read and write).
         for supported in cluster_supported_calendar_types:
-            logging.info(f"Testing for SupportedCalendarType value {supported}")
+            log.info(f"Testing for SupportedCalendarType value {supported}")
             await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(supported), self.endpoint)
             active_calendar_type = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
             asserts.assert_equal(active_calendar_type, supported)

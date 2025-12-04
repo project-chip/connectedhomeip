@@ -29,7 +29,7 @@ from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
@@ -64,7 +64,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        logger.info(f"Launching provider app with with ota image {ota_image_path}")
+        log.info(f"Launching provider app with with ota image {ota_image_path}")
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -79,11 +79,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         if log_file is None:
             # Assign the file descriptor to log_file
-            log_file = tempfile.NamedTemporaryFile(
+            log_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
                 dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
-            logger.info(f"Writing Provider logs at :{log_file.name}")
+            log.info(f"Writing Provider logs at :{log_file.name}")
         else:
-            logger.info(f"Writing Provider logs at : {log_file}")
+            log.info(f"Writing Provider logs at : {log_file}")
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
             provider_app_path,
@@ -101,7 +101,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        log.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -130,14 +130,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             metadataForNode=None,
             endpoint=endpoint
         )
-        logger.info("Sending AnnounceOTA Provider Command")
+        log.info("Sending AnnounceOTA Provider Command")
         cmd_resp = await self.send_single_cmd(
             cmd=cmd_announce_ota_provider,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        logger.info(f"Announce command sent {cmd_resp}")
+        log.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
 
     async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
@@ -155,7 +155,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers: {current_otap_info}")
+        log.info(f"OTA Providers: {current_otap_info}")
 
         # Create Provider Location into Requestor
         provider_location_struct = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
@@ -180,7 +180,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers List: {after_otap_info}")
+        log.info(f"OTA Providers List: {after_otap_info}")
 
     async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
@@ -217,7 +217,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ota_image_info['size'] = path.getsize(ota_path)
             ota_image_info['exists'] = True
         except OSError:
-            logger.info(f"OTA IMAGE at {ota_path} does not exists")
+            log.info(f"OTA IMAGE at {ota_path} does not exists")
             return ota_image_info
 
         return ota_image_info
@@ -237,7 +237,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             target_version (Optional[int], optional): Software version to verify if not provided ignore this check.. Defaults to None.
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
-        logger.info(f"Verifying the event {event_report}")
+        log.info(f"Verifying the event {event_report}")
         asserts.assert_equal(event_report.previousState, expected_previous_state,
                              f"Previous state was not {expected_previous_state}")
         asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")

@@ -38,7 +38,6 @@ class InputIdlFile:
 
         if self.file_type == IdlFileType.MATTER:
             return os.path.join(top_dir, "codegen")
-        elif self.file_type == IdlFileType.ZAP:
+        if self.file_type == IdlFileType.ZAP:
             return os.path.join(top_dir, "zap")
-        else:
-            raise Exception("Unknown file type for self")
+        raise Exception("Unknown file type for self")

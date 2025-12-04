@@ -46,10 +46,12 @@ from matter.clusters import Objects, WebRTCTransportProvider
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -84,8 +86,6 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-
-        return steps
 
     def desc_TC_WEBRTC_1_4(self) -> str:
         return "[TC-WEBRTC-1.4] Validate Non-Deferred Offer Flow for Battery-Powered Camera in Standby Mode"
@@ -169,7 +169,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
 
         self.step(6)
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only:
