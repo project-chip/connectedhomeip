@@ -23,8 +23,8 @@
 
 namespace chip {
 namespace app {
-    
-class DeviceLoadStatusProviderDelegate 
+
+class DeviceLoadStatusProviderDelegate
 {
 public:
     struct MessageStats

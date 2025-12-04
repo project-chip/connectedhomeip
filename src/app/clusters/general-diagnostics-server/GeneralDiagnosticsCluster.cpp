@@ -286,7 +286,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
             .currentSubscriptions = mDeviceLoadStatusProvider->GetNumCurrentSubscriptions(),
             .currentSubscriptionsForFabric         = mDeviceLoadStatusProvider->GetNumCurrentSubscriptionsForFabric(encoder.AccessingFabricIndex()),
             .totalSubscriptionsEstablished         = mDeviceLoadStatusProvider->GetNumTotalSubscriptions(),
-            .totalInteractionModelMessagesSent     = messageStatistics.interactionModelMessagesSent,   
+            .totalInteractionModelMessagesSent     = messageStatistics.interactionModelMessagesSent,
             .totalInteractionModelMessagesReceived = messageStatistics.interactionModelMessagesReceived,
         };
         return encoder.Encode(load);
