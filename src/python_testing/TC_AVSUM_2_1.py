@@ -105,8 +105,9 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
             zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
-            asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMax is not in valid range.")
-            asserts.assert_greater_equal(zoom_max_dut, 2, "ZoomMax must be at least 2.")
+            asserts.assert_less_equal(zoom_max_dut, self.SPEC_ZOOMMAX_MAX_VALUE, "ZoomMax is not in valid range.")
+            asserts.assert_greater_equal(zoom_max_dut, self.SPEC_ZOOMMAX_MIN_VALUE,
+                                         f"ZoomMax must be at least {self.SPEC_ZOOMMAX_MIN_VALUE}.")
         else:
             log.info("MZOOM Feature not supported. Test step skipped")
             self.skip_step(3)
@@ -116,15 +117,15 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
                               "TiltMin attribute is a mandatory attribute if MTILT.")
             tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMin)
-            asserts.assert_less_equal(tilt_min_dut, 179, "TiltMin is not in valid range.")
-            asserts.assert_greater_equal(tilt_min_dut, -180, "TiltMin is not in valid range.")
+            asserts.assert_less_equal(tilt_min_dut, self.SPEC_TILTMIN_MAX_VALUE, "TiltMin is not in valid range.")
+            asserts.assert_greater_equal(tilt_min_dut, self.SPEC_TILTMIN_MIN_VALUE, "TiltMin is not in valid range.")
 
             self.step(5)
             asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
                               "TiltMax attribute is a mandatory attribute if MTILT.")
             tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMax)
-            asserts.assert_less_equal(tilt_max_dut, 180, "TiltMin is not in valid range.")
-            asserts.assert_greater_equal(tilt_max_dut, -179, "TiltMin is not in valid range.")
+            asserts.assert_less_equal(tilt_max_dut, self.SPEC_TILTMAX_MAX_VALUE, "TiltMax is not in valid range.")
+            asserts.assert_greater_equal(tilt_max_dut, self.SPEC_TILTMAX_MIN_VALUE, "TiltMax is not in valid range.")
         else:
             log.info("MTILT Feature not supported. Test steps skipped")
             self.skip_step(4)
@@ -135,15 +136,15 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
                               "PanMin attribute is a mandatory attribute if MPAN.")
             pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMin)
-            asserts.assert_less_equal(pan_min_dut, 179, "PanMin is not in valid range.")
-            asserts.assert_greater_equal(pan_min_dut, -180, "PanMin is not in valid range.")
+            asserts.assert_less_equal(pan_min_dut, self.SPEC_PANMIN_MAX_VALUE, "PanMin is not in valid range.")
+            asserts.assert_greater_equal(pan_min_dut, self.SPEC_PANMIN_MIN_VALUE, "PanMin is not in valid range.")
 
             self.step(7)
             asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
                               "PanMax attribute is a mandatory attribute if MPAN.")
             pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMax)
-            asserts.assert_less_equal(pan_max_dut, 180, "PanMax is not in valid range.")
-            asserts.assert_greater_equal(pan_max_dut, -179, "PanMax is not in valid range.")
+            asserts.assert_less_equal(pan_max_dut, self.SPEC_PANMAX_MAX_VALUE, "PanMax is not in valid range.")
+            asserts.assert_greater_equal(pan_max_dut, self.SPEC_PANMAX_MIN_VALUE, "PanMax is not in valid range.")
         else:
             log.info("MPAN Feature not supported. Test steps skipped")
             self.skip_step(6)
