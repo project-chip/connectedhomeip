@@ -54,7 +54,9 @@ public:
         DeviceEnergyManagement::Delegate & delegate;
 
         Config(EndpointId aEndpointId, BitMask<DeviceEnergyManagement::Feature> aFeatures,
-               DeviceEnergyManagement::Delegate & aDelegate) : endpointId(aEndpointId), featureFlags(aFeatures), delegate(aDelegate)
+               DeviceEnergyManagement::Delegate & aDelegate) :
+            endpointId(aEndpointId),
+            featureFlags(aFeatures), delegate(aDelegate)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
