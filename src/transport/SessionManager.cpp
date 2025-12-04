@@ -1353,7 +1353,7 @@ void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, 
 
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
-        mMessageStats.InteractionModelMessagesReceived++;
+        mMessageStats.mInteractionModelMessagesReceived++;
     }
 }
 
@@ -1364,7 +1364,7 @@ void SessionManager::CountMessagesSent(const SessionHandle & sessionHandle, cons
 
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
-        mMessageStats.InteractionModelMessagesSent++;
+        mMessageStats.mInteractionModelMessagesSent++;
     }
 }
 

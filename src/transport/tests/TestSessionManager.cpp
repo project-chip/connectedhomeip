@@ -1077,8 +1077,8 @@ TEST_F(TestSessionManager, TestMessageStats)
 
     // Ensure base case, counts start at 0
     SessionManager::MessageStats messageStatistics = sessionManager.GetMessageStats();
-    EXPECT_EQ(messageStatistics.InteractionModelMessagesSent, static_cast<uint32_t>(0));
-    EXPECT_EQ(messageStatistics.InteractionModelMessagesReceived, static_cast<uint32_t>(0));
+    EXPECT_EQ(messageStatistics.mInteractionModelMessagesSent, static_cast<uint32_t>(0));
+    EXPECT_EQ(messageStatistics.mInteractionModelMessagesReceived, static_cast<uint32_t>(0));
 
     PayloadHeader payloadHeader;
 
@@ -1100,8 +1100,8 @@ TEST_F(TestSessionManager, TestMessageStats)
     // Verify final stats results
     mContext.DrainAndServiceIO();
     messageStatistics = sessionManager.GetMessageStats();
-    EXPECT_EQ(messageStatistics.InteractionModelMessagesSent, static_cast<uint32_t>(1));
-    EXPECT_EQ(messageStatistics.InteractionModelMessagesReceived, static_cast<uint32_t>(1));
+    EXPECT_EQ(messageStatistics.mInteractionModelMessagesSent, static_cast<uint32_t>(1));
+    EXPECT_EQ(messageStatistics.mInteractionModelMessagesReceived, static_cast<uint32_t>(1));
 
     // Shutdown
     sessionManager.Shutdown();

@@ -291,8 +291,8 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
             .currentSubscriptionsForFabric = static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(
                 ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
             .totalSubscriptionsEstablished = mClusterContext.reportScheduler->GetTotalSubscriptionsEstablished(),
-            .totalInteractionModelMessagesSent     = messageStatistics.InteractionModelMessagesSent,
-            .totalInteractionModelMessagesReceived = messageStatistics.InteractionModelMessagesReceived,
+            .totalInteractionModelMessagesSent     = messageStatistics.mInteractionModelMessagesSent,
+            .totalInteractionModelMessagesReceived = messageStatistics.mInteractionModelMessagesReceived,
         };
         return encoder.Encode(load);
     }

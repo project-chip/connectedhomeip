@@ -151,13 +151,14 @@ public:
 
     struct MessageStats
     {
-        uint32_t InteractionModelMessagesReceived = 0;
-        uint32_t InteractionModelMessagesSent     = 0;
+        uint32_t mInteractionModelMessagesReceived = 0;
+        uint32_t mInteractionModelMessagesSent     = 0;
     };
 
     /**
      * @brief
      *   This function takes the payload and returns an encrypted message which can be sent multiple times.
+     *   Every successful call to this function MUST be followed by a send attempt with the prepared message.
      *
      * @details
      *   It does the following:
