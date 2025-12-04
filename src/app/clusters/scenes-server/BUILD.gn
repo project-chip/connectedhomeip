@@ -17,6 +17,7 @@ static_library("scenes") {
   output_name = "libCHIPScenes"
 
   sources = [
+    "AttributeValuePairValidator.h",
     "ExtensionFieldSets.h",
     "ExtensionFieldSetsImpl.cpp",
     "ExtensionFieldSetsImpl.h",
