@@ -28,7 +28,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep
 
 class BasicInformationAttributesVerificationBase(MatterBaseTest):
     def steps(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
             TestStep(1, "TH reads DataModelRevision from the DUT.",
                      "Verify that the value is DataModelRevision of current matter version 1.5 which is value 19"),
@@ -64,9 +64,6 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                      "Value should be set to a valid Major, Minor, and Dot version with the lower 8 bits set to zero."),
             TestStep(23, "TH reads MaxPathsPerInvoke from the DUT.", "Verify that the value is in the range of 1 to 65535."),
         ]
-
-        # Return all steps - excluded steps will be skipped during execution
-        return steps
 
     def pics(self, cluster_pics) -> list[str]:
         return [f"{cluster_pics}.S"]
