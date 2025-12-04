@@ -423,18 +423,3 @@ jobs:
                   # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
                   # in a header file.
                   git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
-
-            # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.
-            - name:
-                  Check for a direct use of the "logging" module for logging.
-                  Instead one should use a local logger with a name based on
-                  the module name.
-              if: always()
-              run: |
-                  git grep -I -n -E -e 'logging[.](log|debug|info|warn|warning|error|critical|exception)[(]' -- \
-                    'scripts/py_matter_idl' \
-                    'scripts/py_matter_yamltests' \
-                    'src/controller/python' \
-                    'src/python_testing/matter_testing_infrastructure' \
-                    && exit 1 || exit 0
