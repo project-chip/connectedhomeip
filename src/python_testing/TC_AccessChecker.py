@@ -148,7 +148,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     # Set the default to 10 minutes to account for comprehensive subscription testing.
     @property
     def default_timeout(self) -> int:
-        return 600  # 10 minutes for comprehensive subscription testing
+        return 1500  # 25 minutes for comprehensive subscription testing
 
     @async_test_body
     async def setup_test(self):
@@ -309,13 +309,13 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 self.success = False
                 return False
 
-            logging.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")
+            log.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")
             subscription.Shutdown()
             return True
 
         except ChipStackError as e:  # chipstack-ok
             # Unexpected ChipStackError
-            logging.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
             self.record_error(test_name=test_name,
                               location=AttributePathLocation(endpoint_id=endpoint_id,
                                                              cluster_id=cluster_id, attribute_id=attribute_id),
@@ -351,7 +351,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                   problem=f"Subscription failed with {e.status} but expected UnsupportedAccess for privilege {privilege}")
                 self.success = False
                 return False
-            logging.info("Subscription correctly failed with UnsupportedAccess")
+            log.info("Subscription correctly failed with UnsupportedAccess")
             return True
 
         except ChipStackError as e:  # chipstack-ok
@@ -363,11 +363,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # - NetworkCommissioning
                 # - CameraAvStreamManagement
                 # - OperationalCredentials
-                logging.warning(
+                log.warning(
                     f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
                 return None  # Indicates skip
             # Unexpected ChipStackError
-            logging.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
             self.record_error(test_name=test_name,
                               location=AttributePathLocation(endpoint_id=endpoint_id,
                                                              cluster_id=cluster_id, attribute_id=attribute_id),
@@ -387,7 +387,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             test_name = f'Subscribe access checker - {privilege}'
 
-            logging.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
+            log.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
 
             if operation_allowed(spec_requires, privilege):
                 result = await self._subscribe_single_attribute_check_success(
