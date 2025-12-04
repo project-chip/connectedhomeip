@@ -323,6 +323,49 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
 }
 
 // =============================================================================
+// Startup Tests
+// =============================================================================
+
+TEST_F(TestDeviceEnergyManagementCluster, TestStartupFailsWithMismatchedEndpointId)
+{
+    chip::Test::TestServerClusterContext context;
+    DeviceEnergyManagementMockDelegate mockDelegate;
+    BitMask<Feature> noFeatures;
+
+    constexpr EndpointId kClusterEndpointId  = 1;
+    constexpr EndpointId kDelegateEndpointId = 2;
+
+    // Create cluster with one endpoint ID
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kClusterEndpointId, noFeatures, mockDelegate));
+
+    // Set delegate to a different endpoint ID
+    mockDelegate.SetEndpointId(kDelegateEndpointId);
+
+    // Startup should fail because endpoint IDs don't match
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestDeviceEnergyManagementCluster, TestStartupSucceedsWithMatchingEndpointId)
+{
+    chip::Test::TestServerClusterContext context;
+    DeviceEnergyManagementMockDelegate mockDelegate;
+    BitMask<Feature> noFeatures;
+
+    constexpr EndpointId kEndpointId = 1;
+
+    // Create cluster with endpoint ID
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kEndpointId, noFeatures, mockDelegate));
+
+    // Delegate endpoint ID is set in constructor, so they should match
+    EXPECT_EQ(mockDelegate.GetEndpointId(), kEndpointId);
+
+    // Startup should succeed because endpoint IDs match
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    cluster.Shutdown();
+}
+
+// =============================================================================
 // Attribute Tests
 // =============================================================================
 
@@ -488,7 +531,12 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPauseRequest)
     EXPECT_FALSE(tester.Invoke(Commands::PauseRequest::Id, command).IsSuccess());
     mockDelegate.SetOptOutState(OptOutStateEnum::kNoOptOut);
 
+    // Force set the ESA in an invalid state - rejected
+    EXPECT_EQ(mockDelegate.SetESAState(ESAStateEnum::kFault), CHIP_NO_ERROR);
+    EXPECT_FALSE(tester.Invoke(Commands::PauseRequest::Id, command).IsSuccess());
+
     // Valid pause - succeeds
+    EXPECT_EQ(mockDelegate.SetESAState(ESAStateEnum::kOnline), CHIP_NO_ERROR);
     EXPECT_TRUE(tester.Invoke(Commands::PauseRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kPaused);
     EXPECT_EQ(mockDelegate.GetForecast().Value().forecastUpdateReason, ForecastUpdateReasonEnum::kLocalOptimization);

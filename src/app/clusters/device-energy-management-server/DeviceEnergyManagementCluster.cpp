@@ -100,6 +100,17 @@ DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & 
 using namespace DeviceEnergyManagement;
 using namespace DeviceEnergyManagement::Attributes;
 
+CHIP_ERROR DeviceEnergyManagementCluster::Startup(ServerClusterContext & context)
+{
+    if (mDelegate.GetEndpointId() != mPath.mEndpointId)
+    {
+        ChipLogError(Zcl, "DEM: EndpointId mismatch - delegate has %d, cluster has %d", mDelegate.GetEndpointId(),
+                     mPath.mEndpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return DefaultServerCluster::Startup(context);
+}
+
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                            AttributeValueEncoder & encoder)
 {
@@ -494,6 +505,11 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
     ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
+
+    VerifyOrReturnError(mDelegate.GetESAState() == ESAStateEnum::kOnline ||
+                            mDelegate.GetESAState() == ESAStateEnum::kPowerAdjustActive ||
+                            mDelegate.GetESAState() == ESAStateEnum::kPaused,
+                        Status::ConstraintError);
 
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
     if (forecast.IsNull())

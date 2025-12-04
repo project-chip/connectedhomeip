@@ -83,6 +83,8 @@ public:
     const BitFlags<DeviceEnergyManagement::Feature> & Features() const { return mFeatureFlags; }
     DeviceEnergyManagement::Delegate & GetDelegate() { return mDelegate; }
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
