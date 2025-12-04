@@ -331,8 +331,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
-        log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
-        sys.exit(2)
+        raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
     paths_finder = PathsFinder()
 
