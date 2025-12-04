@@ -137,6 +137,12 @@ source_set("subscription-info-provider") {
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
 
+source_set("device-load-status-provider-delegate") {
+  sources = [ "DeviceLoadStatusProviderDelegate.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
 config("config-controller-dynamic-server") {
   defines = [
     "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
@@ -219,6 +225,7 @@ static_library("interaction-model") {
     ":app_config",
     ":command-handler-impl",
     ":constants",
+    ":device-load-status-provider-delegate",
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
