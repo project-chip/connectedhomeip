@@ -151,6 +151,7 @@
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
+    "editor.rulers": [132],
     "better-comments.tags": [
         {
             "tag": "!",
