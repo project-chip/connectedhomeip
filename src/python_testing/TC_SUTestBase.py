@@ -284,47 +284,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
-        """
-        Extend ACLs on Provider to allow interaction with the Requestor.
-        Preserves existing ACLs to avoid overwriting.
-
-        Args:
-            controller: The Matter device controller instance.
-            provider_node_id (int): Node ID of the OTA Provider.
-            requestor_node_id (int): Node ID of the OTA Requestor (DUT).
-        """
-        # Read existing ACLs
-        provider_existing_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-        logger.info(f'Existing OTA ACLs on provider {provider_node_id}: {provider_existing_acls}')
-
-        default_acl_entries = self._create_default_acl_entries(
-            dev_ctrl=controller,
-            requestor_node_id=requestor_node_id
-        )
-
-        # Create OTA ACL, the Requestor is allowed to access on the Provider
-        await self.create_acl_entry(
-            dev_ctrl=controller,
-            provider_node_id=provider_node_id,      # write ACLs on the Provider
-            requestor_node_id=requestor_node_id,     # allow access from the Requestor
-            acl_entries=default_acl_entries + provider_existing_acls  # preserve existing ACLs
-        )
-
-        # Read updated ACLs
-        provider_current_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-        logger.info(f'Updated OTA ACLs on provider {provider_node_id}: {provider_current_acls}')
-
     def _create_default_acl_entries(self,
                                     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
                                     requestor_node_id: Optional[int] = None) -> list[Clusters.AccessControl.Structs.AccessControlEntryStruct]:
