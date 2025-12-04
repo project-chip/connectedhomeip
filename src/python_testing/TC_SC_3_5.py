@@ -52,6 +52,8 @@ class TC_SC_3_5(MatterBaseTest):
         self.th_server = None
         self.storage = None
 
+        self.DUT_has_icac = None
+
         self.th_client = self.default_controller
         self.th_server_local_nodeid = 1111
         self.th_server_discriminator = 1234
@@ -218,7 +220,7 @@ class TC_SC_3_5(MatterBaseTest):
         await self.th_client.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=self.th_server_passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.th_server_discriminator)
         log.info("Commissioning TH_SERVER complete")
 
-        '''------------------------------------------- Determine if DUT Commissioner has ICAC in its NOC Chain--------------------------------------------- '''
+        # ------------------------------------------- Determine if DUT Commissioner has ICAC in its NOC Chain---------------------------------------------
         self.step("1a")
         th_server_passcode = await self.open_commissioning_window()
 
@@ -269,7 +271,7 @@ class TC_SC_3_5(MatterBaseTest):
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
-        '''------------------------------------------- Inject Fault into Sigma 2 TBEData2Encrypted--------------------------------------------- '''
+        # ------------------------------------------- Inject Fault into Sigma 2 TBEData2Encrypted---------------------------------------------
         self.step("2a")
         th_server_passcode = await self.open_commissioning_window()
 
@@ -299,7 +301,7 @@ class TC_SC_3_5(MatterBaseTest):
             f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
         )
 
-        '''------------------------------------------- Inject Fault into Sigma2 responderNOC--------------------------------------------- '''
+        # ------------------------------------------- Inject Fault into Sigma2 responderNOC---------------------------------------------
 
         self.step("3a")
         th_server_passcode = await self.reopen_commissioning_window()
@@ -331,7 +333,7 @@ class TC_SC_3_5(MatterBaseTest):
             f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
         )
 
-        '''------------------------------------------- Inject Fault into Sigma2 responderICAC--------------------------------------------- '''
+        # ------------------------------------------- Inject Fault into Sigma2 responderICAC---------------------------------------------
 
         if not self.DUT_has_icac:
             logging.info("DUT Commissioner does not have ICAC in its NOC Chain, skipping ICAC Fault Injection testcase")
@@ -369,7 +371,7 @@ class TC_SC_3_5(MatterBaseTest):
                 f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
             )
 
-        '''------------------------------------------- Inject Fault into Sigma2 Signature--------------------------------------------- '''
+        # ------------------------------------------- Inject Fault into Sigma2 Signature---------------------------------------------
 
         self.step("5a")
         th_server_passcode = await self.reopen_commissioning_window()
