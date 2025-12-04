@@ -193,16 +193,27 @@ template("chip_data_model") {
       "${_app_root}/clusters/groups-server/groups-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
+      "${_app_root}/util/generic-callback-stubs.cpp",
+      "${_app_root}/util/privilege-storage.cpp",
+      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
+    ]
+
+    # TODO: this should become a public dependency on
+    #       "${_app_root}/clusters/scenes-server:scenes"
+    #       once these sources are decoupled from ember
+    # Applications seem to generally want to access cluster headers (like color-control-server.h)
+    # and those include scenes bits, so we add all dependencies here
+    sources += [
+      "${_app_root}/clusters/scenes-server/AttributeValuePairValidator.h",
+      "${_app_root}/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
       "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
       "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
       "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
       "${_app_root}/clusters/scenes-server/SceneTable.h",
       "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
       "${_app_root}/clusters/scenes-server/scenes-server.h",
-      "${_app_root}/util/generic-callback-stubs.cpp",
-      "${_app_root}/util/privilege-storage.cpp",
-      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
     sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
