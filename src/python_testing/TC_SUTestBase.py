@@ -18,6 +18,7 @@
 import logging
 import tempfile
 from os import path
+from time import sleep
 from typing import Optional
 
 from mobly import asserts
@@ -47,7 +48,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        storage_dir='/tmp',
                        extra_args: list = [],
                        kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
+                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
                        timeout: int = 10):
         """Start the provider process using the provided configuration.
 
@@ -61,7 +62,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
-            expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
+            expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
         logger.info(f"Launching provider app with with ota image {ota_image_path}")
@@ -102,6 +103,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         self.current_provider_app_proc = proc
         logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+
+    def terminate_provider(self):
+        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
+            logger.info("Terminating existing OTA Provider")
+            self.current_provider_app_proc.terminate()
+            self.current_provider_app_proc = None
+        else:
+            logger.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -300,3 +309,73 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    def restart_requestor(self, requestor_th):
+        """This method restart the requestor so stops using updated requestor image.
+
+        Args:
+            controller (_type_): _description_
+        """
+        restart_flag_file = self.get_restart_flag_file()
+        logger.info(f"RESTART FILE at {restart_flag_file}")
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            logging.info("Expiring sessions after manual device reboot")
+            requestor_th.ExpireSessions(self.requestor_node_id)
+            logging.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                logging.info("Created restart flag file to signal app restart")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                sleep(1)
+
+                # Expire sessions and re-establish connections
+                requestor_th.ExpireSessions(self.requestor_node_id)
+                logging.info("App restart completed successfully")
+
+            except Exception as e:
+                logging.error(f"Failed to restart Requestor: {e}")
+                asserts.fail(f"Requestor restart failed: {e}")
+
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+
+        Args:
+            controller (ChipDeviceCtrl): The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeId=requestor_node_id
+        )
+        logger.info('Cleanup - DefaultOTAProviders cleared')
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+
+    def clear_kvs(self, kvs_prefix: str = None):
+        """
+        Temporary cleanup of provider KVS files at the tmp path.
+
+        Returns:
+            None
+        """
+        import subprocess
+        if kvs_prefix is None:
+            kvs_prefix = "/tmp/chip_kvs"
+        subprocess.run(f"rm -rf {kvs_prefix}*", shell=True)
+        logger.info(f"KVS files removed with prefix {kvs_prefix}")
