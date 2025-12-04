@@ -69,13 +69,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mAdministratorCommissioningCluster.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
-    InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
-                                      GeneralDiagnosticsCluster::Context{
-                                          .interactionModelEngine = interactionModel,
-                                          .sessionManager         = interactionModel->GetExchangeManager()->GetSessionManager(),
-                                          .reportScheduler        = interactionModel->GetReportScheduler(),
-                                      });
+                                      InteractionModelEngine::GetInstance());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create();

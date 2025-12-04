@@ -27,6 +27,7 @@
 
 #include <utility>
 
+#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <crypto/SessionKeystore.h>
@@ -148,12 +149,6 @@ class DLL_EXPORT SessionManager : public TransportMgrDelegate, public FabricTabl
 public:
     SessionManager();
     ~SessionManager() override;
-
-    struct MessageStats
-    {
-        uint32_t mInteractionModelMessagesReceived = 0;
-        uint32_t mInteractionModelMessagesSent     = 0;
-    };
 
     /**
      * @brief
@@ -535,7 +530,7 @@ public:
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
-    MessageStats GetMessageStats() const { return mMessageStats; }
+    app::DeviceLoadStatusProviderDelegate::MessageStats GetMessageStats() const { return mMessageStats; }
 
 private:
     /**
@@ -560,7 +555,7 @@ private:
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
-    MessageStats mMessageStats;
+    app::DeviceLoadStatusProviderDelegate::MessageStats mMessageStats;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;

@@ -35,6 +35,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
+#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
@@ -92,7 +93,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
-                               public WriteHandlerDelegate
+                               public WriteHandlerDelegate,
+                               public DeviceLoadStatusProviderDelegate
 {
 public:
     /**
@@ -428,6 +430,23 @@ public:
     //
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+
+    // DeviceLoadStatusProviderDelegate functions implementation
+    MessageStats GetMessageStats() override {
+        return GetExchangeManager()->GetSessionManager()->GetMessageStats();
+    }
+
+    uint32_t GetNumTotalSubscriptions() override {
+        return GetReportScheduler()->GetTotalSubscriptionsEstablished();
+    }
+
+    uint16_t GetNumCurrentSubscriptions() override {
+        return static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe));
+    }
+
+    uint16_t GetNumCurrentSubscriptionsForFabric(FabricIndex fabric) override {
+        return static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric));
+    }
 
 private:
     /* DataModel::ActionContext implementation */

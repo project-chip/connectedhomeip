@@ -29,6 +29,7 @@
                                               // includes SessionManager.h indirectly
 
 #include <access/SubjectDescriptor.h>
+#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -1076,9 +1077,9 @@ TEST_F(TestSessionManager, TestMessageStats)
     callback.ReceiveHandlerCallCount = 0;
 
     // Ensure base case, counts start at 0
-    SessionManager::MessageStats messageStatistics = sessionManager.GetMessageStats();
-    EXPECT_EQ(messageStatistics.mInteractionModelMessagesSent, static_cast<uint32_t>(0));
-    EXPECT_EQ(messageStatistics.mInteractionModelMessagesReceived, static_cast<uint32_t>(0));
+    chip::app::DeviceLoadStatusProviderDelegate::MessageStats messageStatistics = sessionManager.GetMessageStats();
+    EXPECT_EQ(messageStatistics.interactionModelMessagesSent, static_cast<uint32_t>(0));
+    EXPECT_EQ(messageStatistics.interactionModelMessagesReceived, static_cast<uint32_t>(0));
 
     PayloadHeader payloadHeader;
 
@@ -1100,8 +1101,8 @@ TEST_F(TestSessionManager, TestMessageStats)
     // Verify final stats results
     mContext.DrainAndServiceIO();
     messageStatistics = sessionManager.GetMessageStats();
-    EXPECT_EQ(messageStatistics.mInteractionModelMessagesSent, static_cast<uint32_t>(1));
-    EXPECT_EQ(messageStatistics.mInteractionModelMessagesReceived, static_cast<uint32_t>(1));
+    EXPECT_EQ(messageStatistics.interactionModelMessagesSent, static_cast<uint32_t>(1));
+    EXPECT_EQ(messageStatistics.interactionModelMessagesReceived, static_cast<uint32_t>(1));
 
     // Shutdown
     sessionManager.Shutdown();

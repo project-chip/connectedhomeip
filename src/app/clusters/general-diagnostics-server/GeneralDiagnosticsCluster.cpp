@@ -16,6 +16,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -279,20 +280,14 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
         static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
                       "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
-        VerifyOrReturnError(mClusterContext.interactionModelEngine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mClusterContext.sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mClusterContext.reportScheduler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        const SessionManager::MessageStats messageStatistics = mClusterContext.sessionManager->GetMessageStats();
+        const DeviceLoadStatusProviderDelegate::MessageStats messageStatistics = mDeviceLoadStatusProvider->GetMessageStats();
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
-            .currentSubscriptions = static_cast<uint16_t>(
-                mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-            .currentSubscriptionsForFabric = static_cast<uint16_t>(mClusterContext.interactionModelEngine->GetNumActiveReadHandlers(
-                ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
-            .totalSubscriptionsEstablished = mClusterContext.reportScheduler->GetTotalSubscriptionsEstablished(),
-            .totalInteractionModelMessagesSent     = messageStatistics.mInteractionModelMessagesSent,
-            .totalInteractionModelMessagesReceived = messageStatistics.mInteractionModelMessagesReceived,
+            .currentSubscriptions = mDeviceLoadStatusProvider->GetNumCurrentSubscriptions(),
+            .currentSubscriptionsForFabric         = mDeviceLoadStatusProvider->GetNumCurrentSubscriptionsForFabric(encoder.AccessingFabricIndex()),
+            .totalSubscriptionsEstablished         = mDeviceLoadStatusProvider->GetNumTotalSubscriptions(),
+            .totalInteractionModelMessagesSent     = messageStatistics.interactionModelMessagesSent,   
+            .totalInteractionModelMessagesReceived = messageStatistics.interactionModelMessagesReceived,
         };
         return encoder.Encode(load);
     }

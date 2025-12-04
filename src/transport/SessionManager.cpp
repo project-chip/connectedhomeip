@@ -128,6 +128,9 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mConnClosedCb   = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
+    // Ensure MessageStats struct is at default state on Init
+    mMessageStats = app::DeviceLoadStatusProviderDelegate::MessageStats();
+
     return CHIP_NO_ERROR;
 }
 
@@ -1353,7 +1356,7 @@ void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, 
 
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
-        mMessageStats.mInteractionModelMessagesReceived++;
+        mMessageStats.interactionModelMessagesReceived++;
     }
 }
 
@@ -1364,7 +1367,7 @@ void SessionManager::CountMessagesSent(const SessionHandle & sessionHandle, cons
 
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
-        mMessageStats.mInteractionModelMessagesSent++;
+        mMessageStats.interactionModelMessagesSent++;
     }
 }
 

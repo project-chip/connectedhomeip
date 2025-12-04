@@ -52,11 +52,6 @@ public:
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         InteractionModelEngine * interactionModel         = InteractionModelEngine::GetInstance();
-        GeneralDiagnosticsCluster::Context clusterContext = {
-            .interactionModelEngine = interactionModel,
-            .sessionManager         = interactionModel->GetExchangeManager()->GetSessionManager(),
-            .reportScheduler        = interactionModel->GetReportScheduler(),
-        };
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         const GeneralDiagnosticsFunctionsConfig functionsConfig
@@ -76,9 +71,9 @@ public:
             .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), clusterContext, functionsConfig);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel, functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), clusterContext);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel);
 #endif
         return gServer.Registration();
     }

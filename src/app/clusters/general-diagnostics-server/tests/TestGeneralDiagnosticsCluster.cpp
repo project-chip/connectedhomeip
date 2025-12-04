@@ -95,28 +95,13 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
-
-    // No session manager instance can be accessed on the interaction model at this point,
-    // so creating one here to be used for the cluster context.
-    SessionManager sessionManager;
-
-    GeneralDiagnosticsCluster::Context CreateStandardContext()
-    {
-        InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
-
-        return GeneralDiagnosticsCluster::Context{
-            .interactionModelEngine = interactionModel,
-            .sessionManager         = &sessionManager,
-            .reportScheduler        = interactionModel->GetReportScheduler(),
-        };
-    }
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
 
-    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext());
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance());
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -125,7 +110,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     };
 
     GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(
-        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext(), functionsConfig);
+        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(), functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -138,7 +123,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
 
         // Create cluster without enabling any feature flags
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext());
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance());
 
         // Check required accepted commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -211,7 +196,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, CreateStandardContext());
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance());
 
         // Check mandatory commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -269,7 +254,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     // Create a cluster with no optional attributes enabled
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
-    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext());
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance());
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -292,7 +277,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
         .enablePayloadSnapshot = false,
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                                      CreateStandardContext(), functionsConfig);
+                                                      InteractionModelEngine::GetInstance(), functionsConfig);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -313,7 +298,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     // Create a cluster with no optional attributes enabled
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
-    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), CreateStandardContext());
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance());
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
