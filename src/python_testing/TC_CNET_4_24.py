@@ -410,10 +410,33 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 3: TH sends ConnectNetwork command with incorrect network ID, Breadcrumb = 2
         self.step(3)
 
+        logger.info(" --- Step 3: Sending ConnectNetwork with incorrect network ID")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(
+                networkID=incorrect_thread_dataset_1,
+                breadcrumb=2
+            ),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(response, expect_success=False)
+        logger.info(" --- Step 3: ConnectNetwork failed as expected with incorrect network ID")
+
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
+        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
         # Step 4: TH reads LastNetworkingStatus (should be kNetworkNotFound or kOtherConnectionFailure)
         self.step(4)
+
+        expected_statuses = [
+            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
+            cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
+        ]
+        await self._read_last_networking_status(
+            endpoint,
+            valid_statuses=expected_statuses
+        )
 
         # Step 5: TH reads Networks attribute (verify incorrect network ID is stored)
         self.step(5)
