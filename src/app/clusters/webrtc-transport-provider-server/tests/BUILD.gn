@@ -15,18 +15,19 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("webrtc-transport-provider-server") {
-  sources = [
-    "CodegenIntegration.cpp",
-    "WebRTCTransportProviderCluster.cpp",
-    "WebRTCTransportProviderCluster.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestWebRTCTransportProviderCluster"
+
+  test_sources = [ "TestWebRTCTransportProviderCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app:attribute-access",
-    "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/lib/core:error",
-    "${chip_root}/zzz_generated/app-common/clusters/WebRTCTransportProvider",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/clusters/webrtc-transport-provider-server",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
   ]
 }
