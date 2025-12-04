@@ -326,7 +326,6 @@
 // Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ON_OFF_SERVER
-#define MATTER_DM_PLUGIN_ON_OFF
 
 // Use this macro to check if the server side of the Level Control cluster is included
 #define ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER

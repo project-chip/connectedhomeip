@@ -557,13 +557,14 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bo
 
 static void setOnOffValue(EndpointId endpoint, bool onOff)
 {
-#ifdef MATTER_DM_PLUGIN_ON_OFF
-    if (emberAfContainsServer(endpoint, OnOff::Id))
+    if (MATTER_DM_PLUGIN_ON_OFF)
     {
-        ChipLogProgress(Zcl, "Setting on/off to %s due to level change", onOff ? "ON" : "OFF");
-        OnOffServer::Instance().setOnOffValue(endpoint, (onOff ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id), true);
+        if (emberAfContainsServer(endpoint, OnOff::Id))
+        {
+            ChipLogProgress(Zcl, "Setting on/off to %s due to level change", onOff ? "ON" : "OFF");
+            OnOffServer::Instance().setOnOffValue(endpoint, (onOff ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id), true);
+        }
     }
-#endif // MATTER_DM_PLUGIN_ON_OFF
 }
 
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
@@ -998,14 +999,15 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
 
-#ifdef MATTER_DM_PLUGIN_ON_OFF
-    // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
-    if (commandId == Commands::MoveToLevelWithOnOff::Id && state->moveToLevel != state->minLevel &&
-        OnOffServer::Instance().SupportsLightingApplications(endpoint))
+    if (MATTER_DM_PLUGIN_ON_OFF)
     {
-        OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
+        // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
+        if (commandId == Commands::MoveToLevelWithOnOff::Id && state->moveToLevel != state->minLevel &&
+            OnOffServer::Instance().SupportsLightingApplications(endpoint))
+        {
+            OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
+        }
     }
-#endif // MATTER_DM_PLUGIN_ON_OFF
 
     return Status::Success;
 }

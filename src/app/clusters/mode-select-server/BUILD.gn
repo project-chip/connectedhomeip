@@ -13,3 +13,7 @@
 # limitations under the License.
 group("mode-select-server") {
 }
+
+config("includes") {
+  defines = [ "MATTER_DM_PLUGIN_ON_OFF=1" ]
+}
