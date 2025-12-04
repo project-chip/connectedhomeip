@@ -247,22 +247,27 @@ class TC_SC_3_5(MatterBaseTest):
         )
 
         self.step("1c")
-        nocStructs = await self.read_single_attribute_check_success(dev_ctrl=self.th_client,
-                                                                    node_id=self.th_server_local_nodeid,
-                                                                    cluster=Clusters.OperationalCredentials,
-                                                                    attribute=Clusters.OperationalCredentials.Attributes.NOCs,
-                                                                    fabric_filtered=False)
 
-        asserts.assert_equal(len(nocStructs), 2,
-                             f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
-        DUT_Commissioner_icac = nocStructs[1].icac
-        DUT_Commissioner_fabricIndex = nocStructs[1].fabricIndex
-
-        # Determine if DUT_Commissioner has ICAC in its NOC Chain
-        if DUT_Commissioner_icac is NullValue:
-            self.DUT_has_icac = False
+        if self.is_pics_sdk_ci_only:
+            print("Skip this step since we are running in CI; since there is no DUT Commissioner to check for ICAC")
+            pass
         else:
-            self.DUT_has_icac = True
+            nocStructs = await self.read_single_attribute_check_success(dev_ctrl=self.th_client,
+                                                                        node_id=self.th_server_local_nodeid,
+                                                                        cluster=Clusters.OperationalCredentials,
+                                                                        attribute=Clusters.OperationalCredentials.Attributes.NOCs,
+                                                                        fabric_filtered=False)
+
+            asserts.assert_equal(len(nocStructs), 2,
+                                 f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
+            DUT_Commissioner_icac = nocStructs[1].icac
+            DUT_Commissioner_fabricIndex = nocStructs[1].fabricIndex
+
+            # Determine if DUT_Commissioner has ICAC in its NOC Chain
+            if DUT_Commissioner_icac is NullValue:
+                self.DUT_has_icac = False
+            else:
+                self.DUT_has_icac = True
 
         # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Initiator in next step
         self.step("1d")
