@@ -271,10 +271,15 @@ class TC_SC_3_5(MatterBaseTest):
 
         # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Initiator in next step
         self.step("1d")
-        cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=DUT_Commissioner_fabricIndex)
-        resp = await self.send_single_cmd(dev_ctrl=self.th_client, node_id=self.th_server_local_nodeid, cmd=cmd)
-        asserts.assert_equal(
-            resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
+
+        if self.is_pics_sdk_ci_only:
+            print("Skip this step since we are running in CI and there is no DUT Commissioner")
+            pass
+        else:
+            cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=DUT_Commissioner_fabricIndex)
+            resp = await self.send_single_cmd(dev_ctrl=self.th_client, node_id=self.th_server_local_nodeid, cmd=cmd)
+            asserts.assert_equal(
+                resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
         # ------------------------------------------- Inject Fault into Sigma 2 TBEData2Encrypted---------------------------------------------
         self.step("2a")
