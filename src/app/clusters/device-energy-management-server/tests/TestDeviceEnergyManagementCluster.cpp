@@ -26,6 +26,7 @@
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/DeviceEnergyManagement/Attributes.h>
+#include <clusters/DeviceEnergyManagement/Commands.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
 
 using namespace chip;
@@ -33,6 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
+using namespace chip::app::Clusters::DeviceEnergyManagement::Commands;
 using namespace chip::Test;
 using namespace chip::Testing;
 
@@ -52,113 +54,272 @@ struct TestDeviceEnergyManagementCluster : public ::testing::Test
 // Feature Tests
 // =============================================================================
 
-TEST_F(TestDeviceEnergyManagementCluster, TestNoFeatures)
+TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
 {
     chip::Test::TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
-    BitMask<Feature> noFeatures;
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    // Test 1: No features - only mandatory attributes
+    {
+        BitMask<Feature> noFeatures;
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Verify only mandatory attributes are present
-    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-                                        {
-                                            ESAType::kMetadataEntry,
-                                            ESACanGenerate::kMetadataEntry,
-                                            ESAState::kMetadataEntry,
-                                            AbsMinPower::kMetadataEntry,
-                                            AbsMaxPower::kMetadataEntry,
-                                        }));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                            }));
 
-    // Verify no commands are available
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-    EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
-    cluster.Shutdown();
-}
+        cluster.Shutdown();
+    }
 
-TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustmentFeature)
-{
-    chip::Test::TestServerClusterContext context;
-    DeviceEnergyManagementMockDelegate mockDelegate;
-    BitMask<Feature> features(Feature::kPowerAdjustment);
+    // Test 2: PowerAdjustment feature - PowerAdjustmentCapability and OptOutState attributes
+    {
+        BitMask<Feature> features(Feature::kPowerAdjustment);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                PowerAdjustmentCapability::kMetadataEntry,
+                                                OptOutState::kMetadataEntry,
+                                            }));
 
-    // Verify PowerAdjustmentCapability and OptOutState attributes are present
-    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-                                        {
-                                            ESAType::kMetadataEntry,
-                                            ESACanGenerate::kMetadataEntry,
-                                            ESAState::kMetadataEntry,
-                                            AbsMinPower::kMetadataEntry,
-                                            AbsMaxPower::kMetadataEntry,
-                                            PowerAdjustmentCapability::kMetadataEntry,
-                                            OptOutState::kMetadataEntry,
-                                        }));
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
+        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
+                      PowerAdjustRequest::kMetadataEntry,
+                      CancelPowerAdjustRequest::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
 
-    // Verify PowerAdjustment commands are available
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-    EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-              CHIP_NO_ERROR);
-    auto commandsBuffer = commandsBuilder.TakeBuffer();
-    EXPECT_EQ(commandsBuffer.size(), 2u);
+        cluster.Shutdown();
+    }
 
-    cluster.Shutdown();
-}
+    // Test 3: PowerForecastReporting feature - Forecast attribute
+    {
+        BitMask<Feature> features(Feature::kPowerForecastReporting);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-TEST_F(TestDeviceEnergyManagementCluster, TestForecastFeature)
-{
-    chip::Test::TestServerClusterContext context;
-    DeviceEnergyManagementMockDelegate mockDelegate;
-    BitMask<Feature> features(Feature::kPowerForecastReporting);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                Forecast::kMetadataEntry,
+                                            }));
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
-    // Verify Forecast attribute is present
-    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-                                        {
-                                            ESAType::kMetadataEntry,
-                                            ESACanGenerate::kMetadataEntry,
-                                            ESAState::kMetadataEntry,
-                                            AbsMinPower::kMetadataEntry,
-                                            AbsMaxPower::kMetadataEntry,
-                                            Forecast::kMetadataEntry,
-                                        }));
+        cluster.Shutdown();
+    }
 
-    cluster.Shutdown();
-}
+    // Test 4: StateForecastReporting feature - Forecast attribute
+    {
+        BitMask<Feature> features(Feature::kStateForecastReporting);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-TEST_F(TestDeviceEnergyManagementCluster, TestAllFeatures)
-{
-    chip::Test::TestServerClusterContext context;
-    DeviceEnergyManagementMockDelegate mockDelegate;
-    BitMask<Feature> allFeatures(Feature::kPowerAdjustment, Feature::kPowerForecastReporting, Feature::kStateForecastReporting,
-                                 Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                 Feature::kConstraintBasedAdjustment);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                Forecast::kMetadataEntry,
+                                            }));
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, allFeatures, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
-    // Verify all optional attributes are present
-    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-                                        {
-                                            ESAType::kMetadataEntry,
-                                            ESACanGenerate::kMetadataEntry,
-                                            ESAState::kMetadataEntry,
-                                            AbsMinPower::kMetadataEntry,
-                                            AbsMaxPower::kMetadataEntry,
-                                            PowerAdjustmentCapability::kMetadataEntry,
-                                            Forecast::kMetadataEntry,
-                                            OptOutState::kMetadataEntry,
-                                        }));
+        cluster.Shutdown();
+    }
 
-    cluster.Shutdown();
+    // Test 5: Pausable feature - PauseRequest and ResumeRequest commands, OptOutState attribute
+    {
+        BitMask<Feature> features(Feature::kPausable);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                OptOutState::kMetadataEntry,
+                                            }));
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
+        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
+                      PauseRequest::kMetadataEntry,
+                      ResumeRequest::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+
+        cluster.Shutdown();
+    }
+
+    // Test 6: ForecastAdjustment feature - ModifyForecastRequest command, OptOutState attribute, CancelRequest command
+    {
+        BitMask<Feature> features(Feature::kForecastAdjustment);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                OptOutState::kMetadataEntry,
+                                            }));
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
+        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
+                      ModifyForecastRequest::kMetadataEntry,
+                      CancelRequest::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+
+        cluster.Shutdown();
+    }
+
+    // Test 7: StartTimeAdjustment feature - StartTimeAdjustRequest command, OptOutState attribute, CancelRequest command
+    {
+        BitMask<Feature> features(Feature::kStartTimeAdjustment);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                OptOutState::kMetadataEntry,
+                                            }));
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
+        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
+                      StartTimeAdjustRequest::kMetadataEntry,
+                      CancelRequest::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+
+        cluster.Shutdown();
+    }
+
+    // Test 8: ConstraintBasedAdjustment feature - RequestConstraintBasedForecast command, OptOutState attribute, CancelRequest
+    {
+        BitMask<Feature> features(Feature::kConstraintBasedAdjustment);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                OptOutState::kMetadataEntry,
+                                            }));
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
+        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
+                      RequestConstraintBasedForecast::kMetadataEntry,
+                      CancelRequest::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+
+        cluster.Shutdown();
+    }
+
+    // Test 9: All features - all optional attributes, all commands
+    {
+        BitMask<Feature> allFeatures(Feature::kPowerAdjustment, Feature::kPowerForecastReporting, Feature::kStateForecastReporting,
+                                     Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                     Feature::kConstraintBasedAdjustment);
+        DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, allFeatures, mockDelegate));
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                ESAType::kMetadataEntry,
+                                                ESACanGenerate::kMetadataEntry,
+                                                ESAState::kMetadataEntry,
+                                                AbsMinPower::kMetadataEntry,
+                                                AbsMaxPower::kMetadataEntry,
+                                                PowerAdjustmentCapability::kMetadataEntry,
+                                                Forecast::kMetadataEntry,
+                                                OptOutState::kMetadataEntry,
+                                            }));
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
+        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
+                      PowerAdjustRequest::kMetadataEntry,
+                      CancelPowerAdjustRequest::kMetadataEntry,
+                      StartTimeAdjustRequest::kMetadataEntry,
+                      PauseRequest::kMetadataEntry,
+                      ResumeRequest::kMetadataEntry,
+                      ModifyForecastRequest::kMetadataEntry,
+                      RequestConstraintBasedForecast::kMetadataEntry,
+                      CancelRequest::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+
+        cluster.Shutdown();
+    }
 }
 
 // =============================================================================
@@ -176,23 +337,23 @@ TEST_F(TestDeviceEnergyManagementCluster, TestMandatoryAttributes)
 
     chip::Test::ClusterTester tester(cluster);
 
-    ESATypeEnum esaType;
+    ESATypeEnum esaType = ESATypeEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(ESAType::Id, esaType), CHIP_NO_ERROR);
     EXPECT_EQ(esaType, ESATypeEnum::kEvse);
 
-    bool esaCanGenerate;
+    bool esaCanGenerate = false;
     ASSERT_EQ(tester.ReadAttribute(ESACanGenerate::Id, esaCanGenerate), CHIP_NO_ERROR);
     EXPECT_EQ(esaCanGenerate, false);
 
-    ESAStateEnum esaState;
+    ESAStateEnum esaState = ESAStateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(ESAState::Id, esaState), CHIP_NO_ERROR);
     EXPECT_EQ(esaState, ESAStateEnum::kOnline);
 
-    int64_t absMinPower;
+    int64_t absMinPower = 0;
     ASSERT_EQ(tester.ReadAttribute(AbsMinPower::Id, absMinPower), CHIP_NO_ERROR);
     EXPECT_EQ(absMinPower, DeviceEnergyManagementMockDelegate::kAbsMinPower);
 
-    int64_t absMaxPower;
+    int64_t absMaxPower = 0;
     ASSERT_EQ(tester.ReadAttribute(AbsMaxPower::Id, absMaxPower), CHIP_NO_ERROR);
     EXPECT_EQ(absMaxPower, DeviceEnergyManagementMockDelegate::kAbsMaxPower);
 
@@ -410,7 +571,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestModifyForecastRequest)
 // RequestConstraintBasedForecast Command Tests
 // =============================================================================
 
-TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast_Success)
+TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast)
 {
     chip::Test::TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;

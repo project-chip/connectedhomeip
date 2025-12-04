@@ -14,27 +14,13 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
 #include <app/clusters/device-energy-management-server/tests/DeviceEnergyManagementMockDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
-
-namespace {
-ForecastUpdateReasonEnum AdjustmentCauseToForecastUpdateReason(AdjustmentCauseEnum cause)
-{
-    switch (cause)
-    {
-    case AdjustmentCauseEnum::kLocalOptimization:
-        return ForecastUpdateReasonEnum::kLocalOptimization;
-    case AdjustmentCauseEnum::kGridOptimization:
-        return ForecastUpdateReasonEnum::kGridOptimization;
-    default:
-        return ForecastUpdateReasonEnum::kInternalOptimization;
-    }
-}
-} // namespace
 
 DeviceEnergyManagementMockDelegate::DeviceEnergyManagementMockDelegate()
 {
@@ -74,7 +60,7 @@ Protocols::InteractionModel::Status
 DeviceEnergyManagementMockDelegate::PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause)
 {
     mESAState                                = ESAStateEnum::kPowerAdjustActive;
-    mPowerAdjustmentCapability.Value().cause = static_cast<PowerAdjustReasonEnum>(cause);
+    mPowerAdjustmentCapability.Value().cause = AdjustmentCauseToPowerAdjustReason(cause);
     return Protocols::InteractionModel::Status::Success;
 }
 

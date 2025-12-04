@@ -31,6 +31,11 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace DeviceEnergyManagement {
+// Helper functions to convert AdjustmentCauseEnum to ForecastUpdateReasonEnum and PowerAdjustReasonEnum
+ForecastUpdateReasonEnum AdjustmentCauseToForecastUpdateReason(AdjustmentCauseEnum cause);
+PowerAdjustReasonEnum AdjustmentCauseToPowerAdjustReason(AdjustmentCauseEnum cause);
+} // namespace DeviceEnergyManagement
 
 class DeviceEnergyManagementCluster : public DefaultServerCluster
 {
@@ -49,9 +54,7 @@ public:
         DeviceEnergyManagement::Delegate & delegate;
 
         Config(EndpointId aEndpointId, BitMask<DeviceEnergyManagement::Feature> aFeatures,
-               DeviceEnergyManagement::Delegate & aDelegate) :
-            endpointId(aEndpointId),
-            featureFlags(aFeatures), delegate(aDelegate)
+               DeviceEnergyManagement::Delegate & aDelegate) : endpointId(aEndpointId), featureFlags(aFeatures), delegate(aDelegate)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
@@ -68,7 +71,8 @@ public:
                                            DeviceEnergyManagement::Feature::kStateForecastReporting));
             attrs.Set<DeviceEnergyManagement::Attributes::OptOutState::Id>(config.featureFlags.HasAny(
                 DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-                DeviceEnergyManagement::Feature::kForecastAdjustment, DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+                DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+                DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
             return attrs;
         }())
     {

@@ -33,7 +33,34 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace DeviceEnergyManagement {
 
+ForecastUpdateReasonEnum AdjustmentCauseToForecastUpdateReason(AdjustmentCauseEnum cause)
+{
+    switch (cause)
+    {
+    case AdjustmentCauseEnum::kLocalOptimization:
+        return ForecastUpdateReasonEnum::kLocalOptimization;
+    case AdjustmentCauseEnum::kGridOptimization:
+        return ForecastUpdateReasonEnum::kGridOptimization;
+    default:
+        return ForecastUpdateReasonEnum::kInternalOptimization;
+    }
+}
+
+PowerAdjustReasonEnum AdjustmentCauseToPowerAdjustReason(AdjustmentCauseEnum cause)
+{
+    switch (cause)
+    {
+    case AdjustmentCauseEnum::kLocalOptimization:
+        return PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+    case AdjustmentCauseEnum::kGridOptimization:
+        return PowerAdjustReasonEnum::kGridOptimizationAdjustment;
+    default:
+        return PowerAdjustReasonEnum::kUnknownEnumValue;
+    }
+}
+} // namespace DeviceEnergyManagement
 namespace {
 
 bool IsWithinRange(const int64_t power, const uint32_t duration,
@@ -153,7 +180,7 @@ std::optional<DataModel::ActionReturnStatus> DeviceEnergyManagementCluster::Invo
 CHIP_ERROR DeviceEnergyManagementCluster::Attributes(const ConcreteClusterPath & path,
                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    DataModel::AttributeEntry optionalAttributes[] = {
+    static constexpr DataModel::AttributeEntry optionalAttributes[] = {
         PowerAdjustmentCapability::kMetadataEntry,
         Forecast::kMetadataEntry,
         OptOutState::kMetadataEntry,
@@ -223,17 +250,17 @@ DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::
     {
     case OptOutStateEnum::kNoOptOut: /* User has NOT opted out so allow it */
         ChipLogProgress(Zcl, "DEM: OptOutState = kNoOptOut");
-        return DataModel::ActionReturnStatus(Status::Success);
+        return Status::Success;
 
     case OptOutStateEnum::kLocalOptOut: /* User has opted out from Local only*/
         ChipLogProgress(Zcl, "DEM: OptOutState = kLocalOptOut");
         switch (adjustmentCause)
         {
         case AdjustmentCauseEnum::kGridOptimization:
-            return DataModel::ActionReturnStatus(Status::Success);
+            return Status::Success;
         case AdjustmentCauseEnum::kLocalOptimization:
         default:
-            return DataModel::ActionReturnStatus(Status::ConstraintError);
+            return Status::ConstraintError;
         }
 
     case OptOutStateEnum::kGridOptOut: /* User has opted out from Grid only */
@@ -241,19 +268,19 @@ DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::
         switch (adjustmentCause)
         {
         case AdjustmentCauseEnum::kLocalOptimization:
-            return DataModel::ActionReturnStatus(Status::Success);
+            return Status::Success;
         case AdjustmentCauseEnum::kGridOptimization:
         default:
-            return DataModel::ActionReturnStatus(Status::ConstraintError);
+            return Status::ConstraintError;
         }
 
     case OptOutStateEnum::kOptOut: /* User has opted out from both local and grid */
         ChipLogProgress(Zcl, "DEM: OptOutState = kOptOut");
-        return DataModel::ActionReturnStatus(Status::ConstraintError);
+        return Status::ConstraintError;
 
     default:
         ChipLogError(Zcl, "DEM: invalid optOutState %d", static_cast<int>(optOutState));
-        return DataModel::ActionReturnStatus(Status::InvalidValue);
+        return Status::InvalidValue;
     }
 }
 
@@ -302,12 +329,13 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
         ChipLogError(Zcl, "DEM: PowerAdjustmentCapability is Null");
         return Status::ConstraintError;
     }
-    if (powerAdjustmentCapability.Value().cause != static_cast<DeviceEnergyManagement::PowerAdjustReasonEnum>(commandData.cause))
+    PowerAdjustReasonEnum expectedCause = AdjustmentCauseToPowerAdjustReason(commandData.cause);
+    if (powerAdjustmentCapability.Value().cause != expectedCause)
     {
         ChipLogError(Zcl,
                      "DEM: PowerAdjustmentCapability's cause was not updated to the new cause- expected: '0x%" PRIx32
                      "', got: '0x%" PRIx32 "'",
-                     static_cast<uint32_t>(commandData.cause), static_cast<uint32_t>(powerAdjustmentCapability.Value().cause));
+                     static_cast<uint32_t>(expectedCause), static_cast<uint32_t>(powerAdjustmentCapability.Value().cause));
         return Status::ConstraintError;
     }
 
@@ -523,10 +551,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
         return Status::ConstraintError;
     }
 
-    ReturnErrorOnFailure(
-        DataModel::ActionReturnStatus(mDelegate.PauseRequest(commandData.duration, commandData.cause)).GetUnderlyingError());
-
-    return Status::Success;
+    return mDelegate.PauseRequest(commandData.duration, commandData.cause);
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest(const DataModel::InvokeRequest & request,
@@ -618,11 +643,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
         return Status::InvalidCommand;
     }
 
-    ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.ModifyForecastRequest(
-                                                           commandData.forecastID, commandData.slotAdjustments, commandData.cause))
-                             .GetUnderlyingError());
-
-    return Status::Success;
+    return mDelegate.ModifyForecastRequest(commandData.forecastID, commandData.slotAdjustments, commandData.cause);
 }
 
 DataModel::ActionReturnStatus
@@ -734,11 +755,7 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
         }
     }
 
-    ReturnErrorOnFailure(
-        DataModel::ActionReturnStatus(mDelegate.RequestConstraintBasedForecast(commandData.constraints, commandData.cause))
-            .GetUnderlyingError());
-
-    return Status::Success;
+    return mDelegate.RequestConstraintBasedForecast(commandData.constraints, commandData.cause);
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest(const DataModel::InvokeRequest & request,
@@ -752,32 +769,24 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest
 
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
-    Status status = Status::Failure;
     if (forecast.IsNull())
     {
         ChipLogDetail(Zcl, "Cancelling on a Null forecast!");
-        status = Status::Failure;
-    }
-    else if (forecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization)
-    {
-        ChipLogDetail(Zcl, "Bad Cancel when ESA ForecastUpdateReason was already Internal Optimization!");
-        status = Status::InvalidInState;
-    }
-    else
-    {
-        status = mDelegate.CancelRequest();
-        if (status == Status::Success)
-        {
-            DataModel::Nullable<Structs::ForecastStruct::Type> updatedForecast = mDelegate.GetForecast();
-            if (updatedForecast.IsNull() ||
-                updatedForecast.Value().forecastUpdateReason != ForecastUpdateReasonEnum::kInternalOptimization)
-            {
-                return Status::Failure;
-            }
-        }
+        return Status::Failure;
     }
 
-    return status;
+    if (forecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization)
+    {
+        ChipLogDetail(Zcl, "Bad Cancel when ESA ForecastUpdateReason was already Internal Optimization!");
+        return Status::InvalidInState;
+    }
+
+    VerifyOrReturnError(mDelegate.CancelRequest() == Status::Success, Status::Failure);
+    VerifyOrReturnError(!mDelegate.GetForecast().IsNull(), Status::InvalidInState);
+    VerifyOrReturnError(mDelegate.GetForecast().Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization,
+                        Status::InvalidInState);
+
+    return Status::Success;
 }
 
 } // namespace Clusters
