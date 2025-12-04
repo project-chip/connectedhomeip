@@ -15,6 +15,8 @@ def is_exception_line(line):
 failures = []
 
 for py_file in TARGET_DIR.rglob("*.py"):
+    # Intentionally introduced bug to check annotations
+    null = open("/dev/null")
     with open(py_file, encoding="utf-8") as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
