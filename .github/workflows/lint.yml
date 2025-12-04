@@ -42,153 +42,6 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v5
 
-            # Bootstrap and checkout for internal scripts (like idl_lint)
-            # to run
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                  platform: linux
-
-            - name: Check for orphaned gn files
-              if: always()
-              # We should enforce that ALL new files are referenced in our build scripts.
-              # Several things do not have a clear fix path:
-              #   - various platform implementations (including darwin-specific files as they
-              #     are not using GN)
-              #   - app/clusters (they are fetched dynamically - this should probably be fixed)
-              #
-              # All the rest of the exceptions should be driven down to 0: chip should fully
-              # be defined in build rules.
-              #
-              # This check enforces that for any newly added file, it must be part of some
-              # BUILD.gn file
-              run: |
-                  # These ARE actually orphaned but due to dynamic-server we have code paths
-                  # for them. Keeping them as a list as they still need review ...
-                  #   --known-failure app/util/attribute-table.cpp \
-                  #   --known-failure app/util/ember-io-storage.cpp \
-                  #   --known-failure app/util/attribute-storage.cpp \
-                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
-                     --skip-dir app/clusters \
-                     --skip-dir darwin \
-                     --skip-dir include \
-                     --skip-dir platform/Ameba \
-                     --skip-dir platform/android \
-                     --skip-dir platform/ASR \
-                     --skip-dir platform/Beken \
-                     --skip-dir platform/bouffalolab \
-                     --skip-dir platform/ti/cc13xx_26xx \
-                     --skip-dir platform/cc32xx \
-                     --skip-dir platform/Darwin \
-                     --skip-dir platform/ESP32 \
-                     --skip-dir platform/fake \
-                     --skip-dir platform/FreeRTOS \
-                     --skip-dir platform/Infineon \
-                     --skip-dir platform/Linux \
-                     --skip-dir platform/mt793x \
-                     --skip-dir platform/nxp \
-                     --skip-dir platform/OpenThread \
-                     --skip-dir platform/qpg \
-                     --skip-dir platform/silabs \
-                     --skip-dir platform/telink \
-                     --skip-dir platform/webos \
-                     --skip-dir platform/Zephyr \
-                     --skip-dir test_driver \
-                     --skip-dir platform/NuttX \
-                     --known-failure app/app-platform/ContentApp.cpp \
-                     --known-failure app/app-platform/ContentApp.h \
-                     --known-failure app/app-platform/ContentAppPlatform.cpp \
-                     --known-failure app/app-platform/ContentAppPlatform.h \
-                     --known-failure controller/ExamplePersistentStorage.cpp \
-                     --known-failure controller/ExamplePersistentStorage.h \
-                     --known-failure app/AttributeAccessToken.h \
-                     --known-failure app/CommandResponseSender.h \
-                     --known-failure app/CommandSenderLegacyCallback.h \
-                     --known-failure app/ReadHandler.h \
-                     --known-failure app/reporting/tests/MockReportScheduler.cpp \
-                     --known-failure app/reporting/tests/MockReportScheduler.h \
-                     --known-failure app/util/attribute-storage-detail.h \
-                     --known-failure app/util/attribute-storage.h \
-                     --known-failure app/util/attribute-table-detail.h \
-                     --known-failure app/util/attribute-table.h \
-                     --known-failure app/util/config.h \
-                     --known-failure app/util/DataModelHandler.cpp \
-                     --known-failure app/util/DataModelHandler.h \
-                     --known-failure app/util/ember-io-storage.h \
-                     --known-failure app/util/endpoint-config-api.h \
-                     --known-failure app/util/generic-callbacks.h \
-                     --known-failure app/util/generic-callback-stubs.cpp \
-                     --known-failure app/util/im-client-callbacks.h \
-                     --known-failure app/util/IMClusterCommandHandler.h \
-                     --known-failure app/util/util.cpp \
-                     --known-failure app/util/util.h \
-                     --known-failure app/WriteHandler.h \
-                     --known-failure platform/DeviceSafeQueue.cpp \
-                     --known-failure platform/DeviceSafeQueue.h \
-                     --known-failure platform/GLibTypeDeleter.h \
-                     --known-failure platform/SingletonConfigurationManager.cpp \
-                     src \
-                  "
-                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
-                     -e py -e matter -e lark -e yaml -e cpp -e java -e kt -e jinja -e proto \
-                     --gn-extra scripts/py_matter_idl/files.gni \
-                     --skip-dir scripts/py_matter_idl/build \
-                     scripts/py_matter_idl \
-                  "
-                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
-                     -e py -e cpp -e cc -e c -e h -e hpp -e mm \
-                     --known-failure build-matter-wheel.py \
-                     --known-failure tests/scripts/base.py \
-                     --known-failure tests/scripts/cirque_restart_remote_device.py \
-                     --known-failure tests/scripts/cluster_objects.py \
-                     --known-failure tests/scripts/commissioning_failure_test.py \
-                     --known-failure tests/scripts/commissioning_test.py \
-                     --known-failure tests/scripts/commissioning_window_test.py \
-                     --known-failure tests/scripts/example_python_commissioning_flow.py \
-                     --known-failure tests/scripts/failsafe_tests.py \
-                     --known-failure tests/scripts/icd_device_test.py \
-                     --known-failure tests/scripts/mobile-device-test.py \
-                     --known-failure tests/scripts/network_commissioning.py \
-                     --known-failure tests/scripts/python_commissioning_flow_test.py \
-                     --known-failure tests/scripts/split_commissioning_test.py \
-                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl1.py \
-                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl2.py \
-                     --known-failure tests/scripts/subscription_resumption_test.py \
-                     --known-failure tests/scripts/subscription_resumption_timeout_test.py \
-                     --known-failure tests/test_cluster_objects.py \
-                     --known-failure tests/test_generated_cluster_objects.py \
-                     --known-failure tests/test_tlv.py \
-                     src/controller/python \
-                  "
-            - name: Check for matter lint errors
-              if: always()
-              run: |
-                  for idl_file in $(find . -name '*.matter'); do
-                      # TODO: all these conformance failures should be fixed
-                      #       Issues exist for most of them:
-                      #       https://github.com/project-chip/connectedhomeip/issues/19176
-                      #       https://github.com/project-chip/connectedhomeip/issues/19175
-                      #       https://github.com/project-chip/connectedhomeip/issues/19173
-                      if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
-                      # Example is intentionally not spe compliant for use in cert testing
-                      if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
-
-                      # Test files are intentionally small and not spec-compliant, just parse-compliant
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
-
-                      ./scripts/run_in_build_env.sh "matter-idl-lint --log-level warn $idl_file" >/dev/null || exit 1
-                  done
-
             - name: Check broken links
               # On-push disabled until the job can run fully green
               # At that point the step should be enabled.
@@ -423,3 +276,153 @@ jobs:
                   # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
                   # in a header file.
                   git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
+
+            # Bootstrap and checkout for internal scripts (like idl_lint)
+            # to run
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+
+            - name: Check for orphaned gn files
+              if: always()
+              # We should enforce that ALL new files are referenced in our build scripts.
+              # Several things do not have a clear fix path:
+              #   - various platform implementations (including darwin-specific files as they
+              #     are not using GN)
+              #   - app/clusters (they are fetched dynamically - this should probably be fixed)
+              #
+              # All the rest of the exceptions should be driven down to 0: chip should fully
+              # be defined in build rules.
+              #
+              # This check enforces that for any newly added file, it must be part of some
+              # BUILD.gn file
+              run: |
+                  # These ARE actually orphaned but due to dynamic-server we have code paths
+                  # for them. Keeping them as a list as they still need review ...
+                  #   --known-failure app/util/attribute-table.cpp \
+                  #   --known-failure app/util/ember-io-storage.cpp \
+                  #   --known-failure app/util/attribute-storage.cpp \
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     --skip-dir app/clusters \
+                     --skip-dir darwin \
+                     --skip-dir include \
+                     --skip-dir platform/Ameba \
+                     --skip-dir platform/android \
+                     --skip-dir platform/ASR \
+                     --skip-dir platform/Beken \
+                     --skip-dir platform/bouffalolab \
+                     --skip-dir platform/ti/cc13xx_26xx \
+                     --skip-dir platform/cc32xx \
+                     --skip-dir platform/Darwin \
+                     --skip-dir platform/ESP32 \
+                     --skip-dir platform/fake \
+                     --skip-dir platform/FreeRTOS \
+                     --skip-dir platform/Infineon \
+                     --skip-dir platform/Linux \
+                     --skip-dir platform/mt793x \
+                     --skip-dir platform/nxp \
+                     --skip-dir platform/OpenThread \
+                     --skip-dir platform/qpg \
+                     --skip-dir platform/silabs \
+                     --skip-dir platform/telink \
+                     --skip-dir platform/webos \
+                     --skip-dir platform/Zephyr \
+                     --skip-dir test_driver \
+                     --skip-dir platform/NuttX \
+                     --known-failure app/app-platform/ContentApp.cpp \
+                     --known-failure app/app-platform/ContentApp.h \
+                     --known-failure app/app-platform/ContentAppPlatform.cpp \
+                     --known-failure app/app-platform/ContentAppPlatform.h \
+                     --known-failure controller/ExamplePersistentStorage.cpp \
+                     --known-failure controller/ExamplePersistentStorage.h \
+                     --known-failure app/AttributeAccessToken.h \
+                     --known-failure app/CommandResponseSender.h \
+                     --known-failure app/CommandSenderLegacyCallback.h \
+                     --known-failure app/ReadHandler.h \
+                     --known-failure app/reporting/tests/MockReportScheduler.cpp \
+                     --known-failure app/reporting/tests/MockReportScheduler.h \
+                     --known-failure app/util/attribute-storage-detail.h \
+                     --known-failure app/util/attribute-storage.h \
+                     --known-failure app/util/attribute-table-detail.h \
+                     --known-failure app/util/attribute-table.h \
+                     --known-failure app/util/config.h \
+                     --known-failure app/util/DataModelHandler.cpp \
+                     --known-failure app/util/DataModelHandler.h \
+                     --known-failure app/util/ember-io-storage.h \
+                     --known-failure app/util/endpoint-config-api.h \
+                     --known-failure app/util/generic-callbacks.h \
+                     --known-failure app/util/generic-callback-stubs.cpp \
+                     --known-failure app/util/im-client-callbacks.h \
+                     --known-failure app/util/IMClusterCommandHandler.h \
+                     --known-failure app/util/util.cpp \
+                     --known-failure app/util/util.h \
+                     --known-failure app/WriteHandler.h \
+                     --known-failure platform/DeviceSafeQueue.cpp \
+                     --known-failure platform/DeviceSafeQueue.h \
+                     --known-failure platform/GLibTypeDeleter.h \
+                     --known-failure platform/SingletonConfigurationManager.cpp \
+                     src \
+                  "
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     -e py -e matter -e lark -e yaml -e cpp -e java -e kt -e jinja -e proto \
+                     --gn-extra scripts/py_matter_idl/files.gni \
+                     --skip-dir scripts/py_matter_idl/build \
+                     scripts/py_matter_idl \
+                  "
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     -e py -e cpp -e cc -e c -e h -e hpp -e mm \
+                     --known-failure build-matter-wheel.py \
+                     --known-failure tests/scripts/base.py \
+                     --known-failure tests/scripts/cirque_restart_remote_device.py \
+                     --known-failure tests/scripts/cluster_objects.py \
+                     --known-failure tests/scripts/commissioning_failure_test.py \
+                     --known-failure tests/scripts/commissioning_test.py \
+                     --known-failure tests/scripts/commissioning_window_test.py \
+                     --known-failure tests/scripts/example_python_commissioning_flow.py \
+                     --known-failure tests/scripts/failsafe_tests.py \
+                     --known-failure tests/scripts/icd_device_test.py \
+                     --known-failure tests/scripts/mobile-device-test.py \
+                     --known-failure tests/scripts/network_commissioning.py \
+                     --known-failure tests/scripts/python_commissioning_flow_test.py \
+                     --known-failure tests/scripts/split_commissioning_test.py \
+                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl1.py \
+                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl2.py \
+                     --known-failure tests/scripts/subscription_resumption_test.py \
+                     --known-failure tests/scripts/subscription_resumption_timeout_test.py \
+                     --known-failure tests/test_cluster_objects.py \
+                     --known-failure tests/test_generated_cluster_objects.py \
+                     --known-failure tests/test_tlv.py \
+                     src/controller/python \
+                  "
+            - name: Check for matter lint errors
+              if: always()
+              run: |
+                  for idl_file in $(find . -name '*.matter'); do
+                      # TODO: all these conformance failures should be fixed
+                      #       Issues exist for most of them:
+                      #       https://github.com/project-chip/connectedhomeip/issues/19176
+                      #       https://github.com/project-chip/connectedhomeip/issues/19175
+                      #       https://github.com/project-chip/connectedhomeip/issues/19173
+                      if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+                      # Example is intentionally not spe compliant for use in cert testing
+                      if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
+
+                      # Test files are intentionally small and not spec-compliant, just parse-compliant
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
+
+                      ./scripts/run_in_build_env.sh "matter-idl-lint --log-level warn $idl_file" >/dev/null || exit 1
+                  done
+
+# NOTE: Actions which do not require bootstrapping the build environment
+#       should be added above the "Checkout submodules & Bootstrap" step.
