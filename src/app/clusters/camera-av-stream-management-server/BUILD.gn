@@ -14,10 +14,15 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("camera-av-stream-management-server-impl") {
-  sources = [ "CameraAVStreamManagementCluster.cpp" ]
+source_set("camera-av-stream-management-server") {
+  sources = [
+    "CodegenIntegration.cpp",
+    "CameraAVStreamManagementCluster.cpp",
+    "CameraAVStreamManagementCluster.h",
+  ]
 
   deps = [
+    "${chip_root}/src/app/persistence:singleton",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
@@ -26,7 +31,6 @@ source_set("camera-av-stream-management-server-impl") {
 }
 
 source_set("camera-av-stream-management-cluster") {
-  sources = [ "CameraAVStreamManagementCluster.h" ]
 
   public_deps = [
     "${chip_root}/src/app:constants",
@@ -36,11 +40,5 @@ source_set("camera-av-stream-management-cluster") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/CameraAvStreamManagement",
-  ]
-}
-
-group("camera-av-stream-management-server") {
-  public_deps = [
-    ":camera-av-stream-management-server-impl",
   ]
 }

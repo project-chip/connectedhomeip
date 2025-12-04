@@ -619,7 +619,7 @@ public:
 
     Globals::ThreeLevelAutoEnum GetStatusLightBrightness() const { return mStatusLightBrightness; }
 
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    // EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
     // Add/Remove Management functions for streams
 
@@ -705,7 +705,6 @@ private:
     CameraAVStreamManagementDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
     EndpointId mEndpointId;
-    CameraAVStreamMgmtDelegate & mDelegate;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
@@ -763,7 +762,7 @@ private:
         if (currentValue != newValue)
         {
             currentValue = newValue;
-            auto path    = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+            auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
                 ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
@@ -775,7 +774,7 @@ private:
     }
 
     template <typename StreamContainer, typename IdGetter>
-    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, CommandHandler * handler,
+    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, CommandHandler & handler,
                                                  const ConcreteCommandPath & commandPath,
                                                  StreamType streamType, IdGetter id_getter, bool isDeallocate)
     {
@@ -783,17 +782,17 @@ private:
 
         if (it == streams.end())
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
-            handler->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
+            handler.AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
             return false;
         }
 
         if (isDeallocate && it->referenceCount > 0)
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
-            handler->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
+            handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
             return false;
         }
 
@@ -802,9 +801,9 @@ private:
         {
             if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
             {
-                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mPath.mEndpointId,
                              StreamTypeToString(streamType), streamID);
-                handler->AddStatus(commandPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                handler.AddStatus(commandPath, Protocols::InteractionModel::Status::DynamicConstraintError);
                 return false;
             }
         }
@@ -831,14 +830,14 @@ private:
                             Zcl,
                             "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
                             "not modifiable",
-                            mEndpointId, streamID);
-                        handler->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
+                            mPath.mEndpointId, streamID);
+                        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
                         return false;
                     }
                 }
                 else
                 {
-                    handler->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
+                    handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
                     return false;
                 }
             }
@@ -891,50 +890,50 @@ private:
 
     bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
-    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                    const Commands::VideoStreamAllocate::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamModify(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                  const Commands::VideoStreamModify::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                      const Commands::VideoStreamDeallocate::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleAudioStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleAudioStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                    const Commands::AudioStreamAllocate::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleAudioStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleAudioStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                      const Commands::AudioStreamDeallocate::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleSnapshotStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleSnapshotStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                       const Commands::SnapshotStreamAllocate::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleSnapshotStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleSnapshotStreamModify(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                     const Commands::SnapshotStreamModify::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleSnapshotStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleSnapshotStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                         const Commands::SnapshotStreamDeallocate::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleSetStreamPriorities(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleSetStreamPriorities(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                    const Commands::SetStreamPriorities::DecodableType & req);
 
-    std::optional<DataModel::ActionReturnStatus> HandleCaptureSnapshot(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    std::optional<DataModel::ActionReturnStatus> HandleCaptureSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const Commands::CaptureSnapshot::DecodableType & req);
 
-    bool CheckSnapshotStreamsAvailability(CommandHandler * handler, const ConcreteCommandPath & commandPath);
+    bool CheckSnapshotStreamsAvailability(CommandHandler & handler, const ConcreteCommandPath & commandPath);
 
     bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID,
-                                  CommandHandler * handler, const ConcreteCommandPath & commandPath);
+                                  CommandHandler & handler, const ConcreteCommandPath & commandPath);
 
     bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID,
-                                                  CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                                                  CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                   bool isDeallocate);
 
     bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID,
-                                          CommandHandler * handler, const ConcreteCommandPath & commandPath);
+                                          CommandHandler & handler, const ConcreteCommandPath & commandPath);
 
     bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID,
-                                                     CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                                                     CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                      bool isDeallocate);
 };
 
