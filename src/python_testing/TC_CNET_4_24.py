@@ -372,10 +372,40 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 1: TH reads Networks attribute and removes all configured networks
         self.step(1)
 
+        networks = await self._read_networks(endpoint)
+        logger.info(f" --- Found {len(networks)} network(s) configured during commissioning")
+        for network in networks:
+            network_id = network.networkID
+            logger.info(f" --- Removing network: {network_id.decode('utf-8', errors='replace')}")
+            remove_response = await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=cnet.Commands.RemoveNetwork(
+                    networkID=network_id,
+                    breadcrumb=0
+                )
+            )
+            await self._validate_network_config_response(remove_response)
+            logger.info(f" --- Network removed successfully: {network_id.decode('utf-8', errors='replace')}")
+
         # Verify that DUT successfully removed all networks configured during commissioning
+        networks_after = await self._read_networks(endpoint)
+        asserts.assert_equal(len(networks_after), 0,
+                             f"Expected empty network list after cleanup, but found {len(networks_after)} network(s)")
+        logger.info(" --- All networks successfully removed. Ready for manual WiFi configuration tests.")
 
         # Step 2: TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (invalid network), Breadcrumb = 1
         self.step(2)
+
+        logger.info(" --- Step 2: Sending AddOrUpdateThreadNetwork with incorrect operational dataset (invalid network)")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
+                operationalDataset=incorrect_thread_dataset_1,
+                breadcrumb=1
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        await self._validate_network_config_response(response)
 
         # Step 3: TH sends ConnectNetwork command with incorrect network ID, Breadcrumb = 2
         self.step(3)
