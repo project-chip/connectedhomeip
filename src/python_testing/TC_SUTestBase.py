@@ -290,7 +290,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         Create a default list of ACL entries for OTA providers needed for the SU tests.
         """
-        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        admin_node_id = dev_ctrl.nodeId
         requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
 
         return [
