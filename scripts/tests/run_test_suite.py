@@ -320,11 +320,20 @@ def cmd_list(context):
     default=False,
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+@click.option(
+    '--save-failures-to',
+    type=click.Path(),
+    help='Save the names of failed tests to the specified file.')
+@click.option(
+    '--tests-from-file',
+    type=click.Path(exists=True),
+    help='Read the list of tests to run from the specified file.')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi,
+            save_failures_to, tests_from_file):
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
@@ -421,6 +430,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     apps_register = AppsRegister()
     apps_register.init()
 
+    failed_tests = []
+
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
@@ -430,10 +441,22 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 bus.terminate()
             ns.terminate()
 
+        if save_failures_to and failed_tests:
+            with open(save_failures_to, 'w') as f:
+                for test in failed_tests:
+                    f.write(f"{test}\n")
+
     for i in range(iterations):
         log.info("Starting iteration %d", i+1)
         observed_failures = 0
-        for test in context.obj.tests:
+        tests_to_run = context.obj.tests
+
+        if tests_from_file:
+            with open(tests_from_file, 'r') as f:
+                target_test_names = {line.strip() for line in f if line.strip()}
+            tests_to_run = [t for t in tests_to_run if t.name in target_test_names]
+
+        for test in tests_to_run:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
                     log.debug("Test '%s' not included", test.name)
@@ -463,6 +486,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 test_end = time.monotonic()
                 log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                 observed_failures += 1
+                failed_tests.append(test.name)
                 if not keep_going:
                     cleanup()
                     sys.exit(2)
