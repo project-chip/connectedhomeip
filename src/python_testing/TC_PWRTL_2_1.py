@@ -41,18 +41,24 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_PWRTL_2_1(MatterBaseTest):
 
     def pics_TC_PWRTL_2_1(self) -> list[str]:
         return ["PWRTL.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PWRTL_2_1(self):
 
         attributes = Clusters.PowerTopology.Attributes
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
         powertop_cluster = Clusters.Objects.PowerTopology
@@ -67,9 +73,9 @@ class TC_PWRTL_2_1(MatterBaseTest):
             available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
 
             if available_endpoints == []:
-                logging.info("AvailableEndpoints is an empty list")
+                log.info("AvailableEndpoints is an empty list")
             else:
-                logging.info("AvailableEndpoints: %s" % (available_endpoints))
+                log.info("AvailableEndpoints: %s" % (available_endpoints))
                 asserts.assert_less_equal(len(available_endpoints), 20,
                                           "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
@@ -80,7 +86,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         if act_endpoints_attr_id in attribute_list:
             active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
-            logging.info("ActiveEndpoints: %s" % (active_endpoints))
+            log.info("ActiveEndpoints: %s" % (active_endpoints))
             asserts.assert_less_equal(len(active_endpoints), 20,
                                       "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
 

@@ -17,7 +17,7 @@
 
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>

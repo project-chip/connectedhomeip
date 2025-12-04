@@ -1709,6 +1709,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+ *
+ * The CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC is a configuration for shorter idle mode interval for LIT capable devices
+ * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availability status with their
+ * subscribers.
+ *
+ * The short idleMode duration SHALL be lesser than or equal to the IdleModeDuration.
+ *
+ * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+ */
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#endif
+
+/**
  * @def CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
  *
  * @brief Default value for the ICD Management cluster ActiveModeDuration attribute, in milliseconds
@@ -1885,10 +1900,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
  * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
- *        Two are used in the default implementation. Users can increase it to register more observers.
+ *        Three are used in the default implementation. Users can increase it to register more observers.
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
 #endif
 
 /**
@@ -1998,18 +2013,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
-
-/**
- *  @def CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
- *
- *  @brief
- *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the
- * remote device is LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the
- * controller in congested network in time.
- */
-#ifndef CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
-#define CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL 0
-#endif // CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
 
 /**
  * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE

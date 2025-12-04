@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -1048,7 +1055,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 5;
+  revision 6;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1086,6 +1093,10 @@ cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+    optional int16u simultaneousInvocationsSupported = 2;
+    optional int16u simultaneousWritesSupported = 3;
+    optional int16u readPathsSupported = 4;
+    optional int16u subscribePathsSupported = 5;
   }
 
   struct ProductAppearanceStruct {
@@ -1126,12 +1137,12 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
-  readonly attribute int32u specificationVersion = 21;
-  readonly attribute int16u maxPathsPerInvoke = 22;
-  readonly attribute int32u configurationVersion = 24;
+  readonly attribute optional int32u specificationVersion = 21;
+  readonly attribute optional int16u maxPathsPerInvoke = 22;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1751,7 +1762,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 2;
+  revision 3;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1815,7 +1826,7 @@ cluster NetworkCommissioning = 49 {
     char_string<16> networkName = 2;
     int16u channel = 3;
     int8u version = 4;
-    octet_string<8> extendedAddress = 5;
+    octet_string extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
   }
@@ -1837,9 +1848,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  provisional readonly attribute optional int16u threadVersion = 10;
+  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1853,7 +1864,7 @@ cluster NetworkCommissioning = 49 {
 
   response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string debugText = 1;
+    optional long_char_string<512> debugText = 1;
     optional WiFiInterfaceScanResultStruct wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResultStruct threadScanResults[] = 3;
   }
@@ -1879,7 +1890,7 @@ cluster NetworkCommissioning = 49 {
 
   response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string<512> debugText = 1;
+    optional long_char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
     optional octet_string<140> clientIdentity = 3;
     optional octet_string<64> possessionSignature = 4;
@@ -1912,19 +1923,19 @@ cluster NetworkCommissioning = 49 {
     optional octet_string<64> possessionSignature = 1;
   }
 
-  /** Detemine the set of networks the device sees as available. */
+  /** This command is used to scan for available networks on the network interface associated with the cluster instance. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
-  /** Add or update the credentials for a given Wi-Fi network. */
+  /** This command is used to add or update a Wi-Fi network configuration. */
   command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  /** Add or update the credentials for a given Thread network. */
+  /** This command is used to add or update a Thread network configuration. */
   command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  /** Remove the definition of a given network (including its credentials). */
+  /** This command is used to remove a network configuration on the network interface associated with the cluster instance. */
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  /** Connect to the specified network, using previously-defined credentials. */
+  /** This command is used to connect to a network on the network interface associated with the cluster instance. */
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  /** Modify the order in which networks will be presented in the Networks attribute. */
+  /** This command is used to re-order the network configuration list. */
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-  /** Retrieve details about and optionally proof of possession of a network client identity. */
+  /** This command is used to query the identity of a network configuration. */
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
@@ -1976,7 +1987,7 @@ cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 2;
+  revision 3;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -2029,6 +2040,15 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
+    kDeviceLoad = 0x2;
+  }
+
+  struct DeviceLoadStruct {
+    int16u currentSubscriptions = 0;
+    int16u currentSubscriptionsForFabric = 1;
+    int32u totalSubscriptionsEstablished = 2;
+    int32u totalInteractionModelMessagesSent = 3;
+    int32u totalInteractionModelMessagesReceived = 4;
   }
 
   struct NetworkInterface {
@@ -2036,7 +2056,7 @@ cluster GeneralDiagnostics = 51 {
     boolean isOperational = 1;
     nullable boolean offPremiseServicesReachableIPv4 = 2;
     nullable boolean offPremiseServicesReachableIPv6 = 3;
-    octet_string<8> hardwareAddress = 4;
+    octet_string hardwareAddress = 4;
     octet_string IPv4Addresses[] = 5;
     octet_string IPv6Addresses[] = 6;
     InterfaceTypeEnum type = 7;
@@ -2070,6 +2090,7 @@ cluster GeneralDiagnostics = 51 {
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
+  readonly attribute optional DeviceLoadStruct deviceLoadStatus = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2093,14 +2114,14 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct PayloadTestResponse = 4 {
-    octet_string payload = 0;
+    long_octet_string<2048> payload = 0;
   }
 
-  /** Provide a means for certification tests to trigger some test-plan-specific events */
+  /** This command SHALL be supported to provide a means for certification tests to trigger some test-plan-specific events, necessary to assist in automation of device interactions for some certification test cases. */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
-  /** Take a snapshot of system time and epoch time. */
+  /** This command MAY be used by a client to obtain a correlated view of both System Time, and, if currently synchronized and supported, "wall clock time" of the server. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
-  /** Request a variable length payload response. */
+  /** This command provides a means for certification tests or manufacturer's internal tests to validate particular command handling and encoding constraints by generating a response of a given size. */
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
@@ -2576,7 +2597,7 @@ cluster TimeSynchronization = 56 {
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
 cluster BridgedDeviceBasicInformation = 57 {
-  revision 5;
+  revision 6;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -2653,7 +2674,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute optional char_string<64> productLabel = 14;
   readonly attribute optional char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -3545,7 +3566,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3575,7 +3596,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -3613,7 +3634,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 3;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3637,7 +3658,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -4432,7 +4453,7 @@ cluster Groupcast = 101 {
 
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4476,13 +4497,13 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4526,7 +4547,57 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
+  command ResetCondition(): DefaultSuccess = 0;
+}
+
+/** This generic cluster provides an interface to the current condition of a resource. */
+cluster WaterTankLevelMonitoring = 121 {
+  revision 1;
+
+  shared enum ChangeIndicationEnum : enum8 {
+    kOK = 0 [spec_name = "OK"];
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  shared enum DegradationDirectionEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  shared enum ProductIdentifierTypeEnum : enum8 {
+    kUPC = 0 [spec_name = "UPC"];
+    kGTIN8 = 1 [spec_name = "GTIN-8"];
+    kEAN = 2 [spec_name = "EAN"];
+    kGTIN14 = 3 [spec_name = "GTIN-14"];
+    kOEM = 4 [spec_name = "OEM"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+    kReplacementProductList = 0x4;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
@@ -9832,8 +9903,8 @@ provisional cluster ContentControl = 1295 {
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
-provisional cluster ContentAppObserver = 1296 {
-  revision 1; // NOTE: Default/not specifically set
+cluster ContentAppObserver = 1296 {
+  revision 1;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -9847,22 +9918,22 @@ provisional cluster ContentAppObserver = 1296 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ContentAppMessageRequest {
-    optional char_string data = 0;
-    char_string encodingHint = 1;
+    optional long_char_string<500> data = 0;
+    char_string<100> encodingHint = 1;
   }
 
   response struct ContentAppMessageResponse = 1 {
     StatusEnum status = 0;
-    optional char_string data = 1;
-    optional char_string encodingHint = 2;
+    optional long_char_string<500> data = 1;
+    optional char_string<100> encodingHint = 2;
   }
 
-  /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
+  /** Upon receipt, the data field MAY be parsed and interpreted. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
 /** This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. */
-provisional cluster ZoneManagement = 1360 {
+cluster ZoneManagement = 1360 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -9990,7 +10061,7 @@ provisional cluster ZoneManagement = 1360 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-provisional cluster CameraAvStreamManagement = 1361 {
+cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -10263,7 +10334,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 }
 
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   enum PhysicalMovementEnum : enum8 {
@@ -10366,7 +10437,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 }
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
-provisional cluster WebRTCTransportProvider = 1363 {
+cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -10451,7 +10522,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
 }
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
-provisional cluster WebRTCTransportRequestor = 1364 {
+cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
@@ -10494,7 +10565,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-provisional cluster PushAvStreamTransport = 1365 {
+cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum CMAFInterfaceEnum : enum8 {
@@ -10676,7 +10747,7 @@ provisional cluster PushAvStreamTransport = 1365 {
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
-provisional cluster Chime = 1366 {
+cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {
@@ -10693,6 +10764,7 @@ provisional cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** This command will play the currently selected chime. */
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
@@ -10869,7 +10941,7 @@ provisional cluster CommodityTariff = 1792 {
 }
 
 /** Provides extended device information for all the logical devices represented by a Bridged Node. */
-provisional cluster EcosystemInformation = 1872 {
+cluster EcosystemInformation = 1872 {
   revision 1;
 
   struct DeviceTypeStruct {
@@ -11327,7 +11399,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
       TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
+cluster TlsCertificateManagement = 2049 {
   revision 1;
 
   fabric_scoped struct TLSCertStruct {
@@ -11440,7 +11512,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 }
 
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsClientManagement = 2050 {
+cluster TlsClientManagement = 2050 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {

@@ -27,10 +27,10 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import tempfile
-from time import sleep
 
 from mobly import asserts
 
@@ -41,6 +41,8 @@ from matter.fault_injection import CHIPFaultId
 from matter.interaction_model import InteractionModelError
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_SC_3_5(MatterBaseTest):
@@ -76,13 +78,12 @@ class TC_SC_3_5(MatterBaseTest):
         return "[TC-SC-3.5] CASE Error Handling [DUT_Initiator] "
 
     def pics_TC_SC_3_5(self) -> list[str]:
-        pics = [
+        return [
             "MCORE.ROLE.COMMISSIONER",
         ]
-        return pics
 
     def steps_TC_SC_3_5(self) -> list[TestStep]:
-        steps = [
+        return [
 
             TestStep("precondition", "TH_SERVER has been commissioned to TH_CLIENT", is_commissioning=True),
 
@@ -143,7 +144,6 @@ class TC_SC_3_5(MatterBaseTest):
 
 
         ]
-        return steps
 
     def start_th_server(self):
 
@@ -154,7 +154,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server = AppServerSubprocess(
             self.th_server_app,
@@ -171,10 +171,10 @@ class TC_SC_3_5(MatterBaseTest):
 
         # Instructing TH Server to accept a new Commissioner, which is the DUT
         params = await self.th_client.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=4*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=4*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
         new_random_passcode = params.setupPinCode
-        sleep(1)
-        logging.info("OpenCommissioningWindow complete")
+        await asyncio.sleep(1)
+        log.info("OpenCommissioningWindow complete")
 
         return new_random_passcode
 
@@ -183,12 +183,12 @@ class TC_SC_3_5(MatterBaseTest):
 
         try:
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th_client.SendCommand(nodeid=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
+            await self.th_client.SendCommand(nodeId=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
         except InteractionModelError as e:
             asserts.assert_not_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                      'Failed to invoke Revoke Commissioning due to Commissioning Window not being open.')
 
-        sleep(1)
+        await asyncio.sleep(1)
 
         return await self.open_commissioning_window()
 
@@ -204,7 +204,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         try:
             await self.th_client.SendCommand(
-                nodeid=self.th_server_local_nodeid,
+                nodeId=self.th_server_local_nodeid,
                 endpoint=0,  # Fault‑Injection cluster lives on EP0
                 payload=command,
             )
@@ -216,7 +216,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         self.step("precondition")
         await self.th_client.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=self.th_server_passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.th_server_discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         '''------------------------------------------- Determine if DUT Commissioner has ICAC in its NOC Chain--------------------------------------------- '''
         self.step("1a")

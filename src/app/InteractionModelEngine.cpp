@@ -206,7 +206,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    mReportingEngine.Init((eventManagement != nullptr) ? eventManagement : &EventManagement::GetInstance());
+    TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
+                                                                                : &EventManagement::GetInstance());
 
     StatusIB::RegisterErrorFormatter();
 
@@ -278,7 +279,7 @@ void InteractionModelEngine::Shutdown()
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
     mDataVersionFilterPool.ReleaseAll();
-    mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
+    TEMPORARY_RETURN_IGNORED mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 
     mpCASESessionMgr = nullptr;
 
@@ -569,7 +570,7 @@ void InteractionModelEngine::TryToResumeSubscriptions()
     {
         mSubscriptionResumptionScheduled            = true;
         auto timeTillNextSubscriptionResumptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+        TEMPORARY_RETURN_IGNORED mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
         ChipLogProgress(InteractionModel, "Schedule subscription resumption when failing to establish session, Retries: %" PRIu32,
@@ -748,7 +749,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         VerifyOrReturnError(subscribeRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-        subscribeRequestParser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED subscribeRequestParser.PrettyPrint();
 #endif
 
         VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
@@ -788,8 +789,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                                         ", FabricIndex: %u, SubscriptionId: 0x%" PRIx32,
                                         ChipLogValueX64(subscriptionInfo.mNodeId), subscriptionInfo.mFabricIndex,
                                         subscriptionInfo.mSubscriptionId);
-                        mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                                                subscriptionInfo.mSubscriptionId);
+                        TEMPORARY_RETURN_IGNORED mpSubscriptionResumptionStorage->Delete(
+                            subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex, subscriptionInfo.mSubscriptionId);
                     }
                 }
                 iterator->Release();
@@ -880,7 +881,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-        readRequestParser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED readRequestParser.PrettyPrint();
 #endif
         {
             size_t requestedAttributePathCount = 0;
@@ -986,7 +987,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    report.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED report.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;
@@ -1086,7 +1087,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
-        OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
+        TEMPORARY_RETURN_IGNORED OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
     }
     else
     {
@@ -1118,7 +1119,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
         // Get the next item before invoking `OnActiveModeNotification`.
         CATValues cats;
 
-        mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
+        TEMPORARY_RETURN_IGNORED mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
             (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
              aMonitoredSubject == mpFabricTable->FindFabricWithIndex(pListItem->GetFabricIndex())->GetNodeId()))
@@ -1793,29 +1794,37 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
-
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
-    // Operate, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
-    // leak information if we do fail existence checks.
-    // SPEC-DIVERGENCE: For non-concrete paths (Group Commands), the spec mandates only one ACL check AFTER the existence check.
-    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
-    // existence check. In practice, this divergence is not observable if all commands require at least Operate privilege.
-    Status status = CheckCommandAccess(request, Access::Privilege::kOperate);
-    VerifyOrReturnValue(status == Status::Success, status);
+    const Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
+    const bool commandExists     = (existenceStatus == Status::Success);
 
-    status = CheckCommandExistence(request.path, acceptedCommandEntry);
+    // If the command exists, then the spec defines either doing a check for Operate access
+    // followed by a check for the actual access level of the command (in the concrete path case)
+    // or just doing a check for the actual access level of the command (in the non-concrete path case).
+    // Since all commands require at least Operate access in the spec (and the spec algorithm would be
+    // wrong if they did not), this is equivalent to doing a single check for the actual access level of the command.
+    //
+    // If the command does not exist, but we still got here, we must be in the concrete path case, and the spec
+    // then defines a single check for the Operate access level, whose failure must take precedence over the
+    // existence check in terms of what is communicated back to the client.
+    //
+    // The code below implements equivalent logic:
+    // * If the command exists, the only possible failure is due to insufficient access, and it's
+    //   enough to check the actual access level of the command.
+    // * If the command does not exist, a check for Operate is done, and if that fails the corresponding
+    //   status is returned.  If it succeeds, then the "no such command" status is returned.
+    Access::Privilege privilegeToCheck = commandExists ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
-    if (status != Status::Success)
+    Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
+    VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
+
+    if (!commandExists)
     {
         ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
-        return status;
+        return existenceStatus;
     }
-
-    status = CheckCommandAccess(request, acceptedCommandEntry.GetInvokePrivilege());
-    VerifyOrReturnValue(status == Status::Success, status);
 
     return CheckCommandFlags(request, acceptedCommandEntry);
 }
@@ -1970,7 +1979,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 
@@ -1993,7 +2002,7 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     Status status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ true);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 

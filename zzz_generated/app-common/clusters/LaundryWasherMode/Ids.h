@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster LaundryWasherMode (cluster code: 81/0x0451)
+// Identifier constant values for cluster LaundryWasherMode (cluster code: 81/0x0051)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -42,11 +42,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_ACL_2_9(MatterBaseTest):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
         result = await self.th2.ReadAttribute(self.dut_node_id, [(0, attribute)])
-        logging.info(f"Result: {result}")
+        log.info(f"Result: {result}")
         value = result[0][Clusters.Objects.AccessControl][attribute]
         asserts.assert_greater_equal(
             value,
@@ -61,8 +63,11 @@ class TC_ACL_2_9(MatterBaseTest):
     def desc_TC_ACL_2_9(self) -> str:
         return "[TC-ACL-2.9] Cluster access"
 
+    def pics_TC_ACL_2_9(self) -> list[str]:
+        return ['ACL.S.A0001']
+
     def steps_TC_ACL_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
@@ -121,7 +126,6 @@ class TC_ACL_2_9(MatterBaseTest):
                 "TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                 "TH1 removes TH2 fabric using th2_idx"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_9(self):
@@ -146,7 +150,7 @@ class TC_ACL_2_9(MatterBaseTest):
 
         # Open commissioning window on TH1
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             timeout=self.max_window_duration,
             iteration=1000,
             discriminator=self.discriminator,
@@ -269,7 +273,7 @@ class TC_ACL_2_9(MatterBaseTest):
         self.step(14)
         # TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 
 if __name__ == "__main__":

@@ -149,6 +149,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "HepaFilterMonitoring";
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return "ActivatedCarbonFilterMonitoring";
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id:
+        return "WaterTankLevelMonitoring";
     case chip::app::Clusters::BooleanStateConfiguration::Id:
         return "BooleanStateConfiguration";
     case chip::app::Clusters::ValveConfigurationAndControl::Id:
@@ -941,6 +943,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveNetworkFaults";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id:
             return "TestEventTriggersEnabled";
+        case chip::app::Clusters::GeneralDiagnostics::Attributes::DeviceLoadStatus::Id:
+            return "DeviceLoadStatus";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::AcceptedCommandList::Id:
@@ -2147,6 +2151,35 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::Condition::Id:
+            return "Condition";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::DegradationDirection::Id:
+            return "DegradationDirection";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ChangeIndication::Id:
+            return "ChangeIndication";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::InPlaceIndicator::Id:
+            return "InPlaceIndicator";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::LastChangedTime::Id:
+            return "LastChangedTime";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ReplacementProductList::Id:
+            return "ReplacementProductList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5605,6 +5638,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         switch (id)
         {
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id:
+            return "ResetCondition";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Id:
             return "ResetCondition";
         default:
             return "Unknown";

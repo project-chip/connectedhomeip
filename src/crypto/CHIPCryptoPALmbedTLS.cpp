@@ -722,7 +722,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    output.SetLength(bbuf.Needed());
+    TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
 
 exit:
     ClearSecretData(privkey, sizeof(privkey));

@@ -43,10 +43,9 @@
 
 """Define Matter test case TC_DEM_2_10."""
 
-
+import asyncio
 import logging
 import sys
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -56,7 +55,7 @@ from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
@@ -68,14 +67,13 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_10(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S"
         ]
-        return pics
 
     def steps_TC_DEM_2_10(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap",
@@ -128,8 +126,6 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                      "The subscription is cancelled successfully"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_10(self):
         # pylint: disable=too-many-locals, too-many-statements
@@ -139,7 +135,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
         self.step("2")
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
-        logger.info(f"FeatureMap: {feature_map}")
+        log.info(f"FeatureMap: {feature_map}")
 
         has_pfr = feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting
         has_sfr = feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting
@@ -167,9 +163,9 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=False)
 
-        def accumulate_reports(wait_time):
-            logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
-            time.sleep(wait_time)
+        async def accumulate_reports(wait_time):
+            log.info(f"Test will now wait {wait_time} seconds to accumulate reports")
+            await asyncio.sleep(wait_time)
 
         self.step("5")
         await self.send_test_event_trigger_user_opt_out_clear_all()
@@ -199,11 +195,11 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             self.step("8")
             wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
             sub_handler.reset()
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("9")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
-            logging.info(f"Received {count} Forecast updates in {wait} seconds")
+            log.info(f"Received {count} Forecast updates in {wait} seconds")
             asserts.assert_less_equal(count, 2, f"Expected <= 2 Forecast updates in {wait} seconds")
 
             self.step("10")
@@ -229,11 +225,11 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("13")
             wait = 5  # We expect a change to the forecast attribute after the cancel, Wait 5 seconds - allow time for the report to come in
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("13a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
-            logging.info(f"Received {count} Forecast updates in {wait} seconds")
+            log.info(f"Received {count} Forecast updates in {wait} seconds")
             asserts.assert_greater_equal(count, 1, "Expected >= 1 Forecast updates after a cancelled operation")
 
             self.step("14")
@@ -258,7 +254,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             self.step("16b")
             powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
             asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-            logging.info(powerAdjustCapabilityStruct)
+            log.info(powerAdjustCapabilityStruct)
             asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                                  Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
@@ -271,7 +267,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                 max_power = max(max_power, entry.maxPower)
 
             result = f"min_power {min_power} max_power {max_power}"
-            logging.info(result)
+            log.info(result)
 
             self.step("17")
             sub_handler.reset()
@@ -281,11 +277,11 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("18")
             wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("18a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]
-            logging.info(f"Received {count} PowerAdjustmentCapability updates in {wait} seconds")
+            log.info(f"Received {count} PowerAdjustmentCapability updates in {wait} seconds")
             asserts.assert_less_equal(count, 2, f"Expected <= 2 PowerAdjustmentCapability updates in {wait} seconds")
 
             self.step("19")
@@ -294,11 +290,11 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("20")
             wait = 5  # We expect a change to the forecast attribute after the cancel, Wait 5 seconds - allow time for the report to come in
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("20a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]
-            logging.info(f"Received {count} PowerAdjustmentCapability updates in {wait} seconds")
+            log.info(f"Received {count} PowerAdjustmentCapability updates in {wait} seconds")
             asserts.assert_greater_equal(count, 1, "Expected >= 1 PowerAdjustmentCapability updates after a cancelled operation")
 
             self.step("21")

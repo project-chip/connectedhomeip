@@ -228,6 +228,11 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request,
                         Json::Value & value);
 
@@ -363,6 +368,12 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::WaterTankLevelMonitoring::Structs::ReplacementProductStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WaterTankLevelMonitoring::Structs::ReplacementProductStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type & request,
