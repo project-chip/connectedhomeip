@@ -296,20 +296,20 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         return [
             # Admin entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                subjects=[admin_node_id],  # type: ignore
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[admin_node_id],
                 targets=NullValue
             ),
             # Operate entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                subjects=requestor_subjects,  # type: ignore
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=requestor_subjects,
                 targets=[
-                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
-                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                        cluster=Clusters.OtaSoftwareUpdateProvider.id,
                         endpoint=NullValue,
                         deviceType=NullValue
                     )
