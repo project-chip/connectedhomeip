@@ -28,7 +28,7 @@ namespace chip::scenes {
 template <ClusterId ClusterId, size_t FixedEndpointCount, size_t MaxIndexCount>
 struct CodegenEndpointToIndex
 {
-    using EventControlType = EmberEventControl;
+    using EventControlType                    = EmberEventControl;
     static constexpr size_t kMaxEndpointCount = MaxIndexCount;
 
     static bool EndpointIdToIndex(EndpointId endpointId, uint16_t & index)
