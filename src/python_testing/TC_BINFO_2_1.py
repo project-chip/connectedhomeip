@@ -44,7 +44,7 @@ class TC_BINFO_2_1(BasicInformationAttributesVerificationBase):
         return "[TC-BINFO-2.1] Attributes [DUT-Server]"
 
     def steps_TC_BINFO_2_1(self) -> list[TestStep]:
-       return self.steps()
+        return self.steps()
 
     def pics_TC_BINFO_2_1(self) -> list[str]:
         return self.pics("BINFO")

@@ -29,28 +29,38 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
     def steps(self) -> list[TestStep]:
         steps = [
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
-            TestStep(1, "TH reads DataModelRevision from the DUT.", "Verify that the value is DataModelRevision of current matter version 1.5 which is value 19"),
+            TestStep(1, "TH reads DataModelRevision from the DUT.",
+                     "Verify that the value is DataModelRevision of current matter version 1.5 which is value 19"),
             TestStep(2, "TH reads VendorName from the DUT.", "Verify that the VendorName returns a string with max 32 bytes"),
             TestStep(3, "TH reads VendorID from the DUT.", "Verify value is in the range of 0x0001 to 0xFFF4"),
             TestStep(4, "TH reads ProductName from the DUT.", "Verify it is a string with max length of 32 bytes."),
             TestStep(5, "TH reads ProductID from the DUT.", "Verify value is in the inclusive range of 1 to 65534"),
             TestStep(6, "TH reads NodeLabel from the DUT", "Verify it is of type string, and length is less than or equal to 32 bytes"),
-            TestStep(7, "TH reads Location from the DUT.", "Verify it is of type string, length is less than or equal to 2 characters, and verify that the Location is a valid CountryCode value per ISO 3166-1 alpha-2"),
+            TestStep(7, "TH reads Location from the DUT.",
+                     "Verify it is of type string, length is less than or equal to 2 characters, and verify that the Location is a valid CountryCode value per ISO 3166-1 alpha-2"),
             TestStep(8, "TH reads HardwareVersion from the DUT.", "Verify that the value is in range of 0 to 65534"),
-            TestStep(9, "TH reads HardwareVersionString from the DUT.", "Verify it is of type string, and value length in the range of 1 to 64 bytes"),
+            TestStep(9, "TH reads HardwareVersionString from the DUT.",
+                     "Verify it is of type string, and value length in the range of 1 to 64 bytes"),
             TestStep(10, "TH reads SoftwareVersion from the DUT", "Verify that the value is the range of 0 to 4294967294"),
-            TestStep(11, "TH reads SoftwareVersionString from the DUT.", "Verify it is of type string, has a length of 1 to 64 bytes"),
-            TestStep(12, "TH reads ManufacturingDate from the DUT", "Verify it is of type string, length in the range of 8 to 16 bytes, and the first 8 characters specify date according to YYYYMMDD."),
+            TestStep(11, "TH reads SoftwareVersionString from the DUT.",
+                     "Verify it is of type string, has a length of 1 to 64 bytes"),
+            TestStep(12, "TH reads ManufacturingDate from the DUT",
+                     "Verify it is of type string, length in the range of 8 to 16 bytes, and the first 8 characters specify date according to YYYYMMDD."),
             TestStep(13, "TH reads PartNumber from the DUT", "Verify it is of type string, and has a max length of 32 bytes"),
-            TestStep(14, "TH reads ProductURL from the DUT.", "Verify it is of type string, less than or equal to 256 ASCII characters, and follows the syntax rules specified in RFC 3986"),
-            TestStep(15, "TH reads ProductLabel from the DUT.", "Verify it is of type string, less than or equal to 64 bytes, and does not include the name of the vendor as defined within the VendorName attribute"),
+            TestStep(14, "TH reads ProductURL from the DUT.",
+                     "Verify it is of type string, less than or equal to 256 ASCII characters, and follows the syntax rules specified in RFC 3986"),
+            TestStep(15, "TH reads ProductLabel from the DUT.",
+                     "Verify it is of type string, less than or equal to 64 bytes, and does not include the name of the vendor as defined within the VendorName attribute"),
             TestStep(16, "TH reads SerialNumber from the DUT.", "Verify it is of type string, and has a max length of 32 bytes"),
             TestStep(17, "TH reads LocalConfigDisabled from the DUT.", "Verify it is of type boolean, and is set to false"),
             TestStep(18, "TH reads Reachable from the DUT.", "Verify it is of type boolean, and is set to true"),
-            TestStep(19, "TH reads UniqueID from the DUT.", "Verify it is of type string, and verify that the value is not identical to SerialNumber attribute if SerialNumber attribute is supported"),
-            TestStep(20, "TH reads CapabilityMinima attribute from the DUT", "Verify that the CaseSessionsPerFabric is in the range of 3 to 65535, and SubscriptionsPerFabric is in the inclusive range of 3 to 65535"),
+            TestStep(19, "TH reads UniqueID from the DUT.",
+                     "Verify it is of type string, and verify that the value is not identical to SerialNumber attribute if SerialNumber attribute is supported"),
+            TestStep(20, "TH reads CapabilityMinima attribute from the DUT",
+                     "Verify that the CaseSessionsPerFabric is in the range of 3 to 65535, and SubscriptionsPerFabric is in the inclusive range of 3 to 65535"),
             TestStep(21, "TH reads ProductAppearance from the DUT.", "Verify it is of type ProductAppearanceStruct."),
-            TestStep(22, "TH reads SpecificationVersion from the DUT.", "Value should be set to a valid Major, Minor, and Dot version with the lower 8 bits set to zero."),
+            TestStep(22, "TH reads SpecificationVersion from the DUT.",
+                     "Value should be set to a valid Major, Minor, and Dot version with the lower 8 bits set to zero."),
             TestStep(23, "TH reads MaxPathsPerInvoke from the DUT.", "Verify that the value is in the range of 1 to 65535."),
         ]
 
@@ -189,7 +199,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             asserts.assert_true(isinstance(ret15, str), "ProductLabel should be a string")
             asserts.assert_equal(len(ret15) <= 64, True, "ProductLabel should be a string with max 64 bytes")
             if vendor_name:
-                asserts.assert_not_in(vendor_name, ret15, "ProductLabel should not include the name of the vendor as defined within the VendorName attribute")
+                asserts.assert_not_in(
+                    vendor_name, ret15, "ProductLabel should not include the name of the vendor as defined within the VendorName attribute")
             else:
                 logging.info("VendorName is not set, skipping ProductLabel does not include vendor name verification")
 
@@ -223,7 +234,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             ret19 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.UniqueID)
             asserts.assert_true(isinstance(ret19, str), "UniqueID should be a string")
             if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
-                asserts.assert_not_equal(ret19, serial_number, "UniqueID should not be identical to SerialNumber attribute if SerialNumber attribute is supported")
+                asserts.assert_not_equal(
+                    ret19, serial_number, "UniqueID should not be identical to SerialNumber attribute if SerialNumber attribute is supported")
 
         # Step 20: CapabilityMinima
         if cluster_name == "BRBINFO":
@@ -231,16 +243,21 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         else:
             self.step(20)
             capability_minima = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CapabilityMinima)
-            asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3, "CaseSessionsPerFabric should be greater than or equal to 3")
-            asserts.assert_less_equal(capability_minima.caseSessionsPerFabric, 65535, "CaseSessionsPerFabric should be less than or equal to 65535")
-            asserts.assert_greater_equal(capability_minima.subscriptionsPerFabric, 3, "SubscriptionsPerFabric should be greater than or equal to 3")
-            asserts.assert_less_equal(capability_minima.subscriptionsPerFabric, 65535, "SubscriptionsPerFabric should be less than or equal to 65535")
+            asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3,
+                                         "CaseSessionsPerFabric should be greater than or equal to 3")
+            asserts.assert_less_equal(capability_minima.caseSessionsPerFabric, 65535,
+                                      "CaseSessionsPerFabric should be less than or equal to 65535")
+            asserts.assert_greater_equal(capability_minima.subscriptionsPerFabric, 3,
+                                         "SubscriptionsPerFabric should be greater than or equal to 3")
+            asserts.assert_less_equal(capability_minima.subscriptionsPerFabric, 65535,
+                                      "SubscriptionsPerFabric should be less than or equal to 65535")
 
         # Step 21: ProductAppearance
         self.step(21)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductAppearance):
             ret21 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductAppearance)
-            asserts.assert_true(isinstance(ret21, cluster.Structs.ProductAppearanceStruct), "ProductAppearance should be a ProductAppearanceStruct")
+            asserts.assert_true(isinstance(ret21, cluster.Structs.ProductAppearanceStruct),
+                                "ProductAppearance should be a ProductAppearanceStruct")
 
         # Step 22: SpecificationVersion
         if cluster_name == "BRBINFO":
