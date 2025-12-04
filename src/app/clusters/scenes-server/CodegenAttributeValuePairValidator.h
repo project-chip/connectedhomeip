@@ -1,4 +1,4 @@
-/*
+/**
  *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,21 @@
  */
 #pragma once
 
-// This header is for backwards compatibility only with codegen cluster
-// implementations. We just include the codegen version
-#include "codegen/on-off-server.h" // nogncheck
+#include <app/clusters/scenes-server/AttributeValuePairValidator.h>
+
+namespace chip::scenes {
+
+class CodegenAttributeValuePairValidator : public AttributeValuePairValidator
+{
+public:
+    ~CodegenAttributeValuePairValidator() override = default;
+    CHIP_ERROR Validate(const app::ConcreteClusterPath & clusterPath, AttributeValuePairType & value) override;
+
+    static CodegenAttributeValuePairValidator & Instance()
+    {
+        static CodegenAttributeValuePairValidator sInstance;
+        return sInstance;
+    }
+};
+
+} // namespace chip::scenes
