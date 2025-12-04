@@ -40,13 +40,13 @@ static constexpr uint16_t kMaxIntermediateCerts = 10;
 
 struct InlineBufferedRootCert : CertificateTable::BufferedRootCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
     InlineBufferedRootCert() : CertificateTable::BufferedRootCert(buffer) {}
 };
 
 struct InlineBufferedClientCert : CertificateTable::BufferedClientCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
     InlineBufferedClientCert() : CertificateTable::BufferedClientCert(buffer) {}
 };
 
