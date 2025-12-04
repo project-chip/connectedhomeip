@@ -248,6 +248,8 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
         ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> clustersBuilder;
         ReturnErrorOnFailure(ServerClusters(clustersBuilder));
 
+        // TODO: If we ever get information about sceneable clusters in entry.flags
+        //       we should skip non-sceneable clusters in here.
         for (const auto & entry : clustersBuilder.TakeBuffer())
         {
             ExtensionFieldSet EFS;
