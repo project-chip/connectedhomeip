@@ -274,8 +274,9 @@ public:
      *                                           instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, CameraAvSettingsUserLevelManagementDelegate & aDelegate, BitFlags<Feature> aFeatures,
-                                        BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets);
+    CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, CameraAvSettingsUserLevelManagementDelegate & aDelegate,
+                                               BitFlags<Feature> aFeatures, BitFlags<OptionalAttributes> aOptionalAttrs,
+                                               uint8_t aMaxPresets);
     ~CameraAvSettingsUserLevelManagementCluster() override;
 
     CHIP_ERROR Init();

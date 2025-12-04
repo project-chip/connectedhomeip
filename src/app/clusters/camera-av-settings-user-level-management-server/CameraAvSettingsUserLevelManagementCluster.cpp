@@ -40,11 +40,9 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId,
-                                                                         CameraAvSettingsUserLevelManagementDelegate & aDelegate,
-                                                                         BitFlags<Feature> aFeatures,
-                                                                         BitFlags<OptionalAttributes> aOptionalAttrs,
-                                                                         uint8_t aMaxPresets) :
+CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster(
+    EndpointId aEndpointId, CameraAvSettingsUserLevelManagementDelegate & aDelegate, BitFlags<Feature> aFeatures,
+    BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets) :
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id),
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets)
@@ -403,7 +401,7 @@ void CameraAvSettingsUserLevelManagementCluster::SetMovementState(PhysicalMoveme
  * Methods handling known video stream IDs, the addition and removal thereof.
  */
 void CameraAvSettingsUserLevelManagementCluster::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
-                                                                    Globals::Structs::ViewportStruct::Type aViewport)
+                                                                           Globals::Structs::ViewportStruct::Type aViewport)
 {
     DPTZStruct dptzEntry;
     dptzEntry.videoStreamID = aVideoStreamID;
@@ -413,7 +411,7 @@ void CameraAvSettingsUserLevelManagementCluster::AddMoveCapableVideoStream(uint1
 }
 
 void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
-                                                                       Globals::Structs::ViewportStruct::Type aViewport)
+                                                                              Globals::Structs::ViewportStruct::Type aViewport)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
                            [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
@@ -578,7 +576,8 @@ void CameraAvSettingsUserLevelManagementCluster::LoadPersistentAttributes()
 /**
  * AttributeAccessInterface
  */
-CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Read(const ConcreteReadAttributePath & aPath,
+                                                            AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == CameraAvSettingsUserLevelManagement::Id);
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Camera AV Settings User Level Management: Reading", mEndpointId);
@@ -890,8 +889,8 @@ void CameraAvSettingsUserLevelManagementCluster::HandleMPTZSetPosition(HandlerCo
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRelativeMove(HandlerContext & ctx,
-                                                                 const Commands::MPTZRelativeMove::DecodableType & commandData)
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRelativeMove(
+    HandlerContext & ctx, const Commands::MPTZRelativeMove::DecodableType & commandData)
 {
     bool hasAtLeastOneValue = false;
 
@@ -1063,8 +1062,8 @@ void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRelativeMove(HandlerC
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelManagementCluster::HandleMPTZMoveToPreset(HandlerContext & ctx,
-                                                                 const Commands::MPTZMoveToPreset::DecodableType & commandData)
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZMoveToPreset(
+    HandlerContext & ctx, const Commands::MPTZMoveToPreset::DecodableType & commandData)
 {
     uint8_t preset = commandData.presetID;
 
@@ -1140,7 +1139,7 @@ void CameraAvSettingsUserLevelManagementCluster::HandleMPTZMoveToPreset(HandlerC
 }
 
 void CameraAvSettingsUserLevelManagementCluster::HandleMPTZSavePreset(HandlerContext & ctx,
-                                                               const Commands::MPTZSavePreset::DecodableType & commandData)
+                                                                      const Commands::MPTZSavePreset::DecodableType & commandData)
 {
     Status status = Status::Success;
 
@@ -1234,8 +1233,8 @@ void CameraAvSettingsUserLevelManagementCluster::HandleMPTZSavePreset(HandlerCon
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRemovePreset(HandlerContext & ctx,
-                                                                 const Commands::MPTZRemovePreset::DecodableType & commandData)
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRemovePreset(
+    HandlerContext & ctx, const Commands::MPTZRemovePreset::DecodableType & commandData)
 {
     uint8_t presetToRemove = commandData.presetID;
 
@@ -1282,7 +1281,7 @@ void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRemovePreset(HandlerC
 }
 
 void CameraAvSettingsUserLevelManagementCluster::HandleDPTZSetViewport(HandlerContext & ctx,
-                                                                const Commands::DPTZSetViewport::DecodableType & commandData)
+                                                                       const Commands::DPTZSetViewport::DecodableType & commandData)
 {
     uint16_t videoStreamID                          = commandData.videoStreamID;
     Globals::Structs::ViewportStruct::Type viewport = commandData.viewport;
@@ -1311,8 +1310,8 @@ void CameraAvSettingsUserLevelManagementCluster::HandleDPTZSetViewport(HandlerCo
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelManagementCluster::HandleDPTZRelativeMove(HandlerContext & ctx,
-                                                                 const Commands::DPTZRelativeMove::DecodableType & commandData)
+void CameraAvSettingsUserLevelManagementCluster::HandleDPTZRelativeMove(
+    HandlerContext & ctx, const Commands::DPTZRelativeMove::DecodableType & commandData)
 {
     uint16_t videoStreamID     = commandData.videoStreamID;
     Optional<int16_t> deltaX   = commandData.deltaX;
