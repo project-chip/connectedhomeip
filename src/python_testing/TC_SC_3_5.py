@@ -341,7 +341,7 @@ class TC_SC_3_5(MatterBaseTest):
         # ------------------------------------------- Inject Fault into Sigma2 responderICAC---------------------------------------------
 
         if not self.DUT_has_icac:
-            logging.info("DUT Commissioner does not have ICAC in its NOC Chain, skipping ICAC Fault Injection testcase")
+            log.info("DUT Commissioner does not have ICAC in its NOC Chain, skipping ICAC Fault Injection testcase")
             self.skip_step("4a")
             self.skip_step("4b")
             self.skip_step("4c")
