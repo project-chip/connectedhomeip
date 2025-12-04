@@ -44,6 +44,7 @@ constexpr int16_t kTiltMinMinValue = -180;
 constexpr int16_t kTiltMinMaxValue = 0;
 constexpr int16_t kTiltMaxMinValue = 1;
 constexpr int16_t kTiltMaxMaxValue = 180;
+constexpr uint8_t kZoomMinValue    = 1;
 constexpr uint8_t kZoomMaxMinValue = 2;
 constexpr uint8_t kZoomMaxMaxValue = 100;
 

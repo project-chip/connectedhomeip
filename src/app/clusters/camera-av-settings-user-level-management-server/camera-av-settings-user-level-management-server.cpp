@@ -833,7 +833,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
             return;
         }
         uint8_t zoomValue = zoom.Value();
-        if ((zoomValue > mZoomMax) || (zoomValue < kZoomMaxMinValue - 1))
+        if ((zoomValue > mZoomMax) || (zoomValue < kZoomMinValue))
         {
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Zoom value out of range", mEndpointId);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
