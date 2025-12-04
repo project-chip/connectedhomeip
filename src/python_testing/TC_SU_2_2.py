@@ -256,10 +256,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
         logger.info(f'{step_number}: Prerequisite #2 - Provider Commissioning response: {resp}')
 
-        await self.extend_ota_acls(
-            controller=controller,
-            provider_node_id=provider_node_id,
-            requestor_node_id=requestor_node_id
+        await self.create_acl_entry(
+            dev_ctrl=controller,
+            provider_node_id=provider_node_id,      # write ACLs on the Provider
+            requestor_node_id=requestor_node_id     # allow access from the Requestor
         )
 
         # ------------------------------------------------------------------------------------
