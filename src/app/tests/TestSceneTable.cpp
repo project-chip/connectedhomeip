@@ -419,8 +419,7 @@ public:
         if (endpoint == kTestEndpoint4)
         {
             if (cluster == MockClusterId(app::Clusters::ColorControl::Id) ||
-                cluster == MockClusterId(app::Clusters::LevelControl::Id) ||
-                cluster == MockClusterId(app::Clusters::ColorControl::Id) || cluster == MockClusterId(kFakeClusterId))
+                cluster == MockClusterId(app::Clusters::LevelControl::Id) || cluster == MockClusterId(kFakeClusterId))
             {
                 return true;
             }
