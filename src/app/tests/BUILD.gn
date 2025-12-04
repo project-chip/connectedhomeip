@@ -107,7 +107,7 @@ source_set("actions-cluster-test-srcs") {
 }
 
 source_set("scenes-table-test-srcs") {
-  # Tests currently validate/use capping logic from codegen, so we wadd codegen support
+  # Tests currently validate/use capping logic from codegen, so we add codegen support
   # and mock data models.
   sources = [
     "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
