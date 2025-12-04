@@ -41,8 +41,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
-import logging
 from typing import List
 
 from mobly import asserts
@@ -50,8 +48,6 @@ from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 

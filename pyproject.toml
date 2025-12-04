@@ -48,7 +48,6 @@ ignore = [
     "ASYNC109", # Sometimes we use "timeout" argument in async functions
     "ASYNC230", # Allow open() calls in async functions
     "COM812", # Do not enforce trailing commas in multi-line collections for now
-    "LOG015", # Do not enforce non-root loggers in the entire codebase for now
     "SIM102", # Nested if statements can be more readable in some cases
     "SIM108", # Do not enforce ternary operator in place of if/else blocks
     "SIM114", # Separate if statements can be more readable in some cases
