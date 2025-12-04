@@ -40,7 +40,7 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, 
+CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId,
                                                                          CameraAvSettingsUserLevelManagementDelegate & aDelegate,
                                                                          BitFlags<Feature> aFeatures,
                                                                          BitFlags<OptionalAttributes> aOptionalAttrs,
