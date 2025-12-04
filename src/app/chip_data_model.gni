@@ -182,6 +182,9 @@ template("chip_data_model") {
     if (!defined(sources)) {
       sources = []
     }
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
 
     if (!defined(is_server)) {
       is_server = false
@@ -198,19 +201,11 @@ template("chip_data_model") {
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 
-    # TODO: this should become a public dependency on
-    #       "${_app_root}/clusters/scenes-server:scenes"
-    #       once these sources are decoupled from ember
-    # Applications seem to generally want to access cluster headers (like color-control-server.h)
-    # and those include scenes bits, so we add all dependencies here
+    # other clusters may use scenes. Allow those headers for now
+    public_deps += [ "${_app_root}/clusters/scenes-server:scenes" ]
     sources += [
-      "${_app_root}/clusters/scenes-server/AttributeValuePairValidator.h",
       "${_app_root}/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneTable.h",
-      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
+      "${_app_root}/clusters/scenes-server/CodegenEndpointToIndex.h",
       "${_app_root}/clusters/scenes-server/scenes-server.h",
     ]
 

@@ -40,4 +40,5 @@ static_library("scenes") {
 
 # Empty default target, so that data_model.gni can properly depend on this
 group("scenes-server") {
+  public_deps = [ ":scenes" ]
 }
