@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import logging
 from typing import List, Optional
 
 from mobly import asserts
@@ -25,8 +24,6 @@ from matter.clusters import ClusterObjects, Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityMetering
 

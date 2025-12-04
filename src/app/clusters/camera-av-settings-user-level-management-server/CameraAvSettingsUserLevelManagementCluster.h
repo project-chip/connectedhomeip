@@ -36,12 +36,17 @@ using MPTZStructType       = Structs::MPTZStruct::Type;
 using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
 using DPTZStruct           = Structs::DPTZStruct::Type;
 
-constexpr int16_t kMinPanValue  = -180;
-constexpr int16_t kMaxPanValue  = 180;
-constexpr int16_t kMinTiltValue = -180;
-constexpr int16_t kMaxTiltValue = 180;
-constexpr uint8_t kMinZoomValue = 1;
-constexpr uint8_t kMaxZoomValue = 100;
+constexpr int16_t kPanMinMinValue  = -180;
+constexpr int16_t kPanMinMaxValue  = 0;
+constexpr int16_t kPanMaxMinValue  = 1;
+constexpr int16_t kPanMaxMaxValue  = 180;
+constexpr int16_t kTiltMinMinValue = -180;
+constexpr int16_t kTiltMinMaxValue = 0;
+constexpr int16_t kTiltMaxMinValue = 1;
+constexpr int16_t kTiltMaxMaxValue = 180;
+constexpr uint8_t kZoomMinValue    = 1;
+constexpr uint8_t kZoomMaxMinValue = 2;
+constexpr uint8_t kZoomMaxMaxValue = 100;
 
 // Spec defined defaults for Pan, Tilt, and Zoom
 constexpr int16_t kDefaultPan  = 0;
@@ -380,14 +385,14 @@ private:
     // My known values for MPTZ.
     MPTZStructType mMptzPosition;
 
-    // Note, where assigned, these are spec defaults, potentially overwritten by the delegate. Exception is MaxPresets that
-    // is an F quality attribute and assigned by the constructor
+    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially
+    // overwritten by the delegate. Exception is MaxPresets that is an F quality attribute and assigned by the constructor
     const uint8_t mMaxPresets;
-    int16_t mPanMin  = kMinPanValue;
-    int16_t mPanMax  = kMaxPanValue;
-    int16_t mTiltMin = -90;
-    int16_t mTiltMax = 90;
-    uint8_t mZoomMax = kMaxZoomValue;
+    int16_t mPanMin  = kPanMinMinValue;
+    int16_t mPanMax  = kPanMaxMaxValue;
+    int16_t mTiltMin = kTiltMinMinValue;
+    int16_t mTiltMax = kTiltMaxMaxValue;
+    uint8_t mZoomMax = kZoomMaxMaxValue;
 
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<DPTZStruct> mDptzStreams;

@@ -242,7 +242,7 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMin(int16_t aTiltM
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    if ((aTiltMin < kMinTiltValue) || (aTiltMin > kMaxTiltValue - 1) || (aTiltMin > mTiltMax))
+    if ((aTiltMin < kTiltMinMinValue) || (aTiltMin > kTiltMinMaxValue))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -263,7 +263,7 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMax(int16_t aTiltM
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    if ((aTiltMax > kMaxTiltValue) || (aTiltMax < kMinTiltValue + 1) || (aTiltMax < mTiltMin))
+    if ((aTiltMax > kTiltMaxMaxValue) || (aTiltMax < kTiltMaxMinValue))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -284,7 +284,7 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMin(int16_t aPanMin
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    if ((aPanMin < kMinPanValue) || (aPanMin > kMaxPanValue - 1) || (aPanMin > mPanMax))
+    if ((aPanMin < kPanMinMinValue) || (aPanMin > kPanMinMaxValue))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -305,7 +305,7 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMax(int16_t aPanMax
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    if ((aPanMax > kMaxPanValue) || (aPanMax < kMinPanValue + 1) || (aPanMax < mPanMin))
+    if ((aPanMax > kPanMaxMaxValue) || (aPanMax < kPanMaxMinValue))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -326,7 +326,7 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetZoomMax(uint8_t aZoomM
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    if ((aZoomMax > kMaxZoomValue) || (aZoomMax < kMinZoomValue + 1))
+    if ((aZoomMax > kZoomMaxMaxValue) || (aZoomMax < kZoomMaxMinValue))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -833,7 +833,7 @@ void CameraAvSettingsUserLevelManagementCluster::HandleMPTZSetPosition(HandlerCo
             return;
         }
         uint8_t zoomValue = zoom.Value();
-        if ((zoomValue > mZoomMax) || (zoomValue < kMinZoomValue))
+        if ((zoomValue > mZoomMax) || (zoomValue < kZoomMinValue))
         {
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Zoom value out of range", mEndpointId);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
