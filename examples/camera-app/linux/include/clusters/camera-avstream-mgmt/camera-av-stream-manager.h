@@ -20,7 +20,7 @@
 
 #include "camera-avstream-controller.h"
 #include "camera-device-interface.h"
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <vector>
 

@@ -20,11 +20,11 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPFaultInjection.h>
@@ -50,7 +50,7 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(
-    EndpointId aEndpointId, CameraAVStreamMgmtDelegate & aDelegate, const BitFlags<Feature> aFeatures,
+    CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
     const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
     const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
     const VideoResolutionStruct & aMinViewPortRes,
@@ -61,7 +61,7 @@ CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(
     const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
     const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
     DefaultServerCluster({ aEndpointId, CameraAvStreamManagement::Id }), mDelegate(aDelegate),
-    mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
+    mEnabledFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
     mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams),
     mNightVisionUsesInfrared(aNightVisionUsesInfrared), mMinViewPortResolution(aMinViewPortRes),
     mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
@@ -78,10 +78,6 @@ CameraAVStreamManagementCluster::~CameraAVStreamManagementCluster()
     // Explicitly set the CameraAVStreamManagementCluster pointer in the Delegate to
     // null.
     mDelegate.SetCameraAVStreamManagementCluster(nullptr);
-
-    // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::Init()
@@ -169,14 +165,12 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
 
     LoadPersistentAttributes();
 
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
 bool CameraAVStreamManagementCluster::HasFeature(Feature feature) const
 {
-    return mFeatures.Has(feature);
+    return mEnabledFeatures.Has(feature);
 }
 
 bool CameraAVStreamManagementCluster::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
@@ -549,7 +543,7 @@ DataModel::ActionReturnStatus CameraAVStreamManagementCluster::ReadAttribute(con
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeatures));
+        ReturnErrorOnFailure(aEncoder.Encode(mEnabledFeatures));
         break;
     case MaxConcurrentEncoders::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
@@ -1134,7 +1128,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetViewport(const Globals::Structs::
     }
     mViewport = aViewport;
 
-    StoreViewport(mViewport);
+    ReturnErrorOnFailure(StoreViewport(mViewport));
     mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -1583,7 +1577,12 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    CHIP_ERROR cbErr = mDelegate.PersistentAttributesLoadedCallback();
+    if (cbErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: PersistentAttributesLoadedCallback() failed with error %" CHIP_ERROR_FORMAT,
+                     mPath.mEndpointId, cbErr.Format());
+    }
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport)
@@ -1793,7 +1792,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
 CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (HasFeature(kAudio))
+    if (HasFeature(Feature::kAudio))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AudioStreamAllocate::kMetadataEntry }));
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AudioStreamDeallocate::kMetadataEntry }));
@@ -1826,17 +1825,17 @@ CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClust
 CHIP_ERROR CameraAVStreamManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (HasFeature(kAudio))
+    if (HasFeature(Feature::kAudio))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AudioStreamAllocateResponse::kMetadataEntry }));
     }
 
-    if (HasFeature(kVideo))
+    if (HasFeature(Feature::kVideo))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::VideoStreamAllocateResponse::kMetadataEntry }));
     }
 
-    if (HasFeature(kSnapshot))
+    if (HasFeature(Feature::kSnapshot))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamAllocateResponse::kMetadataEntry }));
         ReturnErrorOnFailure(builder.AppendElements({ Commands::CaptureSnapshotResponse::kMetadataEntry }));
@@ -1997,13 +1996,13 @@ CHIP_ERROR CameraAVStreamManagementCluster::Attributes(const ConcreteClusterPath
 
     if (HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot))
     {
-        listBuilder.Append(Span(MaxConcurrentEncoders::kMetadataEntry));
+        listBuilder.Append(Span(Attributes::MaxConcurrentEncoders::kMetadataEntry));
     }
 
     // Counts only via feature bits; other optionals via optional attribute set.
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), MaxConcurrentEncoders::kMetadataEntry },
-        { HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), MaxEncodedPixelRate::kMetadataEntry },
+        { HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), Attributes::MaxConcurrentEncoders::kMetadataEntry },
+        { HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), Attributes::MaxEncodedPixelRate::kMetadataEntry },
         { HasFeature(Feature::kVideo), VideoSensorParams::kMetadataEntry },
         { HasFeature(Feature::kNightVision), NightVisionUsesInfrared::kMetadataEntry },
         { HasFeature(Feature::kVideo), MinViewportResolution::kMetadataEntry },

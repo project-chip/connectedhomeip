@@ -617,7 +617,7 @@ public:
 
     Globals::ThreeLevelAutoEnum GetStatusLightBrightness() const { return mStatusLightBrightness; }
 
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    // EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
     // Add/Remove Management functions for streams
 
@@ -759,7 +759,7 @@ private:
         if (currentValue != newValue)
         {
             currentValue = newValue;
-            auto path    = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+            auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
                 ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
@@ -779,7 +779,7 @@ private:
 
         if (it == streams.end())
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
             handler->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
             return false;
@@ -787,7 +787,7 @@ private:
 
         if (isDeallocate && it->referenceCount > 0)
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
             handler->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
             return false;
@@ -798,7 +798,7 @@ private:
         {
             if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
             {
-                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mPath.mEndpointId,
                              StreamTypeToString(streamType), streamID);
                 handler->AddStatus(commandPath, Protocols::InteractionModel::Status::DynamicConstraintError);
                 return false;
@@ -827,7 +827,7 @@ private:
                             Zcl,
                             "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
                             "not modifiable",
-                            mEndpointId, streamID);
+                            mPath.mEndpointId, streamID);
                         handler->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
                         return false;
                     }

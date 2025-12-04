@@ -93,6 +93,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
     uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
     uint8_t sensitivityMax                        = mCameraDevice->GetCameraHALInterface().GetSensitivityMax();
+    VideoSensorParamsStruct sensorParams          = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
     TwoDCartesianVertexStruct appTwoDCartesianMax = {};
     appTwoDCartesianMax.x                         = sensorParams.sensorWidth - 1;
     appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
@@ -198,8 +199,8 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    mAVStreamMgmtServer.Create(mEndPoint,
-        mCameraDevice->GetCameraAVStreamMgmtDelegate(), avsmFeatures, avsmOptionalAttrs, maxConcurrentVideoEncoders,
+    mAVStreamMgmtServer.Create(
+        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
         streamUsagePriorities);
