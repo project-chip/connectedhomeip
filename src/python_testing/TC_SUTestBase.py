@@ -274,8 +274,33 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             Result of the ACL write operation
         """
         # Standard ACL entry for OTA Provider cluster
+        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
+
         if acl_entries is None:
-            acl_entries = self._create_default_acl_entries(dev_ctrl, requestor_node_id)
+            # If there are not ACL entries using proper struct constructors create the default.
+            acl_entries = [
+                # Admin entry
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                    subjects=[admin_node_id],  # type: ignore
+                    targets=NullValue
+                ),
+                # Operate entry
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                    subjects=requestor_subjects,  # type: ignore
+                    targets=[
+                        Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
+                            cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                            endpoint=NullValue,
+                            deviceType=NullValue
+                        )
+                    ],
+                )
+            ]
 
         # Create the attribute descriptor for the ACL attribute
         acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
@@ -284,35 +309,3 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
-
-    def _create_default_acl_entries(self,
-                                    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-                                    requestor_node_id: Optional[int] = None) -> list[Clusters.AccessControl.Structs.AccessControlEntryStruct]:
-        """
-        Create a default list of ACL entries for OTA providers needed for the SU tests.
-        """
-        admin_node_id = dev_ctrl.nodeId
-        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
-
-        return [
-            # Admin entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[admin_node_id],
-                targets=NullValue
-            ),
-            # Operate entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=requestor_subjects,
-                targets=[
-                    Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                        cluster=Clusters.OtaSoftwareUpdateProvider.id,
-                        endpoint=NullValue,
-                        deviceType=NullValue
-                    )
-                ],
-            )
-        ]
