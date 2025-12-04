@@ -287,7 +287,7 @@ class AttributeSubscriptionHandler:
                     self._attribute_report_counts[path.AttributeType] += 1
                     self._attribute_reports[path.AttributeType].append(value)
 
-    def wait_for_attribute_report(self):
+    def wait_for_attribute_report(self, timeout_sec: float = 10):
         """
         Blocks and waits for a single attribute report to arrive in the queue.
 
@@ -295,7 +295,7 @@ class AttributeSubscriptionHandler:
         """
 
         try:
-            item = self._q.get(block=True, timeout=10)
+            item = self._q.get(block=True, timeout=timeout_sec)
             attribute_value = item.value
             LOGGER.info(
                 f"[AttributeSubscriptionHandler] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
