@@ -15,11 +15,12 @@
 #    limitations under the License.
 #
 
+import logging
 import re
 from datetime import datetime
-import logging
-from mobly import asserts
+
 import pycountry
+from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.matter_testing import MatterBaseTest, TestStep
