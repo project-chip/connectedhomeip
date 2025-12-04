@@ -378,14 +378,12 @@ jobs:
                       ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' \
                       && exit 1 || exit 0
 
-            # Run ruff python linter
             - name: Check for errors using ruff Python linter
               if: always()
               run: |
-                  ruff check
+                  ruff check --output-format=github
 
-            # Run ChipStackError linter
-            - name: Check for errors using ruff Python linter
+            - name: Check for 'except ChipStackError' usage
               if: always()
               run: |
                   python3 scripts/check_chipstack.py
