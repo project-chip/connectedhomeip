@@ -51,7 +51,7 @@ constexpr uint8_t kDefaultZoom = 1;
 constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
-class CameraAvSettingsUserLevelMgmtServer;
+class CameraAvSettingsUserLevelManagementCluster;
 
 struct MPTZPresetHelper
 {
@@ -94,11 +94,11 @@ public:
  *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement
  * Cluster. Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
  */
-class Delegate
+class CameraAvSettingsUserLevelManagementDelegate
 {
 public:
-    Delegate()          = default;
-    virtual ~Delegate() = default;
+    CameraAvSettingsUserLevelManagementDelegate()          = default;
+    virtual ~CameraAvSettingsUserLevelManagementDelegate() = default;
 
     /**
      * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
@@ -234,15 +234,15 @@ public:
     virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)             = 0;
 
 private:
-    friend class CameraAvSettingsUserLevelMgmtServer;
+    friend class CameraAvSettingsUserLevelManagementCluster;
 
-    CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
+    CameraAvSettingsUserLevelManagementCluster * mServer = nullptr;
 
     // Sets the Server pointer
-    void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
+    void SetServer(CameraAvSettingsUserLevelManagementCluster * aServer) { mServer = aServer; }
 
 protected:
-    CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
+    CameraAvSettingsUserLevelManagementCluster * GetServer() const { return mServer; }
 };
 
 enum class OptionalAttributes : uint32_t
@@ -259,9 +259,9 @@ enum class OptionalAttributes : uint32_t
     kMovementState = 0x0200,
 };
 
-class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface,
-                                            public CommandHandlerInterface,
-                                            public PhysicalPTZCallback
+class CameraAvSettingsUserLevelManagementCluster : public AttributeAccessInterface,
+                                                   public CommandHandlerInterface,
+                                                   public PhysicalPTZCallback
 {
 public:
     /**
@@ -274,9 +274,9 @@ public:
      *                                           instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate & aDelegate, BitFlags<Feature> aFeatures,
+    CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, CameraAvSettingsUserLevelManagementDelegate & aDelegate, BitFlags<Feature> aFeatures,
                                         BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets);
-    ~CameraAvSettingsUserLevelMgmtServer() override;
+    ~CameraAvSettingsUserLevelManagementCluster() override;
 
     CHIP_ERROR Init();
 
@@ -368,7 +368,7 @@ public:
     bool IsMoving() const { return mMovementState == PhysicalMovementEnum::kMoving; }
 
 private:
-    Delegate & mDelegate;
+    CameraAvSettingsUserLevelManagementDelegate & mDelegate;
     EndpointId mEndpointId;
     BitFlags<Feature> mFeatures;
     BitFlags<OptionalAttributes> mOptionalAttrs;

@@ -19,7 +19,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -40,7 +40,8 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate & aDelegate,
+CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, 
+                                                                         CameraAvSettingsUserLevelManagementDelegate & aDelegate,
                                                                          BitFlags<Feature> aFeatures,
                                                                          BitFlags<OptionalAttributes> aOptionalAttrs,
                                                                          uint8_t aMaxPresets) :
@@ -51,7 +52,7 @@ CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(Endpoin
     mDelegate.SetServer(this);
 }
 
-CameraAvSettingsUserLevelMgmtServer::~CameraAvSettingsUserLevelMgmtServer()
+CameraAvSettingsUserLevelManagementCluster::~CameraAvSettingsUserLevelManagementCluster()
 {
     // Unregister command handler and attribute access interfaces
     TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
@@ -59,7 +60,7 @@ CameraAvSettingsUserLevelMgmtServer::~CameraAvSettingsUserLevelMgmtServer()
     mDelegate.SetServer(nullptr);
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Init()
 {
     // Make sure mandated Features are set
     //
@@ -179,27 +180,27 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     return CHIP_NO_ERROR;
 }
 
-void CameraAvSettingsUserLevelMgmtServer::Shutdown()
+void CameraAvSettingsUserLevelManagementCluster::Shutdown()
 {
     mDelegate.ShutdownApp();
 }
 
-bool CameraAvSettingsUserLevelMgmtServer::HasFeature(Feature aFeature) const
+bool CameraAvSettingsUserLevelManagementCluster::HasFeature(Feature aFeature) const
 {
     return mFeatures.Has(aFeature);
 }
 
-bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOptionalAttr) const
+bool CameraAvSettingsUserLevelManagementCluster::SupportsOptAttr(OptionalAttributes aOptionalAttr) const
 {
     return mOptionalAttrs.Has(aOptionalAttr);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::MarkDirty(AttributeId aAttributeId)
+void CameraAvSettingsUserLevelManagementCluster::MarkDirty(AttributeId aAttributeId)
 {
     MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, aAttributeId);
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::StoreMPTZPosition(const MPTZStructType & mptzPosition)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::StoreMPTZPosition(const MPTZStructType & mptzPosition)
 {
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -214,7 +215,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::StoreMPTZPosition(const MPTZStru
     return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::LoadMPTZPosition(MPTZStructType & mptzPosition)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::LoadMPTZPosition(MPTZStructType & mptzPosition)
 {
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -236,7 +237,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::LoadMPTZPosition(MPTZStructType 
  * the associated Feature presence is checked. The attributes are updated, and marked dirty, only if there is a change in the
  * attribute value after constraint checking has been completed.
  */
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetTiltMin(int16_t aTiltMin)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMin(int16_t aTiltMin)
 {
     if (!HasFeature(Feature::kMechanicalTilt))
     {
@@ -257,7 +258,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetTiltMin(int16_t aTiltMin)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetTiltMax(int16_t aTiltMax)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMax(int16_t aTiltMax)
 {
     if (!HasFeature(Feature::kMechanicalTilt))
     {
@@ -278,7 +279,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetTiltMax(int16_t aTiltMax)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetPanMin(int16_t aPanMin)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMin(int16_t aPanMin)
 {
     if (!HasFeature(Feature::kMechanicalPan))
     {
@@ -299,7 +300,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetPanMin(int16_t aPanMin)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetPanMax(int16_t aPanMax)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMax(int16_t aPanMax)
 {
     if (!HasFeature(Feature::kMechanicalPan))
     {
@@ -320,7 +321,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetPanMax(int16_t aPanMax)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetZoomMax(uint8_t aZoomMax)
 {
     if (!HasFeature(Feature::kMechanicalZoom))
     {
@@ -349,7 +350,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
  * MPTZSetPosition, this will be handled and the attributes updated if at least one of the three pan, tilt, or zoom have a value,
  * with all three params passed through once validation is complete. An empty value is just ignored.
  */
-void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
+void CameraAvSettingsUserLevelManagementCluster::SetPan(Optional<int16_t> aPan)
 {
     if (HasFeature(Feature::kMechanicalPan))
     {
@@ -362,7 +363,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
     }
 }
 
-void CameraAvSettingsUserLevelMgmtServer::SetTilt(Optional<int16_t> aTilt)
+void CameraAvSettingsUserLevelManagementCluster::SetTilt(Optional<int16_t> aTilt)
 {
     if (HasFeature(Feature::kMechanicalTilt))
     {
@@ -375,7 +376,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetTilt(Optional<int16_t> aTilt)
     }
 }
 
-void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
+void CameraAvSettingsUserLevelManagementCluster::SetZoom(Optional<uint8_t> aZoom)
 {
     if (HasFeature(Feature::kMechanicalZoom))
     {
@@ -388,7 +389,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
     }
 }
 
-void CameraAvSettingsUserLevelMgmtServer::SetMovementState(PhysicalMovementEnum aMovementState)
+void CameraAvSettingsUserLevelManagementCluster::SetMovementState(PhysicalMovementEnum aMovementState)
 {
     if (HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom))
     {
@@ -401,7 +402,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetMovementState(PhysicalMovementEnum 
 /**
  * Methods handling known video stream IDs, the addition and removal thereof.
  */
-void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
+void CameraAvSettingsUserLevelManagementCluster::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
                                                                     Globals::Structs::ViewportStruct::Type aViewport)
 {
     DPTZStruct dptzEntry;
@@ -411,7 +412,7 @@ void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVi
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
+void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
                                                                        Globals::Structs::ViewportStruct::Type aViewport)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
@@ -428,7 +429,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t 
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
 {
     for (auto & dptzStream : mDptzStreams)
     {
@@ -438,7 +439,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(Globals:
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStream(uint16_t aVideoStreamID)
+void CameraAvSettingsUserLevelManagementCluster::RemoveMoveCapableVideoStream(uint16_t aVideoStreamID)
 {
     // Verify that this is a known ID, if it is, remove from the list
     //
@@ -459,7 +460,7 @@ void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStream(uint16_t 
 /**
  * @returns bool  True if the provided video stream ID is known to the server. False if not.
  */
-bool CameraAvSettingsUserLevelMgmtServer::KnownVideoStreamID(uint16_t aVideoStreamID)
+bool CameraAvSettingsUserLevelManagementCluster::KnownVideoStreamID(uint16_t aVideoStreamID)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
                            [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
@@ -474,7 +475,7 @@ bool CameraAvSettingsUserLevelMgmtServer::KnownVideoStreamID(uint16_t aVideoStre
  * solely server generated, they can also be provided by a client.
  * If there are no free presets (which will happen if all slots are taken), the value is not updated.
  */
-void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
+void CameraAvSettingsUserLevelManagementCluster::UpdatePresetID()
 {
     uint8_t nextIDToCheck = mCurrentPresetID;
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.", mEndpointId,
@@ -506,7 +507,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
 /**
  * Helper Read functions for complex attribute types
  */
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(AttributeValueEncoder & aEncoder)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::ReadAndEncodeMPTZPresets(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (const auto & mptzPresets : mMptzPresetHelpers)
@@ -528,7 +529,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
     });
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (const auto & dptzStream : mDptzStreams)
@@ -540,7 +541,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZStreams(Attribu
     });
 }
 
-void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
+void CameraAvSettingsUserLevelManagementCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Load MPTZPosition
@@ -577,7 +578,7 @@ void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
 /**
  * AttributeAccessInterface
  */
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == CameraAvSettingsUserLevelManagement::Id);
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Camera AV Settings User Level Management: Reading", mEndpointId);
@@ -662,7 +663,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
 /**
  * CommandHandlerInterface
  */
-void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
+void CameraAvSettingsUserLevelManagementCluster::InvokeCommand(HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);
 
@@ -774,8 +775,8 @@ void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handler
     }
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext & ctx,
-                                                                const Commands::MPTZSetPosition::DecodableType & commandData)
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZSetPosition(HandlerContext & ctx,
+                                                                       const Commands::MPTZSetPosition::DecodableType & commandData)
 {
     bool hasAtLeastOneValue = false;
 
@@ -889,7 +890,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRelativeMove(HandlerContext & ctx,
                                                                  const Commands::MPTZRelativeMove::DecodableType & commandData)
 {
     bool hasAtLeastOneValue = false;
@@ -1062,7 +1063,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext & ctx,
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZMoveToPreset(HandlerContext & ctx,
                                                                  const Commands::MPTZMoveToPreset::DecodableType & commandData)
 {
     uint8_t preset = commandData.presetID;
@@ -1138,7 +1139,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZSavePreset(HandlerContext & ctx,
                                                                const Commands::MPTZSavePreset::DecodableType & commandData)
 {
     Status status = Status::Success;
@@ -1233,7 +1234,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext & ctx,
+void CameraAvSettingsUserLevelManagementCluster::HandleMPTZRemovePreset(HandlerContext & ctx,
                                                                  const Commands::MPTZRemovePreset::DecodableType & commandData)
 {
     uint8_t presetToRemove = commandData.presetID;
@@ -1280,7 +1281,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
+void CameraAvSettingsUserLevelManagementCluster::HandleDPTZSetViewport(HandlerContext & ctx,
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
     uint16_t videoStreamID                          = commandData.videoStreamID;
@@ -1310,7 +1311,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext & ctx,
+void CameraAvSettingsUserLevelManagementCluster::HandleDPTZRelativeMove(HandlerContext & ctx,
                                                                  const Commands::DPTZRelativeMove::DecodableType & commandData)
 {
     uint16_t videoStreamID     = commandData.videoStreamID;
@@ -1357,7 +1358,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
 
 // Physical device movement callback
 //
-void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status status)
+void CameraAvSettingsUserLevelManagementCluster::OnPhysicalMovementComplete(Status status)
 {
     // Make sure we're running in the Matter thread
     assertChipStackLockedByCurrentThread();
