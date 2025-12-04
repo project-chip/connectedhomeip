@@ -25,7 +25,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --endpoint 0
+#       --endpoint 3
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
