@@ -309,67 +309,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
-        """
-        Extend ACLs on Provider to allow interaction with the Requestor.
-        Preserves existing ACLs to avoid overwriting.
-
-        Args:
-            controller: The Matter device controller instance.
-            provider_node_id (int): Node ID of the OTA Provider.
-            requestor_node_id (int): Node ID of the OTA Requestor (DUT).
-        """
-        # Read existing ACLs
-        provider_existing_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Create OTA ACL, the Requestor is allowed to access on the Provider
-        await self.create_acl_entry(
-            dev_ctrl=controller,
-            provider_node_id=provider_node_id,      # write ACLs on the Provider
-            requestor_node_id=requestor_node_id     # allow access from the Requestor
-        )
-
-        # Read updated ACLs
-        provider_current_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Combine original + new entries
-        combined_provider_acls = provider_existing_acls + provider_current_acls
-
-        # Write back ACLs
-        await self.write_acl(controller, provider_node_id, combined_provider_acls)
-
-        logger.info(f'OTA ACLs extended between provider {provider_node_id}')
-
-    async def write_acl(self, controller, node_id, acl):
-        """
-        Write the ACL list to a device.
-
-        Args:
-            controller: The Matter controller instance.
-            node_id (int): Node ID of the target device.
-            acl (list): List of AccessControlEntryStruct ACL entries.
-
-        Returns:
-            True if successful.
-        """
-        result = await controller.WriteAttribute(
-            nodeId=node_id,
-            attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
-        )
-
-        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        return True
-
     async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
         """
         Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
