@@ -20,8 +20,6 @@
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/storage/FabricTableImpl.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>

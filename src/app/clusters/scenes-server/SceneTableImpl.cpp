@@ -16,8 +16,11 @@
  */
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <stdlib.h>
+
+#include <cstdlib>
 
 using namespace chip;
 using namespace chip::scenes;
