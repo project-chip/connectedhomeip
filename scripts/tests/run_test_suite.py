@@ -336,7 +336,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     paths_finder = PathsFinder()
 
-    def build_app(arg_value: Path | None, kind: SubprocessKind, key: str) -> SubprocessInfo | None:
+    def build_app(arg_value: str | None, kind: SubprocessKind, key: str) -> SubprocessInfo | None:
         log.debug("Constructing app %s...", key)
         app_path = arg_value if arg_value is not None else paths_finder.get(key)
         return None if app_path is None else SubprocessInfo(kind=kind, path=Path(app_path))
