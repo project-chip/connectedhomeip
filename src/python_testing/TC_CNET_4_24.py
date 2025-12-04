@@ -441,8 +441,24 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 5: TH reads Networks attribute (verify incorrect network ID is stored)
         self.step(5)
 
+        networks = await self._read_networks(endpoint)
+        logger.info(f" --- Step 5: Networks attribute has {len(networks)} network(s)")
+        network_ids = [net.networkID for net in networks]
+        asserts.assert_in(incorrect_thread_dataset_1, network_ids,
+                          "Incorrect network ID not found in Networks attribute after failed connection attempt")
+
         # Step 6: TH sends RemoveNetwork command with incorrect network ID, Breadcrumb = 3
         self.step(6)
+
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.RemoveNetwork(
+                networkID=incorrect_thread_dataset_1,
+                breadcrumb=3
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        await self._validate_network_config_response(response)
 
         # Step 7: TH reads Networks attribute (verify list is empty)
         self.step(7)
