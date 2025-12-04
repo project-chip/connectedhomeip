@@ -201,14 +201,6 @@ template("chip_data_model") {
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 
-    # other clusters may use scenes. Allow those headers for now
-    public_deps += [ "${_app_root}/clusters/scenes-server:scenes" ]
-    sources += [
-      "${_app_root}/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
-      "${_app_root}/clusters/scenes-server/CodegenEndpointToIndex.h",
-      "${_app_root}/clusters/scenes-server/scenes-server.h",
-    ]
-
     sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
