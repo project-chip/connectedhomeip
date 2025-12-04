@@ -273,33 +273,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             Result of the ACL write operation
         """
         # Standard ACL entry for OTA Provider cluster
-        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
-        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
-
         if acl_entries is None:
-            # If there are not ACL entries using proper struct constructors create the default.
-            acl_entries = [
-                # Admin entry
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                    subjects=[admin_node_id],  # type: ignore
-                    targets=NullValue
-                ),
-                # Operate entry
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                    subjects=requestor_subjects,  # type: ignore
-                    targets=[
-                        Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
-                            cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
-                            endpoint=NullValue,
-                            deviceType=NullValue
-                        )
-                    ],
-                )
-            ]
+            acl_entries = self._create_default_acl_entries(dev_ctrl, requestor_node_id)
 
         # Create the attribute descriptor for the ACL attribute
         acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
@@ -326,12 +301,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             endpoint=0,
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
+        logger.info(f'Existing OTA ACLs on provider {provider_node_id}: {provider_existing_acls}')
+
+        default_acl_entries = self._create_default_acl_entries(
+            dev_ctrl=controller,
+            requestor_node_id=requestor_node_id
+        )
 
         # Create OTA ACL, the Requestor is allowed to access on the Provider
         await self.create_acl_entry(
             dev_ctrl=controller,
             provider_node_id=provider_node_id,      # write ACLs on the Provider
-            requestor_node_id=requestor_node_id     # allow access from the Requestor
+            requestor_node_id=requestor_node_id,     # allow access from the Requestor
+            acl_entries=default_acl_entries + provider_existing_acls  # preserve existing ACLs
         )
 
         # Read updated ACLs
@@ -341,71 +323,36 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             endpoint=0,
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
+        logger.info(f'Updated OTA ACLs on provider {provider_node_id}: {provider_current_acls}')
 
-        # Combine original + new entries
-        combined_provider_acls = provider_existing_acls + provider_current_acls
-
-        # Write back ACLs
-        await self.write_acl(controller, provider_node_id, combined_provider_acls)
-
-        logger.info(f'OTA ACLs extended between provider {provider_node_id}')
-
-    async def write_acl(self, controller, node_id, acl):
+    def _create_default_acl_entries(self,
+                                    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+                                    requestor_node_id: Optional[int] = None) -> list[Clusters.AccessControl.Structs.AccessControlEntryStruct]:
         """
-        Write the ACL list to a device.
-
-        Args:
-            controller: The Matter controller instance.
-            node_id (int): Node ID of the target device.
-            acl (list): List of AccessControlEntryStruct ACL entries.
-
-        Returns:
-            True if successful.
+        Create a default list of ACL entries for OTA providers needed for the SU tests.
         """
-        result = await controller.WriteAttribute(
-            nodeId=node_id,
-            attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
-        )
+        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
 
-        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        return True
-
-    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
-        """
-        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
-
-        Args:
-            controller (ChipDeviceCtrl): The controller to use for writing attributes.
-            requestor_node_id (int): Node ID of the Requestor device.
-
-        Returns:
-            None
-        """
-        # Set DefaultOTAProviders to empty list
-        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr_clear)],
-            nodeId=requestor_node_id
-        )
-        logger.info('Cleanup - DefaultOTAProviders cleared')
-
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
-
-    def clear_kvs(self, kvs_path_prefix: str = None):
-        """
-        Remove all temporary KVS files matching a given prefix.
-
-        Args:
-            kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
-            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files
-
-        Returns:
-            None
-        """
-        import subprocess
-
-        if kvs_path_prefix is None:
-            kvs_path_prefix = "/tmp/chip_kvs"
-        subprocess.run(f"rm -rf {kvs_path_prefix}*", shell=True)
-
-        logger.info(f'Removed KVS files matching: {kvs_path_prefix}*')
+        return [
+            # Admin entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=[admin_node_id],  # type: ignore
+                targets=NullValue
+            ),
+            # Operate entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=requestor_subjects,  # type: ignore
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
+                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        endpoint=NullValue,
+                        deviceType=NullValue
+                    )
+                ],
+            )
+        ]
