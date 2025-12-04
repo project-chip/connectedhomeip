@@ -17,8 +17,9 @@
 
 import re
 from datetime import datetime
-import pycountry
+import logging
 from mobly import asserts
+import pycountry
 
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -52,7 +53,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             TestStep(22, "TH reads SpecificationVersion from the DUT.", "Value should be set to a valid Major, Minor, and Dot version with the lower 8 bits set to zero."),
             TestStep(23, "TH reads MaxPathsPerInvoke from the DUT.", "Verify that the value is in the range of 1 to 65535."),
         ]
-        
+
         # Return all steps - excluded steps will be skipped during execution
         return steps
 
@@ -108,7 +109,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 7: Location
         if cluster_name == "BRBINFO":
-            self.skip_step(7)   
+            self.skip_step(7)
         else:
             self.step(7)
             ret7 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.Location)
@@ -223,7 +224,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             asserts.assert_true(isinstance(ret19, str), "UniqueID should be a string")
             if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
                 asserts.assert_not_equal(ret19, serial_number, "UniqueID should not be identical to SerialNumber attribute if SerialNumber attribute is supported")
-            
+
         # Step 20: CapabilityMinima
         if cluster_name == "BRBINFO":
             self.skip_step(20)
@@ -252,11 +253,11 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                 minor = (ret22 >> 16) & 0xFF
                 dot = (ret22 >> 8) & 0xFF
                 reserved = ret22 & 0xFF
-                # Verify the lower 8 bits (reserved) are set to zero
                 asserts.assert_equal(reserved, 0, "SpecificationVersion lower 8 bits (reserved) should be zero")
-                # For Matter 1.5, expect Major=1, Minor=5
+                # For Matter 1.5, expect Major=1, Minor=5, Dot=0
                 asserts.assert_equal(major, 1, f"SpecificationVersion Major should be 1, got {major}")
                 asserts.assert_equal(minor, 5, f"SpecificationVersion Minor should be 5 for Matter 1.5, got {minor}")
+                asserts.assert_equal(dot, 0, f"SpecificationVersion Dot should be 0, got {dot}")
 
         # Step 23: MaxPathsPerInvoke
         if cluster_name == "BRBINFO":
