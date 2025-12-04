@@ -22,7 +22,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/scenes-server.cpp"
     "${CLUSTER_DIR}/scenes-server.h"
 
-    # these below would be pulled by GNI dependency. CMAKE needs these directly
+    # these below would be pulled by GN (.gni file) dependency. CMAKE needs these directly
     "${CLUSTER_DIR}/AttributeValuePairValidator.h"
     "${CLUSTER_DIR}/ExtensionFieldSets.h"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.cpp"
