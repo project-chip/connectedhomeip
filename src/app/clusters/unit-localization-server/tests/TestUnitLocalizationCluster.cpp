@@ -18,6 +18,24 @@
 
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 
+#include <app/ConcreteClusterPath.h>
+#include <app/clusters/testing/AttributeTesting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/TimeFormatLocalization/Metadata.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/ReadOnlyBuffer.h>
+
+#include <clusters/UnitLocalization/ClusterId.h>
+#include <clusters/UnitLocalization/Enums.h>
+#include <clusters/UnitLocalization/Metadata.h>
+
+using namespace chip::Test;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::UnitLocalization;
+
 struct TestUnitLocalizationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -30,42 +48,44 @@ TEST_F(TestUnitLocalizationCluster, AttributeTest)
     TestServerClusterContext clusterContext;
 
     ConcreteClusterPath clusterPath(kRootEndpointId, UnitLocalization::Id);
-    BitFlags<UnitLocalization::Feature> features{ 0 };
+    BitFlags<UnitLocalization::Feature> features{ 1 };
 
-    UnitLocalizationCluster cluster(clusterPath, features);
+    UnitLocalizationCluster cluster(kRootEndpointId, features);
 
     // Test attributes listing with no features enabled
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
 
-    ASSERT_EQ(onlyMandatory.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
     ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedAttributes.AppendElements({ UnitLocalization::Attributes::TemperatureUnit::}), CHIP_NO_ERROR);
+    ASSERT_EQ(expectedAttributes.AppendElements({ Attributes::TemperatureUnit::kMetadataEntry, //
+                                                  Attributes::SupportedTemperatureUnits::kMetadataEntry }),
+              CHIP_NO_ERROR);
 
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
 }
 
 TEST_F(TestUnitLocalizationCluster, MigrationTest)
 {
-
     TestServerClusterContext clusterContext;
 
     ConcreteClusterPath clusterPath(kRootEndpointId, UnitLocalization::Id);
-    BitFlags<UnitLocalization::Feature> features{ 0 };
+    BitFlags<UnitLocalization::Feature> features{ 1 };
 
-    UnitLocalizationClusterWithMigration cluster(clusterPath, features);
-
-    cluster.Startup(clusterContext.Get());
+    UnitLocalizationClusterWithMigration cluster(kRootEndpointId, features);
+    ASSERT_EQ(cluster.Startup(clusterContext.Get()), CHIP_NO_ERROR);
 
     // Test attributes listing with no features enabled
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
 
-    ASSERT_EQ(onlyMandatory.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
     ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedAttributes.AppendElements({ UnitLocalization::Attributes::TemperatureUnit::}), CHIP_NO_ERROR);
+    ASSERT_EQ(expectedAttributes.AppendElements(
+                  { Attributes::TemperatureUnit::kMetadataEntry, Attributes::SupportedTemperatureUnits::kMetadataEntry }),
+              CHIP_NO_ERROR);
 
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
 }
