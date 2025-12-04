@@ -57,7 +57,7 @@ public:
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };
 
-    CHIP_ERROR Init(PersistentStorageDelegate & storage) override;
+    CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) override;
     void Finish() override;
 
     // Scene count
@@ -105,6 +105,9 @@ protected:
 
     // wrapper function around emberAfGetClusterCountForEndpoint to allow override when testing
     virtual uint8_t GetClusterCountFromEndpoint();
+
+private:
+    app::DataModel::Provider * mDataModel = nullptr;
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint

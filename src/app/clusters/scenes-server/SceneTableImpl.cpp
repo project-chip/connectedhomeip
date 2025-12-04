@@ -101,8 +101,9 @@ using FabricSceneData =
 
 template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>;
 
-CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate & storage)
+CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel)
 {
+    mDataModel = &dataModel;
     return FabricTableImpl::Init(storage);
 }
 
@@ -110,6 +111,7 @@ void DefaultSceneTableImpl::Finish()
 {
     UnregisterAllHandlers();
     FabricTableImpl::Finish();
+    mDataModel = nullptr;
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count)
