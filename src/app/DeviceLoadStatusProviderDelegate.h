@@ -44,5 +44,5 @@ public:
     virtual uint16_t GetNumCurrentSubscriptionsForFabric(FabricIndex fabric) = 0;
 };
 
-}
-}
+} // namespace app
+} // namespace chip

@@ -134,7 +134,8 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 {
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
-                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags, DeviceLoadStatusProviderDelegate * deviceLoadStatusProvider,
+                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                                              DeviceLoadStatusProviderDelegate * deviceLoadStatusProvider,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
         GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, deviceLoadStatusProvider),
         mFunctionConfig(functionsConfig)

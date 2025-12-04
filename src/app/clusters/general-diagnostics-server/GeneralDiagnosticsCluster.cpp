@@ -284,7 +284,8 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
             .currentSubscriptions = mDeviceLoadStatusProvider->GetNumCurrentSubscriptions(),
-            .currentSubscriptionsForFabric         = mDeviceLoadStatusProvider->GetNumCurrentSubscriptionsForFabric(encoder.AccessingFabricIndex()),
+            .currentSubscriptionsForFabric =
+                mDeviceLoadStatusProvider->GetNumCurrentSubscriptionsForFabric(encoder.AccessingFabricIndex()),
             .totalSubscriptionsEstablished         = mDeviceLoadStatusProvider->GetNumTotalSubscriptions(),
             .totalInteractionModelMessagesSent     = messageStatistics.interactionModelMessagesSent,
             .totalInteractionModelMessagesReceived = messageStatistics.interactionModelMessagesReceived,

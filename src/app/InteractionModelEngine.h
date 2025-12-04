@@ -432,19 +432,17 @@ public:
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
     // DeviceLoadStatusProviderDelegate functions implementation
-    MessageStats GetMessageStats() override {
-        return GetExchangeManager()->GetSessionManager()->GetMessageStats();
-    }
+    MessageStats GetMessageStats() override { return GetExchangeManager()->GetSessionManager()->GetMessageStats(); }
 
-    uint32_t GetNumTotalSubscriptions() override {
-        return GetReportScheduler()->GetTotalSubscriptionsEstablished();
-    }
+    uint32_t GetNumTotalSubscriptions() override { return GetReportScheduler()->GetTotalSubscriptionsEstablished(); }
 
-    uint16_t GetNumCurrentSubscriptions() override {
+    uint16_t GetNumCurrentSubscriptions() override
+    {
         return static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe));
     }
 
-    uint16_t GetNumCurrentSubscriptionsForFabric(FabricIndex fabric) override {
+    uint16_t GetNumCurrentSubscriptionsForFabric(FabricIndex fabric) override
+    {
         return static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric));
     }
 

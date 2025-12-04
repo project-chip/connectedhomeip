@@ -51,7 +51,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        InteractionModelEngine * interactionModel         = InteractionModelEngine::GetInstance();
+        InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         const GeneralDiagnosticsFunctionsConfig functionsConfig
