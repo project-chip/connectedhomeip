@@ -56,6 +56,8 @@ TEST_F(TestUnitLocalizationCluster, MigrationTest)
 
     UnitLocalizationClusterWithMigration cluster(clusterPath, features);
 
+    cluster.Startup(clusterContext.Get());
+
     // Test attributes listing with no features enabled
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
 
