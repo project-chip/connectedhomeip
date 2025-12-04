@@ -1284,7 +1284,7 @@ class BaseTestHelper:
                 # is declared failed.
                 await taskAttributeChange
 
-            return True if receivedUpdate == 5 else False
+            return receivedUpdate == 5
 
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
