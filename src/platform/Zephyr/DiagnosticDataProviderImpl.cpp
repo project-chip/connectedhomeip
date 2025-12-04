@@ -424,7 +424,7 @@ DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagno
 
     WiFiManager::WiFiInfo info;
     ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
-    securityType   = info.mSecurityType;
+    securityType = info.mSecurityType;
     return CHIP_NO_ERROR;
 }
 
@@ -432,7 +432,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 {
     WiFiManager::WiFiInfo info;
     ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
-    wiFiVersion    = info.mWiFiVersion;
+    wiFiVersion = info.mWiFiVersion;
     return CHIP_NO_ERROR;
 }
 
@@ -440,7 +440,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 {
     WiFiManager::WiFiInfo info;
     ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
-    channelNumber  = info.mChannel;
+    channelNumber = info.mChannel;
     return CHIP_NO_ERROR;
 }
 
@@ -448,7 +448,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
     WiFiManager::WiFiInfo info;
     ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
-    rssi           = info.mRssi;
+    rssi = info.mRssi;
     return CHIP_NO_ERROR;
 }
 
@@ -473,7 +473,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 {
     WiFiManager::NetworkStatistics stats;
     ReturnErrorOnFailure(WiFiManager::Instance().GetNetworkStatistics(stats));
-    beaconRxCount  = stats.mBeaconsSuccessCount;
+    beaconRxCount = stats.mBeaconsSuccessCount;
     return CHIP_NO_ERROR;
 }
 
@@ -513,7 +513,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
 {
     WiFiManager::NetworkStatistics stats;
     ReturnErrorOnFailure(WiFiManager::Instance().GetNetworkStatistics(stats));
-    overrunCount   = static_cast<uint64_t>(stats.mOverRunCount);
+    overrunCount = static_cast<uint64_t>(stats.mOverRunCount);
     return CHIP_NO_ERROR;
 }
 
