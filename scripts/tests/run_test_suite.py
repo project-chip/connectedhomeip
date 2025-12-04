@@ -27,8 +27,8 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import Executor, SubprocessInfo
-from chiptest.test_definition import TestRunTime, TestTag
+from chiptest.runner import Executor, SubprocessKind
+from chiptest.test_definition import TestRunTime, TestTag, SubprocessInfoRepo
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -60,7 +60,6 @@ class RunContext:
     root: str
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
-    chip_tool: str
     dry_run: bool
     runtime: TestRunTime
 
@@ -131,12 +130,9 @@ class RunContext:
     type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
-@click.option(
-    '--chip-tool',
-    help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, runner, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, runner):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -148,18 +144,6 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         runtime = TestRunTime.MATTER_REPL_PYTHON
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
-
-    if chip_tool is not None:
-        chip_tool = SubprocessInfo(kind='tool', path=chip_tool)
-    elif runtime != TestRunTime.MATTER_REPL_PYTHON:
-        paths_finder = PathsFinder()
-        if runtime == TestRunTime.CHIP_TOOL_PYTHON:
-            chip_tool_path = paths_finder.get('chip-tool')
-        else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
-            chip_tool_path = paths_finder.get('darwin-framework-tool')
-
-        if chip_tool_path is not None:
-            chip_tool = SubprocessInfo(kind='tool', path=chip_tool_path)
 
     if include_tags:
         include_tags = {TestTag.__members__[t] for t in include_tags}
@@ -219,8 +203,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
-                             chip_tool=chip_tool, dry_run=dry_run,
-                             runtime=runtime,
+                             dry_run=dry_run, runtime=runtime,
                              include_tags=include_tags,
                              exclude_tags=exclude_tags)
 
@@ -244,53 +227,24 @@ def cmd_list(context):
     default=1,
     help='Number of iterations to run')
 @click.option(
-    '--all-clusters-app',
-    help='what all clusters app to use')
+    '--app-path', multiple=True,
+    help='Set path for an application, value should be <key>:<path>'
+)
 @click.option(
-    '--lock-app',
-    help='what lock app to use')
+    '--tool-path', multiple=True,
+    help='Set path for a tool, value should be <key>:<path>'
+)
 @click.option(
-    '--fabric-bridge-app',
-    help='what fabric bridge app to use')
+    '--custom-path', multiple=True,
+    help="Set path with a custom kind, value should be <kind>:<key>:<path>, valid kind values are "
+    f"{[v.value for v in SubprocessKind.__members__.values()]}"
+)
 @click.option(
-    '--ota-provider-app',
-    help='what ota provider app to use')
-@click.option(
-    '--ota-requestor-app',
-    help='what ota requestor app to use')
-@click.option(
-    '--tv-app',
-    help='what tv app to use')
-@click.option(
-    '--bridge-app',
-    help='what bridge app to use')
-@click.option(
-    '--lit-icd-app',
-    help='what lit-icd app to use')
-@click.option(
-    '--microwave-oven-app',
-    help='what microwave oven app to use')
-@click.option(
-    '--rvc-app',
-    help='what rvc app to use')
-@click.option(
-    '--network-manager-app',
-    help='what network-manager app to use')
-@click.option(
-    '--energy-gateway-app',
-    help='what energy-gateway app to use')
-@click.option(
-    '--energy-management-app',
-    help='what energy-management app to use')
-@click.option(
-    '--closure-app',
-    help='what closure app to use')
-@click.option(
-    '--matter-repl-yaml-tester',
-    help='what python script to use for running yaml tests using matter-repl as controller')
-@click.option(
-    '--chip-tool-with-python',
-    help='what python script to use for running yaml tests using chip-tool as controller')
+    '--discover-paths',
+    is_flag=True,
+    default=False,
+    help='Disover missing paths for application and tool binaries'
+)
 @click.option(
     '--pics-file',
     type=click.Path(exists=True),
@@ -321,71 +275,37 @@ def cmd_list(context):
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
-            energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
+def cmd_run(context, iterations, app_path, tool_path, custom_path, discover_paths,
+            pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
-    paths_finder = PathsFinder()
+    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder())
 
-    def build_app(arg_value, kind: str, key: str):
-        app_path = arg_value if arg_value else paths_finder.get(key)
-        if app_path is not None:
-            return SubprocessInfo(kind=kind, path=app_path)
-        return None
+    for p in app_path:
+        subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
+    for p in tool_path:
+        subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
+    for p in custom_path:
+        subproc_info_repo.addSpec(p)
 
-    all_clusters_app = build_app(all_clusters_app, 'app', 'chip-all-clusters-app')
-    lock_app = build_app(lock_app, 'app', 'chip-lock-app')
-    fabric_bridge_app = build_app(fabric_bridge_app, 'app', 'fabric-bridge-app')
-    ota_provider_app = build_app(ota_provider_app, 'app', 'chip-ota-provider-app')
-    ota_requestor_app = build_app(ota_requestor_app, 'app', 'chip-ota-requestor-app')
-    tv_app = build_app(tv_app, 'app', 'chip-tv-app')
-    bridge_app = build_app(bridge_app, 'app', 'chip-bridge-app')
-    lit_icd_app = build_app(lit_icd_app, 'app', 'lit-icd-app')
-    microwave_oven_app = build_app(microwave_oven_app, 'app', 'chip-microwave-oven-app')
-    rvc_app = build_app(rvc_app, 'app', 'chip-rvc-app')
-    network_manager_app = build_app(network_manager_app, 'app', 'matter-network-manager-app')
-    energy_gateway_app = build_app(energy_gateway_app, 'app', 'chip-energy-gateway-app')
-    energy_management_app = build_app(energy_management_app, 'app', 'chip-energy-management-app')
-    closure_app = build_app(closure_app, 'app', 'closure-app')
-    matter_repl_yaml_tester = build_app(matter_repl_yaml_tester, 'tool',
-                                        'yamltest_with_matter_repl_tester.py').wrap_with('python3')
+    if discover_paths:
+        subproc_info_repo.discover()
 
-    if chip_tool_with_python is None:
-        if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py')
-        else:
-            chip_tool_with_python = build_app(None, 'tool', 'chiptool.py')
-
-        if chip_tool_with_python is not None:
-            chip_tool_with_python = chip_tool_with_python.wrap_with('python3')
+    # We use require here as we want to throw an error as these tools are mandatory for any test run.
+    if context.obj.runtime == TestRunTime.MATTER_REPL_PYTHON:
+        subproc_info_repo.require('matter-repl-yaml-tester')
+    elif context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
+        subproc_info_repo.require('chip-tool')
+        subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
+    else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
+        # `chip-tool` on darwin is `darwin-framework-tool`
+        subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
+        subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
-
-    # Command execution requires an array
-    paths = chiptest.ApplicationPaths(
-        chip_tool=context.obj.chip_tool,
-        all_clusters_app=all_clusters_app,
-        lock_app=lock_app,
-        fabric_bridge_app=fabric_bridge_app,
-        ota_provider_app=ota_provider_app,
-        ota_requestor_app=ota_requestor_app,
-        tv_app=tv_app,
-        bridge_app=bridge_app,
-        lit_icd_app=lit_icd_app,
-        microwave_oven_app=microwave_oven_app,
-        rvc_app=rvc_app,
-        network_manager_app=network_manager_app,
-        energy_gateway_app=energy_gateway_app,
-        energy_management_app=energy_management_app,
-        closure_app=closure_app,
-        matter_repl_yaml_tester_cmd=matter_repl_yaml_tester,
-        chip_tool_with_python_cmd=chip_tool_with_python,
-    )
 
     ble_controller_app = None
     ble_controller_tool = None
@@ -451,7 +371,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 else:
                     log.info("%-20s - Starting test", test.name)
                 test.Run(
-                    runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
+                    runner, apps_register, subproc_info_repo,
+                    pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime,
                     ble_controller_app=ble_controller_app,
                     ble_controller_tool=ble_controller_tool,

@@ -32,10 +32,10 @@ class PathsFinder:
     def __init__(self, root_dir: str = DEFAULT_CHIP_ROOT):
         self.__root_dir = root_dir
 
-    def get(self, target_name: str) -> str:
+    def get(self, target_name: str) -> Path | None:
         path = _PATHS_CACHE.get(target_name)
         if path and Path(path).is_file():
-            return path
+            return Path(path)
 
         if path:
             del _PATHS_CACHE[target_name]
@@ -45,7 +45,7 @@ class PathsFinder:
                 continue
 
             _PATHS_CACHE[target_name] = str(path)
-            return str(path)
+            return Path(path)
 
         return None
 

@@ -25,9 +25,10 @@ import typing
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
+from pathlib import Path
 
-from .runner import SubprocessInfo
+from .runner import SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
@@ -214,20 +215,151 @@ class App:
         return True
 
 
-class TestTarget(Enum):
-    ALL_CLUSTERS = auto()
-    TV = auto()
-    LOCK = auto()
-    OTA = auto()
-    BRIDGE = auto()
-    LIT_ICD = auto()
-    FABRIC_SYNC = auto()
-    MWO = auto()
-    RVC = auto()
-    NETWORK_MANAGER = auto()
-    ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
-    CLOSURE = auto()
+class TestTarget(StrEnum):
+    ALL_CLUSTERS = 'all-clusters'
+    TV = 'tv'
+    LOCK = 'lock'
+    OTA = 'ota-requestor'
+    BRIDGE = 'bridge'
+    LIT_ICD = 'lit-icd'
+    FABRIC_SYNC = 'fabric-sync'
+    MWO = 'microwave-oven'
+    RVC = 'rvc'
+    NETWORK_MANAGER = 'network-manager'
+    ENERGY_GATEWAY = 'energy-gateway'
+    ENERGY_MANAGEMENT = 'energy-management'
+    CLOSURE = 'closure'
+
+
+@dataclass
+class SubprocEntry:
+    kind: SubprocessKind
+    target_name: str | None = None
+    wrapper: tuple[str] | None = None
+
+
+BUILTIN_SUBPROC_KNOWHOW = {
+    # Matter applications
+    'all-clusters': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
+    'all-devices': SubprocEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
+    'air-purifier': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-air-purifier-app'),
+    'bridge': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-bridge-app'),
+    'camera': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-camera-app'),
+    'camera-controller': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-camera-controller'),
+    'closure': SubprocEntry(kind=SubprocessKind.APP, target_name='closure-app'),
+    'energy-gateway': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-energy-gateway-app'),
+    'energy-management': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-energy-management-app'),
+    'fabric-bridge': SubprocEntry(kind=SubprocessKind.APP, target_name='fabric-bridge-app'),
+    'fabric-admin': SubprocEntry(kind=SubprocessKind.APP, target_name='fabric-admin'),
+    'fabric-sync': SubprocEntry(kind=SubprocessKind.APP, target_name='fabric-sync'),
+    'jf-control': SubprocEntry(kind=SubprocessKind.APP, target_name='jfc-app'),
+    'jf-admin': SubprocEntry(kind=SubprocessKind.APP, target_name='jfa-app'),
+    'light': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-lighting-app'),
+    'lit-icd': SubprocEntry(kind=SubprocessKind.APP, target_name='lit-icd-app'),
+    'lock': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-lock-app'),
+    'microwave-oven': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-microwave-oven-app'),
+    'network-manager': SubprocEntry(kind=SubprocessKind.APP, target_name='matter-network-manager-app'),
+    'ota-provider': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-ota-provider-app'),
+    'ota-requestor': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-ota-requestor-app'),
+    'rvc': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
+    'terms-and-conditions': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-terms-and-conditions-app'),
+    'tv': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-tv-app'),
+    'water-leak-detector': SubprocEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
+
+    # Tools
+    'chip-tool': SubprocEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
+    'darwin-framework-tool': SubprocEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
+    'matter-repl-yaml-tester': SubprocEntry(kind=SubprocessKind.TOOL, target_name='yamltest_with_matter_repl_tester.py'),
+
+    # No target_name as this is either chiptool.py or darwinframework.py depending on the platform
+    'chip-tool-with-python': SubprocEntry(kind=SubprocessKind.TOOL)
+}
+
+
+class PathsFinderProto(typing.Protocol):
+    def get(target_name: str) -> Path:
+        pass
+
+
+class SubprocessInfoRepo(dict):
+   # We don't want to explicitly reference PathsFinder type because we
+   # don't want to create a dependency on the diskcache module which PathsFinder imports.
+   # Instead we just want a dict-like object
+    def __init__(self, paths: PathsFinderProto,
+                 subproc_knowhow: dict[str, SubprocEntry] = BUILTIN_SUBPROC_KNOWHOW,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.paths = paths
+        self.subproc_knowhow = subproc_knowhow
+
+    def addSpec(self, spec: str, kind: SubprocessKind | None = None):
+        """Add a path to the repo as specified on the command line"""
+        el = spec.split(':')
+        if len(el) == 3:
+            # <kind>:<key>:<path>
+            kind_s, key, path = el
+            kind = SubprocessKind[kind_s]
+            path = Path(path)
+        elif len(el) == 2:
+            # <key>:<path>
+            key, path = el
+            path = Path(path)
+            if kind is None:
+                if key not in self.subproc_knowhow:
+                    raise KeyError(f"Kind not provided for key '{key}' and not specified in know-how")
+                kind = self.subproc_knowhow[key].kind
+        else:
+            raise RuntimeError(f"Cannot parse path spec '{spec}'")
+
+        s = SubprocessInfo(kind=kind, path=path)
+        if path.suffix == '.py':
+            s = s.wrap_with('python3')
+        self[key] = s
+
+    def discover(self):
+        """
+        Try to discover paths to all apps and tools in the know-how which we are still missing.
+        Reuse the `require` method but ignore failures, we expect the test-cases to fail if they
+        depend on missing paths.
+        """
+        log.info("Discovering missing paths")
+        start_ts = time.time()
+        discovered_count = 0
+        for key, entry in self.subproc_knowhow.items():
+            try:
+                self.require(key)
+                discovered_count += 1
+            except (LookupError, ValueError) as e:
+                # Stack trace is not needed here
+                log.warning("Exception while trying to discover '%s': %r", key, e)
+        log.info("Discovery of %d paths took %.2f seconds", discovered_count, time.time() - start_ts)
+
+    def require(self, key: str, kind: SubprocessKind | None = None, target_name: str | None = None):
+        """
+        Indicate that a subprocess path is required. Throw exception if it's not already in the repo
+        and can't be discovered using the paths finder.
+        """
+        log.debug("Require key '%s' kind '%s' target_name '%s'", key, kind, target_name)
+        if key in self:
+            return self[key]
+        if kind is None:
+            if key not in self.subproc_knowhow:
+                raise ValueError(f"Key '{key}': kind neither provided nor specified in know-how")
+            kind = self.subproc_knowhow[key].kind
+        if target_name is None:
+            if key not in self.subproc_knowhow:
+                raise ValueError(f"Key '{key}': target name neither provided nor specified in know-how")
+            target_name = self.subproc_knowhow[key].target_name
+            if target_name is None:
+                raise ValueError(f"Key '{key}': Key exists in know-how but no target name specified")
+        if (path := self.paths.get(target_name)) is None:
+            raise LookupError(f"Cannot find path for required key '{key}'")
+        log.info("Discovered required key '%s' path '%s'", key, path)
+        s = SubprocessInfo(kind=kind, path=path)
+        if path.suffix == '.py':
+            s = s.wrap_with('python3')
+        self[key] = s
+        return self[key]
 
 
 @dataclass
@@ -376,7 +508,7 @@ class TestDefinition:
         """Get a human readable list of tags applied to this test"""
         return ", ".join([t.to_s() for t in self.tags])
 
-    def Run(self, runner, apps_register, apps: ApplicationPaths, pics_file: str,
+    def Run(self, runner, apps_register, subproc_info_repo: SubprocessInfoRepo, pics_file: str,
             timeout_seconds: typing.Optional[int], dry_run=False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: typing.Optional[int] = None,
@@ -391,57 +523,19 @@ class TestDefinition:
         loggedCapturedLogs = False
 
         try:
-            if self.target == TestTarget.ALL_CLUSTERS:
-                target_app = apps.all_clusters_app
-            elif self.target == TestTarget.TV:
-                target_app = apps.tv_app
-            elif self.target == TestTarget.LOCK:
-                target_app = apps.lock_app
-            elif self.target == TestTarget.FABRIC_SYNC:
-                target_app = apps.fabric_bridge_app
-            elif self.target == TestTarget.OTA:
-                target_app = apps.ota_requestor_app
-            elif self.target == TestTarget.BRIDGE:
-                target_app = apps.bridge_app
-            elif self.target == TestTarget.LIT_ICD:
-                target_app = apps.lit_icd_app
-            elif self.target == TestTarget.MWO:
-                target_app = apps.microwave_oven_app
-            elif self.target == TestTarget.RVC:
-                target_app = apps.rvc_app
-            elif self.target == TestTarget.NETWORK_MANAGER:
-                target_app = apps.network_manager_app
-            elif self.target == TestTarget.ENERGY_GATEWAY:
-                target_app = apps.energy_gateway_app
-            elif self.target == TestTarget.ENERGY_MANAGEMENT:
-                target_app = apps.energy_management_app
-            elif self.target == TestTarget.CLOSURE:
-                target_app = apps.closure_app
-            else:
-                raise Exception("Unknown test target - "
-                                "don't know which application to run")
-
+            target_app = subproc_info_repo.require(self.target.value)
             if not dry_run:
-                for command, key in apps.items_with_key():
-                    # Do not add chip-tool or matter-repl-yaml-tester-cmd to the register
-                    if (command == apps.chip_tool
-                            or command == apps.matter_repl_yaml_tester_cmd
-                            or command == apps.chip_tool_with_python_cmd):
-                        continue
-
-                    # Skip items where we don't actually have a path.  This can
-                    # happen if the relevant application does not exist.  It's
-                    # non-fatal as long as we are not trying to run any tests that
-                    # need that application.
-                    if command is None:
+                for key, subproc in subproc_info_repo.items():
+                    # Do not add tools to the register
+                    if subproc.kind == SubprocessKind.TOOL:
                         continue
 
                     # For the app indicated by self.target, give it the 'default' key to add to the register
-                    if command == target_app:
+                    if key == self.target.value:
                         key = 'default'
                     if ble_controller_app is not None:
-                        command = command.with_args("--ble-controller", str(ble_controller_app), "--wifi")
-                    app = App(runner, command)
+                        subproc = subproc.with_args("--ble-controller", str(ble_controller_app), "--wifi")
+                    app = App(runner, subproc)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
                     apps_register.add(key, app)
@@ -452,7 +546,7 @@ class TestDefinition:
                     # It may sometimes be useful to run the same app multiple times depending
                     # on the implementation. So this code creates a duplicate entry but with a different
                     # key.
-                    app = App(runner, command)
+                    app = App(runner, subproc)
                     apps_register.add(f'{key}#2', app)
                     app.factoryReset()
 
@@ -472,7 +566,7 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = apps.matter_repl_yaml_tester_cmd.with_args(
+                python_cmd = subproc_info_repo['matter-repl-yaml-tester'].with_args(
                     '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
 
                 if dry_run:
@@ -483,17 +577,18 @@ class TestDefinition:
             else:
                 pairing_server_args = []
 
+                pairing_cmd = subproc_info_repo['chip-tool-with-python']
                 if ble_controller_tool is not None:
-                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
+                    pairing_cmd = pairing_cmd.with_args(
                         "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
                     pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 else:
-                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
+                    pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
                 if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                     pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
-                test_cmd = apps.chip_tool_with_python_cmd.with_args('tests', self.run_name, '--PICS', pics_file)
+                test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', pics_file)
 
                 interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
 
@@ -501,15 +596,15 @@ class TestDefinition:
                     interactive_server_args = interactive_server_args + ['--interface-id', '-1']
 
                 server_args = (
-                    '--server_path', str(apps.chip_tool.path),
+                    '--server_path', str(subproc_info_repo['chip-tool'].path),
                     '--server_arguments', ' '.join(interactive_server_args))
 
                 pairing_cmd = pairing_cmd.with_args(*server_args)
                 test_cmd = test_cmd.with_args(*server_args)
 
                 if dry_run:
-                    log.info(shlex.join(pairing_cmd))
-                    log.info(shlex.join(test_cmd))
+                    log.info("Pairing command: %s", shlex.join(pairing_cmd))
+                    log.info("Testcase command: %s", shlex.join(test_cmd))
                 else:
                     runner.RunSubprocess(pairing_cmd,
                                          name='PAIR', dependencies=[apps_register])
