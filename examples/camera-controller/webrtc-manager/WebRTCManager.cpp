@@ -489,6 +489,11 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
     {
         ChipLogError(Camera, "Failed to send ICE candidates: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    else
+    {
+        ChipLogProgress(Camera, "Sent %lu ICE candidate(s), clearing list", mLocalCandidates.size());
+        mLocalCandidates.clear();
+    }
 
     return err;
 }
