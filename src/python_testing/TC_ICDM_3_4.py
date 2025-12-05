@@ -37,7 +37,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import logging
 
 from mobly import asserts
 
@@ -45,8 +44,6 @@ import matter.clusters as Clusters
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 kRootEndpointId = 0
 cluster = Clusters.Objects.IcdManagement

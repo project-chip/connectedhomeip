@@ -225,6 +225,8 @@ from matter.testing.taglist_and_topology_test import (create_device_type_list_fo
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 def get_vendor_id(mei: int) -> int:
     """Get the vendor ID portion (MEI prefix) of an overall MEI."""
@@ -355,7 +357,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
-            logging.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
+            log.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
             if not has_descriptor:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id),
                                   problem=f"Did not find a descriptor on endpoint {endpoint_id}", spec_location="Base Cluster Requirements for Matter")
@@ -434,7 +436,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
 
                     has_attribute = (req_attribute.id in cluster)
                     location = AttributePathLocation(endpoint_id, cluster_id, req_attribute.id)
-                    logging.debug(
+                    log.debug(
                         f"Checking for mandatory global {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
                     # Check attribute is actually present
@@ -473,7 +475,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
                         has_attribute = attribute_id in cluster
 
                         attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
-                        logging.debug(
+                        log.debug(
                             f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
                         if not has_attribute:
