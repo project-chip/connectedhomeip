@@ -209,7 +209,7 @@ class IsolatedNetworkNamespace:
             try:
                 self._run(cmd)
             except Exception as e:
-                log.warning("Encountered error during namespace termination: %s", e, exc_info=True)
+                log.warning("Encountered error during namespace termination: %s", e)
 
 
 class LinuxNamespacedExecutor(Executor):
