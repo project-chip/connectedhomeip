@@ -36,7 +36,7 @@ public:
     static DiagnosticDataProviderImplWiFi & GetDefaultInstance();
 
     // ===== WiFi Network Diagnostics Methods =====
-    
+
     CHIP_ERROR GetWiFiBssId(MutableByteSpan & value) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion) override;
