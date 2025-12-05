@@ -195,7 +195,7 @@ class TC_SC_3_5(MatterBaseTest):
                 asserts.fail(f"RevokeCommissioning failed with error: {e.status}")
         except Exception as e:
             log.exception('Error running RevokeCommissioning command: %s', e)
-            asserts.fail(f"RevokeCommissioning failed with error: {e.status}")
+            asserts.fail(f"RevokeCommissioning failed with error: {str(e)}")
 
         await asyncio.sleep(1)
 
@@ -248,7 +248,7 @@ class TC_SC_3_5(MatterBaseTest):
         # ------------------------------------------- Determine if DUT Commissioner has ICAC in its NOC Chain---------------------------------------------
 
         if self.is_pics_sdk_ci_only:
-            print("Skip steps 1a-1d since we are running in CI and there is no DUT Commissioner in CI to check for its ICAC")
+            log.info("Skip steps 1a-1d since we are running in CI and there is no DUT Commissioner in CI to check for its ICAC")
             self.skip_step("1a")
             self.skip_step("1b")
             self.skip_step("1c")
@@ -268,10 +268,7 @@ class TC_SC_3_5(MatterBaseTest):
                 "Input 'N' if commissioner DUT fails commissioning \n "
             )
 
-            if self.is_pics_sdk_ci_only:
-                resp = 'Y'
-            else:
-                resp = self.wait_for_user_input(prompt_msg)
+            resp = self.wait_for_user_input(prompt_msg)
 
             commissioning_success = resp.lower() == 'y'
 
@@ -293,15 +290,20 @@ class TC_SC_3_5(MatterBaseTest):
 
             dut_commissioner_noc_struct = next((noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId), None)
 
+            asserts.assert_is_not_none(
+                dut_commissioner_noc_struct,
+                "Could not find a NOCStruct for DUT Commissioner. Please ensure that DUT Commissioner commissioned TH Server successfully."
+            )
+
             dut_commissioner_icac = dut_commissioner_noc_struct.icac
             dut_commissioner_fabric_index = dut_commissioner_noc_struct.fabricIndex
 
             # Determine if DUT_Commissioner has ICAC in its NOC Chain
             if dut_commissioner_icac == NullValue:
-                print("DUT_Commissioner does not have ICAC in its NOC Chain")
+                log.info("DUT_Commissioner does not have ICAC in its NOC Chain")
                 self.dut_has_icac = False
             else:
-                print("DUT_Commissioner has ICAC in its NOC Chain")
+                log.info("DUT_Commissioner has ICAC in its NOC Chain")
                 self.dut_has_icac = True
 
             # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Commissioner in next step
