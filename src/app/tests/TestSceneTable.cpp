@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/mock/Constants.h>
@@ -31,7 +32,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app::Clusters::Globals::Attributes;
 
 using SceneTable        = scenes::SceneTable<scenes::ExtensionFieldSetsImpl>;
@@ -56,9 +57,9 @@ constexpr chip::ClusterId kColorControlClusterId = 0x0300;
 constexpr chip::ClusterId kScenesClusterId       = 0x0062;
 
 // Test Endpoint ID
-constexpr chip::EndpointId kTestEndpoint1 = chip::Test::kMockEndpoint1;
-constexpr chip::EndpointId kTestEndpoint2 = chip::Test::kMockEndpoint2;
-constexpr chip::EndpointId kTestEndpoint3 = chip::Test::kMockEndpoint3;
+constexpr chip::EndpointId kTestEndpoint1 = kMockEndpoint1;
+constexpr chip::EndpointId kTestEndpoint2 = kMockEndpoint2;
+constexpr chip::EndpointId kTestEndpoint3 = kMockEndpoint3;
 constexpr chip::EndpointId kTestEndpoint4 = kMockEndpointMin;
 
 // Test Attribute ID
@@ -383,8 +384,8 @@ static const MockNodeConfig SceneMockNodeConfig({
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    TestSceneHandler() = default;
-    ~TestSceneHandler() override {}
+    TestSceneHandler() : DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
+    ~TestSceneHandler() override = default;
 
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override

@@ -67,7 +67,7 @@ TEST_F(TestGroupcastCluster, TestAttributes)
 
     // Read attributes for expected values
     {
-        chip::Test::ClusterTester tester(cluster);
+        chip::Testing::ClusterTester tester(cluster);
         uint16_t revision{};
         ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
         ASSERT_EQ(revision, app::Clusters::Groupcast::kRevision);
@@ -99,7 +99,7 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
 
 TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     app::Clusters::GroupcastCluster cluster(BitFlags<Feature>{ Feature::kListener });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -116,7 +116,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
     chip::app::Testing::MockCommandHandler cmdHandler;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)

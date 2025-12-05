@@ -52,7 +52,7 @@ from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
@@ -294,7 +294,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         supported_attributes = await self.get_supported_energy_evse_attributes()
         if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in supported_attributes:
             self.step("9")
-            logging.info("UserMaximumChargeCurrent is supported...")
+            log.info("UserMaximumChargeCurrent is supported...")
             user_max_charge_current = 6000
             await self.write_user_max_charge(1, user_max_charge_current)
 
@@ -305,7 +305,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
                 user_max_charge_current, circuit_capacity)
             await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
         else:
-            logging.info(
+            log.info(
                 "UserMaximumChargeCurrent is NOT supported... skipping.")
             self.mark_step_range_skipped("9", "9a")
 
