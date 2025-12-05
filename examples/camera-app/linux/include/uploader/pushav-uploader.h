@@ -20,6 +20,7 @@
 
 #include <atomic>
 #include <curl/curl.h>
+#include <filesystem>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -65,8 +66,10 @@ public:
     void setCertificateBuffer(const PushAVCertBuffer & certBuffer) { mCertBuffer = certBuffer; }
     void setCertificatePath(const PushAVCertPath & certPath) { mCertPath = certPath; }
 
-    void setMPDPath(const std::pair<std::string, std::string> & path) { mMPDPath = path; }
-    std::pair<std::string, std::string> getMPDPath() const { return mMPDPath; }
+    void UploadFinalMPD(const std::filesystem::path & filename, std::string & url)
+    {
+        UploadData(make_pair(filename.string(), url));
+    }
 
 private:
     void ProcessQueue();
@@ -77,5 +80,4 @@ private:
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
-    std::pair<std::string, std::string> mMPDPath;
 };

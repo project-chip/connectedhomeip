@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -220,6 +221,8 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTriggerType;
     chip ::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mReasonType;
 
+    std::filesystem::path mUploadFileBasePath;
+
     /// @name Internal Methods
     /// @{
 
@@ -230,7 +233,24 @@ private:
      */
     bool EnsureDirectoryExists(const std::string & path);
 
-    bool CheckAndUploadFile(std::string path);
+    bool CheckAndUploadFile(std::string filename);
+
+    /**
+     * @brief Checks if a file is ready for upload (exists and not being written to).
+     * @param path The file path to check.
+     * @return true if the file is ready for upload, false otherwise.
+     */
+    bool IsFileReadyForUpload(const std::filesystem::path & path) const;
+
+    /**
+     * @brief Updates the startNumber in an MPD file to a default value.
+     *
+     * This function reads an MPD file, finds the startNumber attribute,
+     * and replaces it with the default start number (1001).
+     *
+     * @param mpdPath Path to the MPD file to update
+     */
+    void UpdateMPDStartNumber(const std::string & mpdPath);
 
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
 
