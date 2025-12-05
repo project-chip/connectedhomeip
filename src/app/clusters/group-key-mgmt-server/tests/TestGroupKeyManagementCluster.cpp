@@ -88,7 +88,6 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
     ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
     ASSERT_EQ(generatedCommands[1], GroupKeyManagement::Commands::KeySetReadResponse::Id);
 }
-
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
     GroupKeyManagementCluster cluster;
@@ -220,10 +219,10 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 
     void SetUp() override
     {
+        auto * storage = &mTestContext.StorageDelegate();
 
-        mOldGroupProvider = Credentials::GetGroupDataProvider();
-        mRealProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
-        mRealProvider.SetSessionKeystore(&mOpKeyStore);
+        mRealProvider.SetStorageDelegate(storage);
+        mRealProvider.SetSessionKeystore(&mMockKeystore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mRealProvider);
         tester.SetFabricIndex(TestHelpers::kTestFabricIndex);
