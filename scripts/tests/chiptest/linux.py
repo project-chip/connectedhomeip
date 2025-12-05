@@ -204,7 +204,7 @@ class IsolatedNetworkNamespace:
                 raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
-        """Execute all down commands in reverse order gracefully omitting errors."""
+        """Execute all down commands gracefully omitting errors."""
         for cmd in self.COMMANDS_TERMINATE:
             try:
                 self._run(cmd)
