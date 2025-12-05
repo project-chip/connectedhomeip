@@ -27,16 +27,16 @@ namespace app {
 class OTARequestorEventHandler
 {
 public:
+    using ChangeReasonEnum = chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum;
+    using UpdateStateEnum  = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+
     virtual ~OTARequestorEventHandler() = default;
 
-    virtual void OnStateTransition(chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
-                                   chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
-                                   chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
-                                   chip::app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion) = 0;
-    virtual void OnVersionApplied(uint32_t softwareVersion, uint16_t productId)                            = 0;
-    virtual void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                 chip::app::DataModel::Nullable<uint8_t> progressPercent,
-                                 chip::app::DataModel::Nullable<int64_t> platformCode)                     = 0;
+    virtual void OnStateTransition(UpdateStateEnum previousState, UpdateStateEnum newState, ChangeReasonEnum reason,
+                                   DataModel::Nullable<uint32_t> const & targetSoftwareVersion) = 0;
+    virtual void OnVersionApplied(uint32_t softwareVersion, uint16_t productId)                 = 0;
+    virtual void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded, DataModel::Nullable<uint8_t> progressPercent,
+                                 DataModel::Nullable<int64_t> platformCode)                     = 0;
 };
 
 } // namespace app

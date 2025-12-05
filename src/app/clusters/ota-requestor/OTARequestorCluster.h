@@ -52,9 +52,9 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    void OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
-                           OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
-                           OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
+    void OnStateTransition(OTARequestorEventHandler::UpdateStateEnum previousState,
+                           OTARequestorEventHandler::UpdateStateEnum newState,
+                           OTARequestorEventHandler::ChangeReasonEnum reason,
                            DataModel::Nullable<uint32_t> const & targetSoftwareVersion) override;
 
     void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) override;

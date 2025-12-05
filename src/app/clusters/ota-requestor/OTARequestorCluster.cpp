@@ -185,9 +185,9 @@ CHIP_ERROR OTARequestorCluster::AcceptedCommands(const ConcreteClusterPath & pat
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-void OTARequestorCluster::OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
-                                            OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
-                                            OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
+void OTARequestorCluster::OnStateTransition(OTARequestorEventHandler::UpdateStateEnum previousState,
+                                            OTARequestorEventHandler::UpdateStateEnum newState,
+                                            OTARequestorEventHandler::ChangeReasonEnum reason,
                                             DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
 {
     if (previousState == newState)
