@@ -2270,15 +2270,18 @@ void InteractionModelEngine::ResetNumSubscriptionsRetries()
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
-MessageStats InteractionModelEngine::GetMessageStats() { return GetExchangeManager()->GetSessionManager()->GetMessageStats(); }
+MessageStats InteractionModelEngine::GetMessageStats()
+{
+    return GetExchangeManager()->GetSessionManager()->GetMessageStats();
+}
 
 SubscriptionStats InteractionModelEngine::GetSubscriptionStats(FabricIndex fabric)
 {
     return SubscriptionStats{ .numTotalSubscriptions = GetReportScheduler()->GetTotalSubscriptionsEstablished(),
-                                .numCurrentSubscriptions =
-                                    static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-                                .numCurrentSubscriptionsForFabric = static_cast<uint16_t>(
-                                    GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric)) };
+                              .numCurrentSubscriptions =
+                                  static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+                              .numCurrentSubscriptionsForFabric = static_cast<uint16_t>(
+                                  GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric)) };
 }
 
 } // namespace app
