@@ -44,10 +44,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
 
-    // Instantiate WebRTCTransport Provider
-    mWebRTCTransportProviderPtr =
-        std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
-
     Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
 
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
@@ -279,8 +275,16 @@ void CameraApp::InitializeCameraAVStreamMgmt()
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    TEMPORARY_RETURN_IGNORED mWebRTCTransportProviderPtr->Init();
-    mCameraDevice->GetWebRTCProviderController().SetWebRTCTransportProvider(std::move(mWebRTCTransportProviderPtr));
+    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCTransportProviderServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register WebRTCTransportProvider on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
+
+    // Set the WebRTCTransportProvider server in the manager
+    mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
 
     TEMPORARY_RETURN_IGNORED mChimeServerPtr->Init();
 
@@ -294,8 +298,19 @@ void CameraApp::InitCameraDeviceClusters()
 void CameraApp::ShutdownCameraDeviceClusters()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
+<<<<<<< HEAD
     mAVSettingsUserLevelMgmtServer.Cluster().Shutdown();
     mWebRTCTransportProviderPtr->Shutdown();
+=======
+    mAVSettingsUserLevelMgmtServerPtr->Shutdown();
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "WebRTCTransportProvider unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mWebRTCTransportProviderServer.Destroy();
+>>>>>>> master
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

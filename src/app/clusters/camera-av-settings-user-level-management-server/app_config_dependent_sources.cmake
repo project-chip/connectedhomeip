@@ -16,10 +16,11 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-cluster.cpp"
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-cluster.h"
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementCluster.cpp"
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementCluster.h"
     "${CLUSTER_DIR}/camera-av-settings-user-level-management-logic.cpp"
     "${CLUSTER_DIR}/camera-av-settings-user-level-management-logic.h"    
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
+
 )

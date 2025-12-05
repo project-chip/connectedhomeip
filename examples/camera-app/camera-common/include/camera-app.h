@@ -46,11 +46,12 @@ private:
     CameraDeviceInterface * mCameraDevice;
 
     // SDK cluster servers
-    std::unique_ptr<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer> mWebRTCTransportProviderPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
+        mWebRTCTransportProviderServer;
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvSettingsUserLevelMgmtServer>
-        mAVSettingsUserLevelMgmtServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvSettingsUserLevelManagementCluster>
+        mAVSettingsUserLevelMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 
     // Helper to set attribute defaults for CameraAVStreamMgmt

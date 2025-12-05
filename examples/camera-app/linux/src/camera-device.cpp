@@ -1834,9 +1834,9 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
-WebRTCTransportProvider::WebRTCTransportProviderController & CameraDevice::GetWebRTCProviderController()
+void CameraDevice::SetWebRTCTransportProvider(WebRTCTransportProvider::WebRTCTransportProviderCluster * provider)
 {
-    return mWebRTCProviderManager;
+    mWebRTCProviderManager.SetWebRTCTransportProvider(provider);
 }
 
 PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
@@ -1854,7 +1854,12 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
     return mCameraAVStreamManager;
 }
 
+<<<<<<< HEAD
 CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+=======
+CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
+CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+>>>>>>> master
 {
     return mCameraAVSettingsUserLevelManager;
 }

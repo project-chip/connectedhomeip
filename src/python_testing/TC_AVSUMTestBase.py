@@ -22,7 +22,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class AVSUMTestBase:
@@ -246,7 +246,7 @@ class AVSUMTestBase:
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         if len(aAllocatedVideoStreams) > 0:
             return aAllocatedVideoStreams[0].videoStreamID
 

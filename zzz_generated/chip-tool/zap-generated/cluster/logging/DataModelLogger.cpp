@@ -1230,6 +1230,38 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("SimultaneousInvocationsSupported", indent + 1, value.simultaneousInvocationsSupported);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SimultaneousInvocationsSupported'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SimultaneousWritesSupported", indent + 1, value.simultaneousWritesSupported);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SimultaneousWritesSupported'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ReadPathsSupported", indent + 1, value.readPathsSupported);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ReadPathsSupported'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SubscribePathsSupported", indent + 1, value.subscribePathsSupported);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SubscribePathsSupported'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -1563,6 +1595,57 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Rssi'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CurrentSubscriptions", indent + 1, value.currentSubscriptions);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentSubscriptions'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CurrentSubscriptionsForFabric", indent + 1, value.currentSubscriptionsForFabric);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentSubscriptionsForFabric'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TotalSubscriptionsEstablished", indent + 1, value.totalSubscriptionsEstablished);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TotalSubscriptionsEstablished'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TotalInteractionModelMessagesSent", indent + 1, value.totalInteractionModelMessagesSent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TotalInteractionModelMessagesSent'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TotalInteractionModelMessagesReceived", indent + 1, value.totalInteractionModelMessagesReceived);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1,
+                                       "Struct truncated due to invalid value for 'TotalInteractionModelMessagesReceived'");
             return err;
         }
     }
@@ -13938,6 +14021,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEventTriggersEnabled", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
+            chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DeviceLoadStatus", 1, value);
         }
         case GeneralDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

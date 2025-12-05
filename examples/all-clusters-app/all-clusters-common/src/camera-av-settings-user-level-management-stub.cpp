@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/camera-av-settings-user-level-management-server/CodegenIntegration.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <camera-av-settings-user-level-management-instance.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -28,7 +29,7 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using chip::Protocols::InteractionModel::Status;
 
 std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
-std::unique_ptr<CameraAvSettingsUserLevelMgmtServer> gAVSettingsUserLevelManagementCluster;
+std::unique_ptr<CameraAvSettingsUserLevelManagementCluster> gAVSettingsUserLevelManagementCluster;
 static constexpr EndpointId kEndpointId = 1;
 
 static void onTimerExpiry(System::Layer * systemLayer, void * data);
@@ -223,8 +224,8 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
 
-    gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
-        kEndpointId, *gDelegate.get(), avsumFeatures, appMaxPresets);
+    gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelManagementCluster>(
+        kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
     TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom

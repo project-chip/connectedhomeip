@@ -41,7 +41,6 @@ source_set("camera-lib") {
     "include/camera-device-interface.h",
     "include/media-controller/media-controller.h",
     "include/transport/transport.h",
-    "include/webrtc-provider-controller/webrtc-provider-controller.h",
     "src/camera-app.cpp",
   ]
 
@@ -58,6 +57,7 @@ source_set("camera-lib") {
     "${chip_root}/examples/camera-app/camera-common",
     "${chip_root}/src/app/clusters/camera-av-settings-user-level-management-server",
     "${chip_root}/src/app/clusters/push-av-stream-transport-server",
+    "${chip_root}/src/app/clusters/webrtc-transport-provider-server",
     "${chip_root}/src/lib",
   ]
 }

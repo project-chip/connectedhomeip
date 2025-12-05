@@ -19,12 +19,11 @@
 #pragma once
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
-#include "webrtc-provider-controller.h"
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
@@ -125,8 +124,9 @@ public:
     // Getter for WebRTCProvider Delegate
     virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 
-    // Getter for WebRTCProvider Controller
-    virtual chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() = 0;
+    // Set the WebRTC Transport Provider server instance
+    virtual void
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) = 0;
 
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
@@ -135,7 +135,12 @@ public:
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
+<<<<<<< HEAD
     virtual chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+=======
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
+    GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+>>>>>>> master
 
     // Getter for ZoneManagement Delegate
     virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;

@@ -19,7 +19,7 @@
 #pragma once
 
 #include "camera-device-interface.h"
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {

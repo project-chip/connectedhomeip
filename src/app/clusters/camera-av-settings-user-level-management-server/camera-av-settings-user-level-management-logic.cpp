@@ -20,7 +20,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -562,7 +562,8 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
             return Status::InvalidCommand;
         }
         uint8_t zoomValue = zoom.Value();
-        if ((zoomValue > mZoomMax) || (zoomValue < kZoomMaxMinValue))
+
+        if ((zoomValue > mZoomMax) || (zoomValue < kZoomMinValue))
         {
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Zoom value out of range", mEndpointId);
             return Status::ConstraintError;
