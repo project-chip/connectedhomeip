@@ -137,12 +137,6 @@ source_set("subscription-info-provider") {
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
 
-source_set("device-load-status-provider-delegate") {
-  sources = [ "DeviceLoadStatusProviderDelegate.h" ]
-
-  public_deps = [ "${chip_root}/src/lib/core" ]
-}
-
 config("config-controller-dynamic-server") {
   defines = [
     "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
@@ -181,6 +175,7 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "CommandSender.cpp",
     "CommandSender.h",
+    "DeviceLoadStatusProvider.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
@@ -198,6 +193,7 @@ static_library("interaction-model") {
                      # fixing
     "ReadPrepareParams.h",
     "SubscriptionResumptionStorage.h",
+    "SubscriptionStats.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
     "TimedRequest.cpp",
@@ -225,7 +221,6 @@ static_library("interaction-model") {
     ":app_config",
     ":command-handler-impl",
     ":constants",
-    ":device-load-status-provider-delegate",
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
@@ -243,6 +238,7 @@ static_library("interaction-model") {
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
+    "${chip_root}/src/transport",
   ]
 
   if (chip_enable_icd_server) {

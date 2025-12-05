@@ -29,7 +29,6 @@
                                               // includes SessionManager.h indirectly
 
 #include <access/SubjectDescriptor.h>
-#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -45,6 +44,7 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
+#include <transport/MessageStats.h>
 
 #undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
@@ -1077,7 +1077,7 @@ TEST_F(TestSessionManager, TestMessageStats)
     callback.ReceiveHandlerCallCount = 0;
 
     // Ensure base case, counts start at 0
-    chip::app::DeviceLoadStatusProviderDelegate::MessageStats messageStatistics = sessionManager.GetMessageStats();
+    MessageStats messageStatistics = sessionManager.GetMessageStats();
     EXPECT_EQ(messageStatistics.interactionModelMessagesSent, static_cast<uint32_t>(0));
     EXPECT_EQ(messageStatistics.interactionModelMessagesReceived, static_cast<uint32_t>(0));
 

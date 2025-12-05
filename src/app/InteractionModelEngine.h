@@ -35,7 +35,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
-#include <app/DeviceLoadStatusProviderDelegate.h>
+#include <app/DeviceLoadStatusProvider.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
@@ -44,6 +44,7 @@
 #include <app/StatusResponse.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionsInfoProvider.h>
+#include <app/SubscriptionStats.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
@@ -67,8 +68,8 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
-
 #include <app/CASESessionManager.h>
+#include <transport/MessageStats.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -94,7 +95,7 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
                                public WriteHandlerDelegate,
-                               public DeviceLoadStatusProviderDelegate
+                               public DeviceLoadStatusProvider
 {
 public:
     /**
@@ -431,7 +432,7 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
-    // DeviceLoadStatusProviderDelegate functions implementation
+    // DeviceLoadStatusProvider functions implementation
     MessageStats GetMessageStats() override { return GetExchangeManager()->GetSessionManager()->GetMessageStats(); }
 
     SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override

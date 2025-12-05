@@ -18,34 +18,13 @@
 #pragma once
 
 #include <cstdint>
-#include <lib/core/DataModelTypes.h>
-#include <utility>
 
 namespace chip {
-namespace app {
 
-class DeviceLoadStatusProviderDelegate
+struct MessageStats
 {
-public:
-    struct MessageStats
-    {
-        uint32_t interactionModelMessagesReceived = 0;
-        uint32_t interactionModelMessagesSent     = 0;
-    };
-
-    struct SubscriptionStats
-    {
-        uint32_t numTotalSubscriptions            = 0;
-        uint16_t numCurrentSubscriptions          = 0;
-        uint16_t numCurrentSubscriptionsForFabric = 0;
-    };
-
-    virtual ~DeviceLoadStatusProviderDelegate() = default;
-
-    virtual MessageStats GetMessageStats() = 0;
-
-    virtual SubscriptionStats GetSubscriptionStats(FabricIndex fabric) = 0;
+    uint32_t interactionModelMessagesReceived = 0;
+    uint32_t interactionModelMessagesSent     = 0;
 };
 
-} // namespace app
-} // namespace chip
+}

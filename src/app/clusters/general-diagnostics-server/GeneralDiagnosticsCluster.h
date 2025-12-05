@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DeviceLoadStatusProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/Server.h>
@@ -50,7 +51,7 @@ public:
                                         >;
 
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
-                              DeviceLoadStatusProviderDelegate * deviceLoadStatusProvider) :
+                              DeviceLoadStatusProvider * deviceLoadStatusProvider) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
         mFeatureFlags(featureFlags), mDeviceLoadStatusProvider(deviceLoadStatusProvider)
@@ -127,7 +128,7 @@ protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
     BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
-    DeviceLoadStatusProviderDelegate * mDeviceLoadStatusProvider;
+    DeviceLoadStatusProvider * mDeviceLoadStatusProvider;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
@@ -135,7 +136,7 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
                                               const BitFlags<GeneralDiagnostics::Feature> featureFlags,
-                                              DeviceLoadStatusProviderDelegate * deviceLoadStatusProvider,
+                                              DeviceLoadStatusProvider * deviceLoadStatusProvider,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
         GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, deviceLoadStatusProvider),
         mFunctionConfig(functionsConfig)

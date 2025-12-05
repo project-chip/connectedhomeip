@@ -28,6 +28,7 @@ static_library("transport") {
     "GroupSession.h",
     "MessageCounter.h",
     "MessageCounterManagerInterface.h",
+    "MessageStats.h",
     "PeerMessageCounter.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
@@ -57,7 +58,6 @@ static_library("transport") {
 
   public_deps = [
     "${chip_root}/src/access",
-    "${chip_root}/src/app:device-load-status-provider-delegate",
     "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",

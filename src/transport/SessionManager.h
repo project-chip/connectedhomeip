@@ -27,7 +27,6 @@
 
 #include <utility>
 
-#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <crypto/SessionKeystore.h>
@@ -42,6 +41,7 @@
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
+#include <transport/MessageStats.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/Session.h>
 #include <transport/SessionDelegate.h>
@@ -530,7 +530,7 @@ public:
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
-    app::DeviceLoadStatusProviderDelegate::MessageStats GetMessageStats() const { return mMessageStats; }
+    MessageStats GetMessageStats() const { return mMessageStats; }
 
 private:
     /**
@@ -555,7 +555,7 @@ private:
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
-    app::DeviceLoadStatusProviderDelegate::MessageStats mMessageStats;
+    MessageStats mMessageStats;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;

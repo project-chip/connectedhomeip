@@ -16,14 +16,15 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/DeviceLoadStatusProviderDelegate.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SubscriptionStats.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
+#include <transport/MessageStats.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -280,9 +281,9 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
         static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
                       "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
-        const DeviceLoadStatusProviderDelegate::SubscriptionStats subscriptionStats =
+        const SubscriptionStats subscriptionStats =
             mDeviceLoadStatusProvider->GetSubscriptionStats(encoder.AccessingFabricIndex());
-        const DeviceLoadStatusProviderDelegate::MessageStats messageStatistics = mDeviceLoadStatusProvider->GetMessageStats();
+        const MessageStats messageStatistics = mDeviceLoadStatusProvider->GetMessageStats();
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
             .currentSubscriptions                  = subscriptionStats.numCurrentSubscriptions,

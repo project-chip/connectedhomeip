@@ -129,7 +129,7 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // Ensure MessageStats struct is at default state on Init
-    mMessageStats = app::DeviceLoadStatusProviderDelegate::MessageStats();
+    mMessageStats = MessageStats();
 
     return CHIP_NO_ERROR;
 }
