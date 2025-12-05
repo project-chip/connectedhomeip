@@ -148,7 +148,7 @@ public:
      * gaps.
      * @param chimeID a reference to the uint8_t variable that is to contain the ChimeID value.
      * @return Returns a CHIP_NO_ERROR if there was no error and the ChimeID was returned successfully,
-     * CHIP_ERROR_NOT_FOUND if the index in beyond the list of available chime sounds.
+     * CHIP_ERROR_NOT_FOUND if the index is beyond the list of available chime sounds.
      *
      * Note: This is used by the SDK to help populate the InstalledChimeSounds attribute. If the contents of this list change,
      * the device SHALL call the Instance's ReportInstalledChimeSoundsChange method to report that this attribute has changed.
