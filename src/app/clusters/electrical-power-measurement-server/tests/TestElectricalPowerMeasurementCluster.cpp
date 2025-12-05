@@ -122,7 +122,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
             .endpointId         = kTestEndpointId,
             .delegate           = delegate,
             .features           = BitMask<Feature>(Feature::kDirectCurrent, Feature::kAlternatingCurrent, Feature::kPolyphasePower,
-                                                   Feature::kHarmonics, Feature::kPowerQuality),
+                                         Feature::kHarmonics, Feature::kPowerQuality),
             .optionalAttributes = optionalAttrs,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
