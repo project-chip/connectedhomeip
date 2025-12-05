@@ -661,7 +661,7 @@ public:
 };
 
 TestPersistentStorageDelegate * TestSceneTable::mpTestStorage = nullptr;
-TestSceneHandler * TestSceneTable::mpSceneHandler                   = nullptr;
+TestSceneHandler * TestSceneTable::mpSceneHandler             = nullptr;
 
 void ResetSceneTable(SceneTable * sceneTable)
 {
