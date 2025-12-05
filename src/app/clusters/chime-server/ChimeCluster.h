@@ -135,7 +135,7 @@ public:
      * @param name  A reference to the mutable char span which will be mutated to receive the chime sound name on success. Use
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error and the chime sound details were returned successfully,
-     * CHIP_ERROR_NOT_FOUND if the index in beyond the list of available chime sounds.
+     * CHIP_ERROR_NOT_FOUND if the index is beyond the list of available chime sounds.
      *
      * Note: This is used by the SDK to populate the InstalledChimeSounds attribute. If the contents of this list change,
      * the device SHALL call the Instance's ReportInstalledChimeSoundsChange method to report that this attribute has changed.
