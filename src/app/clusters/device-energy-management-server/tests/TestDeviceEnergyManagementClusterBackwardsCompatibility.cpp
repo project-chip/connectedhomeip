@@ -26,7 +26,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 // Mock function for linking
 void InitDataModelHandler() {}
@@ -42,7 +42,7 @@ struct TestDeviceEnergyManagementClusterBackwardsCompatibility : public ::testin
 
     void SetUp() override {}
 
-    chip::Test::TestServerClusterContext mContext;
+    TestServerClusterContext mContext;
 };
 
 TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLifecycle)

@@ -36,7 +36,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Commands;
-using namespace chip::Test;
 using namespace chip::Testing;
 
 namespace {
@@ -64,7 +63,7 @@ struct TestDeviceEnergyManagementCluster : public ::testing::Test
 
 TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
 
     // Test 1: No features - only mandatory attributes
@@ -336,7 +335,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestStartupFailsWithMismatchedEndpointId)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> noFeatures;
 
@@ -355,7 +354,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartupFailsWithMismatchedEndpoint
 
 TEST_F(TestDeviceEnergyManagementCluster, TestStartupSucceedsWithMatchingEndpointId)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> noFeatures;
 
@@ -379,14 +378,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartupSucceedsWithMatchingEndpoin
 
 TEST_F(TestDeviceEnergyManagementCluster, TestMandatoryAttributes)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> noFeatures;
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
 
     ESATypeEnum esaType = ESATypeEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(ESAType::Id, esaType), CHIP_NO_ERROR);
@@ -417,14 +416,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestMandatoryAttributes)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPowerAdjustment);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::PowerAdjustRequest::Type command;
     command.power    = 1000;
     command.duration = 60;
@@ -449,14 +448,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustRequest)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerAdjustRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPowerAdjustment);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::CancelPowerAdjustRequest::Type cancelCommand;
 
     // Cancel without active adjustment - fails (InvalidInState)
@@ -483,14 +482,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerAdjustRequest)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kStartTimeAdjustment);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::StartTimeAdjustRequest::Type command;
     command.cause = AdjustmentCauseEnum::kLocalOptimization;
 
@@ -516,14 +515,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestPauseRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPausable);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::PauseRequest::Type command;
     command.duration = 60;
     command.cause    = AdjustmentCauseEnum::kLocalOptimization;
@@ -568,14 +567,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPauseRequest)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestResumeRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPausable);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::ResumeRequest::Type resumeCommand;
 
     // Resume without being paused - fails (InvalidInState)
@@ -601,14 +600,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestResumeRequest)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestModifyForecastRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kForecastAdjustment);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::ModifyForecastRequest::Type command;
     command.cause = AdjustmentCauseEnum::kLocalOptimization;
 
@@ -634,7 +633,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast)
         GTEST_SKIP() << "Real-time clock not available";
     }
 
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kConstraintBasedAdjustment);
 
@@ -644,7 +643,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast)
     Commands::RequestConstraintBasedForecast::Type command;
     command.cause = AdjustmentCauseEnum::kLocalOptimization;
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     auto result = tester.Invoke(Commands::RequestConstraintBasedForecast::Id, command);
     EXPECT_TRUE(result.IsSuccess());
 
@@ -657,14 +656,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestCancelRequest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kStartTimeAdjustment);
 
     DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
     Commands::CancelRequest::Type cancelCommand;
 
     // Mock starts with kLocalOptimization - cancel succeeds
