@@ -413,8 +413,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     if (transport->HasCandidates())
     {
-        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-        ScheduleICECandidatesSend(sessionId);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, transport, sessionId]() {
+            transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+            ScheduleICECandidatesSend(sessionId);
+        });
     }
 
     return CHIP_NO_ERROR;
