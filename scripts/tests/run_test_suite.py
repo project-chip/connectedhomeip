@@ -500,8 +500,6 @@ if sys.platform == 'linux':
     def cmd_shell(context: click.Context, ns_index: int | None) -> None:
         assert isinstance(context.obj, RunContext)
 
-        if ns_index is None:
-            ns_index = 0
         chiptest.linux.IsolatedNetworkNamespace(ns_index, unshared=context.obj.in_unshare)
 
         shell = os.environ.get("SHELL", "bash")
