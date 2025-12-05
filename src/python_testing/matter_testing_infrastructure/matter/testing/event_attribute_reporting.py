@@ -111,14 +111,10 @@ class EventSubscriptionHandler:
 
     async def cancel(self, timeout_sec: float = 5.0):
         """This cancels a subscription."""
-        # Allow time for the subscription shutdown to complete before returning
-        try:
-            # Shutdown is synchronous, but it may trigger async cleanup. We sleep
-            # briefly to allow this cleanup to happen before the test continues.
-            self._subscription.Shutdown()
-            await asyncio.sleep(timeout_sec)
-        except asyncio.CancelledError:
-            pass
+        # Shutdown is synchronous, but it may trigger async cleanup. We sleep
+        # briefly to allow this cleanup to happen before the test continues.
+        self._subscription.Shutdown()
+        await asyncio.sleep(timeout_sec)
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -260,14 +256,10 @@ class AttributeSubscriptionHandler:
 
     async def cancel(self, timeout_sec: float = 5.0):
         """This cancels a subscription."""
-        # Allow time for the subscription shutdown to complete before returning
-        try:
-            # Shutdown is synchronous, but it may trigger async cleanup. We sleep
-            # briefly to allow this cleanup to happen before the test continues.
-            self._subscription.Shutdown()
-            await asyncio.sleep(timeout_sec)
-        except asyncio.CancelledError:
-            pass
+        # Shutdown is synchronous, but it may trigger async cleanup. We sleep
+        # briefly to allow this cleanup to happen before the test continues.
+        self._subscription.Shutdown()
+        await asyncio.sleep(timeout_sec)
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
