@@ -1349,22 +1349,18 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
     return CHIP_NO_ERROR;
 }
 
-void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader)
+// Session handle parameter included here for future counting usage.
+void SessionManager::CountMessagesReceived(const SessionHandle &, const PayloadHeader & payloadHeader)
 {
-    // For future counting usage.
-    (void) sessionHandle;
-
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
         mMessageStats.interactionModelMessagesReceived++;
     }
 }
 
-void SessionManager::CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader)
+// Session handle parameter included here for future counting usage.
+void SessionManager::CountMessagesSent(const SessionHandle &, const PayloadHeader & payloadHeader)
 {
-    // For future counting usage.
-    (void) sessionHandle;
-
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
         mMessageStats.interactionModelMessagesSent++;
