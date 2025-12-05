@@ -69,7 +69,7 @@ void RegisterPlatformErrorFormatter();
  *
  * @param[in] buf                   Buffer into which the error string will be placed.
  * @param[in] bufSize               Size of the supplied buffer in bytes.
- * @param[in] aError                   The error to be described.
+ * @param[in] aError                The error to be described.
  *
  * @return true                     If a description string was written into the supplied buffer.
  * @return false                    If the supplied error was not a Platform error.

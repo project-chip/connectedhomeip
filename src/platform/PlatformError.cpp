@@ -19,7 +19,7 @@
 #include <platform/PlatformError.h>
 
 #include <lib/core/ErrorStr.h>
-#include <mutex>
+#include <lib/support/CHIPMemString.h>
 
 #include <string.h>
 
@@ -56,30 +56,22 @@ const char * DescribePlatformError(CHIP_ERROR aError)
 #endif
 
     // Use thread-safe strerror_r on POSIX systems
-#if defined(_GNU_SOURCE)
+#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
     // GNU version returns char*
     const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
     if (s != nullptr)
     {
         if (s != errBuf)
         {
-            strncpy(errBuf, s, sizeof(errBuf) - 1);
+            CopyString(errBuf, sizeof(errBuf), s);
             errBuf[sizeof(errBuf) - 1] = '\0';
         }
         return errBuf;
     }
-#elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
-    // POSIX version returns int
+#else
+    // POSIX version returns int (0 on success)
     if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
     {
-        return errBuf;
-    }
-#else
-    // Fallback to strerror (not thread-safe but only if no alternative)
-    const char * s = strerror(lError);
-    if (s != nullptr)
-    {
-        snprintf(errBuf, sizeof(errBuf), "%s", s);
         return errBuf;
     }
 #endif
@@ -92,7 +84,9 @@ void RegisterPlatformErrorFormatter()
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
     static bool sRegistered                       = false;
     if (sRegistered)
+    {
         return;
+    }
     RegisterErrorFormatter(&sPlatformErrorFormatter);
     sRegistered = true;
 }
