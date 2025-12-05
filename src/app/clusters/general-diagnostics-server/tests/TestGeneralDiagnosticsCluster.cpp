@@ -38,7 +38,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::app::DataModel;
-using namespace chip::Test;
 using namespace chip::Testing;
 
 template <class T>

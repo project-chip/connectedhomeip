@@ -21,29 +21,31 @@
 #include <ble/BleLayer.h>
 
 namespace chip {
-namespace Test {
-/**
- * @brief Class acts as an accessor to private methods of the BleLayer class without needing to give friend access to
- *        each individual test.
- */
-class BleLayerTestAccess
-{
-public:
-    BleLayerTestAccess() = delete;
-    BleLayerTestAccess(Ble::BleLayer * layer) : mLayer(layer) {}
+namespace Testing {
+    /**
+     * @brief Class acts as an accessor to private methods of the BleLayer class without needing to give friend access to
+     *        each individual test.
+     */
+    class BleLayerTestAccess {
+    public:
+        BleLayerTestAccess() = delete;
+        BleLayerTestAccess(Ble::BleLayer * layer)
+            : mLayer(layer)
+        {
+        }
 
-    void SetConnectionDelegate(Ble::BleConnectionDelegate * delegate) { mLayer->mConnectionDelegate = delegate; }
+        void SetConnectionDelegate(Ble::BleConnectionDelegate * delegate) { mLayer->mConnectionDelegate = delegate; }
 
-    // Wrapper for OnConnectionComplete private method
-    void CallOnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
-    {
-        mLayer->OnConnectionComplete(appState, connObj);
-    }
+        // Wrapper for OnConnectionComplete private method
+        void CallOnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+        {
+            mLayer->OnConnectionComplete(appState, connObj);
+        }
 
-    void CallOnConnectionError(void * appState, CHIP_ERROR err) { mLayer->OnConnectionError(appState, err); }
+        void CallOnConnectionError(void * appState, CHIP_ERROR err) { mLayer->OnConnectionError(appState, err); }
 
-private:
-    Ble::BleLayer * mLayer = nullptr;
-};
-} // namespace Test
+    private:
+        Ble::BleLayer * mLayer = nullptr;
+    };
+} // namespace Testing
 } // namespace chip
