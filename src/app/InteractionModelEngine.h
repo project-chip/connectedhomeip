@@ -433,16 +433,9 @@ public:
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
     // DeviceLoadStatusProvider functions implementation
-    MessageStats GetMessageStats() override { return GetExchangeManager()->GetSessionManager()->GetMessageStats(); }
+    MessageStats GetMessageStats() override;
 
-    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override
-    {
-        return SubscriptionStats{ .numTotalSubscriptions = GetReportScheduler()->GetTotalSubscriptionsEstablished(),
-                                  .numCurrentSubscriptions =
-                                      static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-                                  .numCurrentSubscriptionsForFabric = static_cast<uint16_t>(
-                                      GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric)) };
-    }
+    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
 
 private:
     /* DataModel::ActionContext implementation */
