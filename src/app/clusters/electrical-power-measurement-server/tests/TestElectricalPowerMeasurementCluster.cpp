@@ -37,7 +37,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
-using namespace chip::Test;
 using namespace chip::Testing;
 
 namespace {
@@ -54,7 +53,7 @@ struct TestElectricalPowerMeasurementCluster : public ::testing::Test
 
 TEST_F(TestElectricalPowerMeasurementCluster, BasicConfigurations)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // No features, no optional attributes
@@ -89,7 +88,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, BasicConfigurations)
 
 TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // Test AlternatingCurrent with optional AC attributes
@@ -123,7 +122,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
             .endpointId         = kTestEndpointId,
             .delegate           = delegate,
             .features           = BitMask<Feature>(Feature::kDirectCurrent, Feature::kAlternatingCurrent, Feature::kPolyphasePower,
-                                         Feature::kHarmonics, Feature::kPowerQuality),
+                                                   Feature::kHarmonics, Feature::kPowerQuality),
             .optionalAttributes = optionalAttrs,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -133,7 +132,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
 
 TEST_F(TestElectricalPowerMeasurementCluster, FeatureConformance)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // PolyphasePower requires AlternatingCurrent
@@ -172,7 +171,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, FeatureConformance)
 
 TEST_F(TestElectricalPowerMeasurementCluster, AttributeConformance)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // ReactiveCurrent requires AlternatingCurrent
@@ -206,7 +205,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, AttributeConformance)
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // Test values
@@ -244,7 +243,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     // Read mandatory attributes
     PowerModeEnum powerMode;
@@ -281,7 +280,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // Test values for range 1
@@ -350,7 +349,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     // Read and decode the Ranges list
     Ranges::TypeInfo::DecodableType ranges;
@@ -417,7 +416,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadHarmonicAttributes)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // Test values for harmonic currents
@@ -462,7 +461,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadHarmonicAttributes)
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     // Read and verify HarmonicCurrents
     {
@@ -527,7 +526,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadHarmonicAttributes)
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadPolyphaseAttributes)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     MockElectricalPowerMeasurementDelegate delegate;
 
     // Test values
@@ -558,7 +557,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadPolyphaseAttributes)
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     DataModel::Nullable<int64_t> value;
 
