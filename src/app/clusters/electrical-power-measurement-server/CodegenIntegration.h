@@ -55,30 +55,7 @@ public:
             .endpointId         = aEndpointId,
             .delegate           = aDelegate,
             .features           = aFeature,
-            .optionalAttributes = ([&]() {
-                ElectricalPowerMeasurementCluster::OptionalAttributesSet attrs;
-                attrs.Set<Attributes::Ranges::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeRanges));
-                attrs.Set<Attributes::Voltage::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeVoltage));
-                attrs.Set<Attributes::ActiveCurrent::Id>(
-                    aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeActiveCurrent));
-                attrs.Set<Attributes::ReactiveCurrent::Id>(
-                    aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeReactiveCurrent));
-                attrs.Set<Attributes::ApparentCurrent::Id>(
-                    aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeApparentCurrent));
-                attrs.Set<Attributes::ReactivePower::Id>(
-                    aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeReactivePower));
-                attrs.Set<Attributes::ApparentPower::Id>(
-                    aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeApparentPower));
-                attrs.Set<Attributes::RMSVoltage::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeRMSVoltage));
-                attrs.Set<Attributes::RMSCurrent::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeRMSCurrent));
-                attrs.Set<Attributes::RMSPower::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeRMSPower));
-                attrs.Set<Attributes::Frequency::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeFrequency));
-                attrs.Set<Attributes::PowerFactor::Id>(aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributePowerFactor));
-                attrs.Set<Attributes::NeutralCurrent::Id>(
-                    aOptionalAttributes.Has(OptionalAttributes::kOptionalAttributeNeutralCurrent));
-
-                return attrs;
-            }()),
+            .optionalAttributes = FromLegacyOptionalAttributes(aOptionalAttributes),
         })
     {
         RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
@@ -87,6 +64,9 @@ public:
     ~Instance() { RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster())); }
 
 private:
+    static ElectricalPowerMeasurementCluster::OptionalAttributesSet
+    FromLegacyOptionalAttributes(BitMask<OptionalAttributes> aOptionalAttributes);
+
     RegisteredServerCluster<ElectricalPowerMeasurementCluster> mCluster;
 };
 
