@@ -500,7 +500,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
 
         // Remove only the candidates that were successfully sent
         // New candidates may have arrived during transmission, so we remove from the front
-        if (mLocalCandidates.size() >= candidateCount)
+        if (mLocalCandidates.size() > candidateCount)
         {
             mLocalCandidates.erase(mLocalCandidates.begin(), mLocalCandidates.begin() + candidateCount);
             if (!mLocalCandidates.empty())
