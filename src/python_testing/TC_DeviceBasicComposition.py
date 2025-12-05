@@ -87,7 +87,9 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
-#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     script-args:
+#       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: false
 #     quiet: true
 #   run10:
@@ -717,19 +719,22 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         self.print_step(12, "Validate that event wildcard subscription works")
 
         test_failure = None
-        try:
-            subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
-                                                                   events=[('*')],
-                                                                   fabricFiltered=False,
-                                                                   reportInterval=(100, 1000))
-            if len(subscription.GetEvents()) == 0:
-                test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
-            # Connection over PASE will fail subscriptions with "Unsupported access"
-            # TODO: ideally we should SKIP this test for PASE connections
-            _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
-            if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
-                test_failure = f"Failed to wildcard subscribe events(*): {e}"
+        if self.test_from_file:
+            logging.warning("Skipping check of event wildcards as this test is being run from an attribute file")
+        else:
+            try:
+                subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
+                                                                       events=[('*')],
+                                                                       fabricFiltered=False,
+                                                                       reportInterval=(100, 1000))
+                if len(subscription.GetEvents()) == 0:
+                    test_failure = 'Wildcard event subscription returned no events'
+            except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
+                # Connection over PASE will fail subscriptions with "Unsupported access"
+                # TODO: ideally we should SKIP this test for PASE connections
+                _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
+                if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
+                    test_failure = f"Failed to wildcard subscribe events(*): {e}"
 
         if test_failure:
             self.record_error(self.get_test_name(), problem=test_failure, location=UnknownProblemLocation())
