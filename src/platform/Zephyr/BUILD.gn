@@ -89,7 +89,7 @@ static_library("Zephyr") {
       "wifi/ZephyrWifiDriver.h",
     ]
   } else {
-    # Non-WiFi builds use the base dianostic provider getter.
+    # Non-WiFi builds use the base diagnostic provider getter.
     # Wi-Fi implementation provides its own.
     sources += [ "DiagnosticDataProviderImplGetter.cpp" ]
   }
