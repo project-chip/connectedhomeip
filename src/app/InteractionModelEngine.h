@@ -28,6 +28,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
+#include <app/CASESessionManager.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
@@ -43,8 +44,8 @@
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
-#include <app/SubscriptionsInfoProvider.h>
 #include <app/SubscriptionStats.h>
+#include <app/SubscriptionsInfoProvider.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
@@ -68,7 +69,6 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
-#include <app/CASESessionManager.h>
 #include <transport/MessageStats.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER

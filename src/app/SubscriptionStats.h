@@ -29,5 +29,5 @@ struct SubscriptionStats
     uint16_t numCurrentSubscriptionsForFabric = 0;
 };
 
-}
-}
+} // namespace app
+} // namespace chip

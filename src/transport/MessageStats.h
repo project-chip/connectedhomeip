@@ -27,4 +27,4 @@ struct MessageStats
     uint32_t interactionModelMessagesSent     = 0;
 };
 
-}
+} // namespace chip

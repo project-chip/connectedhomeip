@@ -41,10 +41,10 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <transport/MessageStats.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
-#include <transport/MessageStats.h>
 
 #undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
