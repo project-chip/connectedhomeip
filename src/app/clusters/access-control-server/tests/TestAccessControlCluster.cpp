@@ -175,9 +175,9 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
     return it.GetStatus();
 }
 
+// Test that all available attributes (mandatory and optional) can be read
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
 {
-    // Test that all available attributes (mandatory and optional) can be read
     AccessControlCluster cluster;
     chip::Test::ClusterTester tester(cluster);
 
@@ -273,31 +273,19 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
     // and return a response with a token.
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify that the command succeeded
-    ASSERT_TRUE(result.IsSuccess()) << "ReviewFabricRestrictions command should succeed";
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    ASSERT_GT(result.response->token, 0u);
+    ASSERT_EQ(mockProvider.mRequestCount, 1u);
+    ASSERT_EQ(mockProvider.mLastArl.size(), 1u);
+    ASSERT_EQ(mockProvider.mLastArl[0].endpointNumber, 1u);
+    ASSERT_EQ(mockProvider.mLastArl[0].clusterId, 0x0006u);
 
-    // Verify that a response was returned
-    ASSERT_TRUE(result.response.has_value()) << "Response should be present";
-
-    // Verify that the response contains a valid token (non-zero)
-    // The token is used to correlate the request with a FabricRestrictionReviewUpdate event
-    ASSERT_GT(result.response->token, 0u) << "Token should be greater than zero";
-
-    // Verify that the AccessRestrictionProvider was called exactly once
-    ASSERT_EQ(mockProvider.mRequestCount, 1u) << "Provider should be called once";
-
-    // Verify that the provider received the correct ARL entry
-    ASSERT_EQ(mockProvider.mLastArl.size(), 1u) << "Provider should receive one ARL entry";
-    ASSERT_EQ(mockProvider.mLastArl[0].endpointNumber, 1u) << "Endpoint should match";
-    ASSERT_EQ(mockProvider.mLastArl[0].clusterId, 0x0006u) << "Cluster ID should match OnOff cluster";
-
-    // Verify that the restriction was correctly passed to the provider
-    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u) << "Entry should have one restriction";
+    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden)
-        << "Restriction type should match";
-    ASSERT_TRUE(mockProvider.mLastArl[0].restrictions[0].id.HasValue()) << "Restriction ID should be set";
-    ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].id.Value(), 0x0000u) << "Restriction ID should match";
+              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
+    ASSERT_TRUE(mockProvider.mLastArl[0].restrictions[0].id.HasValue());
+    ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].id.Value(), 0x0000u);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
@@ -316,22 +304,13 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
     request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(nullptr, 0);
 
-    // Invoke the command with the empty list
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify that the command succeeded even with an empty list
-    ASSERT_TRUE(result.IsSuccess()) << "Command should succeed with empty ARL";
-
-    // Verify that a response with a token was returned
-    ASSERT_TRUE(result.response.has_value()) << "Response should be present";
-    ASSERT_GT(result.response->token, 0u) << "Token should be valid";
-
-    // Verify that the provider was called
-    ASSERT_EQ(mockProvider.mRequestCount, 1u) << "Provider should be called";
-
-    // Verify that an empty ARL list was passed to the provider
-    // This indicates a request to review all restrictions
-    ASSERT_EQ(mockProvider.mLastArl.size(), 0u) << "Empty ARL should be passed to provider";
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    ASSERT_GT(result.response->token, 0u);
+    ASSERT_EQ(mockProvider.mRequestCount, 1u);
+    ASSERT_EQ(mockProvider.mLastArl.size(), 0u);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries)
@@ -369,32 +348,22 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
     request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(entries, 2);
 
-    // Invoke the command
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify success
-    ASSERT_TRUE(result.IsSuccess()) << "Command should succeed with multiple entries";
-    ASSERT_TRUE(result.response.has_value()) << "Response should be present";
-
-    // Verify that the provider received both entries
-    ASSERT_EQ(mockProvider.mRequestCount, 1u) << "Provider should be called once";
-    ASSERT_EQ(mockProvider.mLastArl.size(), 2u) << "Provider should receive two entries";
-
-    // Verify the first entry details
-    ASSERT_EQ(mockProvider.mLastArl[0].endpointNumber, 1u) << "First entry endpoint should match";
-    ASSERT_EQ(mockProvider.mLastArl[0].clusterId, 0x0006u) << "First entry cluster should match";
-    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u) << "First entry should have one restriction";
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    ASSERT_EQ(mockProvider.mRequestCount, 1u);
+    ASSERT_EQ(mockProvider.mLastArl.size(), 2u);
+    ASSERT_EQ(mockProvider.mLastArl[0].endpointNumber, 1u);
+    ASSERT_EQ(mockProvider.mLastArl[0].clusterId, 0x0006u);
+    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden)
-        << "First entry restriction type should match";
-
-    // Verify the second entry details
-    ASSERT_EQ(mockProvider.mLastArl[1].endpointNumber, 2u) << "Second entry endpoint should match";
-    ASSERT_EQ(mockProvider.mLastArl[1].clusterId, 0x0008u) << "Second entry cluster should match";
-    ASSERT_EQ(mockProvider.mLastArl[1].restrictions.size(), 1u) << "Second entry should have one restriction";
+              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
+    ASSERT_EQ(mockProvider.mLastArl[1].endpointNumber, 2u);
+    ASSERT_EQ(mockProvider.mLastArl[1].clusterId, 0x0008u);
+    ASSERT_EQ(mockProvider.mLastArl[1].restrictions.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden)
-        << "Second entry restriction type should match";
+              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestriction)
@@ -424,20 +393,13 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestric
     entry.restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restriction, 1);
     request.arl        = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(&entry, 1);
 
-    // Invoke the command
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify success
-    ASSERT_TRUE(result.IsSuccess()) << "Command should succeed with wildcard restriction";
-    ASSERT_TRUE(result.response.has_value()) << "Response should be present";
-
-    // Verify that the provider received the entry with wildcard restriction
-    ASSERT_EQ(mockProvider.mLastArl.size(), 1u) << "Provider should receive one entry";
-    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u) << "Entry should have one restriction";
-
-    // Verify that the restriction ID is null (wildcard)
-    // The provider should receive Optional<uint32_t> with no value
-    ASSERT_FALSE(mockProvider.mLastArl[0].restrictions[0].id.HasValue()) << "Wildcard restriction should have null ID in provider";
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    ASSERT_EQ(mockProvider.mLastArl.size(), 1u);
+    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u);
+    ASSERT_FALSE(mockProvider.mLastArl[0].restrictions[0].id.HasValue());
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestrictionsPerEntry)
@@ -474,31 +436,21 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestric
     // Wrap all restrictions in a list
     entry.restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(restrictions, 3);
 
-    // Build the request
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
     request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(&entry, 1);
 
-    // Invoke the command
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify success
-    ASSERT_TRUE(result.IsSuccess()) << "Command should succeed with multiple restrictions";
-    ASSERT_TRUE(result.response.has_value()) << "Response should be present";
-
-    // Verify that the provider received the entry with all restrictions
-    ASSERT_EQ(mockProvider.mLastArl.size(), 1u) << "Provider should receive one entry";
-    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 3u) << "Entry should have three restrictions";
-
-    // Verify each restriction was correctly passed
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    ASSERT_EQ(mockProvider.mLastArl.size(), 1u);
+    ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 3u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden)
-        << "First restriction type should match";
+              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[1].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden)
-        << "Second restriction type should match";
+              chip::Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[2].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden)
-        << "Third restriction type should match";
+              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
@@ -525,15 +477,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
     entry.restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(nullptr, 0);
     request.arl        = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(&entry, 1);
 
-    // Invoke the command
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify that the command failed due to provider error
-    // The command handler should convert the provider error to an appropriate status
-    ASSERT_FALSE(result.IsSuccess()) << "Command should fail when provider returns error";
-
-    // Verify that the provider was still called (to attempt the operation)
-    ASSERT_EQ(mockProvider.mRequestCount, 1u) << "Provider should be called even on error";
+    ASSERT_FALSE(result.IsSuccess());
+    ASSERT_EQ(mockProvider.mRequestCount, 1u);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionTypes)
@@ -584,29 +531,19 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
     request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(entries, 4);
 
-    // Invoke the command
     auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    // Verify success
-    ASSERT_TRUE(result.IsSuccess()) << "Command should succeed with all restriction types";
-    ASSERT_TRUE(result.response.has_value()) << "Response should be present";
-
-    // Verify that all entries were received
-    ASSERT_EQ(mockProvider.mLastArl.size(), 4u) << "Provider should receive all four entries";
-
-    // Verify each restriction type was correctly converted
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    ASSERT_EQ(mockProvider.mLastArl.size(), 4u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden)
-        << "First entry should be AttributeAccessForbidden";
+              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden)
-        << "Second entry should be AttributeWriteForbidden";
+              chip::Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
     ASSERT_EQ(mockProvider.mLastArl[2].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden)
-        << "Third entry should be CommandForbidden";
+              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden);
     ASSERT_EQ(mockProvider.mLastArl[3].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kEventForbidden)
-        << "Fourth entry should be EventForbidden";
+              chip::Access::AccessRestrictionProvider::Type::kEventForbidden);
 }
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
