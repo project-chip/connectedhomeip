@@ -452,10 +452,10 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - os: macos-14
+                    - os: macos-26
                       arch: arm64     # observed, not configured
                       build_variant: no-ble-no-shell-asan-clang
-                    - os: macos-14
+                    - os: macos-26
                       arch: arm64     # observed, not configured
                       build_variant: no-ble-no-shell-tsan-clang
         env:
@@ -1019,7 +1019,7 @@ jobs:
         strategy:
             matrix:
                 include:
-                - os: macos-14
+                - os: macos-26
                   arch: arm64   # observed, not configured
                   build_variant: no-ble-no-wifi-tsan-clang
                 # - os: macos-15-intel
