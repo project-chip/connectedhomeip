@@ -25,7 +25,31 @@ source_set("ota-requestor") {
   ]
 
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
-  # Maybe DefaultOTARequestor and related code should have its own source set.
+  # A source set has been created for DefaultOTARequestor and related code. Apps should be updated
+  # to use it so the controller dependency here can be removed.
+  public_deps = [
+    ":interface",
+    "${chip_root}/src/app:user-consent",
+    "${chip_root}/src/app/clusters/basic-information",
+    "${chip_root}/src/controller:interactions",
+  ]
+}
+
+source_set("default-ota-requestor") {
+  sources = [
+    "BDXDownloader.cpp",
+    "BDXDownloader.h",
+    "DefaultOTARequestor.cpp",
+    "DefaultOTARequestor.h",
+    "DefaultOTARequestorDriver.cpp",
+    "DefaultOTARequestorDriver.h",
+    "DefaultOTARequestorStorage.cpp",
+    "DefaultOTARequestorStorage.h",
+    "DefaultOTARequestorUserConsent.h",
+    "ExtendedOTARequestorDriver.cpp",
+    "ExtendedOTARequestorDriver.h",
+  ]
+
   public_deps = [
     ":interface",
     "${chip_root}/src/app:user-consent",
