@@ -51,7 +51,7 @@ using Milliseconds64      = System::Clock::Milliseconds64;
 
 static const size_t kNumMaxReadHandlers = 16;
 
-class TestReportScheduler : public chip::Test::AppContext
+class TestReportScheduler : public chip::Testing::AppContext
 {
 public:
     void TestReadHandlerList();

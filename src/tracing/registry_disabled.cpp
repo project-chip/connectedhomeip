@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
 
-#include <app/ConcreteCommandPath.h>
+#include <tracing/registry.h>
 
-namespace chip {
-namespace Testing {
+#include <lib/support/logging/CHIPLogging.h>
 
-/// what was the last path on which DispatchSingleClusterCommand was called
-app::ConcreteCommandPath GetLastDispatchPath();
+namespace chip::Tracing {
 
-/// How many times was DispatchSingleClusterCommand called
-uint32_t DispatchCount();
+void Register(Backend & backend)
+{
+    ChipLogProgress(NotSpecified, "Ignoring tracing backend registration because tracing is disabled");
+}
 
-} // namespace Testing
-} // namespace chip
+void Unregister(Backend & backend)
+{
+    /* no-op */
+}
+
+} // namespace chip::Tracing

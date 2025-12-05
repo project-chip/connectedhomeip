@@ -38,7 +38,7 @@
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Globals::Attributes;
 
@@ -60,9 +60,9 @@ constexpr uint8_t defaultTestFabricCapacity = (defaultTestTableSize - 1) / 2;
 constexpr chip::ClusterId kFakeClusterId = 0x0007;
 
 // Test Endpoint ID
-constexpr chip::EndpointId kTestEndpoint1 = chip::Test::kMockEndpoint1;
-constexpr chip::EndpointId kTestEndpoint2 = chip::Test::kMockEndpoint2;
-constexpr chip::EndpointId kTestEndpoint3 = chip::Test::kMockEndpoint3;
+constexpr chip::EndpointId kTestEndpoint1 = kMockEndpoint1;
+constexpr chip::EndpointId kTestEndpoint2 = kMockEndpoint2;
+constexpr chip::EndpointId kTestEndpoint3 = kMockEndpoint3;
 constexpr chip::EndpointId kTestEndpoint4 = kMockEndpointMin;
 
 // Test Attribute ID

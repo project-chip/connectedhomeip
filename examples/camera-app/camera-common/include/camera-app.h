@@ -50,7 +50,7 @@ private:
         mWebRTCTransportProviderServer;
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
-    std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
+    std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementCluster>
         mAVSettingsUserLevelMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 
