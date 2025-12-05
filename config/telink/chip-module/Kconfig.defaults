@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023-2024 Project CHIP Authors
+#   Copyright (c) 2023-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -97,9 +97,15 @@ config NET_IPV6_MLD
     default n if PM
     default y
 
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
+
 config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 8 if PM
     default 15
+
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
 
 # Network buffers
 config NET_PKT_RX_COUNT

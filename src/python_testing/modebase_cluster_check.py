@@ -15,13 +15,9 @@
 #    limitations under the License.
 #
 
-import logging
-
 from mobly import asserts
 
 from matter.clusters.Types import NullValue
-
-logger = logging.getLogger(__name__)
 
 # Maximum value for ModeTags according to specs is 16bits.
 MAX_MODE_TAG = 0xFFFF

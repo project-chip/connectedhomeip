@@ -46,6 +46,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 # This test requires several additional command line arguments
 # run with
 # --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
@@ -110,7 +112,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        logging.info("SupportedModes: %s" % (supported_modes))
+        log.info("SupportedModes: %s" % (supported_modes))
 
         asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
 
@@ -120,7 +122,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (old_current_mode))
+        log.info("CurrentMode: %s" % (old_current_mode))
 
         # pick a value that's not on the list of supported modes
         invalid_mode = max(modes) + 1
@@ -156,7 +158,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             self.print_step(6, "Read CurrentMode attribute")
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (old_current_mode))
+            log.info("CurrentMode: %s" % (old_current_mode))
 
             self.print_step(7, "Send ChangeToMode command with NewMode set to %d" % (self.mode_fail))
 
@@ -173,7 +175,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             self.print_step(8, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
+            log.info("CurrentMode: %s" % (current_mode))
 
             asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
 
@@ -188,7 +190,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.print_step(10, "Read CurrentMode attribute")
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (old_current_mode))
+        log.info("CurrentMode: %s" % (old_current_mode))
 
         self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.mode_ok))
 
@@ -199,7 +201,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.print_step(12, "Read CurrentMode attribute")
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (current_mode))
+        log.info("CurrentMode: %s" % (current_mode))
 
         asserts.assert_true(current_mode == self.mode_ok,
                             "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
@@ -213,7 +215,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.print_step(14, "Read CurrentMode attribute")
         current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info("CurrentMode: %s" % (current_mode))
+        log.info("CurrentMode: %s" % (current_mode))
 
         asserts.assert_true(current_mode == self.mode_ok, "CurrentMode changed after failed ChangeToMode command!")
 
