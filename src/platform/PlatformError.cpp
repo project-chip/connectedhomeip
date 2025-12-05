@@ -78,8 +78,7 @@ const char * DescribePlatformError(CHIP_ERROR aError)
     const char * s = strerror(lError);
     if (s != nullptr)
     {
-        snprintf(errBuf, sizeof(errBuf), "%s", s);
-        return errBuf;
+        CopyString(errBuf, sizeof(errBuf), s);
     }
 #endif
 

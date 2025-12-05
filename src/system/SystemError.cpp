@@ -28,6 +28,7 @@
 #include <system/SystemError.h>
 
 #include <lib/core/ErrorStr.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/DLLUtil.h>
 
 #include <lib/core/CHIPConfig.h>
@@ -91,15 +92,35 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
     static char errBuf[128];
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
+    // Use thread-safe strerror_r when available
+#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+    // GNU version returns char*
+    const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
+    if (s != nullptr)
+    {
+        if (s != errBuf)
+        {
+            CopyString(errBuf, sizeof(errBuf), s);
+        }
+        return errBuf;
+    }
+#elif defined(_POSIX_C_SOURCE)
+    // POSIX version returns int (0 on success)
+    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
+    {
+        return errBuf;
+    }
+#else
+    // Fallback for platforms without strerror_r
     const char * s = strerror(lError);
     if (s != nullptr)
     {
-        strncpy(errBuf, s, sizeof(errBuf) - 1);
-        errBuf[sizeof(errBuf) - 1] = '\0';
+        CopyString(errBuf, sizeof(errBuf), s);
         return errBuf;
     }
+#endif
 
-    return "Unknown platform error";
+    return "Unknown POSIX error";
 }
 
 /**
@@ -108,8 +129,13 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 void RegisterPOSIXErrorFormatter()
 {
     static ErrorFormatter sPOSIXErrorFormatter = { FormatPOSIXError, nullptr };
-
+    static bool sRegistered                    = false;
+    if (sRegistered)
+    {
+        return;
+    }
     RegisterErrorFormatter(&sPOSIXErrorFormatter);
+    sRegistered = true;
 }
 
 /**
