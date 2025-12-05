@@ -244,7 +244,7 @@ void postOnOff(EndpointId endpoint, bool value)
         if (!currentStatus.GetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning))
         {
             currentStatus.SetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning, 1);
-            setPumpStatus(endpoint, currentStatus.Raw());
+            TEMPORARY_RETURN_IGNORED setPumpStatus(endpoint, currentStatus.Raw());
         }
     }
     else
@@ -252,7 +252,7 @@ void postOnOff(EndpointId endpoint, bool value)
         if (currentStatus.GetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning))
         {
             currentStatus.SetField(PumpConfigurationAndControl::PumpStatusBitmap::kRunning, 0);
-            setPumpStatus(endpoint, currentStatus.Raw());
+            TEMPORARY_RETURN_IGNORED setPumpStatus(endpoint, currentStatus.Raw());
         }
     }
 }
@@ -341,7 +341,7 @@ void init()
                            "Failed to initialize OnOff to false for Endpoint: %d", endpointId);
         updateSetPointsOnOff(endpointId, false);
 
-        setPumpStatus(endpointId, 0);
+        TEMPORARY_RETURN_IGNORED setPumpStatus(endpointId, 0);
     }
 }
 

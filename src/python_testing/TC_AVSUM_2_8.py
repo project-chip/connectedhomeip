@@ -50,7 +50,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.8] DPTZRelativeMove command validation"
 
     def steps_TC_AVSUM_2_8(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send DPTZRelativeMove with an unknown stream ID, but valid Zoom Delta verify NotFound response"),
             TestStep(3, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
@@ -67,13 +67,11 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
             TestStep(14, "Via DPTZRelativeMove send the created values of deltaX and deltaY. Verify success"),
             TestStep(15, "Read the DPTZStreams attribute, verify that the new viewport is set to the dimensions of MinViewport"),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_8(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S", "AVSUM.S.F00", "AVSM.S"
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and
@@ -84,7 +82,7 @@ class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
         attributes = cluster.Attributes
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

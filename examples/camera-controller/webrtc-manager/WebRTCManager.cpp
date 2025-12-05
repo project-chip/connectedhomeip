@@ -135,11 +135,11 @@ CHIP_ERROR WebRTCManager::HandleOffer(const WebRTCSessionStruct & session, const
     mPendingSessionId = session.id;
 
     // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
-    DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
-            self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
+            TEMPORARY_RETURN_IGNORED self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
         },
         this);
 
@@ -165,11 +165,11 @@ CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, cons
     mPendingSessionId = session.id;
 
     // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
-    DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
-            self->ProvideICECandidates(self->mPendingSessionId);
+            TEMPORARY_RETURN_IGNORED self->ProvideICECandidates(self->mPendingSessionId);
         },
         this);
 
@@ -483,11 +483,37 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, mLocalCandidates);
+    // Make a copy of candidates to send to avoid race condition with onLocalCandidate callback
+    // which can asynchronously add new candidates while we're sending
+    std::vector<ICECandidateInfo> candidatesToSend = mLocalCandidates;
+    size_t candidateCount                          = candidatesToSend.size();
+
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, candidatesToSend);
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to send ICE candidates: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(Camera, "Sent %lu ICE candidate(s)", candidateCount);
+
+        // Remove only the candidates that were successfully sent
+        // New candidates may have arrived during transmission, so we remove from the front
+        if (mLocalCandidates.size() > candidateCount)
+        {
+            mLocalCandidates.erase(mLocalCandidates.begin(), mLocalCandidates.begin() + candidateCount);
+            if (!mLocalCandidates.empty())
+            {
+                ChipLogProgress(Camera, "%lu new candidate(s) arrived during transmission, keeping for next batch",
+                                mLocalCandidates.size());
+            }
+        }
+        else
+        {
+            ChipLogProgress(Camera, "Sent %lu ICE candidate(s), clearing list", mLocalCandidates.size());
+            mLocalCandidates.clear();
+        }
     }
 
     return err;

@@ -90,3 +90,7 @@ void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);
 void MatterUserLabelClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);

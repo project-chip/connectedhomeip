@@ -121,7 +121,7 @@ class BlePeripheral:
         if not servDataDict:
             return None
         servDataDict = dict(servDataDict)
-        for i in servDataDict.keys():
+        for i in servDataDict:
             if str(i).lower() == str(CHIP_SERVICE_SHORT).lower():
                 return ParseServiceData(bytes(servDataDict[i]))
         return None
@@ -213,7 +213,7 @@ class CoreBluetoothManager(ChipBleBase):
 
         if cond.op == "ready":
             return not self.ready_condition
-        elif cond.op == "scan":
+        if cond.op == "scan":
             for peripheral in self.peripheral_adv_list:
                 if cond.arg and str(peripheral.peripheral._.name) == cond.arg:
                     return False
@@ -249,7 +249,7 @@ class CoreBluetoothManager(ChipBleBase):
         string = "BLE is ready!" if state > 4 else "BLE is not ready!"
         LOGGER.info(string)
         self.manager = manager
-        self.ready_condition = True if state > 4 else False
+        self.ready_condition = state > 4
 
     def centralManager_didDiscoverPeripheral_advertisementData_RSSI_(
         self, manager, peripheral, data, rssi
@@ -378,9 +378,7 @@ class CoreBluetoothManager(ChipBleBase):
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
 
         if self.devCtrl:
-            txEvent = BleTxEvent(
-                charId=charId, svcId=svcId, status=True if not error else False
-            )
+            txEvent = BleTxEvent(charId=charId, svcId=svcId, status=not error)
             self.chip_queue.put(txEvent)
             self.devCtrl.DriveBleIO()
 
@@ -393,7 +391,7 @@ class CoreBluetoothManager(ChipBleBase):
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
         # look at error and send True/False on Success/Failure
-        success = True if not error else False
+        success = not error
         if characteristic.isNotifying():
             operation = BLE_SUBSCRIBE_OPERATION_SUBSCRIBE
             self.subscribe_condition = True
@@ -444,13 +442,13 @@ class CoreBluetoothManager(ChipBleBase):
             if isinstance(ev, BleRxEvent):
                 eventStruct = BleRxEventStruct.fromBleRxEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleTxEvent):
+            if isinstance(ev, BleTxEvent):
                 eventStruct = BleTxEventStruct.fromBleTxEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleSubscribeEvent):
+            if isinstance(ev, BleSubscribeEvent):
                 eventStruct = BleSubscribeEventStruct.fromBleSubscribeEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleDisconnectEvent):
+            if isinstance(ev, BleDisconnectEvent):
                 eventStruct = BleDisconnectEventStruct.fromBleDisconnectEvent(
                     ev)
                 return cast(pointer(eventStruct), c_void_p).value
