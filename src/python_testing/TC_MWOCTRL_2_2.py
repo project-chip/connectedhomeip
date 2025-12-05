@@ -43,6 +43,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # This test requires several additional command line arguments
 # run with
 # --endpoint endpoint
@@ -76,7 +78,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         return "[TC-MWOCTRL-2.2] Secondary functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Set MinPowerValue variable"),
             TestStep(3, "Read the MinPower attribute"),
@@ -95,14 +97,12 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             TestStep(16, "If PowerStep=1, exit test case."),
             TestStep(17, "Set PowerSetting to a value that is not an integer multiple of PowerStep"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_2(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
             "MWOCTRL.S.F00",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -121,11 +121,11 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         is_pwrnum_feature_supported = feature_map & features.kPowerAsNumber
 
         if not is_pwrnum_feature_supported:
-            logging.info("PWRNUM is not supported so skipping remaining test steps")
+            log.info("PWRNUM is not supported so skipping remaining test steps")
             self.mark_all_remaining_steps_skipped(2)
             return
 
-        logging.info("The PWRNUM feature is supported so continuing with remaining test steps")
+        log.info("The PWRNUM feature is supported so continuing with remaining test steps")
 
         self.step(2)
         minPowerValue = 10
@@ -135,7 +135,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
             asserts.assert_greater_equal(minPowerValue, 1, "MinPower is less than 1")
             asserts.assert_less_equal(minPowerValue, 99, "MinPower is less than 1")
-        logging.info("MinPower is %s" % minPowerValue)
+        log.info("MinPower is %s" % minPowerValue)
 
         self.step(4)
         maxPowerValue = 100
@@ -145,7 +145,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             maxPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPower)
             asserts.assert_greater(maxPowerValue, minPowerValue, "MaxPower is less than MinPower")
             asserts.assert_less(maxPowerValue, 100, "MaxPower is greater than 100")
-        logging.info("MaxPower is %s" % maxPowerValue)
+        log.info("MaxPower is %s" % maxPowerValue)
 
         self.step(6)
         powerStepValue = 10
@@ -157,7 +157,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             asserts.assert_less_equal(powerStepValue, maxPowerValue, "PowerStep is greater than MaxPower")
             asserts.assert_true((maxPowerValue - minPowerValue) % powerStepValue ==
                                 0, "PowerStep is not correct for MaxPower - MinPower")
-        logging.info("PowerStep is %s" % powerStepValue)
+        log.info("PowerStep is %s" % powerStepValue)
 
         self.step(8)
         powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
@@ -166,12 +166,12 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         asserts.assert_true((powerValue-minPowerValue) % powerStepValue == 0, "PowerSetting is not a multiple of power step")
 
         self.step(9)
-        logging.info("minPowerValue is %s" % minPowerValue)
-        logging.info("maxPowerValue is %s" % maxPowerValue)
-        logging.info("powerStepValue is %s" % powerStepValue)
-        logging.info("powerValue is %s" % powerValue)
+        log.info("minPowerValue is %s" % minPowerValue)
+        log.info("maxPowerValue is %s" % maxPowerValue)
+        log.info("powerStepValue is %s" % powerStepValue)
+        log.info("powerValue is %s" % powerValue)
         newPowerValue = (powerValue-minPowerValue) % (maxPowerValue-minPowerValue)+powerStepValue+minPowerValue
-        logging.info("newPowerValue is %s" % newPowerValue)
+        log.info("newPowerValue is %s" % newPowerValue)
         await self.set_power_setting_expect_success(endpoint, newPowerValue)
 
         self.step(10)
@@ -200,9 +200,9 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         self.step(17)
         newPowerValue = minPowerValue + powerStepValue / 2
-        logging.info("-------> MinPower = %d", minPowerValue)
-        logging.info("-------> PowerStep = %d", powerStepValue)
-        logging.info("-------> newPowerValue = %d", newPowerValue)
+        log.info("-------> MinPower = %d", minPowerValue)
+        log.info("-------> PowerStep = %d", powerStepValue)
+        log.info("-------> newPowerValue = %d", newPowerValue)
         await self.set_power_setting_expect_failure(endpoint, newPowerValue)
 
 

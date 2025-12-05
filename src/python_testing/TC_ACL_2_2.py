@@ -46,12 +46,11 @@ class TC_ACL_2_2(MatterBaseTest):
         return ['ACL.S']
 
     def steps_TC_ACL_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"),
             TestStep(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_2(self):

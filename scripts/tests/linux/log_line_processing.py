@@ -125,7 +125,7 @@ class ProcessOutputCapture:
         if exception_value:
             # When we fail because of an exception, report the entire log content
             log.error("-------- START: LOG DUMP FOR %r -----", self.command)
-            with open(self.output_path, "rt") as f:
+            with open(self.output_path) as f:
                 for output_line in f.readlines():
                     log.error(output_line.strip())
             log.error("-------- END:   LOG DUMP FOR %r -----", self.command)

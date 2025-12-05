@@ -15,11 +15,9 @@
  *    limitations under the License.
  */
 
-#include "ClusterActions.h"
-
 #include <app/ConcreteClusterPath.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <gtest/gtest.h>
 #include <lib/support/TimerDelegateMock.h>
@@ -62,7 +60,6 @@ struct TestIdentifyClusterBackwardsCompatibility : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
-    chip::Test::TestServerClusterContext mContext;
     TimerDelegateMock mMockTimerDelegate;
 };
 
@@ -80,24 +77,23 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
     // Old style struct
     struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
                              onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
+    EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Test onIdentifyStart callback by writing to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 10u), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, 10u).IsSuccess());
     EXPECT_TRUE(onIdentifyStartCalled);
 
     // Test onIdentifyStop callback by writing to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 0u), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, 0u).IsSuccess());
     EXPECT_TRUE(onIdentifyStopCalled);
 
     // Test onEffectIdentifier callback by invoking TriggerEffect command.
     Commands::TriggerEffect::Type data;
     data.effectIdentifier = EffectIdentifierEnum::kBlink;
     data.effectVariant    = EffectVariantEnum::kDefault;
-    auto result           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, data);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-              Protocols::InteractionModel::Status::Success);
+    auto result           = tester.Invoke(Commands::TriggerEffect::Id, data);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(onEffectIdentifierCalled);
 }
 
@@ -106,7 +102,8 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     onEffectIdentifierCalled = false;
     struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, onEffectIdentifier,
                              EffectIdentifierEnum::kStopEffect, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
+    EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Check that the effect identifier is the default one
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kStopEffect);
@@ -115,20 +112,16 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     Commands::TriggerEffect::Type dataBlink;
     dataBlink.effectIdentifier = EffectIdentifierEnum::kBlink;
     dataBlink.effectVariant    = EffectVariantEnum::kDefault;
-    auto resultBlink           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataBlink);
-    ASSERT_TRUE(resultBlink.has_value());
-    EXPECT_EQ(resultBlink.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-              Protocols::InteractionModel::Status::Success);
+    auto resultBlink           = tester.Invoke(Commands::TriggerEffect::Id, dataBlink);
+    EXPECT_TRUE(resultBlink.IsSuccess());
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kBlink);
 
     // Invoke the TriggerEffect command with kFinishEffect
     Commands::TriggerEffect::Type dataFinish;
     dataFinish.effectIdentifier = EffectIdentifierEnum::kFinishEffect;
     dataFinish.effectVariant    = EffectVariantEnum::kDefault;
-    auto resultFinish           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataFinish);
-    ASSERT_TRUE(resultFinish.has_value());
-    EXPECT_EQ(resultFinish.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-              Protocols::InteractionModel::Status::Success);
+    auto resultFinish           = tester.Invoke(Commands::TriggerEffect::Id, dataFinish);
+    EXPECT_TRUE(resultFinish.IsSuccess());
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kFinishEffect);
 }
 
@@ -151,17 +144,18 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestMActive)
 {
     struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, nullptr,
                              EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
+    EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Test that mActive is false initially.
     EXPECT_FALSE(identify.mActive);
 
     // Test that mActive is true after writing a non-zero value to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 10u), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, 10u).IsSuccess());
     EXPECT_TRUE(identify.mActive);
 
     // Test that mActive is false after writing 0 to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 0u), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, 0u).IsSuccess());
     EXPECT_FALSE(identify.mActive);
 }
 
@@ -187,10 +181,11 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, StopIdentifyingTest)
     // Old style struct
     struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
                              onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
+    EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Start identifying.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 10u), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, 10u).IsSuccess());
     EXPECT_TRUE(identify.mActive);
 
     // Find the cluster on the endpoint and call StopIdentifying

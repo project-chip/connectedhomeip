@@ -48,6 +48,8 @@ from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_WebRTCR_2_6(WEBRTCRTestBase):
     def setup_class(self):
@@ -64,7 +66,7 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -99,24 +101,22 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
             TestStep(4, "Activate fault injection on TH_SERVER to modify the session ID of the WebRTC ICECandidates command"),
             TestStep(5, "Trigger TH_SERVER to send ICECandidates command to DUT with invalid session ID"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_6(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.C02.Rsp",   # ICECandidates command
         ]
-        return pics
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -137,7 +137,7 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
 
         self.step(1)
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
@@ -171,7 +171,7 @@ class TC_WebRTCR_2_6(WEBRTCRTestBase):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
+        log.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once

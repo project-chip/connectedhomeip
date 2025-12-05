@@ -75,6 +75,8 @@ import matter.clusters as Clusters
 from matter.testing.commissioning import get_setup_payload_info_config
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 '''
 Purpose
 The purpose of this test case is to verify that a device is able to
@@ -265,11 +267,10 @@ class TC_SC_4_1(MatterBaseTest):
                 assert_valid_short_discriminator_subtype(discriminator_subtype)
             else:
                 asserts.fail("Setup Code Type must be either QR code or Manual.")
-            logging.info(f"\n\n\t** discriminator subtype: {discriminator_subtype}\n")
+            log.info(f"\n\n\t** discriminator subtype: {discriminator_subtype}\n")
 
             return discriminator_subtype, discriminator
-        else:
-            asserts.fail("Failed to get the discriminator value from the setup payload info.")
+        asserts.fail("Failed to get the discriminator value from the setup payload info.")
 
         return None
 
@@ -474,7 +475,7 @@ class TC_SC_4_1(MatterBaseTest):
         #   - supports_icd is False.
         #   - supports_icd is True and supports_lit is True and ICD == '1'
         sit_mode = self.supports_icd and (not self.supports_lit or icd_key == '0')
-        logging.info(f"\n\n\t** sit_mode: {sit_mode}\n")
+        log.info(f"\n\n\t** sit_mode: {sit_mode}\n")
 
         # *** SII KEY ***
         if sit_mode:
@@ -705,12 +706,12 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         self.supports_icd = Clusters.IcdManagement.id in ep0_servers
-        logging.info(f"\n\n\t** supports_icd: {self.supports_icd}\n")
+        log.info(f"\n\n\t** supports_icd: {self.supports_icd}\n")
 
         # Read the ActiveModeThreshold attribute if ICD is supported
         if self.supports_icd:
             self.active_mode_threshold_ms = await self.get_active_mode_threshold_ms()
-            logging.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
+            log.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
 
         # *** STEP 3 ***
         # Check if the LITS feature is supported
@@ -719,7 +720,7 @@ class TC_SC_4_1(MatterBaseTest):
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
             self.supports_lit = bool(feature_map & LITS == LITS)
-            logging.info(f"\n\n\t** supports_lit: {self.supports_lit}\n")
+            log.info(f"\n\n\t** supports_lit: {self.supports_lit}\n")
 
         # *** STEP 4 ***
         # Check if the DUT supports TCP
@@ -748,7 +749,7 @@ class TC_SC_4_1(MatterBaseTest):
         # DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)
         if supports_obcw:
             self.step(7)
-            logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
+            log.info("\n\n\t ** Open Basic Commissioning Window supported\n")
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=0,
@@ -792,7 +793,7 @@ class TC_SC_4_1(MatterBaseTest):
             self.step(14)
             await self.close_commissioning_window()
         else:
-            logging.info("\n\n\t ** Open Basic Commissioning Window command is unsupported, skipping advertisement verification steps.\n")
+            log.info("\n\n\t ** Open Basic Commissioning Window command is unsupported, skipping advertisement verification steps.\n")
             self.mark_step_range_skipped(7, 14)
 
         # *** STEP 15 ***
@@ -849,7 +850,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
         extended_discovery_mode = long_discriminator_ptr_instance_name is not None
-        logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
+        log.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
         if extended_discovery_mode:
             # *** STEP 24 ***
@@ -872,7 +873,7 @@ class TC_SC_4_1(MatterBaseTest):
             self.step(27)
             await self._verify_aaaa_records(srv_hostname)
         else:
-            logging.info("Skipping Extended Discovery mode advertisements verification steps.")
+            log.info("Skipping Extended Discovery mode advertisements verification steps.")
             self.mark_step_range_skipped(24, 27)
 
 

@@ -36,7 +36,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
-#include "FakeWifiDriver.h"
+#include "FakeDrivers.h"
 
 namespace {
 
@@ -108,13 +108,13 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     NoopBreadcrumbTracker tracker;
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     {
         WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
         writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(true);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(false);
 
         // no notification if enable fails
         context.ChangeListener().DirtyList().clear();

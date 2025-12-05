@@ -48,7 +48,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = Clusters.Thermostat
 
@@ -211,7 +211,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         return ["TSTAT.S"]
 
     def steps_TC_TSTAT_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH writes to the Presets attribute without calling the AtomicRequest command",
@@ -250,8 +250,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
                      "Verify that the write request returned RESOURCE_EXHAUSTED (0x89)."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_TSTAT_4_2(self):
         endpoint = self.get_endpoint()
@@ -259,7 +257,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("1")
         # Commission DUT - already done
 
-        logger.info("Commissioning under second controller")
+        log.info("Commissioning under second controller")
         params = await self.default_controller.OpenCommissioningWindow(
             nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
@@ -340,10 +338,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Read the PresetTypes to get the preset scenarios supported by the Thermostat.
             presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
-            logger.info(f"Rx'd Preset Types: {presetTypes}")
+            log.info(f"Rx'd Preset Types: {presetTypes}")
 
             current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            logger.info(f"Rx'd Presets: {current_presets}")
+            log.info(f"Rx'd Presets: {current_presets}")
 
             presetScenarioCounts = self.count_preset_scenarios(current_presets)
 
@@ -373,7 +371,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Read the presets attribute and verify it was updated by the write
                 saved_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-                logger.info(f"Rx'd Presets: {saved_presets}")
+                log.info(f"Rx'd Presets: {saved_presets}")
                 self.check_returned_presets(test_presets, saved_presets)
 
                 await self.send_atomic_request_rollback_command()
@@ -382,7 +380,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
                 asserts.assert_equal(presets, current_presets, "Presets were updated which is not expected")
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 3 since there was no available preset scenario to append")
 
         self.step("4")
@@ -412,12 +410,12 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
                 current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-                logger.info(f"Rx'd Presets: {current_presets}")
+                log.info(f"Rx'd Presets: {current_presets}")
                 self.check_returned_presets(test_presets, current_presets)
 
                 presetScenarioCounts = self.count_preset_scenarios(current_presets)
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 4 since there were no built-in presets")
 
         self.step("5")
@@ -440,7 +438,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Send the AtomicRequest commit command and expect ConstraintError for presets.
                 await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.ConstraintError)
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 5 since there were no built-in presets")
 
         self.step("6")
@@ -455,7 +453,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Read the active preset handle attribute and verify it was updated to preset handle
                 activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-                logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+                log.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
                 asserts.assert_equal(activePresetHandle, activePreset.presetHandle,
                                      "Active preset handle was not updated as expected")
 
@@ -464,13 +462,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute after removing the preset that was set as the active preset handle.
                 test_presets = [preset for preset in current_presets if preset.presetHandle != activePresetHandle]
-                logger.info(f"Sending Presets: {test_presets}")
+                log.info(f"Sending Presets: {test_presets}")
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
 
                 # Send the AtomicRequest commit command and expect InvalidInState for presets.
                 await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 6 since there were no non-built-in presets to activate and delete")
 
             # Write the occupied cooling setpoint to a different value
@@ -486,7 +484,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint+1), endpoint_id=endpoint)
 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+            log.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
             asserts.assert_equal(activePresetHandle, NullValue, "Active preset handle was not cleared as expected")
 
         self.step("7")
@@ -508,7 +506,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 7 since there was no built-in presets")
 
         self.step("8")
@@ -531,7 +529,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 8 since there was no available preset scenario to append")
 
         self.step("9")
@@ -572,7 +570,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 10 since there was no available preset scenario to duplicate")
 
         self.step("11")
@@ -594,7 +592,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 11 since there were no presets that were not built-in")
 
         self.step("12")
@@ -624,7 +622,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 12 since there was no available preset scenario without name support")
 
         self.step("13")
@@ -649,7 +647,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Send the AtomicRequest commit command and expect InvalidInState as the previous edit request was cancelled
                 await self.send_atomic_request_commit_command(expected_status=Status.InvalidInState)
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 13 since there was no available preset scenario to add")
 
         self.step("14")
@@ -705,7 +703,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 17 since all preset scenarios in PresetScenarioEnum are supported by this Thermostat")
 
         self.step("18")
@@ -761,7 +759,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(
+                log.info(
                     "Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
 
 
