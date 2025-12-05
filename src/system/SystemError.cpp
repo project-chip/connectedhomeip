@@ -100,7 +100,7 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
     {
         if (s != errBuf)
         {
-            CopyString(errBuf, sizeof(errBuf), s);
+            chip::Platform::CopyString(errBuf, sizeof(errBuf), s);
         }
         return errBuf;
     }
@@ -115,7 +115,7 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
     const char * s = strerror(lError);
     if (s != nullptr)
     {
-        CopyString(errBuf, sizeof(errBuf), s);
+        chip::Platform::CopyString(errBuf, sizeof(errBuf), s);
         return errBuf;
     }
 #endif

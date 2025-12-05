@@ -89,6 +89,9 @@ void RegisterPlatformErrorFormatter()
 {
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
     static bool sRegistered                       = false;
+    // Note: The static bool pattern is acceptable here as RegisterPlatformErrorFormatter() is
+    // typically called during early initialization before multi-threaded execution begins.
+    // Adding std::call_once/std::once_flag would introduce unnecessary C++ runtime overhead.
     if (sRegistered)
     {
         return;
