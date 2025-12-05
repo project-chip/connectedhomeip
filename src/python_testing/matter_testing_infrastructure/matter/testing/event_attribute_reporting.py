@@ -258,7 +258,7 @@ class AttributeSubscriptionHandler:
 
     async def cancel(self, timeout_sec: float = 5.0):
         """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
+        # Allow time for the subscription shutdown to complete before returning
         try:
             self._subscription.Shutdown()
             await asyncio.sleep(timeout_sec)
