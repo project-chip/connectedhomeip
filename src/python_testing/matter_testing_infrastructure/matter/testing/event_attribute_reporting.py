@@ -111,8 +111,8 @@ class EventSubscriptionHandler:
 
     async def cancel(self, timeout_sec: float = 5.0):
         """This cancels a subscription."""
-        # Shutdown is synchronous, but it may trigger async cleanup. We sleep
-        # briefly to allow this cleanup to happen before the test continues.
+        # Shutdown is synchronous, but it may trigger async cleanup. We wait
+        # for up to `timeout_sec` seconds (default 5.0) to allow this cleanup to happen before the test continues.
         self._subscription.Shutdown()
         await asyncio.sleep(timeout_sec)
 
