@@ -16,10 +16,14 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/AttributeValuePairValidator.h"
     "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.cpp"
     "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.h"
     "${CLUSTER_DIR}/CodegenEndpointToIndex.h"
+    "${CLUSTER_DIR}/scenes-server.cpp"
+    "${CLUSTER_DIR}/scenes-server.h"
+
+    # these below would be pulled by GN (.gni file) dependency. CMAKE needs these directly
+    "${CLUSTER_DIR}/AttributeValuePairValidator.h"
     "${CLUSTER_DIR}/ExtensionFieldSets.h"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.cpp"
     "${CLUSTER_DIR}/ExtensionFieldSetsImpl.h"
@@ -28,6 +32,4 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/SceneTable.h"
     "${CLUSTER_DIR}/SceneTableImpl.cpp"
     "${CLUSTER_DIR}/SceneTableImpl.h"
-    "${CLUSTER_DIR}/scenes-server.cpp"
-    "${CLUSTER_DIR}/scenes-server.h"
 )

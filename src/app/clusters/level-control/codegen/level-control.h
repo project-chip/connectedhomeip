@@ -31,7 +31,7 @@
 #include <app/util/basic-types.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/SceneTable.h>
+#include <app/clusters/scenes-server/SceneTable.h> // nogncheck
 #endif
 
 /** @brief Level Control Cluster Server Post Init
