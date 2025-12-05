@@ -31,7 +31,6 @@ import asyncio
 import logging
 import os
 import tempfile
-
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -52,7 +51,7 @@ class TC_SC_3_5(MatterBaseTest):
         self.th_server = None
         self.storage = None
 
-        self.DUT_has_icac = None
+        self.DUT_has_icac = NullValue
 
         self.th_client = self.default_controller
         self.th_server_local_nodeid = 1111
@@ -228,6 +227,8 @@ class TC_SC_3_5(MatterBaseTest):
             self.skip_step("1b")
             self.skip_step("1c")
             self.skip_step("1d")
+            # Although this doesnt matter, we keep this True so we do not skip Steps 4a-4c in CI (in case they have other syntax issues)
+            self.DUT_has_icac = True
 
         else:
             self.step("1a")
@@ -261,13 +262,18 @@ class TC_SC_3_5(MatterBaseTest):
 
             asserts.assert_equal(len(nocStructs), 2,
                                  f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
-            DUT_Commissioner_icac = nocStructs[1].icac
-            DUT_Commissioner_fabricIndex = nocStructs[1].fabricIndex
+
+            DUT_Commissioner_nocStruct = next(noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId)
+
+            DUT_Commissioner_icac = DUT_Commissioner_nocStruct.icac
+            DUT_Commissioner_fabricIndex = DUT_Commissioner_nocStruct.fabricIndex
 
             # Determine if DUT_Commissioner has ICAC in its NOC Chain
-            if DUT_Commissioner_icac is NullValue:
+            if DUT_Commissioner_icac == NullValue:
+                print("DUT_Commissioner does not have ICAC in its NOC Chain")
                 self.DUT_has_icac = False
             else:
+                print("DUT_Commissioner has ICAC in its NOC Chain")
                 self.DUT_has_icac = True
 
             # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Initiator in next step
@@ -278,7 +284,7 @@ class TC_SC_3_5(MatterBaseTest):
             asserts.assert_equal(
                 resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
-        # ------------------------------------------- Inject Fault into Sigma 2 TBEData2Encrypted---------------------------------------------
+        # ------------------------------------------- Inject Fault into Sigma2 TBEData2Encrypted---------------------------------------------
         self.step("2a")
         th_server_passcode = await self.open_commissioning_window()
 
@@ -395,8 +401,6 @@ class TC_SC_3_5(MatterBaseTest):
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
         )
-
-        print(f"self.is_pics_sdk_ci_only = {self.is_pics_sdk_ci_only}")
         if self.is_pics_sdk_ci_only:
             resp = 'Y'
         else:
