@@ -413,10 +413,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     if (transport->HasCandidates())
     {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, transport, sessionId]() {
-            transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-            ScheduleICECandidatesSend(sessionId);
-        });
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
     }
 
     return CHIP_NO_ERROR;
@@ -1076,19 +1074,10 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle
-    CHIP_ERROR err = Controller::InvokeCommandRequest(
-        &exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess, onFailure,
-        /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
-        /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
-
-    // Flush any queued up ICE candidates after the answer is sent
-    if (transport->HasCandidates())
-    {
-        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-        ScheduleICECandidatesSend(sessionId);
-    }
-
-    return err;
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
+                                            onFailure,
+                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
 }
 
 CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeManager & exchangeMgr,
