@@ -52,7 +52,7 @@ class TC_SC_3_5(MatterBaseTest):
         self.th_server = None
         self.storage = None
 
-        self.DUT_has_icac = NullValue
+        self.dut_has_icac = NullValue
 
         self.th_client = self.default_controller
         self.th_server_local_nodeid = 1111
@@ -228,8 +228,8 @@ class TC_SC_3_5(MatterBaseTest):
             self.skip_step("1b")
             self.skip_step("1c")
             self.skip_step("1d")
-            # Although this doesnt matter, we keep this True so we do not skip Steps 4a-4c in CI (in case they have other syntax issues)
-            self.DUT_has_icac = True
+            # Although this doesn't matter, we keep this True so we do not skip Steps 4a-4c in CI (in case they have other syntax issues)
+            self.dut_has_icac = True
 
         else:
             self.step("1a")
@@ -264,23 +264,23 @@ class TC_SC_3_5(MatterBaseTest):
             asserts.assert_equal(len(nocStructs), 2,
                                  f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
 
-            DUT_Commissioner_nocStruct = next(noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId)
+            dut_commissioner_noc_struct = next((noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId), None)
 
-            DUT_Commissioner_icac = DUT_Commissioner_nocStruct.icac
-            DUT_Commissioner_fabricIndex = DUT_Commissioner_nocStruct.fabricIndex
+            dut_commissioner_icac = dut_commissioner_noc_struct.icac
+            dut_commissioner_fabric_index = dut_commissioner_noc_struct.fabricIndex
 
             # Determine if DUT_Commissioner has ICAC in its NOC Chain
-            if DUT_Commissioner_icac == NullValue:
+            if dut_commissioner_icac == NullValue:
                 print("DUT_Commissioner does not have ICAC in its NOC Chain")
-                self.DUT_has_icac = False
+                self.dut_has_icac = False
             else:
                 print("DUT_Commissioner has ICAC in its NOC Chain")
-                self.DUT_has_icac = True
+                self.dut_has_icac = True
 
             # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Initiator in next step
             self.step("1d")
 
-            cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=DUT_Commissioner_fabricIndex)
+            cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=dut_commissioner_fabric_index)
             resp = await self.send_single_cmd(dev_ctrl=self.th_client, node_id=self.th_server_local_nodeid, cmd=cmd)
             asserts.assert_equal(
                 resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
@@ -349,7 +349,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         # ------------------------------------------- Inject Fault into Sigma2 responderICAC---------------------------------------------
 
-        if not self.DUT_has_icac:
+        if not self.dut_has_icac:
             log.info("DUT Commissioner does not have ICAC in its NOC Chain, skipping ICAC Fault Injection testcase")
             self.skip_step("4a")
             self.skip_step("4b")
