@@ -155,8 +155,8 @@ CodeDrivenClusters:
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs
-    - Ethernet Network Diagnostics
     - Electrical Power Measurement
+    - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
     - General Diagnostics
