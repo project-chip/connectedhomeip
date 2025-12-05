@@ -22,26 +22,26 @@
 namespace chip {
 namespace Testing {
 
-    constexpr FabricIndex kTestFabrixIndex = kMinValidFabricIndex;
-    constexpr NodeId kTestNodeId = 0xFFFF'1234'ABCD'4321;
+constexpr FabricIndex kTestFabrixIndex = kMinValidFabricIndex;
+constexpr NodeId kTestNodeId           = 0xFFFF'1234'ABCD'4321;
 
-    constexpr Access::SubjectDescriptor kAdminSubjectDescriptor {
-        .fabricIndex = kTestFabrixIndex,
-        .authMode = Access::AuthMode::kCase,
-        .subject = kTestNodeId,
-    };
+constexpr Access::SubjectDescriptor kAdminSubjectDescriptor{
+    .fabricIndex = kTestFabrixIndex,
+    .authMode    = Access::AuthMode::kCase,
+    .subject     = kTestNodeId,
+};
 
-    constexpr Access::SubjectDescriptor kViewSubjectDescriptor {
-        .fabricIndex = kTestFabrixIndex + 1,
-        .authMode = Access::AuthMode::kCase,
-        .subject = kTestNodeId,
-    };
+constexpr Access::SubjectDescriptor kViewSubjectDescriptor{
+    .fabricIndex = kTestFabrixIndex + 1,
+    .authMode    = Access::AuthMode::kCase,
+    .subject     = kTestNodeId,
+};
 
-    constexpr Access::SubjectDescriptor kDenySubjectDescriptor {
-        .fabricIndex = kTestFabrixIndex + 2,
-        .authMode = Access::AuthMode::kCase,
-        .subject = kTestNodeId,
-    };
+constexpr Access::SubjectDescriptor kDenySubjectDescriptor{
+    .fabricIndex = kTestFabrixIndex + 2,
+    .authMode    = Access::AuthMode::kCase,
+    .subject     = kTestNodeId,
+};
 
 } // namespace Testing
 } // namespace chip
