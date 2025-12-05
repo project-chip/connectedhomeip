@@ -221,37 +221,38 @@ class TC_SC_3_5(MatterBaseTest):
         log.info("Commissioning TH_SERVER complete")
 
         # ------------------------------------------- Determine if DUT Commissioner has ICAC in its NOC Chain---------------------------------------------
-        self.step("1a")
-        th_server_passcode = await self.open_commissioning_window()
-
-        self.step("1b")
-        prompt_msg = (
-            "\nPlease commission the TH_SERVER app from DUT:\n"
-            f"  pairing onnetwork 1 {th_server_passcode}\n"
-            "Input 'Y' if commissioner DUT commissions TH server app successfully \n"
-            "Input 'N' if commissioner DUT fails commissioning \n "
-        )
 
         if self.is_pics_sdk_ci_only:
-            resp = 'Y'
+            print("Skip steps 1a-1d since we are running in CI and there is no DUT Commissioner in CI to check for its ICAC")
+            self.skip_step("1a")
+            self.skip_step("1b")
+            self.skip_step("1c")
+            self.skip_step("1d")
+
         else:
+            self.step("1a")
+            th_server_passcode = await self.open_commissioning_window()
+
+            self.step("1b")
+            prompt_msg = (
+                "\nPlease commission the TH_SERVER app from DUT:\n"
+                f"  pairing onnetwork 1 {th_server_passcode}\n"
+                "Input 'Y' if commissioner DUT commissions TH server app successfully \n"
+                "Input 'N' if commissioner DUT fails commissioning \n "
+            )
+
             resp = self.wait_for_user_input(prompt_msg)
 
-        commissioning_success = resp.lower() == 'y'
+            commissioning_success = resp.lower() == 'y'
 
-        # Verify that DUT commissioned TH_SERVER successfully
-        asserts.assert_equal(
-            commissioning_success,
-            True,
-            "Expected DUT_Commissioner to commission TH_SERVER app successfully"
-        )
+            # Verify that DUT commissioned TH_SERVER successfully
+            asserts.assert_equal(
+                commissioning_success,
+                True,
+                "Expected DUT_Commissioner to commission TH_SERVER app successfully"
+            )
 
-        self.step("1c")
-
-        if self.is_pics_sdk_ci_only:
-            print("Skip this step since we are running in CI; since there is no DUT Commissioner to check for ICAC")
-            pass
-        else:
+            self.step("1c")
             nocStructs = await self.read_single_attribute_check_success(dev_ctrl=self.th_client,
                                                                         node_id=self.th_server_local_nodeid,
                                                                         cluster=Clusters.OperationalCredentials,
@@ -269,13 +270,9 @@ class TC_SC_3_5(MatterBaseTest):
             else:
                 self.DUT_has_icac = True
 
-        # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Initiator in next step
-        self.step("1d")
+            # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Initiator in next step
+            self.step("1d")
 
-        if self.is_pics_sdk_ci_only:
-            print("Skip this step since we are running in CI and there is no DUT Commissioner")
-            pass
-        else:
             cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=DUT_Commissioner_fabricIndex)
             resp = await self.send_single_cmd(dev_ctrl=self.th_client, node_id=self.th_server_local_nodeid, cmd=cmd)
             asserts.assert_equal(
