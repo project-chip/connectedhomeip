@@ -11508,7 +11508,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000000C: {
-                "attributeName": "PrivacyMode",
+                "attributeName": "PrivacyModeEnabled",
                 "attributeId": 0x0000000C,
                 "type": "bool",
                 "reportable": True,

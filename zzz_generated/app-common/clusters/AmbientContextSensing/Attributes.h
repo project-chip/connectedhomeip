@@ -195,7 +195,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PredictedActivity
-namespace PrivacyMode {
+namespace PrivacyModeEnabled {
 struct TypeInfo
 {
     using Type             = bool;
@@ -203,10 +203,10 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PrivacyMode::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PrivacyModeEnabled::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PrivacyMode
+} // namespace PrivacyModeEnabled
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -258,7 +258,7 @@ struct TypeInfo
         Attributes::HoldTime::TypeInfo::DecodableType holdTime                                     = static_cast<uint16_t>(0);
         Attributes::HoldTimeLimits::TypeInfo::DecodableType holdTimeLimits;
         Attributes::PredictedActivity::TypeInfo::DecodableType predictedActivity;
-        Attributes::PrivacyMode::TypeInfo::DecodableType privacyMode = static_cast<bool>(0);
+        Attributes::PrivacyModeEnabled::TypeInfo::DecodableType privacyModeEnabled = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

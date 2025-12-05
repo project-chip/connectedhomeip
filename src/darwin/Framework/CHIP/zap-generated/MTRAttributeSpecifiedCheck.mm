@@ -5377,7 +5377,7 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::PredictedActivity::Id: {
         return YES;
     }
-    case Attributes::PrivacyMode::Id: {
+    case Attributes::PrivacyModeEnabled::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

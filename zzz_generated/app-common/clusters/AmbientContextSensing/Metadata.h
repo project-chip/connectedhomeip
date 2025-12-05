@@ -76,10 +76,10 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace PredictedActivity
-namespace PrivacyMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PrivacyMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace PrivacyModeEnabled {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PrivacyModeEnabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace PrivacyMode
+} // namespace PrivacyModeEnabled
 constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
     SimultaneousDetectionLimit::kMetadataEntry,
 

@@ -41947,7 +41947,7 @@ class AmbientContextSensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x0000000A, Type=typing.Optional[AmbientContextSensing.Structs.HoldTimeLimitsStruct]),
                 ClusterObjectFieldDescriptor(Label="predictedActivity", Tag=0x0000000B, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]]),
-                ClusterObjectFieldDescriptor(Label="privacyMode", Tag=0x0000000C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="privacyModeEnabled", Tag=0x0000000C, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -41967,7 +41967,7 @@ class AmbientContextSensing(Cluster):
     holdTime: typing.Optional[uint] = None
     holdTimeLimits: typing.Optional[AmbientContextSensing.Structs.HoldTimeLimitsStruct] = None
     predictedActivity: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
-    privacyMode: typing.Optional[bool] = None
+    privacyModeEnabled: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -42226,7 +42226,7 @@ class AmbientContextSensing(Cluster):
             value: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
 
         @dataclass
-        class PrivacyMode(ClusterAttributeDescriptor):
+        class PrivacyModeEnabled(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000431

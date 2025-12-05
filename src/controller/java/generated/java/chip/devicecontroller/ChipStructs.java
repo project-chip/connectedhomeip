@@ -11293,7 +11293,6 @@ public static class SoilMeasurementClusterMeasurementAccuracyRangeStruct {
     return output.toString();
   }
 }
-
 public static class SoilMeasurementClusterMeasurementAccuracyStruct {
   public Integer measurementType;
   public Boolean measured;
@@ -11395,6 +11394,355 @@ public static class SoilMeasurementClusterMeasurementAccuracyStruct {
     output.append("\n");
     output.append("\taccuracyRanges: ");
     output.append(accuracyRanges);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientContextSensingClusterSemanticTagStruct {
+  public @Nullable Integer mfgCode;
+  public Integer namespaceID;
+  public Integer tag;
+  public @Nullable Optional<String> label;
+  private static final long MFG_CODE_ID = 0L;
+  private static final long NAMESPACE_ID_ID = 1L;
+  private static final long TAG_ID = 2L;
+  private static final long LABEL_ID = 3L;
+
+  public AmbientContextSensingClusterSemanticTagStruct(
+    @Nullable Integer mfgCode,
+    Integer namespaceID,
+    Integer tag,
+    @Nullable Optional<String> label
+  ) {
+    this.mfgCode = mfgCode;
+    this.namespaceID = namespaceID;
+    this.tag = tag;
+    this.label = label;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MFG_CODE_ID, mfgCode != null ? new UIntType(mfgCode) : new NullType()));
+    values.add(new StructElement(NAMESPACE_ID_ID, new UIntType(namespaceID)));
+    values.add(new StructElement(TAG_ID, new UIntType(tag)));
+    values.add(new StructElement(LABEL_ID, label != null ? label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterSemanticTagStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Integer mfgCode = null;
+    Integer namespaceID = null;
+    Integer tag = null;
+    @Nullable Optional<String> label = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MFG_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mfgCode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NAMESPACE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          namespaceID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TAG_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          tag = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new AmbientContextSensingClusterSemanticTagStruct(
+      mfgCode,
+      namespaceID,
+      tag,
+      label
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterSemanticTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+    output.append("\n");
+    output.append("\tnamespaceID: ");
+    output.append(namespaceID);
+    output.append("\n");
+    output.append("\ttag: ");
+    output.append(tag);
+    output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientContextSensingClusterAmbientContextTypeStruct {
+  public ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed;
+  public Optional<Long> detectionStartTime;
+  private static final long AMBIENT_CONTEXT_SENSED_ID = 0L;
+  private static final long DETECTION_START_TIME_ID = 1L;
+
+  public AmbientContextSensingClusterAmbientContextTypeStruct(
+    ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed,
+    Optional<Long> detectionStartTime
+  ) {
+    this.ambientContextSensed = ambientContextSensed;
+    this.detectionStartTime = detectionStartTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AMBIENT_CONTEXT_SENSED_ID, ArrayType.generateArrayType(ambientContextSensed, (elementambientContextSensed) -> elementambientContextSensed.encodeTlv())));
+    values.add(new StructElement(DETECTION_START_TIME_ID, detectionStartTime.<BaseTLVType>map((nonOptionaldetectionStartTime) -> new UIntType(nonOptionaldetectionStartTime)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterAmbientContextTypeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed = null;
+    Optional<Long> detectionStartTime = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AMBIENT_CONTEXT_SENSED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          ambientContextSensed = castingValue.map((elementcastingValue) -> ChipStructs.AmbientContextSensingClusterSemanticTagStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == DETECTION_START_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          detectionStartTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new AmbientContextSensingClusterAmbientContextTypeStruct(
+      ambientContextSensed,
+      detectionStartTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterAmbientContextTypeStruct {\n");
+    output.append("\tambientContextSensed: ");
+    output.append(ambientContextSensed);
+    output.append("\n");
+    output.append("\tdetectionStartTime: ");
+    output.append(detectionStartTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientContextSensingClusterHoldTimeLimitsStruct {
+  public Integer holdTimeMin;
+  public Integer holdTimeMax;
+  public Integer holdTimeDefault;
+  private static final long HOLD_TIME_MIN_ID = 0L;
+  private static final long HOLD_TIME_MAX_ID = 1L;
+  private static final long HOLD_TIME_DEFAULT_ID = 2L;
+
+  public AmbientContextSensingClusterHoldTimeLimitsStruct(
+    Integer holdTimeMin,
+    Integer holdTimeMax,
+    Integer holdTimeDefault
+  ) {
+    this.holdTimeMin = holdTimeMin;
+    this.holdTimeMax = holdTimeMax;
+    this.holdTimeDefault = holdTimeDefault;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(HOLD_TIME_MIN_ID, new UIntType(holdTimeMin)));
+    values.add(new StructElement(HOLD_TIME_MAX_ID, new UIntType(holdTimeMax)));
+    values.add(new StructElement(HOLD_TIME_DEFAULT_ID, new UIntType(holdTimeDefault)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterHoldTimeLimitsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer holdTimeMin = null;
+    Integer holdTimeMax = null;
+    Integer holdTimeDefault = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == HOLD_TIME_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeMin = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOLD_TIME_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeMax = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOLD_TIME_DEFAULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeDefault = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientContextSensingClusterHoldTimeLimitsStruct(
+      holdTimeMin,
+      holdTimeMax,
+      holdTimeDefault
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterHoldTimeLimitsStruct {\n");
+    output.append("\tholdTimeMin: ");
+    output.append(holdTimeMin);
+    output.append("\n");
+    output.append("\tholdTimeMax: ");
+    output.append(holdTimeMax);
+    output.append("\n");
+    output.append("\tholdTimeDefault: ");
+    output.append(holdTimeDefault);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientContextSensingClusterPredictedActivityStruct {
+  public Long startTimestamp;
+  public Long endTimestamp;
+  public Optional<ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct>> ambientContextType;
+  public Optional<Boolean> crowdDetected;
+  public Optional<Integer> crowdCount;
+  public Integer confidence;
+  private static final long START_TIMESTAMP_ID = 0L;
+  private static final long END_TIMESTAMP_ID = 1L;
+  private static final long AMBIENT_CONTEXT_TYPE_ID = 2L;
+  private static final long CROWD_DETECTED_ID = 3L;
+  private static final long CROWD_COUNT_ID = 4L;
+  private static final long CONFIDENCE_ID = 5L;
+
+  public AmbientContextSensingClusterPredictedActivityStruct(
+    Long startTimestamp,
+    Long endTimestamp,
+    Optional<ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct>> ambientContextType,
+    Optional<Boolean> crowdDetected,
+    Optional<Integer> crowdCount,
+    Integer confidence
+  ) {
+    this.startTimestamp = startTimestamp;
+    this.endTimestamp = endTimestamp;
+    this.ambientContextType = ambientContextType;
+    this.crowdDetected = crowdDetected;
+    this.crowdCount = crowdCount;
+    this.confidence = confidence;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(START_TIMESTAMP_ID, new UIntType(startTimestamp)));
+    values.add(new StructElement(END_TIMESTAMP_ID, new UIntType(endTimestamp)));
+    values.add(new StructElement(AMBIENT_CONTEXT_TYPE_ID, ambientContextType.<BaseTLVType>map((nonOptionalambientContextType) -> ArrayType.generateArrayType(nonOptionalambientContextType, (elementnonOptionalambientContextType) -> elementnonOptionalambientContextType.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(CROWD_DETECTED_ID, crowdDetected.<BaseTLVType>map((nonOptionalcrowdDetected) -> new BooleanType(nonOptionalcrowdDetected)).orElse(new EmptyType())));
+    values.add(new StructElement(CROWD_COUNT_ID, crowdCount.<BaseTLVType>map((nonOptionalcrowdCount) -> new UIntType(nonOptionalcrowdCount)).orElse(new EmptyType())));
+    values.add(new StructElement(CONFIDENCE_ID, new UIntType(confidence)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterPredictedActivityStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long startTimestamp = null;
+    Long endTimestamp = null;
+    Optional<ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct>> ambientContextType = Optional.empty();
+    Optional<Boolean> crowdDetected = Optional.empty();
+    Optional<Integer> crowdCount = Optional.empty();
+    Integer confidence = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == START_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == END_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == AMBIENT_CONTEXT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          ambientContextType = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.AmbientContextSensingClusterSemanticTagStruct.decodeTlv(elementcastingValue)));
+        }
+      } else if (element.contextTagNum() == CROWD_DETECTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          crowdDetected = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == CROWD_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          crowdCount = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == CONFIDENCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          confidence = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientContextSensingClusterPredictedActivityStruct(
+      startTimestamp,
+      endTimestamp,
+      ambientContextType,
+      crowdDetected,
+      crowdCount,
+      confidence
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterPredictedActivityStruct {\n");
+    output.append("\tstartTimestamp: ");
+    output.append(startTimestamp);
+    output.append("\n");
+    output.append("\tendTimestamp: ");
+    output.append(endTimestamp);
+    output.append("\n");
+    output.append("\tambientContextType: ");
+    output.append(ambientContextType);
+    output.append("\n");
+    output.append("\tcrowdDetected: ");
+    output.append(crowdDetected);
+    output.append("\n");
+    output.append("\tcrowdCount: ");
+    output.append(crowdCount);
+    output.append("\n");
+    output.append("\tconfidence: ");
+    output.append(confidence);
     output.append("\n");
     output.append("}\n");
     return output.toString();

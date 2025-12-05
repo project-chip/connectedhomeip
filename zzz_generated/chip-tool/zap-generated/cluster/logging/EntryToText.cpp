@@ -3975,8 +3975,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTimeLimits";
         case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
             return "PredictedActivity";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyMode::Id:
-            return "PrivacyMode";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyModeEnabled::Id:
+            return "PrivacyModeEnabled";
         case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:

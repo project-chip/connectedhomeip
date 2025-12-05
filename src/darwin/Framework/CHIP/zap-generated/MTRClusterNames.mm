@@ -7462,8 +7462,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"PredictedActivity";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributePrivacyModeID:
-            result = @"PrivacyMode";
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributePrivacyModeEnabledID:
+            result = @"PrivacyModeEnabled";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID:

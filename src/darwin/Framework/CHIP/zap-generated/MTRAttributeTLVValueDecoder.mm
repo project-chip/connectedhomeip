@@ -16634,8 +16634,8 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
         }
         return value;
     }
-    case Attributes::PrivacyMode::Id: {
-        using TypeInfo = Attributes::PrivacyMode::TypeInfo;
+    case Attributes::PrivacyModeEnabled::Id: {
+        using TypeInfo = Attributes::PrivacyModeEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

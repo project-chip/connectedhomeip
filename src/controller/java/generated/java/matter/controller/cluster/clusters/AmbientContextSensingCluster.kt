@@ -1471,7 +1471,7 @@ suspend fun readPredictedActivityAttribute(): PredictedActivityAttribute {val AT
       }
     }    
   }
-suspend fun readPrivacyModeAttribute(): Boolean? {val ATTRIBUTE_ID: UInt = 12u
+suspend fun readPrivacyModeEnabledAttribute(): Boolean? {val ATTRIBUTE_ID: UInt = 12u
 
     val attributePath = AttributePath(
       endpointId = endpointId, 
@@ -1499,7 +1499,7 @@ suspend fun readPrivacyModeAttribute(): Boolean? {val ATTRIBUTE_ID: UInt = 12u
       }        
        
     requireNotNull(attributeData) { 
-      "Privacymode attribute not found in response" 
+      "Privacymodeenabled attribute not found in response" 
     }
 
     // Decode the TLV data into the appropriate type
@@ -1514,7 +1514,7 @@ suspend fun readPrivacyModeAttribute(): Boolean? {val ATTRIBUTE_ID: UInt = 12u
     return decodedValue
   }
 
-  suspend fun subscribePrivacyModeAttribute(
+  suspend fun subscribePrivacyModeEnabledAttribute(
     minInterval: Int,
     maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
@@ -1546,7 +1546,7 @@ suspend fun readPrivacyModeAttribute(): Boolean? {val ATTRIBUTE_ID: UInt = 12u
             }        
              
           requireNotNull(attributeData) { 
-            "Privacymode attribute not found in Node State update" 
+            "Privacymodeenabled attribute not found in Node State update" 
           }
 
           // Decode the TLV data into the appropriate type

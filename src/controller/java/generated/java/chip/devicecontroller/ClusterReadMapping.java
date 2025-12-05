@@ -16103,17 +16103,17 @@ public class ClusterReadMapping {
           readAmbientContextSensingPredictedActivityCommandParams
         );
         result.put("readPredictedActivityAttribute", readAmbientContextSensingPredictedActivityAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingPrivacyModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingPrivacyModeAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readAmbientContextSensingPrivacyModeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingPrivacyModeEnabledAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readPrivacyModeAttribute(
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readPrivacyModeEnabledAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readAmbientContextSensingPrivacyModeCommandParams
+          readAmbientContextSensingPrivacyModeEnabledCommandParams
         );
-        result.put("readPrivacyModeAttribute", readAmbientContextSensingPrivacyModeAttributeInteractionInfo);
+        result.put("readPrivacyModeEnabledAttribute", readAmbientContextSensingPrivacyModeEnabledAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
