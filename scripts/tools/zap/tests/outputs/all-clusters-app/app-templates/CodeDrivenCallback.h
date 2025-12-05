@@ -115,6 +115,10 @@ void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoin
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
