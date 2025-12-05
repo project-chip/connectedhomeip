@@ -47,8 +47,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AmbientConte
             return HoldTimeLimits::kMetadataEntry;
         case PredictedActivity::Id:
             return PredictedActivity::kMetadataEntry;
-        case PrivacyMode::Id:
-            return PrivacyMode::kMetadataEntry;
+        case PrivacyModeEnabled::Id:
+            return PrivacyModeEnabled::kMetadataEntry;
         default:
             return std::nullopt;
         }

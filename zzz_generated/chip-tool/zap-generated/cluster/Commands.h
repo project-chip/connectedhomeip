@@ -11586,7 +11586,7 @@ private:
 | * HoldTime                                                          | 0x0009 |
 | * HoldTimeLimits                                                    | 0x000A |
 | * PredictedActivity                                                 | 0x000B |
-| * PrivacyMode                                                       | 0x000C |
+| * PrivacyModeEnabled                                                | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -29376,7 +29376,7 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<ReadAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "privacy-mode", Attributes::PrivacyMode::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "privacy-mode-enabled", Attributes::PrivacyModeEnabled::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
@@ -29412,8 +29412,8 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type>>>(
             Id, "predicted-activity", Attributes::PredictedActivity::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "privacy-mode", 0, 1, Attributes::PrivacyMode::Id, WriteCommandType::kForceWrite,
-                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "privacy-mode-enabled", 0, 1, Attributes::PrivacyModeEnabled::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29440,7 +29440,7 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<SubscribeAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "privacy-mode", Attributes::PrivacyMode::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "privacy-mode-enabled", Attributes::PrivacyModeEnabled::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //

@@ -51899,7 +51899,7 @@ public class ChipClusters {
     private static final long HOLD_TIME_ATTRIBUTE_ID = 9L;
     private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 10L;
     private static final long PREDICTED_ACTIVITY_ATTRIBUTE_ID = 11L;
-    private static final long PRIVACY_MODE_ATTRIBUTE_ID = 12L;
+    private static final long PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -52283,9 +52283,9 @@ public class ChipClusters {
         }, PREDICTED_ACTIVITY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readPrivacyModeAttribute(
+    public void readPrivacyModeEnabledAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRIVACY_MODE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -52293,12 +52293,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRIVACY_MODE_ATTRIBUTE_ID, true);
+        }, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, true);
     }
 
-    public void subscribePrivacyModeAttribute(
+    public void subscribePrivacyModeEnabledAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRIVACY_MODE_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -52306,7 +52306,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PRIVACY_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

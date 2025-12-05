@@ -64,9 +64,9 @@ namespace PredictedActivity {
 inline constexpr AttributeId Id = 0x0000000B;
 } // namespace PredictedActivity
 
-namespace PrivacyMode {
+namespace PrivacyModeEnabled {
 inline constexpr AttributeId Id = 0x0000000C;
-} // namespace PrivacyMode
+} // namespace PrivacyModeEnabled
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

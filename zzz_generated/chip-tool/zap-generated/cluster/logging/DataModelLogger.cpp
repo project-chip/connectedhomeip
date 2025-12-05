@@ -20918,10 +20918,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PredictedActivity", 1, value);
         }
-        case AmbientContextSensing::Attributes::PrivacyMode::Id: {
+        case AmbientContextSensing::Attributes::PrivacyModeEnabled::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PrivacyMode", 1, value);
+            return DataModelLogger::LogValue("PrivacyModeEnabled", 1, value);
         }
         case AmbientContextSensing::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

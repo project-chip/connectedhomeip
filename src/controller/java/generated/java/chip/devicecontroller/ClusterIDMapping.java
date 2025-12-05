@@ -15218,7 +15218,7 @@ public class ClusterIDMapping {
             HoldTime(9L),
             HoldTimeLimits(10L),
             PredictedActivity(11L),
-            PrivacyMode(12L),
+            PrivacyModeEnabled(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

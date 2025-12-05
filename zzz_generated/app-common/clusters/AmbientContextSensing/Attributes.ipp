@@ -56,8 +56,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, holdTimeLimits);
     case Attributes::PredictedActivity::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, predictedActivity);
-    case Attributes::PrivacyMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, privacyMode);
+    case Attributes::PrivacyModeEnabled::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, privacyModeEnabled);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

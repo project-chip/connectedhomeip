@@ -31277,7 +31277,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 } // namespace HoldTime
 
-namespace PrivacyMode {
+namespace PrivacyModeEnabled {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 {
@@ -31322,7 +31322,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
     return emberAfWriteAttribute(endpoint, Clusters::AmbientContextSensing::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace PrivacyMode
+} // namespace PrivacyModeEnabled
 
 namespace FeatureMap {
 
