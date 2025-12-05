@@ -31,13 +31,10 @@ using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
 
 CHIP_ERROR ElectricalPowerMeasurementInstance::Init()
 {
-    return Instance::Init();
+    return CHIP_NO_ERROR;
 }
 
-void ElectricalPowerMeasurementInstance::Shutdown()
-{
-    Instance::Shutdown();
-}
+void ElectricalPowerMeasurementInstance::Shutdown() {}
 
 // --------------- Internal Attribute Set APIs
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerMode(PowerModeEnum newValue)

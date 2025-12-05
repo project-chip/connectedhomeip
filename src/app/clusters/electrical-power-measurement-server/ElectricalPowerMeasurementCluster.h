@@ -17,28 +17,77 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/electrical-power-measurement-server/ElectricalPowerMeasurementDelegate.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
+#include <clusters/ElectricalPowerMeasurement/ClusterId.h>
+#include <clusters/ElectricalPowerMeasurement/Metadata.h>
+// #include <clusters/ElectricalPowerMeasurement/Structs.h>
+// #include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
 
-enum class OptionalAttributes : uint32_t
+class ElectricalPowerMeasurementCluster : public DefaultServerCluster
 {
-    kOptionalAttributeRanges          = 0x1,
-    kOptionalAttributeVoltage         = 0x2,
-    kOptionalAttributeActiveCurrent   = 0x4,
-    kOptionalAttributeReactiveCurrent = 0x8,
-    kOptionalAttributeApparentCurrent = 0x10,
-    kOptionalAttributeReactivePower   = 0x20,
-    kOptionalAttributeApparentPower   = 0x40,
-    kOptionalAttributeRMSVoltage      = 0x80,
-    kOptionalAttributeRMSCurrent      = 0x100,
-    kOptionalAttributeRMSPower        = 0x200,
-    kOptionalAttributeFrequency       = 0x400,
-    kOptionalAttributePowerFactor     = 0x800,
-    kOptionalAttributeNeutralCurrent  = 0x1000,
+public:
+    using OptionalAttributesSet = OptionalAttributeSet<               //
+        ElectricalPowerMeasurement::Attributes::Ranges::Id,           // Optional
+        ElectricalPowerMeasurement::Attributes::Voltage::Id,          // Optional
+        ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id,    // Optional
+        ElectricalPowerMeasurement::Attributes::ReactiveCurrent::Id,  // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::ApparentCurrent::Id,  // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::ReactivePower::Id,    // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::ApparentPower::Id,    // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::RMSVoltage::Id,       // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::RMSCurrent::Id,       // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::RMSPower::Id,         // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::Frequency::Id,        // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::HarmonicCurrents::Id, // Derived from Harmonics feature
+        ElectricalPowerMeasurement::Attributes::HarmonicPhases::Id,   // Derived from PowerQuality feature
+        ElectricalPowerMeasurement::Attributes::PowerFactor::Id,      // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id    // Optional but depends on PolyphasePower feature
+        >;
+
+    struct Config
+    {
+        EndpointId endpointId;
+        Delegate & delegate;
+        BitMask<Feature> features;
+        OptionalAttributesSet optionalAttributes;
+    };
+
+    ElectricalPowerMeasurementCluster(const Config & config) :
+        DefaultServerCluster({ config.endpointId, ElectricalPowerMeasurement::Id }), mDelegate(config.delegate),
+        mFeatureFlags(config.features), mEnabledOptionalAttributes([&]() {
+            OptionalAttributesSet attrs = config.optionalAttributes;
+            // Set attributes based on conformance of feature flags
+            attrs.Set<Attributes::HarmonicCurrents::Id>(config.features.Has(Feature::kHarmonics));
+            attrs.Set<Attributes::HarmonicPhases::Id>(config.features.Has(Feature::kPowerQuality));
+            return attrs;
+        }())
+    {
+        mDelegate.SetEndpointId(config.endpointId);
+    }
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+private:
+    Delegate & mDelegate;
+    const BitMask<Feature> mFeatureFlags;
+    const OptionalAttributesSet mEnabledOptionalAttributes;
+
+    CHIP_ERROR EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 };
 
 } // namespace ElectricalPowerMeasurement

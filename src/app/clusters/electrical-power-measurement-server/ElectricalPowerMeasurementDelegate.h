@@ -17,7 +17,11 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+// #include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/ElectricalPowerMeasurement/Enums.h>
+#include <clusters/ElectricalPowerMeasurement/Structs.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 namespace chip {
 namespace app {

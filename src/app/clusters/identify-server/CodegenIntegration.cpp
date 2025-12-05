@@ -148,9 +148,8 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
                    EffectVariantEnum effectVariant, chip::TimerDelegate * timerDelegate) :
 
-    mOnIdentifyStart(onIdentifyStart),
-    mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
-    mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
+    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
+    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
     mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
                  .WithIdentifyType(identifyType)
                  .WithDelegate(&gLegacyDelegate)
