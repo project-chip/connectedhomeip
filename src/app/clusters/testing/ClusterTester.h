@@ -238,6 +238,8 @@ public:
 
     std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
+    void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
+
 private:
     bool VerifyClusterPathsValid()
     {
@@ -257,7 +259,7 @@ private:
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
     // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
     // If protocol or test requirements change, this value may need to be increased.
-    static constexpr size_t kTlvBufferSize = 256;
+    static constexpr size_t kTlvBufferSize = 512;
 
     app::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];

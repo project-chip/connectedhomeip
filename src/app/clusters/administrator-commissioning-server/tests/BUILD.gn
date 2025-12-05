@@ -27,6 +27,9 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app/clusters/administrator-commissioning-server",
     "${chip_root}/src/app/clusters/operational-credentials-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/data-model-provider/tests",
+    "${chip_root}/src/app/persistence",
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
