@@ -20,7 +20,7 @@
  * @brief Implementation for the Chime Server Cluster
  ***************************************************************************/
 
-#include "ChimeCluster.h"
+#include "chime-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
