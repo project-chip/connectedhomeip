@@ -434,12 +434,13 @@ public:
     // DeviceLoadStatusProviderDelegate functions implementation
     MessageStats GetMessageStats() override { return GetExchangeManager()->GetSessionManager()->GetMessageStats(); }
 
-    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override {
-        return SubscriptionStats {
-            .numTotalSubscriptions = GetReportScheduler()->GetTotalSubscriptionsEstablished(),
-            .numCurrentSubscriptions = static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-            .numCurrentSubscriptionsForFabric = static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric))
-        };
+    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override
+    {
+        return SubscriptionStats{ .numTotalSubscriptions = GetReportScheduler()->GetTotalSubscriptionsEstablished(),
+                                  .numCurrentSubscriptions =
+                                      static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+                                  .numCurrentSubscriptionsForFabric = static_cast<uint16_t>(
+                                      GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric)) };
     }
 
 private:

@@ -35,8 +35,8 @@ public:
 
     struct SubscriptionStats
     {
-        uint32_t numTotalSubscriptions = 0;
-        uint16_t numCurrentSubscriptions = 0;
+        uint32_t numTotalSubscriptions            = 0;
+        uint16_t numCurrentSubscriptions          = 0;
         uint16_t numCurrentSubscriptionsForFabric = 0;
     };
 

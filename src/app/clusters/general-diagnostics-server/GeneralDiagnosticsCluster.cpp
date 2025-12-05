@@ -280,7 +280,8 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
         static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
                       "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
-        const DeviceLoadStatusProviderDelegate::SubscriptionStats subscriptionStats = mDeviceLoadStatusProvider->GetSubscriptionStats(encoder.AccessingFabricIndex());
+        const DeviceLoadStatusProviderDelegate::SubscriptionStats subscriptionStats =
+            mDeviceLoadStatusProvider->GetSubscriptionStats(encoder.AccessingFabricIndex());
         const DeviceLoadStatusProviderDelegate::MessageStats messageStatistics = mDeviceLoadStatusProvider->GetMessageStats();
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
