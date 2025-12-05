@@ -910,6 +910,7 @@ mcumgr
 MCUs
 mcux
 MCUXpresso
+MCXW
 mdash
 MDNS
 MediaInput

@@ -93,7 +93,9 @@ LockApp::DeviceCallbacks & LockApp::DeviceCallbacks::GetDefaultInstance()
     return sDeviceCallbacks;
 }
 
+#ifndef CONFIG_APP_DEVICE_CALLBACKS_CUSTOM_SINGLETON_IMPL
 chip::DeviceManager::CHIPDeviceManagerCallbacks & chip::NXP::App::GetDeviceCallbacks()
 {
     return LockApp::DeviceCallbacks::GetDefaultInstance();
 }
+#endif

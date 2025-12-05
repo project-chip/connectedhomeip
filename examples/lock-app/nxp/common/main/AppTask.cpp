@@ -168,7 +168,9 @@ LockApp::AppTask & LockApp::AppTask::GetDefaultInstance()
     return sAppTask;
 }
 
+#ifndef CONFIG_APP_TASK_CUSTOM_SINGLETON_IMPL
 chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
 {
     return LockApp::AppTask::GetDefaultInstance();
 }
+#endif

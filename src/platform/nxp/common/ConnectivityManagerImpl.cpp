@@ -399,6 +399,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         {
             sInstance._SetWiFiStationState(kWiFiStationState_Connecting_Succeeded);
             sInstance._SetWiFiStationState(kWiFiStationState_Connected);
+            NetworkCommissioning::NXPWiFiDriver::GetInstance().OnNetworkStatusChange();
             NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kSuccess,
                                                                                     CharSpan(), wlanEvent);
             sInstance.OnStationConnected();

@@ -73,21 +73,21 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm \
                       build \
                   "
             - name: Get MCXW71 contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
-                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm/app.elf \
+                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm/app.elf \
                     /tmp/bloat_reports/
 
             - name: Build MCXW72 examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-frdm \
                       build \
                   "
 
@@ -101,7 +101,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12 \
                       build \
                   "
 
@@ -115,7 +115,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12-cmake \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12 \
                       build \
                   "
 
@@ -126,15 +126,15 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory-cmake \
-                      --target nxp-rw61x-freertos-thermostat-wifi-se05x-cmake \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory \
+                      --target nxp-rw61x-freertos-thermostat-wifi-se05x \
                       build \
                   "
             - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
+                      --target nxp-rw61x-freertos-thermostat-ethernet-frdm \
                       build \
                   "
 

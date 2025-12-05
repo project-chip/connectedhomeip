@@ -11,10 +11,6 @@
             -   [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
     -   [Building](#building)
         -   [CMake Build System](#cmake-build-system)
-        -   [GN Build System](#gn-build-system)
-            -   [Building with Matter over Wifi configuration on RT1170 + IW612](#building-with-matter-over-wifi-configuration-on-rt1170--iw612)
-            -   [Building with Matter over Thread configuration on RT1170 + IW612](#building-with-matter-over-thread-configuration-on-rt1170--iw612)
-            -   [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iw612)
         -   [General information](#general-information)
     -   [Manufacturing data](#manufacturing-data)
     -   [Flashing and debugging](#flashing-and-debugging)
@@ -56,7 +52,6 @@ over Thread on RT1170 :
 RT1170 platform supports two different build systems to generate the application
 :
 
--   `GN`
 -   `CMake`
 
 ### Hardware requirements for RT1170 + IW612
@@ -182,55 +177,6 @@ to check all the supported configurations.
 > with CMake. To disable them, you can refer to the
 > [How to customize the CMake build](./nxp_examples_freertos_platforms.md#how-to-customize-the-cmake-build)
 > section.
-
-### GN Build System
-
-#### Building with Matter over Wifi configuration on RT1170 + IW612
-
--   Build the Wi-fi configuration for MIMXRT1170 board + IW612 transceiver (with
-    BLE for commissioning).
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170$ gn gen --args="chip_enable_wifi=true iwx12_transceiver=true chip_config_network_layer_ble=true chip_enable_ble=true " out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170$ ninja -C out/debug
-```
-
-#### Building with Matter over Thread configuration on RT1170 + IW612
-
--   Build the Openthread configuration for MIMXRT1170 board + IW612 transceiver
-    (with BLE for commissioning).
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170$ gn gen --args="chip_enable_openthread=true iwx12_transceiver=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170/$ ninja -C out/debug
-```
-
-#### Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612
-
-This configuration supports the Thread Border Router management cluster to
-provision the Thread credentials. Enabling the Matter CLI in order to control
-the Thread network on the Border Router is optional but recommended for other
-features like the Thread credential sharing.
-
-Note that the Thread Border Router management cluster is only supported on the
-thermostat application for now.
-
--   Build Matter with Border Router configuration with BLE commissioning
-    (ble-wifi) :
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt11170$ gn gen --args="chip_enable_wifi=true iwx12_transceiver=true chip_config_network_layer_ble=true chip_enable_ble=true chip_enable_openthread=true nxp_enable_matter_cli=true" out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170$ ninja -C out/debug
-```
-
-### General information
-
-The resulting output file can be found in
-out/debug/chip-rt1170-all-cluster-example.
-
-Additional GN options can be added when building the application. You can check
-[Common GN options to FreeRTOS platforms](./nxp_examples_freertos_platforms.md#general-information)
-for the full list.
 
 ## Manufacturing data
 

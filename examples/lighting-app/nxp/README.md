@@ -1,138 +1,99 @@
 # Matter NXP Lighting Example Application
 
+-   [Overview](#overview)
+-   [Supported Platforms](#supported-platforms)
+-   [Environment Setup, Building, and Testing](#build)
+-   [Data Model](#data-model)
+-   [Manufacturing Data](#factory-data)
+
+<a name="overview"></a>
+
+## Overview
+
 This reference application implements an On/Off Light device type. It uses board
 buttons or `matter-cli` for user input and LEDs for state feedback. You can use
 this example as a reference for creating your own application.
 
-The example is based on:
+The example is based on
+[Project CHIP](https://github.com/project-chip/connectedhomeip) and NXP SDK, and
+provides a prototype application that demonstrates device commissioning and
+different cluster control.
 
--   [Matter](https://github.com/project-chip/connectedhomeip)
--   [NXP github SDK](https://github.com/nxp-mcuxpresso/mcux-sdk)
+The light bulb device communicates with clients over a low-power, 802.15.4
+Thread network. It can be commissioned into an existing Matter network using a
+controller such as `chip-tool`.
 
--   [Matter NXP Lighting Example Application](#matter-nxp-lighting-example-application)
-    -   [Supported devices](#supported-devices)
-    -   [Introduction](#introduction)
-    -   [Device UI](#device-ui)
-    -   [Prerequisites for building](#prerequisites-for-building)
-    -   [Building](#building)
-        -   [Data model](#data-model)
-        -   [Manufacturing data](#manufacturing-data)
-    -   [Flashing and debugging](#flashing-and-debugging)
-
-## Supported devices
-
--   [mcxw71](mcxw71/README.md)
--   [mcxw72](mcxw72/README.md)
-
-## Introduction
-
-The application showcases a light bulb device that communicates with clients
-over a low-power, 802.15.4 Thread network.
-
-It can be commissioned into an existing Matter network using a controller such
-as `chip-tool`.
-
-This example implements a `User-Intent Commissioning Flow`, meaning the user has
-to press a button in order for the device to be ready for commissioning. The
-initial commissioning is done through `ble-thread` pairing method.
+This example implements a `User-Intent Commissioning Flow`, meaning that the
+user is required to press a button on the device in order to get it ready for
+commissioning. The initial commissioning is usually performed using the
+`ble-thread` pairing method.
 
 The Thread network dataset will be transferred on the device using a secure
 session over Bluetooth LE. In order to start the commissioning process, the user
 must enable BLE advertising on the device manually. To pair successfully, the
 commissioner must know the commissioning information corresponding to the
-device: setup passcode and discriminator. This data is usually encoded within a
-QR code or printed to the UART console.
+device: setup passcode and/or discriminator. This data is usually encoded within
+a QR code or printed to the device's UART console.
 
-## Device UI
+<a name="supported-platforms"></a>
 
-The example application provides a simple UI that depicts the state of the
-device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in the evaluation boards. Please see each
-supported device readme file for details.
+## Supported Platforms
 
-## Prerequisites for building
+The On/Off Light example is supported on the following platforms:
 
-In order to build the example, it is recommended to use a Linux distribution.
-Please visit the supported Operating Systems list in
-[BUILDING.md](../../../docs/guides/BUILDING.md#prerequisites).
+| NXP platform | Dedicated readme                                                    |
+| ------------ | ------------------------------------------------------------------- |
+| MCXW71       | [NXP MCXW71 Guide](../../../docs/platforms/nxp/nxp_mcxw71_guide.md) |
+| MCXW72       | [NXP MCXW72 Guide](../../../docs/platforms/nxp/nxp_mcxw72_guide.md) |
 
--   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../docs/guides/BUILDING.md#prerequisites))
+For details on platform-specific requirements and configurations, please refer
+to the respective platform's readme.
 
-```
-sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
-```
+A list of popular standard lighting app targets is presented below. These
+targets can be used with the `build_example.py` tool.
 
--   Step 1: checkout NXP specific submodules only
+| Target name                                                         | Description                                                                     |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `nxp-<device>-freertos-lighting-thread-frdm`                        | Default lighting app                                                            |
+| `nxp-<device>-freertos-lighting-thread-factory-frdm`                | Default lighting app with factory data                                          |
+| `nxp-<device>-freertos-lighting-thread-rotating-id-frdm`            | Lighting app with rotating device id support                                    |
+| `nxp-<device>-freertos-lighting-thread-factory-dac-conversion-frdm` | Lighting app that leverages a secure enclave to secure the DAC private key      |
+| `nxp-<device>-freertos-lighting-thread-sw-v2-frdm`                  | Lighting app with software version 2 (can be used to test OTA)                  |
+| `nxp-<device>-freertos-lighting-thread-factory-sw-v2-frdm`          | Lighting app with factory data and software version 2 (can be used to test OTA) |
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
-    ```
+where `device` is be one of the [supported platforms](#supported-platforms).
 
--   Step 2: activate local environment
+<a name="build"></a>
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
-    ```
+## Environment Setup, Building, and Testing
 
-    If the script says the environment is out of date, you can update it by
-    running the following command:
+All the information required to set up the environment, build the application,
+and test it can be found in the common readme for NXP platforms:
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
-    ```
+-   NXP FreeRTOS Platforms : Refer to the
+    [CHIP NXP Examples Guide for FreeRTOS platforms](../../../docs/platforms/nxp/nxp_examples_freertos_platforms.md)
 
--   Step 3: Init NXP SDK(s)
+<a name="data-model"></a>
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
-    ```
-
-Note: By default, `update_nxp_sdk.py` will try to initialize all NXP SDKs.
-Please run the script with arg `--help` to view all available options.
-
-## Building
-
-There are two options for building this reference app:
-
--   Using `build_examples.py` framework.
--   Manually generating `ninja` files using `gn`.
-
-For manual generation and building, please see the specific readme file for your
-device.
-
-A list of all available contact sensor targets can be viewed in the following
-table:
-
-| target name                                         | description                                                                     |
-| --------------------------------------------------- | ------------------------------------------------------------------------------- |
-| nxp-device-freertos-lighting                        | Default lighting app                                                            |
-| nxp-device-freertos-lighting-factory                | Default lighting app with factory data                                          |
-| nxp-device-freertos-lighting-rotating-id            | Lighting app with rotating device id support                                    |
-| nxp-device-freertos-lighting-factory-dac-conversion | Lighting app that leverages a secure enclave to secure the DAC private key      |
-| nxp-device-freertos-lighting-sw-v2                  | Lighting app with software version 2 (can be used to test OTA)                  |
-| nxp-device-freertos-lighting-factory-sw-v2          | Lighting app with factory data and software version 2 (can be used to test OTA) |
-
-where `device` can be one of the [Supported devices](#supported-devices).
-
-### Data model
+## Data Model
 
 The application uses an NXP specific data model file:
 
-| path                      | description                             |
+| Path                      | Description                             |
 | ------------------------- | --------------------------------------- |
 | `zap/lighting-on-off.zap` | Data model for On/Off Light device type |
 
-The data model can be changed by simply replacing the gn `deps` statement
-corresponding to data model target.
+<a name="factory-data"></a>
 
-### Manufacturing data
+## Manufacturing Data
 
-Use `nxp_use_factory_data=true` in the gn build command to enable factory data.
+The support for manufacturing data is enabled at build time when you use the
+appropriate build configuration files for this feature. Please refer to the
+[NXP Matter examples guide for FreeRTOS](../../../docs/platforms/nxp/nxp_examples_freertos_platforms.md)
+for details on the build process and available build configurations.
+Manufacturing data can also be forced in the build command line by using the
+`CONFIG_CHIP_FACTORY_DATA=y` build option or by using the appropriate
+`build_examples.py` [targets](#supported-platforms).
 
-For a full guide on manufacturing flow, please see
+For a full guide on the manufacturing flow, please refer to the
 [Guide for writing manufacturing data on NXP devices](../../../docs/platforms/nxp/nxp_manufacturing_flow.md).
-
-## Flashing and debugging
-
-Please see the device specific readme file.

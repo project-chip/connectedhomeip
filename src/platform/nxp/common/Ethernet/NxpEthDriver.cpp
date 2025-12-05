@@ -64,12 +64,39 @@ void NxpEthDriver::eth_netif_ext_status_callback(struct netif * netif, netif_nsc
         {
             ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
         }
+        SystemLayer().ScheduleLambda([]() { NxpEthDriver::Instance().OnNetworkStatusChange(); });
+    }
+}
+
+void NxpEthDriver::OnNetworkStatusChange()
+{
+    ChipLogProgress(NetworkProvisioning, "NxpEthDriver::OnNetworkStatusChange\r\n");
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
+    NetworkIterator * networkIterator = GetNetworks();
+
+    if (networkIterator != nullptr)
+    {
+        EthernetNetworkIterator * ethIterator = static_cast<EthernetNetworkIterator *>(networkIterator);
+
+        if (ethIterator->interfaceNameLen)
+        {
+            mpStatusChangeCallback->OnNetworkingStatusChange(
+                Status::kSuccess, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)), NullOptional);
+        }
+        else
+        {
+            mpStatusChangeCallback->OnNetworkingStatusChange(
+                Status::kUnknownError, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)),
+                NullOptional);
+        }
+        networkIterator->Release();
     }
 }
 
 CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     err_t err;
+    mpStatusChangeCallback          = networkStatusChangeCallback;
     ethernetif_config_t enet_config = {
         .phyHandle   = &phyHandle,
         .phyAddr     = EXAMPLE_PHY_ADDRESS,
