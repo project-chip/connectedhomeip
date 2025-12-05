@@ -137,7 +137,7 @@ DataModel::ActionReturnStatus ElectricalPowerMeasurementCluster::ReadAttribute(c
         ReturnErrorOnFailure(encoder.Encode(mDelegate.GetRMSPower()));
         break;
     case Attributes::Frequency::Id:
-        // Requires Alternating Current feature and Frequency attribut
+        // Requires Alternating Current feature and Frequency attribute
         ReturnErrorOnFailure(encoder.Encode(mDelegate.GetFrequency()));
         break;
     case Attributes::HarmonicCurrents::Id:
