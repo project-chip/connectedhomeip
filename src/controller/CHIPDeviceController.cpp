@@ -703,6 +703,20 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                           CommissioningParameters & commissioningParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
+    if (commissioningParams.GetBorderAgentAddress().HasValue() && commissioningParams.GetBorderAgentPort().HasValue() &&
+        commissioningParams.GetThreadOperationalDataset().HasValue())
+    {
+        char ipAddr[64] = {0};
+        commissioningParams.GetBorderAgentAddress().Value().ToString(ipAddr);
+        Thread::OperationalDatasetView dataset;
+        dataset.Init(commissioningParams.GetThreadOperationalDataset().Value());
+        uint8_t pskc[Thread::kSizePSKc];
+        ReturnErrorOnFailure(dataset.GetPSKc(pskc));
+        Dnssd::DiscoveredNodeData nodeData = mThreadCommissionerProxy.discover(
+                ByteSpan(pskc), ipAddr, commissioningParams.GetBorderAgentPort().Value(), rendezvousParams.GetDiscriminator());
+        OnNodeDiscovered(nodeData);
+        return CHIP_NO_ERROR;
+    }
     ReturnErrorOnFailureWithMetric(kMetricDeviceCommissionerCommission, EstablishPASEConnection(remoteDeviceId, rendezvousParams));
     auto errorCode = Commission(remoteDeviceId, commissioningParams);
     VerifyOrDoWithMetric(kMetricDeviceCommissionerCommission, CHIP_NO_ERROR == errorCode, errorCode);

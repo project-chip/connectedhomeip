@@ -179,6 +179,11 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
                                                         uint64_t nodeId, uint32_t setupPasscode, const uint8_t filterType,
                                                         const char * filterParam, uint32_t discoveryTimeoutMsec);
 
+PyChipError pychip_DeviceController_ThreadOnlyCommission(chip::Controller::DeviceCommissioner * devCtrl,
+                                                         chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                         uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
+                                                         const char *borderAgentIPAddr, uint16_t borderAgentPort);
+
 PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
 PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
@@ -562,6 +567,25 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
+
+PyChipError pychip_DeviceController_ThreadOnlyCommission(chip::Controller::DeviceCommissioner * devCtrl,
+                                                         chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                         uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
+                                                         const char *borderAgentIPAddrStr, uint16_t borderAgentPort)
+{
+    CHIP_ERROR err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, pairingDelegate, devCtrl,
+                                                          1000000);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    chip::Inet::IPAddress borderAgentIPAddr;
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(borderAgentIPAddrStr, borderAgentIPAddr),
+            ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    sCommissioningParameters.SetBorderAgentAddress(borderAgentIPAddr);
+    sCommissioningParameters.SetBorderAgentPort(borderAgentPort);
+
+    auto params = RendezvousParameters().SetSetupPINCode(setupPasscode).SetDiscriminator(discriminator);
+    return ToPyChipError(devCtrl->PairDevice(nodeId, params, sCommissioningParameters));
+}
+
 
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)
 {

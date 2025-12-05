@@ -130,6 +130,9 @@ declare_args() {
   # and the supplicant can support.
   chip_device_config_enable_wifipaf =
       chip_enable_wifi && chip_device_platform == "linux"
+
+  # Build controller with Thread commissioner
+  chip_device_config_enable_thread_commissioning_protocol = false
 }
 
 declare_args() {

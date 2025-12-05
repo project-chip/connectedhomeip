@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "commands/common/Command.h"
 #include "commands/common/Commands.h"
 #include "commands/pairing/GetCommissionerNodeIdCommand.h"
 #include "commands/pairing/GetCommissionerRootCertificateCommand.h"
@@ -157,6 +158,14 @@ public:
     {}
 };
 
+class PairThreadOnly : public PairingCommand
+{
+public:
+    PairThreadOnly(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("thread-only", PairingMode::ThreadOnly, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
 class PairBleWiFi : public PairingCommand
 {
 public:
@@ -277,6 +286,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairOnNetworkCommissioner>(credsIssuerConfig),
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkInstanceName>(credsIssuerConfig),
+        make_unique<PairThreadOnly>(credsIssuerConfig),
         // TODO(#13973) - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),

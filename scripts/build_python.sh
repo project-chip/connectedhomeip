@@ -127,6 +127,15 @@ while (($#)); do
             wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
             shift
             ;;
+        --enable_thread_commissioning_protocol | -p)
+            declare thread_commissioning_protocol_arg="$2"
+            if [[ "$thread_commissioning_protocol_arg" != "true" && "$thread_commissioning_protocol_arg" != "false" ]]; then
+                echo "Error: --enable_thread_commissioning_protocol/-p should have a true/false value, not '$thread_commissioning_protocol_arg'" >&2
+                exit 1
+            fi
+            thread_commissioning_protocol_config="chip_device_config_enable_thread_commissioning_protocol=$thread_commissioning_protocol_arg"
+            shift
+            ;;
         --enable_ipv4 | -4)
             enable_ipv4=$2
             if [[ "$enable_ipv4" != "true" && "$enable_ipv4" != "false" ]]; then
@@ -233,6 +242,9 @@ echo "  enable_nfc=\"$enable_nfc\""
 if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
+if [[ -n $thread_commissioning_protocol_config ]]; then
+    echo "  $thread_commissioning_protocol_config"
+fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 echo "  chip_support_webrtc_python_bindings=\"$enable_webrtc\""
@@ -308,6 +320,9 @@ if [[ -n "$pregen_dir" ]]; then
 fi
 if [[ -n $wifi_paf_config ]]; then
     gn_args+=("$wifi_paf_config")
+fi
+if [[ -n $thread_commissioning_protocol_config ]]; then
+    gn_args+=("$thread_commissioning_protocol_config")
 fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")

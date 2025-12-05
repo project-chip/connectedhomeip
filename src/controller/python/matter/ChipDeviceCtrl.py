@@ -2388,6 +2388,10 @@ class ChipDeviceControllerBase():
                 c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_ThreadOnlyCommission.argtypes = [
+                c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
+            self._dmLib.pychip_DeviceController_ThreadOnlyCommission.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
@@ -2989,6 +2993,21 @@ class ChipDeviceController(ChipDeviceControllerBase):
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def CommissionThreadOnly(self, nodeId: int, setupPinCode: int,
+                                   discriminator: int, borderAgentIPAddr: str,
+                                   borderAgentPort: int, threadOperationalDataset: bytes) -> int:
+        self.CheckIsActive()
+
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ThreadOnlyCommission(
+                    self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, discriminator, borderAgentIPAddr.encode("utf-8"), borderAgentPort)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)

@@ -51,6 +51,8 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
+    border_agent_ip_addr: Optional[str] = None
+    border_agent_port: Optional[int] = None
     # By default, let's set validity to 10 years
     certificate_validity_period = int(timedelta(days=10*365).total_seconds())
 

@@ -660,6 +660,11 @@ public:
         mExtraReadPaths = decltype(mExtraReadPaths)();
     }
 
+    void SetBorderAgentAddress(const Inet::IPAddress & ipAddr) { mBorderAgentAddress.SetValue(ipAddr); }
+    Optional<Inet::IPAddress> GetBorderAgentAddress() const { return mBorderAgentAddress; }
+    void SetBorderAgentPort(uint16_t port) { mBorderAgentPort.SetValue(port); }
+    Optional<uint16_t> GetBorderAgentPort() const { return mBorderAgentPort; }
+
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
@@ -710,6 +715,9 @@ private:
     Span<const app::AttributePathParams> mExtraReadPaths;
 
     Optional<bool> mUseJCM;
+
+    Optional<Inet::IPAddress> mBorderAgentAddress;
+    Optional<uint16_t> mBorderAgentPort;
 };
 
 struct RequestedCertificate

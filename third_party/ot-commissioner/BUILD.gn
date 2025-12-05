@@ -64,6 +64,7 @@ static_library("ot-commissioner") {
   include_dirs = [
     "repo/src",
     "repo/include",
+    "repo/third_party/fmtlib/repo/include",
   ]
   sources = [
     "repo/src/library/network_data.cpp",

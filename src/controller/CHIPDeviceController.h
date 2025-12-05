@@ -77,6 +77,10 @@
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONING_PROTOCOL
+#include <controller/ThreadCommissionerProxy.h>
+#endif
+
 namespace chip {
 
 namespace Controller {
@@ -1159,6 +1163,10 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
     EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONING_PROTOCOL
+    ThreadCommissionerProxy mThreadCommissionerProxy;
 #endif
 };
 

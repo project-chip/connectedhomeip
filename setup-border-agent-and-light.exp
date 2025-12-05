@@ -107,30 +107,12 @@ expect {
     }
 }
 
-send_user "I'm going to commission the device with the following info:\n"
+send_user "Please commission the device with the following info:\n"
+send_user "    Border agen address: 127.0.0.1\n"
 send_user "    Border agent port: $ba_port\n"
 send_user "    Pin code: $pincode\n"
 send_user "    Discriminator: $discriminator\n"
-
-spawn examples/chip-tool/out/debug/chip-tool pairing thread-only 255 $pincode $discriminator --thread-dataset hex:$dataset --thread-ba-host 127.0.0.1 --thread-ba-port "${ba_port}"
-set chip_tool $spawn_id
-
-expect {
-    -timeout 20 "Device commissioning completed with success" {
-        send_user "OK, commissioning completed.\n"
-    } -i $otbr_agent eof {
-        error "otbr-agent exited!"
-        exit 1
-    } -i $joiner eof {
-        error "joiner exited!"
-        exit 1
-    } timeout {
-        error "timeout!"
-    }
-}
-
-send_user "Commissioned successfully!\n"
-
+send_user "    Dataset: $dataset\n"
 send_user "chip-lighting-app will continue to run for 1000s..\nExit with CTRL-C\n"
 
 expect {

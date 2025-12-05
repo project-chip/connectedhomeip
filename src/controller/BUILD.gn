@@ -117,6 +117,15 @@ static_library("controller") {
     "${chip_root}/src/transport",
   ]
 
+  if (chip_device_config_enable_thread_commissioning_protocol) {
+    sources += [
+      "ThreadCommissionerProxy.cpp",
+      "ThreadCommissionerProxy.h",
+    ]
+
+    public_deps += [ "${chip_root}/third_party/ot-commissioner", ]
+  }
+
   cflags = [ "-Wconversion" ]
   if (chip_support_webrtc_python_bindings) {
     public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]

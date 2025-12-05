@@ -47,6 +47,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+    ThreadOnly,
 };
 
 enum class PairingNetworkType
@@ -136,6 +137,7 @@ public:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
+        case PairingMode::ThreadOnly:
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
