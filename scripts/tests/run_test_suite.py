@@ -497,7 +497,7 @@ if sys.platform == 'linux':
         help='Index of Linux network namespace'
     )
     @click.pass_context
-    def cmd_shell(context: click.Context, ns_index: int | None) -> None:
+    def cmd_shell(context: click.Context, ns_index: int) -> None:
         assert isinstance(context.obj, RunContext)
 
         chiptest.linux.IsolatedNetworkNamespace(ns_index, unshared=context.obj.in_unshare)
