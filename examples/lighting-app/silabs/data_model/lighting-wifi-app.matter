@@ -3097,6 +3097,7 @@ endpoint 1 {
     handle command GetSceneMembership;
     handle command GetSceneMembershipResponse;
     handle command CopyScene;
+    handle command CopySceneResponse;
   }
 
   server cluster ColorControl {

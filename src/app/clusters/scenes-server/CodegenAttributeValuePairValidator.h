@@ -1,7 +1,5 @@
-/*
- *
+/**
  *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/scenes-server/AttributeValuePairValidator.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WebRTCTransportProvider {
+namespace chip::scenes {
 
-/**
- * The application interface to define the options & implement commands.
- */
-class WebRTCTransportProviderController
+class CodegenAttributeValuePairValidator : public AttributeValuePairValidator
 {
 public:
-    virtual ~WebRTCTransportProviderController() = default;
+    ~CodegenAttributeValuePairValidator() override = default;
+    CHIP_ERROR Validate(const app::ConcreteClusterPath & clusterPath, AttributeValuePairType & value) override;
 
-    virtual void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) = 0;
+    static CodegenAttributeValuePairValidator & Instance()
+    {
+        static CodegenAttributeValuePairValidator sInstance;
+        return sInstance;
+    }
 };
 
-} // namespace WebRTCTransportProvider
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::scenes

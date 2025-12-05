@@ -119,6 +119,10 @@ void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpoi
 
 void MatterElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);

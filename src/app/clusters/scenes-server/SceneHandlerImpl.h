@@ -16,8 +16,8 @@
  */
 #pragma once
 
+#include <app/clusters/scenes-server/AttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTable.h>
-#include <app/util/types_stub.h>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -147,7 +147,8 @@ public:
     template <typename Finder>
     struct TransitionTimeInterface
     {
-        EmberEventControl sceneHandlerEventControls[Finder::kMaxEndpointCount];
+        using ControlType = typename Finder::EventControlType;
+        ControlType sceneHandlerEventControls[Finder::kMaxEndpointCount];
 
         TransitionTimeInterface(void (*callback)(EndpointId)) : mCallback(callback) {}
 
@@ -155,11 +156,11 @@ public:
          * @brief Configures EventControl callback
          *
          * @param[in] endpoint endpoint to start timer for
-         * @return EmberEventControl* configured event control
+         * @return ControlType (typically EmberEventControl*) configured event control
          */
-        EmberEventControl * sceneEventControl(EndpointId endpoint)
+        ControlType * sceneEventControl(EndpointId endpoint)
         {
-            EmberEventControl * controller = getEventControl(endpoint, Span<EmberEventControl>(sceneHandlerEventControls));
+            ControlType * controller = getEventControl(endpoint, Span<ControlType>(sceneHandlerEventControls));
             VerifyOrReturnValue(controller != nullptr, nullptr);
 
             controller->endpoint = endpoint;
@@ -176,9 +177,9 @@ public:
          *
          * @param[in] endpoint target endpoint
          * @param[in] eventControlArray Array where to find the event control
-         * @return EmberEventControl* configured event control
+         * @return ControlType* configured event control
          */
-        EmberEventControl * getEventControl(EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
+        ControlType * getEventControl(EndpointId endpoint, const Span<ControlType> & eventControlArray)
         {
             uint16_t index;
             VerifyOrReturnValue(Finder::EndpointIdToIndex(endpoint, index), nullptr);
@@ -189,7 +190,7 @@ public:
 
     static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
-    DefaultSceneHandlerImpl()           = default;
+    DefaultSceneHandlerImpl(AttributeValuePairValidator & validator) : mValidator(validator) {}
     ~DefaultSceneHandlerImpl() override = default;
 
     /// @brief Encodes an attribute value list into a TLV structure and resizes the buffer to the size of the encoded data
@@ -212,8 +213,8 @@ public:
     /// @param serializedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not supported, CHIP_ERROR value
     /// otherwise
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
-                                    MutableByteSpan & serializedBytes) override;
+    CHIP_ERROR SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
+                            MutableByteSpan & serializedBytes) override;
 
     /// @brief Simulates taking data from nvm and loading it in a command object if the cluster is supported by the endpoint
     /// @param endpoint target endpoint
@@ -221,11 +222,12 @@ public:
     /// @param serializedBytes data to deserialize into EFS
     /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not
     /// supported, specific CHIP_ERROR otherwise
-    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                   ExtensionFieldSetType & extensionFieldSet) override;
+    CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                           ExtensionFieldSetType & extensionFieldSet) override;
 
 private:
     AttributeValuePairType mAVPairs[kMaxAvPair];
+    AttributeValuePairValidator & mValidator;
 };
 
 } // namespace scenes

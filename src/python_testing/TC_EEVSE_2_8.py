@@ -40,8 +40,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -49,7 +47,6 @@ import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 

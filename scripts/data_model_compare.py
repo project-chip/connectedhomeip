@@ -52,7 +52,7 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -116,14 +116,14 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
         current_path = path + [name]
 
         if matter_item is None:
-            logging.warning("%s - does not exist in .matter file", "::".join(current_path))
+            log.warning("%s - does not exist in .matter file", "::".join(current_path))
             continue
         if data_model_item is None:
-            logging.warning("%s - does not exist in the data_model file", "::".join(current_path))
+            log.warning("%s - does not exist in the data_model file", "::".join(current_path))
             continue
 
         if matter_item.api_maturity != data_model_item.api_maturity:
-            logging.error(
+            log.error(
                 "Different maturity: %s != %s: %s", data_model_item.api_maturity, matter_item.api_maturity, "::".join(current_path)
             )
             had_diffs = True
@@ -212,14 +212,14 @@ def filter_matter(matter, output, filenames):
     Filter clusters from a ".matter" file to contain only clusters defined
     in the given data_model XML files
     """
-    LOGGER.info("Starting to parse ...")
+    log.info("Starting to parse ...")
     sources = [ParseSource(source=name) for name in filenames]
     data_model_xmls = ParseXmls(sources)
 
-    LOGGER.info("Parsing matter file ...")
+    log.info("Parsing matter file ...")
     with open(matter) as f:
         matter_idl = CreateParser(skip_meta=True).parse(f.read(), file_name=matter)
-    LOGGER.info("Parsing done, filtering ...")
+    log.info("Parsing done, filtering ...")
 
     # ensure that input file is filtered to only interesting
     # clusters
@@ -227,7 +227,7 @@ def filter_matter(matter, output, filenames):
     matter_idl.clusters = [c for c in matter_idl.clusters if c.code in loaded_clusters]
     _normalize_order(matter_idl)
 
-    LOGGER.info("Filter done ...")
+    log.info("Filter done ...")
 
     # data_model file parsing does not include global items, so clear them out
     matter_idl.global_bitmaps = []
@@ -236,7 +236,7 @@ def filter_matter(matter, output, filenames):
 
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=matter_idl).render(dry_run=False)
-    LOGGER.info("Generation done ...")
+    log.info("Generation done ...")
     if output == "-":
         print(storage.content)
     else:
@@ -258,14 +258,14 @@ def conformance_diff(matter, filenames):
     Compare provisional/non-provisional conformance between a given matter file
     and the given data_model XML files.
     """
-    LOGGER.info("Starting to parse ...")
+    log.info("Starting to parse ...")
     sources = [ParseSource(source=name) for name in filenames]
     data_model_xmls = ParseXmls(sources)
 
-    LOGGER.info("Parsing matter file ...")
+    log.info("Parsing matter file ...")
     with open(matter) as f:
         matter_idl = CreateParser(skip_meta=True).parse(f.read(), file_name=matter)
-    LOGGER.info("Parsing done, performing diff ...")
+    log.info("Parsing done, performing diff ...")
 
     # ensure that input file is filtered to only interesting
     # clusters
@@ -289,10 +289,10 @@ def parse(output, filenames):
     """
     Parse data_model XML files and output the resulting .matter file.
     """
-    LOGGER.info("Starting to parse ...")
+    log.info("Starting to parse ...")
     sources = [ParseSource(source=name) for name in filenames]
     data = ParseXmls(sources)
-    LOGGER.info("Parse completed")
+    log.info("Parse completed")
 
     # make sure compares are working well - same ordering
     _normalize_order(data)

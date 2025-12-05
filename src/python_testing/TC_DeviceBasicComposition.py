@@ -87,7 +87,9 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
-#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     script-args:
+#       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: false
 #     quiet: true
 #   run10:
@@ -167,6 +169,18 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run17:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --debug
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
@@ -185,6 +199,7 @@
 # Run 14: Tests against network-management-app
 # Run 15: Tests against lighting-app-data-mode-no-unique-id
 # Run 16: Tests against all-devices-app
+# Run 17: runs through all tests with debug mode enabled (dumps attribute data on failure)
 
 import logging
 import os
@@ -211,6 +226,8 @@ from matter.testing.taglist_and_topology_test import (create_device_type_list_fo
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from matter.tlv import uint
+
+log = logging.getLogger(__name__)
 
 
 def get_vendor_id(mei: int) -> int:
@@ -285,7 +302,7 @@ def check_no_duplicates(obj: Any) -> None:
         raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
-class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
+class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -342,7 +359,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
-            logging.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
+            log.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
             if not has_descriptor:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id),
                                   problem=f"Did not find a descriptor on endpoint {endpoint_id}", spec_location="Base Cluster Requirements for Matter")
@@ -421,7 +438,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
                     has_attribute = (req_attribute.id in cluster)
                     location = AttributePathLocation(endpoint_id, cluster_id, req_attribute.id)
-                    logging.debug(
+                    log.debug(
                         f"Checking for mandatory global {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
                     # Check attribute is actually present
@@ -460,7 +477,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         has_attribute = attribute_id in cluster
 
                         attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
-                        logging.debug(
+                        log.debug(
                             f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
                         if not has_attribute:
@@ -702,19 +719,22 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(12, "Validate that event wildcard subscription works")
 
         test_failure = None
-        try:
-            subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
-                                                                   events=[('*')],
-                                                                   fabricFiltered=False,
-                                                                   reportInterval=(100, 1000))
-            if len(subscription.GetEvents()) == 0:
-                test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
-            # Connection over PASE will fail subscriptions with "Unsupported access"
-            # TODO: ideally we should SKIP this test for PASE connections
-            _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
-            if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
-                test_failure = f"Failed to wildcard subscribe events(*): {e}"
+        if self.test_from_file:
+            logging.warning("Skipping check of event wildcards as this test is being run from an attribute file")
+        else:
+            try:
+                subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
+                                                                       events=[('*')],
+                                                                       fabricFiltered=False,
+                                                                       reportInterval=(100, 1000))
+                if len(subscription.GetEvents()) == 0:
+                    test_failure = 'Wildcard event subscription returned no events'
+            except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
+                # Connection over PASE will fail subscriptions with "Unsupported access"
+                # TODO: ideally we should SKIP this test for PASE connections
+                _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
+                if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
+                    test_failure = f"Failed to wildcard subscribe events(*): {e}"
 
         if test_failure:
             self.record_error(self.get_test_name(), problem=test_failure, location=UnknownProblemLocation())
@@ -982,15 +1002,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
 
         # Structured dump so we can pull these back out of the logs
-        def log_structured_data(start_tag: str, dump_string):
-            lines = dump_string.splitlines()
-            logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
-            for line in lines:
-                logging.info(f'{start_tag}{line}')
-            logging.info(f'{start_tag}END ====')
-
-        log_structured_data('==== json: ', json_str)
-        log_structured_data('==== txt: ', txt_str)
+        self.log_structured_data('==== json: ', json_str)
+        self.log_structured_data('==== txt: ', txt_str)
 
     @async_test_body
     async def test_TC_DESC_2_1(self):

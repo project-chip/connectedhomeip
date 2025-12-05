@@ -153,6 +153,7 @@ CodeDrivenClusters:
     - Boolean State
     - Boolean State Configuration
     - Descriptor
+    - Device Energy Management
     - Diagnostic Logs
     - Ethernet Network Diagnostics
     - Electrical Power Measurement
