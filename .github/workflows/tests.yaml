@@ -434,7 +434,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Ensure only useful ccache is kept
-              if: env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
@@ -602,7 +602,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Ensure only useful ccache is kept
-              if: env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
@@ -856,7 +856,7 @@ jobs:
                 if-no-files-found: error
                 overwrite: true
             - name: Ensure only useful ccache is kept
-              if: env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
