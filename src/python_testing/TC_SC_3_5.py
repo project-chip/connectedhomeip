@@ -191,7 +191,7 @@ class TC_SC_3_5(MatterBaseTest):
             if e.status == Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen:
                 pass
             else:
-                log.exception('Error running RevokeCommissioning command')
+                log.exception('Error running RevokeCommissioning command: %s', e)
                 asserts.fail(f"RevokeCommissioning failed with error: {e.status}")
         except Exception as e:
             log.exception('Error running RevokeCommissioning command: %s', e)
