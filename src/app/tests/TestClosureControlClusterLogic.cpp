@@ -83,6 +83,7 @@ public:
     CriticalFailure ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // Clock overrides
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void SetMonotonic(Clock::Milliseconds64 timestamp)
     {
         MockClock::SetMonotonic(timestamp);
@@ -96,6 +97,7 @@ public:
         }
     }
 
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void AdvanceMonotonic(Clock::Milliseconds64 increment) { SetMonotonic(GetMonotonicMilliseconds64() + increment); }
 
 private:
