@@ -546,21 +546,56 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 13: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(13)
 
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
+        )
+
         # Step 14: TH reads Networks attribute
         self.step(14)
 
+        response = await self._read_networks(endpoint)
+        logger.info(f" --- Step 14: Networks attribute has {len(response)} network(s)")
+        asserts.assert_greater_equal(len(response), 1,
+                                     "Expected at least one network in Networks attribute after successful connection")
         # Verify the device is connected to the correct network
+        connected_networks = [network.networkID for network in response if network.connected]
+        asserts.assert_true(correct_thread_dataset in connected_networks,
+                            f"Expected device to be connected to Thread network with operational dataset '{correct_thread_dataset}'")
 
         # Step 15: TH sends CommissioningComplete to finalize commissioning
         self.step(15)
 
+        await asyncio.sleep(MDNS_DISCOVERY_PREP_DELAY)
+
         # Discover device on Thread network via mDNS to establish CASE session
+        logger.info(" --- Discovering device on Thread network via mDNS...")
+        discovered_devices = await find_matter_devices_mdns(self.dut_node_id)
+        logger.info(f" --- Found {len(discovered_devices)} device(s) via mDNS")
+        asserts.assert_greater(len(discovered_devices), 0,
+                               "No devices found via mDNS after Thread connection")
 
         # Close PASE session to force CASE session establishment over Thread
+        logger.info(" --- Closing BLE connection and expiring PASE session...")
+        self.default_controller.CloseBLEConnection()
+        self.default_controller.ExpireSessions(self.dut_node_id)
+
+        await asyncio.sleep(SESSION_EXPIRY_DELAY)
+
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cgen.Commands.CommissioningComplete(),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
 
         # Verify that DUT sends CommissioningCompleteResponse with the following fields:
+        asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse),
+                            "Expected CommissioningCompleteResponse")
 
         # 1. ErrorCode field set to OK (0)
+        asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"Expected CommissioningCompleteResponse errorCode to be OK (0), but got {response.errorCode}")
+        logger.info(" --- CommissioningComplete command sent successfully, commissioning finalized.")
 
 
 if __name__ == "__main__":
