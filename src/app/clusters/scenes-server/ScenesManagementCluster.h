@@ -79,7 +79,7 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    // CommandHanlerInterface
+    // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
 
     // AttributeAccessInterface
