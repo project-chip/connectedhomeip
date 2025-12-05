@@ -79,7 +79,6 @@
 using namespace chip;
 using namespace chip::Testing;
 using namespace chip::app;
-using namespace chip::Testing;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
