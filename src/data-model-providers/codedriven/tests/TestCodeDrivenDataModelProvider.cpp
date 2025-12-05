@@ -223,14 +223,14 @@ public:
 
 protected:
     TestProviderChangeListener mChangeListener;
-    chip::Test::LogOnlyEvents mEventGenerator;
+    chip::Testing::LogOnlyEvents mEventGenerator;
     TestActionContext mActionContext;
     DataModel::InteractionModelContext mContext{
         .eventsGenerator         = mEventGenerator,
         .dataModelChangeListener = mChangeListener,
         .actionContext           = mActionContext,
     };
-    chip::Test::TestServerClusterContext mServerClusterTestContext;
+    chip::Testing::TestServerClusterContext mServerClusterTestContext;
     CodeDrivenDataModelProvider mProvider;
     std::vector<std::unique_ptr<SpanEndpoint>> mEndpointStorage;                     // To keep providers alive
     std::vector<std::unique_ptr<EndpointInterfaceRegistration>> mOwnedRegistrations; // To keep registration objects alive

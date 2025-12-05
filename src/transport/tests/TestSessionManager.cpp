@@ -52,10 +52,10 @@ namespace {
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::TestCerts;
 
-using TestContext = chip::Test::LoopbackTransportManager;
+using TestContext = LoopbackTransportManager;
 
 const char PAYLOAD[] = "Hello!";
 
