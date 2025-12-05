@@ -28,6 +28,7 @@
 #include <clusters/DeviceEnergyManagement/Attributes.h>
 #include <clusters/DeviceEnergyManagement/Commands.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -41,6 +42,13 @@ using namespace chip::Testing;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
+
+// Helper to check if real-time clock is available (required for time-based validations)
+bool IsRealTimeClockAvailable()
+{
+    uint32_t epoch = 0;
+    return chip::System::Clock::GetClock_MatterEpochS(epoch) == CHIP_NO_ERROR;
+}
 
 struct TestDeviceEnergyManagementCluster : public ::testing::Test
 {
@@ -621,6 +629,11 @@ TEST_F(TestDeviceEnergyManagementCluster, TestModifyForecastRequest)
 
 TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast)
 {
+    if (!IsRealTimeClockAvailable())
+    {
+        GTEST_SKIP() << "Real-time clock not available";
+    }
+
     chip::Test::TestServerClusterContext context;
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kConstraintBasedAdjustment);
