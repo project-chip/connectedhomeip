@@ -514,10 +514,34 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 11: TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 6
         self.step(11)
 
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateThreadNetwork(
+                operationalDataset=correct_thread_dataset,
+                breadcrumb=7
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        await self._validate_network_config_response(response)
+
         # Wait for DUT to stabilize Thread configuration before attempting connection
+        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to stabilize Thread configuration...")
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
         # Step 12: TH sends ConnectNetwork command and Breadcrumb = 7
         self.step(12)
+
+        logger.info(" --- Step 12: Sending ConnectNetwork with correct operational dataset")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(
+                networkID=correct_thread_dataset,
+                breadcrumb=8
+            ),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(response, expect_success=True)
+        logger.info(" --- Step 12: ConnectNetwork succeeded with correct operational dataset")
 
         # Step 13: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(13)
