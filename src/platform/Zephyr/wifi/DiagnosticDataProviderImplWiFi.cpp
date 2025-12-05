@@ -20,8 +20,8 @@
  *          Provides an implementation of Wi-Fi network diagnostics methods of the DiagnosticDataProvider object.
  */
 
-#include <platform/Zephyr/wifi/DiagnosticDataProviderImplWiFi.h>
 #include <platform/Zephyr/InetUtils.h>
+#include <platform/Zephyr/wifi/DiagnosticDataProviderImplWiFi.h>
 #include <platform/Zephyr/wifi/WiFiManager.h>
 
 namespace chip {
@@ -32,7 +32,8 @@ DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
     return DiagnosticDataProviderImplWiFi::GetDefaultInstance();
 }
 
-DiagnosticDataProviderImplWiFi & DiagnosticDataProviderImplWiFi::GetDefaultInstance() {
+DiagnosticDataProviderImplWiFi & DiagnosticDataProviderImplWiFi::GetDefaultInstance()
+{
     static DiagnosticDataProviderImplWiFi sInstance;
     return sInstance;
 }
