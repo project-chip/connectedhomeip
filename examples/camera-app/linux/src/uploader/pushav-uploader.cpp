@@ -17,9 +17,10 @@
  */
 
 #include "pushav-uploader.h"
+#include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <openssl/bio.h>
@@ -40,6 +41,22 @@ PushAVUploader::~PushAVUploader()
     }
 
     Stop();
+
+    while (!mAvData.empty())
+    {
+        std::pair<std::string, std::string> uploadJob = std::move(mAvData.front());
+        mAvData.pop();
+
+        std::error_code ec;
+        if (!std::filesystem::remove(uploadJob.first, ec))
+        {
+            ChipLogError(Camera, "Failed to delete file: %s, error: %s", uploadJob.first.c_str(), ec.message().c_str());
+        }
+        else
+        {
+            ChipLogDetail(Camera, "Successfully deleted file: %s", uploadJob.first.c_str());
+        }
+    }
 }
 
 // Helper function to convert certificate from DER format to PEM format
@@ -77,25 +94,6 @@ std::string DerCertToPem(const std::vector<uint8_t> & derData)
     X509_free(cert);
 
     return pem;
-}
-
-// Helper function to convert vector of bytes to hex string representation
-std::string vectorToHexString(const std::vector<uint8_t> & vec)
-{
-    std::ostringstream oss;
-    for (size_t i = 0; i < vec.size(); ++i)
-    {
-        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(vec[i]);
-        if ((i + 1) % 16 == 0)
-        {
-            oss << "\n";
-        }
-        else if (i != vec.size() - 1)
-        {
-            oss << " ";
-        }
-    }
-    return oss.str();
 }
 
 // Helper function to convert ECDSA private key from DER format to PEM format
@@ -288,19 +286,61 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
-    headers                     = curl_slist_append(headers, "Content-Type: application/*");
 
-    // Extract just the filename from the full path
+    // Determine content type based on file extension
+    std::string contentType = "application/*"; // Default fallback
+
+    // Extract file extension from full path using std::filesystem
+    std::filesystem::path filePath(data.first);
+    std::filesystem::path extension = filePath.extension();
+    if (extension == ".mpd")
+    {
+        contentType = "application/dash+xml"; // Manifest file
+    }
+    else if (extension == ".m4s")
+    {
+        contentType = "video/iso.segment"; // Media segment
+    }
+    else if (extension == ".init")
+    {
+        contentType = "video/mp4"; // Initialization segment
+    }
+
+    std::string contentTypeHeader = "Content-Type: " + contentType;
+    headers                       = curl_slist_append(headers, contentTypeHeader.c_str());
+
+    // Extract the filename from the full path
     std::string fullPath = data.first;
-    std::string filename = fullPath.substr(fullPath.find_last_of("/\\") + 1);
+    std::string filename = "";
+    std::string baseUrl  = data.second;
+    std::string fullUrl;
 
-    // Construct the URL with just the filename
-    std::string baseUrl = data.second;
+    // Declare all variables that are used after goto cleanup
+    std::string rootCertPEM;
+    std::string clientCertPEM;
+    std::string derKeyToPemstr;
+    std::error_code ec;
+    size_t sessionPos;
+    CURLcode res;
+
+    sessionPos = fullPath.find("/session_");
+    if (sessionPos != std::string::npos)
+    {
+        filename = fullPath.substr(sessionPos + 1);
+    }
+    else
+    {
+        ChipLogError(Camera,
+                     "Invalid file path: %s. Expected to contain "
+                     "'session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>.<SegmentExtension>' pattern. Skipping upload.",
+                     fullPath.c_str());
+        goto cleanup;
+    }
     if (baseUrl.back() != '/')
     {
         baseUrl += "/";
     }
-    std::string fullUrl = baseUrl + filename;
+    fullUrl = baseUrl + filename;
 
     ChipLogProgress(Camera, "Uploading file: %s to URL: %s", filename.c_str(), fullUrl.c_str());
 
@@ -316,8 +356,8 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
     // temporary workaround, PEM-format files are being provided as input to curl.
 
-    auto rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
-    auto clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
+    clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
     if (!mCertBuffer.mIntermediateCertBuffer.empty())
     {
         clientCertPEM.append("\n"); // Add newline separator between certs in PEM format
@@ -326,7 +366,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     {
         clientCertPEM.append(DerCertToPem(mCertBuffer.mIntermediateCertBuffer[i]) + "\n");
     }
-    std::string derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+    derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
 
     SaveCertToFile(rootCertPEM, "/tmp/root.pem");
     SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
@@ -355,7 +395,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
 
-    CURLcode res = curl_easy_perform(curl);
+    res = curl_easy_perform(curl);
 
     if (res != CURLE_OK)
     {
@@ -365,6 +405,20 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     {
         ChipLogDetail(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
     }
+
+    if (extension != ".mpd")
+    {
+        if (!std::filesystem::remove(data.first, ec))
+        {
+            ChipLogError(Camera, "Failed to delete file: %s, error: %s", data.first.c_str(), ec.message().c_str());
+        }
+        else
+        {
+            ChipLogDetail(Camera, "Successfully deleted file: %s", data.first.c_str());
+        }
+    }
+
+cleanup:
     if (upload.mData)
     {
         std::free(upload.mData);

@@ -176,7 +176,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     const chip::Inet::IPAddress * ipAddresses = player->GetIPAddresses();
     if (ipAddresses != nullptr)
     {
-        chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
         for (size_t i = 0; i < player->GetNumIPs() && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
         {
             char addrCString[chip::Inet::IPAddress::kMaxStringLength];
@@ -188,7 +188,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
                 env->GetStaticMethodID(jIPAddressClass, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
             jobject jIPAddress = env->CallStaticObjectMethod(jIPAddressClass, jGetByNameMid, jIPAddressStr);
 
-            chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
         }
     }
 
@@ -534,7 +534,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
                                                                          jCommissionerDeclarationClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
-    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZ)V");
+    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZI)V");
     if (jCommissionerDeclarationConstructor == nullptr)
     {
         ChipLogError(AppServer,

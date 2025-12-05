@@ -146,11 +146,11 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    chip::BindingManager::GetInstance().Init(
+    TEMPORARY_RETURN_IGNORED chip::app::Clusters::Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
     // Set FabricDelegate
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
 
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));

@@ -99,11 +99,11 @@ class TC_DA_1_5(MatterBaseTest):
         vendor1 = None
         vendor2 = None
         vendor3 = None
-        if 3 in decoded.keys():
+        if 3 in decoded:
             vendor1 = decoded[3]
-        if 4 in decoded.keys():
+        if 4 in decoded:
             vendor2 = decoded[4]
-        if 5 in decoded.keys():
+        if 5 in decoded:
             vendor3 = decoded[5]
 
         # Verify that length of nocsr_elements is <= 900
@@ -187,7 +187,7 @@ class TC_DA_1_5(MatterBaseTest):
 
         self.print_step(13, "Open commissioning window")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(14, "Commission to TH2")
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()

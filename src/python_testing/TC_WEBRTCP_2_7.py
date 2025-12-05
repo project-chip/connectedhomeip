@@ -46,32 +46,56 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_7(self) -> str:
+    def desc_TC_WebRTCP_2_7(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.7] Validate SolicitOffer fails with HardPrivacyModeOn"
+        return "[TC-{picsCode}-2.7] Validate SolicitOffer fails when physical privacy switch is ON"
 
-    def steps_TC_WebRTCProvider_2_7(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_7(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
-            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement"),
-            TestStep(2, "TH writes `HardPrivacyModeOn` to TRUE on CameraAVStreamManagement cluster"),
-            TestStep(3, "TH sends the SolicitOffer command with valid parameters including allocated stream IDs"),
-            TestStep(4, "TH writes `HardPrivacyModeOn` to FALSE on CameraAVStreamManagement cluster"),
+        return [
+            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
+                     "DUT responds with success"),
+            TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
+                     "DUT's HardPrivacyModeOn attribute becomes TRUE"),
+            TestStep(3, "TH sends the SolicitOffer command with valid parameters including allocated stream IDs",
+                     "DUT responds with INVALID_IN_STATE status code"),
+            TestStep(4, "Tures OFF the physical privacy switch (HardPrivacyModeOn is FALSE)",
+                     "DUT's HardPrivacyModeOn attribute becomes FALSE"),
             TestStep(5, "TH sends the SolicitOffer command with the same valid parameters"),
         ]
-        return steps
+
+    def pics_TC_WebRTCP_2_7(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        return [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0015",        # HardPrivacyModeOn attribute
+        ]
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
-    async def test_TC_WebRTCProvider_2_7(self):
+    async def test_TC_WebRTCP_2_7(self):
         """
-        Executes the test steps for validating SolicitOffer behavior with HardPrivacyModeOn.
+        Executes the test steps for validating SolicitOffer behavior when physical privacy switch is ON.
         """
 
-        endpoint = self.get_endpoint(default=1)
+        self.step("precondition")
+        # Commission DUT - already done
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate both Audio and Video streams
@@ -83,8 +107,12 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_video_stream(videoStreamID)
 
         self.step(2)
-        # Set HardPrivacyModeOn to TRUE via app pipe
-        self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
+        # For CI: Use app pipe to simulate physical privacy switch being turned on
+        # For manual testing: User should physically turn on the privacy switch
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
+        else:
+            self.wait_for_user_input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute was set successfully
         hard_privacy_mode = await self.read_single_attribute_check_success(
@@ -92,7 +120,7 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
             cluster=Clusters.CameraAvStreamManagement,
             attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
         )
-        asserts.assert_true(hard_privacy_mode, "HardPrivacyModeOn should be True")
+        asserts.assert_true(hard_privacy_mode, "HardPrivacyModeOn should be True when privacy switch is on")
 
         self.step(3)
         # Send SolicitOffer command with valid parameters - should fail with INVALID_IN_STATE
@@ -110,8 +138,12 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE when HardPrivacyModeOn is True")
 
         self.step(4)
-        # Set HardPrivacyModeOn to FALSE via app pipe
-        self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+        # For CI: Use app pipe to simulate physical privacy switch being turned off
+        # For manual testing: User should physically turn off the privacy switch
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+        else:
+            self.wait_for_user_input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute was set successfully
         hard_privacy_mode = await self.read_single_attribute_check_success(
@@ -119,7 +151,7 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
             cluster=Clusters.CameraAvStreamManagement,
             attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
         )
-        asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
+        asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False when privacy switch is off")
 
         self.step(5)
         # Send SolicitOffer command with the same valid parameters - should succeed now

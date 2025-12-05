@@ -211,11 +211,10 @@ MTR_DIRECT_MEMBERS
     // keep track of the potentially-long value that was set by the client.
     NSNumber * _Nullable _shadowDiscriminator;
 
-    // When we are initialized from a concatenated QR code, we store the
-    // original string and prevent mutation, instead of re-serializing from
-    // _payload (which in that situation no longer represents all the information
-    // in the original string).
-    NSString * _Nullable _concatenatedQRCode;
+    // When this object represents a concatenated payload, this array contains the
+    // underlying sub-payloads, and `_payload` will be a copy of the first sub-payload,
+    // to provide compatibility with legacy code. Nil if not concatenated.
+    NSArray<MTRSetupPayload *> * _Nullable _subPayloads;
 }
 
 + (void)initialize
@@ -260,7 +259,11 @@ MTR_DIRECT_MEMBERS
 
     _payload = payloads[0];
     if (payloads.size() > 1) {
-        _concatenatedQRCode = [qrCode copy];
+        NSMutableArray<MTRSetupPayload *> * subPayloads = [[NSMutableArray alloc] initWithCapacity:payloads.size()];
+        for (auto & payload : payloads) {
+            [subPayloads addObject:[[MTRSetupPayload alloc] initWithSetupPayload:payload]];
+        }
+        _subPayloads = [subPayloads copy]; // ensure immutability for now since _subPayloads is exposed without copy
     }
     return CHIP_NO_ERROR;
 }
@@ -309,11 +312,21 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-- (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload
+- (instancetype)initWithSetupPayload:(const chip::SetupPayload &)setupPayload
 {
     self = [super init];
     _payload = setupPayload;
     return self;
+}
+
+- (BOOL)isConcatenated
+{
+    return _subPayloads != nil;
+}
+
+- (NSArray<MTRSetupPayload *> *)subPayloads
+{
+    return _subPayloads ?: @[];
 }
 
 #pragma mark - Mutable properties
@@ -325,10 +338,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setVersion:(NSNumber *)version
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change version of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     _payload.version = static_cast<decltype(_payload.version)>(version.unsignedIntegerValue);
 }
 
@@ -339,10 +349,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setVendorID:(NSNumber *)vendorID
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change vendorID of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     _payload.vendorID = static_cast<decltype(_payload.vendorID)>(vendorID.unsignedIntegerValue);
 }
 
@@ -353,10 +360,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setProductID:(NSNumber *)productID
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change productID of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     _payload.productID = static_cast<decltype(_payload.productID)>(productID.unsignedIntegerValue);
 }
 
@@ -374,10 +378,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setCommissioningFlow:(MTRCommissioningFlow)commissioningFlow
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change commissioningFlow of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     _payload.commissioningFlow = static_cast<chip::CommissioningFlow>(commissioningFlow);
 }
 
@@ -399,10 +400,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setDiscoveryCapabilities:(MTRDiscoveryCapabilities)discoveryCapabilities
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change discoveryCapabilities of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     if (discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
         _payload.rendezvousInformation.ClearValue();
     } else {
@@ -420,10 +418,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setDiscriminator:(uint16_t)discriminator isShort:(BOOL)isShort
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change discriminator of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     if (isShort) {
         _payload.discriminator.SetShortValue(discriminator & kShortDiscriminatorMask);
         _shadowDiscriminator = @(discriminator); // keep as a shadow value
@@ -448,10 +443,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setHasShortDiscriminator:(BOOL)hasShortDiscriminator
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change hasShortDiscriminator of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     VerifyOrReturn(hasShortDiscriminator != self.hasShortDiscriminator);
     [self setDiscriminator:self.discriminator.unsignedShortValue isShort:hasShortDiscriminator];
 }
@@ -463,10 +455,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)setSetupPasscode:(NSNumber *)setupPasscode
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change setupPasscode of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     _payload.setUpPINCode = static_cast<decltype(_payload.setUpPINCode)>(setupPasscode.unsignedIntegerValue);
 }
 
@@ -479,24 +468,22 @@ MTR_DIRECT_MEMBERS
 
 - (void)setSerialNumber:(nullable NSString *)serialNumber
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to change serialNumber of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
+    CHIP_ERROR err;
     if (serialNumber) {
         NSString * existing = self.serialNumber;
         if (existing) {
             // The underlying TLV tag can be encoded as either a string or an integer,
             // avoid changing it if the represented serial number is not changing.
             VerifyOrReturn(![existing isEqualToString:serialNumber]);
-            _payload.removeSerialNumber();
+            TEMPORARY_RETURN_IGNORED _payload.removeSerialNumber();
         }
-        CHIP_ERROR err = _payload.addSerialNumber(serialNumber.UTF8String);
-        if (err != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Ignoring unexpected error in SetupPayload::addSerialNumber: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        err = _payload.addSerialNumber(serialNumber.UTF8String);
     } else {
-        _payload.removeSerialNumber();
+        err = _payload.removeSerialNumber();
+    }
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Ignoring unexpected error in SetupPayload::addSerialNumber: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -523,25 +510,24 @@ MTR_DIRECT_MEMBERS
 
 - (void)removeVendorElementWithTag:(NSNumber *)tag
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to modify vendor elements of concatenated QR code", self);
-        return;
-    }
-    _payload.removeOptionalVendorData(ValidateVendorTag(tag));
+    _subPayloads = nil;
+    TEMPORARY_RETURN_IGNORED _payload.removeOptionalVendorData(ValidateVendorTag(tag));
 }
 
 - (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element
 {
-    if (_concatenatedQRCode) {
-        MTR_LOG_ERROR("%@ Unable to modify vendor elements of concatenated QR code", self);
-        return;
-    }
+    _subPayloads = nil;
     MTRVerifyArgumentOrDie(element != nil, @"element");
     CHIP_ERROR err = [element addAsVendorElementTo:_payload];
     VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Internal error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 #pragma mark - Export methods
+
+typedef NS_OPTIONS(NSUInteger, QRCodeOptions) {
+    SkipValidation = (1 << 0),
+    AsConcatenation = (1 << 1),
+};
 
 - (nullable NSString *)manualEntryCode
 {
@@ -553,7 +539,7 @@ MTR_DIRECT_MEMBERS
 
 - (nullable NSString *)qrCodeString
 {
-    return [self qrCodeStringSkippingValidation:NO];
+    return [self qrCodeStringWithOptions:0];
 }
 
 + (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode
@@ -567,17 +553,29 @@ MTR_DIRECT_MEMBERS
     return SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passCode));
 }
 
-- (nullable NSString *)qrCodeStringSkippingValidation:(BOOL)allowInvalid
+- (nullable NSString *)qrCodeStringWithOptions:(QRCodeOptions)options
 {
-    if (_concatenatedQRCode) {
-        return _concatenatedQRCode;
+    if (_subPayloads) {
+        NSMutableString * result;
+        for (MTRSetupPayload * subPayload in _subPayloads) {
+            NSString * component = [subPayload qrCodeStringWithOptions:options];
+            VerifyOrReturnValue(component != nil, nil);
+            if (!result) {
+                result = [component mutableCopy];
+                options |= AsConcatenation;
+            } else {
+                [result appendString:component];
+            }
+        }
+        return result;
     }
 
     chip::QRCodeSetupPayloadGenerator generator(_payload);
-    generator.SetAllowInvalidPayload(allowInvalid);
+    generator.SetAllowInvalidPayload(options & SkipValidation);
+    generator.SetAsConcatenation(options & AsConcatenation);
     std::string result;
     CHIP_ERROR err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result);
-    if (allowInvalid) {
+    if (options & SkipValidation) {
         // Encoding should always work if invalid payloads are allowed
         VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Internal error: %" CHIP_ERROR_FORMAT, err.Format());
     } else if (err != CHIP_NO_ERROR) {
@@ -592,35 +590,27 @@ MTR_DIRECT_MEMBERS
 - (id)copyWithZone:(NSZone *)zone
 {
     MTRSetupPayload * copy = [[MTRSetupPayload alloc] initWithSetupPayload:_payload];
-    copy->_shadowDiscriminator = _shadowDiscriminator;
-    copy->_concatenatedQRCode = _concatenatedQRCode;
+    if (_subPayloads) {
+        copy->_subPayloads = [[NSArray alloc] initWithArray:_subPayloads copyItems:YES];
+    } else {
+        copy->_shadowDiscriminator = _shadowDiscriminator; // not relevant if concatenated
+    }
     return copy;
 }
 
 - (NSUInteger)hash
 {
-    if (_concatenatedQRCode) {
-        return _concatenatedQRCode.hash;
-    }
-
+    // The discriminator of the first payload is a good enough hash even if concatenated
     return self.discriminator.unsignedIntegerValue;
 }
 
 - (BOOL)isEqual:(id)object
 {
+    VerifyOrReturnValue(object != self, YES);
     VerifyOrReturnValue([object class] == [self class], NO);
     MTRSetupPayload * other = object;
 
-    bool hasConcatenatedQRCode = (_concatenatedQRCode != nil);
-    bool otherHasConcatenatedQRCode = (other->_concatenatedQRCode != nil);
-    if (hasConcatenatedQRCode != otherHasConcatenatedQRCode) {
-        return NO;
-    }
-
-    if (_concatenatedQRCode) {
-        return [_concatenatedQRCode isEqual:other->_concatenatedQRCode];
-    }
-
+    VerifyOrReturnValue(MTREqualObjects(_subPayloads, other->_subPayloads), NO);
     VerifyOrReturnValue(_payload == other->_payload, NO);
     VerifyOrReturnValue(MTREqualObjects(_shadowDiscriminator, other->_shadowDiscriminator), NO);
     return YES;
@@ -643,7 +633,7 @@ MTR_DIRECT_MEMBERS
         [result appendFormat:@" commissioningFlow=0x%llx", (unsigned long long) flow];
     }
 
-    [result appendFormat:@", concatenated: %@>", MTR_YES_NO(_concatenatedQRCode != nil)];
+    [result appendFormat:@", concatenated: %@>", MTR_YES_NO(self.concatenated)];
     return result;
 }
 
@@ -667,7 +657,7 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:[self qrCodeStringSkippingValidation:YES] forKey:MTRSetupPayloadCodingKeyQRCode];
+    [coder encodeObject:[self qrCodeStringWithOptions:SkipValidation] forKey:MTRSetupPayloadCodingKeyQRCode];
     [coder encodeObject:self.version forKey:MTRSetupPayloadCodingKeyVersion];
     [coder encodeObject:self.vendorID forKey:MTRSetupPayloadCodingKeyVendorID];
     [coder encodeObject:self.productID forKey:MTRSetupPayloadCodingKeyProductID];
@@ -698,12 +688,14 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
         self.serialNumber = [coder decodeObjectOfClass:NSString.class forKey:MTRSetupPayloadCodingKeySerialNumber];
     }
 
-    // The QR code cannot represent short discriminators or the absence of rendevouz
-    //  information, so always decode the state of those properties separately.
-    self.hasShortDiscriminator = ([coder decodeIntegerForKey:MTRSetupPayloadCodingKeyHasShortDiscriminator] != 0);
-    self.discriminator = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyDiscriminator];
-    // For compatibility reasons, keep decoding rendevouzInformation instead of discoveryCapabilities
-    self.rendezvousInformation = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyRendevouzInformation];
+    // The QR code cannot represent short discriminators or the absence of rendezvous
+    // information, so decode the state of those properties separately for stand-alone payloads.
+    if (!self.concatenated) {
+        self.hasShortDiscriminator = ([coder decodeIntegerForKey:MTRSetupPayloadCodingKeyHasShortDiscriminator] != 0);
+        self.discriminator = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyDiscriminator];
+        // For compatibility reasons, keep decoding rendezvouzInformation instead of discoveryCapabilities
+        self.rendezvousInformation = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyRendevouzInformation];
+    }
 
     return self;
 }

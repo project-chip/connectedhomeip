@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -50,7 +51,7 @@ from matter.clusters import MeterIdentification
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = MeterIdentification
 
@@ -70,7 +71,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
     def steps_TC_MTRID_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Meter Identification cluster:
                      - MinIntervalFloor: 0
@@ -99,7 +100,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                      - Store value as power_threshold."""),
             TestStep("8", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "TestEventTriggersEnabled is True."),
-            TestStep("9", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY 
+            TestStep("9", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY
                      and EventTrigger field set to PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
                      "DUT returns SUCCESS."),
             TestStep("10", "TH awaits a MeterType attribute with 10s timeout.", """
@@ -124,13 +125,11 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                      - ApparentPowerThreshold field has type int64;
                      - PowerThresholdSource field has type PowerThresholdSourceEnum and value in range 0 - 2;
                      - The value does not match the power_threshold."""),
-            TestStep("15", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY 
+            TestStep("15", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY
                      and EventTrigger field set to PIXIT.MTRID.TEST_EVENT_TRIGGER for Test Event Clear.""",
                      "DUT returns SUCCESS."),
             TestStep("16", "TH removes the subscriptions to the Meter Identification cluster.", "Subscription successfully removed."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_MTRID_3_1(self):
@@ -173,7 +172,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("6")
 
             if not self.check_pics("MTRID.S.A0003"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
+                log.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
 
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
             protocol_version = await self.read_single_attribute_check_success(
@@ -196,7 +195,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("7")
 
             if not self.check_pics("MTRID.S.A0004"):
-                logger.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
+                log.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
             power_threshold = await self.read_single_attribute_check_success(
@@ -240,7 +239,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("13")
 
             if not self.check_pics("MTRID.S.A0003"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
+                log.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
 
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
             await self.check_protocol_version_attribute(
@@ -261,7 +260,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("14")
 
             if not self.check_pics("MTRID.S.A0004"):
-                logger.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
+                log.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
             await self.check_power_threshold_attribute(

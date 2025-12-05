@@ -60,7 +60,7 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <attribute side="server" code="0x0000" name="GroupKeyMap" define="GROUP_KEY_MAP" type="array" length="254" entryType="GroupKeyMapStruct" writable="true" optional="false">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>

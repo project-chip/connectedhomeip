@@ -52,21 +52,36 @@ if (chip_build_tests) {
     tests = [
       "${chip_root}/src/access/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
+      "${chip_root}/src/app/clusters/descriptor/tests",
+      "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
+      "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/operational-credentials-server/tests",
       "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
+      "${chip_root}/src/app/clusters/user-label-server/tests",
+      "${chip_root}/src/app/clusters/identify-server/tests",
+      "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
+      "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
+      "${chip_root}/src/app/clusters/time-format-localization-server/tests",
+      "${chip_root}/src/app/clusters/time-synchronization-server/tests",
+      "${chip_root}/src/app/clusters/localization-configuration-server/tests",
+      "${chip_root}/src/app/clusters/resource-monitoring-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -75,7 +90,6 @@ if (chip_build_tests) {
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/include/platform/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
       "${chip_root}/src/lib/asn1/tests",
@@ -90,28 +104,26 @@ if (chip_build_tests) {
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
-      "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
+      "${chip_root}/src/tracing/esp32_diagnostics/tests",
+      "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
+      "${chip_root}/src/app/clusters/zone-management-server/tests",
+      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+      "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+      "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+      "${chip_root}/src/lib/dnssd/tests",
+      "${chip_root}/src/app/clusters/groupcast/tests",
 
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 
-    # Skip DNSSD tests for Mbed platform due to flash memory size limitations
-    if (current_os != "mbed") {
-      tests += [
-        "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
-        "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
-        "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
-        "${chip_root}/src/lib/dnssd/tests",
-      ]
-    }
-
-    if (current_os != "zephyr" && current_os != "mbed") {
+    if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed") {
+    if (current_os != "zephyr") {
       # Avoid these items from "one single binary" test executions. Once tests
       # are split, we can re-visit this (and likely many others).
       #
@@ -124,8 +136,7 @@ if (chip_build_tests) {
       ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && chip_device_platform != "efr32") {
       # Disabled from "one single binary" since the "mocks" contain duplicate sybmols
       # with ember
       # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
@@ -134,6 +145,10 @@ if (chip_build_tests) {
         "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/examples/common/server-cluster-shim/tests",
       ]
+    }
+
+    if (chip_device_platform != "nrfconnect") {
+      tests += [ "${chip_root}/src/app/clusters/diagnostic-logs-server/tests/" ]
     }
 
     if (chip_device_platform != "efr32") {
@@ -177,8 +192,8 @@ if (chip_build_tests) {
       ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "esp32" && chip_device_platform != "ameba") {
+    if (current_os != "zephyr" && chip_device_platform != "esp32" &&
+        chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
@@ -190,7 +205,12 @@ if (chip_build_tests) {
     }
 
     if (chip_device_config_enable_joint_fabric) {
-      tests += [ "${chip_root}/src/app/server/tests" ]
+      tests += [
+        "${chip_root}/src/app/server/tests",
+        "${chip_root}/src/controller/tests/jcm",
+        "${chip_root}/src/credentials/tests/jcm",
+        "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      ]
     }
   }
 

@@ -15,7 +15,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRCommissioningDelegate.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerDelegate.h>
 #import <Matter/MTRSetupPayload.h>
@@ -26,13 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTRDeviceControllerDelegate_Internal <MTRDeviceControllerDelegate>
 @required
 - (void)controller:(MTRDeviceController *)controller
-    scannedWiFiNetworks:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
-                  error:(nullable NSError *)error;
+    needsWiFiCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
+                                  error:(nullable NSError *)error;
 - (void)controller:(MTRDeviceController *)controller
-    scannedThreadNetworks:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
-                    error:(nullable NSError *)error;
-- (void)controller:(MTRDeviceController *)controller
-    reachedCommissioningStage:(MTRCommissioningStage)stage;
+    needsThreadCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
+                                    error:(nullable NSError *)error;
+- (void)controllerStartingNetworkScan:(MTRDeviceController *)controller;
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error forPayload:(MTRSetupPayload * _Nullable)payload;
 @end
 NS_ASSUME_NONNULL_END

@@ -46,17 +46,17 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_2(self) -> str:
+    def desc_TC_WebRTCP_2_2(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.2] Validate immediate processing of SolicitOffer with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_2(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_2(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no audio or video id => expect INVALID_COMMAND"),
@@ -65,10 +65,28 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
             TestStep(5, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
             TestStep(6, "Send EndSession with valid WebRTCSessionID => expect SUCCESS"),
         ]
-        return steps
+
+    def pics_TC_WebRTCP_2_2(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        return [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "WEBRTCP.S.C06.Rsp",   # EndSession command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
-    async def test_TC_WebRTCProvider_2_2(self):
+    async def test_TC_WebRTCP_2_2(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
@@ -81,7 +99,7 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         self.step(1)

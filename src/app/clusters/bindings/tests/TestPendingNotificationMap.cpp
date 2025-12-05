@@ -19,16 +19,12 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
-using chip::BindingTable;
-using chip::ClusterId;
-using chip::FabricIndex;
-using chip::MakeOptional;
-using chip::NodeId;
-using chip::NullOptional;
-using chip::PendingNotificationEntry;
-using chip::PendingNotificationMap;
+using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Binding;
 
 namespace {
 
@@ -38,24 +34,24 @@ public:
     static void SetUpTestSuite()
     {
         static chip::TestPersistentStorageDelegate storage;
-        BindingTable::GetInstance().SetPersistentStorage(&storage);
+        Binding::Table::GetInstance().SetPersistentStorage(&storage);
     }
 };
 
-void ClearBindingTable(BindingTable & table)
+void ClearBindingTable(Binding::Table & table)
 {
     auto iter = table.begin();
     while (iter != table.end())
     {
-        table.RemoveAt(iter);
+        EXPECT_SUCCESS(table.RemoveAt(iter));
     }
 }
 
-void CreateDefaultFullBindingTable(BindingTable & table)
+void CreateDefaultFullBindingTable(Binding::Table & table)
 {
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
-        table.Add(EmberBindingTableEntry::ForNode(i / 10, i % 5, 0, 0, std::make_optional<ClusterId>(i)));
+        EXPECT_SUCCESS(table.Add(Binding::TableEntry(i / 10, i % 5, 0, 0, std::make_optional<ClusterId>(i))));
     }
 }
 
@@ -70,17 +66,17 @@ TEST_F(TestPendingNotificationMap, TestEmptyMap)
 TEST_F(TestPendingNotificationMap, TestAddRemove)
 {
     PendingNotificationMap pendingMap;
-    ClearBindingTable(BindingTable::GetInstance());
-    CreateDefaultFullBindingTable(BindingTable::GetInstance());
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
+    ClearBindingTable(Binding::Table::GetInstance());
+    CreateDefaultFullBindingTable(Binding::Table::GetInstance());
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
         EXPECT_EQ(pendingMap.AddPendingNotification(i, nullptr), CHIP_NO_ERROR);
     }
     // Confirm adding in one more element fails
-    EXPECT_EQ(pendingMap.AddPendingNotification(BindingTable::kMaxBindingEntries, nullptr), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(pendingMap.AddPendingNotification(Binding::Table::kMaxBindingEntries, nullptr), CHIP_ERROR_NO_MEMORY);
 
     auto iter = pendingMap.begin();
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
         PendingNotificationEntry entry = *iter;
         EXPECT_EQ(entry.mBindingEntryId, i);
@@ -91,23 +87,23 @@ TEST_F(TestPendingNotificationMap, TestAddRemove)
     size_t pendingMapCount = 0;
     for (iter = pendingMap.begin(); iter != pendingMap.end(); ++iter)
     {
-        PendingNotificationEntry entry      = *iter;
-        EmberBindingTableEntry bindingEntry = BindingTable::GetInstance().GetAt(entry.mBindingEntryId);
+        PendingNotificationEntry entry   = *iter;
+        Binding::TableEntry bindingEntry = Binding::Table::GetInstance().GetAt(entry.mBindingEntryId);
         pendingMapCount++;
         EXPECT_NE(chip::ScopedNodeId(bindingEntry.nodeId, bindingEntry.fabricIndex), chip::ScopedNodeId());
     }
-    EXPECT_EQ(pendingMapCount, BindingTable::kMaxBindingEntries - 2);
+    EXPECT_EQ(pendingMapCount, Binding::Table::kMaxBindingEntries - 2);
     pendingMap.RemoveAllEntriesForFabric(0);
     pendingMapCount = 0;
     for (iter = pendingMap.begin(); iter != pendingMap.end(); ++iter)
     {
-        PendingNotificationEntry entry      = *iter;
-        EmberBindingTableEntry bindingEntry = BindingTable::GetInstance().GetAt(entry.mBindingEntryId);
+        PendingNotificationEntry entry   = *iter;
+        Binding::TableEntry bindingEntry = Binding::Table::GetInstance().GetAt(entry.mBindingEntryId);
         pendingMapCount++;
         EXPECT_NE(bindingEntry.fabricIndex, 0);
     }
-    EXPECT_EQ(pendingMapCount, BindingTable::kMaxBindingEntries - 10);
-    const FabricIndex maxFabricIndex = static_cast<FabricIndex>(BindingTable::kMaxBindingEntries / 10);
+    EXPECT_EQ(pendingMapCount, Binding::Table::kMaxBindingEntries - 10);
+    const FabricIndex maxFabricIndex = static_cast<FabricIndex>(Binding::Table::kMaxBindingEntries / 10);
     for (FabricIndex index = 1; index <= maxFabricIndex; index++)
     {
         pendingMap.RemoveAllEntriesForFabric(index);
@@ -118,8 +114,8 @@ TEST_F(TestPendingNotificationMap, TestAddRemove)
 TEST_F(TestPendingNotificationMap, TestLRUEntry)
 {
     PendingNotificationMap pendingMap;
-    ClearBindingTable(BindingTable::GetInstance());
-    CreateDefaultFullBindingTable(BindingTable::GetInstance());
+    ClearBindingTable(Binding::Table::GetInstance());
+    CreateDefaultFullBindingTable(Binding::Table::GetInstance());
     EXPECT_EQ(pendingMap.AddPendingNotification(0, nullptr), CHIP_NO_ERROR);
     EXPECT_EQ(pendingMap.AddPendingNotification(1, nullptr), CHIP_NO_ERROR);
     EXPECT_EQ(pendingMap.AddPendingNotification(5, nullptr), CHIP_NO_ERROR);

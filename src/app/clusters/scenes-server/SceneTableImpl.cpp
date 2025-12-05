@@ -132,14 +132,14 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
 CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
 {
     // Scene data is small, buffer can be allocated on stack
-    PersistentStore<Serializer::kEntryMaxBytes()> writeBuffer;
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> writeBuffer;
     return this->SetTableEntry(fabric_index, entry.mStorageId, entry.mStorageData, writeBuffer);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
     // All data is copied to SceneTableEntry, buffer can be allocated on stack
-    PersistentStore<Serializer::kEntryMaxBytes()> store;
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> store;
     ReturnErrorOnFailure(this->GetTableEntry(fabric_index, scene_id, entry.mStorageData, store));
     entry.mStorageId = scene_id;
     return CHIP_NO_ERROR;
@@ -283,7 +283,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
         for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldSetCount(); i++)
         {
             ExtensionFieldSet EFS;
-            scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
+            TEMPORARY_RETURN_IGNORED scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
             ByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, EFS.mUsedBytes);
 
             if (!EFS.IsEmpty())

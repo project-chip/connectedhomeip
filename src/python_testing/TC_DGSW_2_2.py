@@ -74,10 +74,10 @@ class TC_DGSW_2_2(MatterBaseTest):
         return "[TC-DGSW-2.2] Event Functionality with Server as DUT"
 
     def pics_TC_DGSW_2_2(self) -> list[str]:
-        return ["DGSW.S"]
+        return ["DGSW.S.E00"]
 
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH subscribes to the SoftwareDiagnostics cluster in the DUT to receive SoftwareFault events. "
                      "The DUT is triggered to emit a SoftwareFault event. Wait for the SoftwareFault event to arrive.",
@@ -86,12 +86,11 @@ class TC_DGSW_2_2(MatterBaseTest):
                      "Name field shall be set to vendor specific name strings that last software fault occurred."
                      "FaultRecording field shall be set by a vendor specific payload in octstr format."),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
     async def test_TC_DGSW_2_2(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
 
         # STEP 1: Commission DUT (already done)
         self.step(1)

@@ -22,6 +22,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TimeUtils.h>
+#include <optional>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CheckInCounter.h>
 #include <system/SystemClock.h>
@@ -59,6 +60,7 @@ public:
 
     static ICDConfigurationData & GetInstance() { return instance; };
 
+    // This represents the ICDManagement Cluster's fixed value mIdleModeDuration Attribute
     System::Clock::Seconds32 GetIdleModeDuration() { return mIdleModeDuration; }
 
     System::Clock::Milliseconds32 GetActiveModeDuration() { return mActiveModeDuration; }
@@ -91,6 +93,29 @@ public:
      * @return System::Clock::Milliseconds32
      */
     System::Clock::Milliseconds32 GetSlowPollingInterval();
+
+    /**
+     * @brief Indicates if the device should apply the ShortIdleModeDuration instead of the normal IdleModeDuration.
+     *
+     * Uses ShortIdle only when:
+     *  - ShortIdleModeDuration < IdleModeDuration
+     *  - Long Idle Time feature is supported
+     *  - Device currently operates in SIT mode
+     *
+     * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+     *
+     * @return true if ShortIdleModeDuration shall be used, false otherwise.
+     */
+    bool ShouldUseShortIdle();
+
+    /**
+     * @brief Returns the appropriate Idle duration based on current operating conditions.
+     *
+     * If ShouldUseShortIdle() is true, returns ShortIdleModeDuration; otherwise returns IdleModeDuration.
+     *
+     * @return Effective IdleMode duration in seconds.
+     */
+    System::Clock::Seconds32 GetModeBasedIdleModeDuration();
 
     ICDMode GetICDMode() { return mICDMode; }
 
@@ -160,6 +185,9 @@ private:
      * @param[in] activeModeDuration new ActiveModeDuration value
      * @param[in] idleModeDuration new IdleModeDuration value
      *                                The precision of the IdleModeDuration must be seconds.
+     * Note: mIdleModeDuration is expressed in seconds. The idleModeDuration parameter is in milliseconds for backward compatibility
+     * reasons. The conversion to seconds is done inside the function.
+     *
      * @return CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT is returned if idleModeDuration_ms is smaller than activeModeDuration_ms
      *                                                is returned if idleModeDuration_ms is greater than 64800000 ms
      *                                                is returned if idleModeDuration_ms is smaller than 1000 ms
@@ -168,6 +196,34 @@ private:
      */
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
                                 Optional<System::Clock::Milliseconds32> idleModeDuration);
+
+    /**
+     * @brief Change the ActiveModeDuration, IdleModeDuration and/or ShortIdleModeDuration values.
+     *
+     * At least one of the three parameters must be provided. Omitted parameters keep their current stored values.
+     *
+     * Constraints:
+     *  - activeModeDuration (ms) must be <= resulting idleModeDuration (s)
+     *  - idleModeDuration (s) must be within [kMinIdleModeDuration, kMaxIdleModeDuration]
+     *  - shortIdleModeDuration (s) must be <= resulting idleModeDuration (s)
+     *
+     * NOTE: to keep previous behavior, If shortIdleModeDuration is not provided, mShortIdleModeDuration can be clamped to resulting
+     * idleModeDuration if the later becomes lesser than the previous mShortIdleModeDuration.
+     *
+     * @param[in] activeModeDuration      New ActiveModeDuration in milliseconds (optional).
+     * @param[in] idleModeDuration        New IdleModeDuration in seconds (optional).
+     * @param[in] shortIdleModeDuration   New ShortIdleModeDuration in seconds (optional, must not exceed IdleModeDuration).
+     *
+     * @return CHIP_NO_ERROR on success.
+     * @return CHIP_ERROR_INVALID_ARGUMENT when:
+     *         - no parameter is provided
+     *         - activeModeDuration > resulting idleModeDuration
+     *         - idleModeDuration is greater than 64800 s or is smaller than 1 s
+     *         - shortIdleModeDuration > resulting idleModeDuration
+     */
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
+                                std::optional<System::Clock::Seconds32> idleModeDuration,
+                                std::optional<System::Clock::Seconds32> shortIdleModeDuration);
 
     void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mFeatureMap = featureMap; }
 
@@ -182,6 +238,11 @@ private:
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= kMinIdleModeDuration.count(),
                   "Spec requires the IdleModeDuration to be equal or greater to 1s.");
     System::Clock::Seconds32 mIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC);
+
+    // Shorter idleModeDuration when a LIT capable device operates in SIT mode.
+    System::Clock::Seconds32 mShortIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC);
+    static_assert((CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC <= CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
+                  "mShortIdleModeDuration must be lesser or equal than mIdleModeDuration.");
 
     static_assert(System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <=
                       System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),

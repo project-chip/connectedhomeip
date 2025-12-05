@@ -165,7 +165,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
             // ValidateIncomingTransportOptions() function already checked the CENCKey length
-            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
+            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
             CENCKey.SetValue(CENCKeyBuffer);
         }
         else
@@ -179,7 +179,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
             // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
+            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
             CENCKeyID.SetValue(CENCKeyIDBuffer);
         }
         else
@@ -267,7 +267,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = aTransportOptionsStorage.streamUsage;
         videoStreamID = aTransportOptionsStorage.videoStreamID;
         audioStreamID = aTransportOptionsStorage.audioStreamID;
-        endpointID    = aTransportOptionsStorage.endpointID;
+        TLSEndpointID = aTransportOptionsStorage.TLSEndpointID;
 
         // Deep copy the URL buffer
         std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
@@ -292,7 +292,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
         audioStreamID = transportOptions.audioStreamID;
-        endpointID    = transportOptions.endpointID;
+        TLSEndpointID = transportOptions.TLSEndpointID;
 
         MutableCharSpan urlBuffer(mUrlBuffer);
         // ValidateIncomingTransportOptions() function already checked the url length

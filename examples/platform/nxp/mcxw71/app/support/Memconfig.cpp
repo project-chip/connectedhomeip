@@ -23,6 +23,7 @@
  */
 
 #include "FreeRTOS.h"
+#include "fsl_debug_console.h"
 #include "task.h"
 #include <cstring>
 #include <stdint.h>
@@ -138,6 +139,17 @@ void * __wrap__realloc_r(void * REENT, void * ptr, size_t new_size)
 void * __wrap__calloc_r(void * REENT, size_t num, size_t size)
 {
     return __wrap_calloc(num, size);
+}
+
+int __wrap_printf(const char * fmt_s, ...)
+{
+    int res = 0;
+    va_list args;
+
+    va_start(args, fmt_s);
+    res = DbgConsole_Vprintf(fmt_s, args);
+    va_end(args);
+    return res;
 }
 
 } // extern "C"

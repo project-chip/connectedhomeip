@@ -41,7 +41,6 @@ static_library("PSOC6") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "LwIPCoreLock.cpp",
     "MTBKeyValueStore.cpp",
     "MTBKeyValueStore.h",
     "NetworkCommissioningDriver.h",

@@ -21,7 +21,7 @@ from xml.sax.xmlreader import AttributesImpl
 from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -44,8 +44,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
             if parsed & (1 << (bits - 1)):
                 parsed -= 1 << bits
         return parsed
-    else:
-        return int(value)
+    return int(value)
 
 
 def ParseOptionalInt(value: str) -> Optional[int]:
@@ -170,7 +169,7 @@ def NormalizeName(name: str) -> str:
 
     while '_' in name:
         idx = name.find('_')
-        name = name[:idx] + name[idx+1].upper() + name[idx+2:]
+        name = name[:idx] + name[idx + 1].upper() + name[idx + 2:]
 
     return name
 
@@ -204,7 +203,7 @@ def AttributesToField(attrs: AttributesImpl) -> Field:
         #       specifically) WITHOUT re-stating things like types
         #
         # https://github.com/csa-data-model/projects/issues/365
-        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        log.error("Attribute '%s' has no type", attrs['name'])
         attr_type = "sint32"
     t = ParseType(attr_type)
 
@@ -226,8 +225,7 @@ def AttributesToBitFieldConstantEntry(attrs: AttributesImpl) -> ConstantEntry:
         #       diff
         # Issue: https://github.com/csa-data-model/projects/issues/347
 
-        LOGGER.error(
-            f"Constant {attrs['name']} has no bit value (may be multibit)")
+        log.error("Constant '%s' has no bit value (may be multibit)", attrs['name'])
         return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=0)
 
     assert "bit" in attrs
@@ -244,7 +242,7 @@ def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
     else:
         # TODO: we should NOT have this, however we are now lenient
         # to bad input data
-        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        log.error("Attribute '%s' has no type", attrs['name'])
         attr_type = "sint32"
 
     t = ParseType(attr_type)
@@ -262,20 +260,20 @@ def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
 def AttributesToEvent(attrs: AttributesImpl) -> Event:
     assert "name" in attrs
     assert "id" in attrs
-    assert "priority" in attrs
-
-    if attrs["priority"] == "critical":
-        priority = EventPriority.CRITICAL
-    elif attrs["priority"] == "info":
-        priority = EventPriority.INFO
-    elif attrs["priority"] == "debug":
-        priority = EventPriority.DEBUG
-    elif attrs["priority"] == "desc":
-        LOGGER.warn("Found an event with 'desc' priority: %s" %
-                    [item for item in attrs.items()])
-        priority = EventPriority.CRITICAL
+    if "priority" in attrs:
+        if attrs["priority"] == "critical":
+            priority = EventPriority.CRITICAL
+        elif attrs["priority"] == "info":
+            priority = EventPriority.INFO
+        elif attrs["priority"] == "debug":
+            priority = EventPriority.DEBUG
+        elif attrs["priority"] == "desc":
+            log.warning("Found an event with 'desc' priority: '%s'", attrs.items())
+            priority = EventPriority.CRITICAL
+        else:
+            raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
     else:
-        raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
+        priority = EventPriority.INFO
 
     return Event(
         name=NormalizeName(attrs["name"]),
@@ -287,14 +285,13 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
 def StringToAccessPrivilege(value: str) -> AccessPrivilege:
     if value == "view":
         return AccessPrivilege.VIEW
-    elif value == "operate":
+    if value == "operate":
         return AccessPrivilege.OPERATE
-    elif value == "manage":
+    if value == "manage":
         return AccessPrivilege.MANAGE
-    elif value == "admin":
+    if value == "admin":
         return AccessPrivilege.ADMINISTER
-    else:
-        raise Exception("UNKNOWN privilege level: %r" % value)
+    raise Exception("UNKNOWN privilege level: %r" % value)
 
 
 def AttributesToCommand(attrs: AttributesImpl) -> Command:
@@ -302,7 +299,7 @@ def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "name" in attrs
 
     if "response" not in attrs:
-        LOGGER.warn(f"Command {attrs['name']} has no response set.")
+        log.warning("Command '%s' has no response set.", attrs['name'])
         # Matter IDL has no concept of "no response sent"
         # Example is DoorLock::"Operating Event Notification"
         #
@@ -321,45 +318,3 @@ def AttributesToCommand(attrs: AttributesImpl) -> Command:
         input_param=None,  # not specified YET
         output_param=output_param
     )
-
-
-def ApplyConstraint(attrs, field: Field):
-    """
-    Handles constraints according to Matter IDL formats.
-
-    Specifically it does NOT handle min/max values as current IDL
-    format does not support having such values defined.
-    """
-    assert "type" in attrs
-
-    constraint_type = attrs["type"]
-
-    if constraint_type == "allowed":
-        pass  # unsure what to do allowed
-    elif constraint_type == "desc":
-        pass  # free-form description
-    elif constraint_type in {"countBetween", "maxCount"}:
-        pass  # cannot implement count
-    elif constraint_type == "min":
-        # field.data_type.min_value = ParseOptionalInt(attrs["value"])
-        pass
-    elif constraint_type == "max":
-        # field.data_type.max_value = ParseOptionalInt(attrs["value"])
-        pass
-    elif constraint_type == "between":
-        # TODO: examples existing in the parsed data which are NOT
-        #       handled:
-        #         - from="-2.5°C" to="2.5°C"
-        #         - from="0%" to="100%"
-        # field.data_type.min_value = ParseOptionalInt(attrs["from"])
-        # field.data_type.max_value = ParseOptionalInt(attrs["to"])
-        pass
-    elif constraint_type == "maxLength":
-        field.data_type.max_length = ParseOptionalInt(attrs["value"])
-    elif constraint_type == "minLength":
-        field.data_type.min_length = ParseOptionalInt(attrs["value"])
-    elif constraint_type == "lengthBetween":
-        field.data_type.min_length = ParseOptionalInt(attrs["from"])
-        field.data_type.max_length = ParseOptionalInt(attrs["to"])
-    else:
-        logging.error(f"UNKNOWN constraint type {constraint_type}")

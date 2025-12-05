@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-asr:167
+            image: ghcr.io/project-chip/chip-build-asr:175
             options: --user root
 
         steps:
@@ -47,7 +47,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: asr
-            - name: Build all ASR582X examples
+            - name: Build all ASR582X examples (part1)
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -57,6 +57,14 @@ jobs:
                         --target asr-asr582x-light-switch-shell \
                         --target asr-asr582x-lock-no_logging \
                         --target asr-asr582x-ota-requestor \
+                        build \
+                     "
+            - name: Clean out directory (make some room for more compiles)
+              run: rm -rf out/
+            - name: Build all ASR582X examples (part2)
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
                         --target asr-asr582x-bridge-factory \
                         --target asr-asr582x-temperature-measurement-rotating_id \
                         --target asr-asr582x-thermostat-rio \

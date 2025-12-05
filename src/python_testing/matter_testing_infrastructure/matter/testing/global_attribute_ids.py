@@ -38,36 +38,37 @@ class GlobalAttributeIds(IntEnum):
             return "FeatureMap"
         if self == GlobalAttributeIds.CLUSTER_REVISION_ID:
             return "ClusterRevision"
+        return None
 
 
 class DeviceTypeIdType(Enum):
-    kInvalid = auto(),
-    kStandard = auto(),
-    kManufacturer = auto(),
-    kTest = auto(),
+    kInvalid = auto()
+    kStandard = auto()
+    kManufacturer = auto()
+    kTest = auto()
 
 
 class ClusterIdType(Enum):
     kInvalid = auto()
-    kStandard = auto(),
-    kManufacturer = auto(),
-    kTest = auto(),
+    kStandard = auto()
+    kManufacturer = auto()
+    kTest = auto()
 
 
 class AttributeIdType(Enum):
     kInvalid = auto()
-    kStandardGlobal = auto(),
-    kStandardNonGlobal = auto(),
-    kManufacturer = auto(),
-    kTest = auto(),
+    kStandardGlobal = auto()
+    kStandardNonGlobal = auto()
+    kManufacturer = auto()
+    kTest = auto()
 
 
 class CommandIdType(Enum):
     kInvalid = auto()
-    kStandardGlobal = auto(),
-    kScopedNonGlobal = auto(),
-    kManufacturer = auto(),
-    kTest = auto(),
+    kStandardGlobal = auto()
+    kScopedNonGlobal = auto()
+    kManufacturer = auto()
+    kTest = auto()
 
 
 # ID helper classes - this allows us to use the values from the prefix and suffix table directly

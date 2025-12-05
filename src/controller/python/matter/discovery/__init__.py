@@ -25,6 +25,8 @@ from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle
 from .types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 
+LOGGER = logging.getLogger(__name__)
+
 
 class DiscoveryType(enum.IntEnum):
     DISCOVERY_NETWORK_ONLY = 0
@@ -72,8 +74,8 @@ class PendingDiscovery:
     """Accumulator for ongoing discovery."""
     result: AggregatedDiscoveryResults
     callback: Callable[[AggregatedDiscoveryResults], None]
-    expireTime: int
-    firstResultTime: int
+    expireTime: float
+    firstResultTime: float
 
 
 @dataclass
@@ -152,7 +154,7 @@ class _PendingDiscoveries:
                         try:
                             item.callback(item.result)
                         except Exception:
-                            logging.exception("Node discovery callback failed")
+                            LOGGER.exception("Node discovery callback failed")
                     else:
                         updatedDiscoveries.append(item)
 
@@ -164,10 +166,7 @@ class _PendingDiscoveries:
         if item.expireTime <= now:
             return True
 
-        if (item.firstResultTime > 0) and (item.firstResultTime + _RESULT_WAIT_TIME_SEC <= now):
-            return True
-
-        return False
+        return bool(item.firstResultTime > 0 and item.firstResultTime + _RESULT_WAIT_TIME_SEC <= now)
 
     def ComputeNextEventTimeoutSeconds(self):
         """Compute how much a thread needs to sleep based on the active discoveries list."""
@@ -197,16 +196,14 @@ class _PendingDiscoveries:
 # define firstResultTime
 
 
-# All pending discovery operations awayting callback results
+# All pending discovery operations awaiting callback results
 _gPendingDiscoveries = _PendingDiscoveries()
 
 
 @DiscoverSuccessCallback_t
-def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str,  port: int):
+def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str, port: int):
     peerId = PeerId(fabric, node)
     address = NodeAddress(interface, ip, port)
-
-    global _gPendingDiscoveries
     _gPendingDiscoveries.OnSuccess(peerId, address)
 
 
@@ -214,29 +211,24 @@ def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str,  port: int
 def _DiscoverFailure(fabric: int, node: int, errorCode: PyChipError):
     # Many discovery errors currently do not include a useful node/fabric id
     # hence we just log and rely on discovery timeouts to return 'no data'
-    logging.error("Discovery failure, error %d", errorCode.code)
+    LOGGER.error("Discovery failure, error %d", errorCode.code)
 
 
-def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):
+def FindAddressAsync(fabricId: int, nodeId: int, callback, timeoutMs=1000):
     """Discovers the IP address(es) of a node.
 
     Args:
-      fabricid: the fabric to which the node is attached
-      nodeid:   the node id to find
+      fabricId: The fabric to which the node is attached.
+      nodeId:   The node ID to find.
       callback: Will be called once node resolution completes.
     """
 
     _GetDiscoveryLibraryHandle().pychip_discovery_set_callbacks(
         _DiscoverSuccess, _DiscoverFailure)
 
-    global _gPendingDiscoveries
-    _gPendingDiscoveries.Start(
-        PeerId(fabricid, nodeid),
-        callback,
-        timeout_ms
-    )
+    _gPendingDiscoveries.Start(PeerId(fabricId, nodeId), callback, timeoutMs)
 
-    res = _GetDiscoveryLibraryHandle().pychip_discovery_resolve(fabricid, nodeid)
+    res = _GetDiscoveryLibraryHandle().pychip_discovery_resolve(fabricId, nodeId)
     res.raise_on_error()
 
 
@@ -256,8 +248,8 @@ class _SyncAddressFinder:
         return self.result
 
 
-def FindAddress(fabricid, nodeid, timeout_ms=1000):
+def FindAddress(fabricId: int, nodeId: int, timeoutMs=1000):
     """Performs an address discovery for a node and returns the result."""
     finder = _SyncAddressFinder()
-    FindAddressAsync(fabricid, nodeid, finder.Callback, timeout_ms)
+    FindAddressAsync(fabricId, nodeId, finder.Callback, timeoutMs)
     return finder.WaitForResult()

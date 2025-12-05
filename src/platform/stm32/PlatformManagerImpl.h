@@ -45,11 +45,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
     friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 #endif
 
-public:
-    // ===== Platform-specific members that may be accessed directly by the application.
-
-    CHIP_ERROR InitLwIPCoreLock(void);
-
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 

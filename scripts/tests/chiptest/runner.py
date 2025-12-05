@@ -14,19 +14,25 @@
 
 import logging
 import os
+import pathlib
 import pty
 import queue
 import re
 import subprocess
-import sys
 import threading
 import typing
+from dataclasses import dataclass
+from typing import Literal
+
+log = logging.getLogger(__name__)
+
+log = logging.getLogger(__name__)
 
 
 class LogPipe(threading.Thread):
     """Create PTY-based PIPE for IPC.
 
-    Python provides a built-in mechanism for creating comunication PIPEs for
+    Python provides a built-in mechanism for creating communication PIPEs for
     subprocesses spawned with Popen(). However, created PIPEs will most likely
     enable IO buffering in the spawned process. In order to trick such process
     to flush its streams immediately, we are going to create a PIPE based on
@@ -42,7 +48,7 @@ class LogPipe(threading.Thread):
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = pty.openpty()
-        self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')
+        self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')  # noqa: SIM115
         self.captured_logs = []
         self.capture_delegate = capture_delegate
         self.name = name
@@ -77,7 +83,7 @@ class LogPipe(threading.Thread):
                     break
             except OSError:
                 break
-            logging.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip())
             self.captured_logs.append(line)
             if self.capture_delegate:
                 self.capture_delegate.Log(self.name, line)
@@ -118,12 +124,42 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class Runner:
+@dataclass
+class SubprocessInfo:
+    # Restricted as this identifies the name of the network namespace in an executor implementing
+    # test case isolation.
+    kind: Literal['app', 'tool']
+    path: pathlib.Path | str
+    wrapper: tuple[str, ...] = ()
+    args: tuple[str, ...] = ()
 
-    def __init__(self, capture_delegate=None):
+    def __post_init__(self):
+        self.path = pathlib.Path(self.path)
+
+    def with_args(self, *args: str):
+        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
+
+    def wrap_with(self, *args: str):
+        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
+
+    def to_cmd(self) -> typing.List[str]:
+        return list(self.wrapper) + [str(self.path)] + list(self.args)
+
+
+class Executor:
+    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+        return subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+
+
+class Runner:
+    def __init__(self, executor: Executor, capture_delegate=None):
+        self.executor = executor
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, cmd, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+    def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+        log.info('RunSubprocess starting application %s' % subproc)
+        cmd = subproc.to_cmd()
+
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
             name=name + ' OUT')
@@ -131,14 +167,10 @@ class Runner:
             logging.INFO, capture_delegate=self.capture_delegate,
             name=name + ' ERR')
 
-        if sys.platform == 'darwin':
-            # Try harder to avoid any stdout buffering in our tests
-            cmd = ['stdbuf', '-o0', '-i0'] + cmd
-
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
 
-        s = subprocess.Popen(cmd, stdin=stdin, stdout=outpipe, stderr=errpipe)
+        s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()
         errpipe.close()
 
@@ -163,7 +195,7 @@ class Runner:
         if s.returncode != 0:
             if wait.timed_out:
                 raise Exception("Command %r exceeded test timeout (%d seconds)" % (cmd, wait.timeout_seconds))
-            else:
-                raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
-        logging.debug('Command %r completed with error code 0', cmd)
+        log.debug("Command %r completed with error code 0", cmd)
+        return None

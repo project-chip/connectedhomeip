@@ -36,17 +36,14 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    changed_paths:
-      uses: ./.github/workflows/analyze-changed-paths.yaml
-
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -75,7 +72,7 @@ jobs:
                 platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
+              uses: github/codeql-action/init@v4
               with:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
@@ -123,7 +120,7 @@ jobs:
               if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-gcc-debug
@@ -141,7 +138,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v4
+            #   uses: actions/upload-artifact@v5
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux-gcc-debug
@@ -151,12 +148,12 @@ jobs:
 
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -190,7 +187,7 @@ jobs:
             # deactivate until a better workaround is found
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@v3
+            #   uses: github/codeql-action/init@v4
             #   with:
             #       languages: "cpp"
             - name: Setup and Build Simulated Device
@@ -238,11 +235,6 @@ jobs:
             - name: Find changed files
               id: changed-files
               uses: tj-actions/changed-files@v47
-              with:
-                # Exclude all files under "third_party/"
-                files-ignore: |
-                  third_party/
-
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
@@ -306,7 +298,7 @@ jobs:
             #     language: cpp
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux
@@ -319,7 +311,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v4
+            #   uses: actions/upload-artifact@v5
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux
@@ -329,12 +321,12 @@ jobs:
 
     build_linux_python_lib:
         name: Build on Linux (python_lib)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -392,12 +384,12 @@ jobs:
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
-        needs: changed_paths
+
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -426,9 +418,8 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, simulated)
-        needs: changed_paths
-        runs-on: macos-13
-        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+        runs-on: macos-14
+        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
 
         steps:
             - name: Checkout
@@ -446,7 +437,7 @@ jobs:
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@v3
+            #   uses: github/codeql-action/init@v4
             #   with:
             #       languages: "cpp"
 
@@ -496,7 +487,7 @@ jobs:
                        check \
                     "
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin
@@ -514,15 +505,17 @@ jobs:
 
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
-        needs: changed_paths
+
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
-        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        # Use namespace to get more disk space and slightly better performance (Compile and unit tests
+        # are CPU bound)
+        runs-on: namespace-profile-4x8
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:175
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 

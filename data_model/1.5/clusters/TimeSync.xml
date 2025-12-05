@@ -268,7 +268,7 @@ Davis, CA 95616, USA
         <maxLength value="128"/>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="TimeZone" type="list" default="[{0,0}]">
+    <attribute id="0x0005" name="TimeZone" type="list">
       <entry type="TimeZoneStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
@@ -454,6 +454,12 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Name" type="string">
         <optionalConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="0"/>
+            <to value="64"/>
+          </lengthBetween>
+        </constraint>
       </field>
     </event>
     <event id="0x03" name="TimeFailure" priority="info">

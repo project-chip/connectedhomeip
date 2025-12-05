@@ -69,6 +69,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from matter.testing.matter_test_config import MatterTestConfig
 
+LOGGER = logging.getLogger(__name__)
+
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
@@ -82,7 +84,7 @@ def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib
     dev_path = cred_path.joinpath("development")
     paa_path = dev_path.joinpath("paa-root-certs")
 
-    return paa_path.resolve() if all([path.exists() for path in [cred_path, dev_path, paa_path]]) else None
+    return paa_path.resolve() if all(path.exists() for path in [cred_path, dev_path, paa_path]) else None
 
 
 def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
@@ -124,7 +126,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             count: The number of tests in the set.
         """
-        logging.info(f'Starting test set, running {count} tests')
+        LOGGER.info(f'Starting test set, running {count} tests')
 
     def stop(self, duration: int):
         """
@@ -133,7 +135,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             duration: The duration of the test set in milliseconds.
         """
-        logging.info(f'Finished test set, ran for {duration}ms')
+        LOGGER.info(f'Finished test set, ran for {duration}ms')
 
     def test_start(
             self,
@@ -150,7 +152,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             count: Number of steps in the test
             steps: List of step descriptions
         """
-        logging.info(f'Starting test from {filename}: {name} - {count} steps')
+        LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
         """
@@ -160,7 +162,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             exception: Exception raised during test execution, or None if successful
             duration: Test execution duration in milliseconds
         """
-        logging.info(f'Finished test in {duration}ms')
+        LOGGER.info(f'Finished test in {duration}ms')
 
     def step_skipped(self, name: str, expression: str):
         """
@@ -172,7 +174,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # TODO: Do we really need the expression as a string? We can evaluate
         # this in code very easily
-        logging.info(f'\t\t**** Skipping: {name}')
+        LOGGER.info(f'\t\t**** Skipping: {name}')
 
     def step_start(self, name: str):
         """
@@ -183,7 +185,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # The way I'm calling this, the name is already includes the step
         # number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
+        LOGGER.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
         """
@@ -208,11 +210,11 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             request: The original test request
             received: The actual response received
         """
-        logging.info('\t\t***** Test Failure : ')
+        LOGGER.info('\t\t***** Test Failure : ')
         if received is not None:
-            logging.info(f'\t\t      Received: {received}')
+            LOGGER.info(f'\t\t      Received: {received}')
         if request is not None:
-            logging.info(f'\t\t      Expected: {request}')
+            LOGGER.info(f'\t\t      Expected: {request}')
 
     def step_unknown(self):
         """
@@ -242,7 +244,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             filename: Source file containing the test
             name: Name of the test
         """
-        logging.info(f"Skipping test from {filename}: {name}")
+        LOGGER.info(f"Skipping test from {filename}: {name}")
 
 
 @dataclass
@@ -306,8 +308,7 @@ def _find_test_class():
 
     def get_subclasses(cls: Any):
         subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
-        subclasses = [c for c in subclasses if c.__name__ != cls.__name__]
-        return subclasses
+        return [c for c in subclasses if c.__name__ != cls.__name__]
 
     def has_subclasses(cls: Any):
         return get_subclasses(cls) != []
@@ -403,8 +404,7 @@ def run_tests_no_exit(
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
-    # loop is not serializable. So, we are setting the event loop as a test
-    # class member.
+    #       loop is not serializable. So, we are setting the event loop as a test class member.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
@@ -453,6 +453,15 @@ def run_tests_no_exit(
         # Execute the test class with the config
         ok = True
 
+        def _handler(loop, context):
+            loop.default_exception_handler(context)
+            nonlocal ok
+            # Fail the test run on unhandled exceptions.
+            ok = False
+
+        # Set custom exception handler to catch unhandled exceptions.
+        event_loop.set_exception_handler(_handler)
+
         runner = TestRunner(log_dir=test_config.log_path,
                             testbed_name=test_config.testbed_name)
 
@@ -483,8 +492,8 @@ def run_tests_no_exit(
             except signals.TestAbortAll:
                 ok = False
             except Exception:
-                logging.exception('Exception when executing %s.',
-                                  test_config.testbed_name)
+                LOGGER.exception('Exception when executing %s.',
+                                 test_config.testbed_name)
                 ok = False
 
     if hooks:
@@ -501,9 +510,9 @@ def run_tests_no_exit(
         event_loop.run_until_complete(shutdown())
 
     if ok:
-        logging.info("Final result: PASS !")
+        LOGGER.info("Final result: PASS !")
     else:
-        logging.error("Final result: FAIL !")
+        LOGGER.error("Final result: FAIL !")
     return ok
 
 
@@ -641,10 +650,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.discriminators.extend(args.discriminators)
     config.setup_passcodes.extend(args.passcodes)
 
-    if args.qr_code != [] and args.manual_code != []:
-        print("error: Cannot have both --qr-code and --manual-code present!")
-        return False
-
     if len(config.discriminators) != len(config.setup_passcodes):
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
@@ -654,50 +659,72 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if not config.dut_node_ids:
         config.dut_node_ids = [TestingDefaults.DUT_NODE_ID]
 
-    if args.commissioning_method is None:
+    commissioning_method = args.in_test_commissioning_method or args.commissioning_method
+    if not commissioning_method:
         return True
 
-    if len(config.dut_node_ids) > len(device_descriptors):
-        print("error: More node IDs provided than discriminators")
-        return False
+    # For NFC transport (when using the --commissioning-method argument), the NFC tag data is
+    # read beforehand and commissioning data (QR code) is already populated from the tag.
+    # Therefore, it does not need to be passed explicitly.
+    #
+    # However, during in-test commissioning, the user must manually read the NFC tag
+    # (containing the commissioning credentials) within the main test body
+    # and supply it later for commissioning with the DUT.
+    #
+    # For this reason, commissioning data validation is intentionally skipped in this scenario.
 
-    if len(config.dut_node_ids) < len(device_descriptors):
-        # We generate new node IDs sequentially from the last one seen for all
-        # missing NodeIDs when commissioning many nodes at once.
-        missing = len(device_descriptors) - len(config.dut_node_ids)
-        for i in range(missing):
-            config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
+    if 'nfc' not in (args.in_test_commissioning_method or []):
+        if len(config.dut_node_ids) > len(device_descriptors):
+            print("error: More node IDs provided than discriminators")
+            return False
 
-    if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
-        print("error: Duplicate values in node id list")
-        return False
+        if len(config.dut_node_ids) < len(device_descriptors):
+            # We generate new node IDs sequentially from the last one seen for all
+            # missing NodeIDs when commissioning many nodes at once.
+            missing = len(device_descriptors) - len(config.dut_node_ids)
+            for i in range(missing):
+                config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
 
-    if len(config.discriminators) != len(set(config.discriminators)):
-        print("error: Duplicate value in discriminator list")
-        return False
+        if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+            print("error: Duplicate values in node id list")
+            return False
 
-    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
-        return False
+        if len(config.discriminators) != len(set(config.discriminators)):
+            print("error: Duplicate value in discriminator list")
+            return False
 
-    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --passcode when no --qr-code/--manual-code present!")
-        return False
+        if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
+            print("error: Missing --discriminator when no --qr-code/--manual-code present!")
+            return False
 
-    if config.commissioning_method == "ble-wifi":
+        if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
+            print("error: Missing --passcode when no --qr-code/--manual-code present!")
+            return False
+    else:
+        # For NFC in-test commissioning, we still need to ensure node IDs are unique if provided
+        if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+            print("error: Duplicate values in node id list")
+            return False
+
+    wifi_args = ['ble-wifi']
+    thread_args = ['ble-thread', 'nfc-thread']
+    if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
-            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-ssid <SSID> for --commissioning-method "
+                  "or --in-test-commissioning-method ble-wifi!")
             return False
 
         if args.wifi_passphrase is None:
-            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-passphrase <passphrase> for --commissioning-method or "
+                  "--in-test-commissioning-method ble-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
         config.wifi_passphrase = args.wifi_passphrase
-    elif config.commissioning_method == "ble-thread":
+    elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
-            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
+                  "--in-test-commissioning-method ble-thread or nfc-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
     elif config.commissioning_method == "on-network-ip":
@@ -722,6 +749,33 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
     config = MatterTestConfig()
 
+    # Accumulate all command-line-passed named args
+    all_global_args = []
+    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
+                                 args.hex_arg, args.bool_arg) if item is not None]
+    for argset in chain.from_iterable(argsets):
+        all_global_args.extend(argset)
+
+    config.global_test_params = {}
+    for name, value in all_global_args:
+        config.global_test_params[name] = value
+
+    if "nfc" in (args.commissioning_method or []):
+
+        if "NFC_Reader_index" not in config.global_test_params:
+            LOGGER.error("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for "
+                         "NFC commissioning tests")
+            sys.exit(1)
+
+        if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
+            LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
+                         "The payload is read directly from the NFC tag.")
+            sys.exit(1)
+
+        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+        args.qr_code.append(nfc_tag_data)
+
     # Populate commissioning config if present, exiting on error
     if not populate_commissioning_args(args, config):
         sys.exit(1)
@@ -738,13 +792,14 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
+    config.debug = args.debug
 
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
@@ -757,17 +812,6 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.tc_version_to_simulate = args.tc_version_to_simulate
     config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
     config.dac_revocation_set_path = args.dac_revocation_set_path
-
-    # Accumulate all command-line-passed named args
-    all_global_args = []
-    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
-                                 args.hex_arg, args.bool_arg) if item is not None]
-    for argset in chain.from_iterable(argsets):
-        all_global_args.extend(argset)
-
-    config.global_test_params = {}
-    for name, value in all_global_args:
-        config.global_test_params[name] = value
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
     config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
@@ -808,6 +852,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
+    basic_group.add_argument('--debug', action="store_true", default=False,
+                             help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
@@ -818,11 +864,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -860,7 +906,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
-    code_group = parser.add_mutually_exclusive_group(required=False)
+    code_group = parser.add_argument_group(title="Setup codes")
 
     code_group.add_argument('-q', '--qr-code', type=str,
                             metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
@@ -979,7 +1025,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value").lower() == "true" else False
+        value = match.group("truth_value").lower() == "true"
     else:
         value = int(match.group("decimal_value")) != 0
 

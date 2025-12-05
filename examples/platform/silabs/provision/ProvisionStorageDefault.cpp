@@ -29,11 +29,11 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <silabs_creds.h>
 #ifndef NDEBUG
-#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED && (SL_MATTER_GN_BUILD == 0)
 #include <sl_matter_test_event_trigger_config.h>
 #endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
 #endif // NDEBUG
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 #ifndef SLI_SI91X_MCU_INTERFACE
@@ -164,7 +164,7 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
 #ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
 #endif // SLI_SI91X_MCU_INTERFACE
-        chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
 #ifdef SL_PROVISION_GENERATOR
         setNvm3End(base_addr);
 #endif
@@ -616,7 +616,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     // ChipLogByteSpan(DeviceLayer, ByteSpan(signature.data(), signature.size() < kDebugLength ? signature.size() : kDebugLength));
     return err;
 }
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // SLI_SI91X_MCU_INTERFACE && SL_MBEDTLS_USE_TINYCRYPT
 
 //
 // Other
@@ -662,12 +662,62 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
     return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Provision_Request, value);
 }
 
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
-    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    // Tinycrypt doesn't support the key ID, so we need to store the key as a binary blob
+    return SilabsConfig::WriteConfigValueBin(SilabsConfig::kOtaTlvEncryption_KeyId, value.data(), value.size());
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    Silabs::OtaTlvEncryptionKey key;
     ReturnErrorOnFailure(key.Import(value.data(), value.size()));
     return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKeyId(uint32_t & keyId)
+{
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    // Tinycrypt doesn't support the key ID
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    // Read the key ID from the config
+    return SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
+
+CHIP_ERROR Storage::DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset)
+{
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    uint8_t keyBuffer[kOTAEncryptionKeyLength] = { 0 };
+    size_t keyLen                              = 0;
+
+    // Read the key from the provisioning storage
+    MutableByteSpan keySpan = MutableByteSpan(keyBuffer);
+
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kOtaTlvEncryption_KeyId, keySpan.data(), keySpan.size());
+    VerifyOrReturnError(keySpan.size() == kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    Silabs::OtaTlvEncryptionKey::Decrypt((const ByteSpan) keySpan, block, ivOffset);
+    return CHIP_NO_ERROR;
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
+#else
+CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKeyId(uint32_t & keyId)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 

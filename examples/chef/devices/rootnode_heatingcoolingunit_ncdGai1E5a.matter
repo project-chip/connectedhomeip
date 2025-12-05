@@ -350,7 +350,7 @@ fabric_scoped struct WebRTCSessionStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -647,13 +647,13 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-  /** Command description for MoveToLevel */
+  /** This command will move the device to the specified level. */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  /** Command description for Move */
+  /** This command will move the device using the specified values. */
   command Move(MoveRequest): DefaultSuccess = 1;
-  /** Command description for Step */
+  /** This command will do a relative step change of the device using the specified values. */
   command Step(StepRequest): DefaultSuccess = 2;
-  /** Command description for Stop */
+  /** This command will stop the actions of various other commands that are still in progress. */
   command Stop(StopRequest): DefaultSuccess = 3;
   /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
@@ -663,8 +663,7 @@ cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-  /** Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible. */
+  /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
@@ -2487,8 +2486,8 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
   }
@@ -2539,8 +2538,8 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -2587,7 +2586,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
   }

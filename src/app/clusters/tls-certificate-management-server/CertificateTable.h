@@ -52,12 +52,11 @@ public:
 
     using IterateRootCertFnType   = std::function<CHIP_ERROR(CommonIterator<RootCertStruct> & iterator)>;
     using IterateClientCertFnType = std::function<CHIP_ERROR(CommonIterator<ClientCertWithKey> & iterator)>;
-    using RootBuffer              = PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>;
-    using ClientBuffer            = PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>;
+    using RootBuffer              = PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>;
+    using ClientBuffer            = PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>;
 
     /// @brief a root cert along with an associated buffer for the cert payload. RootCertStruct has a ByteSpan,
     /// and this wrapper ensures that the underlying buffer for the ByteSpan has a long-enough lifetime.
-    /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedRootCert
     {
         BufferedRootCert(RootBuffer & buffer) : mBuffer(buffer) {}
@@ -74,7 +73,6 @@ public:
     /// @brief a client cert along with an associated buffer for the cert payload.  ClientCertStruct contains various
     /// lists and bytespans, and this wrapper ensures that the underlying buffers for those data structures
     /// have long-enough lifetimes.
-    /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedClientCert
     {
         BufferedClientCert(ClientBuffer & buffer) : mBuffer(buffer) {}
@@ -180,15 +178,54 @@ public:
     virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)          = 0;
     virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) = 0;
 
+    /**
+     * @brief Removes all data and certificates associated with the specified fabric.
+     *
+     * @param[in] fabric The fabric to remove.
+     */
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric) = 0;
+
 protected:
-    static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
+    static inline PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
     {
         return bufferedCert.mBuffer;
     }
-    static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & GetBuffer(BufferedClientCert & bufferedCert)
+    static inline PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & GetBuffer(BufferedClientCert & bufferedCert)
     {
         return bufferedCert.mBuffer;
     }
+};
+
+/** @brief
+ *  Defines methods for implementing application-specific logic for checking if a certificate
+ *  has no blocking dependencies and can be removed.
+ */
+class CertificateDependencyChecker
+{
+public:
+    CertificateDependencyChecker() = default;
+
+    virtual ~CertificateDependencyChecker() = default;
+
+    /**
+     * @brief Checks whether the root certificate with the given (matterEndpoint, fabric, id) has no dependencies
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the root certificate to remove.
+     * @return CHIP_NO_ERROR if the certificate can be removed.
+     */
+    virtual CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
+
+    /**
+     * @brief Checks whether the client certificate with the given (matterEndpoint, fabric, id) has no dependencies
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the client certificate to remove.
+     * @return CHIP_NO_ERROR if the certificate can be removed.
+     */
+    virtual CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) = 0;
 };
 
 } // namespace Tls

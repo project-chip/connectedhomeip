@@ -48,7 +48,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -261,6 +261,7 @@ void Instance::ResetCurrentAttributes()
     mCurrentDayEntry.SetNull();
     mNextDayEntry.SetNull();
     mCurrentDayEntryDate.SetNull();
+    mNextDayEntryDate.SetNull();
 
     mCurrentTariffComponents_MgmtObj.Cleanup();
     mNextTariffComponents_MgmtObj.Cleanup();
@@ -341,11 +342,14 @@ const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
     return nullptr;
 }
 
-DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t timestamp)
+DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t matterTimestamp_s)
 {
-    time_t time = static_cast<time_t>(timestamp);
+    // Convert Matter time to Unix epoch
+    time_t unixTime = static_cast<time_t>(matterTimestamp_s + kChipEpochSecondsSinceUnixEpoch);
+
     struct tm utcTimeStruct;
-    struct tm * utcTime = gmtime_r(&time, &utcTimeStruct);
+    struct tm * utcTime = gmtime_r(&unixTime, &utcTimeStruct);
+
     return static_cast<DayPatternDayOfWeekBitmap>(1 << utcTime->tm_wday);
 }
 
@@ -607,7 +611,7 @@ void Instance::InitCurrentAttrs()
 void Instance::TariffTimeAttrsSync()
 {
     CHIP_ERROR err = UpdateCurrentAttrs();
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_NOT_FOUND))
     {
         ChipLogError(AppServer, "Failed to sync tariff time attributes: %" CHIP_ERROR_FORMAT, err.Format());
     }
@@ -615,10 +619,12 @@ void Instance::TariffTimeAttrsSync()
 
 CHIP_ERROR Instance::UpdateCurrentAttrs()
 {
-    uint32_t matterEpochNow_s = GetCurrentTimestamp();
-    if (!matterEpochNow_s)
+    uint32_t matterEpochNow_s;
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
+
+    if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "The timestamp value can't be zero!");
+        ChipLogError(AppServer, "Unable to get valid time value");
         return CHIP_ERROR_INVALID_TIME;
     }
 
@@ -652,7 +658,7 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     }
 
     ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
-    SetCurrentDay(currentDay);
+    ReturnErrorOnFailure(SetCurrentDay(currentDay));
 
     nextDay.SetNonNull(
         Utils::FindDay(mServerTariffAttrsCtx, (matterEpochNow_s + (kSecondsPerDay - matterEpochNow_s % kSecondsPerDay)) + 1));
@@ -660,7 +666,7 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     if (Utils::DayIsValid(&nextDay.Value()))
     {
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
-        SetNextDay(nextDay);
+        ReturnErrorOnFailure(SetNextDay(nextDay));
     }
 
     return CHIP_NO_ERROR;
@@ -694,8 +700,8 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
     }
 
-    SetCurrentDayEntry(tmpDayEntry);
-    SetCurrentDayEntryDate(tmpDate);
+    ReturnErrorOnFailure(SetCurrentDayEntry(tmpDayEntry));
+    ReturnErrorOnFailure(SetCurrentDayEntryDate(tmpDate));
 
     // Handle next day entry
     tmpDayEntry.SetNull();
@@ -710,10 +716,8 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
     }
 
-    SetNextDayEntry(tmpDayEntry);
-    SetNextDayEntryDate(tmpDate);
-
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(SetNextDayEntry(tmpDayEntry));
+    return SetNextDayEntryDate(tmpDate);
 }
 
 void Instance::DeinitCurrentAttrs()

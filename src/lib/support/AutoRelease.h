@@ -30,6 +30,7 @@ namespace chip {
 /// RAII class for iterators that guarantees that Release() will be called
 /// on the underlying type.  This is effectively a simple unique_ptr, except
 /// calling Release instead of delete
+/// See also ReferenceCountedPtr<T>, which automatically retains a ReferenceCounted
 template <typename Releasable>
 class AutoRelease
 {
@@ -47,6 +48,7 @@ public:
     inline const Releasable & operator*() const { return *mReleasable; }
     inline Releasable & operator*() { return *mReleasable; }
 
+    inline operator bool() { return mReleasable != nullptr; }
     inline bool IsNull() const { return mReleasable == nullptr; }
 
     void Release()
@@ -58,8 +60,11 @@ public:
 
     void Set(Releasable * releasable)
     {
-        Release();
-        mReleasable = releasable;
+        if (mReleasable != releasable)
+        {
+            Release();
+            mReleasable = releasable;
+        }
     }
 
 protected:

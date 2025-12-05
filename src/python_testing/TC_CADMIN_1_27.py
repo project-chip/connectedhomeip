@@ -48,6 +48,8 @@ from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_CADMIN_1_27(MatterBaseTest):
 
@@ -84,11 +86,11 @@ class TC_CADMIN_1_27(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
         if self.storage_fabric_b is None:
             self.storage_directory_ecosystem_b = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_B_")
             self.storage_fabric_b = self.storage_directory_ecosystem_b.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_b)
+            log.info("Temporary storage directory: %s", self.storage_fabric_b)
 
         #####################################################################################################################################
         #
@@ -315,7 +317,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
         noc_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
@@ -339,7 +341,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
                 break
         asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
         response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
         noc_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
@@ -365,7 +367,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(
             self.jfctrl_fabric_a_vid,
@@ -373,7 +375,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
             "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
         response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(
             self.jfctrl_fabric_b_vid,
@@ -382,7 +384,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
         self.step("3")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            nodeId=2, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(
             self.jfctrl_fabric_a_vid,
@@ -390,7 +392,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
             "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=2, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            nodeId=2, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
             returnClusterObject=True)
         asserts.assert_equal(
             int('0xFFFFFFFD'+self.ecoACATs, 16),
@@ -399,7 +401,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
         self.step("4")
         response = await devCtrlEcoB.ReadAttribute(
-            nodeid=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            nodeId=22, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(
             self.jfctrl_fabric_b_vid,
@@ -407,7 +409,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
             "JF-Admin App on Ecosystem A doesn't have the correct VID")
 
         response = await devCtrlEcoB.ReadAttribute(
-            nodeid=22, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            nodeId=22, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
             returnClusterObject=True)
         asserts.assert_equal(
             int('0xFFFFFFFD'+self.ecoBCATs, 16),
@@ -417,7 +419,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         self.step("5")
         try:
             response = await devCtrlEcoB.OpenJointCommissioningWindow(
-                nodeid=11,
+                nodeId=11,
                 endpointId=1,
                 timeout=400,
                 iteration=random.randint(1000, 100000),
@@ -436,7 +438,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         self.step("7")
         # TODO: Uncomment step once https://github.com/project-chip/connectedhomeip/issues/40836 is fixed
         # response = await devCtrlEcoA.ReadAttribute(
-        #     nodeid=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+        #     nodeId=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
         #     returnClusterObject=True)
         # asserts.assert_in(response[0][Clusters.BasicInformation].productID,
         #                   range(1, 65535), "Invalid Product ID for node 22 on Joint Fabric")
@@ -461,7 +463,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
         self.step("9")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=3, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+            nodeId=3, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
             returnClusterObject=True)
         asserts.assert_in(response[0][Clusters.BasicInformation].productID,
                           range(1, 65535), "Invalid Product ID for node 3 on Ecosystem A")

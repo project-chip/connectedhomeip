@@ -34,19 +34,19 @@ using namespace chip::app::DataModel;
 
 constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
     {
-        Globals::Attributes::ClusterRevision::Id,
-        BitFlags<AttributeQualityFlags>(),
-        Access::Privilege::kView,
-        std::nullopt,
-    },
-    {
         Globals::Attributes::FeatureMap::Id,
         BitFlags<AttributeQualityFlags>(),
         Access::Privilege::kView,
         std::nullopt,
     },
     {
-        Globals::Attributes::AttributeList::Id,
+        Globals::Attributes::ClusterRevision::Id,
+        BitFlags<AttributeQualityFlags>(),
+        Access::Privilege::kView,
+        std::nullopt,
+    },
+    {
+        Globals::Attributes::GeneratedCommandList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
         std::nullopt,
@@ -58,7 +58,7 @@ constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
         std::nullopt,
     },
     {
-        Globals::Attributes::GeneratedCommandList::Id,
+        Globals::Attributes::AttributeList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
         std::nullopt,
@@ -71,8 +71,6 @@ Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
 {
     return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
 }
-
-DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
 
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {

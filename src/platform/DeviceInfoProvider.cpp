@@ -35,15 +35,16 @@ DeviceInfoProvider * gDeviceInfoProvider = nullptr;
 
 } // namespace
 
-CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint,
-                                                const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList)
+CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint, Span<const UserLabelType> labelList)
 {
     size_t index          = 0;
     size_t previousLength = 0;
     size_t currentLength  = labelList.size();
 
+    VerifyOrReturnError(labelList.size() <= kMaxUserLabelListLength, CHIP_ERROR_NO_MEMORY);
+
     CHIP_ERROR err = GetUserLabelLength(endpoint, previousLength);
-    VerifyOrReturnError(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
 
     ReturnErrorOnFailure(SetUserLabelLength(endpoint, currentLength));
 
@@ -64,18 +65,7 @@ CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint,
 
 CHIP_ERROR DeviceInfoProvider::ClearUserLabelList(EndpointId endpoint)
 {
-    size_t length;
-
-    CHIP_ERROR err = GetUserLabelLength(endpoint, length);
-    VerifyOrReturnError(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-    ReturnErrorOnFailure(err);
-
-    for (size_t i = 0; i < length; i++)
-    {
-        ReturnErrorOnFailure(DeleteUserLabelAt(endpoint, i));
-    }
-
-    return CHIP_NO_ERROR;
+    return SetUserLabelList(endpoint, Span<const UserLabelType>());
 }
 
 CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLabelType & label)
@@ -84,11 +74,7 @@ CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLa
 
     // Fetch current list length
     ReturnErrorOnFailure(GetUserLabelLength(endpoint, length));
-
-    if (length >= kMaxUserLabelListLength)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrReturnError(length < kMaxUserLabelListLength, CHIP_ERROR_NO_MEMORY);
 
     // Add the new entry to the list
     ReturnErrorOnFailure(SetUserLabelLength(endpoint, length + 1));
@@ -126,10 +112,7 @@ DeviceInfoProvider * GetDeviceInfoProvider()
  */
 void SetDeviceInfoProvider(DeviceInfoProvider * provider)
 {
-    if (provider)
-    {
-        gDeviceInfoProvider = provider;
-    }
+    gDeviceInfoProvider = provider;
 }
 
 } // namespace DeviceLayer

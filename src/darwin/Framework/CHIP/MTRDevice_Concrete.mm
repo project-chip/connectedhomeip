@@ -732,6 +732,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // Check user default to disable time sync detection
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kDisableTimeSyncLossDetectionKey]) {
+        return NO;
+    }
+
     if (_timeSynchronizationLossDetectedTime == nil) {
         return YES;
     }
@@ -3751,26 +3756,65 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // AttributeList) to determine this set, because we might be in the middle
     // of priming right now and have not gotten those yet.  Just use the set of
     // attribute paths we actually have.
-    NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
+    NSMutableArray<MTRAttributePath *> * existentPaths = [[NSMutableArray alloc] init];
     {
-        std::lock_guard lock(_lock);
+        // Separate paths that ask for wildcard attributes from specific attributes
+        NSMutableArray<MTRAttributeRequestPath *> * wildcardAttributePaths = [[NSMutableArray alloc] init];
+        NSMutableArray<MTRAttributeRequestPath *> * specificAttributePaths = [[NSMutableArray alloc] init];
         for (MTRAttributeRequestPath * requestPath in attributePaths) {
-            for (MTRClusterPath * clusterPath in [self _knownClusters]) {
-                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
-                    continue;
-                }
+            if (requestPath.attribute == nil) {
+                [wildcardAttributePaths addObject:requestPath];
+            } else {
+                [specificAttributePaths addObject:requestPath];
+            }
+        }
+
+        std::lock_guard lock(_lock);
+        for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+            MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+            // First pass to check whether any request path includes all attributes from this cluster.
+            BOOL allAttributesRequestedForCluster = NO;
+            for (MTRAttributeRequestPath * requestPath in wildcardAttributePaths) {
                 if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
                     continue;
                 }
-                MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
-                if (requestPath.attribute == nil) {
-                    for (NSNumber * attributeID in clusterData.attributes) {
-                        [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
-                    }
-                } else if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
-                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+
+                // Looping over wildcardAttributePaths, and so requestPath.attribute is known to be nil
+                allAttributesRequestedForCluster = YES;
+                break;
+            }
+            if (allAttributesRequestedForCluster) {
+                // add all attributes - no need to check other paths
+                for (NSNumber * attributeID in clusterData.attributes) {
+                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
+                }
+                continue;
+            }
+
+            // Otherwise, we build the list of unique attributes in this cluster that match requested paths.
+
+#define MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX (32)
+            // Use a reasonable maximum as a starting size to avoid re-hashing of the temporary set
+            //  (vast majority of clusters in spec have fewer than 32 attributes as of 2025-10-04)
+            NSUInteger reasonableClusterSize = MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX;
+            reasonableClusterSize = std::min({ reasonableClusterSize, specificAttributePaths.count, clusterData.attributes.count });
+            NSMutableSet<MTRAttributePath *> * requestedAttributesInCluster = [[NSMutableSet alloc] initWithCapacity:reasonableClusterSize];
+            for (MTRAttributeRequestPath * requestPath in specificAttributePaths) {
+                if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
+                    continue;
+                }
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+                if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
+                    [requestedAttributesInCluster addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
                 }
             }
+            [existentPaths addObjectsFromArray:[requestedAttributesInCluster allObjects]];
         }
     }
 

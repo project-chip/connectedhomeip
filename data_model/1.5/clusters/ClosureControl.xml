@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0104" name="Closure Control">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0104" name="Closure Control"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CLCTRL" scope="Endpoint"/>
   <features>
@@ -107,12 +105,6 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="8" code="MO" name="ManuallyOperable" summary="Supports the manual operation feature">
       <optionalConform/>
-    </feature>
-    <feature bit="9" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -353,29 +345,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
-    </command>
-    <command id="0x03" name="GroupedMoveTo" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <notTerm>
-            <feature name="ACC"/>
-          </notTerm>
-        </mandatoryConform>
-      </otherwiseConform>
-      <field id="0" name="Position" type="TargetPositionEnum" default="desc">
-        <optionalConform choice="a" more="true" min="1"/>
-      </field>
-      <field id="1" name="Latch" type="bool" default="desc">
-        <optionalConform choice="a" more="true" min="1"/>
-      </field>
-      <field id="2" name="Speed" type="ThreeLevelAutoEnum">
-        <default>
-          <enum default="Auto"/>
-        </default>
-        <optionalConform choice="a" more="true" min="1"/>
-      </field>
     </command>
   </commands>
   <events>

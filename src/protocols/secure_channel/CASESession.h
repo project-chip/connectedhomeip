@@ -542,7 +542,7 @@ private:
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
+    void HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
     void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
     // Reference holder to the underlying TCP connection state. Returned by the
@@ -552,7 +552,7 @@ private:
     // invocation of the callbacks when the connection is established/closed.
     //
     // This pointer must be nulled out when the connection is closed.
-    Transport::ActiveTCPConnectionHolder mPeerConnState;
+    Transport::ActiveTCPConnectionHandle mPeerConnState;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

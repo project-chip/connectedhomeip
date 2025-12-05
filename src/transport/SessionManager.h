@@ -312,8 +312,7 @@ public:
         auto * targetFabric = mFabricTable->FindFabricWithIndex(fabricIndex);
         VerifyOrReturnError(targetFabric != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-        auto err = targetFabric->FetchRootPubkey(targetPubKey);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(targetFabric->FetchRootPubkey(targetPubKey));
 
         mSecureSessions.ForEachSession([&](auto * session) {
             Crypto::P256PublicKey comparePubKey;
@@ -331,8 +330,7 @@ public:
             auto * compareFabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
             VerifyOrDie(compareFabric != nullptr);
 
-            err = compareFabric->FetchRootPubkey(comparePubKey);
-            VerifyOrDie(err == CHIP_NO_ERROR);
+            SuccessOrDie(compareFabric->FetchRootPubkey(comparePubKey));
 
             if (comparePubKey.Matches(targetPubKey) && targetFabric->GetFabricId() == compareFabric->GetFabricId())
             {
@@ -475,18 +473,18 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionHolder & peerConnState);
+                          Transport::ActiveTCPConnectionHandle & peerConnState);
 
     void HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn) override;
 
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 
     void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
     // Functors for callbacks into higher layers
-    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionHolder & conn);
+    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionHandle & conn);
 
-    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr);
+    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
 
     using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 

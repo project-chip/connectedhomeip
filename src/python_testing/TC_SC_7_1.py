@@ -43,9 +43,13 @@ import matter.clusters as Clusters
 from matter import discovery
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 def _trusted_root_test_step(dut_num: int) -> TestStep:
-    read_trusted_roots_over_pase = f'TH establishes a PASE session to DUT{dut_num} using the provided setup code and reads the TrustedRootCertificates attribute from the operational credentials cluster over PASE'
+    read_trusted_roots_over_pase = (f'TH establishes a PASE session to DUT{dut_num} using the provided '
+                                    f'setup code and reads the TrustedRootCertificates attribute from the '
+                                    f'operational credentials cluster over PASE')
     return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
 
 
@@ -104,7 +108,7 @@ class TC_SC_7_1(MatterBaseTest):
         # Make sure these are no fabrics on the device so we know we're looking at the factory discriminator. This also ensures that the provided codes are correct.
         for i, setup_code in enumerate(self.matter_test_config.qr_code_content + self.matter_test_config.manual_code):
             self.step(i+1)
-            await self.default_controller.FindOrEstablishPASESession(setupCode=setup_code, nodeid=i+1)
+            await self.default_controller.FindOrEstablishPASESession(setupCode=setup_code, nodeId=i+1)
             root_certs = await self.read_single_attribute_check_success(node_id=i+1, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.TrustedRootCertificates, endpoint=0)
             asserts.assert_equal(
                 root_certs, [], "Root certificates found on device. Device must be factory reset before running this test.")
@@ -120,7 +124,7 @@ class TC_SC_7_1(MatterBaseTest):
                 self.mark_current_step_skipped()
         else:
             if setup_payload_info[0].filter_value == setup_payload_info[1].filter_value and self.matter_test_config.manual_code is not None:
-                logging.warn("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
+                log.warning("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
             asserts.assert_not_equal(
                 setup_payload_info[0].filter_value, setup_payload_info[1].filter_value, "Devices are using the same discriminator values")
 

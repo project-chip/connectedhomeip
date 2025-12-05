@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/identify-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
@@ -33,6 +34,7 @@
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace app::Clusters;
 using namespace app::Clusters::Groups;
 using namespace chip::Credentials;
@@ -42,9 +44,8 @@ using Protocols::InteractionModel::Status;
 static bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
-    uint16_t identifyTime;
-    Status status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
-    return (status == Status::Success && 0 < identifyTime);
+    auto cluster = FindIdentifyClusterOnEndpoint(endpoint);
+    return cluster != nullptr && cluster->GetIdentifyTime() > 0;
 #else
     return false;
 #endif
@@ -343,7 +344,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
     }
 #endif
 
-    provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
+    TEMPORARY_RETURN_IGNORED provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
     status = Status::Success;
     MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
 exit:

@@ -748,7 +748,7 @@ server cluster A = 1 { /* Test comment */ }
                                                ServerClusterInstantiation(
                                                    name="Bar"),
                                            ],
-                                           client_bindings=["Bar", "Test"],)
+                                           client_bindings=["Bar", "Test"])
                                   ])
         self.assertIdlEqual(actual, expected)
 
@@ -783,7 +783,7 @@ server cluster A = 1 { /* Test comment */ }
                                                                           storage=AttributeStorage.CALLBACK, default=True),
                                                ]),
                                            ],
-                                           client_bindings=[],)
+                                           client_bindings=[])
                                   ])
         self.assertIdlEqual(actual, expected)
 
@@ -907,10 +907,10 @@ server cluster A = 1 { /* Test comment */ }
                               ]),
                     ],
                     structs=[
-                        Struct(name="MyStruct", fields=[
-                            Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE), ],
-                        ),
                         global_struct,
+                        Struct(name="MyStruct", fields=[
+                            Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE)],
+                        )
                     ],
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE, definition=Field(
@@ -973,9 +973,9 @@ server cluster A = 1 { /* Test comment */ }
                     enums=[global_enum],
                     bitmaps=[global_bitmap],
                     structs=[
-                        global_struct3,
-                        global_struct2,
                         global_struct1,
+                        global_struct2,
+                        global_struct3,
                     ],
                     attributes=[
                         Attribute(

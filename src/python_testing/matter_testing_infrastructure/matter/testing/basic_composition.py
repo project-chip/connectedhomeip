@@ -38,6 +38,8 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
+LOGGER = logging.getLogger(__name__)
+
 
 @dataclass
 class ArlData:
@@ -87,7 +89,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
         if isinstance(value, bytes):
             return base64.b64encode(value).decode("UTF-8")
-        elif isinstance(value, list):
+        if isinstance(value, list):
             value = [ConvertValue(item) for item in value]
         elif isinstance(value, dict):
             value = MatterTlvToJson(value)
@@ -155,8 +157,8 @@ class BasicCompositionTests:
         setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
         if not setup_codes:
             return None
-        asserts.assert_equal(len(setup_codes), 1,
-                             "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
+        asserts.assert_greater_equal(len(setup_codes), 1,
+                                     "Require at least one of either --qr-code, --manual-code or (--discriminator and --passcode).")
         return setup_codes[0]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
@@ -165,7 +167,7 @@ class BasicCompositionTests:
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
         json_dump_string = json.dumps(node_dump_dict, indent=2)
-        logging.debug(f"Raw TLV contents of Node: {json_dump_string}")
+        LOGGER.debug(f"Raw TLV contents of Node: {json_dump_string}")
 
         if dump_device_composition_path is not None:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
@@ -180,9 +182,9 @@ class BasicCompositionTests:
         self.test_from_file = self.user_params.get("test_from_file", None)
 
         def log_test_start():
-            logging.info("###########################################################")
-            logging.info("Start of actual tests")
-            logging.info("###########################################################")
+            LOGGER.info("###########################################################")
+            LOGGER.info("Start of actual tests")
+            LOGGER.info("###########################################################")
 
         if self.test_from_file:
             cache = JsonToMatterTlv(self.test_from_file)
@@ -201,7 +203,7 @@ class BasicCompositionTests:
             pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
 
-        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
         task_list.append(asyncio.create_task(case_future))
 
         for task in task_list:
@@ -257,7 +259,7 @@ class BasicCompositionTests:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
             # For now, assume we're looking at a 1.2 device (this is as close as we can get before the 1.1 and 1.0 DM files are populated)
-            logging.info("No specification version attribute found in the Basic Information cluster - assuming 1.2 as closest match")
+            LOGGER.info("No specification version attribute found in the Basic Information cluster - assuming 1.2 as closest match")
             return PrebuiltDataModelDirectory.k1_2
         try:
             dm = dm_from_spec_version(spec_version)
@@ -270,9 +272,9 @@ class BasicCompositionTests:
 
     def build_spec_xmls(self):
         dm = self._get_dm()
-        logging.info("----------------------------------------------------------------------------------")
-        logging.info(f"-- Running tests against Specification version {dm.dirname}")
-        logging.info("----------------------------------------------------------------------------------")
+        LOGGER.info("----------------------------------------------------------------------------------")
+        LOGGER.info(f"-- Running tests against Specification version {dm.dirname}")
+        LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)

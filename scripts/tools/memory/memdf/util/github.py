@@ -26,6 +26,8 @@ import dateutil.parser  # type: ignore
 import ghapi.all  # type: ignore
 from memdf import Config, ConfigDescription
 
+log = logging.getLogger(__name__)
+
 
 def postprocess_config(config: Config, _key: str, _info: Mapping) -> None:
     """Postprocess --github-repository."""
@@ -36,7 +38,7 @@ def postprocess_config(config: Config, _key: str, _info: Mapping) -> None:
         if not config['github.token']:
             config['github.token'] = os.environ.get('GITHUB_TOKEN')
             if not config['github.token']:
-                logging.error('Missing --github-token')
+                log.error("Missing --github-token")
 
 
 CONFIG: ConfigDescription = {
@@ -106,7 +108,7 @@ class Gh:
             return itertools.chain.from_iterable(
                 ghapi.all.paged(self.ghapi.issues.list_comments, pr))
         except Exception as e:
-            logging.error('Failed to get comments for PR #%d: %s', pr, e)
+            log.exception("Failed to get comments for PR #%d: %r", pr, e)
             return []
 
     def get_commits_for_pr(self, pr: int):
@@ -116,7 +118,7 @@ class Gh:
             return itertools.chain.from_iterable(
                 ghapi.all.paged(self.ghapi.pulls.list_commits, pr))
         except Exception as e:
-            logging.error('Failed to get commits for PR #%d: %s', pr, e)
+            log.exception("Failed to get commits for PR #%d: %r", pr, e)
             return []
 
     def get_artifacts(self, page_limit: int = -1, per_page: int = -1):
@@ -128,20 +130,18 @@ class Gh:
 
         assert self.ghapi
         try:
-            page = 0
-            for i in ghapi.all.paged(
+            for page, i in enumerate(ghapi.all.paged(
                     self.ghapi.actions.list_artifacts_for_repo,
-                    per_page=per_page):
+                    per_page=per_page)):
                 if not i.artifacts:
                     break
                 for a in i.artifacts:
                     yield a
-                page += 1
-                logging.debug('ASP: artifact page %d of %d', page, page_limit)
+                log.debug("ASP: artifact page %d of %d", page, page_limit)
                 if page_limit and page >= page_limit:
                     break
         except Exception as e:
-            logging.error('Failed to get artifact list: %s', e)
+            log.exception("Failed to get artifact list: %r", e)
 
     def get_size_artifacts(self,
                            page_limit: int = -1,
@@ -171,7 +171,7 @@ class Gh:
 
     def download_artifact(self, artifact_id: int):
         """Download a GitHub artifact, returning a binary zip object."""
-        logging.debug('Downloading artifact %d', artifact_id)
+        log.debug("Downloading artifact %d", artifact_id)
         try:
             assert self.ghapi
 
@@ -200,7 +200,7 @@ class Gh:
                 ]
             )
         except Exception as e:
-            logging.error('Failed to download artifact %d: %s', artifact_id, e)
+            log.exception("Failed to download artifact %d: %r", artifact_id, e)
         return None
 
     def delete_artifact(self, artifact_id: int) -> bool:
@@ -210,17 +210,17 @@ class Gh:
         self.deleted_artifacts.add(artifact_id)
 
         if self.config['github.keep']:
-            logging.info('Suppressed deleting artifact %d', artifact_id)
+            log.info("Suppressed deleting artifact %d", artifact_id)
             return False
 
         try:
             assert self.ghapi
-            logging.info('Deleting artifact %d', artifact_id)
+            log.info("Deleting artifact %d", artifact_id)
             self.ghapi.actions.delete_artifact(artifact_id)
             return True
         except Exception as e:
             # During manual testing we sometimes lose the race against CI.
-            logging.error('Failed to delete artifact %d: %s', artifact_id, e)
+            log.exception("Failed to delete artifact %d: %r", artifact_id, e)
         return False
 
     def delete_artifacts(self, artifacts: Iterable[int]):
@@ -230,31 +230,31 @@ class Gh:
     def create_comment(self, issue_id: int, text: str) -> bool:
         """Create a GitHub comment."""
         if self.config['github.dryrun-comment']:
-            logging.info('Suppressed creating comment on #%d', issue_id)
-            logging.debug('%s', text)
+            log.info("Suppressed creating comment on issue #%d", issue_id)
+            log.debug(text)
             return False
 
         assert self.ghapi
-        logging.info('Creating comment on #%d', issue_id)
+        log.info("Creating comment on issue #%d", issue_id)
         try:
             self.ghapi.issues.create_comment(issue_id, text)
             return True
         except Exception as e:
-            logging.error('Failed to created comment on #%d: %s', issue_id, e)
+            log.exception("Failed to created comment on issue #%d: %r", issue_id, e)
         return False
 
     def update_comment(self, comment_id: int, text: str) -> bool:
         """Update a GitHub comment."""
         if self.config['github.dryrun-comment']:
-            logging.info('Suppressed updating comment #%d', comment_id)
-            logging.debug('%s', text)
+            log.info("Suppressed updating comment #%d", comment_id)
+            log.debug(text)
             return False
 
-        logging.info('Updating comment #%d', comment_id)
+        log.info("Updating comment #%d", comment_id)
         try:
             assert self.ghapi
             self.ghapi.issues.update_comment(comment_id, text)
             return True
         except Exception as e:
-            logging.error('Failed to update comment %d: %s', comment_id, e)
+            log.exception("Failed to update comment %d: %r", comment_id, e)
         return False

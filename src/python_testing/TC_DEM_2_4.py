@@ -41,8 +41,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -53,7 +53,7 @@ from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
@@ -65,13 +65,12 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_4(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F04",  # Depends on F04(Pausable)
         ]
-        return pics
 
     def steps_TC_DEM_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -169,12 +168,10 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_4(self):
 
-        logging.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
+        log.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
 
         self.step("1")
         # Commission DUT - already done
@@ -352,8 +349,8 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPaused)
 
         self.step("18")
-        logging.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
-        time.sleep(forecast.slots[0].minPauseDuration)
+        log.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
+        await asyncio.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 

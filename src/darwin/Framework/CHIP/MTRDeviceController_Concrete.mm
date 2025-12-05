@@ -27,6 +27,7 @@
 #import "MTRCommissioningParameters.h"
 #import "MTRCommissioningParameters_Internal.h"
 #import "MTRConversion.h"
+#import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
@@ -141,6 +142,10 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // run on a queue that's not the Matter queue, and safely use APIs that
     // involve sync dispatch to the Matter queue.
     dispatch_queue_t _commissioningQueue;
+
+    // Keep track of dns-sd resolution objects for shutdown-time cleanup.
+    os_unfair_lock _deviceConnectivityMonitorLock;
+    NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
 }
 
 // TODO: Figure out whether the work queue storage lives here or in the superclass
@@ -199,6 +204,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         _assertionLock = OS_UNFAIR_LOCK_INIT;
         _currentCommissioning = nil;
         _commissioningQueue = dispatch_queue_create("org.csa-iot.matter.framework.commissioning.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        _deviceConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -353,7 +359,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             auto * fabricTable = factory.fabricTable;
             if (fabricTable) {
                 // We don't care about errors here. If our fabric is gone, nothing to do.
-                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
+                TEMPORARY_RETURN_IGNORED fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
                 [factory resetOperationalAdvertising];
             }
         }
@@ -370,7 +376,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             auto * fabricTable = factory.fabricTable;
             if (fabricTable) {
                 // We don't care about errors here. If our fabric is gone, nothing to do.
-                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
+                TEMPORARY_RETURN_IGNORED fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
                 [factory resetOperationalAdvertising];
             }
         }
@@ -476,6 +482,16 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     }];
 
     [self stopBrowseForCommissionables];
+
+    // Calling stopMonitoring breaks the retain cycle of the monitor handler holding
+    // the monitor object, allowing the monitor object to dealloc and clean up.
+    {
+        std::lock_guard lock(_deviceConnectivityMonitorLock);
+        for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
+            [deviceConnectivityMonitor stopMonitoring];
+        }
+        [_weakSetOfDeviceConnectivityMonitors removeAllObjects];
+    }
 
     [_factory controllerShuttingDown:self];
 }
@@ -765,6 +781,8 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             self.nodeID = @(_cppCommissioner->GetNodeId());
             self.fabricID = @(_cppCommissioner->GetFabricId());
         }
+
+        _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
 
         commissionerInitialized = YES;
 
@@ -1139,7 +1157,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
-        } else if (!commissioningParams.preventNetworkScans) {
+        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceThreadScan) {
             params.SetAttemptThreadNetworkScan(true);
         }
         if (commissioningParams.acceptedTermsAndConditions && commissioningParams.acceptedTermsAndConditionsVersion) {
@@ -1174,7 +1192,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
             chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
             params.SetWiFiCredentials(wifiCreds);
-        } else if (!commissioningParams.preventNetworkScans) {
+        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceWiFiScan) {
             params.SetAttemptWiFiNetworkScan(true);
         }
 
@@ -1705,6 +1723,21 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    [self getSessionForNode:nodeID parameters:0 completion:completion];
+}
+
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    {
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            if (completion != nil) {
+                completion(nil, chip::NullOptional, error, nil);
+            }
+            return;
+        }
+    }
+
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
     if (self.suspended) {
@@ -1717,23 +1750,51 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
     if ([self definitelyUsesThreadForDevice:nodeID]) {
-        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        __block MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                 const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                 completion(exchangeManager, session, error, retryDelay);
                 workItemCompletion(MTRAsyncWorkComplete);
             };
-            [self directlyGetSessionForNode:nodeID completion:completionWrapper];
+            [self directlyGetSessionForNode:nodeID parameters:parameters completion:completionWrapper];
         }];
 
-        [_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+        // The monitor would call the handler when resolve returns a usable address. The monitor
+        // handler block retains the monitor object itself, forming a retain cycle. The cycle is
+        // broken when stopMonitoring is called.
+        MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
+        BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
+            // Ensure the work item is queued only once, since this handler could be called multiple times in a row
+            if (workItem) {
+                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+                workItem = nil;
+                [deviceConnectivityMonitor stopMonitoring];
+            }
+        } queue:_chipWorkQueue];
+
+        if (monitorStarted) {
+            // Add the monitor object to the weak set, so that the above retain cycle can be broken
+            // when the controller shuts down.
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+        } else {
+            // DNS-SD monitoring failed to start - proceed with immediate connection attempt
+            // (This is unlikely, but needed so that the workItem block always executes.)
+            MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
+            [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
+        }
     } else {
-        [self directlyGetSessionForNode:nodeID completion:completion];
+        [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
     }
 }
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    [self directlyGetSessionForNode:nodeID parameters:0 completion:completion];
+}
+
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
@@ -1748,9 +1809,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);
 
-            // MTRDeviceConnectionBridge always delivers errors async via
-            // completion.
-            connectionBridge->connect(commissioner, nodeID);
+            // MTRDeviceConnectionBridge always delivers errors via completion.
+            connectionBridge->Connect(commissioner, nodeID, parameters);
         }
         errorHandler:^(NSError * error) {
             completion(nullptr, chip::NullOptional, error, nil);
@@ -2104,7 +2164,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 
 // We never trigger network scans for commissioning that comes through the old
-// APIs, so don't need scannedWiFiNetworks:/scannedThreadNetworks: bits.
+// APIs, and in general don't really support not providing credentials as part
+// of MTRCommissioningParameters, so don't need
+// needsWiFiCredentialsWithScanResults/needsThreadCredentialsWithScanResults bits.
 
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
     succeededForNodeID:(NSNumber *)nodeID

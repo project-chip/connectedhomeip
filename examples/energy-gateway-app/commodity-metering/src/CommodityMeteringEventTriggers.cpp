@@ -182,10 +182,10 @@ private:
     {
         if (mInstance)
         {
-            mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
-            mInstance->SetMeteredQuantity(mMeteredQuantity);
-            mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
-            mInstance->SetTariffUnit(mTariffUnit);
+            TEMPORARY_RETURN_IGNORED mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
+            TEMPORARY_RETURN_IGNORED mInstance->SetMeteredQuantity(mMeteredQuantity);
+            TEMPORARY_RETURN_IGNORED mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
+            TEMPORARY_RETURN_IGNORED mInstance->SetTariffUnit(mTariffUnit);
         }
     }
 
@@ -228,10 +228,10 @@ private:
 
         mMaximumMeteredQuantities.SetNonNull(MQSamplePair.second);
 
-        mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
-        mInstance->SetMeteredQuantity(nullableList);
-        mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
-        mInstance->SetTariffUnit(mTariffUnit);
+        TEMPORARY_RETURN_IGNORED mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
+        TEMPORARY_RETURN_IGNORED mInstance->SetMeteredQuantity(nullableList);
+        TEMPORARY_RETURN_IGNORED mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
+        TEMPORARY_RETURN_IGNORED mInstance->SetTariffUnit(mTariffUnit);
     }
 
 public:

@@ -239,6 +239,10 @@
 #include <clusters/GroupKeyManagement/Commands.h>
 #include <clusters/GroupKeyManagement/Events.h>
 #include <clusters/GroupKeyManagement/Structs.h>
+#include <clusters/Groupcast/Attributes.h>
+#include <clusters/Groupcast/Commands.h>
+#include <clusters/Groupcast/Events.h>
+#include <clusters/Groupcast/Structs.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Events.h>
@@ -559,6 +563,10 @@
 #include <clusters/WaterHeaterMode/Commands.h>
 #include <clusters/WaterHeaterMode/Events.h>
 #include <clusters/WaterHeaterMode/Structs.h>
+#include <clusters/WaterTankLevelMonitoring/Attributes.h>
+#include <clusters/WaterTankLevelMonitoring/Commands.h>
+#include <clusters/WaterTankLevelMonitoring/Events.h>
+#include <clusters/WaterTankLevelMonitoring/Structs.h>
 #include <clusters/WebRTCTransportProvider/Attributes.h>
 #include <clusters/WebRTCTransportProvider/Commands.h>
 #include <clusters/WebRTCTransportProvider/Events.h>
@@ -584,7 +592,7 @@
 #include <clusters/ZoneManagement/Events.h>
 #include <clusters/ZoneManagement/Structs.h>
 
-#include <app/common/CompatEnumNames.h>
+#include <app-common/zap-generated/cluster-enums.h>
 
 namespace chip {
 namespace app {
@@ -595,3 +603,8 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand);
 
 } // namespace app
 } // namespace chip
+
+// Included at the end, so all our definitions above are available.
+#define CHIP_INCLUDING_FROM_CLUSTER_OBJECTS
+#include <app/common/CompatClusterObjects.h>
+#undef CHIP_INCLUDING_FROM_CLUSTER_OBJECTS

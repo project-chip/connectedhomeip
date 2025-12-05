@@ -62,15 +62,28 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="TLSCertificatesCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="PowerSourceCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="TimeSyncWithNTPCCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="TimeSyncWithClientCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="TimeSyncWithTZCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
-    </cluster>
-    <cluster id="0x002F" name="Power Source" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
-      <mandatoryConform/>
     </cluster>
     <cluster id="0x0551" name="Camera AV Stream Management" side="server">
       <mandatoryConform/>
@@ -99,9 +112,6 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0554" name="WebRTC Transport Requestor" side="client">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0801" name="TLS Certificate Management" side="server">
       <mandatoryConform/>
     </cluster>
   </clusters>
