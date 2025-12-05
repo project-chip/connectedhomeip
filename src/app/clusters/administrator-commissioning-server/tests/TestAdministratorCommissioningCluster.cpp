@@ -29,14 +29,6 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
-<<<<<<< HEAD
->>>>>>> 02e7e35d88 (TODO: Fix dependency issue of test certificates and use these certificates for fabric initialization) namespace
-{
-
-    using namespace chip;
-    using namespace chip::app::Clusters;
-    using namespace chip::app::Clusters::AdministratorCommissioning;
-=======
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -48,356 +40,266 @@
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 
-    namespace {
+namespace {
 
-    using namespace chip;
-    using namespace chip::app::Clusters;
-    using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AdministratorCommissioning;
 
-    using chip::app::DataModel::AcceptedCommandEntry;
-    using chip::app::DataModel::AttributeEntry;
+using chip::app::DataModel::AcceptedCommandEntry;
+using chip::app::DataModel::AttributeEntry;
 
-    // initialize memory as ReadOnlyBufferBuilder may allocate
-    struct TestAdministratorCommissioningCluster : public ::testing::Test
-    {
-        static chip::DeviceLayer::TestOnlyCommissionableDataProvider sTestCommissionableDataProvider;
-        static chip::Credentials::PersistentStorageOpCertStore sTestOpCertStore;
-        static chip::PersistentStorageOperationalKeystore sTestOpKeystore;
-        static chip::TestPersistentStorageDelegate sStorageDelegate;
-
-        static void SetUpTestSuite()
-        {
-            ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-            ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-
-            ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
-            ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
-
-            auto & fabricTable = Server::GetInstance().GetFabricTable();
-            FabricTable::InitParams initParams;
-            initParams.storage             = &sStorageDelegate;
-            initParams.operationalKeystore = &sTestOpKeystore;
-            initParams.opCertStore         = &sTestOpCertStore;
-            ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
-        }
-        static void TearDownTestSuite()
-        {
-            chip::Server::GetInstance().GetFabricTable().Shutdown();
-            sTestOpCertStore.Finish();
-            sTestOpKeystore.Finish();
-            chip::DeviceLayer::PlatformMgr().Shutdown();
-            chip::Platform::MemoryShutdown();
-        }
-    };
-
-    chip::DeviceLayer::TestOnlyCommissionableDataProvider TestAdministratorCommissioningCluster::sTestCommissionableDataProvider;
-    chip::Credentials::PersistentStorageOpCertStore TestAdministratorCommissioningCluster::sTestOpCertStore;
-    chip::PersistentStorageOperationalKeystore TestAdministratorCommissioningCluster::sTestOpKeystore;
-    chip::TestPersistentStorageDelegate TestAdministratorCommissioningCluster::sStorageDelegate;
-
-    const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
->>>>>>> c019cc8afd (Initialize FabricTable in)
-
-    using chip::app::DataModel::AcceptedCommandEntry;
-    using chip::app::DataModel::AttributeEntry;
-
-    // initialize memory as ReadOnlyBufferBuilder may allocate
-    struct TestAdministratorCommissioningCluster : public ::testing::Test
-    {
-        static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-        static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-    };
-
+// initialize memory as ReadOnlyBufferBuilder may allocate
+struct TestAdministratorCommissioningCluster : public ::testing::Test
+{
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider sTestCommissionableDataProvider;
+    static chip::Credentials::PersistentStorageOpCertStore sTestOpCertStore;
+    static chip::PersistentStorageOperationalKeystore sTestOpKeystore;
+    static chip::TestPersistentStorageDelegate sStorageDelegate;
 
-    TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
+    static void SetUpTestSuite()
     {
-        {
-            AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-            ReadOnlyBufferBuilder<AttributeEntry> builder;
-            ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
+        ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
+        ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
 
-            ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-            ASSERT_EQ(expectedBuilder.AppendElements({
-                          AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
-                          AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
-                          AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
-                      }),
-                      CHIP_NO_ERROR);
-            ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-            ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-        }
-
-        {
-            AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
-                                                                                  BitFlags<Feature>{ Feature::kBasic });
-
-            ReadOnlyBufferBuilder<AttributeEntry> builder;
-            ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-            ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-            ASSERT_EQ(expectedBuilder.AppendElements({
-                          AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
-                          AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
-                          AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
-                      }),
-                      CHIP_NO_ERROR);
-            ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-            ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-        }
+        auto & fabricTable = Server::GetInstance().GetFabricTable();
+        FabricTable::InitParams initParams;
+        initParams.storage             = &sStorageDelegate;
+        initParams.operationalKeystore = &sTestOpKeystore;
+        initParams.opCertStore         = &sTestOpCertStore;
+        ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
     }
-
-    TEST_F(TestAdministratorCommissioningCluster, TestCommands)
+    static void TearDownTestSuite()
     {
-        {
-            AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-
-            ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-            ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-            ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-            ASSERT_EQ(expectedBuilder.AppendElements({
-                          AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
-                          AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
-                      }),
-                      CHIP_NO_ERROR);
-
-            EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-        }
-
-        {
-            AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{});
-
-            ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-            ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-            ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-            ASSERT_EQ(expectedBuilder.AppendElements({
-                          AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
-                          AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
-                      }),
-                      CHIP_NO_ERROR);
-
-            EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-        }
-
-        {
-            AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
-                                                                                  BitFlags<Feature>{ Feature::kBasic });
-
-            ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-            ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-            ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-            ASSERT_EQ(expectedBuilder.AppendElements({
-                          AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
-                          AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
-                          AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
-                      }),
-                      CHIP_NO_ERROR);
-
-            EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-        }
+        chip::Server::GetInstance().GetFabricTable().Shutdown();
+        sTestOpCertStore.Finish();
+        sTestOpKeystore.Finish();
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        chip::Platform::MemoryShutdown();
     }
+};
 
-    } // namespace
+chip::DeviceLayer::TestOnlyCommissionableDataProvider TestAdministratorCommissioningCluster::sTestCommissionableDataProvider;
+chip::Credentials::PersistentStorageOpCertStore TestAdministratorCommissioningCluster::sTestOpCertStore;
+chip::PersistentStorageOperationalKeystore TestAdministratorCommissioningCluster::sTestOpKeystore;
+chip::TestPersistentStorageDelegate TestAdministratorCommissioningCluster::sStorageDelegate;
 
-    TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
+const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
+
+TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
+{
     {
         AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-        chip::Test::ClusterTester tester(cluster);
 
-        {
-            Attributes::FeatureMap::TypeInfo::Type feature{};
-            ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
-            ASSERT_EQ(feature, 0u);
-        }
+        ReadOnlyBufferBuilder<AttributeEntry> builder;
+        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
 
-        {
-            uint16_t revision;
-            ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
-            ASSERT_EQ(revision, 1u);
-        }
-
-        {
-            Attributes::WindowStatus::TypeInfo::Type winStatus;
-            auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-            ASSERT_TRUE(status.IsSuccess());
-            EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-        }
-
-        {
-            Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
-            ASSERT_EQ(tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric), CHIP_NO_ERROR);
-            ASSERT_TRUE(adminFabric.IsNull());
-        }
-
-        {
-            Attributes::AdminVendorId::TypeInfo::Type adminVendor;
-            ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
-            ASSERT_TRUE(adminVendor.IsNull());
-        }
-    }
-
-    TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
-    {
-        AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-        chip::Test::ClusterTester tester(cluster);
-
-        Attributes::WindowStatus::TypeInfo::DecodableType winStatus;
-        auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-        ASSERT_TRUE(status.IsSuccess());
-        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-
-        Commands::OpenCommissioningWindow::Type request;
-        request.commissioningTimeout = 900;
-        uint16_t originDiscriminator;
-        EXPECT_EQ(sTestCommissionableDataProvider.GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
-        request.discriminator = static_cast<uint16_t>(originDiscriminator + 1);
-        chip::Crypto::Spake2pVerifier verifier{};
-        request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
-        request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-
-        auto & fabricTable          = Server::GetInstance().GetFabricTable();
-        FabricIndex testFabricIndex = chip::kUndefinedFabricIndex;
-        ASSERT_EQ(fabricTable.AddNewFabricForTest(
-                      chip::TestCerts::GetRootACertAsset().mCert, chip::TestCerts::GetIAA1CertAsset().mCert,
-                      chip::TestCerts::GetNodeA1CertAsset().mCert, chip::TestCerts::GetNodeA1CertAsset().mKey, &testFabricIndex),
+        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
+                      AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
+                      AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
+                  }),
                   CHIP_NO_ERROR);
-        ASSERT_NE(testFabricIndex, chip::kUndefinedFabricIndex);
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
-        // Read Fabrics attribute to verify the fabric was added
-        OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
-        auto stat = opCredsTester.ReadAttribute(OperationalCredentials::Attributes::Fabrics::Id, fabrics);
-        ASSERT_TRUE(stat.IsSuccess());
-
-        auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
-        ASSERT_TRUE(result.status.has_value());
-
-        if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
-        {
-            status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-            ASSERT_TRUE(status.IsSuccess());
-            EXPECT_EQ(winStatus,
-                      chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
-
-            Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
-            status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
-            ASSERT_TRUE(status.IsSuccess());
-            ASSERT_FALSE(adminFabric.IsNull());
-
-            Attributes::AdminVendorId::TypeInfo::Type adminVendor;
-            status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
-            ASSERT_TRUE(status.IsSuccess());
-            ASSERT_FALSE(adminVendor.IsNull());
-        }
+        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
-    TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
+    {
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
+                                                                              BitFlags<Feature>{ Feature::kBasic });
+
+        ReadOnlyBufferBuilder<AttributeEntry> builder;
+        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
+                      AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
+                      AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+}
+
+TEST_F(TestAdministratorCommissioningCluster, TestCommands)
+{
     {
         AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-        chip::Test::ClusterTester tester(cluster);
 
-        {
-            Attributes::FeatureMap::TypeInfo::Type feature{};
-            ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
-            ASSERT_EQ(feature, 0u);
-        }
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
 
-        {
-            uint16_t revision;
-            ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
-            ASSERT_EQ(revision, 1u);
-        }
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
+                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
 
-        {
-            Attributes::WindowStatus::TypeInfo::Type winStatus;
-            auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-            ASSERT_TRUE(status.IsSuccess());
-            EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-        }
-
-        {
-            Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
-            ASSERT_EQ(tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric), CHIP_NO_ERROR);
-            ASSERT_TRUE(adminFabric.IsNull());
-        }
-
-        {
-            Attributes::AdminVendorId::TypeInfo::Type adminVendor;
-            ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
-            ASSERT_TRUE(adminVendor.IsNull());
-        }
+        EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
-    TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
     {
-        AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-        chip::Test::ClusterTester tester(cluster);
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{});
 
-        Attributes::WindowStatus::TypeInfo::DecodableType winStatus;
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
+                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+
+        EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+
+    {
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
+                                                                              BitFlags<Feature>{ Feature::kBasic });
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
+                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
+                      AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+
+        EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+}
+
+} // namespace
+
+TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
+{
+    AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+    chip::Test::ClusterTester tester(cluster);
+
+    {
+        Attributes::FeatureMap::TypeInfo::Type feature{};
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
+        ASSERT_EQ(feature, 0u);
+    }
+
+    {
+        uint16_t revision;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+        ASSERT_EQ(revision, 1u);
+    }
+
+    {
+        Attributes::WindowStatus::TypeInfo::Type winStatus;
         auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
         ASSERT_TRUE(status.IsSuccess());
         EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-
-        Commands::OpenCommissioningWindow::Type request;
-        request.commissioningTimeout = 900;
-        uint16_t originDiscriminator;
-        EXPECT_EQ(sTestCommissionableDataProvider.GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
-        request.discriminator = static_cast<uint16_t>(originDiscriminator + 1);
-        chip::Crypto::Spake2pVerifier verifier{};
-        request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
-        request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-
-        // FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
-        // FabricTable::InitParams initParams;
-        // initParams.opCertStore         = &mMockOpCertStore;
-        // initParams.storage             = &mTestContext.StorageDelegate();
-        // initParams.operationalKeystore = nullptr;
-        // fabricTable.Init(initParams);
-        auto context = OperationalCredentialsCluster::Context{
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-            .dnssdServer                = app::DnssdServer::Instance(),
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        };
-        OperationalCredentialsCluster opCreds(kRootEndpointId, context);
-        chip::Test::ClusterTester opCredsTester(opCreds);
-        EXPECT_EQ(opCreds.Startup(opCredsTester.GetServerClusterContext()), CHIP_NO_ERROR);
-        opCredsTester.SetFabricIndex(kTestFabricIndex);
-
-        // 1. Arm FailSafe because AddNOC command requires it.
-        auto & failSafe = context.failSafeContext;
-        ASSERT_EQ(failSafe.ArmFailSafe(kTestFabricIndex, System::Clock::Seconds16(900)), CHIP_NO_ERROR);
-        // 2. Add Trusted Root Cert for the fabric.
-        OperationalCredentials::Commands::AddTrustedRootCertificate::Type addRcaRequest;
-        addRcaRequest.rootCACertificate = chip::TestCerts::GetRootACertAsset().mCert;
-        auto root = opCredsTester.Invoke(OperationalCredentials::Commands::AddTrustedRootCertificate::Id, addRcaRequest);
-        ASSERT_TRUE(root.status.has_value());
-        ASSERT_TRUE(root.status->IsSuccess());
-
-        auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
-        ASSERT_TRUE(result.status.has_value());
-
-        if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
-        {
-            status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-            ASSERT_TRUE(status.IsSuccess());
-            EXPECT_EQ(winStatus,
-                      chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
-
-            Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
-            status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
-            ASSERT_TRUE(status.IsSuccess());
-            ASSERT_FALSE(adminFabric.IsNull());
-
-            Attributes::AdminVendorId::TypeInfo::Type adminVendor;
-            status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
-            ASSERT_TRUE(status.IsSuccess());
-            ASSERT_FALSE(adminVendor.IsNull());
-        }
     }
+
+    {
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric), CHIP_NO_ERROR);
+        ASSERT_TRUE(adminFabric.IsNull());
+    }
+
+    {
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
+        ASSERT_TRUE(adminVendor.IsNull());
+    }
+}
+
+TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
+{
+    AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+    chip::Test::ClusterTester tester(cluster);
+
+    Attributes::WindowStatus::TypeInfo::DecodableType winStatus;
+    auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+    ASSERT_TRUE(status.IsSuccess());
+    EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+
+    Commands::OpenCommissioningWindow::Type request;
+    request.commissioningTimeout = 900;
+    uint16_t originDiscriminator;
+    EXPECT_EQ(sTestCommissionableDataProvider.GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
+    request.discriminator = static_cast<uint16_t>(originDiscriminator + 1);
+    chip::Crypto::Spake2pVerifier verifier{};
+    request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
+    request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
+    request.salt = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20, 0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
+
+    // auto optCertStore = chip::Server::GetInstance().GetOpCertStore();
+    // chip::CommonCaseDeviceServerInitParams initParams;
+    // EXPECT_EQ(initParams.opCertStore, nullptr);
+    auto & fabricTable          = Server::GetInstance().GetFabricTable();
+    FabricIndex testFabricIndex = kTestFabricIndex;
+    ASSERT_EQ(fabricTable.AddNewFabricForTest(chip::TestCerts::GetRootACertAsset().mCert, chip::TestCerts::GetIAA1CertAsset().mCert,
+                                              chip::TestCerts::GetNodeA1CertAsset().mCert,
+                                              chip::TestCerts::GetNodeA1CertAsset().mKey, &testFabricIndex),
+              CHIP_NO_ERROR);
+    ASSERT_NE(testFabricIndex, chip::kUndefinedFabricIndex);
+    tester.SetFabricIndex(testFabricIndex);
+    // ASSERT_EQ(optCertStore, nullptr);
+
+    // OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
+    //                                                    .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+    //                                                    .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+    //                                                    .dnssdServer     = app::DnssdServer::Instance(),
+    //                                                    .commissioningWindowManager =
+    //                                                        Server::GetInstance().GetCommissioningWindowManager() };
+    // OperationalCredentialsCluster opCreds(kRootEndpointId, context);
+    // chip::Test::ClusterTester opCredsTester(opCreds);
+    // EXPECT_EQ(opCreds.Startup(opCredsTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    // opCredsTester.SetFabricIndex(testFabricIndex);
+
+    // 1. Arm FailSafe because AddNOC command requires it.
+    // auto & failSafe = context.failSafeContext;
+    // ASSERT_EQ(failSafe.ArmFailSafe(testFabricIndex, System::Clock::Seconds16(900)), CHIP_NO_ERROR);
+
+    // 2. Add Trusted Root Cert for the fabric.
+    // OperationalCredentials::Commands::AddTrustedRootCertificate::Type addRcaRequest;
+    // addRcaRequest.rootCACertificate = chip::TestCerts::GetRootACertAsset().mCert;
+    // auto root = opCredsTester.Invoke(OperationalCredentials::Commands::AddTrustedRootCertificate::Id, addRcaRequest);
+    // ASSERT_TRUE(root.status.has_value());
+    // ASSERT_TRUE(root.status->IsSuccess());
+
+    // Read Fabrics attribute to verify the fabric was added
+    // OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
+    // auto stat = opCredsTester.ReadAttribute(OperationalCredentials::Attributes::Fabrics::Id, fabrics);
+    // ASSERT_TRUE(stat.IsSuccess());
+
+    auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
+    // ASSERT_EQ(result.status, std::nullopt);
+    ASSERT_TRUE(result.status.has_value());
+    ASSERT_TRUE(result.status->IsSuccess());
+
+    if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
+    {
+        status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+        ASSERT_TRUE(status.IsSuccess());
+        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
+
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminFabric.IsNull());
+
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminVendor.IsNull());
+    }
+}
