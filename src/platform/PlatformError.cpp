@@ -55,7 +55,7 @@ const char * DescribePlatformError(CHIP_ERROR aError)
     static char errBuf[128];
 #endif
 
-    // Use thread-safe strerror_r on POSIX systems
+    // Use thread-safe strerror_r when available
 #if defined(_GNU_SOURCE) && !defined(__ANDROID__)
     // GNU version returns char*
     const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
@@ -64,14 +64,21 @@ const char * DescribePlatformError(CHIP_ERROR aError)
         if (s != errBuf)
         {
             CopyString(errBuf, sizeof(errBuf), s);
-            errBuf[sizeof(errBuf) - 1] = '\0';
         }
         return errBuf;
     }
-#else
+#elif defined(_POSIX_C_SOURCE)
     // POSIX version returns int (0 on success)
     if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
     {
+        return errBuf;
+    }
+#else
+    // Fallback for platforms without strerror_r
+    const char * s = strerror(lError);
+    if (s != nullptr)
+    {
+        snprintf(errBuf, sizeof(errBuf), "%s", s);
         return errBuf;
     }
 #endif
