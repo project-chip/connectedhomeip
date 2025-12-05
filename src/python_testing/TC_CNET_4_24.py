@@ -264,7 +264,7 @@ class TC_CNET_4_24(MatterBaseTest):
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty\n"),
-            TestStep(9, "TH sends ConnectNetwork command and Breadcrumb = 5",
+            TestStep(9, "TH sends ConnectNetwork command with valid format but with modified Extended PAN ID and Breadcrumb = 5",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is NOT kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
@@ -482,15 +482,34 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_network_config_response(response)
 
-        # Step 9: TH sends ConnectNetwork command and Breadcrumb = 5
+        # Step 9: TH sends ConnectNetwork command with valid format but with modified Extended PAN ID and Breadcrumb = 5
         self.step(9)
 
+        logger.info(" --- Step 9: Sending ConnectNetwork with valid format but with modified Extended PAN ID")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(
+                networkID=incorrect_thread_dataset_2,
+                breadcrumb=5
+            ),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(response, expect_success=False)
+        logger.info(
+            " --- ConnectNetwork failed as expected with modified Extended PAN ID")
+
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
+        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
         # Step 10: TH reads LastNetworkingStatus (should be kOtherConnectionFailure)
         self.step(10)
 
         # When connection fails due to wrong network, the DUT should return kOtherConnectionFailure
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
+        )
 
         # Step 11: TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 6
         self.step(11)
