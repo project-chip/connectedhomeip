@@ -37,7 +37,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
@@ -130,11 +130,11 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
-    chip::Test::TestServerClusterContext mTestContext;
+    TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     Crypto::DefaultSessionKeystore mMockKeystore;
     GroupKeyManagementCluster mCluster;
-    chip::Test::ClusterTester tester;
+    ClusterTester tester;
 
     TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
 
