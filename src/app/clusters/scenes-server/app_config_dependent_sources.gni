@@ -15,6 +15,7 @@ app_config_dependent_sources = [
   "CodegenAttributeValuePairValidator.cpp",
   "CodegenAttributeValuePairValidator.h",
   "CodegenEndpointToIndex.h",
-  "scenes-server.cpp",
+  "ScenesManagementCluster.cpp",
+  "ScenesManagementCluster.h",
   "scenes-server.h",
 ]
