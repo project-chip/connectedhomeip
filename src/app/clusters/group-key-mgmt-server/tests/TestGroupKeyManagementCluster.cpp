@@ -32,13 +32,13 @@
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
 namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::Testing;
+
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
@@ -80,9 +80,9 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
               GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
 
     // Check required generated commands are present
-    ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
+    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
     ASSERT_EQ(cluster.GeneratedCommands(groupKeyManagementPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
     ASSERT_EQ(generatedCommands.size(), GroupKeyManagement::Commands::kGeneratedCommandsCount);
     ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
@@ -128,84 +128,6 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 } // namespace TestHelpers
 
-class MockSessionKeystore : public Crypto::SessionKeystore
-{
-public:
-    using P256ECDHDerivedSecret        = Crypto::P256ECDHDerivedSecret;
-    using Symmetric128BitsKeyByteArray = Crypto::Symmetric128BitsKeyByteArray;
-    using Aes128KeyHandle              = Crypto::Aes128KeyHandle;
-    using Hmac128KeyHandle             = Crypto::Hmac128KeyHandle;
-    using HkdfKeyHandle                = Crypto::HkdfKeyHandle;
-    using Symmetric128BitsKeyHandle    = Crypto::Symmetric128BitsKeyHandle;
-    using AttestationChallenge         = Crypto::AttestationChallenge;
-
-    MockSessionKeystore()           = default;
-    ~MockSessionKeystore() override = default;
-
-    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override
-    {
-        memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override
-    {
-        memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) override
-    {
-        auto & rawKey = key.AsMutable<std::array<std::byte, CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE>>();
-        VerifyOrReturnError(keyMaterial.size() <= sizeof(rawKey), CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(rawKey.data(), keyMaterial.data(), keyMaterial.size());
-        return CHIP_NO_ERROR;
-    }
-
-    void DestroyKey(Symmetric128BitsKeyHandle & key) override
-    {
-        memset(key.AsMutable<Symmetric128BitsKeyByteArray>(), 0, sizeof(Symmetric128BitsKeyByteArray));
-    }
-
-    void DestroyKey(HkdfKeyHandle & key) override
-    {
-        auto & rawKey = key.AsMutable<std::byte[CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE]>();
-        memset(rawKey, 0, sizeof(rawKey));
-    }
-
-    CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & /*secret*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
-                         Aes128KeyHandle & key) override
-    {
-        std::array<uint8_t, sizeof(Symmetric128BitsKeyByteArray)> dummy = {};
-        memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), dummy.data(), dummy.size());
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR DeriveSessionKeys(const ByteSpan & /*secret*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
-                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
-                                 AttestationChallenge & attestationChallenge) override
-    {
-        std::array<uint8_t, sizeof(Symmetric128BitsKeyByteArray)> dummy = {};
-        memcpy(i2rKey.AsMutable<Symmetric128BitsKeyByteArray>(), dummy.data(), dummy.size());
-        memcpy(r2iKey.AsMutable<Symmetric128BitsKeyByteArray>(), dummy.data(), dummy.size());
-        ZeroAttestationChallenge(attestationChallenge);
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & /*hkdfKey*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
-                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
-                                 AttestationChallenge & attestationChallenge) override
-    {
-        return DeriveSessionKeys(ByteSpan{}, ByteSpan{}, ByteSpan{}, i2rKey, r2iKey, attestationChallenge);
-    }
-
-private:
-    void ZeroAttestationChallenge(AttestationChallenge & challenge)
-    {
-        memset(challenge.Bytes(), 0, AttestationChallenge::Capacity());
-    }
-};
-
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
 
@@ -224,6 +146,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         mRealProvider.SetStorageDelegate(storage);
         mRealProvider.SetSessionKeystore(&mMockKeystore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
+        ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
+
         Credentials::SetGroupDataProvider(&mRealProvider);
         tester.SetFabricIndex(TestHelpers::kTestFabricIndex);
     }
@@ -309,4 +233,298 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
     PrepopulateGroupKeyMap(keys, TestHelpers::kTestFabricIndex);
     VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, keys);
 }
+
+
+const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
+const chip::GroupId kTestGroupId         = 0x1234;
+const chip::EndpointId kTestEndpoint1    = 10;
+const chip::EndpointId kTestEndpoint2    = 11;
+constexpr uint16_t kTestKeySetId         = 1;
+constexpr uint64_t kStartTimeOffset      = 100;
+
+// spec states - group should be deleted if the endpoint member list's last member is removed
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestGroupEndpointLifecycle)
+{
+    CHIP_ERROR err;
+
+    auto doesGroupExist = [&](GroupId gid) {
+        auto * iter = mRealProvider.IterateGroupInfo(kTestFabricIndex);
+        if (iter == nullptr)
+        {
+            return false;
+        }
+        chip::Credentials::GroupDataProvider::GroupInfo info;
+        bool found = false;
+        while (iter->Next(info))
+        {
+            if (info.group_id == gid)
+            {
+                found = true;
+                break;
+            }
+        }
+        iter->Release();
+        return found;
+    };
+
+    auto getEndpointCountForGroup = [&](GroupId gid) {
+        auto * iter = mRealProvider.IterateEndpoints(kTestFabricIndex, gid);
+        if (iter == nullptr)
+        {
+            return size_t(0);
+        }
+        size_t count = iter->Count();
+        iter->Release();
+        return count;
+    };
+
+    ASSERT_FALSE(doesGroupExist(kTestGroupId));
+    ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 0u);
+
+    err = mRealProvider.AddEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint1);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    ASSERT_TRUE(doesGroupExist(kTestGroupId));
+    ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 1u);
+
+    err = mRealProvider.AddEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint2);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    ASSERT_TRUE(doesGroupExist(kTestGroupId));
+    ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 2u);
+
+    err = mRealProvider.RemoveEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint1);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    ASSERT_TRUE(doesGroupExist(kTestGroupId));
+    ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 1u);
+
+    err = mRealProvider.RemoveEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint2);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    ASSERT_FALSE(doesGroupExist(kTestGroupId));
+    ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 0u);
+}
+
+constexpr FabricId kTestFabricId                    = 0xDEADBEEF00000001;
+constexpr NodeId kTestNodeId                        = 0xDEADBEEF00000002;
+constexpr uint64_t kTestRcacId                      = 0x1111222233334444;
+constexpr uint64_t kRootCertSerial                  = 1;
+constexpr uint64_t kNocSerial                       = 2;
+constexpr uint64_t kCertValidityStart               = 0;
+constexpr uint32_t kRootCertValidityDurationSeconds = 315360000; // 10 years
+constexpr uint32_t kNocCertValidityDurationSeconds  = 31536000;  // 1 year
+
+struct TestGroupKeyManagementWithFabric : public TestGroupKeyManagementClusterWithStorage
+{
+    uint8_t mRootCertDER[chip::Credentials::kMaxDERCertLength];
+    MutableByteSpan mRootCertSpan;
+    uint8_t mNocDER[chip::Credentials::kMaxDERCertLength];
+    MutableByteSpan mNocSpan;
+    Crypto::P256SerializedKeypair mSerializedOpKey;
+
+    chip::FabricIndex mTestFabricIndex = kUndefinedFabricIndex;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+
+    FabricTable mfabricTable;
+    FabricTable::InitParams initParams;
+
+    void SetUp() override
+    {
+
+        TestGroupKeyManagementClusterWithStorage::SetUp();
+
+        initParams.opCertStore         = &mOpCertStore;
+        initParams.storage             = &mTestContext.StorageDelegate();
+        initParams.operationalKeystore = nullptr;
+
+        GroupKeyManagementCluster::SetFabricTableForTest(&mfabricTable);
+
+        ASSERT_EQ(mOpCertStore.Init(&mTestContext.StorageDelegate()), CHIP_NO_ERROR);
+        ASSERT_EQ(mfabricTable.Init(initParams), CHIP_NO_ERROR);
+
+        ASSERT_EQ(mfabricTable.PeekFabricIndexForNextAddition(mTestFabricIndex), CHIP_NO_ERROR);
+        SetUpCertificates();
+
+        CHIP_ERROR err = mfabricTable.AddNewFabricForTest(
+            mRootCertSpan, ByteSpan(), mNocSpan, ByteSpan(mSerializedOpKey.Bytes(), mSerializedOpKey.Length()), &mTestFabricIndex);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+
+        ASSERT_EQ(mfabricTable.CommitPendingFabricData(), CHIP_NO_ERROR);
+
+        tester.SetFabricIndex(mTestFabricIndex);
+    }
+
+    void SetUpCertificates()
+    {
+
+        Crypto::P256Keypair rootCACredentials;
+        ASSERT_EQ(rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+        Crypto::P256Keypair deviceOpKey;
+        ASSERT_EQ(deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+        ASSERT_EQ(deviceOpKey.Serialize(mSerializedOpKey), CHIP_NO_ERROR);
+
+        // Create temporary X.509 (DER) buffers
+        // store the final TLV certs in the member variables
+        uint8_t rootCertDER_temp[chip::Credentials::kMaxDERCertLength];
+        MutableByteSpan rootCertDERSpan(rootCertDER_temp);
+
+        uint8_t nocDER_temp[chip::Credentials::kMaxDERCertLength];
+        MutableByteSpan nocDERSpan(nocDER_temp);
+
+        mRootCertSpan = MutableByteSpan(mRootCertDER);
+        mNocSpan      = MutableByteSpan(mNocDER);
+
+        chip::Credentials::X509CertRequestParams rootRequestParams;
+        rootRequestParams.SerialNumber  = kRootCertSerial;
+        rootRequestParams.ValidityStart = kCertValidityStart;
+        rootRequestParams.ValidityEnd   = kRootCertValidityDurationSeconds;
+
+        const char * rootName = "My Test Root CA";
+        CHIP_ERROR err        = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
+                                                                        CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
+               );
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        err = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;
+
+        err = chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+
+        // Convert X.509 DER to Matter TLV
+        err = chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+
+        chip::Credentials::X509CertRequestParams nocRequestParams;
+        nocRequestParams.SerialNumber  = kNocSerial;
+        nocRequestParams.ValidityStart = kCertValidityStart;
+        nocRequestParams.ValidityEnd   = kNocCertValidityDurationSeconds;
+        nocRequestParams.IssuerDN      = rootRequestParams.SubjectDN;
+        err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        err = chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+
+        err = chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    void TearDownFabric()
+    {
+
+        if (mTestFabricIndex != chip::kUndefinedFabricIndex)
+        {
+            CHIP_ERROR err = mRealProvider.RemoveFabric(mTestFabricIndex);
+            EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_FOUND);
+
+            EXPECT_EQ(mOpCertStore.RemoveOpCertsForFabric(mTestFabricIndex), CHIP_NO_ERROR);
+            err = mfabricTable.Delete(mTestFabricIndex);
+            EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_FOUND);
+
+            mTestFabricIndex = chip::kUndefinedFabricIndex;
+            mfabricTable.Shutdown();
+            mOpCertStore.Finish();
+        }
+        tester.SetFabricIndex(kUndefinedFabricIndex);
+    }
+
+    void TearDown() override
+    {
+
+        TearDownFabric();
+        GroupKeyManagementCluster::SetFabricTableForTest(nullptr);
+        TestGroupKeyManagementClusterWithStorage::TearDown();
+    }
+};
+
+const uint64_t kStartTime = 123456789;
+
+static const chip::Credentials::GroupDataProvider::EpochKey kKey = {
+    .start_time = 0, .key = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10 }
+};
+
+static const chip::Credentials::GroupDataProvider::EpochKey kNewKey = {
+    .start_time = 0, .key = { 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 }
+};
+
+// writing a valid key set
+TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteCommand)
+{
+
+    GroupKeyManagement::Commands::KeySetWrite::Type requestData;
+
+    requestData.groupKeySet = {
+        .groupKeySetID          = kTestKeySetId,
+        .groupKeySecurityPolicy = GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst,
+        .epochKey0              = chip::ByteSpan(kKey.key, sizeof(kKey.key)),
+        .epochStartTime0        = kStartTime,
+        .epochKey1              = DataModel::NullNullable,
+        .epochStartTime1        = DataModel::NullNullable,
+        .epochKey2              = DataModel::NullNullable,
+        .epochStartTime2        = DataModel::NullNullable,
+    };
+
+    auto result = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData);
+    EXPECT_TRUE(result.IsSuccess());
+    Credentials::GroupDataProvider::KeySet storedKeySet;
+    CHIP_ERROR err = mRealProvider.GetKeySet(mTestFabricIndex, kTestKeySetId, storedKeySet);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(storedKeySet.keyset_id, kTestKeySetId);
+    ASSERT_EQ(storedKeySet.policy, GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst);
+    ASSERT_EQ(storedKeySet.num_keys_used, 1);
+    ASSERT_EQ(storedKeySet.epoch_keys[0].start_time, kStartTime);
+}
+
+// Spec states that writing a KeySet with an existing KeySetID on the same fabric should overwrite the existing one
+TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteSameId)
+{
+    GroupKeyManagement::Commands::KeySetWrite::Type requestData1;
+    requestData1.groupKeySet = {
+        .groupKeySetID          = kTestKeySetId,
+        .groupKeySecurityPolicy = GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst,
+        .epochKey0              = chip::ByteSpan(kKey.key, sizeof(kKey.key)),
+        .epochStartTime0        = kStartTime,
+        .epochKey1              = DataModel::NullNullable,
+        .epochStartTime1        = DataModel::NullNullable,
+        .epochKey2              = DataModel::NullNullable,
+        .epochStartTime2        = DataModel::NullNullable,
+    };
+    auto result1 = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData1);
+
+    EXPECT_TRUE(result1.IsSuccess());
+    chip::Credentials::GroupDataProvider::KeySet storedKeySet;
+    CHIP_ERROR err = mRealProvider.GetKeySet(mTestFabricIndex, kTestKeySetId, storedKeySet);
+
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(storedKeySet.policy, GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst);
+
+    GroupKeyManagement::Commands::KeySetWrite::Type requestData2;
+    requestData2.groupKeySet = {
+        .groupKeySetID          = kTestKeySetId,
+        .groupKeySecurityPolicy = GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst,
+        .epochKey0              = chip::ByteSpan(kNewKey.key, sizeof(kNewKey.key)),
+        .epochStartTime0        = kStartTime + kStartTimeOffset,
+        .epochKey1              = DataModel::NullNullable,
+        .epochStartTime1        = DataModel::NullNullable,
+        .epochKey2              = DataModel::NullNullable,
+        .epochStartTime2        = DataModel::NullNullable,
+    };
+
+    auto result2 = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData2);
+
+    EXPECT_TRUE(result2.IsSuccess());
+
+    err = mRealProvider.GetKeySet(mTestFabricIndex, kTestKeySetId, storedKeySet);
+
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(storedKeySet.policy, GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst);
+    ASSERT_EQ(storedKeySet.num_keys_used, 1);
+    ASSERT_EQ(storedKeySet.epoch_keys[0].start_time, kStartTime + kStartTimeOffset);
+}
+
 } // namespace
