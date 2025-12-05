@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,46 +17,38 @@
  */
 #pragma once
 
-#include <app/clusters/power-topology-server/power-topology-server.h>
+#include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
+#include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerTopology {
 
-class PowerTopologyDelegate : public Delegate
+class MockPowerTopologyDelegate : public Delegate
 {
 public:
-    ~PowerTopologyDelegate() = default;
+    ~MockPowerTopologyDelegate() = default;
 
     CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override;
     CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
-};
 
-class PowerTopologyInstance : public Instance
-{
-public:
-    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature) :
-        PowerTopology::Instance(aEndpointId, aDelegate, aFeature)
-    {
-        mDelegate = &aDelegate;
-    }
-
-    // Delete copy constructor and assignment operator.
-    PowerTopologyInstance(const PowerTopologyInstance &)             = delete;
-    PowerTopologyInstance(const PowerTopologyInstance &&)            = delete;
-    PowerTopologyInstance & operator=(const PowerTopologyInstance &) = delete;
-
-    CHIP_ERROR Init();
-    void Shutdown();
-
-    PowerTopologyDelegate * GetDelegate() { return mDelegate; };
+    // Test helper methods
+    void SetAvailableEndpoints(const std::vector<EndpointId> & endpoints) { mAvailableEndpoints = endpoints; }
+    void SetActiveEndpoints(const std::vector<EndpointId> & endpoints) { mActiveEndpoints = endpoints; }
+    void SetAvailableEndpointsError(CHIP_ERROR error) { mAvailableEndpointsError = error; }
+    void SetActiveEndpointsError(CHIP_ERROR error) { mActiveEndpointsError = error; }
+    void ClearAvailableEndpoints() { mAvailableEndpoints.clear(); }
+    void ClearActiveEndpoints() { mActiveEndpoints.clear(); }
 
 private:
-    PowerTopologyDelegate * mDelegate;
+    std::vector<EndpointId> mAvailableEndpoints;
+    std::vector<EndpointId> mActiveEndpoints;
+    CHIP_ERROR mAvailableEndpointsError = CHIP_NO_ERROR;
+    CHIP_ERROR mActiveEndpointsError    = CHIP_NO_ERROR;
 };
 
 } // namespace PowerTopology
