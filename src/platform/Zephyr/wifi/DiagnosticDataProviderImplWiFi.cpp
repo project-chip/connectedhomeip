@@ -89,7 +89,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 {
     WiFiManager::WiFiInfo info;
     ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
-    // mCurrentPhyRate Value in MB
+    // mCurrentPhyRate Value in Mbps
     currentMaxRate = info.mCurrentPhyRate * 1000000;
     return CHIP_NO_ERROR;
 }
