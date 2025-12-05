@@ -18,8 +18,6 @@
 #pragma once
 
 #include <app/clusters/electrical-power-measurement-server/ElectricalPowerMeasurementCluster.h>
-// #include <app/clusters/electrical-power-measurement-server/ElectricalPowerMeasurementDelegate.h>
-// #include <app/AttributeAccessInterface.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>

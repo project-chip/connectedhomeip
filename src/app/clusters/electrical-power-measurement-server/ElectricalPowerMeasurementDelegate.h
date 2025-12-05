@@ -17,7 +17,6 @@
  */
 #pragma once
 
-// #include <app-common/zap-generated/cluster-objects.h>
 #include <clusters/ElectricalPowerMeasurement/Enums.h>
 #include <clusters/ElectricalPowerMeasurement/Structs.h>
 #include <lib/core/CHIPError.h>

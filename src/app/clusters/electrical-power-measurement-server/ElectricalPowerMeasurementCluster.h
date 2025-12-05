@@ -23,8 +23,6 @@
 #include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
 #include <clusters/ElectricalPowerMeasurement/Metadata.h>
-// #include <clusters/ElectricalPowerMeasurement/Structs.h>
-// #include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
