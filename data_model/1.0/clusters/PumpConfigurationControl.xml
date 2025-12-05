@@ -192,11 +192,17 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <optionalConform/>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="MaxConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <optionalConform/>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
   </attributes>
   <events>

@@ -91,10 +91,10 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="BallastStatus" type="map8" default="0">
       <bitmap>
-        <bitfield name="" bit="0" summary="">
+        <bitfield name="Ballast Non-operational" bit="0" summary="0 = The ballast is fully operational 1 = The ballast is not fully operational">
           <mandatoryConform/>
         </bitfield>
-        <bitfield name="" bit="1" summary="">
+        <bitfield name="Lamp Failure" bit="1" summary="0 = All lamps are operational 1 = One or more lamp is not in its socket or is faulty">
           <mandatoryConform/>
         </bitfield>
       </bitmap>
@@ -193,7 +193,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0034" name="LampAlarmMode" type="map8" default="0">
       <bitmap>
-        <bitfield name="" bit="0" summary="">
+        <bitfield name="LampBurnHours" bit="0" summary="LampBurnHours">
           <mandatoryConform/>
         </bitfield>
       </bitmap>

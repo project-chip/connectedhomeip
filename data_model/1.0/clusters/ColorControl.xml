@@ -1221,19 +1221,19 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UpdateFlags" type="map8">
         <bitmap>
-          <bitfield name="" bit="0" summary="">
+          <bitfield name="UpdateAction" bit="0" summary="UpdateAction">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="" bit="1" summary="">
+          <bitfield name="UpdateDirection" bit="1" summary="UpdateDirection">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="" bit="2" summary="">
+          <bitfield name="UpdateTime" bit="2" summary="UpdateTime">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="" bit="3" summary="">
+          <bitfield name="UpdateStartHue" bit="3" summary="UpdateStartHue">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="" from="0x00000004" to="0x00000007" summary="">
+          <bitfield name="(Reserved)" from="0x00000004" to="0x00000007" summary="(Reserved)">
             <mandatoryConform/>
           </bitfield>
         </bitmap>
