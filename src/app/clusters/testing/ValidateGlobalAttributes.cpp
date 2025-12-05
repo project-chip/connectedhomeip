@@ -20,6 +20,12 @@ namespace chip::Testing {
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
                              std::initializer_list<const app::DataModel::AttributeEntry> expected)
 {
+    std::vector<app::DataModel::AttributeEntry> attributes(expected.begin(), expected.end());
+    return IsAttributesListEqualTo(cluster, std::move(attributes));
+}
+
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected)
+{
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
@@ -29,7 +35,6 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
         return false;
     }
 
-    // build expectation with global attributes
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
 
     SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
@@ -37,6 +42,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     {
         SuccessOrDie(expectedBuilder.Append(entry));
     }
+
     SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
 
     return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());

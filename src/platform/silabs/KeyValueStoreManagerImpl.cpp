@@ -83,7 +83,7 @@ bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
 uint16_t KeyValueStoreManagerImpl::hashKvsKeyString(const char * key) const
 {
     uint8_t hash256[Crypto::kSHA256_Hash_Length] = { 0 };
-    Crypto::Hash_SHA256(reinterpret_cast<const uint8_t *>(key), strlen(key), hash256);
+    TEMPORARY_RETURN_IGNORED Crypto::Hash_SHA256(reinterpret_cast<const uint8_t *>(key), strlen(key), hash256);
 
     uint16_t hash16 = 0, i = 0;
 
@@ -172,8 +172,8 @@ void KeyValueStoreManagerImpl::ForceKeyMapSave()
 
 void KeyValueStoreManagerImpl::OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState)
 {
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<const uint8_t *>(mKvsKeyMap),
-                                      sizeof(mKvsKeyMap));
+    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
+                                                               reinterpret_cast<const uint8_t *>(mKvsKeyMap), sizeof(mKvsKeyMap));
 }
 
 void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
@@ -182,7 +182,7 @@ void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
         During commissioning, the key map will be modified multiples times subsequently.
         Commit the key map in nvm once it as stabilized.
     */
-    SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(
         std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(SL_KVS_SAVE_DELAY_SECONDS)),
         KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
 }
@@ -267,7 +267,7 @@ void KeyValueStoreManagerImpl::ErasePartition(void)
     // Iterate over all the Matter Kvs nvm3 records and delete each one...
     for (uint32_t nvm3Key = SilabsConfig::kMinConfigKey_MatterKvs; nvm3Key <= SilabsConfig::kConfigKey_KvsLastKeySlot; nvm3Key++)
     {
-        SilabsConfig::ClearConfigValue(nvm3Key);
+        TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(nvm3Key);
     }
 
     memset(mKvsKeyMap, 0, sizeof(mKvsKeyMap));
@@ -308,8 +308,9 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
                     VerifyOrDie(prefixedData != nullptr);
                     memcpy(prefixedData, keyString, keyStringLen);
 
-                    SilabsConfig::ReadConfigValueBin(nvm3Key, prefixedData + keyStringLen, dataLen, readlen);
-                    SilabsConfig::WriteConfigValueBin(nvm3Key, prefixedData, keyStringLen + dataLen);
+                    TEMPORARY_RETURN_IGNORED SilabsConfig::ReadConfigValueBin(nvm3Key, prefixedData + keyStringLen, dataLen,
+                                                                              readlen);
+                    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValueBin(nvm3Key, prefixedData, keyStringLen + dataLen);
                     mKvsKeyMap[i] = KeyValueStoreMgrImpl().hashKvsKeyString(keyString);
                     Platform::MemoryFree(prefixedData);
                 }

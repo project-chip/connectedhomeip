@@ -49,6 +49,8 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_IDM_3_2(BasicCompositionTests):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""
@@ -64,7 +66,7 @@ class TC_IDM_3_2(BasicCompositionTests):
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
         """
-        logging.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
+        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
 
         for endpoint_id, endpoint in endpoints_data.items():
             for cluster_type, cluster_data in endpoint.items():
@@ -82,15 +84,15 @@ class TC_IDM_3_2(BasicCompositionTests):
                             issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
                         # Check if this attribute requires timed write using the must_use_timed_write class property
                         if attr_type.must_use_timed_write:
-                            logging.info(f"Found timed write attribute: {attr_type.__name__} "
-                                         f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                            log.info(f"Found timed write attribute: {attr_type.__name__} "
+                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
                             return endpoint_id, attr_type
 
-        logging.warning("No timed write attributes found on device")
+        log.warning("No timed write attributes found on device")
         return None, None
 
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH sends the WriteRequestMessage to the DUT to write any attribute on an unsupported Endpoint. DUT responds with the Write Response action",
                      "Verify on the TH that the DUT sends the status code UNSUPPORTED_ENDPOINT"),
@@ -107,7 +109,6 @@ class TC_IDM_3_2(BasicCompositionTests):
             TestStep(7, "TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs Timed Write transaction to write and this action is not part of a Timed Write transaction.",
                      "On the TH verify that the DUT sends a status code NEEDS_TIMED_INTERACTION."),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_IDM_3_2(self):
@@ -146,12 +147,16 @@ class TC_IDM_3_2(BasicCompositionTests):
         '''
         supported_cluster_ids = set()
         for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys(
-            ) if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
+            supported_cluster_ids.update({
+                cluster.id for cluster in endpoint_clusters
+                if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
+            })
 
         # Get all possible standard clusters
-        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys(
-        ) if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
+        all_standard_cluster_ids = {
+            cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
+            if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
+        }
 
         # Find unsupported clusters
         unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
@@ -192,21 +197,21 @@ class TC_IDM_3_2(BasicCompositionTests):
                 if unsupported:
                     unsupported_attribute = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
                     unsupported_endpoint = endpoint_id
-                    logging.info(f"Found unsupported attribute: {unsupported_attribute} in cluster {cluster_type.id}")
+                    log.info(f"Found unsupported attribute: {unsupported_attribute} in cluster {cluster_type.id}")
                     break
             if unsupported_attribute:
-                logging.info(f"Unsupported attribute: {unsupported_attribute}")
+                log.info(f"Unsupported attribute: {unsupported_attribute}")
                 break
 
         if not unsupported_attribute:
-            logging.warning("No unsupported attributes found - this may be OK for non-commissionable devices")
+            log.warning("No unsupported attributes found - this may be OK for non-commissionable devices")
         else:
             write_status2 = await self.write_single_attribute(
                 attribute_value=unsupported_attribute(0),
                 endpoint_id=unsupported_endpoint,
                 expect_success=False
             )
-            logging.info(f"Writing unsupported attribute: {unsupported_attribute}")
+            log.info(f"Writing unsupported attribute: {unsupported_attribute}")
             asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                                  f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
@@ -233,8 +238,8 @@ class TC_IDM_3_2(BasicCompositionTests):
             test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
             test_value = "SuppressResponse-Test"
 
-            logging.info("Testing SuppressResponse functionality with NodeLabel attribute")
-            logging.info("NOTE: Device may or may not respond - both behaviors are acceptable for now per Issue #41227")
+            log.info("Testing SuppressResponse functionality with NodeLabel attribute")
+            log.info("NOTE: Device may or may not respond - both behaviors are acceptable for now per Issue #41227")
 
             # Send write request with suppressResponse=True
             # Device may respond or not - we just ensure it doesn't crash
@@ -244,13 +249,13 @@ class TC_IDM_3_2(BasicCompositionTests):
                     attributes=[(self.endpoint, test_attribute(test_value))],
                     suppressResponse=True
                 )
-                logging.info(f"Device responded to suppressResponse=True request: {res}")
+                log.info(f"Device responded to suppressResponse=True request: {res}")
             except Exception as e:
                 # Device didn't respond (timeout or other error) - this is also acceptable
-                logging.info(f"Device did not respond or encountered error: {e}")
+                log.info(f"Device did not respond or encountered error: {e}")
 
             # Verify the write operation succeeded by reading back the value
-            logging.info("Verifying that the write operation succeeded")
+            log.info("Verifying that the write operation succeeded")
             actual_value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint,
                 cluster=Clusters.BasicInformation,
@@ -280,7 +285,7 @@ class TC_IDM_3_2(BasicCompositionTests):
 
             # Get the current DataVersion
             current_data_version = read_result[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            logging.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
+            log.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
 
             write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
@@ -313,7 +318,7 @@ class TC_IDM_3_2(BasicCompositionTests):
             )
 
             initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            logging.info(f"Initial DataVersion for step 6: {initial_data_version}")
+            log.info(f"Initial DataVersion for step 6: {initial_data_version}")
 
             # Write without DataVersion (this should succeed and increment the DataVersion)
             new_value1 = "New-Label-Step6"
@@ -338,7 +343,7 @@ class TC_IDM_3_2(BasicCompositionTests):
             # NodeLabel doesn't exist - skip these steps for now
             # Created following follow-up task for the event that the node label attribute does not exist
             # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
-            logging.info("NodeLabel not found - this may be a non-commissionable device")
+            log.info("NodeLabel not found - this may be a non-commissionable device")
 
         endpoint_id, timed_attr = await self.find_timed_write_attribute(self.endpoints)
         if timed_attr:
@@ -362,11 +367,11 @@ class TC_IDM_3_2(BasicCompositionTests):
             '''
 
             # Test with the real timed-write attribute found on the device
-            logging.info(f"Testing timed write attribute: {timed_attr}")
+            log.info(f"Testing timed write attribute: {timed_attr}")
 
             # Test NEEDS_TIMED_INTERACTION - Writing timed-write-required attribute without timed transaction
             # Found below logic in /home/ubuntu/connectedhomeapi/connectedhomeip/src/controller/python/tests/scripts/cluster_objects.py and TC_IDM_1_2 test logic.
-            logging.info("Writing timed-write-required attribute without timedRequestTimeoutMs should be rejected")
+            log.info("Writing timed-write-required attribute without timedRequestTimeoutMs should be rejected")
             try:
                 await self.default_controller.WriteAttribute(
                     self.dut_node_id,
@@ -379,7 +384,7 @@ class TC_IDM_3_2(BasicCompositionTests):
 
             # TIMED_REQUEST_MISMATCH - Writing with TimedRequest flag but no actual timed transaction
             # Thanks to Cecille for the guidance on the test step logic and plumbing for this to function below.
-            logging.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
+            log.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
             try:
                 await self.default_controller.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
                     self.dut_node_id,
@@ -393,7 +398,7 @@ class TC_IDM_3_2(BasicCompositionTests):
                                      f"WriteAttribute should return TimedRequestMismatch, got {e.status}")
 
             # TIMED_REQUEST_MISMATCH - Writing with timed action performed but TimedRequest flag set to false
-            logging.info("Writing with timed action but TimedRequest flag=false should return TIMED_REQUEST_MISMATCH")
+            log.info("Writing with timed action but TimedRequest flag=false should return TIMED_REQUEST_MISMATCH")
             try:
                 await self.default_controller.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
                     self.dut_node_id,

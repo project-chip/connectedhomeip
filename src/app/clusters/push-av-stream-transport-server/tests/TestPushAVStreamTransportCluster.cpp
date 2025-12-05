@@ -24,7 +24,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/testing/MockCommandHandler.h>
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/tests/AppTestContext.h>
@@ -79,7 +79,7 @@ static uint8_t gInfoEventBuffer[120];
 static uint8_t gCritEventBuffer[120];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-class MockEventLogging : public chip::Test::AppContext
+class MockEventLogging : public chip::Testing::AppContext
 {
 public:
     void SetUp() override

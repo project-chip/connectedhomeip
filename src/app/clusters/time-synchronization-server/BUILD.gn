@@ -30,8 +30,8 @@ source_set("time-synchronization-server") {
   sources = [
     "DefaultTimeSyncDelegate.cpp",
     "DefaultTimeSyncDelegate.h",
-    "time-synchronization-cluster.cpp",
-    "time-synchronization-cluster.h",
+    "TimeSynchronizationCluster.cpp",
+    "TimeSynchronizationCluster.h",
     "time-synchronization-delegate.h",
   ]
 

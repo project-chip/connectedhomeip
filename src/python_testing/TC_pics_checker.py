@@ -67,7 +67,7 @@ class TC_PICS_Checker(BasicCompositionTests):
                 continue
             pics = pics_mapper(self.xml_clusters[cluster_id].pics, element_id)
 
-            if cluster_id not in self.endpoint.keys():
+            if cluster_id not in self.endpoint:
                 # This cluster is not on this endpoint
                 required = False
             elif element_id in self.endpoint[cluster_id][attribute_id_of_element_list]:
@@ -101,8 +101,10 @@ class TC_PICS_Checker(BasicCompositionTests):
     def test_TC_IDM_10_4(self):
         # wildcard read is done in setup_class
         self.step(1)
-        self.endpoint_id = self.get_endpoint(default=None)
-        asserts.assert_not_equal(self.endpoint_id, None, "An explicit endpoint is required for this test, please use --endpoint")
+        asserts.assert_not_equal(self.matter_test_config.endpoint, None,
+                                 "An explicit endpoint is required for this test, please use --endpoint")
+        self.endpoint_id = self.get_endpoint()
+
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 

@@ -13,6 +13,8 @@ from chiptest.runner import Runner, SubprocessInfo
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
 
+log = logging.getLogger(__name__)
+
 TEST_NODE_ID = '0x12344321'
 TEST_VID = '0xFFF1'
 TEST_PID = '0x8001'
@@ -39,7 +41,7 @@ class DarwinToolRunner:
             self.process.kill()
 
     def waitForMessage(self, message):
-        logging.debug('Waiting for %s' % message)
+        log.debug("Waiting for '%s'", message)
 
         start_time = time.monotonic()
         ready, self.lastLogIndex = self.outpipe.CapturedLogContains(
@@ -48,7 +50,7 @@ class DarwinToolRunner:
             if self.process.poll() is not None:
                 died_str = ('Process died while waiting for %s, returncode %d' %
                             (message, self.process.returncode))
-                logging.error(died_str)
+                log.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > 10:
                 raise Exception('Timeout while waiting for %s' % message)
@@ -56,7 +58,7 @@ class DarwinToolRunner:
             ready, self.lastLogIndex = self.outpipe.CapturedLogContains(
                 message, self.lastLogIndex)
 
-        logging.debug('Success waiting for: %s' % message)
+        log.debug("Success waiting for: '%s'", message)
 
 
 class InteractiveDarwinTool(DarwinToolRunner):
@@ -68,7 +70,7 @@ class InteractiveDarwinTool(DarwinToolRunner):
         self.waitForMessage(self.prompt)
 
     def sendCommand(self, command):
-        logging.debug('Sending command %s' % command)
+        log.debug("Sending command '%s'", command)
         print(command, file=self.stdin)
         self.waitForPrompt()
 
@@ -182,7 +184,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         apps_register.compareFiles(ota_data_file, ota_destination_file)
 
     except Exception:
-        logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+        log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
         runner.capture_delegate.LogContents()
         raise
     finally:

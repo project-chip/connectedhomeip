@@ -48,6 +48,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_I_2_4(MatterBaseTest):
     def desc_TC_I_2_4(self) -> str:
@@ -109,14 +111,13 @@ class TC_I_2_4(MatterBaseTest):
                 ]
 
     def pics_TC_I_2_4(self) -> list[str]:
-        pics = [
+        return [
             "I.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Identify))
     async def test_TC_I_2_4(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Commissioning - already done
         self.step(1)
@@ -141,7 +142,7 @@ class TC_I_2_4(MatterBaseTest):
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(6)
-        logging.info("Test waits for 12 seconds")
+        log.info("Test waits for 12 seconds")
         await asyncio.sleep(12)
 
         self.step(7)
@@ -150,7 +151,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(8)
         reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
+        log.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
         asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
 
         self.step(9)
@@ -174,7 +175,7 @@ class TC_I_2_4(MatterBaseTest):
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(14)
-        logging.info("Test waits for 1 seconds")
+        log.info("Test waits for 1 seconds")
         await asyncio.sleep(1)
 
         self.step(15)
@@ -183,7 +184,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(16)
         reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
+        log.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
         asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
 
         self.step(17)
@@ -211,7 +212,7 @@ class TC_I_2_4(MatterBaseTest):
             pass
 
         self.step(21)
-        logging.info("Test waits for 12 seconds")
+        log.info("Test waits for 12 seconds")
         await asyncio.sleep(12)
 
         self.step(22)
@@ -220,7 +221,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(23)
         reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
+        log.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
         asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
 
         self.step(24)
@@ -250,7 +251,7 @@ class TC_I_2_4(MatterBaseTest):
             pass
 
         self.step(29)
-        logging.info("Test waits for 1 seconds")
+        log.info("Test waits for 1 seconds")
         await asyncio.sleep(1)
 
         self.step(30)
@@ -259,7 +260,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(31)
         reportedIdentifyTimeValuesList = sub_handler.attribute_reports[cluster.Attributes.IdentifyTime]
-        logging.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
+        log.info(f'IdentifyTime reports: {reportedIdentifyTimeValuesList}')
         asserts.assert_almost_equal(reportedIdentifyTimeValuesList[0].value, 5, delta=1, msg="Unexpected first IdentifyTime report")
 
         self.step(32)

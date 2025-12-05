@@ -48,6 +48,8 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
+log = logging.getLogger(__name__)
+
 
 class TC_FAN_4_1(MatterBaseTest):
     def desc_TC_FAN_4_1(self) -> str:
@@ -73,6 +75,7 @@ class TC_FAN_4_1(MatterBaseTest):
             return [mode.kOff, mode.kHigh]
 
         asserts.fail(f"Unknown FanModeSequence {fan_mode_sequence}")
+        return None
 
     def _sub_step(self, start_step: int, attribute_to_set: str, value: str, verify_mode: str, verify_percent: str, verify_speed: str, spd_check: bool = False):
         spd = ""
@@ -250,7 +253,7 @@ class TC_FAN_4_1(MatterBaseTest):
                 asserts.assert_not_equal(percent_setting, 0, "Incorrect percent setting")
 
             self.step(step_num + 3)
-            logging.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
+            log.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
             await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)

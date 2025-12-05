@@ -146,7 +146,7 @@ public:
     uint32_t mNumPairingComplete = 0;
 };
 
-class TestCommissioningWindowManager : public chip::Test::LoopbackMessagingContext
+class TestCommissioningWindowManager : public chip::Testing::LoopbackMessagingContext
 {
 public:
     static void SetUpTestSuite()
@@ -206,7 +206,7 @@ public:
     void SetUp() override
     {
         ConfigInitializeNodes(false);
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 
     void EstablishPASEHandshake(SessionManager & sessionManager, PASESession & pairingCommissioner,
@@ -219,8 +219,9 @@ void TestCommissioningWindowManager::ServiceEvents()
 {
     DrainAndServiceIO();
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
-                                                  (intptr_t) nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t) -> void { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
+        (intptr_t) nullptr);
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 

@@ -56,7 +56,7 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Send ProvideOffer with no audio or video id => expect INVALID_COMMAND"),
             TestStep(3, "Send ProvideOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),
@@ -67,13 +67,12 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
             TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer with StreamUsage = LiveView => expect ProvideOfferResponse"),
             TestStep(9, "Read CurrentSessions attribute => expect 1"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_3(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
@@ -82,7 +81,10 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WebRTCP_2_3(self):
@@ -90,7 +92,7 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         # Sample SDP for testing

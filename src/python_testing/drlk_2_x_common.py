@@ -27,6 +27,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import matchers
 
+log = logging.getLogger(__name__)
+
 
 class DRLK_COMMON:
     async def read_drlk_attribute_expect_success(self, attribute):
@@ -108,7 +110,7 @@ class DRLK_COMMON:
 
     async def read_and_verify_pincode_length(self, attribute, failure_message: str, min_range=0, max_range=255):
         pin_code_length = await self.read_drlk_attribute_expect_success(attribute=attribute)
-        verify_pin_code_length = True if min_range <= pin_code_length <= max_range else False
+        verify_pin_code_length = min_range <= pin_code_length <= max_range
         asserts.assert_true(verify_pin_code_length, f"{failure_message}, got value {pin_code_length}")
         return pin_code_length
 
@@ -126,7 +128,7 @@ class DRLK_COMMON:
 
         # Allow for user overrides of these values
         self.user_index = self.user_params.get("user_index", 1)
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint()
         credentialIndex = self.user_params.get("credential_index", 1)
         userCodeTemporaryDisableTime = self.user_params.get("user_code_temporary_disable_time", 15)
         wrongCodeEntryLimit = self.user_params.get("wrong_code_entry_limit", 3)
@@ -157,7 +159,7 @@ class DRLK_COMMON:
             if self.check_pics("DRLK.S.A0033"):
                 self.print_step("2", "TH reads and saves the value of the RequirePINforRemoteOperation attribute from the DUT")
                 requirePinForRemoteOperation_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.RequirePINforRemoteOperation)
-                logging.info("Current RequirePINforRemoteOperation value is %s" % (requirePinForRemoteOperation_dut))
+                log.info("Current RequirePINforRemoteOperation value is %s" % (requirePinForRemoteOperation_dut))
 
                 if self.check_pics("DRLK.S.M.RequirePINForRemoteOperationAttributeWritable"):
                     self.print_step("2a", "TH verifies that RequirePINforRemoteOperation is FALSE")
@@ -222,7 +224,7 @@ class DRLK_COMMON:
             if self.check_pics("DRLK.S.A0033"):
                 self.print_step("6", "TH reads and saves the value of the RequirePINforRemoteOperation attribute from the DUT")
                 requirePinForRemoteOperation_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.RequirePINforRemoteOperation)
-                logging.info("Current RequirePINforRemoteOperation value is %s" % (requirePinForRemoteOperation_dut))
+                log.info("Current RequirePINforRemoteOperation value is %s" % (requirePinForRemoteOperation_dut))
 
                 if self.check_pics("DRLK.S.M.RequirePINForRemoteOperationAttributeWritable"):
                     self.print_step("6a", "TH verifies that RequirePINforRemoteOperation is TRUE")
@@ -233,7 +235,7 @@ class DRLK_COMMON:
             invalidPincode = bytes(invalidPincodeString, "ascii")
             if invalidPincodeString != pin_code:
                 break
-        logging.info(" pin_code=%s, Invalid PinCode=%s" % (pin_code, invalidPincodeString))
+        log.info(" pin_code=%s, Invalid PinCode=%s" % (pin_code, invalidPincodeString))
         if self.check_pics("DRLK.S.F00") and self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.A0033"):
             self.print_step("7", "TH sends %s Command to the DUT with an invalid PINCode" % lockUnlockText)
             command = lockUnlockCommand(PINCode=invalidPincode)
@@ -261,7 +263,7 @@ class DRLK_COMMON:
 
             self.print_step("10b", "TH reads the value of WrongCodeEntryLimit attribute. Verify a range of 1-255")
             wrongCodeEntryLimit_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.WrongCodeEntryLimit)
-            logging.info("WrongCodeEntryLimit value is %s" % (wrongCodeEntryLimit_dut))
+            log.info("WrongCodeEntryLimit value is %s" % (wrongCodeEntryLimit_dut))
             asserts.assert_in(wrongCodeEntryLimit_dut, range(1, 255), "WrongCodeEntryLimit value is out of range")
 
             self.print_step("11a", "TH writes the UserCodeTemporaryDisableTime to any value between 1 and 255")
@@ -273,7 +275,7 @@ class DRLK_COMMON:
 
             self.print_step("11b", "TH reads the value of UserCodeTemporaryDisableTime attribute. Verify a range of 1-255")
             userCodeTemporaryDisableTime_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.UserCodeTemporaryDisableTime)
-            logging.info("UserCodeTemporaryDisableTime value is %s" % (userCodeTemporaryDisableTime_dut))
+            log.info("UserCodeTemporaryDisableTime value is %s" % (userCodeTemporaryDisableTime_dut))
             asserts.assert_in(userCodeTemporaryDisableTime_dut, range(1, 255), "UserCodeTemporaryDisableTime value is out of range")
 
         if self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.F00"):
@@ -312,7 +314,7 @@ class DRLK_COMMON:
 
                 self.print_step("16", "TH reads the value of AutoRelockTime attribute.")
                 autoRelockTime_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.AutoRelockTime)
-                logging.info("AutoRelockTime value is %s" % (autoRelockTime_dut))
+                log.info("AutoRelockTime value is %s" % (autoRelockTime_dut))
 
                 if self.check_pics(lockUnlockCmdRspPICS):
                     self.print_step("17", "Send %s with valid Pincode and verify success" % lockUnlockText)
@@ -324,11 +326,11 @@ class DRLK_COMMON:
                     # Add additional wait time buffer for motor movement, etc.
                     await asyncio.sleep(autoRelockTime_dut + 5)
                     lockstate_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.LockState)
-                    logging.info("Current LockState is %s" % (lockstate_dut))
+                    log.info("Current LockState is %s" % (lockstate_dut))
                     asserts.assert_equal(lockstate_dut, Clusters.DoorLock.Enums.DlLockState.kLocked,
                                          "LockState expected to be value==Locked")
             else:
-                logging.info("Steps 15 to 18 are Skipped as the PICs DRLK.S.A0023 not enabled")
+                log.info("Steps 15 to 18 are Skipped as the PICs DRLK.S.A0023 not enabled")
             await self.cleanup_users_and_credentials(user_clear_step="20", clear_credential_step="19",
                                                      credentials=credential, userIndex=1)
 

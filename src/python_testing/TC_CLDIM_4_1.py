@@ -46,15 +46,14 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                            default_matter_test_main)
 
+log = logging.getLogger(__name__)
+
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.latch == latch:
-            return True
-        else:
-            return False
+        return report.value.latch == latch
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -62,10 +61,7 @@ def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.position == position:
-            return True
-        else:
-            return False
+        return report.value.position == position
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
@@ -73,10 +69,7 @@ def current_position_and_speed_matcher(position: int, speed: Globals.Enums.Three
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if (report.value.position == position) and (report.value.speed == speed):
-            return True
-        else:
-            return False
+        return (report.value.position == position) and (report.value.speed == speed)
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
@@ -89,7 +82,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         return "[TC-CLDIM-4.1] Step Command Primary Functionality with DUT as Server"
 
     def steps_TC_CLDIM_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
@@ -128,17 +121,19 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep("7f", "Verify TargetState attribute is at MaxPosition"),
             TestStep("7g", "Wait for CurrentState to be updated"),
         ]
-        return steps
 
     def pics_TC_CLDIM_4_1(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S", "CLDIM.S.F00"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLDIM_4_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
@@ -161,7 +156,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
         if not is_positioning_supported:
-            logging.info("Positioning feature is not supported. Skipping remaining steps.")
+            log.info("Positioning feature is not supported. Skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
@@ -189,7 +184,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 2g: If Latching feature is not supported or state is unlatched, skip steps 2h to 2m
         self.step("2g")
         if (not is_latching_supported) or (not initial_state.latch):
-            logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2m.")
+            log.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2m.")
             self.mark_step_range_skipped("2h", "2m")
         else:
             # STEP 2h: Read LatchControlModes attribute
@@ -200,7 +195,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             self.step("2i")
             sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes is manual unlatching. Skipping step 2j.")
+                log.info("LatchControlModes is manual unlatching. Skipping step 2j.")
                 self.skip_step("2j")
             else:
                 # STEP 2j: Send SetTarget command with Latch=False
@@ -216,7 +211,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             # STEP 2k: If LatchControlModes is remote unlatching, skip step 2l
             self.step("2k")
             if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes is remote unlatching. Skipping step 2l.")
+                log.info("LatchControlModes is remote unlatching. Skipping step 2l.")
                 self.skip_step("2l")
             else:
                 # STEP 2l: Manually unlatch the device
@@ -243,7 +238,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 3b: Wait for CurrentState.Position to be updated to MaxPosition
         self.step("3b")
         if initial_state.position == max_position:
-            logging.info("MaxPosition == 0. Skipping step 3b.")
+            log.info("MaxPosition == 0. Skipping step 3b.")
             self.mark_current_step_skipped()
         else:
             sub_handler.await_all_expected_report_matches(
@@ -298,7 +293,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 5a: If Speed Feature is not supported, skip step 5b to 5d
         self.step("5a")
         if not is_speed_supported:
-            logging.info("Speed feature is not supported. Skipping steps 5b to 5d.")
+            log.info("Speed feature is not supported. Skipping steps 5b to 5d.")
             self.mark_step_range_skipped("5b", "5d")
         else:
             # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
@@ -333,7 +328,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 6a: If Speed Feature is not supported, skip step 6b to 6d
         self.step("6a")
         if not is_speed_supported:
-            logging.info("Speed feature is not supported. Skipping steps 6b to 6d.")
+            log.info("Speed feature is not supported. Skipping steps 6b to 6d.")
             self.mark_step_range_skipped("6b", "6d")
         else:
             # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
@@ -391,7 +386,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 7d: Wait for CurrentState to be updated
         self.step("7d")
         if initial_state.position == min_position:
-            logging.info("Initial position == MinPosition. Skipping step 7d.")
+            log.info("Initial position == MinPosition. Skipping step 7d.")
             self.mark_current_step_skipped()
         else:
             sub_handler.await_all_expected_report_matches(
