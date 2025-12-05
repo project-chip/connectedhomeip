@@ -492,6 +492,7 @@ if sys.platform == 'linux':
         help=('Execute a bash shell in the environment (useful to test network namespaces)'))
     @click.option(
         '--ns-index',
+        default=0,
         type=click.IntRange(min=0),
         help='Index of Linux network namespace'
     )
