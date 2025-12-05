@@ -72,7 +72,7 @@ public:
     uint8_t GetSelectedChime() const;
 
     /**
-     * @return The Enabled attribute..
+     * @return The Enabled attribute.
      */
     bool GetEnabled() const;
 
