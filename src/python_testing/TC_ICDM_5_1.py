@@ -61,7 +61,7 @@ class Client:
     clientType: ClientTypeEnum
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 kRootEndpointId = 0
 
 client1 = Client(
@@ -107,7 +107,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         service = None
         for srv in services:
             if service_name is not None and srv.service_name.upper() != service_name:
-                logger.info("   Name does NOT match \'%s\' vs \'%s\'", service_name, srv.service_name.upper())
+                log.info("   Name does NOT match \'%s\' vs \'%s\'", service_name, srv.service_name.upper())
             if srv.service_name.replace(service_type.upper(), service_type) == service_name:
                 service = srv
 

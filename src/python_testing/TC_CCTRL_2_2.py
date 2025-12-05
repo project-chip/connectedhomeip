@@ -73,6 +73,8 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
+log = logging.getLogger(__name__)
+
 
 class TC_CCTRL_2_2(MatterBaseTest):
 
@@ -91,7 +93,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5543
         self.th_server_discriminator = random.randint(0, 4095)
@@ -108,7 +110,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        logging.info("Commissioning from separate fabric")
+        log.info("Commissioning from separate fabric")
 
         # Create a second controller on a new fabric to communicate to the server
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -121,7 +123,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             setupPinCode=self.th_server_passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_server_discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -286,7 +288,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(19)
-        logging.info("Test now waits for 30 seconds")
+        log.info("Test now waits for 30 seconds")
         if not self.is_pics_sdk_ci_only:
             await asyncio.sleep(30)
 

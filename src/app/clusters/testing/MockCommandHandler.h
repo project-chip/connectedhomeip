@@ -35,7 +35,6 @@ namespace chip {
 namespace app {
 namespace Testing {
 
-// Test-only fabric index value for test code.
 constexpr FabricIndex kTestFabricIndex = static_cast<FabricIndex>(151);
 
 // Mock class that simulates CommandHandler behavior for unit testing, allowing capture and
