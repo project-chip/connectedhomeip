@@ -511,9 +511,8 @@ class TC_CNET_4_23(MatterBaseTest):
                     logger.info(
                         f" --- ScanNetworks found target SSID: {correct_ssid.decode('utf-8', errors='replace')} on attempt {attempt}")
                     break
-                else:
-                    logger.warning(
-                        f" --- Target SSID '{correct_ssid.decode('utf-8', errors='replace')}' not found in scan results (attempt {attempt})")
+                logger.warning(
+                    f" --- Target SSID '{correct_ssid.decode('utf-8', errors='replace')}' not found in scan results (attempt {attempt})")
             else:
                 logger.warning(f" --- No networks found in scan (attempt {attempt})")
 
