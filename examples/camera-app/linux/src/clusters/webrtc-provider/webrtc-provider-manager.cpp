@@ -170,6 +170,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // cluster and update the reference counts.
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
+    // Set initialization in progress - candidates will be batched until answer is received
+    transport->SetInitializationInProgress(true);
     transport->MoveToState(WebrtcTransport::State::SendingOffer);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
@@ -365,6 +367,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // cluster and update the reference counts.
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
+    // Set initialization in progress - candidates will be batched until answer is sent
+    transport->SetInitializationInProgress(true);
     transport->MoveToState(WebrtcTransport::State::SendingAnswer);
 
     if (peerConnection != nullptr)
@@ -411,11 +415,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
-    if (transport->HasCandidates())
-    {
-        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-        ScheduleICECandidatesSend(sessionId);
-    }
+    // Initialization complete - enable trickle ICE for future candidates
+    transport->SetInitializationInProgress(false);
+    transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+    ScheduleICECandidatesSend(sessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -963,6 +966,8 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
         ScheduleOfferSend(sessionId);
         break;
     case WebrtcTransport::State::SendingAnswer:
+        // Initialization complete after answer is created - enable trickle ICE for future candidates
+        transport->SetInitializationInProgress(false);
         ScheduleAnswerSend(sessionId);
         break;
     default:
@@ -1078,6 +1083,9 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
         &exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess, onFailure,
         /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
         /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
+
+    // Initialization complete - enable trickle ICE for future candidates
+    transport->SetInitializationInProgress(false);
 
     // Flush any queued up ICE candidates after the answer is sent
     if (transport->HasCandidates())

@@ -141,9 +141,13 @@ public:
     void SetRequestArgs(const RequestArgs & args);
     RequestArgs & GetRequestArgs();
 
+    void SetInitializationInProgress(bool inProgress) { mInitializationInProgress = inProgress; }
+    bool IsInitializationInProgress() const { return mInitializationInProgress; }
+
 private:
-    CommandType mCommandType = CommandType::kUndefined;
-    State mState             = State::Idle;
+    CommandType mCommandType       = CommandType::kUndefined;
+    State mState                   = State::Idle;
+    bool mInitializationInProgress = false;
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
 
