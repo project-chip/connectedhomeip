@@ -32,7 +32,7 @@ class PathsFinder:
     def __init__(self, root_dir: str = DEFAULT_CHIP_ROOT):
         self.__root_dir = root_dir
 
-    def get(self, target_name: str) -> str:
+    def get(self, target_name: str) -> str | None:
         path = _PATHS_CACHE.get(target_name)
         if path and Path(path).is_file():
             return path
