@@ -819,7 +819,7 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
                             persistedStream.snapshotStreamID);
 
             // Convert SnapshotStreamStruct to SnapshotStreamAllocateArgs
-            CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
+            CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
 
             snapshotStreamArgs.imageCodec       = persistedStream.imageCodec;
             snapshotStreamArgs.maxFrameRate     = persistedStream.frameRate;
