@@ -1356,7 +1356,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def device_reboot(self, factory_reset: bool = False):
         '''
-        Reboots the DUT. If factory_reset is True, the DUT will also be factory reset by removing the kvs file. Otherwise, the DUT will just be restarted.
+        Reboots the DUT. If factory_reset is True, it signals the test runner to perform a factory reset. Otherwise, the DUT will just be restarted.
         This method currently only works in the CI and while running the tests through the test runner script (python_testing/scripts/tests/run_python_test.py)
 
         Args:
@@ -1374,8 +1374,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             # After manual reboot, expire previous sessions so that we can re-establish connections
             LOGGER.info("Expiring sessions after manual device reboot")
-            self.th1.ExpireSessions(self.dut_node_id)
-            self.th2.ExpireSessions(self.dut_node_id)
+            if hasattr(self, 'th1') and self.th1:
+                self.th1.ExpireSessions(self.dut_node_id)
+            if hasattr(self, 'th2') and self.th2:
+                self.th2.ExpireSessions(self.dut_node_id)
             LOGGER.info("Manual device reboot completed")
 
         else:
@@ -1389,12 +1391,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                     LOGGER.info("Created restart flag file to signal app restart")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
-                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                # Waiting a bit longer for the app to be ready and stable after restart.
                 await asyncio.sleep(1)
 
                 # Expire sessions and re-establish connections
-                self.th1.ExpireSessions(self.dut_node_id)
-                self.th2.ExpireSessions(self.dut_node_id)
+                if hasattr(self, 'th1') and self.th1:
+                    self.th1.ExpireSessions(self.dut_node_id)
+                if hasattr(self, 'th2') and self.th2:
+                    self.th2.ExpireSessions(self.dut_node_id)
 
                 LOGGER.info("App restart completed successfully")
 
