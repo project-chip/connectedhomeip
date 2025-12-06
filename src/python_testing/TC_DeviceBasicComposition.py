@@ -720,7 +720,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
 
         test_failure = None
         if self.test_from_file:
-            logging.warning("Skipping check of event wildcards as this test is being run from an attribute file")
+            log.warning("Skipping check of event wildcards as this test is being run from an attribute file")
         else:
             try:
                 subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
