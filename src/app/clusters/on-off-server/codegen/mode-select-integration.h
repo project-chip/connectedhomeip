@@ -22,11 +22,11 @@ namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
 
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
 
-void SetStartupOnMode(chip::EndpointId endpoint);
+void UpdateCurrentModeToOnMode(chip::EndpointId endpoint);
 
 #else
 
-inline void SetStartupOnMode(chip::EndpointId endpoint) {}
+inline void UpdateCurrentModeToOnMode(chip::EndpointId endpoint) {}
 
 #endif // MATTER_DM_PLUGIN_MODE_SELECT
 
