@@ -109,6 +109,15 @@ class EventSubscriptionHandler:
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
+    async def cancel(self):
+        """This cancels a subscription."""
+        # Wait for the asyncio.CancelledError to be called before returning
+        try:
+            self._subscription.Shutdown()
+            await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            pass
+
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
