@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class WebRTCTransportProviderClusterSFrameStruct(
   val cipherSuite: UShort,
   val baseKey: ByteArray,
-  val kid: ByteArray,
+  val kid: ByteArray
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterSFrameStruct {\n")
@@ -55,7 +57,7 @@ class WebRTCTransportProviderClusterSFrameStruct(
       val cipherSuite = tlvReader.getUShort(ContextSpecificTag(TAG_CIPHER_SUITE))
       val baseKey = tlvReader.getByteArray(ContextSpecificTag(TAG_BASE_KEY))
       val kid = tlvReader.getByteArray(ContextSpecificTag(TAG_KID))
-
+      
       tlvReader.exitContainer()
 
       return WebRTCTransportProviderClusterSFrameStruct(cipherSuite, baseKey, kid)

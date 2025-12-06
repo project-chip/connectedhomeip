@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class LaundryWasherModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<LaundryWasherModeClusterModeTagStruct>,
+  val modeTags: List<LaundryWasherModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
     append("LaundryWasherModeClusterModeOptionStruct {\n")
@@ -59,15 +60,14 @@ class LaundryWasherModeClusterModeOptionStruct(
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUByte(ContextSpecificTag(TAG_MODE))
-      val modeTags =
-        buildList<LaundryWasherModeClusterModeTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(LaundryWasherModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val modeTags = buildList<LaundryWasherModeClusterModeTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(LaundryWasherModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return LaundryWasherModeClusterModeOptionStruct(label, mode, modeTags)

@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterMapStruct(val mapID: ULong, val name: String) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ServiceAreaClusterMapStruct (
+    val mapID: ULong,
+    val name: String) {
+  override fun toString(): String  = buildString {
     append("ServiceAreaClusterMapStruct {\n")
     append("\tmapID : $mapID\n")
     append("\tname : $name\n")
@@ -43,11 +49,11 @@ class ServiceAreaClusterMapStruct(val mapID: ULong, val name: String) {
     private const val TAG_MAP_ID = 0
     private const val TAG_NAME = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterMapStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ServiceAreaClusterMapStruct {
       tlvReader.enterStructure(tlvTag)
       val mapID = tlvReader.getULong(ContextSpecificTag(TAG_MAP_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-
+      
       tlvReader.exitContainer()
 
       return ServiceAreaClusterMapStruct(mapID, name)

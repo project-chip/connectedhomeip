@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
-  val nodeID: ULong,
-  val friendlyName: String,
-  val vendorID: UInt,
-  val icac: ByteArray,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct (
+    val nodeID: ULong,
+    val friendlyName: String,
+    val vendorID: UInt,
+    val icac: ByteArray) {
+  override fun toString(): String  = buildString {
     append("JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tfriendlyName : $friendlyName\n")
@@ -54,24 +57,16 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
     private const val TAG_VENDOR_ID = 3
     private const val TAG_ICAC = 4
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
       val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
       val icac = tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
-
+      
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
-        nodeID,
-        friendlyName,
-        vendorID,
-        icac,
-      )
+      return JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(nodeID, friendlyName, vendorID, icac)
     }
   }
 }

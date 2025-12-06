@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(
   val number: UByte,
-  val requiredState: UByte,
+  val requiredState: UByte
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {\n")
@@ -46,14 +48,11 @@ class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(
     private const val TAG_NUMBER = 0
     private const val TAG_REQUIRED_STATE = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {
       tlvReader.enterStructure(tlvTag)
       val number = tlvReader.getUByte(ContextSpecificTag(TAG_NUMBER))
       val requiredState = tlvReader.getUByte(ContextSpecificTag(TAG_REQUIRED_STATE))
-
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(number, requiredState)
