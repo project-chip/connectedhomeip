@@ -427,19 +427,23 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                                 ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
             // create a castingPlayer with Endpoints and add it to the castingPlayers to be returned
-            core::CastingPlayer * castingPlayer = new core::CastingPlayer(attributes);
+            // NOTE: Create without endpoints first to avoid dangling pointer issues
+            core::CastingPlayer castingPlayer(attributes);
+            ChipLogProgress(AppServer, "CastingStore::ReadAll() Created CastingPlayer with deviceName: %s",
+                            castingPlayer.GetDeviceName());
+            castingPlayers.push_back(castingPlayer);
+            
+            // Now register endpoints on the object in the vector to ensure pointer consistency
+            core::CastingPlayer * finalCastingPlayer = &castingPlayers.back();
             for (auto & endpointAttributes : endpointAttributesList)
             {
-                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(castingPlayer, endpointAttributes));
+                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(finalCastingPlayer, endpointAttributes));
                 ChipLogProgress(AppServer, "CastingStore::ReadAll() endpointServerListMap[endpointAttributes.mId].size(): %d",
                                 static_cast<int>(endpointServerListMap[endpointAttributes.mId].size()));
                 endpoint->RegisterClusters(endpointServerListMap[endpointAttributes.mId]);
-                castingPlayer->RegisterEndpoint(endpoint);
+                finalCastingPlayer->RegisterEndpoint(endpoint);
                 ChipLogProgress(AppServer, "CastingStore::ReadAll() Registered endpointID: %d", endpoint->GetId());
             }
-            ChipLogProgress(AppServer, "CastingStore::ReadAll() Created CastingPlayer with deviceName: %s",
-                            castingPlayer->GetDeviceName());
-            castingPlayers.push_back(*castingPlayer);
             continue;
         }
     }

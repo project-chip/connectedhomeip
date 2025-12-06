@@ -123,6 +123,9 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
 
+                ChipLogProgress(AppServer, "Assigning from cache. Current: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d, Cached: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex,
+                    ChipLogValueX64(cachedCastingPlayers[index].GetNodeId()), cachedCastingPlayers[index].GetFabricIndex());
+
                 // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
                 unsigned int discoveredNumIPs = mAttributes.numIPs;
                 chip::Inet::IPAddress discoveredIpAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
@@ -131,7 +134,6 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     discoveredIpAddresses[i] = mAttributes.ipAddresses[i];
                 }
                 chip::Inet::InterfaceId discoveredInterfaceId = mAttributes.interfaceId;
-
                 *this                          = cachedCastingPlayers[index];
                 mConnectionState               = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
@@ -545,11 +547,28 @@ CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
     if (this != &other)
     {
         mAttributes                    = other.mAttributes;
-        mEndpoints                     = other.mEndpoints;
         mConnectionState               = other.mConnectionState;
         mIdOptions                     = other.mIdOptions;
         mCommissioningWindowTimeoutSec = other.mCommissioningWindowTimeoutSec;
         mOnCompleted                   = other.mOnCompleted;
+        
+        // Create new Endpoint objects instead of sharing them
+        mEndpoints.clear();
+        for (const auto & endpoint : other.mEndpoints)
+        {
+            // Create EndpointAttributes from the existing endpoint
+            EndpointAttributes attrs;
+            attrs.mId = endpoint->GetId();
+            attrs.mVendorId = endpoint->GetVendorId();
+            attrs.mProductId = endpoint->GetProductId();
+            attrs.mDeviceTypeList = endpoint->GetDeviceTypeList();
+            
+            // Create a new Endpoint with the same attributes but pointing to this CastingPlayer
+            auto newEndpoint = std::make_shared<Endpoint>(this, attrs);
+            // Register the same clusters
+            newEndpoint->RegisterClusters(endpoint->GetServerList());
+            mEndpoints.push_back(newEndpoint);
+        }
     }
     return *this;
 }
