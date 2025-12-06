@@ -1406,6 +1406,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
 
+
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
 
