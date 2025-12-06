@@ -559,12 +559,13 @@ public:
     {
     public:
         // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-        CHIP_ERROR StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
+        CriticalFailure StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete,
+                                   void * aAppState) override
         {
             return mStartTimerCallback ? mStartTimerCallback.value()(aDelay, aComplete, aAppState) : CHIP_NO_ERROR;
         }
         // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-        CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
+        CriticalFailure ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
         {
             return mScheduleWorkCallback ? mScheduleWorkCallback.value()(aComplete, aAppState) : CHIP_NO_ERROR;
         }
