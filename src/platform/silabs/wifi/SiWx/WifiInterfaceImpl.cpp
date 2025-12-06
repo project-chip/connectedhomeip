@@ -441,7 +441,7 @@ sl_status_t SetWifiConfigurations()
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
 
-    status = sl_si91x_set_join_configuration(
+    status = sl_wifi_set_join_configuration(
         SL_WIFI_CLIENT_INTERFACE, (SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID | SL_SI91X_JOIN_FEAT_PS_CMD_LISTEN_INTERVAL_VALID));
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -508,14 +508,14 @@ sl_status_t SetWifiConfigurations()
  *
  * @param configuration Matter Power Save Configuration
  *
- * @return sl_si91x_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
+ * @return sl_wifi_system_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
  *                                        kHighPerformance: HIGH_PERFORMANCE
  *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE
  *                                        kDeepSleep: DEEP_SLEEP_WITH_RAM_RETENTION
  */
-sl_si91x_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
+sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
 {
-    sl_si91x_performance_profile_t profile = HIGH_PERFORMANCE;
+    sl_wifi_system_performance_profile_t profile = HIGH_PERFORMANCE;
 
     switch (configuration)
     {
