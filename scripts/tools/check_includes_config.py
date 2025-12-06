@@ -214,8 +214,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
 
     # Not intended for embedded clients
-    'src/app/server/JointFabricDatastore.cpp': {'vector'},
-    'src/app/server/JointFabricDatastore.h': {'vector'},
+    'src/app/server/JointFabricDatastore.cpp': {'vector', 'unordered_set'},
+    'src/app/server/JointFabricDatastore.h': {'vector', 'unordered_set'},
 
     # For webrtc python bindings
     'src/controller/webrtc/WebRTC.h': {'string'},
