@@ -53,7 +53,6 @@
     ],
     "bridge": ["Test_TC_BR_1", "Test_TC_BR_2", "Test_TC_BR_3", "Test_TC_BR_4"],
     "DeviceAttestation": [
-        "Test_TC_DA_1_1",
         "Test_TC_DA_1_3",
         "Test_TC_DA_1_4",
         "Test_TC_DA_1_6",
