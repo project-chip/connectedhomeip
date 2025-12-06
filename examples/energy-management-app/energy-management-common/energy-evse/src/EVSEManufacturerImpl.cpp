@@ -70,12 +70,12 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
     VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
-    dem->SetESAState(ESAStateEnum::kOnline);
-    dem->SetESAType(ESATypeEnum::kEvse);
+    TEMPORARY_RETURN_IGNORED dem->SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED dem->SetESAType(ESATypeEnum::kEvse);
 
     // Set the abs min and max power
-    dem->SetAbsMinPower(1200000); // 1.2KW
-    dem->SetAbsMaxPower(7600000); // 7.6KW
+    TEMPORARY_RETURN_IGNORED dem->SetAbsMinPower(1200000); // 1.2KW
+    TEMPORARY_RETURN_IGNORED dem->SetAbsMaxPower(7600000); // 7.6KW
 
     /*
      * This is an example implementation for manufacturers to consider
@@ -406,16 +406,17 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             /* Determine requiredEnergy based on if we support SoC Reporting or fallback to AddedEnergy target */
             if (DetermineRequiredEnergy(dg, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR)
             {
-                ComputeStartTime(dg, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s, requiredEnergy_mWh);
+                TEMPORARY_RETURN_IGNORED ComputeStartTime(dg, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s,
+                                                          requiredEnergy_mWh);
             }
         }
     }
 
     // Update the attributes to allow a UI to inform the user
-    dg->SetNextChargeStartTime(startTime_epoch_s);
-    dg->SetNextChargeTargetTime(targetTime_epoch_s);
-    dg->SetNextChargeRequiredEnergy(targetAddedEnergy_mWh);
-    dg->SetNextChargeTargetSoC(targetSoC);
+    TEMPORARY_RETURN_IGNORED dg->SetNextChargeStartTime(startTime_epoch_s);
+    TEMPORARY_RETURN_IGNORED dg->SetNextChargeTargetTime(targetTime_epoch_s);
+    TEMPORARY_RETURN_IGNORED dg->SetNextChargeRequiredEnergy(targetAddedEnergy_mWh);
+    TEMPORARY_RETURN_IGNORED dg->SetNextChargeTargetSoC(targetSoC);
 
     return err;
 }
@@ -462,9 +463,7 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
     // since it takes a copy (see power-source-server.cpp)
-    PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
-
-    return CHIP_NO_ERROR;
+    return PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
 }
 
 /**
@@ -484,9 +483,9 @@ CHIP_ERROR EVSEManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aA
     ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    dg->SetActivePower(MakeNullable(aActivePower_mW));
-    dg->SetVoltage(MakeNullable(aVoltage_mV));
-    dg->SetActiveCurrent(MakeNullable(aActiveCurrent_mA));
+    TEMPORARY_RETURN_IGNORED dg->SetActivePower(MakeNullable(aActivePower_mW));
+    TEMPORARY_RETURN_IGNORED dg->SetVoltage(MakeNullable(aVoltage_mV));
+    TEMPORARY_RETURN_IGNORED dg->SetActiveCurrent(MakeNullable(aActiveCurrent_mA));
 
     return CHIP_NO_ERROR;
 }
@@ -504,7 +503,7 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
                                                          int64_t aCumulativeEnergyExported)
 {
-    MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
@@ -577,7 +576,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aPeriodicEnergyImported,
                                                        int64_t aPeriodicEnergyExported)
 {
-    MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
@@ -662,12 +661,12 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
     {
     case EVSECallbackType::StateChanged:
         ChipLogProgress(AppServer, "EVSE callback - state changed");
-        pClass->ComputeChargingSchedule();
+        TEMPORARY_RETURN_IGNORED pClass->ComputeChargingSchedule();
         break;
     case EVSECallbackType::ChargeCurrentChanged:
         ChipLogProgress(AppServer, "EVSE callback - maxChargeCurrent changed to %ld",
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
-        pClass->ComputeChargingSchedule();
+        TEMPORARY_RETURN_IGNORED pClass->ComputeChargingSchedule();
         pClass->UpdateEVFakeReadings(cb->ChargingCurrent.maximumChargeCurrent);
         break;
     case EVSECallbackType::DischargeCurrentChanged:
@@ -688,7 +687,7 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
 
     case EVSECallbackType::ChargingPreferencesChanged:
         ChipLogProgress(AppServer, "EVSE callback - ChargingPreferencesChanged");
-        pClass->ComputeChargingSchedule();
+        TEMPORARY_RETURN_IGNORED pClass->ComputeChargingSchedule();
         break;
 
     default:

@@ -47,6 +47,8 @@ from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_JFDS_2_1(MatterBaseTest):
 
@@ -74,7 +76,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
         #####################################################################################################################################
         #
@@ -82,6 +84,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         #
         #####################################################################################################################################
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric A JF-Administrator App
@@ -89,7 +92,7 @@ class TC_JFDS_2_1(MatterBaseTest):
             jfa_server_app,
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
@@ -108,9 +111,10 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {
+                self.jfadmin_fabric_a_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=10)
+            timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()

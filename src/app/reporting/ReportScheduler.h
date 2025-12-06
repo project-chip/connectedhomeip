@@ -21,6 +21,7 @@
 #include <app/ReadHandler.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -29,13 +30,6 @@ namespace reporting {
 
 // Forward declaration of TestReportScheduler to allow it to be friend with ReportScheduler
 class TestReportScheduler;
-
-class TimerContext
-{
-public:
-    virtual ~TimerContext() {}
-    virtual void TimerFired() = 0;
-};
 
 /**
  * @class ReportScheduler
@@ -60,25 +54,6 @@ class ReportScheduler : public ReadHandler::Observer, public ICDStateObserver
 {
 public:
     using Timestamp = System::Clock::Timestamp;
-
-    /// @brief This class acts as an interface between the report scheduler and the system timer to reduce dependencies on the
-    /// system layer.
-    class TimerDelegate
-    {
-    public:
-        virtual ~TimerDelegate() {}
-        /// @brief Start a timer for a given context. The report scheduler must always cancel an existing timer for a context (using
-        /// CancelTimer) before starting a new one for that context.
-        /// @param context context to pass to the timer callback.
-        /// @param aTimeout time in milliseconds before the timer expires
-        virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) = 0;
-        /// @brief Cancel a timer for a given context
-        /// @param context used to identify the timer to cancel
-        virtual void CancelTimer(TimerContext * context)   = 0;
-        virtual bool IsTimerActive(TimerContext * context) = 0;
-        virtual Timestamp GetCurrentMonotonicTimestamp()   = 0;
-    };
-
     /**
      * @class ReadHandlerNode
      *

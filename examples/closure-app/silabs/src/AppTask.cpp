@@ -23,6 +23,8 @@
 #include "LEDWidget.h"
 
 #ifdef DISPLAY_ENABLED
+#include "ClosureUI.h"
+#include "ClosureUIStrings.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
@@ -48,6 +50,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <stdio.h>
 
 #define APP_FUNCTION_BUTTON 0
 #define APP_CLOSURE_BUTTON 1
@@ -80,7 +83,8 @@ CHIP_ERROR AppTask::AppInit()
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Closure-App");
+    TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) "Closure-App");
+    GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
 
     // Initialization of Closure Manager and endpoints of closure and closurepanel.
@@ -88,7 +92,7 @@ CHIP_ERROR AppTask::AppInit()
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(false);
+    UpdateClosureUI();
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -99,7 +103,7 @@ CHIP_ERROR AppTask::AppInit()
         GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
-#endif
+#endif // DISPLAY_ENABLED
 
     return err;
 }
@@ -157,7 +161,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 // Check if an action is already in progress
                 if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
@@ -228,3 +232,103 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
         ChipLogError(AppServer, "Unhandled event type in ClosureButtonActionEventHandler");
     }
 }
+
+#ifdef DISPLAY_ENABLED
+void AppTask::UpdateClosureUIHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_UpdateUI)
+    {
+        UpdateClosureUI();
+    }
+}
+
+void AppTask::UpdateClosureUI()
+{
+    ClosureManager & closureManager = ClosureManager::GetInstance();
+
+    // Lock chip stack when accessing CHIP attributes from app task context
+    DeviceLayer::PlatformMgr().LockChipStack();
+    auto uiData = closureManager.GetClosureUIData();
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    ClosureUI::SetMainState(uiData.mainState);
+
+    const char * positionSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().position.HasValue() &&
+        !uiData.overallCurrentState.Value().position.Value().IsNull())
+    {
+        switch (uiData.overallCurrentState.Value().position.Value().Value())
+        {
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_CLOSED;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyOpened:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_OPEN;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kPartiallyOpened:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_PARTIAL;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForPedestrian:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_PEDESTRIAN;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForVentilation:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_VENTILATION;
+            break;
+        default:
+            positionSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+            break;
+        }
+    }
+    ClosureUI::FormatAndSetPosition(positionSuffix);
+
+    const char * latchSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().latch.HasValue() &&
+        !uiData.overallCurrentState.Value().latch.Value().IsNull())
+    {
+        latchSuffix = uiData.overallCurrentState.Value().latch.Value().Value() ? ClosureUIStrings::LATCH_SUFFIX_ENGAGED
+                                                                               : ClosureUIStrings::LATCH_SUFFIX_RELEASED;
+    }
+    ClosureUI::FormatAndSetLatch(latchSuffix);
+
+    const char * secureSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && !uiData.overallCurrentState.Value().secureState.IsNull())
+    {
+        secureSuffix = uiData.overallCurrentState.Value().secureState.Value() ? ClosureUIStrings::SECURE_SUFFIX_YES
+                                                                              : ClosureUIStrings::SECURE_SUFFIX_NO;
+    }
+    ClosureUI::FormatAndSetSecure(secureSuffix);
+
+    const char * speedSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().speed.HasValue())
+    {
+        switch (uiData.overallCurrentState.Value().speed.Value())
+        {
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kLow:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_LOW;
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kMedium:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_MEDIUM;
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kHigh:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_HIGH;
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kAuto:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_AUTO;
+            break;
+        default:
+            speedSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+            break;
+        }
+    }
+    ClosureUI::FormatAndSetSpeed(speedSuffix);
+
+#ifdef SL_WIFI
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
+    }
+}
+#endif // DISPLAY_ENABLED

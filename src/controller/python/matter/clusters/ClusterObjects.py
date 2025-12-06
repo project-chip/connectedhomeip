@@ -33,7 +33,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
     '''
-    if (not (typing.get_origin(typeToCheck) == typing.Union)):
+    if typing.get_origin(typeToCheck) != typing.Union:
         return None
 
     for t in typing.get_args(typeToCheck):
@@ -250,6 +250,10 @@ class ClusterCommand(ClusterObject):
         raise NotImplementedError()
 
     @ChipUtility.classproperty
+    def is_client(self) -> bool:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
         return False
 
@@ -281,7 +285,7 @@ class Cluster(ClusterObject):
         '''
         if self._data_version is not None:
             yield "(data version)", self.data_version
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 

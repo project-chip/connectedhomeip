@@ -37,7 +37,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
@@ -58,7 +60,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:175
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -96,7 +98,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:174
+            image: ghcr.io/project-chip/chip-build-esp32:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
@@ -106,15 +110,6 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
-
-            # We cannot add esp-idf-kconfig==2.5.0 to rquirements.txt because it
-            # will break the nuttx workflow which requires the older version of
-            # the kconfiglib and esp-idf-kconfig==2.5.0 installs newer version
-            # so, install it in in the virtual environment here
-            - name: Install esp-idf-kconfig
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "pip install esp-idf-kconfig==2.5.0"
 
             - name: CI Examples ESP32
               shell: bash
@@ -127,7 +122,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:174
+            image: ghcr.io/project-chip/chip-build-nrf-platform:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
@@ -148,7 +145,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:174
+            image: ghcr.io/project-chip/chip-build-telink:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:

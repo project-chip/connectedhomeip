@@ -49,6 +49,8 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_IDM_2_2(IDMBaseTest, BasicCompositionTests):
     """Test case for IDM-2.2: Report Data Action from DUT to TH.
@@ -75,7 +77,7 @@ class TC_IDM_2_2(IDMBaseTest, BasicCompositionTests):
         return 600
 
     def steps_TC_IDM_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint, AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]], On receipt of this message, DUT should send a report data action with the attribute value to the DUT.",
                      "On the TH verify the received report data message has the right attribute values.", is_commissioning=True),
             TestStep(2, "TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint, AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]], On receipt of this message, DUT should send a report data action with the attribute value to the DUT.",
@@ -119,7 +121,6 @@ class TC_IDM_2_2(IDMBaseTest, BasicCompositionTests):
             TestStep(21, "TH sends a Read Request Message to read all events and attributes from the DUT.",
                      "Verify that the DUT sends back data of all attributes and events that the TH has access to."),
         ]
-        return steps
 
     # Update the test method to call functions directly with explicit parameters
     @async_test_body
@@ -199,7 +200,7 @@ class TC_IDM_2_2(IDMBaseTest, BasicCompositionTests):
         # Check if BasicInformation cluster exists before running steps 14-17
         # If it doesn't exist (e.g., non-commissionable node), skip these steps
         if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
-            logging.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
+            log.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
             self.skip_step(14)
             self.skip_step(15)
             self.skip_step(16)
@@ -284,7 +285,7 @@ class TC_IDM_2_2(IDMBaseTest, BasicCompositionTests):
         # Check if BasicInformation cluster exists before running step 20
         # If it doesn't exist (e.g., non-commissionable node), skip this step
         if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
-            logging.info("BasicInformation cluster not found on endpoint - skipping step 20")
+            log.info("BasicInformation cluster not found on endpoint - skipping step 20")
             self.skip_step(20)
         else:
             self.step(20)

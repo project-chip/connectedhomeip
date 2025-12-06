@@ -40,8 +40,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -49,7 +47,6 @@ import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
@@ -66,7 +63,7 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S.F02"]
 
     def steps_TC_EEVSE_2_8(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
@@ -77,8 +74,6 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("5", "TH reads from the DUT the VehicleID attribute.",
                      "Verify that the DUT response contains a string value with length <= 32 characters."),
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kPlugAndCharge))
     async def test_TC_EEVSE_2_8(self):

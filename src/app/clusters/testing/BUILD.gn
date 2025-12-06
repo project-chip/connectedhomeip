@@ -21,15 +21,26 @@ source_set("testing") {
     "AttributeTesting.cpp",
     "AttributeTesting.h",
     "ClusterTester.h",
+    "MockCommandHandler.cpp",
+    "MockCommandHandler.h",
+    "ValidateGlobalAttributes.cpp",
     "ValidateGlobalAttributes.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app:command-handler",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/MessageDef:MessageDef",
+    "${chip_root}/src/app/data-model:data-model",
+    "${chip_root}/src/app/data-model-provider:core",
+    "${chip_root}/src/app/data-model-provider:data-model-provider",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster:server-cluster",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging:messaging",
+    "${chip_root}/src/protocols/interaction_model:interaction_model",
   ]
 }

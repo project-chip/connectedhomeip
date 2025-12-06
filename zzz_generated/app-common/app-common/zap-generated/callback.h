@@ -7079,59 +7079,11 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
- * @brief Time Synchronization Cluster SetUTCTime Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetTrustedTimeSource Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetTimeZone Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetDSTOffset Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetDefaultNTP Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
-/**
  * @brief Bridged Device Basic Information Cluster KeepActive Command callback (from client)
  */
 bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
-/**
- * @brief ICD Management Cluster RegisterClient Command callback (from client)
- */
-bool emberAfIcdManagementClusterRegisterClientCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
-/**
- * @brief ICD Management Cluster UnregisterClient Command callback (from client)
- */
-bool emberAfIcdManagementClusterUnregisterClientCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
-/**
- * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
- */
-bool emberAfIcdManagementClusterStayActiveRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
 /**
  * @brief Timer Cluster SetTimer Command callback (from client)
  */
@@ -7190,18 +7142,6 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
 bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
- */
-bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData);
-/**
- * @brief Boolean State Configuration Cluster EnableDisableAlarm Command callback (from client)
- */
-bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData);
 /**
  * @brief Valve Configuration and Control Cluster Open Command callback (from client)
  */

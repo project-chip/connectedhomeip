@@ -48,6 +48,8 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 # one of the steps in this test requires sending a command that requires a timed interaction
 # without first sending the TimedRequest action
 # OpenCommissioningWindow requires a timed invoke and is mandatory on servers, BUT, it's marked
@@ -109,7 +111,7 @@ class TC_IDM_1_2(IDMBaseTest):
                     continue
                 # just use the first command with default values
                 name, cmd = members[0]
-                logging.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
+                log.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
                 try:
                     await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail("Unexpected success return from sending command to unsupported cluster")
@@ -130,7 +132,7 @@ class TC_IDM_1_2(IDMBaseTest):
                 break
             for cid in supported_clusters[i]:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-                logging.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
+                log.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
                 members = get_all_cmds_for_cluster_id(cid)
                 if not members:
                     continue
@@ -156,7 +158,7 @@ class TC_IDM_1_2(IDMBaseTest):
         # It might actually be the case that all the supported clusters support all the commands. In that case, let's just put a warning.
         # We could, in theory, send a command with a fully out of bounds command ID, but that's not supported by the controller
         if not sent:
-            logging.warning("Unable to find a supported cluster with unsupported commands on any endpoint - SKIPPING")
+            log.warning("Unable to find a supported cluster with unsupported commands on any endpoint - SKIPPING")
 
         self.print_step(4, "Setup TH to have no privileges for a cluster, send Invoke")
         # Setup the ACL
@@ -243,7 +245,7 @@ class TC_IDM_1_2(IDMBaseTest):
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
         except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
-            logging.info("DUT correctly supressed the response")
+            log.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent
         breadcrumb = await self.read_single_attribute_check_success(
