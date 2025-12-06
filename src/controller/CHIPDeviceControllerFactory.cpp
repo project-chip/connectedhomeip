@@ -102,10 +102,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
-
-    // re-initialization keeps any previously initialized values. The only place where
-    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
-    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    params.dataModelProvider         = mDataModelProvider;
 
     return InitSystemState(params);
 }
@@ -353,6 +350,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
     mSystemState->SetTempFabricTable(tempFabricTable, params.enableServerInteractions);
+    mDataModelProvider = params.dataModelProvider;
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
 }
@@ -481,6 +479,8 @@ void DeviceControllerFactory::Shutdown()
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
     mSessionResumptionStorage  = nullptr;
+
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
 }
 
 void DeviceControllerSystemState::Shutdown()
