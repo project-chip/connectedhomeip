@@ -155,6 +155,7 @@ static_library("webos") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_enable_openthread) {
