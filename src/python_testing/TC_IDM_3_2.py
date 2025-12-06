@@ -74,6 +74,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
                 cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
                 # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
+
                 if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
                     # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
                     continue
@@ -215,16 +216,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                                  f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
-        self.skip_step(4)
-        # Currently skipping step 4 as we have removed support in the python framework for this functionality currently.
-        # This is now contained in the SuppressResponse test module PR referenced below for TC_IDM_3_2, once this test module merges that PR can then be merged
-        # and this test step will become valid after issues with SuppressResponse mentioned in issue https://github.com/project-chip/connectedhomeip/issues/41227.
-        # SuppressResponse PR Reference: https://github.com/project-chip/connectedhomeip/pull/41590
-        # TODO: Once the SuppressResponse test module PR merges, uncomment the following code and remove the skip_step line above.
-
-        """
-        self.step(4)
         # Check if NodeLabel attribute exists for step 4 (SuppressResponse tests)
+        self.step(4)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
@@ -264,7 +257,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
-        """
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):

@@ -1034,9 +1034,8 @@ def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must
 
 
 def WriteAttributes(future: Future, eventLoop, device,
-                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
-                    forceLegacyListEncoding: bool = False) -> PyChipError:
+                    attributes: List[AttributeWriteRequest], suppressResponse: bool = False, timedRequestTimeoutMs: Union[None, int] = None,
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
     pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
