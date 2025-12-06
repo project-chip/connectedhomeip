@@ -1354,6 +1354,53 @@ class MatterBaseTest(base_test.BaseTestClass):
             error_message='Push AV Stream validation failed'
         )
 
+    async def device_reboot(self, factory_reset: bool = False):
+        '''
+        Reboots the DUT. If factory_reset is True, the DUT will also be factory reset by removing the kvs file. Otherwise, the DUT will just be restarted.
+        This method currently only works in the CI and while running the tests through the test runner script (python_testing/scripts/tests/run_python_test.py)
+
+        Args:
+            factory_reset: Whether to factory reset the DUT.
+
+        Returns:
+            None
+        '''
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            LOGGER.info("Expiring sessions after manual device reboot")
+            self.th1.ExpireSessions(self.dut_node_id)
+            self.th2.ExpireSessions(self.dut_node_id)
+            LOGGER.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    if factory_reset:
+                        f.write("reset")
+                    else:
+                        f.write("restart")
+                    LOGGER.info("Created restart flag file to signal app restart")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                await asyncio.sleep(1)
+
+                # Expire sessions and re-establish connections
+                self.th1.ExpireSessions(self.dut_node_id)
+                self.th2.ExpireSessions(self.dut_node_id)
+
+                LOGGER.info("App restart completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to restart app: {e}")
+                asserts.fail(f"App restart failed: {e}")
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
