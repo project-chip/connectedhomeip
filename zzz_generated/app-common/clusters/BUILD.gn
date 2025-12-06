@@ -16,6 +16,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/ActivatedCarbonFilterMonitoring" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/AdministratorCommissioning" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/AirQuality" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/AmbientSensingUnion" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ApplicationBasic" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ApplicationLauncher" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/AudioOutput" + invoker.target,

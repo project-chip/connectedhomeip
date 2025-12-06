@@ -22,6 +22,8 @@
 #include <clusters/AdministratorCommissioning/MetadataProvider.h>
 #include <clusters/AirQuality/Ids.h>
 #include <clusters/AirQuality/MetadataProvider.h>
+#include <clusters/AmbientSensingUnion/Ids.h>
+#include <clusters/AmbientSensingUnion/MetadataProvider.h>
 #include <clusters/ApplicationBasic/Ids.h>
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
@@ -338,6 +340,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == AirQuality::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AirQuality::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AmbientSensingUnion::Id) || ...))
+    {
+        if (id == AmbientSensingUnion::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientSensingUnion::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ApplicationBasic::Id) || ...))
     {

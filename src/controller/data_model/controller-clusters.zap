@@ -2487,6 +2487,14 @@
           "apiMaturity": "provisional"
         },
         {
+          "name": "Ambient Sensing Union",
+          "code": 1074,
+          "mfgCode": null,
+          "define": "AMBIENT_SENSING_UNION_CLUSTER",
+          "side": "client",
+          "enabled": 1
+        },
+        {
           "name": "Thread Border Router Management",
           "code": 1106,
           "mfgCode": null,

@@ -47,6 +47,10 @@
 #include <clusters/AirQuality/Commands.ipp>
 #include <clusters/AirQuality/Events.ipp>
 #include <clusters/AirQuality/Structs.ipp>
+#include <clusters/AmbientSensingUnion/Attributes.ipp>
+#include <clusters/AmbientSensingUnion/Commands.ipp>
+#include <clusters/AmbientSensingUnion/Events.ipp>
+#include <clusters/AmbientSensingUnion/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>

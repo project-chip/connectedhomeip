@@ -15981,6 +15981,142 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readAmbientSensingUnionInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAmbientSensingUnionUnionIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionIDAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readAmbientSensingUnionUnionIDCommandParams
+        );
+        result.put("readUnionIDAttribute", readAmbientSensingUnionUnionIDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionUnionNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionNameAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionNameAttribute(
+              (ChipClusters.CharStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+          readAmbientSensingUnionUnionNameCommandParams
+        );
+        result.put("readUnionNameAttribute", readAmbientSensingUnionUnionNameAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionUnionHealthCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionHealthAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionHealthAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientSensingUnionUnionHealthCommandParams
+        );
+        result.put("readUnionHealthAttribute", readAmbientSensingUnionUnionHealthAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionUnionSensorListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionSensorListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionSensorListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.UnionSensorListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterUnionSensorListAttributeCallback(),
+          readAmbientSensingUnionUnionSensorListCommandParams
+        );
+        result.put("readUnionSensorListAttribute", readAmbientSensingUnionUnionSensorListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionUnionSensorHealthCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionUnionSensorHealthAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readUnionSensorHealthAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.UnionSensorHealthAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterUnionSensorHealthAttributeCallback(),
+          readAmbientSensingUnionUnionSensorHealthCommandParams
+        );
+        result.put("readUnionSensorHealthAttribute", readAmbientSensingUnionUnionSensorHealthAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionSensorIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionSensorIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readSensorIDAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientSensingUnionSensorIDCommandParams
+        );
+        result.put("readSensorIDAttribute", readAmbientSensingUnionSensorIDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionZoneSensorListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionZoneSensorListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readZoneSensorListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.ZoneSensorListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterZoneSensorListAttributeCallback(),
+          readAmbientSensingUnionZoneSensorListCommandParams
+        );
+        result.put("readZoneSensorListAttribute", readAmbientSensingUnionZoneSensorListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterGeneratedCommandListAttributeCallback(),
+          readAmbientSensingUnionGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readAmbientSensingUnionGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterAcceptedCommandListAttributeCallback(),
+          readAmbientSensingUnionAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readAmbientSensingUnionAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.AmbientSensingUnionCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAmbientSensingUnionClusterAttributeListAttributeCallback(),
+          readAmbientSensingUnionAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readAmbientSensingUnionAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readAmbientSensingUnionFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readAmbientSensingUnionFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientSensingUnionClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientSensingUnionClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientSensingUnionCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientSensingUnionClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readAmbientSensingUnionClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWiFiNetworkManagementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWiFiNetworkManagementSsidCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWiFiNetworkManagementSsidAttributeInteractionInfo = new InteractionInfo(
@@ -20844,6 +20980,7 @@ public class ClusterReadMapping {
             put("totalVolatileOrganicCompoundsConcentrationMeasurement", readTotalVolatileOrganicCompoundsConcentrationMeasurementInteractionInfo());
             put("radonConcentrationMeasurement", readRadonConcentrationMeasurementInteractionInfo());
             put("soilMeasurement", readSoilMeasurementInteractionInfo());
+            put("ambientSensingUnion", readAmbientSensingUnionInteractionInfo());
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());
             put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());

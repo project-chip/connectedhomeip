@@ -6512,6 +6512,52 @@ public static class OccupancySensingClusterOccupancyChangedEvent {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterSensorListChangeEvent {
+  public ArrayList<Integer> unionSensorList;
+  private static final long UNION_SENSOR_LIST_ID = 0L;
+
+  public AmbientSensingUnionClusterSensorListChangeEvent(
+    ArrayList<Integer> unionSensorList
+  ) {
+    this.unionSensorList = unionSensorList;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UNION_SENSOR_LIST_ID, ArrayType.generateArrayType(unionSensorList, (elementunionSensorList) -> new UIntType(elementunionSensorList))));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterSensorListChangeEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<Integer> unionSensorList = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UNION_SENSOR_LIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          unionSensorList = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterSensorListChangeEvent(
+      unionSensorList
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterSensorListChangeEvent {\n");
+    output.append("\tunionSensorList: ");
+    output.append(unionSensorList);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;
