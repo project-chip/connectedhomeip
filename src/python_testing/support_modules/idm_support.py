@@ -21,8 +21,11 @@ Support module for IDM (Interaction Data Model) test modules containing shared f
 import copy
 import inspect
 import logging
+from typing import Any, Optional
 
 from mobly import asserts
+
+log = logging.getLogger(__name__)
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -160,8 +163,7 @@ class IDMBaseTest(MatterBaseTest):
             keepSubscriptions=False,
             fabricFiltered=True
         )
-        acl_list = sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-        return acl_list
+        return sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
     async def write_dut_acl(self, ctrl: ChipDeviceCtrl, acl, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Write an ACL to the DUT.
@@ -207,6 +209,35 @@ class IDMBaseTest(MatterBaseTest):
                 Attribute=attribute
             )
         )
+
+    async def find_timed_write_attribute(
+        self, endpoints_data: dict[int, Any]
+    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
+        """
+        Find an attribute that requires timed write on the actual device
+        Uses the wildcard read data that's already in endpoints_data
+        """
+        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
+        for endpoint_id, endpoint in endpoints_data.items():
+            for cluster_type, cluster_data in endpoint.items():
+                cluster_id = cluster_type.id
+
+                cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
+                # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
+
+                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
+                    # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+                for attr_type in cluster_data:
+                    # Check if this is an attribute descriptor class
+                    if (isinstance(attr_type, type) and
+                            issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
+                        # Check if this attribute requires timed write using the must_use_timed_write class property
+                        if attr_type.must_use_timed_write:
+                            log.info(f"Found timed write attribute: {attr_type.__name__} "
+                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                            return endpoint_id, attr_type
+        log.warning("No timed write attributes found on device")
 
     # ========================================================================
     # Attribute Verification Functions
@@ -394,7 +425,7 @@ class IDMBaseTest(MatterBaseTest):
             # Verify that returned attributes match the AttributeList
             # DataVersion is excluded as it is metadata and not a real attribute
             if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard:
-                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster].keys()
+                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster]
                                          if x != Clusters.Attribute.DataVersion])
                 attr_list = sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList])
                 asserts.assert_equal(
@@ -418,7 +449,7 @@ class IDMBaseTest(MatterBaseTest):
                           read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint].keys()])
+        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
         server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
         asserts.assert_equal(
             returned_cluster_ids,
@@ -426,7 +457,7 @@ class IDMBaseTest(MatterBaseTest):
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
         for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys()
+            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
                              if a != Clusters.Attribute.DataVersion]
             asserts.assert_equal(
                 sorted(attribute_ids),
@@ -482,7 +513,7 @@ class IDMBaseTest(MatterBaseTest):
 
         # Test the unsupported cluster on all available endpoints
         # It should return UnsupportedCluster error from all endpoints
-        for endpoint_id in self.endpoints.keys():
+        for endpoint_id in self.endpoints:
             result = await self.read_single_attribute_expect_error(
                 endpoint=endpoint_id,
                 cluster=unsupported_cluster,
@@ -490,7 +521,7 @@ class IDMBaseTest(MatterBaseTest):
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
-            logging.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
+            log.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
 
     async def read_unsupported_attribute(self):
         """Attempt to read an unsupported attribute from a supported cluster on any endpoint.
@@ -511,7 +542,7 @@ class IDMBaseTest(MatterBaseTest):
                 ]
                 if unsupported:
                     unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
-                    logging.info(
+                    log.info(
                         f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
                     # Only request this single attribute
                     result = await self.read_single_attribute_expect_error(
@@ -522,7 +553,7 @@ class IDMBaseTest(MatterBaseTest):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
-                    logging.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
+                    log.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
                     return
 
         # If we get here, we got problems as there should always be at least one unsupported attribute
@@ -556,7 +587,7 @@ class IDMBaseTest(MatterBaseTest):
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
-        logging.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
+        log.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
         return results
 
     async def read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -610,7 +641,6 @@ class IDMBaseTest(MatterBaseTest):
             # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/data_model/Interaction-Model.adoc#101-status-code-table
             asserts.assert_equal(e.err, 0x580,
                                  "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
-            return None
 
     async def read_limited_access(self, endpoint, cluster_id):
         """Test reading all attributes from all clusters at an endpoint with limited access.
@@ -651,7 +681,7 @@ class IDMBaseTest(MatterBaseTest):
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-            logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            log.info(f"Granted TH2 View access to only cluster {cluster_id}")
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
@@ -664,7 +694,7 @@ class IDMBaseTest(MatterBaseTest):
 
             # Verify only the allowed cluster is returned
             returned_clusters = list(read_request.attributes[endpoint].keys())
-            logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            log.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
 
             # The allowed cluster should be present
             allowed_cluster_obj = None
@@ -688,9 +718,9 @@ class IDMBaseTest(MatterBaseTest):
                 await self.default_controller.WriteAttribute(
                     self.dut_node_id,
                     [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
-                logging.info("Restored original ACL")
+                log.info("Restored original ACL")
             except Exception as e:
-                logging.error(f"Failed to restore original ACL: {e}")
+                log.error(f"Failed to restore original ACL: {e}")
 
             # Removes TH2 controller
             TH2.Shutdown()

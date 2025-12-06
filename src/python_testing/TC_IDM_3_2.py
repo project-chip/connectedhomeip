@@ -47,49 +47,18 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from support_modules.idm_support import IDMBaseTest
 
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
+class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
-
-    async def find_timed_write_attribute(
-        self, endpoints_data: dict[int, Any]
-    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
-        """
-        Find an attribute that requires timed write on the actual device
-        Uses the wildcard read data that's already in endpoints_data
-        """
-        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
-
-        for endpoint_id, endpoint in endpoints_data.items():
-            for cluster_type, cluster_data in endpoint.items():
-                cluster_id = cluster_type.id
-
-                cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
-                # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
-                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
-                    # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
-
-                for attr_type in cluster_data:
-                    # Check if this is an attribute descriptor class
-                    if (isinstance(attr_type, type) and
-                            issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
-                        # Check if this attribute requires timed write using the must_use_timed_write class property
-                        if attr_type.must_use_timed_write:
-                            log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
-                            return endpoint_id, attr_type
-
-        log.warning("No timed write attributes found on device")
-        return None, None
 
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
         return [
