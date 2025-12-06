@@ -158,7 +158,7 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         dump_json_ids(output_dir)
         dump_ids_from_data_model_dirs()
         # Update all the files in the python wheels
-        generate_data_model_xmls_gni.generate_gni_file()
+        generate_data_model_xmls_gni.generate_dm_gni_file()
 
 
 def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
