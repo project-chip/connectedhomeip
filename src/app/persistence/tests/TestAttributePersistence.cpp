@@ -34,7 +34,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 
 TEST(TestAttributePersistence, TestLoadAndDecodeAndStoreNativeEndian)
 {

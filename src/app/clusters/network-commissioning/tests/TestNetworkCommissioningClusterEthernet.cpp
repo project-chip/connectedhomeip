@@ -48,8 +48,8 @@ using namespace chip::app::Clusters::NetworkCommissioning;
 
 using chip::app::AttributeValueDecoder;
 using chip::app::DataModel::AttributeEntry;
-using chip::app::Testing::kAdminSubjectDescriptor;
-using chip::app::Testing::WriteOperation;
+using chip::Testing::kAdminSubjectDescriptor;
+using chip::Testing::WriteOperation;
 
 class NoopBreadcrumbTracker : public BreadCrumbTracker
 {

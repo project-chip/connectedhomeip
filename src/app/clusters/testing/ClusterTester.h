@@ -92,18 +92,18 @@ public:
         // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
         // using std::unique_ptr because ReadOperation is non-copyable and non-movable
         // vector reallocation is not an issue since we store unique_ptrs
-        std::unique_ptr<app::Testing::ReadOperation> readOperation =
-            std::make_unique<app::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
+        std::unique_ptr<chip::Testing::ReadOperation> readOperation =
+            std::make_unique<chip::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
 
         mReadOperations.push_back(std::move(readOperation));
-        app::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
+        chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
         app::DataModel::ActionReturnStatus status           = mCluster.ReadAttribute(readOperationRef.GetRequest(), *encoder);
         VerifyOrReturnError(status.IsSuccess(), status);
         ReturnErrorOnFailure(readOperationRef.FinishEncoding());
 
-        std::vector<app::Testing::DecodedAttributeData> attributeData;
+        std::vector<chip::Testing::DecodedAttributeData> attributeData;
         ReturnErrorOnFailure(readOperationRef.GetEncodedIBs().Decode(attributeData));
         VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
@@ -124,7 +124,7 @@ public:
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
-        app::Testing::WriteOperation writeOp(path);
+        chip::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack
         Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
@@ -293,9 +293,9 @@ private:
     // If protocol or test requirements change, this value may need to be increased.
     static constexpr size_t kTlvBufferSize = 256;
 
-    app::Testing::MockCommandHandler mHandler;
+    chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
-    std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
+    std::vector<std::unique_ptr<chip::Testing::ReadOperation>> mReadOperations;
 };
 
 } // namespace Testing

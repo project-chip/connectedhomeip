@@ -115,7 +115,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.gracePeriod     = MakeOptional(0U);
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
-    chip::app::Testing::MockCommandHandler cmdHandler;
+    chip::Testing::MockCommandHandler cmdHandler;
     chip::Testing::ClusterTester tester(cluster);
     auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData);
     ASSERT_TRUE(result.status.has_value());
