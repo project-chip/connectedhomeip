@@ -24,7 +24,6 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
-#include <controller/tests/data_model/DataModelFixtures.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/core/CHIPCore.h>
@@ -54,9 +53,6 @@ namespace Controller {
 namespace JCM {
 using namespace ::chip::Credentials::JCM;
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 class MockTrustVerificationDelegate : public TrustVerificationDelegate
 {
 public:
@@ -77,7 +73,7 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
-                                              ByteSpan & globallyTrustedRootSpan)
+                                              ByteSpan & globallyTrustedRootSpan) override
     {
         mLookedUpOperationalTrustAnchor = true;
         globallyTrustedRootSpan         = mRemoteAdminTrustedRoot;
@@ -140,15 +136,15 @@ public:
         Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
         fabricDescriptor.rootPublicKey = ByteSpan{ trustedCAPublicKey.ConstBytes(), trustedCAPublicKey.Length() };
 
+        // Setup NOCs list attribute
+        OperationalCredentials::Structs::NOCStruct::Type nocStruct;
+        nocStruct.fabricIndex = fabricDescriptor.fabricIndex;
+
         OperationalCredentials::Structs::FabricDescriptorStruct::Type fabricListData[1] = { std::move(fabricDescriptor) };
         DataModel::List<const OperationalCredentials::Structs::FabricDescriptorStruct::Type> fabricsList;
         fabricsList = fabricListData;
         ConcreteAttributePath fabricsPath(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
         ReturnErrorOnFailure(SetAttributeForWrite(fabricsPath, fabricsList));
-
-        // Setup NOCs list attribute
-        OperationalCredentials::Structs::NOCStruct::Type nocStruct;
-        nocStruct.fabricIndex = fabricDescriptor.fabricIndex;
 
         uint8_t icacBuf[Credentials::kMaxCHIPCertLength];
         MutableByteSpan icacSpan{ icacBuf };
@@ -387,9 +383,13 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mCommissioningParams.SetUseJCM(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        CHIP_ERROR err = mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "mAutoCommissioner.SetCommissioningParameters failed with error: %s", ErrorStr(err));
+        }
 
-        CHIP_ERROR err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
+        err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "MockClusterStateCache::SetUp failed with error: %s", ErrorStr(err));
@@ -431,7 +431,8 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     // Simulate user consenting
     mTrustVerificationDelegate.mShouldConsent = true;
     // Set up the mock ReadCommissioningInfo
-    mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    CHIP_ERROR err = mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     TrustVerificationStage stage = TrustVerificationStage::kIdle;
     TrustVerificationError error = TrustVerificationError::kSuccess;

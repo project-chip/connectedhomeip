@@ -37,15 +37,7 @@ using namespace chip::Test;
 using namespace chip::TestCerts;
 using namespace chip::Transport;
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace chip {
-namespace app {
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
-{}
-} // namespace app
 namespace Credentials {
 namespace JCM {
 
@@ -158,7 +150,7 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
-                                              ByteSpan & globallyTrustedRootSpan)
+                                              ByteSpan & globallyTrustedRootSpan) override
     {
         if (mInvalidOperationTrustAnchor)
         {
@@ -176,7 +168,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnVendorIdVerificationComplete(const CHIP_ERROR & err)
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override
     {
         mVerificationCompleteCalled = true;
         mVerificationResult         = err;
