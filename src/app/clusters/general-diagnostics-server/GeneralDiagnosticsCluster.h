@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DeviceLoadStatusProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/Server.h>
@@ -49,10 +50,11 @@ public:
                                         //       it will be forced as mandatory by the cluster constructor
                                         >;
 
-    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                              DeviceLoadStatusProvider * deviceLoadStatusProvider) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
-        mFeatureFlags(featureFlags)
+        mFeatureFlags(featureFlags), mDeviceLoadStatusProvider(deviceLoadStatusProvider)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -126,6 +128,7 @@ protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
     BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
+    DeviceLoadStatusProvider * mDeviceLoadStatusProvider;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
@@ -133,8 +136,9 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
                                               const BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                                              DeviceLoadStatusProvider * deviceLoadStatusProvider,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags),
+        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, deviceLoadStatusProvider),
         mFunctionConfig(functionsConfig)
     {}
 
