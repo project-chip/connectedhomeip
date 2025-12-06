@@ -18,6 +18,18 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 1000
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -85,6 +97,57 @@ tests:
       response:
           saveAs: NumberOfHolidaySchedulesSupportedValue
           value: 10
+
+    #
+    # Commission to second fabric to facilitate testing schedule/fabric restrictions
+    #
+    - label: "Open Commissioning Window from alpha"
+      endpoint: 0
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Commission from TH2"
+      identity: "beta"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for TH2"
+      endpoint: 0
+      identity: beta
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #
     # Excercise SetWeekDay schedules with invalid parameters
@@ -865,6 +928,93 @@ tests:
                 value: 12345689
 
     - label: "Verify created schedule"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+
+    # Verify that schedule modification fails from different fabric than created user
+    - label: "Attempt to set Week Day schedule from different fabric"
+      command: "SetWeekDaySchedule"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 14
+              - name: "StartMinute"
+                value: 15
+              - name: "EndHour"
+                value: 19
+              - name: "EndMinute"
+                value: 00
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Verify schedule was not modified"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 15
+              - name: "StartMinute"
+                value: 16
+              - name: "EndHour"
+                value: 18
+              - name: "EndMinute"
+                value: 00
+
+    - label: "Attempt to set Year Day schedule from different fabric"
+      command: "SetYearDaySchedule"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "LocalStartTime"
+                value: 12356
+              - name: "LocalEndTime"
+                value: 12345765
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Verify schedule was not modified"
       command: "GetYearDaySchedule"
       arguments:
           values:
