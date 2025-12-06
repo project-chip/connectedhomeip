@@ -1174,7 +1174,7 @@ CameraError CameraDevice::StopAudioPlaybackStream()
 }
 
 // Allocate snapshot stream
-CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
                                                  uint16_t & outStreamID)
 {
 
@@ -1748,8 +1748,8 @@ void CameraDevice::InitializeSnapshotStreams()
                       streamId);
 }
 
-bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs,
-                                     uint16_t & outStreamID)
+bool CameraDevice::AddSnapshotStream(
+    const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs, uint16_t & outStreamID)
 {
     constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
 
@@ -1844,7 +1844,7 @@ PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
     return mPushAVTransportManager;
 }
 
-CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+CameraAVStreamManagementDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
