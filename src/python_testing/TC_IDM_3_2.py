@@ -37,7 +37,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from typing import Any, Optional
 
 from mobly import asserts
 

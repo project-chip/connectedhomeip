@@ -25,8 +25,6 @@ from typing import Any, Optional
 
 from mobly import asserts
 
-log = logging.getLogger(__name__)
-
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
@@ -35,6 +33,8 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.matter_testing import MatterBaseTest
+
+log = logging.getLogger(__name__)
 
 # ============================================================================
 # Module-Level Utility Functions
@@ -238,6 +238,7 @@ class IDMBaseTest(MatterBaseTest):
                                      f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
                             return endpoint_id, attr_type
         log.warning("No timed write attributes found on device")
+        return None, None
 
     # ========================================================================
     # Attribute Verification Functions
@@ -488,12 +489,12 @@ class IDMBaseTest(MatterBaseTest):
         # Get all standard clusters supported on all endpoints
         supported_cluster_ids = set()
         for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys(
-            ) if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
+            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters
+            if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
 
         # Get all possible standard clusters
-        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys(
-        ) if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
+        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
+        if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
 
         # Find unsupported clusters
         unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
