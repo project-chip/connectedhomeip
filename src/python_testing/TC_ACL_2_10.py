@@ -32,7 +32,6 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
 
