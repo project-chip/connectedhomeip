@@ -172,6 +172,7 @@ CodeDrivenClusters:
     - Software Diagnostics
     - Time Format Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
