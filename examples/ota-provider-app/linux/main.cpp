@@ -24,6 +24,7 @@
 #include <json/json.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
+#include <ota-provider-common/OtaProviderAppCommandDelegate.h>
 
 #include "AppMain.h"
 
@@ -59,6 +60,8 @@ constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
 constexpr uint16_t kOptionPollInterval              = 'P';
 
 OTAProviderExample gOtaProvider;
+NamedPipeCommands sChipNamedPipeCommands;
+OtaProviderAppCommandDelegate sOtaProviderAppCommandDelegate;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
@@ -403,9 +406,29 @@ void ApplicationInit()
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
+
+    std::string path     = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    std::string path_out = std::string(LinuxDeviceOptions::GetInstance().app_pipe_out);
+
+    if ((!path.empty()) and (!path_out.empty()) and
+        (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
+    }
+    else
+    {
+        sOtaProviderAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
+    }
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
+}
 
 namespace {
 class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation

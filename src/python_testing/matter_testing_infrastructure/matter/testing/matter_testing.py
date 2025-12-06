@@ -22,7 +22,9 @@ import logging
 import os
 import queue
 import random
+import select
 import shlex
+import subprocess
 import textwrap
 import time
 import typing
@@ -1012,13 +1014,88 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
+    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, is_subprocess: Optional[bool] = False):
+        """
+        Read an out-of-band command from a Matter app.
+        Args:
+            app_pipe_out (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441_out or /tmp/chip_rvc_fifo_11111_out). Raises
+            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe-out,  arg --app-pipe-out has his own file exists check.
+            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test needs to read the pipe from a subprocess (i.e. Otaprovider) and LINUX_DUT_IP environment variable is not needed as the pipe is set locally
+
+        This method uses the following environment variables:
+
+         - LINUX_DUT_IP
+            * if not provided, the Matter app is assumed to run on the same machine as the test,
+              such as during CI, and the commands are sent to it using a local named pipe
+            * if provided, the commands for writing to the named pipe are forwarded to the DUT
+        - LINUX_DUT_USER
+            * if LINUX_DUT_IP is provided, use this for the DUT user name
+            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
+                 + Step 1: If you do not have a key, create one using ssh-keygen
+                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
+                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        """
+        # If is not empty from the args, verify if the fifo file exists.
+        if app_pipe_out is not None and not os.path.exists(app_pipe_out):
+            LOGGER.error("Named pipe %r does NOT exist" % app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+
+        if app_pipe_out is None:
+            app_pipe_out = self.matter_test_config.pipe_name_out
+
+        if not isinstance(app_pipe_out, str):
+            raise TypeError("The named pipe must be provided as a string value")
+
+        dut_ip = None
+
+        if not is_subprocess:
+            dut_ip = os.getenv('LINUX_DUT_IP')
+
+        # Checks for concatenate app_pipe and app_pid
+        if dut_ip is None:
+            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            try:
+                buf = bytearray()
+                while True:
+                    r, _, _ = select.select([fd], [], [], timeout)
+                    if not r:
+                        raise TimeoutError(f"No data within {timeout}")
+
+                    chunk_bytes = os.read(fd, chunk)
+                    if not chunk_bytes:
+                        break
+                    buf += chunk_bytes
+
+                    if len(buf) > max_bytes:
+                        raise ValueError("Command too large")
+
+                    if b"\n" in buf:
+                        line, _, _ = buf.partition(b"\n")
+                        return json.loads(line.decode("utf-8"))
+
+                if buf:
+                    return json.loads(buf.decode("utf-8"))
+                raise EOFError("Empty command response")
+            finally:
+                os.close(fd)
+
+        else:
+            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+
+            dut_uname = os.getenv('LINUX_DUT_USER')
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+            LOGGER.info(f"Using DUT user name: {dut_uname}")
+            cmd_list = ["ssh", f"{dut_uname}@{dut_ip}", f"cat {app_pipe_out}"]
+            return subprocess.check_output(cmd_list)
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, is_subprocess: Optional[bool] = False):
         """
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test needs to write the pipe from a subprocess (i.e. Otaprovider) and LINUX_DUT_IP environment variable is not needed as the pipe is set locally
 
         This method uses the following environment variables:
 
@@ -1048,7 +1125,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise TypeError("The command must be passed as a dictionary value")
 
         command = json.dumps(command_dict)
-        dut_ip = os.getenv('LINUX_DUT_IP')
+        dut_ip = None
+
+        if not is_subprocess:
+            dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
