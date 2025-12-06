@@ -89,6 +89,17 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
+    created_codes = []
+    for idx, discriminator in enumerate(matter_test_config.discriminators):
+        created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
+
+    setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+    if not setup_codes:
+        return None
+    return setup_codes[0]
+
+
 @dataclass
 class AttributeValue:
     endpoint_id: int
@@ -477,6 +488,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
+
+    @property
+    def first_setup_code(self) -> Optional[str]:
+        return get_first_setup_code(self.default_controller, self.matter_test_config)
 
     @property
     def is_pics_sdk_ci_only(self) -> bool:
