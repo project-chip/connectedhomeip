@@ -382,7 +382,7 @@ private:
     }
 
 protected:
-    CameraAVStreamManagementCluster * GetCameraAVStreamMgmtServer() const { return mCameraAVStreamManagementCluster; }
+    CameraAVStreamManagementCluster * GetCameraAVStreamManagementCluster() const { return mCameraAVStreamManagementCluster; }
 };
 
 enum class OptionalAttribute : uint32_t
