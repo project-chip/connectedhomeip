@@ -166,8 +166,6 @@ static_library("ESP32") {
 
   if (chip_enable_openthread) {
     sources += [
-      "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
-      "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "../OpenThread/OpenThreadUtils.cpp",
       "OpenthreadLauncher.cpp",
       "OpenthreadLauncher.h",
@@ -179,13 +177,6 @@ static_library("ESP32") {
       sources += [
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
-      ]
-    }
-    if (chip_openthread_border_router) {
-      deps += [ "${chip_root}/src/app/common:ids" ]
-      sources += [
-        "${chip_root}/src/platform/OpenThread/GenericThreadBorderRouterDelegate.cpp",
-        "${chip_root}/src/platform/OpenThread/GenericThreadBorderRouterDelegate.h",
       ]
     }
     configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]
