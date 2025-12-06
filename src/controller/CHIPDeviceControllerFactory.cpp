@@ -69,6 +69,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mEnableTcpEndpoint         = params.enableTcpEndpoint;
 
     // Initialize the system state. Note that it is left in a somewhat
     // special state where it is initialized, but has a ref count of 0.
@@ -102,6 +103,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
+    params.enableTcpEndpoint         = mEnableTcpEndpoint;
 
     // re-initialization keeps any previously initialized values. The only place where
     // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
@@ -138,7 +140,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(params.listenPort)
-                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+                               .SetServerListenEnabled(mEnableTcpEndpoint); // Control TCP via runtime flag
 #endif
 
     if (params.dataModelProvider == nullptr)
@@ -199,7 +201,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                         Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
-                                                            .SetServerListenEnabled(false)
+                                                            .SetServerListenEnabled(mEnableTcpEndpoint)
 #endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

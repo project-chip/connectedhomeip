@@ -179,6 +179,10 @@ struct FactoryInitParams
     // networks when activeRetransTimeout is too small.
     // Note: Setting this parameter to a nonzero value is not spec-compliant.
     Optional<uint32_t> minimumLITBackoffInterval;
+
+    // Controls whether TCP endpoints should be enabled during transport manager initialization.
+    // When false, TCP endpoints will not be initialized even if INET_CONFIG_ENABLE_TCP_ENDPOINT is defined.
+    bool enableTcpEndpoint = true;
 };
 
 class DeviceControllerFactory
@@ -314,6 +318,7 @@ private:
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
     bool mEnableServerInteractions                                      = false;
+    bool mEnableTcpEndpoint                                             = true;
 };
 
 } // namespace Controller
