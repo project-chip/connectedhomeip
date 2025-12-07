@@ -26,7 +26,7 @@
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>

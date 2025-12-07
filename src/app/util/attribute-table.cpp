@@ -23,7 +23,7 @@
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/core/CHIPConfig.h>
 
 #include <app/reporting/reporting.h>

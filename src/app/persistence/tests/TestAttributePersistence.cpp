@@ -391,4 +391,224 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
     }
 }
 
+TEST(TestAttributePersistence, TestLoadNativeEndianValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
+    constexpr uint32_t kValueToStore = 42;
+
+    // Store a non-null value directly
+    {
+        typename NumericAttributeTraits<uint32_t>::StorageType storageReadValue;
+        NumericAttributeTraits<uint32_t>::WorkingToStorage(kValueToStore, storageReadValue);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &storageReadValue, sizeof(storageReadValue)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Test loading a non-null value into Nullable
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::MakeNullable<uint32_t>(99);
+
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), kValueToStore);
+    }
+
+    // Store a null value
+    {
+        typename NumericAttributeTraits<uint32_t>::StorageType nullValue;
+        NumericAttributeTraits<uint32_t>::SetNull(nullValue);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &nullValue, sizeof(nullValue)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Test loading a null value
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::MakeNullable<uint32_t>(99);
+
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, defaultValue));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+
+    // Test loading from non-existent path with non-null default
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::MakeNullable<uint32_t>(123);
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, defaultValue));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), 123u);
+    }
+
+    // Test loading from non-existent path with null default
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> defaultValue = DataModel::NullNullable;
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, defaultValue));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestDecodeAndStoreNativeEndianValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kValueToStore = 0x12345678;
+
+    // Store a non-null value via decoder
+    {
+        DataModel::Nullable<uint32_t> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(kValueToStore));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(currentValue.IsNull());
+        EXPECT_EQ(currentValue.Value(), kValueToStore);
+    }
+
+    // Verify the value can be loaded back
+    {
+        DataModel::Nullable<uint32_t> valueRead;
+        DataModel::Nullable<uint32_t> errorRead;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, errorRead));
+        ASSERT_FALSE(valueRead.IsNull());
+        ASSERT_EQ(valueRead.Value(), kValueToStore);
+    }
+
+    // Store a null value via decoder
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kValueToStore);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+
+    // Verify the null value can be loaded back
+    {
+        DataModel::Nullable<uint32_t> valueRead = DataModel::MakeNullable<uint32_t>(999);
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, DataModel::MakeNullable<uint32_t>(0)));
+        ASSERT_TRUE(valueRead.IsNull());
+    }
+}
+
+TEST(TestAttributePersistence, TestNoOpOnSameValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kInitialValue = 42;
+
+    // Test no-op for same non-null value
+    {
+        DataModel::Nullable<uint32_t> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+    }
+
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kInitialValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_TRUE(status.IsNoOpSuccess());
+    }
+
+    // Test no-op for same null value
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kInitialValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        ASSERT_TRUE(currentValue.IsNull());
+    }
+
+    {
+        DataModel::Nullable<uint32_t> currentValue; // null
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_TRUE(status.IsNoOpSuccess());
+    }
+}
+
+TEST(TestAttributePersistence, TestWriteOnDifferentValueNullable)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    constexpr uint32_t kInitialValue = 42;
+    constexpr uint32_t kNewValue     = 99;
+
+    // Store initial non-null value
+    {
+        DataModel::Nullable<uint32_t> currentValue;
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue), CHIP_NO_ERROR);
+        EXPECT_EQ(currentValue.Value(), kInitialValue);
+    }
+
+    // Store a different non-null value - should write
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kInitialValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(kNewValue));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), kNewValue);
+    }
+
+    // Store null - should write
+    {
+        DataModel::Nullable<uint32_t> currentValue = DataModel::MakeNullable(kNewValue);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<uint32_t>());
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_TRUE(currentValue.IsNull());
+    }
+
+    // Store non-null after null - should write
+    {
+        DataModel::Nullable<uint32_t> currentValue; // null
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(kInitialValue));
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
+        EXPECT_TRUE(status.IsSuccess());
+        EXPECT_FALSE(status.IsNoOpSuccess());
+        EXPECT_EQ(currentValue.Value(), kInitialValue);
+    }
+}
+
 } // namespace

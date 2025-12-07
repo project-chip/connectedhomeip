@@ -19,8 +19,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/util/attribute-metadata.h>
-#include <app/util/attribute-storage-null-handling.h>
-#include <app/util/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>

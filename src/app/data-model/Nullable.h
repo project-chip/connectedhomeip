@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/util/attribute-storage-null-handling.h>
+#include <lib/support/attribute-storage-null-handling.h>
 #include <optional>
 #include <type_traits>
 #include <utility>

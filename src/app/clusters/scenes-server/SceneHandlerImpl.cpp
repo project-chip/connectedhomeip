@@ -18,7 +18,7 @@
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/util/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 
 namespace chip {
 namespace scenes {
