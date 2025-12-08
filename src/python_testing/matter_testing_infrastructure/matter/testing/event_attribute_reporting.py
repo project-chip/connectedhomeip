@@ -109,7 +109,7 @@ class EventSubscriptionHandler:
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
-    async def cancel(self):
+    def cancel(self):
         """This cancels a subscription."""
         self._subscription.Shutdown()
 
@@ -251,7 +251,7 @@ class AttributeSubscriptionHandler:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    async def cancel(self):
+    def cancel(self):
         """This cancels a subscription."""
         self._subscription.Shutdown()
 
