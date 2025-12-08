@@ -17,8 +17,8 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
-#include <app/util/mock/MockNodeConfig.h>
 #include <app/util/mock/Functions.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <credentials/jcm/VendorIdVerificationClient.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>

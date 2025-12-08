@@ -20,8 +20,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/Context.h>
 #include <app/tests/AppTestContext.h>
-#include <app/util/mock/MockNodeConfig.h>
 #include <app/util/mock/Functions.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
