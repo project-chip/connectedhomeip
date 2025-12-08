@@ -16,11 +16,11 @@ import("//build_overrides/chip.gni")
 
 source_set("push-av-stream-transport-server") {
   sources = [
-    "push-av-stream-transport-cluster.cpp",
-    "push-av-stream-transport-cluster.h",
+    "PushAVStreamTransportCluster.cpp",
+    "PushAVStreamTransportCluster.h",
+    "PushAVStreamTransportLogic.cpp",
+    "PushAVStreamTransportLogic.h",
     "push-av-stream-transport-delegate.h",
-    "push-av-stream-transport-logic.cpp",
-    "push-av-stream-transport-logic.h",
     "push-av-stream-transport-storage.h",
   ]
 

@@ -3024,6 +3024,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGeneralDiagnosticsClusterDeviceLoadStatusAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.DeviceLoadStatusAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedGeneralDiagnosticsClusterGeneratedCommandListAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8305,6 +8326,111 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedActivatedCarbonFilterMonitoringClusterAttributeListAttributeCallback implements ChipClusters.ActivatedCarbonFilterMonitoringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterLastChangedTimeAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.LastChangedTimeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterReplacementProductListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.ReplacementProductListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.WaterTankLevelMonitoringClusterReplacementProductStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.WaterTankLevelMonitoringClusterReplacementProductStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterGeneratedCommandListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterAcceptedCommandListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedWaterTankLevelMonitoringClusterAttributeListAttributeCallback implements ChipClusters.WaterTankLevelMonitoringCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22992,6 +23118,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ActivatedCarbonFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInfo);
 
+    ClusterInfo waterTankLevelMonitoringClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.WaterTankLevelMonitoringCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("waterTankLevelMonitoring", waterTankLevelMonitoringClusterInfo);
+
     ClusterInfo booleanStateConfigurationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.BooleanStateConfigurationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("booleanStateConfiguration", booleanStateConfigurationClusterInfo);
@@ -23374,6 +23504,7 @@ public class ClusterInfoMapping {
     destination.get("groupcast").combineCommands(source.get("groupcast"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
+    destination.get("waterTankLevelMonitoring").combineCommands(source.get("waterTankLevelMonitoring"));
     destination.get("booleanStateConfiguration").combineCommands(source.get("booleanStateConfiguration"));
     destination.get("valveConfigurationAndControl").combineCommands(source.get("valveConfigurationAndControl"));
     destination.get("electricalPowerMeasurement").combineCommands(source.get("electricalPowerMeasurement"));
@@ -26455,6 +26586,22 @@ public class ClusterInfoMapping {
     activatedCarbonFilterMonitoringClusterInteractionInfoMap.put("resetCondition", activatedCarbonFilterMonitoringresetConditionInteractionInfo);
 
     commandMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> waterTankLevelMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> waterTankLevelMonitoringresetConditionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo waterTankLevelMonitoringresetConditionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterTankLevelMonitoringCluster) cluster)
+        .resetCondition((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        waterTankLevelMonitoringresetConditionCommandParams
+    );
+    waterTankLevelMonitoringClusterInteractionInfoMap.put("resetCondition", waterTankLevelMonitoringresetConditionInteractionInfo);
+
+    commandMap.put("waterTankLevelMonitoring", waterTankLevelMonitoringClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> booleanStateConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 

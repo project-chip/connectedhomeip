@@ -1089,6 +1089,14 @@ NS_ASSUME_NONNULL_BEGIN
         _caseSessionsPerFabric = @(0);
 
         _subscriptionsPerFabric = @(0);
+
+        _simultaneousInvocationsSupported = nil;
+
+        _simultaneousWritesSupported = nil;
+
+        _readPathsSupported = nil;
+
+        _subscribePathsSupported = nil;
     }
     return self;
 }
@@ -1099,13 +1107,17 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.caseSessionsPerFabric = self.caseSessionsPerFabric;
     other.subscriptionsPerFabric = self.subscriptionsPerFabric;
+    other.simultaneousInvocationsSupported = self.simultaneousInvocationsSupported;
+    other.simultaneousWritesSupported = self.simultaneousWritesSupported;
+    other.readPathsSupported = self.readPathsSupported;
+    other.subscribePathsSupported = self.subscribePathsSupported;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; simultaneousInvocationsSupported:%@; simultaneousWritesSupported:%@; readPathsSupported:%@; subscribePathsSupported:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric, _simultaneousInvocationsSupported, _simultaneousWritesSupported, _readPathsSupported, _subscribePathsSupported];
     return descriptionString;
 }
 
@@ -1784,6 +1796,45 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic channel;
 @dynamic wiFiBand;
 @dynamic rssi;
+@end
+
+@implementation MTRGeneralDiagnosticsClusterDeviceLoadStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currentSubscriptions = @(0);
+
+        _currentSubscriptionsForFabric = @(0);
+
+        _totalSubscriptionsEstablished = @(0);
+
+        _totalInteractionModelMessagesSent = @(0);
+
+        _totalInteractionModelMessagesReceived = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGeneralDiagnosticsClusterDeviceLoadStruct alloc] init];
+
+    other.currentSubscriptions = self.currentSubscriptions;
+    other.currentSubscriptionsForFabric = self.currentSubscriptionsForFabric;
+    other.totalSubscriptionsEstablished = self.totalSubscriptionsEstablished;
+    other.totalInteractionModelMessagesSent = self.totalInteractionModelMessagesSent;
+    other.totalInteractionModelMessagesReceived = self.totalInteractionModelMessagesReceived;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentSubscriptions:%@; currentSubscriptionsForFabric:%@; totalSubscriptionsEstablished:%@; totalInteractionModelMessagesSent:%@; totalInteractionModelMessagesReceived:%@; >", NSStringFromClass([self class]), _currentSubscriptions, _currentSubscriptionsForFabric, _totalSubscriptionsEstablished, _totalInteractionModelMessagesSent, _totalInteractionModelMessagesReceived];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface
@@ -4864,6 +4915,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct alloc] init];
+
+    other.productIdentifierType = self.productIdentifierType;
+    other.productIdentifierValue = self.productIdentifierValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: productIdentifierType:%@; productIdentifierValue:%@; >", NSStringFromClass([self class]), _productIdentifierType, _productIdentifierValue];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterTankLevelMonitoringClusterReplacementProductStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _productIdentifierType = @(0);
+
+        _productIdentifierValue = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterTankLevelMonitoringClusterReplacementProductStruct alloc] init];
 
     other.productIdentifierType = self.productIdentifierType;
     other.productIdentifierValue = self.productIdentifierValue;

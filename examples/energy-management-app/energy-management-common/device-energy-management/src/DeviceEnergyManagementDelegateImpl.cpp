@@ -19,6 +19,8 @@
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DEMManufacturerDelegate.h"
 #include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
@@ -118,18 +120,18 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         }
     }
 
-    SetESAState(ESAStateEnum::kPowerAdjustActive);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
 
     // mPowerAdjustCapabilityStruct is guaranteed to have a value as validated in Instance::HandlePowerAdjustRequest.
     // If it did not have a value, this method would not have been called.
     switch (cause)
     {
     case AdjustmentCauseEnum::kLocalOptimization:
-        SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kLocalOptimizationAdjustment);
+        TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kLocalOptimizationAdjustment);
         break;
 
     case AdjustmentCauseEnum::kGridOptimization:
-        SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kGridOptimizationAdjustment);
+        TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kGridOptimizationAdjustment);
         break;
 
     default:
@@ -176,11 +178,11 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustRequestFailure()
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
-    SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
     mPowerAdjustmentInProgress = false;
 
-    SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
+    TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     // TODO
     // Should we inform the mpDEMManufacturerDelegate that PowerAdjustRequest has failed?
@@ -213,17 +215,17 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustTimerExpiry()
     // The PowerAdjustment is no longer in progress
     mPowerAdjustmentInProgress = false;
 
-    SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
-    SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
+    TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     // Generate a PowerAdjustEnd event
-    GeneratePowerAdjustEndEvent(CauseEnum::kNormalCompletion);
+    TEMPORARY_RETURN_IGNORED GeneratePowerAdjustEndEvent(CauseEnum::kNormalCompletion);
 
     // Update the forecast with new expected end time
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerAdjustCompletion();
+        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerAdjustCompletion();
     }
 }
 
@@ -266,10 +268,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
-    SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
     mPowerAdjustmentInProgress = false;
-    SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
+    TEMPORARY_RETURN_IGNORED SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     CHIP_ERROR err = GeneratePowerAdjustEndEvent(cause);
 
@@ -459,7 +461,7 @@ Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, Ad
         }
     }
 
-    SetESAState(ESAStateEnum::kPaused);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPaused);
 
     // Update the forecaseUpdateReason based on the AdjustmentCause
     if (cause == AdjustmentCauseEnum::kLocalOptimization)
@@ -487,7 +489,7 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestFailure()
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
-    SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
     mPauseRequestInProgress = false;
 
@@ -520,15 +522,15 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestTimerExpiry()
     // The PauseRequestment is no longer in progress
     mPauseRequestInProgress = false;
 
-    SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
     // Generate a Resumed event
-    GenerateResumedEvent(CauseEnum::kNormalCompletion);
+    TEMPORARY_RETURN_IGNORED GenerateResumedEvent(CauseEnum::kNormalCompletion);
 
     // It is expected the mpDEMManufacturerDelegate will update the forecast with new expected end time
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPauseCompletion();
+        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPauseCompletion();
     }
 }
 
@@ -546,7 +548,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndGenerateEvent(Ca
 {
     mPauseRequestInProgress = false;
 
-    SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
 
     DeviceLayer::SystemLayer().CancelTimer(PauseRequestTimerExpiry, this);
 

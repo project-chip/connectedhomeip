@@ -40,6 +40,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
@@ -65,7 +66,7 @@ uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
 
 TestPersistentStorageDelegate gStorageDelegate;
 
-class TestWriteChunking : public Test::AppContext
+class TestWriteChunking : public chip::Testing::AppContext
 {
 private:
     using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
@@ -152,7 +153,7 @@ void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aL
 
     // Move Encoded TLV Array into TLVReader Object
     outEncodedListTlvReader.Init(std::move(buffer), writer.GetLengthWritten());
-    outEncodedListTlvReader.Next();
+    EXPECT_SUCCESS(outEncodedListTlvReader.Next());
 }
 
 //clang-format off
@@ -346,7 +347,7 @@ TEST_F(TestWriteChunking, TestListChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -437,7 +438,7 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -541,7 +542,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -624,7 +625,7 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -709,7 +710,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -784,7 +785,7 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -868,7 +869,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -932,7 +933,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -1117,7 +1118,7 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -1373,7 +1374,7 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);

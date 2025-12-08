@@ -104,7 +104,7 @@ void TempMeas(System::Layer * systemLayer, void * appState)
     // chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
     //     /* endpoint ID */ 1, /* humidity in 0.01*C */ int16_t(humidity));
 
-    systemLayer->StartTimer(Clock::Seconds32(kReportDelaySec), TempMeas, nullptr);
+    TEMPORARY_RETURN_IGNORED systemLayer->StartTimer(Clock::Seconds32(kReportDelaySec), TempMeas, nullptr);
 }
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
@@ -116,7 +116,8 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ChipLogProgress(DeviceLayer, "IPv4 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kReportDelaySec), TempMeas, nullptr);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kReportDelaySec),
+                                                                             TempMeas, nullptr);
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {

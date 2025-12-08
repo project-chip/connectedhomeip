@@ -56,7 +56,7 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no audio or video id => expect INVALID_COMMAND"),
@@ -65,13 +65,12 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
             TestStep(5, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
             TestStep(6, "Send EndSession with valid WebRTCSessionID => expect SUCCESS"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_2(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
@@ -81,7 +80,10 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WebRTCP_2_2(self):
@@ -97,7 +99,7 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         self.step(1)
