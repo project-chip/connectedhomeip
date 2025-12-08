@@ -38,7 +38,6 @@ chip_test_suite("jcm") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server:joint_fabric",
-    "${chip_root}/src/app/tests:app-test-stubs",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",

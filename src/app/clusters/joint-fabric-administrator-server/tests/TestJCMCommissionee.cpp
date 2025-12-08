@@ -162,10 +162,8 @@ protected:
         {
             return TrustVerificationStage::kComplete;
         }
-        else
-        {
-            return mStageToRun;
-        }
+
+        return mStageToRun;
     }
 
     CHIP_ERROR ReadAdminFabricIndexAttribute(

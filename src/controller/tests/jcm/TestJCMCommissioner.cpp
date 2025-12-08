@@ -20,13 +20,14 @@
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/Context.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/test-interaction-model-api.h>
+#include <app/util/mock/MockNodeConfig.h>
+#include <app/util/mock/Functions.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
-#include <controller/tests/data_model/DataModelFixtures.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -148,7 +149,7 @@ public:
 
         // Setup NOCs list attribute
         OperationalCredentials::Structs::NOCStruct::Type nocStruct;
-        nocStruct.fabricIndex = fabricDescriptor.fabricIndex;
+        nocStruct.fabricIndex = static_cast<chip::FabricIndex>(fabricIndex);
 
         uint8_t icacBuf[Credentials::kMaxCHIPCertLength];
         MutableByteSpan icacSpan{ icacBuf };
@@ -254,17 +255,22 @@ public:
 class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
 {
 public:
-    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) : mMessagingContext(messagingContext) {}
+    TestVendorIDVerificationDataModel() : mMessagingContext(nullptr) {}
 
     static TestVendorIDVerificationDataModel & Instance(MessagingContext * messagingContext)
     {
-        static TestVendorIDVerificationDataModel instance(messagingContext);
+        static TestVendorIDVerificationDataModel instance;
+        instance.SetMessagingContext(messagingContext);
         return instance;
     }
+
+    void SetMessagingContext(MessagingContext * messagingContext) { mMessagingContext = messagingContext; }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & aRequest,
                                                                chip::TLV::TLVReader & aReader, CommandHandler * aHandler) override
     {
+        VerifyOrDie(mMessagingContext != nullptr);
+
         if (aRequest.path.mClusterId != Clusters::OperationalCredentials::Id ||
             aRequest.path.mCommandId !=
                 Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type::GetCommandId())

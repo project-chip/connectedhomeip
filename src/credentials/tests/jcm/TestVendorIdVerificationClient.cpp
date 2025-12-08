@@ -17,10 +17,11 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/test-interaction-model-api.h>
-#include <controller/tests/data_model/DataModelFixtures.h>
+#include <app/util/mock/MockNodeConfig.h>
+#include <app/util/mock/Functions.h>
 #include <credentials/jcm/VendorIdVerificationClient.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -52,17 +53,22 @@ namespace JCM {
 class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
 {
 public:
-    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) : mMessagingContext(messagingContext) {}
+    TestVendorIDVerificationDataModel() : mMessagingContext(nullptr) {}
 
     static TestVendorIDVerificationDataModel & Instance(MessagingContext * messagingContext)
     {
-        static TestVendorIDVerificationDataModel instance(messagingContext);
+        static TestVendorIDVerificationDataModel instance;
+        instance.SetMessagingContext(messagingContext);
         return instance;
     }
+
+    void SetMessagingContext(MessagingContext * messagingContext) { mMessagingContext = messagingContext; }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & aRequest,
                                                                chip::TLV::TLVReader & aReader, CommandHandler * aHandler) override
     {
+        VerifyOrDie(mMessagingContext != nullptr);
+
         if (aRequest.path.mClusterId != Clusters::OperationalCredentials::Id ||
             aRequest.path.mCommandId !=
                 Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type::GetCommandId())
@@ -158,7 +164,7 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
-                                              ByteSpan & globallyTrustedRootSpan)
+                                              ByteSpan & globallyTrustedRootSpan) override
     {
         if (mInvalidOperationTrustAnchor)
         {
@@ -176,7 +182,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnVendorIdVerificationComplete(const CHIP_ERROR & err)
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override
     {
         mVerificationCompleteCalled = true;
         mVerificationResult         = err;
