@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>

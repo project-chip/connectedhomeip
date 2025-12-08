@@ -21,6 +21,8 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -142,10 +144,9 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(const Cam
     writer.Init(bufferSpan);
     ReturnErrorOnFailure(mptzPosition.Encode(writer, TLV::AnonymousTag()));
 
-    //auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-
-    return CHIP_NO_ERROR; //GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
+    return GetAttributePersistenceProvider()->WriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
@@ -153,8 +154,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(CameraAvSe
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
 
-    //auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
-    //ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->ReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
 

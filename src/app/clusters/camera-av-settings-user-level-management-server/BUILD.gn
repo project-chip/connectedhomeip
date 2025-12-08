@@ -16,14 +16,15 @@ import("//build_overrides/chip.gni")
 
 source_set("camera-av-settings-user-level-management-server") {
   sources = [
-    "camera-av-settings-user-level-management-cluster.cpp",
-    "camera-av-settings-user-level-management-cluster.h",
+    "CameraAvSettingsUserLevelManagementCluster.cpp",
+    "CameraAvSettingsUserLevelManagementCluster.h",
     "camera-av-settings-user-level-management-logic.cpp",
     "camera-av-settings-user-level-management-logic.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app/",
+    "${chip_root}/src/app/persistence:singleton",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/zzz_generated/app-common/clusters/CameraAvSettingsUserLevelManagement",

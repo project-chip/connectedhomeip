@@ -155,10 +155,10 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
 
-    //const uint8_t appMaxPresets = 5;
+    const uint8_t appMaxPresets = 5;
 
     // Instantiate the CameraAVSettingsUserLevelMgmt Server
-    mAVSettingsUserLevelMgmtServer.Create(mEndpoint, avsumFeatures);
+    mAVSettingsUserLevelMgmtServer.Create(mEndpoint, avsumFeatures, appMaxPresets);
     mAVSettingsUserLevelMgmtServer.Cluster().SetDelegate(&mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate());
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVSettingsUserLevelMgmtServer.Registration());
     if (err != CHIP_NO_ERROR)
@@ -298,11 +298,7 @@ void CameraApp::InitCameraDeviceClusters()
 void CameraApp::ShutdownCameraDeviceClusters()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
-<<<<<<< HEAD
     mAVSettingsUserLevelMgmtServer.Cluster().Shutdown();
-    mWebRTCTransportProviderPtr->Shutdown();
-=======
-    mAVSettingsUserLevelMgmtServerPtr->Shutdown();
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
     if (err != CHIP_NO_ERROR)
@@ -310,7 +306,6 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "WebRTCTransportProvider unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mWebRTCTransportProviderServer.Destroy();
->>>>>>> master
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

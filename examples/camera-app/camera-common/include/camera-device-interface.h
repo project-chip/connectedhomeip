@@ -135,12 +135,7 @@ public:
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
-<<<<<<< HEAD
     virtual chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
-=======
-    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
-    GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
->>>>>>> master
 
     // Getter for ZoneManagement Delegate
     virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;

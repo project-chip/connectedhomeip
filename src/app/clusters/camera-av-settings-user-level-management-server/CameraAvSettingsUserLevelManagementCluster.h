@@ -190,8 +190,7 @@ protected:
     CameraAvSettingsUserLevelManagementCluster * GetServer() const { return mServer; }
 };
 
-class CameraAvSettingsUserLevelManagementCluster : public DefaultServerCluster,
-                                                   public CameraAvSettingsUserLevelManagement::PhysicalPTZCallback
+class CameraAvSettingsUserLevelManagementCluster : public DefaultServerCluster
 {
 public:
     /**
@@ -202,11 +201,10 @@ public:
 
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures) :
-        DefaultServerCluster({ aEndpointId, CameraAvSettingsUserLevelManagement::Id }), mLogic(aEndpointId, aFeatures)
+    CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId, BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures,
+                                               uint8_t aMaxPresets) :
+        DefaultServerCluster({ aEndpointId, CameraAvSettingsUserLevelManagement::Id }), mLogic(aEndpointId, aFeatures), mMaxPresets(aMaxPresets)
     {}
-
-    ~CameraAvSettingsUserLevelManagementCluster() override;
 
     CameraAvSettingsUserLevelMgmtServerLogic & GetLogic() { return mLogic; }
 
@@ -283,7 +281,6 @@ public:
 
 private:
     CameraAvSettingsUserLevelMgmtServerLogic mLogic;
-    CameraAvSettingsUserLevelManagementDelegate & mDelegate;
     EndpointId mEndpointId;
     BitFlags<CameraAvSettingsUserLevelManagement::Feature> mFeatures;
 
