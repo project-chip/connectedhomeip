@@ -62,6 +62,9 @@ public:
     void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded, DataModel::Nullable<uint8_t> progressPercent,
                          DataModel::Nullable<int64_t> platformCode) override;
 
+    // This is intended to be used only for backwards compatibility with the codegen data model provider.
+    void SetOtaRequestor(OTARequestorInterface * otaRequestor) { mOtaRequestor = otaRequestor; }
+
 protected:
     // Returns the OTA requestor instance to use internally. Defaults to the instance passed into the constructor.
     virtual OTARequestorInterface * OtaRequestorInstance() { return mOtaRequestor; }

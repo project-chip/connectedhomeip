@@ -40,16 +40,7 @@ static constexpr size_t kOtaRequestorFixedClusterCount =
     OtaSoftwareUpdateRequestor::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kOtaRequestorMaxClusterCount = kOtaRequestorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-// Uses the global singleton OTARequestorInterface as its data source.
-class OTARequestorClusterUsingSingleton : public OTARequestorCluster
-{
-public:
-    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId) : OTARequestorCluster(endpointId, nullptr) {}
-
-    OTARequestorInterface * OtaRequestorInstance() override { return GetRequestorInstance(); }
-};
-
-LazyRegisteredServerCluster<OTARequestorClusterUsingSingleton> gServers[kOtaRequestorMaxClusterCount];
+LazyRegisteredServerCluster<OTARequestorCluster> gServers[kOtaRequestorMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -57,7 +48,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        gServers[clusterInstanceIndex].Create(endpointId, GetRequestorInstance());
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -69,6 +60,17 @@ public:
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
+
+void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
+{
+    for (auto & server : gServers)
+    {
+        if (server.IsConstructed())
+        {
+            server.Cluster().SetOtaRequestor(instance);
+        }
+    }
+}
 
 } // namespace
 
@@ -86,6 +88,8 @@ void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+
+    internalOnSetRequestorInstance = OnSetGlobalOtaRequestorInstance;
 }
 
 void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpointId)

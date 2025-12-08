@@ -775,4 +775,44 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
+// TODO: Verify that changing the OTA requestor updates the behaviour.
+TEST_F(TestOTARequestorCluster, SetOtaRequestorInterfaceChangesBehaviour)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor firstOtaRequestor;
+    MockOtaRequestor secondOtaRequestor;
+    OTARequestorCluster cluster(kTestEndpointId, &firstOtaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    firstOtaRequestor.SetUpdateStateProgress(DataModel::MakeNullable<uint8_t>(20));
+    secondOtaRequestor.SetUpdateStateProgress(DataModel::MakeNullable<uint8_t>(75));
+
+    // Initial reading is the requestor passed in the constructor.
+    DataModel::Nullable<uint8_t> updateStateProgress;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(updateStateProgress.IsNull());
+    EXPECT_EQ(updateStateProgress.Value(), 20);
+
+    // Setting the second requestor uses that as the backing data.
+    cluster.SetOtaRequestor(&secondOtaRequestor);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(updateStateProgress.IsNull());
+    EXPECT_EQ(updateStateProgress.Value(), 75);
+
+    // Clearing the requestor responds with default behaviour, which depends on whether the OTA requestor flag is enabled.
+    // For backwards compatibility, when the flag is disabled the cluster returns default values.
+    cluster.SetOtaRequestor(nullptr);
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
+              CHIP_ERROR_INTERNAL);
+#else
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(updateStateProgress.IsNull());
+#endif
+}
+
 } // namespace
