@@ -421,7 +421,15 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    int lightNum = atoi(argv[0]);
+    char * end;
+    long lightNumLong = strtol(argv[0], &end, 10);
+    if (end == argv[0] || *end != '\0')
+    {
+        ESP_LOGE(TAG, "Invalid light number: %s", argv[0]);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    int lightNum = static_cast<int>(lightNumLong);
+
     Device * dev;
     bool * added;
     DataVersion * dataVersions;
@@ -462,7 +470,15 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    int lightNum = atoi(argv[0]);
+    char * end;
+    long lightNumLong = strtol(argv[0], &end, 10);
+    if (end == argv[0] || *end != '\0')
+    {
+        ESP_LOGE(TAG, "Invalid light number: %s", argv[0]);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    int lightNum = static_cast<int>(lightNumLong);
+
     Device * dev;
     bool * added;
     DataVersion * dataVersions;
@@ -529,25 +545,27 @@ static CHIP_ERROR BridgeListHandler(int argc, char ** argv)
 static CHIP_ERROR BridgeRenameHandler(int argc, char ** argv)
 {
     // Rename all added lights to "Light Xb" (TC-BR-3)
-    if (gLight1Added)
+    struct
     {
-        gLight1.SetName("Light 1b");
-        ESP_LOGI(TAG, "Renamed Light 1 to 'Light 1b'");
-    }
-    if (gLight2Added)
+        int num;
+        Device * dev;
+        bool added;
+    } lights[] = {
+        { 1, &gLight1, gLight1Added },
+        { 2, &gLight2, gLight2Added },
+        { 3, &gLight3, gLight3Added },
+        { 4, &gLight4, gLight4Added },
+    };
+
+    for (const auto & light : lights)
     {
-        gLight2.SetName("Light 2b");
-        ESP_LOGI(TAG, "Renamed Light 2 to 'Light 2b'");
-    }
-    if (gLight3Added)
-    {
-        gLight3.SetName("Light 3b");
-        ESP_LOGI(TAG, "Renamed Light 3 to 'Light 3b'");
-    }
-    if (gLight4Added)
-    {
-        gLight4.SetName("Light 4b");
-        ESP_LOGI(TAG, "Renamed Light 4 to 'Light 4b'");
+        if (light.added)
+        {
+            char newName[16];
+            snprintf(newName, sizeof(newName), "Light %db", light.num);
+            light.dev->SetName(newName);
+            ESP_LOGI(TAG, "Renamed Light %d to '%s'", light.num, newName);
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -556,25 +574,25 @@ static CHIP_ERROR BridgeRenameHandler(int argc, char ** argv)
 static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
 {
     // Toggle all added lights
-    if (gLight1Added)
+    struct
     {
-        gLight1.SetOnOff(!gLight1.IsOn());
-        ESP_LOGI(TAG, "Toggled Light 1: now %s", gLight1.IsOn() ? "ON" : "OFF");
-    }
-    if (gLight2Added)
+        int num;
+        Device * dev;
+        bool added;
+    } lights[] = {
+        { 1, &gLight1, gLight1Added },
+        { 2, &gLight2, gLight2Added },
+        { 3, &gLight3, gLight3Added },
+        { 4, &gLight4, gLight4Added },
+    };
+
+    for (const auto & light : lights)
     {
-        gLight2.SetOnOff(!gLight2.IsOn());
-        ESP_LOGI(TAG, "Toggled Light 2: now %s", gLight2.IsOn() ? "ON" : "OFF");
-    }
-    if (gLight3Added)
-    {
-        gLight3.SetOnOff(!gLight3.IsOn());
-        ESP_LOGI(TAG, "Toggled Light 3: now %s", gLight3.IsOn() ? "ON" : "OFF");
-    }
-    if (gLight4Added)
-    {
-        gLight4.SetOnOff(!gLight4.IsOn());
-        ESP_LOGI(TAG, "Toggled Light 4: now %s", gLight4.IsOn() ? "ON" : "OFF");
+        if (light.added)
+        {
+            light.dev->SetOnOff(!light.dev->IsOn());
+            ESP_LOGI(TAG, "Toggled Light %d: now %s", light.num, light.dev->IsOn() ? "ON" : "OFF");
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -629,31 +647,43 @@ static void InitServer(intptr_t context)
     emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 3, 4, 5
-    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), 1);
-    gLight1Added = true;
+    if (AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight1DataVersions), 1) >= 0)
+    {
+        gLight1Added = true;
+    }
 
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), 1);
-    gLight2Added = true;
+    if (AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight2DataVersions), 1) >= 0)
+    {
+        gLight2Added = true;
+    }
 
-    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions), 1);
-    gLight3Added = true;
+    if (AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight3DataVersions), 1) >= 0)
+    {
+        gLight3Added = true;
+    }
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 3 & 5
-    RemoveDeviceEndpoint(&gLight2);
-    gLight2Added = false;
+    if (RemoveDeviceEndpoint(&gLight2) == CHIP_NO_ERROR)
+    {
+        gLight2Added = false;
+    }
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions), 1);
-    gLight4Added = true;
+    if (AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight4DataVersions), 1) >= 0)
+    {
+        gLight4Added = true;
+    }
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), 1);
-    gLight2Added = true;
+    if (AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                          Span<DataVersion>(gLight2DataVersions), 1) >= 0)
+    {
+        gLight2Added = true;
+    }
 }
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
