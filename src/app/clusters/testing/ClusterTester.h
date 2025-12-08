@@ -41,7 +41,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 // Helper class for testing clusters.
 //
@@ -298,5 +298,5 @@ private:
     std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
