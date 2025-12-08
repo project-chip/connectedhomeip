@@ -18,7 +18,7 @@ import sys
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Awaitable, Callable, Literal, Optional, Union
+from typing import Awaitable, Callable, Literal, Optional
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -336,7 +336,7 @@ class CAHierarchy:
         )
 
         if self.kind == 'server':
-            san_names: list[Union[x509.DNSName, x509.IPAddress]] = [x509.DNSName(dns)]
+            san_names: list[x509.DNSName | x509.IPAddress] = [x509.DNSName(dns)]
             if ip_address:
                 san_names.append(x509.IPAddress(ipaddress.ip_address(ip_address)))
             builder.add_extension(
