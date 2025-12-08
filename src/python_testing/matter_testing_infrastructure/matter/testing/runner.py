@@ -40,7 +40,6 @@ from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
 import matter.testing.global_stash as global_stash
-import matter.testing.nfc
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
@@ -773,6 +772,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
                          "The payload is read directly from the NFC tag.")
             sys.exit(1)
 
+        from matter.testing.nfc import NFCReader
         nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
         nfc_tag_data = reader.read_nfc_tag_data()
