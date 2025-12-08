@@ -249,7 +249,7 @@ class CoreBluetoothManager(ChipBleBase):
         string = "BLE is ready!" if state > 4 else "BLE is not ready!"
         LOGGER.info(string)
         self.manager = manager
-        self.ready_condition = True if state > 4 else False
+        self.ready_condition = state > 4
 
     def centralManager_didDiscoverPeripheral_advertisementData_RSSI_(
         self, manager, peripheral, data, rssi
@@ -378,9 +378,7 @@ class CoreBluetoothManager(ChipBleBase):
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
 
         if self.devCtrl:
-            txEvent = BleTxEvent(
-                charId=charId, svcId=svcId, status=True if not error else False
-            )
+            txEvent = BleTxEvent(charId=charId, svcId=svcId, status=not error)
             self.chip_queue.put(txEvent)
             self.devCtrl.DriveBleIO()
 
@@ -393,7 +391,7 @@ class CoreBluetoothManager(ChipBleBase):
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
         # look at error and send True/False on Success/Failure
-        success = True if not error else False
+        success = not error
         if characteristic.isNotifying():
             operation = BLE_SUBSCRIBE_OPERATION_SUBSCRIBE
             self.subscribe_condition = True

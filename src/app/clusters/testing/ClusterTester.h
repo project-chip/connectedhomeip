@@ -26,6 +26,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -40,7 +41,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 // Helper class for testing clusters.
 //
@@ -116,15 +117,46 @@ public:
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename T>
-    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
+    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)
     {
-        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        auto path = mCluster.GetPaths()[0];
+        const auto & paths = mCluster.GetPaths();
 
-        app::Testing::WriteOperation writeOperation(path.mEndpointId, path.mClusterId, attr_id);
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
-        app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
-        return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder);
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        app::Testing::WriteOperation writeOp(path);
+
+        // Create a stable object on the stack
+        Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
+
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+
+        // - DataModel::Encode(integral, enum, etc.) for simple types.
+        // - DataModel::Encode(List<X>) for lists (which iterates and calls Encode on elements).
+        // - DataModel::Encode(Struct) for non-fabric-scoped structs.
+        // - Note: For attribute writes, DataModel::EncodeForWrite is usually preferred for fabric-scoped types,
+        //         but the generic DataModel::Encode often works as a top-level function.
+        //         If you use EncodeForWrite, you ensure fabric-scoped list items are handled correctly:
+
+        if constexpr (app::DataModel::IsFabricScoped<T>::value)
+        {
+            ReturnErrorOnFailure(chip::app::DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), value));
+        }
+        else
+        {
+            ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
+        }
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
+
+        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
     }
 
     // Result structure for Invoke operations, containing both status and decoded response.
@@ -236,6 +268,10 @@ public:
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
+    std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+
+    void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
+
 private:
     bool VerifyClusterPathsValid()
     {
@@ -262,5 +298,5 @@ private:
     std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

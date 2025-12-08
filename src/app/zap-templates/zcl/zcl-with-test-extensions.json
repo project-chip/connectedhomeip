@@ -388,7 +388,6 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap",
             "ClusterRevision"
         ],
         "Operational Credentials": [
@@ -574,7 +573,8 @@
             "InPlaceIndicator",
             "LastChangedTime",
             "ReplacementProductList",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "HEPA Filter Monitoring": [
             "Condition",
@@ -583,7 +583,8 @@
             "InPlaceIndicator",
             "LastChangedTime",
             "ReplacementProductList",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Carbon Monoxide Concentration Measurement": [
             "MeasuredValue",

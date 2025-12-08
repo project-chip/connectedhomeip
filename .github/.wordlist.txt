@@ -1109,6 +1109,7 @@ PASE
 Passcode
 passRetained
 passwd
+Pausable
 PBKDF
 pbuf
 pbufs
@@ -1560,6 +1561,7 @@ UnitLocalization
 unittest
 unpair
 unprovisioned
+unregistration
 Unsecure
 Unselect
 untrusted

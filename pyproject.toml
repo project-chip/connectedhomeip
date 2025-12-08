@@ -33,8 +33,7 @@ select = [
     # Consistent commas
     "COM",
     # Simplify the code if possible
-    "C4", "RET",
-    "SIM118", "SIM101", "SIM103", "SIM105", "SIM109",
+    "C4", "RET", "SIM",
     # Ensure that scripts are executable
     "EXE",
     # Check for common logging issues
@@ -46,8 +45,10 @@ ignore = [
     "ASYNC109", # Sometimes we use "timeout" argument in async functions
     "ASYNC230", # Allow open() calls in async functions
     "COM812", # Do not enforce trailing commas in multi-line collections for now
-    "LOG015", # Do not enforce non-root loggers in the entire codebase for now
+    "SIM102", # Nested if statements can be more readable in some cases
     "SIM108", # Do not enforce ternary operator in place of if/else blocks
+    "SIM114", # Separate if statements can be more readable in some cases
+    "SIM905", # Sometimes using "command arg1 arg2".split() is more readable
     "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]

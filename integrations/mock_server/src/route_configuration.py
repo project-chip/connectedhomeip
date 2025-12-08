@@ -18,6 +18,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+log = logging.getLogger(__name__)
+
 
 @dataclass
 class RouteResponse:
@@ -143,10 +145,10 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
         with open(file_path, "r") as file:
             config = json.load(file)
         if "routes" not in config:
-            logging.error("Missing required 'routes' key in configuration file: %s", file_path)
+            log.error("Missing required 'routes' key in configuration file: %s", file_path)
             raise KeyError("Configuration file must contain 'routes' key")
 
-        logging.debug("Routes configuration loaded successfully from %s", file_path)
+        log.debug("Routes configuration loaded successfully from %s", file_path)
         routes = []
         for route_config in config["routes"]:
             # Create RouteResponse object
@@ -174,8 +176,8 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
         return routes
 
     except FileNotFoundError:
-        logging.error("Configuration file not found: %s", file_path)
+        log.error("Configuration file not found: %s", file_path)
         raise
     except json.JSONDecodeError as e:
-        logging.error("Invalid JSON in configuration file: %s", file_path)
+        log.error("Invalid JSON in configuration file: %s", file_path)
         raise e
