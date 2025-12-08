@@ -26,7 +26,6 @@ import pathlib
 import re
 import sys
 import typing
-import matter.testing.nfc
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
@@ -41,6 +40,7 @@ from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
 import matter.testing.global_stash as global_stash
+import matter.testing.nfc
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
