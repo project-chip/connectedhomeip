@@ -73,6 +73,8 @@ from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
 
@@ -99,7 +101,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         if self.is_pics_sdk_ci_only:
             # Get the named pipe path for the DUT_FSA app input from the user params.
@@ -188,7 +190,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             # Check if any of the device types is an AGGREGATOR
             if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
                 aggregator_endpoint = endpoint
-                logging.info(f"Aggregator endpoint found: {aggregator_endpoint}")
+                log.info(f"Aggregator endpoint found: {aggregator_endpoint}")
                 break
 
         asserts.assert_not_equal(aggregator_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with commissioning.")
@@ -234,7 +236,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         ))
 
         # Get the endpoint number for just added TH_SERVER_NO_UID.
-        logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
+        log.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
@@ -247,7 +249,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             endpoint=dut_fsa_bridge_th_server_endpoint)
         asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", dut_fsa_bridge_th_server_unique_id)
+        log.info("UniqueID generated for TH_SERVER_NO_UID: %s", dut_fsa_bridge_th_server_unique_id)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ import smartcard
 import smartcard.CardMonitoring
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # NFC transmission success status words
 NFC_SUCCESS_SW1 = 0x90
@@ -54,16 +54,16 @@ class NFCReader:
         if not reader_list:
             raise ValueError("No smartcard reader found.")
 
-        logger.info("Available readers:")
+        log.info("Available readers:")
         for idx, reader in enumerate(reader_list):
-            logger.info(f"{idx}: {reader}")
+            log.info(f"{idx}: {reader}")
 
         if nfc_reader_index < 0 or nfc_reader_index >= len(reader_list):
             raise IndexError(f"Reader index {nfc_reader_index} is out of range.")
 
         self.reader = reader_list[nfc_reader_index]
         self._monitor_manager = None
-        logger.info(f"Using NFC reader: {self.reader}")
+        log.info(f"Using NFC reader: {self.reader}")
 
     def read_nfc_tag_data(self) -> str:
         """
@@ -138,7 +138,7 @@ class NFCReader:
 
             _write_ndef_record(connection, record)
 
-        logger.info(f"Successfully wrote URI '{uri}' to NFC tag.")
+        log.info(f"Successfully wrote URI '{uri}' to NFC tag.")
         return True
 
     def is_onboarding_data(self, ndef_uri: str) -> bool:
@@ -408,15 +408,15 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     def update(self, observable, actions):
         (added_tags, removed_tags) = actions
         for tag in added_tags:
-            logger.debug("NFC tag detected")
+            log.debug("NFC tag detected")
             try:
                 nfc_tag_data = self.reader.read_nfc_tag_data()
                 self.last_ndef = nfc_tag_data
-                logger.debug(nfc_tag_data)
+                log.debug(nfc_tag_data)
             except Exception as e:
-                logger.info(f"Error reading NFC tag: {e}")
+                log.info(f"Error reading NFC tag: {e}")
         for tag in removed_tags:
-            logger.debug("Tag removed.")
+            log.debug("Tag removed.")
 
 
 class TagMonitorManager:
@@ -435,13 +435,13 @@ class TagMonitorManager:
         self.tag_monitor = smartcard.CardMonitoring.CardMonitor()
         self.observer = TagEventObserver(self.reader)
         self.tag_monitor.addObserver(self.observer)
-        logger.info("Start monitoring NFC tags")
+        log.info("Start monitoring NFC tags")
         try:
             while not self._stop_event.is_set():
                 time.sleep(0.1)
         finally:
             self.tag_monitor.deleteObserver(self.observer)
-            logger.info("Stopped monitoring NFC tags")
+            log.info("Stopped monitoring NFC tags")
 
     async def activate(self):
         self._stop_event.clear()
@@ -477,5 +477,5 @@ class NFCConnection:
             if self.connection:
                 self.connection.disconnect()
         except Exception as e:
-            logger.warning(f"Failed to disconnect NFC connection: {e}")
+            log.warning(f"Failed to disconnect NFC connection: {e}")
         return False

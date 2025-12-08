@@ -23,7 +23,7 @@ import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DD_3_23(MatterBaseTest):
@@ -46,7 +46,7 @@ class TC_DD_3_23(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        logger.info(f"NFC Tag data : '{nfc_tag_data}'")
+        log.info(f"NFC Tag data : '{nfc_tag_data}'")
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"

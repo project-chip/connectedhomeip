@@ -28,6 +28,8 @@ import click
 import coloredlogs
 import yaml
 
+log = logging.getLogger(__name__)
+
 # Function to load --app argument environment variables from a file
 
 
@@ -135,9 +137,9 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str],
                 raise
 
     if failed_scripts:
-        logging.error("FAILURES detected:")
+        log.error("FAILURES detected:")
         for s in failed_scripts:
-            logging.error("   - %s", s)
+            log.error("   - %s", s)
         sys.exit(1)
 
 
