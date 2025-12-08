@@ -18,7 +18,7 @@ import sys
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Awaitable, Callable, Literal, Optional
+from typing import Awaitable, Callable, Literal, Optional, Tuple
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -429,8 +429,8 @@ class Session(BaseModel):
     interface: SupportedIngestInterface
     track_name: Optional[str] = None
 
-    uploaded_segments: list[str] = []
-    uploaded_manifests: list[str] = []
+    uploaded_segments: list[Tuple[str, str]] = []
+    uploaded_manifests: list[Tuple[str, str]] = []
     errors: list[UploadError] = []
 
     def save_to_disk(self, wd: WorkingDirectory):
@@ -523,14 +523,14 @@ class PushAvServer:
         return RedirectResponse("/ui/streams")
 
     def ui_streams_list(self, request: Request):
-        s = self.list_streams()
+        s = self.list_sessions()
         return self.templates.TemplateResponse(
-            request=request, name="streams_list.jinja2", context={"streams": s["streams"]}
+            request=request, name="streams_list.jinja2", context={"sessions": s["sessions"]}
         )
 
     def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
         context = {}
-        context['streams'] = self.list_streams()['streams']
+        context['sessions'] = self.list_sessions()['sessions']
         context['stream_id'] = stream_id
         context['file_path'] = file_path
 
@@ -603,7 +603,7 @@ class PushAvServer:
         return {"streams": streams}
 
     def list_sessions(self):
-        return {"sessions": self.sessions}
+        return {"sessions": self.sessions.values()}
 
     async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
         """
@@ -653,9 +653,9 @@ class PushAvServer:
 
             # Update the session with the seen segments/manifests
             if ext == "m4s":
-                session.uploaded_segments.append(file_path_with_ext)
+                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"), )
             else:
-                session.uploaded_manifests.append(file_path_with_ext)
+                session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
 
             # Save data to disk (certificate details + file content)
             cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
