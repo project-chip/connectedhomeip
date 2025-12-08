@@ -21,41 +21,45 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [-d] [-p] [ref]
+#  restyle-diff.sh [-d] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
-# -d sets container's log level to DEBUG, if unspecified the default log level will remain (info level)
-# -p pulls the Docker image before running the restyle paths
+# -d enables debug logging for Restyle CLI
 #
+# Note: This script requires sudo to restore file ownership after restyle
+#  (which uses Docker and changes ownership of restyled files to root); You can either run the
+#  script directly and be prompted for sudo, or run it with sudo.
 
 here=${0%/*}
 
 set -e
 
 MAX_ARGS=256
-pull_image=0
 
 CHIP_ROOT=$(cd "$here/../.." && pwd)
 cd "$CHIP_ROOT"
 
 restyle-paths() {
-    image=restyled/restyler:edge
 
-    docker run \
-        --rm \
-        --env LOG_LEVEL \
-        --env LOG_DESTINATION \
-        --env LOG_FORMAT \
-        --env LOG_COLOR \
-        --env HOST_DIRECTORY="$PWD" \
-        --env UNRESTRICTED=1 \
-        --volume "$PWD":/code \
-        --volume /tmp:/tmp \
-        --volume /var/run/docker.sock:/var/run/docker.sock \
-        --entrypoint restyle-path \
-        "$image" "$@"
+    local uid="${SUDO_UID:-$(id -u)}"
+    local gid="${SUDO_GID:-$(id -g)}"
 
+    restyle --config-file=.restyled.yaml "$@"
+
+    echo
+    echo "[restyle-diff.sh] Restoring file ownership to current user (sudo required)"
+    sudo chown "$uid:$gid" "$@"
 }
+
+if ! command -v restyle >/dev/null 2>&1; then
+    echo
+    echo "Restyle CLI is not installed or is not in PATH."
+    echo
+    echo "Install it by following the installation instructions in the restyled-io/restyler GitHub README and then run again:"
+    echo "  https://github.com/restyled-io/restyler#installation"
+    echo
+    exit 1
+fi
 
 #This was added to be able to use xargs to call the function restyle-paths
 export -f restyle-paths
@@ -63,11 +67,7 @@ export -f restyle-paths
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d)
-            export LOG_LEVEL="DEBUG"
-            shift
-            ;;
-        -p)
-            pull_image=1
+            export DEBUG=True
             shift
             ;;
         *)
@@ -76,11 +76,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-
-# Use AMD64 images on Apple Silicon since restyler doesn't provide ARM64 images
-if [[ -z "$DOCKER_DEFAULT_PLATFORM" && "$(uname -sm)" == "Darwin arm64" ]]; then
-    export DOCKER_DEFAULT_PLATFORM=linux/amd64
-fi
 
 if [[ -z "$ref" ]]; then
     ref="master"
