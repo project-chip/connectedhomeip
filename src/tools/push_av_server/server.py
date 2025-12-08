@@ -451,7 +451,7 @@ class PushAvServer:
 
         # In-memory map to track stream files: {stream_id: {"valid_files": [], "invalid_files": []}}
         self.stream_files_map = {}  # TODO Eventually remove in favor of sessions
-        self.sessions: dict[str, Session] = {}
+        self.sessions = self._list_sessions()
 
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
@@ -487,6 +487,19 @@ class PushAvServer:
             raise HTTPException(404, detail="Stream doesn't exists")
         except Exception as e:
             raise HTTPException(500, f"An unexpected error occurred: {e}")
+
+    def _list_sessions(self):
+        sessions: dict[str, Session] = {}
+
+        for stream_path in self.wd.path("streams").iterdir():
+            if stream_path.is_dir():
+                session_file = stream_path / "session.json"
+                if session_file.exists():
+                    with open(session_file, 'r', encoding='utf-8') as f:
+                        session_data = json.load(f)
+                        sessions[stream_path.name] = Session.model_validate(session_data)
+
+        return sessions
 
     @contextlib.contextmanager
     def _open_session(self, stream_id: int):
