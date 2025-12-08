@@ -463,16 +463,26 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ${{ matrix.os }}
 
         steps:
+            - name: Set up additional environment
+              run: |
+                echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
+            - name: Install ccache
+              run: |
+                brew install ccache
+            - name: Verify ccache installation
+              run: which ccache
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
@@ -484,7 +494,13 @@ jobs:
               with:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
             - name: Build Apps Using Unified Build
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -494,6 +510,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified \
+                        --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -511,9 +528,12 @@ jobs:
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                        --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
+            - name: ccache stats
+              run: ccache -s
             - name: Clean out
               run: rm -rf out/
             - name: Run Tests using the python parser sending commands to chip-tool
@@ -578,6 +598,18 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
@@ -880,7 +912,7 @@ jobs:
               uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
-              uses: namespace-actions/download-artifact@v1
+              uses: namespace-actions/download-artifact@v2
               with:
                 name: repl-build-data
 

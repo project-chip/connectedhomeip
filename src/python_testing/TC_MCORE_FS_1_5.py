@@ -77,6 +77,8 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
+log = logging.getLogger(__name__)
+
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
 
@@ -110,7 +112,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         if self.is_pics_sdk_ci_only:
             # Get the named pipe path for the DUT_FSA app input from the user params.
@@ -226,7 +228,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
-        logging.info("Waiting for update to PartsList.")
+        log.info("Waiting for update to PartsList.")
         start_time = time.time()
         elapsed = 0
         time_remaining = report_waiting_timeout_delay_sec
@@ -313,7 +315,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         self.step(10)
         report_waiting_timeout_delay_sec = max_report_interval_sec + 1
-        logging.info("Waiting for update to AdministratorCommissioning attributes.")
+        log.info("Waiting for update to AdministratorCommissioning attributes.")
         start_time = time.time()
         elapsed = 0
         time_remaining = report_waiting_timeout_delay_sec
@@ -327,8 +329,8 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == newly_added_endpoint and attribute == cadmin_attr.WindowStatus:
                     if value != th_server_direct_cadmin[cadmin_attr.WindowStatus]:
-                        logging.info("Window status is %r, waiting for %r", value,
-                                     th_server_direct_cadmin[cadmin_attr.WindowStatus])
+                        log.info("Window status is %r, waiting for %r", value,
+                                 th_server_direct_cadmin[cadmin_attr.WindowStatus])
                         continue
                     cadmin_sub_new_data = True
                     break

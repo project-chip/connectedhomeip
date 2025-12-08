@@ -51,7 +51,7 @@ from matter.clusters import MeterIdentification
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = MeterIdentification
 
@@ -172,7 +172,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("6")
 
             if not self.check_pics("MTRID.S.A0003"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
+                log.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
 
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
             protocol_version = await self.read_single_attribute_check_success(
@@ -195,7 +195,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("7")
 
             if not self.check_pics("MTRID.S.A0004"):
-                logger.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
+                log.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
             power_threshold = await self.read_single_attribute_check_success(
@@ -239,7 +239,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("13")
 
             if not self.check_pics("MTRID.S.A0003"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
+                log.warning("ProtocolVersion attribute is actually supported by DUT, but PICS MTRID.S.A0003 is False")
 
             # TH reads ProtocolVersion attribute, expects a null or a value of string type
             await self.check_protocol_version_attribute(
@@ -260,7 +260,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             self.step("14")
 
             if not self.check_pics("MTRID.S.A0004"):
-                logger.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
+                log.warning("PowerThreshold feature is actually supported by DUT, but PICS MTRID.S.A0004 is False")
 
             # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
             await self.check_power_threshold_attribute(

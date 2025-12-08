@@ -52,7 +52,7 @@ from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
@@ -323,7 +323,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         # Wait 7 seconds
-        logger.info("Waiting for 7 seconds for discharge timer to expire")
+        log.info("Waiting for 7 seconds for discharge timer to expire")
         await asyncio.sleep(7)
 
         self.step("9a")
@@ -359,7 +359,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10")
         # Wait 10 seconds
-        logger.info("Waiting for 10 seconds for charging timer to expire")
+        log.info("Waiting for 10 seconds for charging timer to expire")
         await asyncio.sleep(10)
 
         self.step("10a")
