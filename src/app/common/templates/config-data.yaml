@@ -152,6 +152,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Chime
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs

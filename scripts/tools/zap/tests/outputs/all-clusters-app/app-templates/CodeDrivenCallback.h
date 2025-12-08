@@ -122,3 +122,7 @@ void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpoi
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterChimeClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterChimeClusterShutdownCallback(chip::EndpointId endpointId);
