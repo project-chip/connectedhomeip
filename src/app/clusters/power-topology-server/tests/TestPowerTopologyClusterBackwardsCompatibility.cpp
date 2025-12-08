@@ -27,7 +27,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PowerTopology;
 using namespace chip::app::Clusters::PowerTopology::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 // Mock function for linking
 void InitDataModelHandler() {}

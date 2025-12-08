@@ -37,7 +37,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PowerTopology;
 using namespace chip::app::Clusters::PowerTopology::Attributes;
-using namespace chip::Test;
 using namespace chip::Testing;
 
 namespace {
@@ -54,7 +53,7 @@ struct TestPowerTopologyCluster : public ::testing::Test
 
 TEST_F(TestPowerTopologyCluster, EmptyAttributeListTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> noFeatures;
     MockPowerTopologyDelegate dummyDelegate;
 
@@ -72,7 +71,7 @@ TEST_F(TestPowerTopologyCluster, EmptyAttributeListTest)
 
 TEST_F(TestPowerTopologyCluster, AllAttributeListTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> allFeatures(Feature::kNodeTopology, Feature::kTreeTopology, Feature::kSetTopology, Feature::kDynamicPowerFlow);
     MockPowerTopologyDelegate dummyDelegate;
 
@@ -94,7 +93,7 @@ TEST_F(TestPowerTopologyCluster, AllAttributeListTest)
 
 TEST_F(TestPowerTopologyCluster, NoActiveEndpointsWithoutDYPFTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kSetTopology);
     MockPowerTopologyDelegate dummyDelegate;
 
@@ -115,7 +114,7 @@ TEST_F(TestPowerTopologyCluster, NoActiveEndpointsWithoutDYPFTest)
 
 TEST_F(TestPowerTopologyCluster, OnlyDynamicPowerFlowFeatureTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kDynamicPowerFlow);
     MockPowerTopologyDelegate dummyDelegate;
 
@@ -131,7 +130,7 @@ TEST_F(TestPowerTopologyCluster, OnlyDynamicPowerFlowFeatureTest)
 
 TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
     MockPowerTopologyDelegate dummyDelegate;
 
@@ -154,7 +153,7 @@ TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
 
 TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsEmptyTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.ClearAvailableEndpoints(); // Empty list
@@ -181,7 +180,7 @@ TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsEmptyTest)
 
 TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsSingleTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.SetAvailableEndpoints({ 5 });
@@ -210,7 +209,7 @@ TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsSingleTest)
 
 TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsMultipleTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.SetAvailableEndpoints({ 1, 2, 5, 10 });
@@ -245,7 +244,7 @@ TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsMultipleTest)
 
 TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsEmptyTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kDynamicPowerFlow, Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.ClearActiveEndpoints();
@@ -272,7 +271,7 @@ TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsEmptyTest)
 
 TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsMultipleTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kDynamicPowerFlow, Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.SetActiveEndpoints({ 3, 7, 9 });
@@ -305,7 +304,7 @@ TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsMultipleTest)
 
 TEST_F(TestPowerTopologyCluster, DelegateAvailableEndpointsErrorTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.SetAvailableEndpointsError(CHIP_ERROR_INTERNAL);
@@ -328,7 +327,7 @@ TEST_F(TestPowerTopologyCluster, DelegateAvailableEndpointsErrorTest)
 
 TEST_F(TestPowerTopologyCluster, DelegateActiveEndpointsErrorTest)
 {
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     BitMask<Feature> features(Feature::kDynamicPowerFlow, Feature::kSetTopology);
     MockPowerTopologyDelegate mockDelegate;
     mockDelegate.SetActiveEndpointsError(CHIP_ERROR_INTERNAL);

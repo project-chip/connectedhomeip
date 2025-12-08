@@ -36,14 +36,13 @@ namespace PowerTopology {
 
 CHIP_ERROR PowerTopologyCluster::GetAvailableEndpoints(AttributeValueEncoder & aEncoder) const
 {
-    // Needs to have SetTopology feature
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
             EndpointId endpointId;
             auto err = mDelegate.GetAvailableEndpointAtIndex(i, endpointId);
 
-            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR); // End of list, safe to exit normally
+            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR);
 
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(endpointId));
@@ -53,14 +52,13 @@ CHIP_ERROR PowerTopologyCluster::GetAvailableEndpoints(AttributeValueEncoder & a
 
 CHIP_ERROR PowerTopologyCluster::GetActiveEndpoints(AttributeValueEncoder & aEncoder) const
 {
-    // Needs to have DynamicPowerFlow feature
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
             EndpointId endpointId;
             auto err = mDelegate.GetActiveEndpointAtIndex(i, endpointId);
 
-            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR); // End of list, safe to exit normally
+            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR);
 
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(endpointId));
