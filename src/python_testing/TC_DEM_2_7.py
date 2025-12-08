@@ -54,7 +54,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
@@ -179,7 +179,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
 
         self.step("4b")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        logging.info(forecast)
+        log.info(forecast)
         asserts.assert_greater(forecast.slots[0].nominalPower, 0)
         asserts.assert_greater(forecast.slots[0].minPower, 0)
         asserts.assert_greater(forecast.slots[0].maxPower, 0)

@@ -87,7 +87,9 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
-#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     script-args:
+#       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: false
 #     quiet: true
 #   run10:
@@ -225,6 +227,8 @@ from matter.testing.taglist_and_topology_test import (create_device_type_list_fo
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 def get_vendor_id(mei: int) -> int:
     """Get the vendor ID portion (MEI prefix) of an overall MEI."""
@@ -355,7 +359,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
-            logging.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
+            log.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
             if not has_descriptor:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id),
                                   problem=f"Did not find a descriptor on endpoint {endpoint_id}", spec_location="Base Cluster Requirements for Matter")
@@ -434,7 +438,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
 
                     has_attribute = (req_attribute.id in cluster)
                     location = AttributePathLocation(endpoint_id, cluster_id, req_attribute.id)
-                    logging.debug(
+                    log.debug(
                         f"Checking for mandatory global {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
                     # Check attribute is actually present
@@ -473,7 +477,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
                         has_attribute = attribute_id in cluster
 
                         attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
-                        logging.debug(
+                        log.debug(
                             f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
                         if not has_attribute:
@@ -715,19 +719,22 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         self.print_step(12, "Validate that event wildcard subscription works")
 
         test_failure = None
-        try:
-            subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
-                                                                   events=[('*')],
-                                                                   fabricFiltered=False,
-                                                                   reportInterval=(100, 1000))
-            if len(subscription.GetEvents()) == 0:
-                test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
-            # Connection over PASE will fail subscriptions with "Unsupported access"
-            # TODO: ideally we should SKIP this test for PASE connections
-            _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
-            if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
-                test_failure = f"Failed to wildcard subscribe events(*): {e}"
+        if self.test_from_file:
+            log.warning("Skipping check of event wildcards as this test is being run from an attribute file")
+        else:
+            try:
+                subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
+                                                                       events=[('*')],
+                                                                       fabricFiltered=False,
+                                                                       reportInterval=(100, 1000))
+                if len(subscription.GetEvents()) == 0:
+                    test_failure = 'Wildcard event subscription returned no events'
+            except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
+                # Connection over PASE will fail subscriptions with "Unsupported access"
+                # TODO: ideally we should SKIP this test for PASE connections
+                _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
+                if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
+                    test_failure = f"Failed to wildcard subscribe events(*): {e}"
 
         if test_failure:
             self.record_error(self.get_test_name(), problem=test_failure, location=UnknownProblemLocation())

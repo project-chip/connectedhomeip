@@ -18,25 +18,31 @@
 
 #pragma once
 
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <lib/support/LinkedList.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace WebRTCTransportProvider {
+namespace DeviceEnergyManagement {
 
-/**
- * The application interface to define the options & implement commands.
- */
-class WebRTCTransportProviderController
+class Instance
 {
 public:
-    virtual ~WebRTCTransportProviderController() = default;
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature);
 
-    virtual void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) = 0;
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    bool HasFeature(Feature aFeature) const;
+
+private:
+    RegisteredServerCluster<DeviceEnergyManagementCluster> mCluster;
 };
 
-} // namespace WebRTCTransportProvider
+} // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

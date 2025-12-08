@@ -27,9 +27,8 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -333,7 +332,7 @@ CHIP_ERROR ScenesServer::Init()
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
-    ReturnErrorOnFailure(sceneTable->Init(Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(sceneTable->Init(Server::GetInstance().GetPersistentStorage(), CodegenDataModelProvider::Instance()));
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
 
     mIsInitialized = true;
