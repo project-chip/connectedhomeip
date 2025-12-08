@@ -100,7 +100,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         auto & delegate = mDelegate;
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        return encoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
             for (uint8_t i = 0; true; i++)
             {
                 PresetTypeStruct::Type presetType;
@@ -110,7 +110,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                     return CHIP_NO_ERROR;
                 }
                 ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(presetType));
+                ReturnErrorOnFailure(enc.Encode(presetType));
             }
         });
     }
@@ -128,7 +128,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         auto & subjectDescriptor = encoder.GetSubjectDescriptor();
         if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
         {
-            return encoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
                 {
                     PresetStructWithOwnedMembers preset;
@@ -138,11 +138,11 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                         return CHIP_NO_ERROR;
                     }
                     ReturnErrorOnFailure(err);
-                    ReturnErrorOnFailure(encoder.Encode(preset));
+                    ReturnErrorOnFailure(enc.Encode(preset));
                 }
             });
         }
-        return encoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
             for (uint8_t i = 0; true; i++)
             {
                 PresetStructWithOwnedMembers preset;
@@ -152,7 +152,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                     return CHIP_NO_ERROR;
                 }
                 ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(preset));
+                ReturnErrorOnFailure(enc.Encode(preset));
             }
         });
     }
