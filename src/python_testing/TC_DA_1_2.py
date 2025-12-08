@@ -60,6 +60,8 @@ from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from matter.tlv import TLVReader
 
+log = logging.getLogger(__name__)
+
 
 def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
     rdn = list(filter(lambda rdn: oid_dotted_str in rdn.oid.dotted_string, cert.subject))
@@ -395,11 +397,11 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
             if '.der' not in filename:
                 continue
             with open(os.path.join(cd_cert_dir, filename), 'rb') as f:
-                logging.info(f'Parsing CD signing certificate file: {filename}')
+                log.info(f'Parsing CD signing certificate file: {filename}')
                 try:
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
-                    logging.info(f'File {filename} is not a valid certificate, skipping')
+                    log.info(f'File {filename} is not a valid certificate, skipping')
                     pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest

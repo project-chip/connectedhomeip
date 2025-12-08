@@ -38,16 +38,17 @@
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/scenes-server.h>
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h> //nogncheck
+#include <app/clusters/scenes-server/scenes-server.h>                      //nogncheck
+#endif                                                                     // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF
-#include <app/clusters/on-off-server/on-off-server.h>
-#endif // MATTER_DM_PLUGIN_ON_OFF
+#include <app/clusters/on-off-server/on-off-server.h> //nogncheck
+#endif                                                // MATTER_DM_PLUGIN_ON_OFF
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#include <app/clusters/color-control-server/color-control-server.h>
-#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#include <app/clusters/color-control-server/color-control-server.h> //nogncheck
+#endif                                                              // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 #include <assert.h>
 
@@ -135,8 +136,8 @@ public:
     // As per spec, 2 attributes are scenable in the level control cluster
     static constexpr uint8_t kLevelMaxScenableAttributes = 2;
 
-    DefaultLevelControlSceneHandler() = default;
-    ~DefaultLevelControlSceneHandler() override {}
+    DefaultLevelControlSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
+    ~DefaultLevelControlSceneHandler() = default;
 
     // Default function for LevelControl cluster, only checks if LevelControl is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
