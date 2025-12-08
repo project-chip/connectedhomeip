@@ -40,7 +40,7 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::Protocols::InteractionModel;
 
 constexpr uint32_t kMockRevision   = 123;
@@ -241,7 +241,7 @@ TEST_F(TestServerClusterExtension, TestExtensionAttributes)
     MockServerCluster underlying(mockPath);
     TestableServerClusterExtension extension(mockPath, underlying);
 
-    chip::Test::ClusterTester tester(extension);
+    chip::Testing::ClusterTester tester(extension);
 
     // Verify attribute listing includes global and extended attributes
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(extension, { kExtraAttributeMetadata[0], kExtraAttributeMetadata[1] }));
