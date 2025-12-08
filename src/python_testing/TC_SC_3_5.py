@@ -52,7 +52,9 @@ class TC_SC_3_5(MatterBaseTest):
         self.th_server = None
         self.storage = None
 
-        self.dut_has_icac = NullValue
+        # We assume that DUT_Commissioner has ICAC in its NOC Chain unless determined otherwise in step 1c.
+        # When running in CI, we also want this to be True to avoid skipping steps.
+        self.dut_has_icac = True
 
         self.th_client = self.default_controller
         self.th_server_local_nodeid = 1111
@@ -253,8 +255,6 @@ class TC_SC_3_5(MatterBaseTest):
             self.skip_step("1b")
             self.skip_step("1c")
             self.skip_step("1d")
-            # Although this doesn't matter, we keep this True so we do not skip Steps 4a-4c in CI (in case they have other syntax issues)
-            self.dut_has_icac = True
 
         else:
             self.step("1a")
