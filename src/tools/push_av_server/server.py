@@ -16,6 +16,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import xmltodict
 from enum import Enum
 from pathlib import Path
 from typing import Awaitable, Callable, Literal, Optional, Tuple
@@ -601,11 +602,27 @@ class PushAvServer:
             if ext not in VALID_EXTENSIONS:
                 # Invalid extension
                 errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
-            elif ext in ["mpd", "m3u8"]:
-                # Manifest files
-                if (session.interface == SupportedIngestInterface.dash and ext != "mpd" or
-                        session.interface == SupportedIngestInterface.hls and ext != "m3u8"):
+            elif ext == "mpd":
+                # DASH manifest files
+                if (session.interface != SupportedIngestInterface.dash):
                     errors.append("Unsupported manifest object extension")
+
+                # TODO Probably won't work due to streaming being requested again later on. Let's test.
+                mpd = xmltodict.parse(await req.body())
+
+                mpd_type = mpd.get("MPD", {}).get("@type").lower()
+
+                if mpd_type == "dynamic" and len(session.uploaded_segments) > 0:
+                    errors.append("Dynamic MPD cannot be uploaded after segments have been uploaded")
+
+                if mpd_type == "static" and len(session.uploaded_segments) == 0:
+                    errors.append("Static MPD cannot be uploaded before segments have been uploaded")
+            elif ext == "m3u8":
+                # HLS manifest files
+                if session.interface != SupportedIngestInterface.hls:
+                    errors.append("Unsupported manifest object extension")
+
+                # TODO Lifecycle validation for HLS manifests
             elif ext == "m4s":
                 # Segmented video files
 
