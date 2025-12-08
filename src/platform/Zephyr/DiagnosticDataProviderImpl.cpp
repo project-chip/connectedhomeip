@@ -329,14 +329,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         CHIP_ERROR error;
         uint8_t addressSize;
 
-#ifdef CONFIG_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         if (interfaceType == Inet::InterfaceType::WiFi)
         {
             ifp->isOperational = ConnectivityMgr().IsWiFiStationConnected();
             error              = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
         }
         else
-#endif // CONFIG_WIFI
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
             if (interfaceType == Inet::InterfaceType::Thread)
         {
