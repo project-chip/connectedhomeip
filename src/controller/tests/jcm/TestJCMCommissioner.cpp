@@ -34,6 +34,7 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <messaging/tests/MessagingContext.h>
 #include <pw_unit_test/framework.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
