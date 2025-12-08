@@ -243,7 +243,7 @@ def cmd_list(context):
     '--discover-paths',
     is_flag=True,
     default=False,
-    help='Disover missing paths for application and tool binaries'
+    help='Discover missing paths for application and tool binaries'
 )
 @click.option(
     '--pics-file',

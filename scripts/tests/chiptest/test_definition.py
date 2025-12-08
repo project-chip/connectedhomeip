@@ -276,14 +276,14 @@ BUILTIN_SUBPROC_KNOWHOW = {
 
 
 class PathsFinderProto(typing.Protocol):
-    def get(target_name: str) -> Path:
+    def get(self, target_name: str) -> Path:
         pass
 
 
 class SubprocessInfoRepo(dict):
-   # We don't want to explicitly reference PathsFinder type because we
-   # don't want to create a dependency on the diskcache module which PathsFinder imports.
-   # Instead we just want a dict-like object
+    # We don't want to explicitly reference PathsFinder type because we
+    # don't want to create a dependency on the diskcache module which PathsFinder imports.
+    # Instead we just want a dict-like object
     def __init__(self, paths: PathsFinderProto,
                  subproc_knowhow: dict[str, KnowhowEntry] = BUILTIN_SUBPROC_KNOWHOW,
                  *args, **kwargs):
@@ -297,7 +297,7 @@ class SubprocessInfoRepo(dict):
         if len(el) == 3:
             # <kind>:<key>:<path>
             kind_s, key, path = el
-            kind = SubprocessKind[kind_s]
+            kind = SubprocessKind(kind_s)
             path = Path(path)
         elif len(el) == 2:
             # <key>:<path>
@@ -315,6 +315,13 @@ class SubprocessInfoRepo(dict):
             s = s.wrap_with('python3')
         self[key] = s
 
+    def missing_keys(self):
+        """
+        Return a list of keys for tools or apps missing (not specified) based on the
+        know-how dictionary.
+        """
+        return [ k for k in self.subproc_knowhow if k not in self ]
+
     def discover(self):
         """
         Try to discover paths to all apps and tools in the know-how which we are still missing.
@@ -324,7 +331,7 @@ class SubprocessInfoRepo(dict):
         log.info("Discovering missing paths")
         start_ts = time.time()
         discovered_count = 0
-        for key, entry in self.subproc_knowhow.items():
+        for key in self.missing_keys():
             try:
                 self.require(key)
                 discovered_count += 1

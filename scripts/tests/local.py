@@ -29,7 +29,6 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import Iterable, List, Optional
 
 import alive_progress
@@ -39,12 +38,7 @@ import coloredlogs
 import tabulate
 import yaml
 
-
-class SubprocessKind(StrEnum):
-    # Unfortunately we cannot import this directly from .chiptest.runner
-    APP = "app"
-    TOOL = "tool"
-
+from chiptest.runner import SubprocessKind
 
 try:
     from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
