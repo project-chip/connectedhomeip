@@ -449,8 +449,7 @@ class PushAvServer:
         self.strict_mode = strict_mode
         self.router = APIRouter()
 
-        # In-memory map to track stream files: {stream_id: {"valid_files": [], "invalid_files": []}}
-        self.stream_files_map = {}  # TODO Eventually remove in favor of sessions
+        # In-memory map to track camera sessions
         self.sessions = self._list_sessions()
 
         # UI
@@ -463,7 +462,6 @@ class PushAvServer:
 
         # HTTP APIs
         self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
-        self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
         self.router.add_api_route("/sessions", self.list_sessions, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
 
@@ -569,15 +567,7 @@ class PushAvServer:
         stream_id = last_stream + 1
         stream_id_str = str(stream_id)
 
-        # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
-        # TODO Remove the details.json file in favor of sessions eventually (same as with the concept of stream_files_map)
-        p = self.wd.mkdir("streams", stream_id_str)
-        stream = {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
-        with open(p / "details.json", 'w', encoding='utf-8') as f:
-            json.dump(stream, f, ensure_ascii=False, indent=4)
-
         # Initialize entry in stream files map
-        self.stream_files_map[stream_id_str] = {"valid_files": [], "invalid_files": []}
         self.sessions[stream_id_str] = Session(
             id=stream_id,
             strict_mode=self.strict_mode,
@@ -586,21 +576,12 @@ class PushAvServer:
             uploaded_manifests=[],
             errors=[],
         )
+
+        self.wd.mkdir("streams", str(stream_id))
         self.sessions[stream_id_str].save_to_disk(self.wd)
 
-        return stream
-
-    def list_streams(self):
-        # Return streams directly from the in-memory map
-        streams = []
-        for stream_id, stream_data in self.stream_files_map.items():
-            streams.append({
-                "id": int(stream_id),
-                "valid_files": stream_data["valid_files"],
-                "invalid_files": stream_data["invalid_files"]
-            })
-
-        return {"streams": streams}
+        # TODO Update TH to use sessions instead
+        return {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
 
     def list_sessions(self):
         return {"sessions": self.sessions.values()}
@@ -643,6 +624,8 @@ class PushAvServer:
                         errors.append("Track name mismatch: "
                                       f"{track_name_in_path} != {track_name}, "
                                       "must match TrackName provided in ContainerOptions")
+
+            # TODO Add better validation for Interface-1, Interface-2 DASH, or I2-HLS ?
 
             file_path_with_ext = f"{file_path}.{ext}"
 
