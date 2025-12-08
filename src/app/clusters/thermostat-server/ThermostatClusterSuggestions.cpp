@@ -182,7 +182,7 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
     NotifyAttributeChanged(ThermostatSuggestions::Id);
 
     // Re-evaluate the current thermostat suggestion.
-    mDelegate->ReEvaluateCurrentSuggestion();
+    TEMPORARY_RETURN_IGNORED mDelegate->ReEvaluateCurrentSuggestion();
 
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
@@ -215,8 +215,8 @@ ThermostatCluster::RemoveThermostatSuggestion(CommandHandler * commandObj, const
     NotifyAttributeChanged(ThermostatSuggestions::Id);
 
     // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
-    RemoveExpiredSuggestions(mDelegate);
-    mDelegate->ReEvaluateCurrentSuggestion();
+    TEMPORARY_RETURN_IGNORED RemoveExpiredSuggestions(mDelegate);
+    TEMPORARY_RETURN_IGNORED mDelegate->ReEvaluateCurrentSuggestion();
 
     return Status::Success;
 }

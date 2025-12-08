@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
@@ -46,6 +46,8 @@ import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+
+log = logging.getLogger(__name__)
 
 
 class TC_CC_2_3(MatterBaseTest):
@@ -168,10 +170,10 @@ class TC_CC_2_3(MatterBaseTest):
         sub_handler = AttributeSubscriptionHandler(expected_cluster=cc)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
 
-        def accumulate_reports():
+        async def accumulate_reports():
             sub_handler.reset()
-            logging.info(f"Test will now wait {gather_time} seconds to accumulate reports")
-            time.sleep(gather_time)
+            log.info(f"Test will now wait {gather_time} seconds to accumulate reports")
+            await asyncio.sleep(gather_time)
 
         def check_report_counts(attr: ClusterObjects.ClusterAttributeDescriptor):
             count = sub_handler.attribute_report_counts[attr]
@@ -198,7 +200,7 @@ class TC_CC_2_3(MatterBaseTest):
             await self.send_single_cmd(cmd)
 
             self.step(11)
-            accumulate_reports()
+            await accumulate_reports()
 
             self.step(12)
             check_report_counts(cc.Attributes.ColorTemperatureMireds)
@@ -227,7 +229,7 @@ class TC_CC_2_3(MatterBaseTest):
             await self.send_single_cmd(cmd)
 
             self.step(17)
-            accumulate_reports()
+            await accumulate_reports()
 
             self.step(18)
             check_report_counts(cc.Attributes.CurrentHue)
@@ -237,7 +239,7 @@ class TC_CC_2_3(MatterBaseTest):
             await self.send_single_cmd(cmd)
 
             self.step(20)
-            accumulate_reports()
+            await accumulate_reports()
 
             self.step(21)
             check_report_counts(cc.Attributes.CurrentSaturation)
@@ -260,7 +262,7 @@ class TC_CC_2_3(MatterBaseTest):
             await self.send_single_cmd(cmd)
 
             self.step(25)
-            accumulate_reports()
+            await accumulate_reports()
 
             self.step(26)
             # reports for x and y are both accumulated in a dict - done above
@@ -283,7 +285,7 @@ class TC_CC_2_3(MatterBaseTest):
             await self.send_single_cmd(cmd)
 
             self.step(31)
-            accumulate_reports()
+            await accumulate_reports()
 
             self.step(32)
             check_report_counts(cc.Attributes.EnhancedCurrentHue)
@@ -298,26 +300,26 @@ class TC_CC_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(35)
-        accumulate_reports()
+        await accumulate_reports()
 
         self.step(36)
         cmd = cc.Commands.MoveToColorTemperature(colorTemperatureMireds=colorTempPhysicalMaxMireds/2, transitionTime=100)
         await self.send_single_cmd(cmd)
 
         self.step(37)
-        logging.info("Test will now wait for 5 seconds")
-        time.sleep(5)
+        log.info("Test will now wait for 5 seconds")
+        await asyncio.sleep(5)
 
         self.step(38)
         cmd = cc.Commands.MoveToColorTemperature(colorTemperatureMireds=colorTempPhysicalMaxMireds, transitionTime=150)
         await self.send_single_cmd(cmd)
 
         self.step(39)
-        logging.info("Test will now wait for 20 seconds")
-        time.sleep(20)
+        log.info("Test will now wait for 20 seconds")
+        await asyncio.sleep(20)
 
         self.step(40)
-        logging.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
+        log.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
         count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         asserts.assert_equal(count, 3, "Unexpected number of reports received")
 

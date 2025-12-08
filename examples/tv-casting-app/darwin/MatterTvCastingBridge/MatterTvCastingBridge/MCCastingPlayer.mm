@@ -190,6 +190,17 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     });
 }
 
+- (void)removeFabric
+{
+    ChipLogProgress(AppServer, "MCCastingPlayer.removeFabric() called");
+    VerifyOrReturn([[MCCastingApp getSharedInstance] isRunning], ChipLogError(AppServer, "MCCastingPlayer.removeFabric() MCCastingApp NOT running"));
+
+    dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
+    dispatch_sync(workQueue, ^{
+        _cppCastingPlayer->RemoveFabric();
+    });
+}
+
 - (NSError * _Nullable)getConnectionState:(MCCastingPlayerConnectionState * _Nonnull)state;
 {
     ChipLogProgress(AppServer, "MCCastingPlayer.getConnectionState() called");

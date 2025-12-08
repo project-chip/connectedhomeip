@@ -37,7 +37,7 @@ echo_bold_white() {
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 
 declare enable_ble=true
-declare enable_nfc=true
+declare enable_nfc=false
 declare enable_ipv4=true
 declare wifi_paf_config=""
 declare chip_detail_logging=false
@@ -379,6 +379,29 @@ if [ -n "$install_virtual_env" ]; then
         echo_blue "Installing python test dependencies ..."
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
+
+        if [ "$enable_nfc" = "true" ]; then
+            echo_blue "Installing python nfc dependencies ..."
+            OS_TYPE="$(uname -s)"
+
+            if [ "$OS_TYPE" = "Linux" ]; then
+
+                # Only run dpkg check if dpkg exists (Debian/Ubuntu)
+                if command -v dpkg >/dev/null 2>&1; then
+                    if ! dpkg -s libpcsclite-dev >/dev/null 2>&1; then
+                        echo "Error: The package 'libpcsclite-dev' is not installed."
+                        echo "Please install it with: sudo apt-get install libpcsclite-dev"
+                        exit 1
+                    fi
+                else
+                    echo "Warning: Non-Debian Linux detected. Skipping dpkg check."
+                    echo "Ensure PCSC development libraries are installed for your distro."
+                fi
+            fi
+
+            "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.nfc.txt"
+        fi
+
     fi
 
     if [ "$install_jupyterlab" = "yes" ]; then

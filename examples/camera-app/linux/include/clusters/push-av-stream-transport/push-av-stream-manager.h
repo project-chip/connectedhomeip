@@ -18,7 +18,7 @@
 
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
 #include <chrono>
@@ -162,6 +162,13 @@ private:
     std::vector<PushAvStream> pushavStreams;
 
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
+
+    /**
+     * @brief Checks if the specified CMAF interface type is supported.
+     * @param cmafInterface The CMAF interface enum to validate.
+     * @return true if the interface is supported, false otherwise.
+     */
+    bool IsCMAFInterfaceSupported(CMAFInterfaceEnum cmafInterface) const;
 
     /**
      * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.

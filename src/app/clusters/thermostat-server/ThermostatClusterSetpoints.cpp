@@ -236,7 +236,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeSetpointLimit(AttributeId attribu
 DataModel::ActionReturnStatus Setpoints::ChangeSetpointDeadBand(int16_t deadBand, bool autoSupported,
                                                                 AttributeValueDecoder & decoder, AttributePersistence & persistence)
 {
-    ChipLogError(Zcl, "Changing MinSetpointDeadBand: deadBand: %d", deadBand);
     if (deadBand < 0 || deadBand > 127)
     {
         ChipLogError(Zcl, "Returning constraint error");
@@ -257,8 +256,6 @@ DataModel::ActionReturnStatus Setpoints::RaiseLowerSetpoint(int16_t amount, Setp
                                                             const BitFlags<Thermostat::Feature> features, bool occupied,
                                                             AttributePersistenceProvider & persistence)
 {
-    ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint");
-
     auto supportsHeat = features.Has(Feature::kHeating);
     auto supportsCool = features.Has(Feature::kCooling);
 

@@ -155,6 +155,7 @@
 #include <clusters/WakeOnLan/CommandIds.h>
 #include <clusters/WaterHeaterManagement/CommandIds.h>
 #include <clusters/WaterHeaterMode/CommandIds.h>
+#include <clusters/WaterTankLevelMonitoring/CommandIds.h>
 #include <clusters/WebRTCTransportProvider/CommandIds.h>
 #include <clusters/WebRTCTransportRequestor/CommandIds.h>
 #include <clusters/WiFiNetworkDiagnostics/CommandIds.h>

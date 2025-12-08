@@ -16,6 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/level-control.cpp"
-    "${CLUSTER_DIR}/level-control.h"
+    "${CLUSTER_DIR}/codegen/level-control.cpp"
+    "${CLUSTER_DIR}/codegen/level-control.h"
 )

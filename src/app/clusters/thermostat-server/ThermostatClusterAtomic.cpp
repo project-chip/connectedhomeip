@@ -43,7 +43,7 @@ namespace Thermostat {
 void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     AtomicWriteSession * session = static_cast<AtomicWriteSession *>(callbackContext);
-    session->OnAtomicWriteTimeout();
+    TEMPORARY_RETURN_IGNORED session->OnAtomicWriteTimeout();
 }
 
 namespace {
@@ -56,7 +56,8 @@ namespace {
  */
 void ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 timeout)
 {
-    DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, reinterpret_cast<void *>(session));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
+                                                                   reinterpret_cast<void *>(session));
 }
 
 /**
