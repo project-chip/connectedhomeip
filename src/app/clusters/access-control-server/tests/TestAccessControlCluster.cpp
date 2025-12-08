@@ -148,13 +148,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -179,7 +179,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
 {
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -243,7 +243,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
 
     // Initialize the cluster and tester
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Build a ReviewFabricRestrictions command request with ARL entries.
@@ -296,7 +296,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
     chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create a request with an empty ARL list
@@ -322,7 +322,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries
     chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create an array of ARL entries for different endpoints and clusters
@@ -375,7 +375,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestric
     chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create a request with a wildcard restriction
@@ -410,7 +410,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestric
     chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create an entry with multiple restrictions
@@ -466,7 +466,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
     chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create a valid request
@@ -492,7 +492,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
     chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create entries for each restriction type
