@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import contextlib
 import datetime
 import ipaddress
 import json
@@ -17,7 +18,7 @@ import sys
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Awaitable, Callable, Literal, Optional
+from typing import Awaitable, Callable, Literal, Optional, Union
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -335,7 +336,7 @@ class CAHierarchy:
         )
 
         if self.kind == 'server':
-            san_names = [x509.DNSName(dns)]
+            san_names: list[Union[x509.DNSName, x509.IPAddress]] = [x509.DNSName(dns)]
             if ip_address:
                 san_names.append(x509.IPAddress(ipaddress.ip_address(ip_address)))
             builder.add_extension(
@@ -412,9 +413,30 @@ class TrackNameRequest(BaseModel):
 
 
 class SupportedIngestInterface(str, Enum):
-    cmaf = "cmaf-ingest"
-    dash = "dash"
-    hls = "hls"
+    cmaf = "cmaf-ingest"  # Interface 1
+    dash = "dash"  # Interface 2, DASH version
+    hls = "hls"  # Interface 2, HLS version
+
+
+class UploadError(BaseModel):
+    file_path: str
+    reasons: list[str]
+
+
+class Session(BaseModel):
+    id: int
+    strict_mode: bool = True
+    interface: SupportedIngestInterface
+    track_name: Optional[str] = None
+
+    uploaded_segments: list[str] = []
+    uploaded_manifests: list[str] = []
+    errors: list[UploadError] = []
+
+    def save_to_disk(self, wd: WorkingDirectory):
+        p = wd.path("streams", str(self.id), "session.json")
+        with open(p, 'w', encoding='utf-8') as f:
+            json.dump(self.model_dump(), f, ensure_ascii=False, indent=4)
 
 
 class PushAvServer:
@@ -428,7 +450,8 @@ class PushAvServer:
         self.router = APIRouter()
 
         # In-memory map to track stream files: {stream_id: {"valid_files": [], "invalid_files": []}}
-        self.stream_files_map = {}
+        self.stream_files_map = {}  # TODO Eventually remove in favor of sessions
+        self.sessions: dict[str, Session] = {}
 
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
@@ -464,6 +487,13 @@ class PushAvServer:
             raise HTTPException(404, detail="Stream doesn't exists")
         except Exception as e:
             raise HTTPException(500, f"An unexpected error occurred: {e}")
+
+    @contextlib.contextmanager
+    def _open_session(self, stream_id: int):
+        """Context manager helper to save a session after use."""
+        stream_id_str = str(stream_id)
+        yield self.sessions[stream_id_str]
+        self.sessions[stream_id_str].save_to_disk(self.wd)
 
     # UI website
 
@@ -510,28 +540,37 @@ class PushAvServer:
 
     # APIs
 
-    def create_stream(self, interface: Optional[SupportedIngestInterface] = None):
+    def create_stream(self, interface: SupportedIngestInterface = SupportedIngestInterface.cmaf):
         # Find the last registered stream
         dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
         last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
         stream_id = last_stream + 1
+        stream_id_str = str(stream_id)
 
         # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
-        p = self.wd.mkdir("streams", str(stream_id))
+        # TODO Remove the details.json file in favor of sessions eventually (same as with the concept of stream_files_map)
+        p = self.wd.mkdir("streams", stream_id_str)
         stream = {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
-
         with open(p / "details.json", 'w', encoding='utf-8') as f:
             json.dump(stream, f, ensure_ascii=False, indent=4)
 
         # Initialize entry in stream files map
-        self.stream_files_map[str(stream_id)] = {"valid_files": [], "invalid_files": []}
+        self.stream_files_map[stream_id_str] = {"valid_files": [], "invalid_files": []}
+        self.sessions[stream_id_str] = Session(
+            id=stream_id,
+            strict_mode=self.strict_mode,
+            interface=interface,
+            uploaded_segments=[],
+            uploaded_manifests=[],
+            errors=[],
+        )
+        self.sessions[stream_id_str].save_to_disk(self.wd)
 
         return stream
 
     def list_streams(self):
         # Return streams directly from the in-memory map
         streams = []
-
         for stream_id, stream_data in self.stream_files_map.items():
             streams.append({
                 "id": int(stream_id),
@@ -541,81 +580,77 @@ class PushAvServer:
 
         return {"streams": streams}
 
-    async def _handle_upload(self, dst: Path, req: Request):
-        """ Handle an upload, sending content to disk at 'dst'.
-
-        Extract the parsed version of a client certificate via a patched TLS
-        extension. See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
-        for the exact content.
-        """
-
-        cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
-
-        with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
-            f.write(json.dumps(cert_details))
-
-        with open(dst, "wb") as f:
-            async for chunk in req.stream():
-                f.write(chunk)
-
-        return Response(status_code=202)
+    def list_sessions(self):
+        return {"sessions": self.sessions}
 
     async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
         """
-            Handle any upload if strict-mode isn't enabled.
-            Otherwise, check if the segment path format complies with Matter Specification path.
-        """
-        stream = self._read_stream_details(stream_id)
-        is_valid = True
-        validation_error_reason = ""
+            Handle file upload for a given stream.
 
-        if stream.get('strict_mode', False):
+            Validate the file name based on the extension and path format.
+            Always save the uploaded file to disk for further analysis.
+            If strict mode is enabled, return bad requests with the errors.
+        """
+        with self._open_session(stream_id) as session:
+            # Validate the incoming file upload (path and extension)
+            errors = []
+
             if ext not in VALID_EXTENSIONS:
-                is_valid = False
-                validation_error_reason = f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}"
+                # Invalid extension
+                errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
             elif ext in ["mpd", "m3u8"]:
-                iface = stream.get('interface', None)
-                if (iface == SupportedIngestInterface.dash and ext != "mpd" or
-                        iface == SupportedIngestInterface.hls and ext != "m3u8"):
-                    is_valid = False
-                    validation_error_reason = "Unsupported manifest object extension"
+                # Manifest files
+                if (session.interface == SupportedIngestInterface.dash and ext != "mpd" or
+                        session.interface == SupportedIngestInterface.hls and ext != "m3u8"):
+                    errors.append("Unsupported manifest object extension")
             elif ext == "m4s":
+                # Segmented video files
+
                 # Checks if CMAF extended path matches the pattern session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>
                 # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#12-operation
-                segment_pattern = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$")
-                match = segment_pattern.match(file_path)
+                match = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$").match(file_path)
                 if not match:
-                    is_valid = False
-                    validation_error_reason = "Path does not adhere to Matter's extended path format: session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>"
+                    errors.append("Path does not adhere to Matter's extended path format: session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>")
                 else:
                     # Validate if the trackName is same as the one assigned during transport allocation.
                     # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#685-trackname-field
                     track_name_in_path = match.group("trackName")
-                    track_name = stream.get('trackName', None)
+                    track_name = session.track_name
+
                     if track_name and track_name != track_name_in_path:
-                        is_valid = False
-                        validation_error_reason = ("Track name mismatch: "
-                                                   f"{track_name_in_path} != {track_name}, "
-                                                   "must match TrackName provided in ContainerOptions")
+                        errors.append("Track name mismatch: "
+                                      f"{track_name_in_path} != {track_name}, "
+                                      "must match TrackName provided in ContainerOptions")
 
-        dst = self.wd.mkdir("streams", str(stream_id), f"{file_path}.{ext}", is_file=True)
-        extended_path = f"{file_path}.{ext}"
+            if len(errors) > 0:
+                session.errors.append(UploadError(file_path=file_path, reasons=errors))
 
-        # Add file to the appropriate list in the stream files map
-        log.debug(f"Upload received: {extended_path}")
-        stream_id_str = str(stream_id)
-        if stream_id_str in self.stream_files_map:
-            if is_valid and extended_path not in self.stream_files_map[stream_id_str]["valid_files"]:
-                self.stream_files_map[stream_id_str]["valid_files"].append(extended_path)
-            if not is_valid:
-                log.error(f"{extended_path}: {validation_error_reason}")
-                if extended_path not in self.stream_files_map[stream_id_str]["invalid_files"]:
-                    self.stream_files_map[stream_id_str]["invalid_files"].append({
-                        "file_path": extended_path,
-                        "validation_error_reason": validation_error_reason
-                    })
+            filename = f"{file_path}.{ext}"
+            file_local_path = self.wd.mkdir("streams", str(stream_id), filename, is_file=True)
 
-        return await self._handle_upload(dst, req)
+            # Update the session with the seen segments/manifests
+            if ext == "m4s":
+                session.uploaded_segments.append(file_path)
+            else:
+                session.uploaded_manifests.append(file_path)
+
+            # Save data to disk (certificate details + file content)
+            cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
+
+            with open(file_local_path.with_suffix(file_local_path.suffix + ".crt"), "w") as f:
+                f.write(json.dumps(cert_details))
+
+            with open(file_local_path, "wb") as f:
+                async for chunk in req.stream():
+                    f.write(chunk)
+
+            if session.strict_mode and len(session.errors) > 0:
+                return JSONResponse(
+                    status_code=400,
+                    content={"errors": [error.model_dump() for error in session.errors]}
+                )
+            else:
+                return Response(status_code=202)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
 
@@ -684,6 +719,7 @@ class PushAvServer:
 
         return {key, cert, created}
 
+    # Seems unused in the current TH tests
     async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
         """
         Updates the trackName for a given stream_id.
