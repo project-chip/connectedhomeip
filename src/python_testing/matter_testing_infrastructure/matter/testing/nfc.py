@@ -390,6 +390,7 @@ def _write_ndef_record(connection, record):
         _check_transmission_status(sw1, sw2, "Write NDEF message failed")
         offset += chunk_len
 
+
 async def wait_for_threading_event(event, poll_interval=0.1):
     while not event.is_set():
         await asyncio.sleep(poll_interval)
