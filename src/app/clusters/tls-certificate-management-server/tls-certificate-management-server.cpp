@@ -359,11 +359,16 @@ void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ct
     VerifyOrReturn(req.nonce.size() == kNonceBytes, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
-    uint8_t numClientCerts;
-    VerifyOrReturn(mCertificateTable.GetClientCertificateCount(fabric, numClientCerts) == CHIP_NO_ERROR,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
-    VerifyOrReturn(numClientCerts < mMaxClientCertificates,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted));
+
+    // If no CCDID is specified, ensure we have capacity for a new client certificate.
+    if (req.ccdid.IsNull())
+    {
+        uint8_t numClientCerts;
+        VerifyOrReturn(mCertificateTable.GetClientCertificateCount(fabric, numClientCerts) == CHIP_NO_ERROR,
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure));
+        VerifyOrReturn(numClientCerts < mMaxClientCertificates,
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted));
+    }
 
     auto status = mDelegate.GenerateClientCsr(ctx.mRequestPath.mEndpointId, fabric, req, [&](auto & response) -> Status {
         VerifyOrDieWithMsg(response.ccdid <= kMaxClientCertId, NotSpecified, "Spec requires CCDID to be <= kMaxClientCertId");

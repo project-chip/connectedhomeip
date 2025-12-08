@@ -26,7 +26,7 @@ uint32_t gDispatchCount = 0;
 } // namespace
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 app::ConcreteCommandPath GetLastDispatchPath()
 {
@@ -38,7 +38,7 @@ uint32_t DispatchCount()
     return gDispatchCount;
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
 
 namespace chip {
