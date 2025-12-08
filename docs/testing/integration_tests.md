@@ -71,10 +71,10 @@ test case in them:
 scripts/build/build_examples.py --target linux-x64-chip-tool --target linux-x64-all-clusters build
 # Run the TestOperationalState test case in the Linux network namespaces
 scripts/tests/run_test_suite.py --runner chip_tool_python \
-    --chip-tool out/linux-x64-chip-tool/chip-tool \
     --target TestOperationalState \
     --log-level=debug \
-    run
+    run \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool
 ```
 
 ### Running tests with mocked BLE and Wi-Fi connectivity
@@ -140,8 +140,9 @@ namespaces use the `--ble-wifi` option to the `run` command of the
 ```shell
 # Run the TestOperationalState test case with ble-wifi commissioning
 scripts/tests/run_test_suite.py --runner chip_tool_python \
-    --chip-tool out/linux-x64-chip-tool/chip-tool \
     --target TestOperationalState \
     --log-level=debug \
-    run --ble-wifi
+    run \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
+    --ble-wifi
 ```
