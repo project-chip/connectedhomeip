@@ -47,8 +47,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        storage_dir='/tmp',
                        extra_args: list = [],
                        kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
-                       timeout: int = 10):
+                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
+                       timeout: int = 30):
         """Start the provider process using the provided configuration.
 
         Args:
@@ -57,14 +57,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             setup_pincode (int, optional): Setup pincode for the provider process. Defaults to 20202021.
             discriminator (int, optional): Discriminator for the provider process. Defaults to 1234.
             port (int, optional): Port for the provider process. Defaults to 5541.
-            storage_dir (str, optional): Storage dir for the provider proccess. Defaults to '/tmp'.
+            storage_dir (str, optional): Storage dir for the provider process. Defaults to '/tmp'.
             extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
-            expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
+            expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        log.info(f"Launching provider app with with ota image {ota_image_path}")
+        log.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
+
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -102,6 +103,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         self.current_provider_app_proc = proc
         log.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+
+    def terminate_provider(self):
+        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
+            log.info("Terminating existing OTA Provider")
+            self.current_provider_app_proc.terminate()
+            self.current_provider_app_proc = None
+        else:
+            log.info("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -145,7 +154,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Args:
             controller (ChipDeviceCtrl): Controller to write the providers.
-            provider_node_id (int): Node where the provider is localted.
+            provider_node_id (int): Node where the provider is located.
             requestor_node_id (int): Node of the requestor to write the providers.
             endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
         """

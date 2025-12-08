@@ -36,7 +36,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
-using namespace chip::Test;
 using namespace chip::Testing;
 
 namespace {
@@ -53,7 +52,7 @@ struct TestElectricalEnergyMeasurementCluster : public ::testing::Test
 
 TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Test 1: No features activated - should only have mandatory Accuracy attribute
     {
@@ -122,7 +121,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
 TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidationTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Test 1: Cluster with all features enabled - snapshot methods and getters should work
     {
@@ -202,7 +201,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
 
 TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Test 1: Cluster with all features - all optional attributes should be readable
     {
@@ -271,7 +270,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
 
 TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Create a cluster with all features enabled
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
@@ -286,7 +285,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Create ClusterTester for simplified attribute reading
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
 
     Structs::MeasurementAccuracyStruct::DecodableType accuracy;
     ASSERT_EQ(tester.ReadAttribute(Accuracy::Id, accuracy), CHIP_NO_ERROR);
@@ -326,7 +325,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
 
 TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEvents)
 {
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
 
     // Create a cluster with all features enabled
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,

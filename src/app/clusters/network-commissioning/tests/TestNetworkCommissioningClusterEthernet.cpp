@@ -69,7 +69,7 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
     Testing::FakeEthernetDriver fakeEthernetDriver;
     ByteSpan testInterfaceName(Uint8::from_const_char("eth0_test"), 9);
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeEthernetDriver, tracker);
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 

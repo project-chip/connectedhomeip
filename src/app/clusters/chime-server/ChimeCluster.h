@@ -20,12 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-// #include <app/AttributeAccessInterface.h>
-// #include <app/CommandHandlerInterface.h>
-// #include <app/ConcreteAttributePath.h>
-// #include <app/reporting/reporting.h>
-// #include <lib/core/CHIPError.h>
-// #include <protocols/interaction_model/StatusCode.h>
+
 
 namespace chip {
 namespace app {
@@ -124,11 +119,6 @@ protected:
     void SetChimeCluster(ChimeCluster * chimeCluster) { mChimeCluster = chimeCluster; }
     ChimeCluster * GetChimeCluster() const { return mChimeCluster; }
 };
-
-/*
-class ChimeServer : private AttributeAccessInterface, private CommandHandlerInterface
-...
-*/
 
 } // namespace Clusters
 } // namespace app
