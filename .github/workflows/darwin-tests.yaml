@@ -128,7 +128,7 @@ jobs:
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --tool-path chip-tool:./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --tool-path darwin-framework-tool:./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
              --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
              --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
              --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
