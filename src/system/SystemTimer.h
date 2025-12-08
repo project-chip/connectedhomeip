@@ -90,10 +90,7 @@ private:
     Clock::Timestamp mAwakenTime;
     Callback mCallback;
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    friend class LayerImplDispatch;
-    dispatch_source_t mTimerSource = nullptr;
-#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
     friend class LayerImplSelect;
     struct ev_timer mLibEvTimer;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
