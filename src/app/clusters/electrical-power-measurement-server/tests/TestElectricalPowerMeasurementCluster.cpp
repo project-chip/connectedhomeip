@@ -250,7 +250,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
     EXPECT_EQ(tester.ReadAttribute(PowerMode::Id, powerMode), CHIP_NO_ERROR);
     EXPECT_EQ(powerMode, expectedPowerMode);
 
-    uint8_t numTypes;
+    uint8_t numTypes = 0;
     EXPECT_EQ(tester.ReadAttribute(NumberOfMeasurementTypes::Id, numTypes), CHIP_NO_ERROR);
     EXPECT_EQ(numTypes, expectedNumMeasurementTypes);
 
