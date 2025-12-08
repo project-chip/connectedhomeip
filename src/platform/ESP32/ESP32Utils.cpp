@@ -249,6 +249,7 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
     wifi_config_t stationConfig;
 
     // Clear the ESP WiFi station configuration.
+    esp_wifi_disconnect();
     memset(&stationConfig, 0, sizeof(stationConfig));
     esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 

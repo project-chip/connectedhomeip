@@ -260,7 +260,6 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
         return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
     }
 
-    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 }
 
@@ -290,7 +289,24 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed()
 {
     if (mpConnectCallback)
     {
-        mpConnectCallback->OnResult(Status::kNetworkNotFound, CharSpan(), 0);
+        Status status = Status::kSuccess;
+        switch (mLastDisconnectedReason)
+        {
+        case WIFI_REASON_AUTH_FAIL:
+        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_MIC_FAILURE:
+        case WIFI_REASON_CONNECTION_FAIL:
+            status = Status::kAuthFailure;
+            break;
+        case WIFI_REASON_NO_AP_FOUND:
+            status = Status::kNetworkNotFound;
+            break;
+        default:
+            status = Status::kOtherConnectionFailure;
+            break;
+        }
+        mpConnectCallback->OnResult(status, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
 }
@@ -360,7 +376,7 @@ CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     }
     else
     {
-        err = esp_wifi_scan_start(NULL, false);
+        err = esp_wifi_scan_start(nullptr, false);
     }
     if (err != ESP_OK)
     {
