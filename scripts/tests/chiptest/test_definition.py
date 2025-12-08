@@ -276,7 +276,7 @@ BUILTIN_SUBPROC_KNOWHOW = {
 
 
 class PathsFinderProto(typing.Protocol):
-    def get(self, target_name: str) -> Path:
+    def get(self, target_name: str) -> Path | None:
         pass
 
 
