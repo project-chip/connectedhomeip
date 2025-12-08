@@ -390,6 +390,10 @@ def _write_ndef_record(connection, record):
         _check_transmission_status(sw1, sw2, "Write NDEF message failed")
         offset += chunk_len
 
+async def wait_for_threading_event(event, poll_interval=0.1):
+    while not event.is_set():
+        await asyncio.sleep(poll_interval)
+
 
 class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     """
@@ -444,8 +448,7 @@ class TagMonitorManager:
         self._thread = threading.Thread(target=self._monitoring_thread, daemon=True)
         self._thread.start()
         # Return control to the caller, but keep this coroutine alive until deactivation
-        while not self._stop_event.is_set():
-            await asyncio.sleep(0.1)
+        await wait_for_threading_event(self._stop_event)
         # After deactivation, join the thread to ensure cleanup
         if self._thread is not None:
             self._thread.join()

@@ -26,6 +26,7 @@ import pathlib
 import re
 import sys
 import typing
+import matter.testing.nfc
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
