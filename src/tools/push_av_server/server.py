@@ -636,17 +636,18 @@ class PushAvServer:
                                       f"{track_name_in_path} != {track_name}, "
                                       "must match TrackName provided in ContainerOptions")
 
-            if len(errors) > 0:
-                session.errors.append(UploadError(file_path=file_path, reasons=errors))
+            file_path_with_ext = f"{file_path}.{ext}"
 
-            filename = f"{file_path}.{ext}"
-            file_local_path = self.wd.mkdir("streams", str(stream_id), filename, is_file=True)
+            if len(errors) > 0:
+                session.errors.append(UploadError(file_path=file_path_with_ext, reasons=errors))
+
+            file_local_path = self.wd.mkdir("streams", str(stream_id), file_path_with_ext, is_file=True)
 
             # Update the session with the seen segments/manifests
             if ext == "m4s":
-                session.uploaded_segments.append(file_path)
+                session.uploaded_segments.append(file_path_with_ext)
             else:
-                session.uploaded_manifests.append(file_path)
+                session.uploaded_manifests.append(file_path_with_ext)
 
             # Save data to disk (certificate details + file content)
             cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
