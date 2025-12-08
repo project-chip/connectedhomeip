@@ -26,7 +26,7 @@ import matter.testing.nfc
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DD_1_5(MatterBaseTest):
@@ -88,7 +88,7 @@ class TC_DD_1_5(MatterBaseTest):
 
         reader.deactivate_tag_monitoring()
         nfc_tag_content = await monitoring_task
-        logger.info(f"nfc_tag_content: {nfc_tag_content}")
+        log.info(f"nfc_tag_content: {nfc_tag_content}")
         asserts.assert_true(reader.is_onboarding_data(nfc_tag_content), "No NFC tag with onboarding data found")
 
         ###########
