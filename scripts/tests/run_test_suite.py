@@ -28,7 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessKind
-from chiptest.test_definition import TestRunTime, TestTag, SubprocessInfoRepo
+from chiptest.test_definition import SubprocessInfoRepo, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)

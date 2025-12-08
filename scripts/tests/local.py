@@ -29,8 +29,8 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import List, Optional, Iterable
 from enum import StrEnum
+from typing import Iterable, List, Optional
 
 import alive_progress
 import click
