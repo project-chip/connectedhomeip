@@ -774,7 +774,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
         from matter.testing.nfc import NFCReader
         nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
-        reader = matter.testing.nfc.NFCReader(nfc_reader_index)
+        reader = NFCReader(nfc_reader_index)
         nfc_tag_data = reader.read_nfc_tag_data()
         args.qr_code.append(nfc_tag_data)
 
