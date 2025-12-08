@@ -44,9 +44,6 @@ private:
 
     // SDK cluster servers
     std::unique_ptr<chip::app::Clusters::Thermostat::ThermostatCluster> mThermostatCluster;
-
-    // Helper to set attribute defaults for CameraAVStreamMgmt
-    void InitializeCameraAVStreamMgmt();
 };
 
 void ThermostatAppInit();
