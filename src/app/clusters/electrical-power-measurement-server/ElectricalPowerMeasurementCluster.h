@@ -36,17 +36,17 @@ public:
         ElectricalPowerMeasurement::Attributes::Ranges::Id,           // Optional
         ElectricalPowerMeasurement::Attributes::Voltage::Id,          // Optional
         ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id,    // Optional
-        ElectricalPowerMeasurement::Attributes::ReactiveCurrent::Id,  // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::ApparentCurrent::Id,  // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::ReactivePower::Id,    // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::ApparentPower::Id,    // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::RMSVoltage::Id,       // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::RMSCurrent::Id,       // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::RMSPower::Id,         // Optional but depends on AlternateCurrent feature
-        ElectricalPowerMeasurement::Attributes::Frequency::Id,        // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::ReactiveCurrent::Id,  // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::ApparentCurrent::Id,  // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::ReactivePower::Id,    // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::ApparentPower::Id,    // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::RMSVoltage::Id,       // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::RMSCurrent::Id,       // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::RMSPower::Id,         // Optional but depends on AlternatingCurrent feature
+        ElectricalPowerMeasurement::Attributes::Frequency::Id,        // Optional but depends on AlternatingCurrent feature
         ElectricalPowerMeasurement::Attributes::HarmonicCurrents::Id, // Derived from Harmonics feature
         ElectricalPowerMeasurement::Attributes::HarmonicPhases::Id,   // Derived from PowerQuality feature
-        ElectricalPowerMeasurement::Attributes::PowerFactor::Id,      // Optional but depends on AlternateCurrent feature
+        ElectricalPowerMeasurement::Attributes::PowerFactor::Id,      // Optional but depends on AlternatingCurrent feature
         ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id    // Optional but depends on PolyphasePower feature
         >;
 

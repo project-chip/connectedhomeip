@@ -351,6 +351,8 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
+    Ranges::TypeInfo::DecodableType ranges;
+    EXPECT_EQ(tester.ReadAttribute(Ranges::Id, ranges), CHIP_NO_ERROR);
     size_t count = 0;
     auto iter    = ranges.begin();
     while (iter.Next())
