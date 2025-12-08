@@ -795,12 +795,20 @@ TEST_F(TestOTARequestorCluster, SetOtaRequestorInterfaceChangesBehaviour)
     EXPECT_FALSE(updateStateProgress.IsNull());
     EXPECT_EQ(updateStateProgress.Value(), 20);
 
+    // Verify the cluster is only registered as an event handler for the first requestor.
+    EXPECT_EQ(firstOtaRequestor.GetEventHandler(kTestEndpointId), &cluster);
+    EXPECT_EQ(secondOtaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+
     // Setting the second requestor uses that as the backing data.
     cluster.SetOtaRequestor(&secondOtaRequestor);
     EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_FALSE(updateStateProgress.IsNull());
     EXPECT_EQ(updateStateProgress.Value(), 75);
+
+    // Verify the cluster is only registered as an event handler for the second requestor.
+    EXPECT_EQ(firstOtaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+    EXPECT_EQ(secondOtaRequestor.GetEventHandler(kTestEndpointId), &cluster);
 
     // Clearing the requestor responds with default behaviour, which depends on whether the OTA requestor flag is enabled.
     // For backwards compatibility, when the flag is disabled the cluster returns default values.
@@ -813,6 +821,10 @@ TEST_F(TestOTARequestorCluster, SetOtaRequestorInterfaceChangesBehaviour)
               CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
 #endif
+
+    // Verify the cluster isn't registered as an event handler.
+    EXPECT_EQ(firstOtaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+    EXPECT_EQ(secondOtaRequestor.GetEventHandler(kTestEndpointId), nullptr);
 }
 
 } // namespace

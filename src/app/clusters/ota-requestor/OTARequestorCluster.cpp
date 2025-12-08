@@ -213,6 +213,21 @@ void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t byt
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
+void OTARequestorCluster::SetOtaRequestor(OTARequestorInterface * otaRequestor)
+{
+    if (mOtaRequestor)
+    {
+        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId), SoftwareUpdate,
+                     "Unable to unregister event handling for endpoint %u before changing requestor", mPath.mEndpointId);
+    }
+    mOtaRequestor = otaRequestor;
+    if (mOtaRequestor)
+    {
+        SuccessOrLog(mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration), SoftwareUpdate,
+                     "Unable to register event handling for endpoint %u after changing requestor", mPath.mEndpointId);
+    }
+}
+
 CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     chip::OTARequestorInterface * requestor = mOtaRequestor;

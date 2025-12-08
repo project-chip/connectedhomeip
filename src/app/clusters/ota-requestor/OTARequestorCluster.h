@@ -63,7 +63,7 @@ public:
                          DataModel::Nullable<int64_t> platformCode) override;
 
     // This is intended to be used only for backwards compatibility with the codegen data model provider.
-    void SetOtaRequestor(OTARequestorInterface * otaRequestor) { mOtaRequestor = otaRequestor; }
+    void SetOtaRequestor(OTARequestorInterface * otaRequestor);
 
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
