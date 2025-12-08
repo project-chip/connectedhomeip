@@ -175,20 +175,19 @@ struct TestBasicInformationReadWrite : public ::testing::Test
         chip::Platform::MemoryShutdown();
     }
 
-    TestBasicInformationReadWrite() : testContext(), context(testContext.Create()) {}
+    TestBasicInformationReadWrite() {}
 
-    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(context), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { basicInformationClusterInstance.Shutdown(); }
 
-    chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
+    chip::Testing::TestServerClusterContext testContext;
     static BasicInformationCluster & basicInformationClusterInstance;
-    static chip::Test::ClusterTester tester;
+    static chip::Testing::ClusterTester tester;
 };
 
 BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
-chip::Test::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
+chip::Testing::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
@@ -196,7 +195,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     CharSpan oldLabelSpan = "Old Label"_span;
 
     // Initialize AttributePersistence with the provider from *this test's* context
-    AttributePersistence persistence(context.attributeStorage);
+    AttributePersistence persistence(testContext.AttributePersistenceProvider());
 
     Storage::String<32> labelStorage;
     ASSERT_EQ(labelStorage.SetContent(oldLabelSpan), true); // ensure it fits
@@ -206,7 +205,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
     basicInformationClusterInstance.Shutdown();
-    ASSERT_EQ(basicInformationClusterInstance.Startup(context), CHIP_NO_ERROR);
+    ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
     char readBuffer[32];
@@ -313,7 +312,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRev), CHIP_NO_ERROR);
         char buf[256];
         CharSpan val(buf);
-        CHIP_ERROR err = tester.ReadAttribute(Attributes::UniqueID::Id, val);
+        DataModel::ActionReturnStatus err = tester.ReadAttribute(Attributes::UniqueID::Id, val);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -371,14 +370,14 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         CharSpan invalidLocation        = CharSpan::fromCharString(invalidLocationStr);
 
         // Attempt to write the invalid location and confirm it fails
-        CHIP_ERROR writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
+        DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
-    bool readValue;
+    bool readValue{};
 
     // --- Test Case 1: Write 'true' ---
     {

@@ -30,6 +30,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 
@@ -157,16 +158,16 @@ TEST(TestQRCode, TestBase38)
     MutableCharSpan encodedSpan(encodedBuf);
 
     // basic stuff
-    base38Encode(inputSpan.SubSpan(0, 0), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 0), encodedSpan));
     EXPECT_EQ(strlen(encodedBuf), 0u);
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 1), encodedSpan));
     EXPECT_STREQ(encodedBuf, "A0");
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 2), encodedSpan));
     EXPECT_STREQ(encodedBuf, "OT10");
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "-N.B0");
 
     // test null termination of output buffer
@@ -176,7 +177,7 @@ TEST(TestQRCode, TestBase38)
     // Force no nulls in output buffer
     memset(encodedSpan.data(), '?', encodedSpan.size());
     subSpan = encodedSpan.SubSpan(0, 3);
-    base38Encode(inputSpan.SubSpan(0, 1), subSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 1), subSpan));
     size_t encodedLen = strnlen(encodedSpan.data(), MATTER_ARRAY_SIZE(encodedBuf));
     EXPECT_EQ(encodedLen, strlen("A0"));
     EXPECT_STREQ(encodedBuf, "A0");
@@ -185,71 +186,71 @@ TEST(TestQRCode, TestBase38)
     MutableCharSpan emptySpan;
     encodedSpan = MutableCharSpan(encodedBuf);
     EXPECT_EQ(base38Encode(inputSpan, emptySpan), CHIP_ERROR_BUFFER_TOO_SMALL);
-    base38Encode(MutableByteSpan(), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(MutableByteSpan(), encodedSpan));
     EXPECT_STREQ(encodedBuf, "");
     EXPECT_EQ(base38Encode(MutableByteSpan(), emptySpan), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // test single odd byte corner conditions
     encodedSpan = MutableCharSpan(encodedBuf);
     input[2]    = 0;
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "OT100");
     input[2]    = 40;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "Y6V91");
     input[2]    = 41;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "KL0B1");
     input[2]    = 255;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "Q-M08");
 
     // verify chunks of 1,2 and 3 bytes result in fixed-length strings padded with '0'
     // for 1 byte we need always 2 characters
     input[0]    = 35;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 1), encodedSpan));
     EXPECT_STREQ(encodedBuf, "Z0");
     // for 2 bytes we need always 4 characters
     input[0]    = 255;
     input[1]    = 0;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 2), encodedSpan));
     EXPECT_STREQ(encodedBuf, "R600");
     // for 3 bytes we need always 5 characters
     input[0]    = 46;
     input[1]    = 0;
     input[2]    = 0;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "81000");
 
     // verify maximum available values for each chunk size to check selecting proper characters number
     // for 1 byte we need 2 characters
     input[0]    = 255;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 1), encodedSpan));
     EXPECT_STREQ(encodedBuf, "R6");
     // for 2 bytes we need 4 characters
     input[0]    = 255;
     input[1]    = 255;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan.SubSpan(0, 2), encodedSpan));
     EXPECT_STREQ(encodedBuf, "NE71");
     // for 3 bytes we need 5 characters
     input[0]    = 255;
     input[1]    = 255;
     input[2]    = 255;
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(inputSpan, encodedSpan);
+    EXPECT_SUCCESS(base38Encode(inputSpan, encodedSpan));
     EXPECT_STREQ(encodedBuf, "PLS18");
 
     // fun with strings
     encodedSpan = MutableCharSpan(encodedBuf);
-    base38Encode(ByteSpan((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), encodedSpan);
+    EXPECT_SUCCESS(base38Encode(ByteSpan((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), encodedSpan));
     EXPECT_STREQ(encodedBuf, "KKHF3W2S013OPM3EJX11");
 
     std::vector<uint8_t> decoded = std::vector<uint8_t>();

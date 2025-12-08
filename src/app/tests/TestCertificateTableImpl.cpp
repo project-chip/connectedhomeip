@@ -22,10 +22,11 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app::DataModel;
 using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
@@ -42,13 +43,13 @@ static constexpr uint16_t kSpecMaxCertBytes = 3000;
 
 struct InlineBufferedRootCert : CertificateTable::BufferedRootCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
     InlineBufferedRootCert() : CertificateTable::BufferedRootCert(buffer) {}
 };
 
 struct InlineBufferedClientCert : CertificateTable::BufferedClientCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
     InlineBufferedClientCert() : CertificateTable::BufferedClientCert(buffer) {}
 };
 
@@ -76,8 +77,8 @@ public:
 
     static void ResetCertificateTable()
     {
-        sCertificateTable.RemoveFabric(kFabric1);
-        sCertificateTable.RemoveFabric(kFabric2);
+        EXPECT_SUCCESS(sCertificateTable.RemoveFabric(kFabric1));
+        EXPECT_SUCCESS(sCertificateTable.RemoveFabric(kFabric2));
     }
 
 protected:

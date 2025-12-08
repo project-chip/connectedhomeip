@@ -27,6 +27,7 @@
 #include "support/EndpointListLoader.h"
 
 #include "lib/support/logging/CHIPLogging.h"
+#include <app/server/AppDelegate.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <string.h>
@@ -92,7 +93,7 @@ class CastingPlayer;
  * @brief CastingPlayer represents a Matter Commissioner that is able to play media to a physical
  * output or to a display screen which is part of the device.
  */
-class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
+class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>, public AppDelegate
 {
 public:
     CastingPlayer(CastingPlayerAttributes playerAttributes) { mAttributes = playerAttributes; }
@@ -223,6 +224,14 @@ public:
     void Disconnect();
 
     /**
+     * @brief Removes any fabric associated with this player in order to cause the UDC flow when
+     * verifyOrEstablishConnection is called
+     *
+     * @note This method will set nodeId and fabricIndex to 0.
+     */
+    void RemoveFabric();
+
+    /**
      * @brief Find an existing session for this CastingPlayer, or trigger a new session
      * request.
      *
@@ -287,6 +296,14 @@ public:
         ChipLogError(AppServer, "CastingPlayer::GetConnectionState() state: %d", mConnectionState);
         return mConnectionState;
     }
+
+    // AppDelegate implementation
+    void OnCommissioningSessionEstablishmentStarted() override;
+    void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowOpened() override;
+    void OnCommissioningWindowClosed() override;
 
 private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;

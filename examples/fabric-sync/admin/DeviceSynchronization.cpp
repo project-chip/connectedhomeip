@@ -289,7 +289,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
     ChipLogProgress(NotSpecified, "Synchronization complete and add device");
 
-    bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
+    TEMPORARY_RETURN_IGNORED bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
 
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
     if (!mCurrentDeviceData.isIcd.value_or(false))
@@ -300,7 +300,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
-            bridge::FabricBridge::Instance().DeviceReachableChanged(mCurrentDeviceData.id, false);
+            TEMPORARY_RETURN_IGNORED bridge::FabricBridge::Instance().DeviceReachableChanged(mCurrentDeviceData.id, false);
         }
     }
 

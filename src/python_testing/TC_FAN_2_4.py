@@ -35,7 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import random
 from typing import Any
 
@@ -45,8 +44,6 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_asserts import assert_valid_map8
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-
-logger = logging.getLogger(__name__)
 
 
 class TC_FAN_2_4(MatterBaseTest):
@@ -105,7 +102,7 @@ class TC_FAN_2_4(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kWind))
     async def test_TC_FAN_2_4(self):
         # Setup
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         valid_wind_support_range = range(1, 4)

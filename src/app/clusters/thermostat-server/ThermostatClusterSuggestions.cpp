@@ -192,7 +192,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
 
     // Re-evaluate the current thermostat suggestion.
-    delegate->ReEvaluateCurrentSuggestion();
+    TEMPORARY_RETURN_IGNORED delegate->ReEvaluateCurrentSuggestion();
 
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
@@ -227,8 +227,8 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
     MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
 
     // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
-    RemoveExpiredSuggestions(delegate);
-    delegate->ReEvaluateCurrentSuggestion();
+    TEMPORARY_RETURN_IGNORED RemoveExpiredSuggestions(delegate);
+    TEMPORARY_RETURN_IGNORED delegate->ReEvaluateCurrentSuggestion();
 
     commandObj->AddStatus(commandPath, Status::Success);
     return true;

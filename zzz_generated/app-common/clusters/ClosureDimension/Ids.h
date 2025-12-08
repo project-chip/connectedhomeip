@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ClosureDimension (cluster code: 261/0x04105)
+// Identifier constant values for cluster ClosureDimension (cluster code: 261/0x0105)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

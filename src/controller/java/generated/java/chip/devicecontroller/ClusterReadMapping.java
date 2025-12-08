@@ -7874,6 +7874,131 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readWaterTankLevelMonitoringInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWaterTankLevelMonitoringConditionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringConditionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readConditionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readWaterTankLevelMonitoringConditionCommandParams
+        );
+        result.put("readConditionAttribute", readWaterTankLevelMonitoringConditionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringDegradationDirectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringDegradationDirectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readDegradationDirectionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readWaterTankLevelMonitoringDegradationDirectionCommandParams
+        );
+        result.put("readDegradationDirectionAttribute", readWaterTankLevelMonitoringDegradationDirectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringChangeIndicationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringChangeIndicationAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readChangeIndicationAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readWaterTankLevelMonitoringChangeIndicationCommandParams
+        );
+        result.put("readChangeIndicationAttribute", readWaterTankLevelMonitoringChangeIndicationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringInPlaceIndicatorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringInPlaceIndicatorAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readInPlaceIndicatorAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readWaterTankLevelMonitoringInPlaceIndicatorCommandParams
+        );
+        result.put("readInPlaceIndicatorAttribute", readWaterTankLevelMonitoringInPlaceIndicatorAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readLastChangedTimeAttribute(
+              (ChipClusters.WaterTankLevelMonitoringCluster.LastChangedTimeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWaterTankLevelMonitoringClusterLastChangedTimeAttributeCallback(),
+          readWaterTankLevelMonitoringLastChangedTimeCommandParams
+        );
+        result.put("readLastChangedTimeAttribute", readWaterTankLevelMonitoringLastChangedTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringReplacementProductListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringReplacementProductListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readReplacementProductListAttribute(
+              (ChipClusters.WaterTankLevelMonitoringCluster.ReplacementProductListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWaterTankLevelMonitoringClusterReplacementProductListAttributeCallback(),
+          readWaterTankLevelMonitoringReplacementProductListCommandParams
+        );
+        result.put("readReplacementProductListAttribute", readWaterTankLevelMonitoringReplacementProductListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.WaterTankLevelMonitoringCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWaterTankLevelMonitoringClusterGeneratedCommandListAttributeCallback(),
+          readWaterTankLevelMonitoringGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readWaterTankLevelMonitoringGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.WaterTankLevelMonitoringCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWaterTankLevelMonitoringClusterAcceptedCommandListAttributeCallback(),
+          readWaterTankLevelMonitoringAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readWaterTankLevelMonitoringAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.WaterTankLevelMonitoringCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWaterTankLevelMonitoringClusterAttributeListAttributeCallback(),
+          readWaterTankLevelMonitoringAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readWaterTankLevelMonitoringAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readWaterTankLevelMonitoringFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readWaterTankLevelMonitoringFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWaterTankLevelMonitoringClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWaterTankLevelMonitoringClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readWaterTankLevelMonitoringClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readWaterTankLevelMonitoringClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readBooleanStateConfigurationInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readBooleanStateConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBooleanStateConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
@@ -20675,6 +20800,7 @@ public class ClusterReadMapping {
             put("groupcast", readGroupcastInteractionInfo());
             put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());
+            put("waterTankLevelMonitoring", readWaterTankLevelMonitoringInteractionInfo());
             put("booleanStateConfiguration", readBooleanStateConfigurationInteractionInfo());
             put("valveConfigurationAndControl", readValveConfigurationAndControlInteractionInfo());
             put("electricalPowerMeasurement", readElectricalPowerMeasurementInteractionInfo());

@@ -61,8 +61,7 @@ def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
         utc_native = desired_datetime
     # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
     utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
-    utc_th_us = int(utc_th_delta.total_seconds() * 1000000)
-    return utc_th_us
+    return int(utc_th_delta.total_seconds() * 1000000)
 
 
 def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
@@ -100,7 +99,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
         posix_time_ms: int, Unix timestamp in milliseconds since Jan 1, 1970
 
     Returns:
-        datetime: UTC datetime   
+        datetime: UTC datetime
 
     Examples:
         >>> utc_datetime_from_posix_time_ms(0)

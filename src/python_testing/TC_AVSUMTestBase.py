@@ -22,10 +22,21 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class AVSUMTestBase:
+    SPEC_PANMIN_MIN_VALUE = -180
+    SPEC_PANMIN_MAX_VALUE = 0
+    SPEC_PANMAX_MIN_VALUE = 1
+    SPEC_PANMAX_MAX_VALUE = 180
+    SPEC_TILTMIN_MIN_VALUE = -180
+    SPEC_TILTMIN_MAX_VALUE = 0
+    SPEC_TILTMAX_MIN_VALUE = 1
+    SPEC_TILTMAX_MAX_VALUE = 180
+    SPEC_ZOOMMAX_MIN_VALUE = 2
+    SPEC_ZOOMMAX_MAX_VALUE = 100
+
     has_feature_dptz = False
     has_feature_mpan = False
     has_feature_mtilt = False
@@ -235,7 +246,7 @@ class AVSUMTestBase:
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         if len(aAllocatedVideoStreams) > 0:
             return aAllocatedVideoStreams[0].videoStreamID
 

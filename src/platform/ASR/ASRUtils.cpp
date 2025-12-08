@@ -75,7 +75,7 @@ bool ASRUtils::IsStationProvisioned(void)
 {
     lega_wlan_wifi_conf stationConfig;
     bool stationConnected;
-    Internal::ASRUtils::IsStationConnected(stationConnected);
+    TEMPORARY_RETURN_IGNORED Internal::ASRUtils::IsStationConnected(stationConnected);
     return (asr_wifi_get_config(&stationConfig) == CHIP_NO_ERROR && stationConfig.ssid_len != 0) || stationConnected;
 }
 
@@ -284,7 +284,7 @@ CHIP_ERROR ASRUtils::asr_wifi_connect(void)
     memset(&conf, 0, sizeof(lega_wlan_init_type_t));
     conf.wifi_mode = STA;
     conf.dhcp_mode = WLAN_DHCP_CLIENT;
-    asr_wifi_get_config(&stationConfig);
+    TEMPORARY_RETURN_IGNORED asr_wifi_get_config(&stationConfig);
 
     strncpy((char *) conf.wifi_ssid, (char *) stationConfig.wifi_ssid, stationConfig.ssid_len);
 
