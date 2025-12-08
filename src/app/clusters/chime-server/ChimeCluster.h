@@ -44,7 +44,6 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    // Public methods for application usage (and legacy compatibility)
     Protocols::InteractionModel::Status SetSelectedChime(uint8_t chimeID);
     Protocols::InteractionModel::Status SetEnabled(bool enabled);
     uint8_t GetSelectedChime() const { return mSelectedChime; }
@@ -81,7 +80,7 @@ public:
      * @param name  A reference to the mutable char span which will be mutated to receive the chime sound name on success. Use
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error and the chime sound details were returned successfully,
-     * CHIP_ERROR_NOT_FOUND if the index is beyond the list of available chime sounds.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED. if the index is beyond the list of available chime sounds.
      *
      * Note: This is used by the SDK to populate the InstalledChimeSounds attribute. If the contents of this list change,
      * the device SHALL call the Instance’s ReportInstalledChimeSoundsChange method to report that this attribute has changed.
@@ -94,7 +93,7 @@ public:
      * gaps.
      * @param chimeID a reference to the uint8_t variable that is to contain the ChimeID value.
      * @return Returns a CHIP_NO_ERROR if there was no error and the ChimeID was returned successfully,
-     * CHIP_ERROR_NOT_FOUND if the index is beyond the list of available chime sounds.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is beyond the list of available chime sounds.
      *
      * Note: This is used by the SDK to help populate the InstalledChimeSounds attribute. If the contents of this list change,
      * the device SHALL call the Instance’s ReportInstalledChimeSoundsChange method to report that this attribute has changed.
@@ -114,7 +113,6 @@ protected:
 
     ChimeCluster * mChimeCluster = nullptr;
 
-    // sets the Chime Cluster pointer
     void SetChimeCluster(ChimeCluster * chimeCluster) { mChimeCluster = chimeCluster; }
     ChimeCluster * GetChimeCluster() const { return mChimeCluster; }
 };
