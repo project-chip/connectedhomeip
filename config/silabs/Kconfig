@@ -213,14 +213,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/silabs/CHIPPlatformConfig.h file.
-
 config CHIP_OPENTHREAD_JOINER_ENABLED
 	bool "Specify whether the Thread Joiner functionality is used when it is enabled"
 	default n

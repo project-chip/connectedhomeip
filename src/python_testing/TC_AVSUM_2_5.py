@@ -51,7 +51,7 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.5] MPTZSavePreset command validation"
 
     def steps_TC_AVSUM_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read and save the current value of MPTZPosition"),
             TestStep(3, "Read the value of MaxPresets, fail if unsupported."),
@@ -68,20 +68,18 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
             TestStep(14, "Repeatedly send MPTZSavePreset commands till the number of presets equals MaxPresets"),
             TestStep(15, "Save a new Preset via the MPTZSavePreset command, name 'newpreset-fail', do not provide a PresetID. Verify Resource Exhausted failure. End the test case."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_5(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_5(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

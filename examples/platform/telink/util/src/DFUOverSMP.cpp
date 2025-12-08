@@ -22,6 +22,7 @@
 #endif
 
 #include "OTAUtil.h"
+#include "Reboot.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -34,6 +35,14 @@
 #include <zephyr/mgmt/mcumgr/mgmt/mgmt.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
+static void reboot_work_handler(struct k_work * work)
+{
+    LOG_INF("[DFU] Start reboot!");
+    chip::DeviceLayer::Reboot(chip::DeviceLayer::SoftwareRebootReason::kUpdateVerificationFailed);
+}
+
+K_WORK_DELAYABLE_DEFINE(reboot_work, reboot_work_handler);
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -71,7 +80,8 @@ int32_t UploadConfirmHandler(uint32_t event, int32_t rc, bool * abort_more, void
     LOG_INF("[DFU] Image Uploaded!");
     if (GetDFUOverSMP().ProcessImageFooter() != CHIP_NO_ERROR)
     {
-        LOG_ERR("[DFU] Image footer verification failed!");
+        LOG_INF("[DFU] Footer verification failed! Invalid image deleted!");
+        k_work_schedule(&reboot_work, K_MSEC(200));
     }
 #ifndef CONFIG_ZEPHYR_VERSION_3_3
     return MGMT_CB_OK;
@@ -168,7 +178,7 @@ CHIP_ERROR DFUOverSMP::GetDFUImageFooter(OTAImageHeader & footer, const struct f
         return CHIP_ERROR_READ_FAILED;
     }
     chip::ByteSpan footer_raw(buffer.data(), buffer.size());
-    mHeaderParser.AccumulateAndDecode(footer_raw, footer);
+    TEMPORARY_RETURN_IGNORED mHeaderParser.AccumulateAndDecode(footer_raw, footer);
     mHeaderParser.Clear();
 
     return CHIP_NO_ERROR;
@@ -215,7 +225,8 @@ CHIP_ERROR DFUOverSMP::CheckDFUImageFooter(OTAImageHeader * imageHeader)
     }
     if (imageHeader->mSoftwareVersion <= softwareVersion)
     {
-        ConfigurationMgr().GetSoftwareVersionString(activeSoftwareVersionString, VERSION_STRING_MAX_LENGTH);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetSoftwareVersionString(activeSoftwareVersionString,
+                                                                             VERSION_STRING_MAX_LENGTH);
         memcpy(newSoftwareVersionString, imageHeader->mSoftwareVersionString.data(), imageHeader->mSoftwareVersionString.size());
         LOG_ERR("[DFU] Incorrect version of the update image!\nActive firmware version:\t %s\nUpdate version:\t %s",
                 newSoftwareVersionString, activeSoftwareVersionString);
@@ -255,6 +266,8 @@ CHIP_ERROR DFUOverSMP::ProcessImageFooter()
     }
     if (CheckDFUImageFooter(&imageFooter) != CHIP_NO_ERROR)
     {
+        LOG_INF("[DFU] Erase invalid image");
+        flash_area_erase(fa, 0, fa->fa_size);
         flash_area_close(fa);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

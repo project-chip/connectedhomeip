@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:175
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -463,16 +463,26 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ${{ matrix.os }}
 
         steps:
+            - name: Set up additional environment
+              run: |
+                echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
+            - name: Install ccache
+              run: |
+                brew install ccache
+            - name: Verify ccache installation
+              run: which ccache
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
@@ -484,51 +494,71 @@ jobs:
               with:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-
-            - name: Build Apps
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+            - name: Build Apps Using Unified Build
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            - name: Clean out
+              run: rm -rf out/
+            - name: Build Remaining Apps That Don't Support Unified Build
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                        --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
-
+            - name: ccache stats
+              run: ccache -s
+            - name: Clean out
+              run: rm -rf out/
             - name: Run Tests using the python parser sending commands to chip-tool
               # tests that failed macOS 15/26 last check: TestGroupMessaging,Test_TC_ACE_1_6,Test_TC_G_*,Test_TC_GRPKEY_*,Test_TC_S_*
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
-                     --chip-tool ./out/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./out/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./out/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-                     --ota-requestor-app ./out/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./out/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}/chip-bridge-app \
-                     --lit-icd-app ./out/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./out/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./out/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./out/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./out/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --all-clusters-app ./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --lit-icd-app ./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --microwave-oven-app ./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --network-manager-app ./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -537,13 +567,13 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
-                     --chip-tool ./out/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --all-clusters-app ./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Uploading core files
@@ -568,6 +598,18 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
@@ -584,7 +626,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -845,7 +887,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:

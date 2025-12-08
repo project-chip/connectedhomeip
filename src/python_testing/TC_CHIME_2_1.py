@@ -48,7 +48,7 @@ class TC_CHIME_2_1(MatterBaseTest, CHIMETestBase):
         return "[TC-CHIME-2.1] Attributes with DUT as Server"
 
     def steps_TC_CHIME_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read InstalledChimeSounds, verify list and field value conformance"),
             TestStep(3, "Verify that all of the ChimeIDs in InstalledChimeSounds are unique"),
@@ -56,19 +56,17 @@ class TC_CHIME_2_1(MatterBaseTest, CHIMETestBase):
             TestStep(5, "Read and verify SelectedChime attribute"),
             TestStep(6, "Read and verify Enabled attribute"),
         ]
-        return steps
 
     def pics_TC_CHIME_2_1(self) -> list[str]:
-        pics = [
+        return [
             "CHIME.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_1(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

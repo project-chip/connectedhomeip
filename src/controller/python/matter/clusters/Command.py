@@ -79,26 +79,24 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
 
 
 class AsyncCommandTransaction:
-    def __init__(self, future: Future, eventLoop, expectType: Type):
+    def __init__(self, future: Future, eventLoop, expectType: type[ClusterCommand] | None):
         self._event_loop = eventLoop
         self._future = future
         self._expect_type = expectType
 
     def _handleResponse(self, path: CommandPath, status: Status, response: bytes):
-        if (len(response) == 0):
+        if len(response) == 0:
             self._future.set_result(None)
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
-            if (self._expect_type is None):
+            if self._expect_type is None:
                 self._expect_type = FindCommandClusterObject(False, path)
 
             if self._expect_type:
                 try:
-                    self._future.set_result(
-                        self._expect_type.FromTLV(response))
+                    self._future.set_result(self._expect_type.FromTLV(response))
                 except Exception as ex:
-                    self._handleError(
-                        status, 0, ex)
+                    self._handleError(status, PyChipError.from_code(0), ex)
             else:
                 self._future.set_result(None)
 
@@ -107,47 +105,41 @@ class AsyncCommandTransaction:
         # checking `index`. We just share a callback API with batch commands. If we ever get a
         # second call to `handleResponse` we will see a different error on trying to set future
         # that has already been set.
-        self._event_loop.call_soon_threadsafe(
-            self._handleResponse, path, status, response)
+        self._event_loop.call_soon_threadsafe(self._handleResponse, path, status, response)
 
-    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
-        if exception:
-            self._future.set_exception(exception)
-        elif chipError != 0:
-            self._future.set_exception(chipError.to_exception())
-        else:
+    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception | None):
+        if chipError != 0:
+            exception = chipError.to_exception()
+        if exception is None:
             try:
                 # If you got an exception from this call other than AttributeError please
                 # add it to the except block below. We changed Exception->AttributeError as
                 # that is what we thought we are trying to catch here.
-                self._future.set_exception(
-                    InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus))
+                exception = InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus)
             except AttributeError:
-                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
-                self._future.set_exception(InteractionModelError(
-                    InteractionModelStatus.Failure, imError.ClusterStatus))
+                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure.", imError)
+                exception = InteractionModelError(InteractionModelStatus.Failure, imError.ClusterStatus)
+        self._future.set_exception(exception)
 
     def handleError(self, status: Status, chipError: PyChipError):
-        self._event_loop.call_soon_threadsafe(
-            self._handleError, status, chipError, None
-        )
+        self._event_loop.call_soon_threadsafe(self._handleError, status, chipError, None)
 
     def handleDone(self):
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
 
 class AsyncBatchCommandsTransaction:
-    def __init__(self, future: Future, eventLoop, expectTypes: List[Type]):
+    def __init__(self, future: Future, eventLoop, expectTypes: list[type[ClusterCommand] | None]):
         self._event_loop = eventLoop
         self._future = future
         self._expect_types = expectTypes
-        default_im_failure = InteractionModelError(
-            InteractionModelStatus.NoCommandResponse)
-        self._responses = [default_im_failure] * len(expectTypes)
+        default_im_failure = InteractionModelError(InteractionModelStatus.NoCommandResponse)
+        self._responses: list[ClusterCommand | InteractionModelError | None] = [default_im_failure] * len(expectTypes)
 
     def _handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
         if index > len(self._responses):
-            self._handleError(status, 0, IndexError(f"CommandSenderCallback has given us an unexpected index value {index}"))
+            self._handleError(status, PyChipError.from_code(0),
+                              IndexError(f"CommandSenderCallback has given us an unexpected index value {index}"))
             return
 
         if status.IMStatus != InteractionModelStatus.Success:
@@ -155,53 +147,47 @@ class AsyncBatchCommandsTransaction:
                 self._responses[index] = InteractionModelError(
                     InteractionModelStatus(status.IMStatus), status.ClusterStatus)
             except AttributeError as ex:
-                self._handleError(status, 0, ex)
-        elif (len(response) == 0):
+                self._handleError(status, PyChipError.from_code(0), ex)
+        elif len(response) == 0:
             self._responses[index] = None
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
-            if (self._expect_types[index] is None):
+            if self._expect_types[index] is None:
                 self._expect_types[index] = FindCommandClusterObject(False, path)
 
-            if self._expect_types[index]:
+            if expectType := self._expect_types[index]:
                 try:
                     # If you got an exception from this call other than AttributeError please
                     # add it to the except block below. We changed Exception->AttributeError as
                     # that is what we thought we are trying to catch here.
-                    self._responses[index] = self._expect_types[index].FromTLV(response)
+                    self._responses[index] = expectType.FromTLV(response)
                 except AttributeError as ex:
-                    self._handleError(status, 0, ex)
+                    self._handleError(status, PyChipError.from_code(0), ex)
             else:
                 self._responses[index] = None
 
     def handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
-        self._event_loop.call_soon_threadsafe(
-            self._handleResponse, path, index, status, response)
+        self._event_loop.call_soon_threadsafe(self._handleResponse, path, index, status, response)
 
-    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
+    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception | None):
         if self._future.done():
-            logger.exception(f"Recieved another error. Only expecting one error. imError:{imError}, chipError {chipError}")
+            logger.exception(f"Received another error. Only expecting one error. imError:{imError}, chipError {chipError}")
             return
-        if exception:
-            self._future.set_exception(exception)
-        elif chipError != 0:
-            self._future.set_exception(chipError.to_exception())
-        else:
+        if chipError != 0:
+            exception = chipError.to_exception()
+        if exception is None:
             try:
                 # If you got an exception from this call other than AttributeError please
                 # add it to the except block below. We changed Exception->AttributeError as
                 # that is what we thought we are trying to catch here.
-                self._future.set_exception(
-                    InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus))
+                exception = InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus)
             except AttributeError:
-                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
-                self._future.set_exception(InteractionModelError(
-                    InteractionModelStatus.Failure, imError.ClusterStatus))
+                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure.", imError)
+                exception = InteractionModelError(InteractionModelStatus.Failure, imError.ClusterStatus)
+        self._future.set_exception(exception)
 
     def handleError(self, status: Status, chipError: PyChipError):
-        self._event_loop.call_soon_threadsafe(
-            self._handleError, status, chipError, None
-        )
+        self._event_loop.call_soon_threadsafe(self._handleError, status, chipError, None)
 
     def _handleDone(self):
         # Future might already be set with exception from `handleError`
@@ -210,13 +196,11 @@ class AsyncBatchCommandsTransaction:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
-        self._event_loop.call_soon_threadsafe(
-            self._handleDone
-        )
+        self._event_loop.call_soon_threadsafe(self._handleDone)
 
 
 class TestOnlyAsyncBatchCommandsTransaction(AsyncBatchCommandsTransaction):
-    def __init__(self, future: Future, eventLoop, expectTypes: List[Type]):
+    def __init__(self, future: Future, eventLoop, expectTypes: list[type[ClusterCommand] | None]):
         self._responseMessageCount = 0
         super().__init__(future, eventLoop, expectTypes)
 
@@ -264,7 +248,8 @@ def _TestOnlyOnCommandSenderDoneCallback(closure, testOnlyDoneInfo: TestOnlyPyOn
     closure.handleDone()
 
 
-def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLoop, responseType, device, commandPath, payload):
+def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLoop,
+                                                         responseType: type[ClusterCommand] | None, device, commandPath, payload):
     ''' ONLY TO BE USED FOR TEST: Sends the payload with a TimedRequest flag but no TimedInvoke transaction
     '''
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
@@ -285,7 +270,8 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
         ))
 
 
-async def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
+async def SendCommand(future: Future, eventLoop, responseType: type[ClusterCommand] | None,
+                      device, commandPath: CommandPath, payload: ClusterCommand,
                       timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None,
                       busyWaitMs: Union[None, int] = None, suppressResponse: Union[None, bool] = None, allowLargePayload: Union[None, bool] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
@@ -322,7 +308,8 @@ async def SendCommand(future: Future, eventLoop, responseType: Type, device, com
         ))
 
 
-def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTimeoutMs: Optional[int], responseTypes, suppressTimedRequestMessage: bool = False) -> List[PyInvokeRequestData]:
+def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTimeoutMs: Optional[int],
+                              responseTypes: list[type[ClusterCommand] | None], suppressTimedRequestMessage: bool = False) -> List[PyInvokeRequestData]:
     numberOfCommands = len(commands)
     pyBatchCommandsDataArrayType = PyInvokeRequestData * numberOfCommands
     pyBatchCommandsData = pyBatchCommandsDataArrayType()
@@ -377,7 +364,7 @@ async def SendBatchCommands(future: Future, eventLoop, device, commands: List[In
     '''
     handle = GetLibraryHandle()
 
-    responseTypes: List[Type] = []
+    responseTypes: list[type[ClusterCommand] | None] = []
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs, responseTypes)
 
     transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
@@ -412,7 +399,7 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[
 
     handle = GetLibraryHandle()
 
-    responseTypes: List[Type] = []
+    responseTypes: list[type[ClusterCommand] | None] = []
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs,
                                                     responseTypes, suppressTimedRequestMessage=suppressTimedRequestMessage)
 

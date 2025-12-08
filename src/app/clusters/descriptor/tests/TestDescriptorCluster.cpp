@@ -15,7 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/descriptor/descriptor-cluster.h>
+#include <app/clusters/descriptor/DescriptorCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -55,7 +55,7 @@ TEST_F(TestDescriptorCluster, AttributesTest)
     DescriptorCluster cluster(1, DescriptorCluster::OptionalAttributesSet(0), {});
     ConcreteClusterPath descriptorPath = ConcreteClusterPath(1, Descriptor::Id);
 
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;

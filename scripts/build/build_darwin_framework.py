@@ -27,6 +27,7 @@ def get_file_from_pigweed(name):
     for filename in glob.glob(pattern, recursive=True):
         if os.path.isfile(filename):
             return filename
+    return None
 
 
 def run_command(command):

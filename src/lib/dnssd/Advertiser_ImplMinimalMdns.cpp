@@ -574,6 +574,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
+    // This message is used as a marker for when the application process has started.
+    // It is watched for by the YAML test toolkit. See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
                     StringOrNullMarker(instanceName.names[2]));
 
@@ -785,6 +787,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
+    // This message is used as a marker for when the application process has started.
+    // It is watched for by the YAML test toolkit. See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
                     StringOrNullMarker(instanceName.names[2]));
 

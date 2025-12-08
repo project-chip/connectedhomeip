@@ -79,7 +79,8 @@ distDir = os.path.abspath(args.dist_dir)
 # for the installable package.
 tmpDir = os.path.join(buildDir, "matter-wheel-components")
 
-manifest = json.load(open(manifestFile, "r"))
+with open(manifestFile) as f:
+    manifest = json.load(f)
 
 try:
 

@@ -42,6 +42,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_ACL_2_8(MatterBaseTest):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
@@ -109,11 +111,11 @@ class TC_ACL_2_8(MatterBaseTest):
         if hasattr(self, controller_name):
             try:
                 controller = getattr(self, controller_name)
-                logging.info(f"Shutting down {controller_name.upper()} controller")
+                log.info(f"Shutting down {controller_name.upper()} controller")
                 await controller.Shutdown()
                 delattr(self, controller_name)
             except Exception as e:
-                logging.warning(f"Error cleaning up {controller_name.upper()}: {e}")
+                log.warning(f"Error cleaning up {controller_name.upper()}: {e}")
 
     def _verify_acl_event(
             self,
@@ -145,12 +147,11 @@ class TC_ACL_2_8(MatterBaseTest):
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered, force_legacy_encoding):
         """Helper method to validate events for a controller"""
-        logging.info(f"Found {len(events)} events for {controller_name}")
+        log.info(f"Found {len(events)} events for {controller_name}")
 
         # We expect to see two events with the expected fabric index if not using legacy encoding
         # We expect to see one event with the expected fabric index if using legacy encoding
@@ -160,7 +161,7 @@ class TC_ACL_2_8(MatterBaseTest):
         found_other_event = False
 
         for event in events:
-            logging.info(f"Examining event: {str(event)}")
+            log.info(f"Examining event: {str(event)}")
             if hasattr(event, 'Data') and hasattr(event.Data, 'fabricIndex'):
                 # If this is an event for the expected fabric
                 if event.Data.fabricIndex == expected_fabric_index:
@@ -216,7 +217,7 @@ class TC_ACL_2_8(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info(f"CurrentFabricIndex F1 {str(f1)}")
+        log.info(f"CurrentFabricIndex F1 {str(f1)}")
 
         self.step(3)
         # Open commissioning window with TH1
@@ -236,7 +237,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(4)
         # Read CurrentFabricIndex for TH2
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info(f"CurrentFabricIndex F2 {str(f2)}")
+        log.info(f"CurrentFabricIndex F2 {str(f2)}")
 
         self.step(5)
         # TH1 writes ACL attribute
@@ -286,7 +287,7 @@ class TC_ACL_2_8(MatterBaseTest):
         acl_list_filtered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr
         )
-        logging.info("TH1 read ACL result (fabricFiltered=True): %s", str(acl_list_filtered))
+        log.info("TH1 read ACL result (fabricFiltered=True): %s", str(acl_list_filtered))
 
         asserts.assert_equal(
             len(acl_list_filtered), 1, "Should have exactly one ACL entry when fabric filtered")
@@ -312,7 +313,7 @@ class TC_ACL_2_8(MatterBaseTest):
             dev_ctrl=self.th1, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
             fabric_filtered=False
         )
-        logging.info("TH1 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
+        log.info("TH1 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
         asserts.assert_greater(len(acl_list_unfiltered), 1, "Should have at least two ACL entries when not fabric filtered")
         # Check non-accessing fabric entry is empty because data leaks are bad
         for entry in acl_list_unfiltered:
@@ -333,7 +334,7 @@ class TC_ACL_2_8(MatterBaseTest):
         acl_list_filtered = await self.read_single_attribute_check_success(
             dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr
         )
-        logging.info("TH2 read ACL result (fabric_filtered=True): %s", str(acl_list_filtered))
+        log.info("TH2 read ACL result (fabric_filtered=True): %s", str(acl_list_filtered))
 
         asserts.assert_equal(
             len(acl_list_filtered), 1, "Should have exactly one ACL entry when fabric filtered")
@@ -360,7 +361,7 @@ class TC_ACL_2_8(MatterBaseTest):
             dev_ctrl=self.th2, endpoint=0, cluster=ac_cluster, attribute=acl_attr,
             fabric_filtered=False
         )
-        logging.info("TH2 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
+        log.info("TH2 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
         asserts.assert_greater(len(acl_list_unfiltered), 1, "Should have at least two ACL entries when not fabric filtered")
         # Check non-accessing fabric entry is empty because data leaks are bad
         for entry in acl_list_unfiltered:
@@ -510,15 +511,18 @@ class TC_ACL_2_8(MatterBaseTest):
          # Re-running test using the legacy list writing mechanism
         if not force_legacy_encoding:
             self.step(11)
-            logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
+            log.info("*** Rerunning test using the legacy list writing mechanism now ***")
         else:
             self.skip_step(11)
 
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
 
+    def pics_TC_ACL_2_8(self) -> list[str]:
+        return ['ACL.S']
+
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID N1",
                      "DUT is commissioned on TH1 fabric", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -542,7 +546,6 @@ class TC_ACL_2_8(MatterBaseTest):
             TestStep(11, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                      "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_8(self):
@@ -550,7 +553,7 @@ class TC_ACL_2_8(MatterBaseTest):
         await self.internal_test_TC_ACL_2_8(force_legacy_encoding=False)
 
         # --- Simplified cleanup between test runs ---
-        logging.info("Cleaning up fabrics between test runs")
+        log.info("Cleaning up fabrics between test runs")
 
         # First, clean up TH1 and TH2 controllers
         await self._shutdown_controller('th1')
@@ -558,7 +561,7 @@ class TC_ACL_2_8(MatterBaseTest):
 
         # Reset step counter and run second test with legacy encoding
         self.current_step_index = 0
-        logging.info("Starting second test run with legacy encoding")
+        log.info("Starting second test run with legacy encoding")
         await self.internal_test_TC_ACL_2_8(force_legacy_encoding=True)
 
 

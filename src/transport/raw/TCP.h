@@ -202,6 +202,10 @@ public:
      */
     void CloseActiveConnections();
 
+#if INET_CONFIG_TEST
+    static bool sForceFailureInDoHandleIncomingConnection;
+#endif
+
 private:
     // Allow tests to access private members.
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
