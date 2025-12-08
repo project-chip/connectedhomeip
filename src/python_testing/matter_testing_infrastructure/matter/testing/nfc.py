@@ -391,11 +391,6 @@ def _write_ndef_record(connection, record):
         offset += chunk_len
 
 
-async def wait_for_threading_event(event, poll_interval=0.1):
-    while not event.is_set():
-        await asyncio.sleep(poll_interval)
-
-
 class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     """
     Observer class to handle tag (NFC) events.
@@ -430,6 +425,7 @@ class TagMonitorManager:
         self.tag_monitor = None
         self.observer = None
         self._stop_event = threading.Event()
+        self._async_stop_event = None  # Will be set in activate()
         self._thread = None
 
     def _monitoring_thread(self):
@@ -438,18 +434,24 @@ class TagMonitorManager:
         self.tag_monitor.addObserver(self.observer)
         log.info("Start monitoring NFC tags")
         try:
-            while not self._stop_event.is_set():
-                time.sleep(0.1)
+            # Wait until stop event is set
+            self._stop_event.wait()
         finally:
             self.tag_monitor.deleteObserver(self.observer)
             log.info("Stopped monitoring NFC tags")
+            # Signal the async event when thread is done
+            if self._async_stop_event is not None:
+                loop = self._async_stop_event._loop
+                if loop.is_running():
+                    loop.call_soon_threadsafe(self._async_stop_event.set)
 
     async def activate(self):
         self._stop_event.clear()
+        self._async_stop_event = asyncio.Event()
         self._thread = threading.Thread(target=self._monitoring_thread, daemon=True)
         self._thread.start()
-        # Return control to the caller, but keep this coroutine alive until deactivation
-        await wait_for_threading_event(self._stop_event)
+        # Wait for the async event to be set
+        await self._async_stop_event.wait()
         # After deactivation, join the thread to ensure cleanup
         if self._thread is not None:
             self._thread.join()
