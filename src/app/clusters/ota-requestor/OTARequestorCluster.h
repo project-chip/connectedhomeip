@@ -65,10 +65,6 @@ public:
     // This is intended to be used only for backwards compatibility with the codegen data model provider.
     void SetOtaRequestor(OTARequestorInterface * otaRequestor) { mOtaRequestor = otaRequestor; }
 
-protected:
-    // Returns the OTA requestor instance to use internally. Defaults to the instance passed into the constructor.
-    virtual OTARequestorInterface * OtaRequestorInstance() { return mOtaRequestor; }
-
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 

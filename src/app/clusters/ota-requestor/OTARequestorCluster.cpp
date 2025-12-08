@@ -49,18 +49,18 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
                  mPath.mEndpointId);
 #endif
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (OtaRequestorInstance())
+    if (mOtaRequestor)
     {
-        return OtaRequestorInstance()->RegisterEventHandler(mEventHandlerRegistration);
+        return mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration);
     }
     return CHIP_NO_ERROR;
 }
 
 void OTARequestorCluster::Shutdown()
 {
-    if (OtaRequestorInstance())
+    if (mOtaRequestor)
     {
-        SuccessOrLog(OtaRequestorInstance()->UnregisterEventHandler(mPath.mEndpointId), SoftwareUpdate,
+        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId), SoftwareUpdate,
                      "Unable to unregister event handling for endpoint %u during shutdown", mPath.mEndpointId);
     }
     DefaultServerCluster::Shutdown();
@@ -72,7 +72,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
-        if (!OtaRequestorInstance())
+        if (!mOtaRequestor)
         {
             // There are examples which enable the OTA requestor cluster in their zap configuration but don't
             // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
@@ -84,7 +84,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
 #endif
         }
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            ProviderLocationList::Iterator providerIterator = OtaRequestorInstance()->GetDefaultOTAProviderListIterator();
+            ProviderLocationList::Iterator providerIterator = mOtaRequestor->GetDefaultOTAProviderListIterator();
             CHIP_ERROR error                                = CHIP_NO_ERROR;
             while (error == CHIP_NO_ERROR && providerIterator.Next())
             {
@@ -96,7 +96,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
         return encoder.Encode(mUpdatePossible);
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-        if (!OtaRequestorInstance())
+        if (!mOtaRequestor)
         {
             // There are examples which enable the OTA requestor cluster in their zap configuration but don't
             // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
@@ -107,9 +107,9 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
             return encoder.Encode(OtaSoftwareUpdateRequestor::UpdateStateEnum::kUnknown);
 #endif
         }
-        return encoder.Encode(OtaRequestorInstance()->GetCurrentUpdateState());
+        return encoder.Encode(mOtaRequestor->GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
-        if (!OtaRequestorInstance())
+        if (!mOtaRequestor)
         {
             // There are examples which enable the OTA requestor cluster in their zap configuration but don't
             // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
@@ -120,7 +120,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
             return encoder.EncodeNull();
 #endif
         }
-        return encoder.Encode(OtaRequestorInstance()->GetCurrentUpdateStateProgress());
+        return encoder.Encode(mOtaRequestor->GetCurrentUpdateStateProgress());
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:
@@ -157,7 +157,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     switch (request.path.mCommandId)
     {
     case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
-        if (!OtaRequestorInstance())
+        if (!mOtaRequestor)
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -171,7 +171,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                          static_cast<unsigned>(kMaxMetadataLen));
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        OtaRequestorInstance()->HandleAnnounceOTAProvider(handler, request.path, data);
+        mOtaRequestor->HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
     default:
@@ -215,7 +215,7 @@ void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t byt
 
 CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    chip::OTARequestorInterface * requestor = OtaRequestorInstance();
+    chip::OTARequestorInterface * requestor = mOtaRequestor;
     if (requestor == nullptr)
     {
         return CHIP_ERROR_INTERNAL;
