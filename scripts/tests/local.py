@@ -1311,8 +1311,8 @@ def chip_tool_tests(
     for target in _get_targets(coverage):
         cmd.extend(_specify_target_path(target, runner))
 
-        # NOTE: we allow all runs here except extra slow
-        #       This means our timeout is quite large
+    # NOTE: we allow all runs here except extra slow
+    #       This means our timeout is quite large
     cmd.extend(["--test-timeout-seconds", "300"])
 
     if expected_failures is not None:
