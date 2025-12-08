@@ -464,6 +464,7 @@ class PushAvServer:
         # HTTP APIs
         self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
         self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
+        self.router.add_api_route("/sessions", self.list_sessions, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
 
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}.{ext}", self.handle_upload, methods=["PUT"])
