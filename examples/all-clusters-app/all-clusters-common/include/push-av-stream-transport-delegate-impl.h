@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/util/config.h>
 #include <vector>
 

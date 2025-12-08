@@ -157,8 +157,7 @@ class EventSubscriptionHandler:
             if event.Header.EventId == event_type.event_id:
                 LOGGER.info(f"Event {event_type.__name__} received: {event}")
                 return event.Data
-            else:
-                LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
+            LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
 
     def get_last_event(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) event only."""
@@ -238,7 +237,7 @@ class AttributeSubscriptionHandler:
         if self._expected_attribute is not None:
             attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
-            nodeid=node_id,
+            nodeId=node_id,
             attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,

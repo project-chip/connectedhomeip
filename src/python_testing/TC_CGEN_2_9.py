@@ -45,6 +45,8 @@ from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_CGEN_2_9(MatterBaseTest):
 
@@ -56,7 +58,7 @@ class TC_CGEN_2_9(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
-        logging.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
+        log.info(f"Commissioner's fabricIndex on DUT: {commissioner_fabric_index_on_dut}")
 
         fabrics: list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
             dev_ctrl=commissioner,
@@ -65,7 +67,7 @@ class TC_CGEN_2_9(MatterBaseTest):
             attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
             fabricFiltered=False)
 
-        logging.info(f"Fabrics table on DUT: {fabrics}")
+        log.info(f"Fabrics table on DUT: {fabrics}")
 
         # Re-order the list of fabrics so that the test harness admin fabric is removed last
         commissioner_fabric = next((fabric for fabric in fabrics if fabric.fabricIndex == commissioner_fabric_index_on_dut), None)
@@ -73,9 +75,9 @@ class TC_CGEN_2_9(MatterBaseTest):
         fabrics.append(commissioner_fabric)
 
         for fabric in fabrics:
-            logging.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
+            log.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
             response: Clusters.OperationalCredentials.Commands.NOCResponse = await commissioner.SendCommand(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 endpoint=ROOT_ENDPOINT_ID,
                 payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabric.fabricIndex),
             )
@@ -120,7 +122,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         await self.commission_devices()
 
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
                 expiryLengthSeconds=failsafe_expiry_length_seconds, breadcrumb=1),
@@ -134,7 +136,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 2: Send SetTCAcknowledgements
         self.step(2)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
                 TCVersion=tc_version_to_simulate, TCUserResponse=tc_user_response_to_simulate
@@ -155,7 +157,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 4: Send CommissioningComplete
         self.step(4)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )
@@ -172,7 +174,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         await self.remove_commissioner_fabric()
 
         # Close the commissioner session with the device to clean up resources
-        commissioner.MarkSessionDefunct(nodeid=self.dut_node_id)
+        commissioner.MarkSessionDefunct(nodeId=self.dut_node_id)
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
@@ -192,7 +194,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 8: Verify CommissioningComplete fails
         self.step(8)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )

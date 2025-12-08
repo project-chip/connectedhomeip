@@ -48,7 +48,7 @@ void MTROTAUnsolicitedBDXMessageHandler::Shutdown()
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturn(mExchangeMgr != nullptr);
-    mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+    TEMPORARY_RETURN_IGNORED mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
 
     VerifyOrReturn(mOTAImageTransferHandler != nullptr);
 

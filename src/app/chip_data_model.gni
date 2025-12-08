@@ -182,6 +182,9 @@ template("chip_data_model") {
     if (!defined(sources)) {
       sources = []
     }
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
 
     if (!defined(is_server)) {
       is_server = false
@@ -193,16 +196,11 @@ template("chip_data_model") {
       "${_app_root}/clusters/groups-server/groups-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneTable.h",
-      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
-      "${_app_root}/clusters/scenes-server/scenes-server.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/privilege-storage.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
     sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
@@ -289,6 +287,7 @@ template("chip_data_model") {
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/data-model-provider",
       "${chip_root}/src/app/persistence",
       "${chip_root}/src/app/persistence:default",
       "${chip_root}/src/app/server",

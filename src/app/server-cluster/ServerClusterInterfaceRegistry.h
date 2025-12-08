@@ -58,7 +58,10 @@ struct RegisteredServerCluster
     {}
 
     [[nodiscard]] constexpr ServerClusterRegistration & Registration() { return registration; }
+    [[nodiscard]] constexpr const ServerClusterRegistration & Registration() const { return registration; }
+
     [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return cluster; }
+    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const { return cluster; }
 
 private:
     SERVER_CLUSTER cluster;
@@ -155,6 +158,11 @@ public:
     // Set up the underlying context for all clusters that are managed by this registry.
     //
     // The values within context will be moved and used as-is.
+    //
+    // Returns:
+    //   - CHIP_NO_ERROR on success
+    //   - CHIP_ERROR_HAD_FAILURES if some cluster `Startup` calls had errors (Startup
+    //     will be called for all clusters).
     CHIP_ERROR SetContext(ServerClusterContext && context);
 
     // Invalidates current context.

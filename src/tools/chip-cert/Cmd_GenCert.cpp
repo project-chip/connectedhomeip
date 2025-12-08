@@ -349,7 +349,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             {
                 gCertType = CertType::kNetworkIdentity;
                 gSelfSign = true;
-                gSubjectDN.AddAttribute_CommonName("*"_span, false);
+                TEMPORARY_RETURN_IGNORED gSubjectDN.AddAttribute_CommonName("*"_span, false);
                 // Not Before Jan 1 00:00:01 2000 GMT
                 gValidFrom         = { 0 };
                 gValidFrom.tm_year = (2000 - 1900);

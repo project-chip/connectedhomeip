@@ -20,7 +20,9 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 } // namespace
 
-GroupcastCluster::GroupcastCluster() : DefaultServerCluster({ kRootEndpointId, Groupcast::Id }) {}
+GroupcastCluster::GroupcastCluster(BitFlags<Groupcast::Feature> features) :
+    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mLogic(features)
+{}
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)
@@ -63,7 +65,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroup::DecodableType data;
         Groupcast::Commands::LeaveGroupResponse::Type response;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        mLogic.LeaveGroup(fabric_index, data, response);
+        TEMPORARY_RETURN_IGNORED mLogic.LeaveGroup(fabric_index, data, response);
         handler->AddResponse(request.path, response);
         return std::nullopt;
     }

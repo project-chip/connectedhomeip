@@ -168,8 +168,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     else if (event->Type == kPlatformNxpStartWlanInitWaitTimerEvent)
     {
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler,
-                                              (void *) event->Platform.pNetworkDataEvent);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler, (void *) event->Platform.pNetworkDataEvent);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
@@ -270,7 +270,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
         }
         err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(err);
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
     }
@@ -291,7 +291,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 #endif
         }
         err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(err);
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
     }
@@ -399,6 +399,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         {
             sInstance._SetWiFiStationState(kWiFiStationState_Connecting_Succeeded);
             sInstance._SetWiFiStationState(kWiFiStationState_Connected);
+            NetworkCommissioning::NXPWiFiDriver::GetInstance().OnNetworkStatusChange();
             NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kSuccess,
                                                                                     CharSpan(), wlanEvent);
             sInstance.OnStationConnected();
@@ -471,7 +472,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
          */
         if (mWiFiStationState == kWiFiStationState_Connecting_Failed)
         {
-            NetworkCommissioning::NXPWiFiDriver::GetInstance().RevertConfiguration();
+            TEMPORARY_RETURN_IGNORED NetworkCommissioning::NXPWiFiDriver::GetInstance().RevertConfiguration();
             mWifiIsProvisioned = false;
         }
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
@@ -484,7 +485,39 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 
     case WLAN_REASON_INITIALIZED:
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-        sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
+        TEMPORARY_RETURN_IGNORED sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
+        if (mIsWifiRecovering)
+        {
+            /*
+            Wifi recovery mechanism (due to firmware hang) is finished, we will attempt to reconnect to the previously staged
+            network
+            */
+            mIsWifiRecovering = false;
+            CHIP_ERROR err    = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWiFiStagedNetwork();
+            if (err == CHIP_ERROR_KEY_NOT_FOUND)
+            {
+                /* if no SSID is staged, notify the network commissioning module to clean environnement for next commissioning  */
+                NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(
+                    NetworkCommissioning::Status::kNetworkIDNotFound, CharSpan(), wlanEvent);
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to reconnect to staged network after WiFi FW recovery: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+        break;
+
+    case WLAN_REASON_FW_HANG:
+        /*
+         If the Wifi driver hangs, a recovery mechanism has been triggered. This mechanism will end with re-initializing the wifi
+         driver. If the wifi state is different from kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting, we want to
+         retry the wifi connection once the driver is re-initialized.
+        */
+        if (mWiFiStationState != kWiFiStationState_NotConnected && mWiFiStationState != kWiFiStationState_Disconnecting)
+        {
+            mIsWifiRecovering = true;
+        }
         break;
 
     default:
@@ -604,8 +637,8 @@ void ConnectivityManagerImpl::BrHandleStateChange()
             mThreadNetIf      = tmpThrIf;
             mBorderRouterInit = true;
 
-            DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
-            chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+            TEMPORARY_RETURN_IGNORED chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
 
             BrInitAppLock(LockThreadStack, UnlockThreadStack);
             BrInitPlatform(ThreadStackMgrImpl().OTInstance(), extNetIfPtr, thrNetIfPtr);

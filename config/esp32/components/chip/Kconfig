@@ -32,7 +32,7 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active CHIP exchange contexts.
-                                           
+
                 An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
@@ -257,6 +257,14 @@ menu "CHIP Core"
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 
+        config USE_LWIP_PBUF_RAM_PACKETBUFFER
+            bool "Use lwIP PBUF_RAM type for CHIP packet buffer"
+            default n
+            help
+                Enable this option to use lwIP PBUF_RAM type for CHIP packet buffer. Configure via
+                MAX_LARGE_BUFFER_SIZE_BYTES to support larger packets exceeding IPv6 MTU.
+                If not enabled, CHIP will use lwIP PBUF_POOL type for packet buffer.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -285,8 +293,8 @@ menu "CHIP Core"
             depends on ENABLE_OTA_REQUESTOR
             default n
             help
-                Enable this option for delta OTA image updates. 
-                Delta OTA updates allow for smaller, more efficient updates by only 
+                Enable this option for delta OTA image updates.
+                Delta OTA updates allow for smaller, more efficient updates by only
                 sending the changes between the current and new firmware versions.
 
         config OTA_AUTO_REBOOT_ON_APPLY
@@ -1161,7 +1169,7 @@ menu "CHIP Device Layer"
             int "MRP local active retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the active state.
 
@@ -1177,7 +1185,7 @@ menu "CHIP Device Layer"
             int "MRP local idle retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the idle state.
 
@@ -1193,7 +1201,7 @@ menu "CHIP Device Layer"
             int "MRP retransmission delta timeout for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 500
+            default 1500
             help
                 A constant value added to the calculated retransmission timeout.
 
@@ -1211,6 +1219,23 @@ menu "CHIP Device Layer"
             default 4
             help
                 The maximum number of retransmissions before giving up.
+
+    endmenu
+
+    menu "Matter TCP transport options"
+        config ENABLE_TCP_TRANSPORT
+            bool "Enable TCP transport"
+            select USE_LWIP_PBUF_RAM_PACKETBUFFER
+            default n
+            help
+                Enable TCP transport. If enabled, USE_LWIP_PBUF_RAM_PACKETBUFFER must be configured.
+
+        config MAX_LARGE_BUFFER_SIZE_BYTES
+            int "Max buffer size for TCP payloads"
+            depends on ENABLE_TCP_TRANSPORT
+            default 1530
+            help
+                Max TCP payload buffer size.
 
     endmenu
 

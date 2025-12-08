@@ -52,6 +52,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/global_stash.py",
     "matter/testing/matchers.py",
     "matter/testing/matter_asserts.py",
+    "matter/testing/matter_nfc_interaction.py",
     "matter/testing/matter_stack_state.py",
     "matter/testing/matter_test_config.py",
     "matter/testing/matter_testing.py",
@@ -69,6 +70,15 @@ pw_python_package("matter-testing-module") {
     "matter/testing/test_tasks.py",
     "matter/testing/test_matter_asserts.py",
   ]
+}
+
+pw_zip("data_model_zip_1_1") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_1) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.1/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_1.zip"
 }
 
 pw_zip("data_model_zip_1_2") {
@@ -136,6 +146,7 @@ pw_python_distribution("matter-testing") {
   }
 
   public_deps = [
+    ":data_model_zip_1_1",
     ":data_model_zip_1_2",
     ":data_model_zip_1_3",
     ":data_model_zip_1_4",
@@ -145,6 +156,7 @@ pw_python_distribution("matter-testing") {
   ]
 
   extra_files = [
+    "${root_out_dir}/data_model/zip_1_1.zip > matter/testing/data_model/1.1/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_2.zip > matter/testing/data_model/1.2/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_3.zip > matter/testing/data_model/1.3/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4.zip > matter/testing/data_model/1.4/allfiles.zip",

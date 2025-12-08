@@ -45,7 +45,6 @@ _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
     "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
     "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
-    "rootnode_onofflight_samplemei",  # not actively developed,
     "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
@@ -69,30 +68,27 @@ def splash() -> None:
 
 
 def load_config() -> None:
-    config = dict()
-    config["nrfconnect"] = dict()
-    config["esp32"] = dict()
-    config["silabs-thread"] = dict()
-    config["ameba"] = dict()
-    config["telink"] = dict()
+    config = {}
+    config["nrfconnect"] = {}
+    config["esp32"] = {}
+    config["silabs-thread"] = {}
+    config["ameba"] = {}
+    config["telink"] = {}
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
-        configStream = open(configFile, 'r')
-        config = yaml.load(configStream, Loader=yaml.SafeLoader)
-        configStream.close()
+        with open(configFile) as f:
+            config = yaml.load(f, Loader=yaml.SafeLoader)
     else:
         flush_print("Running for the first time and configuring config.yaml. " +
                     "Change this configuration file to include correct configuration " +
                     "for the vendor's SDK")
-        configStream = open(configFile, 'w')
         config["nrfconnect"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
         config["nrfconnect"]["ZEPHYR_SDK_INSTALL_DIR"] = os.environ.get(
             'ZEPHYR_SDK_INSTALL_DIR')
         config["nrfconnect"]["TTY"] = None
         config["esp32"]["IDF_PATH"] = os.environ.get('IDF_PATH')
         config["esp32"]["TTY"] = None
-        config["silabs-thread"]["GECKO_SDK"] = f"{
-            _REPO_BASE_PATH}third_party/efr32_sdk/repo"
+        config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
         config["silabs-thread"]["SILABS_BOARD"] = None
@@ -105,9 +101,9 @@ def load_config() -> None:
             'TELINK_ZEPHYR_SDK_DIR')
         config["telink"]["TTY"] = None
 
-        flush_print(yaml.dump(config))
-        yaml.dump(config, configStream)
-        configStream.close()
+        with open(configFile, 'w') as f:
+            flush_print(yaml.dump(config))
+            yaml.dump(config, f)
 
     return config
 
@@ -121,8 +117,7 @@ def check_python_version() -> None:
 
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
-        config = json.loads(config_file.read())
-    return config
+        return json.loads(config_file.read())
 
 
 def flush_print(
@@ -431,8 +426,7 @@ def main() -> int:
                     f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            command = f"./chef.py -cbr -d {
-                device_name} -t {options.build_target}"
+            command = f"./chef.py -cbr -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
@@ -472,7 +466,7 @@ def main() -> int:
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
                         continue
-                    elif options.build_include and not re.search(options.build_include, archive_name):
+                    if options.build_include and not re.search(options.build_include, archive_name):
                         continue
                     if options.dry_run:
                         flush_print(archive_name)
@@ -717,8 +711,7 @@ def main() -> int:
             if len(sw_ver_string) >= 64:
                 truncated_sw_ver_string = f"""{branch[:22]}:{commit_id}"""
                 flush_print(
-                    f"Truncate the software version string from \"{
-                        sw_ver_string}\" to "
+                    f"Truncate the software version string from \"{sw_ver_string}\" to "
                     f"\"{truncated_sw_ver_string}\" due to 64 bytes limitation")
                 sw_ver_string = truncated_sw_ver_string
 
@@ -763,8 +756,7 @@ def main() -> int:
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
-                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{
-                    options.sample_device_type_name}.tar.xz "
+                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz "
                 f"--files-from=chip-shell.flashbundle.txt)")
             shell.run_cmd(
                 f"cp build/$(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz {_CHEF_SCRIPT_PATH}")
@@ -850,8 +842,7 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
                 shell.run_cmd("rm -f project_include.mk")
-                cmd = f"{config['ameba']['AMEBA_SDK']
-                         }/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk"
+                cmd = f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk"
                 with open(cmd, "w") as f:
                     f.write(textwrap.dedent(f"""\
                         SAMPLE_NAME = {options.sample_device_type_name}
@@ -1014,8 +1005,7 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux")
                 shell.run_cmd((
-                    f"{config['ameba']['AMEBA_SDK']
-                       }/tools/AmebaD/Image_Tool_Linux/flash.sh "
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh "
                     f"{config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}"
                     f"/project/realtek_amebaD_va0_example/GCC-RELEASE/out"
                 ), raise_on_returncode=False)
@@ -1024,8 +1014,7 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
                 shell.run_cmd((
-                    f"{config['ameba']['AMEBA_SDK']
-                       }/tools/AmebaZ2/Image_Tool_Linux/flash.sh "
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh "
                     f"{config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}"
                     f"/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin"
                 ), raise_on_returncode=False)
