@@ -20,11 +20,13 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-
 namespace {
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters::Identify;
+using chip::app::Clusters::ChimeServer;
+
 ChimeServer * firstChimeServer = nullptr;
 
 inline void RegisterChimeServer(ChimeServer * inst)
@@ -105,9 +107,8 @@ void ChimeServer::ReportInstalledChimeSoundsChange()
     mCluster.Cluster().ReportInstalledChimeSoundsChange();
 }
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void MatterChimeClusterInitCallback(EndpointId endpointId){}
+void MatterChimeClusterShutdownCallback(EndpointId endpointId) {}
 
 // Stub callbacks for ZAP generated code
 void MatterChimePluginServerInitCallback() {}
