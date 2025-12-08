@@ -247,6 +247,15 @@ public:
     /// a clear decision if the callback should or should not be invoked.
     virtual CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) = 0;
 
+    /// Caches the peerId's address
+    ///
+    /// Allows the caller to pre-cache an address that has just been used, for example, 
+    /// when moving from PASE to CASE during on-network commissioning.
+    ///
+    /// The cache should remember the given address for a single lookup. In other words,
+    /// the entry should be removed after a single cache hit.
+    virtual void AddFallbackEntry(const PeerId & peerId, const ResolveResult & result) {};
+
     /// Shut down any active resolves
     ///
     /// Will immediately fail any scheduled resolve calls and will refuse to register

@@ -2034,6 +2034,23 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 
 /**
+ * CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY enables caching of the IP/port used for on-network commissioning (PASE)
+ */
+#ifndef CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+#define CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY 0
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+
+/**
+ * @def CHIP_DEVICE_DNS_FALLBACK_TIMEOUT_SECONDS
+ * 
+ * @brief The timeout for when to use the cached value
+ * when CHIP_DEVICE_ENABLE_CASE_DNS_CACHE is enabled
+ */
+#ifndef CHIP_DEVICE_DNS_FALLBACK_TIMEOUT_SECONDS
+#define CHIP_DEVICE_DNS_FALLBACK_TIMEOUT_SECONDS 5
+#endif // CHIP_DEVICE_DNS_FALLBACK_TIMEOUT_SECONDS
+
+/**
  * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
  *
  * @brief The maximum number of video streams per device
