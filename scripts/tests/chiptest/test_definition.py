@@ -320,7 +320,7 @@ class SubprocessInfoRepo(dict):
         Return a list of keys for tools or apps missing (not specified) based on the
         know-how dictionary.
         """
-        return [ k for k in self.subproc_knowhow if k not in self ]
+        return [k for k in self.subproc_knowhow if k not in self]
 
     def discover(self):
         """
