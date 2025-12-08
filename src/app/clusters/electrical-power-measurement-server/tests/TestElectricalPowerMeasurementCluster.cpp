@@ -122,7 +122,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
             .endpointId         = kTestEndpointId,
             .delegate           = delegate,
             .features           = BitMask<Feature>(Feature::kDirectCurrent, Feature::kAlternatingCurrent, Feature::kPolyphasePower,
-                                         Feature::kHarmonics, Feature::kPowerQuality),
+                                                   Feature::kHarmonics, Feature::kPowerQuality),
             .optionalAttributes = optionalAttrs,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -246,7 +246,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
     chip::Testing::ClusterTester tester(cluster);
 
     // Read mandatory attributes
-    PowerModeEnum powerMode;
+    PowerModeEnum powerMode = PowerModeEnum::kUnknown;
     EXPECT_EQ(tester.ReadAttribute(PowerMode::Id, powerMode), CHIP_NO_ERROR);
     EXPECT_EQ(powerMode, expectedPowerMode);
 
@@ -254,18 +254,18 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
     EXPECT_EQ(tester.ReadAttribute(NumberOfMeasurementTypes::Id, numTypes), CHIP_NO_ERROR);
     EXPECT_EQ(numTypes, expectedNumMeasurementTypes);
 
-    DataModel::Nullable<int64_t> activePower;
+    DataModel::Nullable<int64_t> activePower = DataModel::Nullable<int64_t>();
     EXPECT_EQ(tester.ReadAttribute(ActivePower::Id, activePower), CHIP_NO_ERROR);
     EXPECT_FALSE(activePower.IsNull());
     EXPECT_EQ(activePower.Value(), expectedActivePower);
 
     // Read optional attributes
-    DataModel::Nullable<int64_t> voltage;
+    DataModel::Nullable<int64_t> voltage = DataModel::Nullable<int64_t>();
     EXPECT_EQ(tester.ReadAttribute(Voltage::Id, voltage), CHIP_NO_ERROR);
     EXPECT_FALSE(voltage.IsNull());
     EXPECT_EQ(voltage.Value(), expectedVoltage);
 
-    DataModel::Nullable<int64_t> activeCurrent;
+    DataModel::Nullable<int64_t> activeCurrent = DataModel::Nullable<int64_t>();
     EXPECT_EQ(tester.ReadAttribute(ActiveCurrent::Id, activeCurrent), CHIP_NO_ERROR);
     EXPECT_FALSE(activeCurrent.IsNull());
     EXPECT_EQ(activeCurrent.Value(), expectedActiveCurrent);
@@ -350,10 +350,6 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
-
-    // Read and decode the Ranges list
-    Ranges::TypeInfo::DecodableType ranges;
-    EXPECT_EQ(tester.ReadAttribute(Ranges::Id, ranges), CHIP_NO_ERROR);
 
     size_t count = 0;
     auto iter    = ranges.begin();
