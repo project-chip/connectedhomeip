@@ -37,7 +37,6 @@ import colorama
 import coloredlogs
 import tabulate
 import yaml
-
 from chiptest.runner import SubprocessKind
 
 try:
