@@ -107,7 +107,7 @@ void ChimeServer::ReportInstalledChimeSoundsChange()
     mCluster.Cluster().ReportInstalledChimeSoundsChange();
 }
 
-void MatterChimeClusterInitCallback(EndpointId endpointId){}
+void MatterChimeClusterInitCallback(EndpointId endpointId) {}
 void MatterChimeClusterShutdownCallback(EndpointId endpointId) {}
 
 // Stub callbacks for ZAP generated code
