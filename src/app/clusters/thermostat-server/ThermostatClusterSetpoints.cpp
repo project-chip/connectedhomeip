@@ -31,15 +31,6 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace Protocols::InteractionModel;
 
-#define FEATURE_MAP_HEAT 0x01
-#define FEATURE_MAP_COOL 0x02
-#define FEATURE_MAP_OCC 0x04
-#define FEATURE_MAP_SCH 0x08
-#define FEATURE_MAP_SB 0x10
-#define FEATURE_MAP_AUTO 0x20
-
-#define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -137,12 +128,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeSetpointLimit(AttributeId attribu
     switch (attribute)
     {
     case MinHeatSetpointLimit::Id:
-        ChipLogError(Zcl,
-                     "Changing MinHeatSetpointLimit: limit: %d, mAbsMinHeatSetpointLimit: %d, mMaxHeatSetpointLimit: %d, "
-                     "mAbsMaxCoolSetpointLimit: %d, mMinCoolSetpointLimit: %d, mDeadBand: %d",
-                     limit, mAbsMinHeatSetpointLimit, mMaxHeatSetpointLimit, mAbsMaxCoolSetpointLimit, mMinCoolSetpointLimit,
-                     mDeadBand);
-
         if (limit < mAbsMinHeatSetpointLimit || limit > mMaxHeatSetpointLimit || limit > mAbsMaxCoolSetpointLimit)
         {
             return Status::ConstraintError;
@@ -156,10 +141,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeSetpointLimit(AttributeId attribu
         }
         break;
     case MaxHeatSetpointLimit::Id:
-        ChipLogError(Zcl,
-                     "Changing MaxHeatSetpointLimit: limit: %d, mAbsMinHeatSetpointLimit: %d, mMinHeatSetpointLimit: %d, "
-                     "mAbsMaxHeatSetpointLimit: %d",
-                     limit, mAbsMinHeatSetpointLimit, mMinHeatSetpointLimit, mAbsMaxHeatSetpointLimit);
         if (limit < mAbsMinHeatSetpointLimit || limit < mMinHeatSetpointLimit || limit > mAbsMaxHeatSetpointLimit)
         {
             return Status::ConstraintError;
@@ -173,10 +154,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeSetpointLimit(AttributeId attribu
         }
         break;
     case MinCoolSetpointLimit::Id:
-        ChipLogError(Zcl,
-                     "Changing MinCoolSetpointLimit: limit: %d, mAbsMinCoolSetpointLimit: %d, mMaxCoolSetpointLimit: %d, "
-                     "mAbsMaxCoolSetpointLimit: %d",
-                     limit, mAbsMinCoolSetpointLimit, mMaxCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
         if (limit < mAbsMinCoolSetpointLimit || limit > mMaxCoolSetpointLimit || limit > mAbsMaxCoolSetpointLimit)
         {
             return Status::ConstraintError;
@@ -190,10 +167,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeSetpointLimit(AttributeId attribu
         }
         break;
     case MaxCoolSetpointLimit::Id:
-        ChipLogError(Zcl,
-                     "Changing MaxCoolSetpointLimit: limit: %d, mAbsMinCoolSetpointLimit: %d, mMinCoolSetpointLimit: %d, "
-                     "mAbsMaxCoolSetpointLimit: %d",
-                     limit, mAbsMinCoolSetpointLimit, mMinCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
         if (limit < mAbsMinCoolSetpointLimit || limit < mMinCoolSetpointLimit || limit > mAbsMaxCoolSetpointLimit)
         {
             return Status::ConstraintError;
@@ -238,7 +211,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeSetpointDeadBand(int16_t deadBand
 {
     if (deadBand < 0 || deadBand > 127)
     {
-        ChipLogError(Zcl, "Returning constraint error");
         return Status::ConstraintError;
     }
     int8_t shortDeadBand = static_cast<int8_t>(deadBand);
@@ -323,7 +295,7 @@ DataModel::ActionReturnStatus Setpoints::RaiseLowerSetpoint(int16_t amount, Setp
     case SetpointRaiseLowerModeEnum::kCool: {
         if (!supportsCool)
         {
-            ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint tried to change cool without supporting cool");
+            ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint tried to change cool without Cooling feature");
             return Status::InvalidCommand;
         }
         targetCoolSetpoint = static_cast<int16_t>(targetCoolSetpoint + amount * 10);
@@ -341,7 +313,7 @@ DataModel::ActionReturnStatus Setpoints::RaiseLowerSetpoint(int16_t amount, Setp
     case SetpointRaiseLowerModeEnum::kHeat: {
         if (!supportsHeat)
         {
-            ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint tried to change heat without supporting heat");
+            ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint tried to change heat without Heating feature");
             return Status::InvalidCommand;
         }
         targetHeatSetpoint = static_cast<int16_t>(targetHeatSetpoint + amount * 10);
@@ -434,89 +406,6 @@ int16_t Setpoints::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
         coolingSetpoint = maxCoolSetpointLimit;
 
     return coolingSetpoint;
-}
-
-Status CheckHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoint, int16_t minHeatingSetpoint, int16_t deadband)
-{
-    if (!autoSupported)
-    {
-        return Status::Success;
-    }
-    int16_t maxValidHeatingSetpoint = static_cast<int16_t>(newCoolingSetpoint - deadband);
-    if (maxValidHeatingSetpoint < minHeatingSetpoint)
-    {
-        // If we need to adjust the heating setpoint to preserve the deadband, it will go below the min heat setpoint
-        return Status::InvalidValue;
-    }
-    // It's possible to adjust the heating setpoint, if needed
-    return Status::Success;
-}
-
-Status CheckCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoint, int16_t maxCoolingSetpoint, int16_t deadband)
-{
-    if (!autoSupported)
-    {
-        return Status::Success;
-    }
-    int16_t minValidCoolingSetpoint = static_cast<int16_t>(newHeatingSetpoint + deadband);
-    if (minValidCoolingSetpoint > maxCoolingSetpoint)
-    {
-        // If we need to adjust the cooling setpoint to preserve the deadband, it will go above the max cool setpoint
-        return Status::InvalidValue;
-    }
-    // It's possible to adjust the cooling setpoint, if needed
-    return Status::Success;
-}
-
-typedef Status (*SetpointSetter)(EndpointId endpoint, int16_t value);
-
-void EnsureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpoint, int16_t newHeatingSetpoint,
-                                   int16_t maxCoolingSetpoint, int16_t deadband, SetpointSetter setter)
-{
-    int16_t minValidCoolingSetpoint = static_cast<int16_t>(newHeatingSetpoint + deadband);
-    if (currentCoolingSetpoint >= minValidCoolingSetpoint)
-    {
-        // The current cooling setpoint doesn't violate the deadband
-        return;
-    }
-    if (minValidCoolingSetpoint > maxCoolingSetpoint)
-    {
-        // Adjusting the cool setpoint to preserve the deadband would violate the max cool setpoint
-        // This should have been caught in CheckCoolingSetpointDeadband, so log and exit
-        ChipLogError(Zcl, "Failed ensuring cooling setpoint deadband");
-        return;
-    }
-    // Adjust the cool setpoint to preserve deadband
-    auto status = setter(endpoint, minValidCoolingSetpoint);
-    if (status != Status::Success)
-    {
-        ChipLogError(Zcl, "Error: EnsureCoolingSetpointDeadband failed!");
-    }
-}
-
-void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
-                                   int16_t minHeatingSetpoint, int16_t deadband, SetpointSetter setter)
-{
-
-    int16_t maxValidHeatingSetpoint = static_cast<int16_t>(newCoolingSetpoint - deadband);
-    if (currentHeatingSetpoint <= maxValidHeatingSetpoint)
-    {
-        // The current heating setpoint doesn't violate the deadband
-        return;
-    }
-    if (maxValidHeatingSetpoint < minHeatingSetpoint)
-    {
-        // Adjusting the heating setpoint to preserve the deadband would violate the min heating setpoint
-        // This should have been caught in CheckHeatingSetpointDeadband, so log and exit
-        ChipLogError(Zcl, "Failed ensuring heating setpoint deadband");
-        return;
-    }
-    // Adjust the heating setpoint to preserve deadband
-    auto status = setter(endpoint, maxValidHeatingSetpoint);
-    if (status != Status::Success)
-    {
-        ChipLogError(Zcl, "Error: EnsureHeatingSetpointDeadband failed!");
-    }
 }
 
 } // namespace Thermostat

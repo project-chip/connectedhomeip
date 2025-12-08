@@ -302,6 +302,10 @@ Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
             return Status::InvalidInState;
         }
         ClusterStatusCode status(mDelegate->CommitPendingPresets());
+        if (status.IsSuccess())
+        {
+            NotifyAttributeChanged(attributeId);
+        }
         return status.GetStatus();
     }
     default:

@@ -80,14 +80,6 @@ private:
     EndpointId mEndpoint;
 };
 
-Protocols::InteractionModel::Status CheckHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoint,
-                                                                 int16_t minHeatingSetpoint, int16_t deadband);
-
-Protocols::InteractionModel::Status CheckCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoint,
-                                                                 int16_t maxCoolingSetpoint, int16_t deadband);
-
-// void EnsureDeadband(const ConcreteAttributePath & attributePath);
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
