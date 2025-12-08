@@ -468,7 +468,7 @@ class TestDefinition:
         try:
             if self.target.value not in subproc_info_repo:
                 log.warning("Path to default target '%s' for test '%s' is not known, test will likely fail",
-                    self.target.value, self.name)
+                            self.target.value, self.name)
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
                     # Do not add tools to the register
