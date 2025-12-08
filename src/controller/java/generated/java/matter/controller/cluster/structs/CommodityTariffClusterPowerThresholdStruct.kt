@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterPowerThresholdStruct(
   val powerThreshold: Optional<Long>,
   val apparentPowerThreshold: Optional<Long>,
-  val powerThresholdSource: UByte?
+  val powerThresholdSource: UByte?,
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterPowerThresholdStruct {\n")
@@ -64,26 +63,33 @@ class CommodityTariffClusterPowerThresholdStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterPowerThresholdStruct {
       tlvReader.enterStructure(tlvTag)
-      val powerThreshold = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_THRESHOLD))) {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_POWER_THRESHOLD)))
-    } else {
-      Optional.empty()
-    }
-      val apparentPowerThreshold = if (tlvReader.isNextTag(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD))) {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD)))
-    } else {
-      Optional.empty()
-    }
-      val powerThresholdSource = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_POWER_THRESHOLD_SOURCE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_POWER_THRESHOLD_SOURCE))
-      null
-    }
-      
+      val powerThreshold =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_THRESHOLD))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_POWER_THRESHOLD)))
+        } else {
+          Optional.empty()
+        }
+      val apparentPowerThreshold =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD)))
+        } else {
+          Optional.empty()
+        }
+      val powerThresholdSource =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_POWER_THRESHOLD_SOURCE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_POWER_THRESHOLD_SOURCE))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return CommodityTariffClusterPowerThresholdStruct(powerThreshold, apparentPowerThreshold, powerThresholdSource)
+      return CommodityTariffClusterPowerThresholdStruct(
+        powerThreshold,
+        apparentPowerThreshold,
+        powerThresholdSource,
+      )
     }
   }
 }

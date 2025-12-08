@@ -17,21 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ContentControlClusterBlockChannelStruct (
-    val blockChannelIndex: UInt?,
-    val majorNumber: UInt,
-    val minorNumber: UInt,
-    val identifier: Optional<String>) {
-  override fun toString(): String  = buildString {
+class ContentControlClusterBlockChannelStruct(
+  val blockChannelIndex: UInt?,
+  val majorNumber: UInt,
+  val minorNumber: UInt,
+  val identifier: Optional<String>,
+) {
+  override fun toString(): String = buildString {
     append("ContentControlClusterBlockChannelStruct {\n")
     append("\tblockChannelIndex : $blockChannelIndex\n")
     append("\tmajorNumber : $majorNumber\n")
@@ -44,16 +42,16 @@ class ContentControlClusterBlockChannelStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (blockChannelIndex != null) {
-      put(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX), blockChannelIndex)
-    } else {
-      putNull(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
-    }
+        put(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX), blockChannelIndex)
+      } else {
+        putNull(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
+      }
       put(ContextSpecificTag(TAG_MAJOR_NUMBER), majorNumber)
       put(ContextSpecificTag(TAG_MINOR_NUMBER), minorNumber)
       if (identifier.isPresent) {
-      val optidentifier = identifier.get()
-      put(ContextSpecificTag(TAG_IDENTIFIER), optidentifier)
-    }
+        val optidentifier = identifier.get()
+        put(ContextSpecificTag(TAG_IDENTIFIER), optidentifier)
+      }
       endStructure()
     }
   }
@@ -64,25 +62,32 @@ class ContentControlClusterBlockChannelStruct (
     private const val TAG_MINOR_NUMBER = 2
     private const val TAG_IDENTIFIER = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentControlClusterBlockChannelStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterBlockChannelStruct {
       tlvReader.enterStructure(tlvTag)
-      val blockChannelIndex = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
-      null
-    }
+      val blockChannelIndex =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
+          null
+        }
       val majorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
       val minorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MINOR_NUMBER))
-      val identifier = if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
-    } else {
-      Optional.empty()
-    }
-      
+      val identifier =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ContentControlClusterBlockChannelStruct(blockChannelIndex, majorNumber, minorNumber, identifier)
+      return ContentControlClusterBlockChannelStruct(
+        blockChannelIndex,
+        majorNumber,
+        minorNumber,
+        identifier,
+      )
     }
   }
 }

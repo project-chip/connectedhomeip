@@ -17,18 +17,16 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ElectricalGridConditionsClusterCurrentConditionsChangedEvent (
-    val currentConditions: chip.devicecontroller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct?) {
-  override fun toString(): String  = buildString {
+class ElectricalGridConditionsClusterCurrentConditionsChangedEvent(
+  val currentConditions:
+    chip.devicecontroller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct?
+) {
+  override fun toString(): String = buildString {
     append("ElectricalGridConditionsClusterCurrentConditionsChangedEvent {\n")
     append("\tcurrentConditions : $currentConditions\n")
     append("}\n")
@@ -38,10 +36,10 @@ class ElectricalGridConditionsClusterCurrentConditionsChangedEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (currentConditions != null) {
-      currentConditions.toTlv(ContextSpecificTag(TAG_CURRENT_CONDITIONS), this)
-    } else {
-      putNull(ContextSpecificTag(TAG_CURRENT_CONDITIONS))
-    }
+        currentConditions.toTlv(ContextSpecificTag(TAG_CURRENT_CONDITIONS), this)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_CONDITIONS))
+      }
       endStructure()
     }
   }
@@ -49,15 +47,21 @@ class ElectricalGridConditionsClusterCurrentConditionsChangedEvent (
   companion object {
     private const val TAG_CURRENT_CONDITIONS = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalGridConditionsClusterCurrentConditionsChangedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ElectricalGridConditionsClusterCurrentConditionsChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val currentConditions = if (!tlvReader.isNull()) {
-      chip.devicecontroller.cluster.structs.ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(ContextSpecificTag(TAG_CURRENT_CONDITIONS), tlvReader)
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_CONDITIONS))
-      null
-    }
-      
+      val currentConditions =
+        if (!tlvReader.isNull()) {
+          chip.devicecontroller.cluster.structs
+            .ElectricalGridConditionsClusterElectricalGridConditionsStruct
+            .fromTlv(ContextSpecificTag(TAG_CURRENT_CONDITIONS), tlvReader)
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_CONDITIONS))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ElectricalGridConditionsClusterCurrentConditionsChangedEvent(currentConditions)

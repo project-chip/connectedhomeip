@@ -17,19 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AmbientContextSensingClusterAmbientContextTypeStruct (
-    val ambientContextSensed: List<AmbientContextSensingClusterSemanticTagStruct>,
-    val detectionStartTime: Optional<ULong>) {
-  override fun toString(): String  = buildString {
+class AmbientContextSensingClusterAmbientContextTypeStruct(
+  val ambientContextSensed: List<AmbientContextSensingClusterSemanticTagStruct>,
+  val detectionStartTime: Optional<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextTypeStruct {\n")
     append("\tambientContextSensed : $ambientContextSensed\n")
     append("\tdetectionStartTime : $detectionStartTime\n")
@@ -45,9 +44,9 @@ class AmbientContextSensingClusterAmbientContextTypeStruct (
       }
       endArray()
       if (detectionStartTime.isPresent) {
-      val optdetectionStartTime = detectionStartTime.get()
-      put(ContextSpecificTag(TAG_DETECTION_START_TIME), optdetectionStartTime)
-    }
+        val optdetectionStartTime = detectionStartTime.get()
+        put(ContextSpecificTag(TAG_DETECTION_START_TIME), optdetectionStartTime)
+      }
       endStructure()
     }
   }
@@ -56,24 +55,32 @@ class AmbientContextSensingClusterAmbientContextTypeStruct (
     private const val TAG_AMBIENT_CONTEXT_SENSED = 0
     private const val TAG_DETECTION_START_TIME = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AmbientContextSensingClusterAmbientContextTypeStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterAmbientContextTypeStruct {
       tlvReader.enterStructure(tlvTag)
-      val ambientContextSensed = buildList<AmbientContextSensingClusterSemanticTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_SENSED))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      val detectionStartTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTION_START_TIME))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DETECTION_START_TIME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val ambientContextSensed =
+        buildList<AmbientContextSensingClusterSemanticTagStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_SENSED))
+          while (!tlvReader.isEndOfContainer()) {
+            add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      val detectionStartTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTION_START_TIME))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DETECTION_START_TIME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterAmbientContextTypeStruct(ambientContextSensed, detectionStartTime)
+      return AmbientContextSensingClusterAmbientContextTypeStruct(
+        ambientContextSensed,
+        detectionStartTime,
+      )
     }
   }
 }

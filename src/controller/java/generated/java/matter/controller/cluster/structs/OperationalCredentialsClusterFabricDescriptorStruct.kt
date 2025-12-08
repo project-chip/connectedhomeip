@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -31,7 +30,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
   val nodeID: ULong,
   val label: String,
   val VIDVerificationStatement: Optional<ByteArray>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
@@ -71,23 +70,35 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     private const val TAG_VID_VERIFICATION_STATEMENT = 6
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalCredentialsClusterFabricDescriptorStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
       val vendorID = tlvReader.getUShort(ContextSpecificTag(TAG_VENDOR_ID))
       val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_ID))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val VIDVerificationStatement = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT)))
-    } else {
-      Optional.empty()
-    }
+      val VIDVerificationStatement =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return OperationalCredentialsClusterFabricDescriptorStruct(rootPublicKey, vendorID, fabricID, nodeID, label, VIDVerificationStatement, fabricIndex)
+      return OperationalCredentialsClusterFabricDescriptorStruct(
+        rootPublicKey,
+        vendorID,
+        fabricID,
+        nodeID,
+        label,
+        VIDVerificationStatement,
+        fabricIndex,
+      )
     }
   }
 }

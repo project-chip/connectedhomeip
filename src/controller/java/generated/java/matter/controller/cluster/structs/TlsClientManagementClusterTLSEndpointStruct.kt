@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -31,7 +29,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
   val caid: UShort,
   val ccdid: UShort?,
   val referenceCount: UByte,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("TlsClientManagementClusterTLSEndpointStruct {\n")
@@ -78,18 +76,27 @@ class TlsClientManagementClusterTLSEndpointStruct(
       val hostname = tlvReader.getByteArray(ContextSpecificTag(TAG_HOSTNAME))
       val port = tlvReader.getUShort(ContextSpecificTag(TAG_PORT))
       val caid = tlvReader.getUShort(ContextSpecificTag(TAG_CAID))
-      val ccdid = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_CCDID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CCDID))
-      null
-    }
+      val ccdid =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_CCDID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CCDID))
+          null
+        }
       val referenceCount = tlvReader.getUByte(ContextSpecificTag(TAG_REFERENCE_COUNT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return TlsClientManagementClusterTLSEndpointStruct(endpointID, hostname, port, caid, ccdid, referenceCount, fabricIndex)
+      return TlsClientManagementClusterTLSEndpointStruct(
+        endpointID,
+        hostname,
+        port,
+        caid,
+        ccdid,
+        referenceCount,
+        fabricIndex,
+      )
     }
   }
 }

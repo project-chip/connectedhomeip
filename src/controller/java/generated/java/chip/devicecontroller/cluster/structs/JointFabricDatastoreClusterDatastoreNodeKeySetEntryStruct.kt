@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct (
-    val nodeID: ULong,
-    val groupKeySetID: UInt,
-    val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct) {
-  override fun toString(): String  = buildString {
+class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
+  val nodeID: ULong,
+  val groupKeySetID: UInt,
+  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
+) {
+  override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tgroupKeySetID : $groupKeySetID\n")
@@ -53,15 +50,26 @@ class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct (
     private const val TAG_GROUP_KEY_SET_ID = 1
     private const val TAG_STATUS_ENTRY = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
-      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
-      
+      val statusEntry =
+        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_STATUS_ENTRY),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(nodeID, groupKeySetID, statusEntry)
+      return JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
+        nodeID,
+        groupKeySetID,
+        statusEntry,
+      )
     }
   }
 }

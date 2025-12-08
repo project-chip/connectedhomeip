@@ -17,23 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ZoneManagementClusterZoneTriggerControlStruct (
-    val zoneID: UInt,
-    val initialDuration: ULong,
-    val augmentationDuration: ULong,
-    val maxDuration: ULong,
-    val blindDuration: ULong,
-    val sensitivity: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class ZoneManagementClusterZoneTriggerControlStruct(
+  val zoneID: UInt,
+  val initialDuration: ULong,
+  val augmentationDuration: ULong,
+  val maxDuration: ULong,
+  val blindDuration: ULong,
+  val sensitivity: Optional<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggerControlStruct {\n")
     append("\tzoneID : $zoneID\n")
     append("\tinitialDuration : $initialDuration\n")
@@ -53,9 +51,9 @@ class ZoneManagementClusterZoneTriggerControlStruct (
       put(ContextSpecificTag(TAG_MAX_DURATION), maxDuration)
       put(ContextSpecificTag(TAG_BLIND_DURATION), blindDuration)
       if (sensitivity.isPresent) {
-      val optsensitivity = sensitivity.get()
-      put(ContextSpecificTag(TAG_SENSITIVITY), optsensitivity)
-    }
+        val optsensitivity = sensitivity.get()
+        put(ContextSpecificTag(TAG_SENSITIVITY), optsensitivity)
+      }
       endStructure()
     }
   }
@@ -68,22 +66,30 @@ class ZoneManagementClusterZoneTriggerControlStruct (
     private const val TAG_BLIND_DURATION = 4
     private const val TAG_SENSITIVITY = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneTriggerControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneTriggerControlStruct {
       tlvReader.enterStructure(tlvTag)
       val zoneID = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_ID))
       val initialDuration = tlvReader.getULong(ContextSpecificTag(TAG_INITIAL_DURATION))
       val augmentationDuration = tlvReader.getULong(ContextSpecificTag(TAG_AUGMENTATION_DURATION))
       val maxDuration = tlvReader.getULong(ContextSpecificTag(TAG_MAX_DURATION))
       val blindDuration = tlvReader.getULong(ContextSpecificTag(TAG_BLIND_DURATION))
-      val sensitivity = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SENSITIVITY))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SENSITIVITY)))
-    } else {
-      Optional.empty()
-    }
-      
+      val sensitivity =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SENSITIVITY))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SENSITIVITY)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ZoneManagementClusterZoneTriggerControlStruct(zoneID, initialDuration, augmentationDuration, maxDuration, blindDuration, sensitivity)
+      return ZoneManagementClusterZoneTriggerControlStruct(
+        zoneID,
+        initialDuration,
+        augmentationDuration,
+        maxDuration,
+        blindDuration,
+        sensitivity,
+      )
     }
   }
 }

@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ChannelClusterProgramCastStruct (
-    val name: String,
-    val role: String) {
-  override fun toString(): String  = buildString {
+class ChannelClusterProgramCastStruct(val name: String, val role: String) {
+  override fun toString(): String = buildString {
     append("ChannelClusterProgramCastStruct {\n")
     append("\tname : $name\n")
     append("\trole : $role\n")
@@ -49,11 +43,11 @@ class ChannelClusterProgramCastStruct (
     private const val TAG_NAME = 0
     private const val TAG_ROLE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterProgramCastStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterProgramCastStruct {
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val role = tlvReader.getString(ContextSpecificTag(TAG_ROLE))
-      
+
       tlvReader.exitContainer()
 
       return ChannelClusterProgramCastStruct(name, role)

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class AmbientContextSensingClusterAmbientContextTypeStruct(
   val ambientContextSensed: List<AmbientContextSensingClusterSemanticTagStruct>,
-  val detectionStartTime: Optional<UInt>
+  val detectionStartTime: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextTypeStruct {\n")
@@ -55,24 +55,32 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
     private const val TAG_AMBIENT_CONTEXT_SENSED = 0
     private const val TAG_DETECTION_START_TIME = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AmbientContextSensingClusterAmbientContextTypeStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterAmbientContextTypeStruct {
       tlvReader.enterStructure(tlvTag)
-      val ambientContextSensed = buildList<AmbientContextSensingClusterSemanticTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_SENSED))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      val detectionStartTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTION_START_TIME))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DETECTION_START_TIME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val ambientContextSensed =
+        buildList<AmbientContextSensingClusterSemanticTagStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_SENSED))
+          while (!tlvReader.isEndOfContainer()) {
+            add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      val detectionStartTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTION_START_TIME))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DETECTION_START_TIME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterAmbientContextTypeStruct(ambientContextSensed, detectionStartTime)
+      return AmbientContextSensingClusterAmbientContextTypeStruct(
+        ambientContextSensed,
+        detectionStartTime,
+      )
     }
   }
 }

@@ -17,21 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThermostatClusterSetpointChangeEvent (
-    val systemMode: UInt,
-    val occupancy: Optional<UInt>,
-    val previousSetpoint: Optional<Int>,
-    val currentSetpoint: Int) {
-  override fun toString(): String  = buildString {
+class ThermostatClusterSetpointChangeEvent(
+  val systemMode: UInt,
+  val occupancy: Optional<UInt>,
+  val previousSetpoint: Optional<Int>,
+  val currentSetpoint: Int,
+) {
+  override fun toString(): String = buildString {
     append("ThermostatClusterSetpointChangeEvent {\n")
     append("\tsystemMode : $systemMode\n")
     append("\toccupancy : $occupancy\n")
@@ -45,13 +43,13 @@ class ThermostatClusterSetpointChangeEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SYSTEM_MODE), systemMode)
       if (occupancy.isPresent) {
-      val optoccupancy = occupancy.get()
-      put(ContextSpecificTag(TAG_OCCUPANCY), optoccupancy)
-    }
+        val optoccupancy = occupancy.get()
+        put(ContextSpecificTag(TAG_OCCUPANCY), optoccupancy)
+      }
       if (previousSetpoint.isPresent) {
-      val optpreviousSetpoint = previousSetpoint.get()
-      put(ContextSpecificTag(TAG_PREVIOUS_SETPOINT), optpreviousSetpoint)
-    }
+        val optpreviousSetpoint = previousSetpoint.get()
+        put(ContextSpecificTag(TAG_PREVIOUS_SETPOINT), optpreviousSetpoint)
+      }
       put(ContextSpecificTag(TAG_CURRENT_SETPOINT), currentSetpoint)
       endStructure()
     }
@@ -63,24 +61,31 @@ class ThermostatClusterSetpointChangeEvent (
     private const val TAG_PREVIOUS_SETPOINT = 2
     private const val TAG_CURRENT_SETPOINT = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterSetpointChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterSetpointChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val systemMode = tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE))
-      val occupancy = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OCCUPANCY))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_OCCUPANCY)))
-    } else {
-      Optional.empty()
-    }
-      val previousSetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SETPOINT))) {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_SETPOINT)))
-    } else {
-      Optional.empty()
-    }
+      val occupancy =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OCCUPANCY))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_OCCUPANCY)))
+        } else {
+          Optional.empty()
+        }
+      val previousSetpoint =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SETPOINT))) {
+          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_SETPOINT)))
+        } else {
+          Optional.empty()
+        }
       val currentSetpoint = tlvReader.getInt(ContextSpecificTag(TAG_CURRENT_SETPOINT))
-      
+
       tlvReader.exitContainer()
 
-      return ThermostatClusterSetpointChangeEvent(systemMode, occupancy, previousSetpoint, currentSetpoint)
+      return ThermostatClusterSetpointChangeEvent(
+        systemMode,
+        occupancy,
+        previousSetpoint,
+        currentSetpoint,
+      )
     }
   }
 }

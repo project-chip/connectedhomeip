@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterPushTransportEndEvent (
-    val connectionID: UInt) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UInt) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("}\n")
@@ -45,10 +40,13 @@ class PushAvStreamTransportClusterPushTransportEndEvent (
   companion object {
     private const val TAG_CONNECTION_ID = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterPushTransportEndEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterPushTransportEndEvent(connectionID)

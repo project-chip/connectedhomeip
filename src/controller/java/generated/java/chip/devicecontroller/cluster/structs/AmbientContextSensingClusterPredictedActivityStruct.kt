@@ -17,23 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AmbientContextSensingClusterPredictedActivityStruct (
-    val startTimestamp: ULong,
-    val endTimestamp: ULong,
-    val ambientContextType: Optional<List<AmbientContextSensingClusterSemanticTagStruct>>,
-    val crowdDetected: Optional<Boolean>,
-    val crowdCount: Optional<UInt>,
-    val confidence: UInt) {
-  override fun toString(): String  = buildString {
+class AmbientContextSensingClusterPredictedActivityStruct(
+  val startTimestamp: ULong,
+  val endTimestamp: ULong,
+  val ambientContextType: Optional<List<AmbientContextSensingClusterSemanticTagStruct>>,
+  val crowdDetected: Optional<Boolean>,
+  val crowdCount: Optional<UInt>,
+  val confidence: UInt,
+) {
+  override fun toString(): String = buildString {
     append("AmbientContextSensingClusterPredictedActivityStruct {\n")
     append("\tstartTimestamp : $startTimestamp\n")
     append("\tendTimestamp : $endTimestamp\n")
@@ -50,21 +49,21 @@ class AmbientContextSensingClusterPredictedActivityStruct (
       put(ContextSpecificTag(TAG_START_TIMESTAMP), startTimestamp)
       put(ContextSpecificTag(TAG_END_TIMESTAMP), endTimestamp)
       if (ambientContextType.isPresent) {
-      val optambientContextType = ambientContextType.get()
-      startArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
-      for (item in optambientContextType.iterator()) {
-        item.toTlv(AnonymousTag, this)
+        val optambientContextType = ambientContextType.get()
+        startArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
+        for (item in optambientContextType.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
-      endArray()
-    }
       if (crowdDetected.isPresent) {
-      val optcrowdDetected = crowdDetected.get()
-      put(ContextSpecificTag(TAG_CROWD_DETECTED), optcrowdDetected)
-    }
+        val optcrowdDetected = crowdDetected.get()
+        put(ContextSpecificTag(TAG_CROWD_DETECTED), optcrowdDetected)
+      }
       if (crowdCount.isPresent) {
-      val optcrowdCount = crowdCount.get()
-      put(ContextSpecificTag(TAG_CROWD_COUNT), optcrowdCount)
-    }
+        val optcrowdCount = crowdCount.get()
+        put(ContextSpecificTag(TAG_CROWD_COUNT), optcrowdCount)
+      }
       put(ContextSpecificTag(TAG_CONFIDENCE), confidence)
       endStructure()
     }
@@ -78,36 +77,51 @@ class AmbientContextSensingClusterPredictedActivityStruct (
     private const val TAG_CROWD_COUNT = 4
     private const val TAG_CONFIDENCE = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AmbientContextSensingClusterPredictedActivityStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterPredictedActivityStruct {
       tlvReader.enterStructure(tlvTag)
       val startTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_START_TIMESTAMP))
       val endTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_END_TIMESTAMP))
-      val ambientContextType = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))) {
-      Optional.of(buildList<AmbientContextSensingClusterSemanticTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val crowdDetected = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CROWD_DETECTED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_CROWD_DETECTED)))
-    } else {
-      Optional.empty()
-    }
-      val crowdCount = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CROWD_COUNT))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CROWD_COUNT)))
-    } else {
-      Optional.empty()
-    }
+      val ambientContextType =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))) {
+          Optional.of(
+            buildList<AmbientContextSensingClusterSemanticTagStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
+              while (!tlvReader.isEndOfContainer()) {
+                add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val crowdDetected =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CROWD_DETECTED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_CROWD_DETECTED)))
+        } else {
+          Optional.empty()
+        }
+      val crowdCount =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CROWD_COUNT))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CROWD_COUNT)))
+        } else {
+          Optional.empty()
+        }
       val confidence = tlvReader.getUInt(ContextSpecificTag(TAG_CONFIDENCE))
-      
+
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterPredictedActivityStruct(startTimestamp, endTimestamp, ambientContextType, crowdDetected, crowdCount, confidence)
+      return AmbientContextSensingClusterPredictedActivityStruct(
+        startTimestamp,
+        endTimestamp,
+        ambientContextType,
+        crowdDetected,
+        crowdCount,
+        confidence,
+      )
     }
   }
 }

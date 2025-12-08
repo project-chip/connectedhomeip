@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class TlsCertificateManagementClusterTLSCertStruct(
   val caid: UShort,
   val certificate: Optional<ByteArray>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSCertStruct {\n")
@@ -58,13 +57,14 @@ class TlsCertificateManagementClusterTLSCertStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TlsCertificateManagementClusterTLSCertStruct {
       tlvReader.enterStructure(tlvTag)
       val caid = tlvReader.getUShort(ContextSpecificTag(TAG_CAID))
-      val certificate = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CERTIFICATE))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE)))
-    } else {
-      Optional.empty()
-    }
+      val certificate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CERTIFICATE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return TlsCertificateManagementClusterTLSCertStruct(caid, certificate, fabricIndex)

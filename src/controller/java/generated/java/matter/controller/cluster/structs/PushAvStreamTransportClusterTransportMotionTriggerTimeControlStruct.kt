@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +26,7 @@ class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
   val initialDuration: UShort,
   val augmentationDuration: UShort,
   val maxDuration: UInt,
-  val blindDuration: UShort
+  val blindDuration: UShort,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {\n")
@@ -56,16 +54,24 @@ class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
     private const val TAG_MAX_DURATION = 2
     private const val TAG_BLIND_DURATION = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {
       tlvReader.enterStructure(tlvTag)
       val initialDuration = tlvReader.getUShort(ContextSpecificTag(TAG_INITIAL_DURATION))
       val augmentationDuration = tlvReader.getUShort(ContextSpecificTag(TAG_AUGMENTATION_DURATION))
       val maxDuration = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_DURATION))
       val blindDuration = tlvReader.getUShort(ContextSpecificTag(TAG_BLIND_DURATION))
-      
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(initialDuration, augmentationDuration, maxDuration, blindDuration)
+      return PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
+        initialDuration,
+        augmentationDuration,
+        maxDuration,
+        blindDuration,
+      )
     }
   }
 }

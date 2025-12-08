@@ -17,27 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThreadNetworkDiagnosticsClusterRouteTableStruct (
-    val extAddress: ULong,
-    val rloc16: UInt,
-    val routerId: UInt,
-    val nextHop: UInt,
-    val pathCost: UInt,
-    val LQIIn: UInt,
-    val LQIOut: UInt,
-    val age: UInt,
-    val allocated: Boolean,
-    val linkEstablished: Boolean) {
-  override fun toString(): String  = buildString {
+class ThreadNetworkDiagnosticsClusterRouteTableStruct(
+  val extAddress: ULong,
+  val rloc16: UInt,
+  val routerId: UInt,
+  val nextHop: UInt,
+  val pathCost: UInt,
+  val LQIIn: UInt,
+  val LQIOut: UInt,
+  val age: UInt,
+  val allocated: Boolean,
+  val linkEstablished: Boolean,
+) {
+  override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n")
     append("\textAddress : $extAddress\n")
     append("\trloc16 : $rloc16\n")
@@ -81,7 +78,10 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct (
     private const val TAG_ALLOCATED = 8
     private const val TAG_LINK_ESTABLISHED = 9
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterRouteTableStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ThreadNetworkDiagnosticsClusterRouteTableStruct {
       tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
       val rloc16 = tlvReader.getUInt(ContextSpecificTag(TAG_RLOC16))
@@ -93,10 +93,21 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct (
       val age = tlvReader.getUInt(ContextSpecificTag(TAG_AGE))
       val allocated = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
       val linkEstablished = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))
-      
+
       tlvReader.exitContainer()
 
-      return ThreadNetworkDiagnosticsClusterRouteTableStruct(extAddress, rloc16, routerId, nextHop, pathCost, LQIIn, LQIOut, age, allocated, linkEstablished)
+      return ThreadNetworkDiagnosticsClusterRouteTableStruct(
+        extAddress,
+        rloc16,
+        routerId,
+        nextHop,
+        pathCost,
+        LQIIn,
+        LQIOut,
+        age,
+        allocated,
+        linkEstablished,
+      )
     }
   }
 }

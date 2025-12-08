@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct (
-    val order: UInt,
-    val measurement: Long?) {
-  override fun toString(): String  = buildString {
+class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
+  val order: UInt,
+  val measurement: Long?,
+) {
+  override fun toString(): String = buildString {
     append("ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {\n")
     append("\torder : $order\n")
     append("\tmeasurement : $measurement\n")
@@ -41,10 +38,10 @@ class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ORDER), order)
       if (measurement != null) {
-      put(ContextSpecificTag(TAG_MEASUREMENT), measurement)
-    } else {
-      putNull(ContextSpecificTag(TAG_MEASUREMENT))
-    }
+        put(ContextSpecificTag(TAG_MEASUREMENT), measurement)
+      } else {
+        putNull(ContextSpecificTag(TAG_MEASUREMENT))
+      }
       endStructure()
     }
   }
@@ -53,16 +50,20 @@ class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct (
     private const val TAG_ORDER = 0
     private const val TAG_MEASUREMENT = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val order = tlvReader.getUInt(ContextSpecificTag(TAG_ORDER))
-      val measurement = if (!tlvReader.isNull()) {
-      tlvReader.getLong(ContextSpecificTag(TAG_MEASUREMENT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MEASUREMENT))
-      null
-    }
-      
+      val measurement =
+        if (!tlvReader.isNull()) {
+          tlvReader.getLong(ContextSpecificTag(TAG_MEASUREMENT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MEASUREMENT))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(order, measurement)

@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DoorLockClusterCredentialStruct(
-  val credentialType: UByte,
-  val credentialIndex: UShort
-) {
+class DoorLockClusterCredentialStruct(val credentialType: UByte, val credentialIndex: UShort) {
   override fun toString(): String = buildString {
     append("DoorLockClusterCredentialStruct {\n")
     append("\tcredentialType : $credentialType\n")
@@ -52,7 +47,7 @@ class DoorLockClusterCredentialStruct(
       tlvReader.enterStructure(tlvTag)
       val credentialType = tlvReader.getUByte(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
       val credentialIndex = tlvReader.getUShort(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return DoorLockClusterCredentialStruct(credentialType, credentialIndex)

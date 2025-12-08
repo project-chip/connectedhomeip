@@ -17,20 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class TimeSynchronizationClusterTimeZoneStruct (
-    val offset: Long,
-    val validAt: ULong,
-    val name: Optional<String>) {
-  override fun toString(): String  = buildString {
+class TimeSynchronizationClusterTimeZoneStruct(
+  val offset: Long,
+  val validAt: ULong,
+  val name: Optional<String>,
+) {
+  override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTimeZoneStruct {\n")
     append("\toffset : $offset\n")
     append("\tvalidAt : $validAt\n")
@@ -44,9 +42,9 @@ class TimeSynchronizationClusterTimeZoneStruct (
       put(ContextSpecificTag(TAG_OFFSET), offset)
       put(ContextSpecificTag(TAG_VALID_AT), validAt)
       if (name.isPresent) {
-      val optname = name.get()
-      put(ContextSpecificTag(TAG_NAME), optname)
-    }
+        val optname = name.get()
+        put(ContextSpecificTag(TAG_NAME), optname)
+      }
       endStructure()
     }
   }
@@ -56,16 +54,17 @@ class TimeSynchronizationClusterTimeZoneStruct (
     private const val TAG_VALID_AT = 1
     private const val TAG_NAME = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTimeZoneStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStruct {
       tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
       val validAt = tlvReader.getULong(ContextSpecificTag(TAG_VALID_AT))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterTimeZoneStruct(offset, validAt, name)

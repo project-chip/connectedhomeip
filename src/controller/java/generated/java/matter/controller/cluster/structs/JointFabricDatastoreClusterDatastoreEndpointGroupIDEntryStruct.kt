@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +26,7 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
   val nodeID: ULong,
   val endpointID: UShort,
   val groupID: UShort,
-  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct
+  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct {\n")
@@ -56,16 +54,28 @@ class JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
     private const val TAG_GROUP_ID = 2
     private const val TAG_STATUS_ENTRY = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val endpointID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_ID))
       val groupID = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
-      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
-      
+      val statusEntry =
+        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_STATUS_ENTRY),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(nodeID, endpointID, groupID, statusEntry)
+      return JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct(
+        nodeID,
+        endpointID,
+        groupID,
+        statusEntry,
+      )
     }
   }
 }

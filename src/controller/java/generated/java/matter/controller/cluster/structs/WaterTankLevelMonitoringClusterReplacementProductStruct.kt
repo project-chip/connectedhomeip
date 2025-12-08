@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class WaterTankLevelMonitoringClusterReplacementProductStruct(
   val productIdentifierType: UByte,
-  val productIdentifierValue: String
+  val productIdentifierValue: String,
 ) {
   override fun toString(): String = buildString {
     append("WaterTankLevelMonitoringClusterReplacementProductStruct {\n")
@@ -48,14 +46,22 @@ class WaterTankLevelMonitoringClusterReplacementProductStruct(
     private const val TAG_PRODUCT_IDENTIFIER_TYPE = 0
     private const val TAG_PRODUCT_IDENTIFIER_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WaterTankLevelMonitoringClusterReplacementProductStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WaterTankLevelMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tlvTag)
-      val productIdentifierType = tlvReader.getUByte(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
-      val productIdentifierValue = tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
-      
+      val productIdentifierType =
+        tlvReader.getUByte(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
+      val productIdentifierValue =
+        tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
+
       tlvReader.exitContainer()
 
-      return WaterTankLevelMonitoringClusterReplacementProductStruct(productIdentifierType, productIdentifierValue)
+      return WaterTankLevelMonitoringClusterReplacementProductStruct(
+        productIdentifierType,
+        productIdentifierValue,
+      )
     }
   }
 }

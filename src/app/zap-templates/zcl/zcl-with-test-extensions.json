@@ -182,11 +182,7 @@
             "AdminVendorId"
         ],
         "Ambient Context Sensing": [
-            "HoldTimeLimits",
-            "PredictedActivity",
-            "AmbientContextTypeSupported",
-            "AmbientContextType",
-            "ClusterRevision"
+            "HoldTimeLimits"
         ],
         "Basic Information": [
             "FeatureMap",

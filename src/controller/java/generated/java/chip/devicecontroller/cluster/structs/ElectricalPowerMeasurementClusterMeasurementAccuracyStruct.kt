@@ -20,19 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ElectricalPowerMeasurementClusterMeasurementAccuracyStruct (
-    val measurementType: UInt,
-    val measured: Boolean,
-    val minMeasuredValue: Long,
-    val maxMeasuredValue: Long,
-    val accuracyRanges: List<ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct>) {
-  override fun toString(): String  = buildString {
+class ElectricalPowerMeasurementClusterMeasurementAccuracyStruct(
+  val measurementType: UInt,
+  val measured: Boolean,
+  val minMeasuredValue: Long,
+  val maxMeasuredValue: Long,
+  val accuracyRanges: List<ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct>,
+) {
+  override fun toString(): String = buildString {
     append("ElectricalPowerMeasurementClusterMeasurementAccuracyStruct {\n")
     append("\tmeasurementType : $measurementType\n")
     append("\tmeasured : $measured\n")
@@ -65,23 +63,38 @@ class ElectricalPowerMeasurementClusterMeasurementAccuracyStruct (
     private const val TAG_MAX_MEASURED_VALUE = 3
     private const val TAG_ACCURACY_RANGES = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalPowerMeasurementClusterMeasurementAccuracyStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ElectricalPowerMeasurementClusterMeasurementAccuracyStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUInt(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
       val measured = tlvReader.getBoolean(ContextSpecificTag(TAG_MEASURED))
       val minMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MIN_MEASURED_VALUE))
       val maxMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MAX_MEASURED_VALUE))
-      val accuracyRanges = buildList<ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ACCURACY_RANGES))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val accuracyRanges =
+        buildList<ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ACCURACY_RANGES))
+          while (!tlvReader.isEndOfContainer()) {
+            add(
+              ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(
+                AnonymousTag,
+                tlvReader,
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
-      return ElectricalPowerMeasurementClusterMeasurementAccuracyStruct(measurementType, measured, minMeasuredValue, maxMeasuredValue, accuracyRanges)
+      return ElectricalPowerMeasurementClusterMeasurementAccuracyStruct(
+        measurementType,
+        measured,
+        minMeasuredValue,
+        maxMeasuredValue,
+        accuracyRanges,
+      )
     }
   }
 }

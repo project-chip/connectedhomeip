@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class OccupancySensingClusterHoldTimeLimitsStruct (
-    val holdTimeMin: UInt,
-    val holdTimeMax: UInt,
-    val holdTimeDefault: UInt) {
-  override fun toString(): String  = buildString {
+class OccupancySensingClusterHoldTimeLimitsStruct(
+  val holdTimeMin: UInt,
+  val holdTimeMax: UInt,
+  val holdTimeDefault: UInt,
+) {
+  override fun toString(): String = buildString {
     append("OccupancySensingClusterHoldTimeLimitsStruct {\n")
     append("\tholdTimeMin : $holdTimeMin\n")
     append("\tholdTimeMax : $holdTimeMax\n")
@@ -53,12 +50,12 @@ class OccupancySensingClusterHoldTimeLimitsStruct (
     private const val TAG_HOLD_TIME_MAX = 1
     private const val TAG_HOLD_TIME_DEFAULT = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OccupancySensingClusterHoldTimeLimitsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OccupancySensingClusterHoldTimeLimitsStruct {
       tlvReader.enterStructure(tlvTag)
       val holdTimeMin = tlvReader.getUInt(ContextSpecificTag(TAG_HOLD_TIME_MIN))
       val holdTimeMax = tlvReader.getUInt(ContextSpecificTag(TAG_HOLD_TIME_MAX))
       val holdTimeDefault = tlvReader.getUInt(ContextSpecificTag(TAG_HOLD_TIME_DEFAULT))
-      
+
       tlvReader.exitContainer()
 
       return OccupancySensingClusterHoldTimeLimitsStruct(holdTimeMin, holdTimeMax, holdTimeDefault)

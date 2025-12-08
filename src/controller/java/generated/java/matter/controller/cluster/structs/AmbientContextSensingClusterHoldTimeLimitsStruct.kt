@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class AmbientContextSensingClusterHoldTimeLimitsStruct(
   val holdTimeMin: UShort,
   val holdTimeMax: UShort,
-  val holdTimeDefault: UShort
+  val holdTimeDefault: UShort,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterHoldTimeLimitsStruct {\n")
@@ -52,15 +50,22 @@ class AmbientContextSensingClusterHoldTimeLimitsStruct(
     private const val TAG_HOLD_TIME_MAX = 1
     private const val TAG_HOLD_TIME_DEFAULT = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AmbientContextSensingClusterHoldTimeLimitsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterHoldTimeLimitsStruct {
       tlvReader.enterStructure(tlvTag)
       val holdTimeMin = tlvReader.getUShort(ContextSpecificTag(TAG_HOLD_TIME_MIN))
       val holdTimeMax = tlvReader.getUShort(ContextSpecificTag(TAG_HOLD_TIME_MAX))
       val holdTimeDefault = tlvReader.getUShort(ContextSpecificTag(TAG_HOLD_TIME_DEFAULT))
-      
+
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterHoldTimeLimitsStruct(holdTimeMin, holdTimeMax, holdTimeDefault)
+      return AmbientContextSensingClusterHoldTimeLimitsStruct(
+        holdTimeMin,
+        holdTimeMax,
+        holdTimeDefault,
+      )
     }
   }
 }

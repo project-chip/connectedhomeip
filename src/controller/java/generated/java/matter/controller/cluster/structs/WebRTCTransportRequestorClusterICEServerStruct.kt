@@ -28,7 +28,7 @@ class WebRTCTransportRequestorClusterICEServerStruct(
   val URLs: List<String>,
   val username: Optional<String>,
   val credential: Optional<String>,
-  val caid: Optional<UShort>
+  val caid: Optional<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterICEServerStruct {\n")
@@ -71,29 +71,33 @@ class WebRTCTransportRequestorClusterICEServerStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportRequestorClusterICEServerStruct {
       tlvReader.enterStructure(tlvTag)
-      val URLs = buildList<String> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_UR_LS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getString(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val username = if (tlvReader.isNextTag(ContextSpecificTag(TAG_USERNAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_USERNAME)))
-    } else {
-      Optional.empty()
-    }
-      val credential = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIAL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CREDENTIAL)))
-    } else {
-      Optional.empty()
-    }
-      val caid = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_CAID)))
-    } else {
-      Optional.empty()
-    }
-      
+      val URLs =
+        buildList<String> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_UR_LS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getString(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val username =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_USERNAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_USERNAME)))
+        } else {
+          Optional.empty()
+        }
+      val credential =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIAL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CREDENTIAL)))
+        } else {
+          Optional.empty()
+        }
+      val caid =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAID))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_CAID)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterICEServerStruct(URLs, username, credential, caid)
