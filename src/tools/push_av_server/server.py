@@ -504,9 +504,17 @@ class PushAvServer:
 
     @contextlib.contextmanager
     def _open_session(self, stream_id: int):
-        """Context manager helper to save a session after use."""
+        """Context manager helper to save a session after use.
+
+        Note that any exceptions raised within the context will prevent sessions from being saved to disk.
+        """
         stream_id_str = str(stream_id)
         yield self.sessions[stream_id_str]
+
+        # TODO Look if we need the following try/catch block if the default behavior of the framework
+        # is good enough for debugging purposes.
+        # except Exception as e:
+        #    raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
         self.sessions[stream_id_str].save_to_disk(self.wd)
 
     # UI website
