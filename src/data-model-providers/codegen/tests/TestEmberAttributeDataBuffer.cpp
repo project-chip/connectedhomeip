@@ -26,7 +26,6 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
-#include <lib/support/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
@@ -35,6 +34,7 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <limits>
 #include <optional>

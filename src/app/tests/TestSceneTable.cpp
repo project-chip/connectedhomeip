@@ -22,7 +22,6 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
-#include <lib/support/odd-sized-integers.h>
 #include <clusters/ColorControl/Ids.h>
 #include <clusters/LevelControl/Ids.h>
 #include <clusters/OnOff/Ids.h>
@@ -32,6 +31,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>

@@ -33,10 +33,10 @@
 #include <app/util/attribute-table.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
-#include <lib/support/odd-sized-integers.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <zap-generated/endpoint_config.h>
 
