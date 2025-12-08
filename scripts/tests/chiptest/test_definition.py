@@ -362,68 +362,6 @@ class SubprocessInfoRepo(dict):
 
 
 @dataclass
-class ApplicationPaths:
-    chip_tool: SubprocessInfo
-    all_clusters_app: SubprocessInfo
-    lock_app: SubprocessInfo
-    fabric_bridge_app: SubprocessInfo
-    ota_provider_app: SubprocessInfo
-    ota_requestor_app: SubprocessInfo
-    tv_app: SubprocessInfo
-    bridge_app: SubprocessInfo
-    lit_icd_app: SubprocessInfo
-    microwave_oven_app: SubprocessInfo
-    matter_repl_yaml_tester_cmd: SubprocessInfo
-    chip_tool_with_python_cmd: SubprocessInfo
-    rvc_app: SubprocessInfo
-    network_manager_app: SubprocessInfo
-    energy_gateway_app: SubprocessInfo
-    energy_management_app: SubprocessInfo
-    closure_app: SubprocessInfo
-
-    def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app,
-                self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
-                self.tv_app, self.bridge_app, self.lit_icd_app,
-                self.microwave_oven_app, self.matter_repl_yaml_tester_cmd,
-                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app,
-                self.energy_gateway_app, self.energy_management_app, self.closure_app]
-
-    def items_with_key(self):
-        """
-        Returns all path items and also the corresponding "Application Key" which
-        is the typical application name.
-
-        This is to provide scripts a consistent way to reference a path, even if
-        the paths used for individual appplications contain different names
-        (e.g. they could be wrapper scripts).
-        """
-        return [
-            (self.chip_tool, "chip-tool"),
-            (self.all_clusters_app, "chip-all-clusters-app"),
-            (self.lock_app, "chip-lock-app"),
-            (self.fabric_bridge_app, "fabric-bridge-app"),
-            (self.ota_provider_app, "chip-ota-provider-app"),
-            (self.ota_requestor_app, "chip-ota-requestor-app"),
-            (self.tv_app, "chip-tv-app"),
-            (self.bridge_app, "chip-bridge-app"),
-            (self.lit_icd_app, "lit-icd-app"),
-            (self.microwave_oven_app, "chip-microwave-oven-app"),
-            (self.matter_repl_yaml_tester_cmd, "yamltest_with_matter_repl_tester.py"),
-            (
-                # This path varies, however it is a fixed python tool so it may be ok
-                self.chip_tool_with_python_cmd,
-                self.chip_tool_with_python_cmd.path.name,
-            ),
-            (self.rvc_app, "chip-rvc-app"),
-            (self.network_manager_app, "matter-network-manager-app"),
-            (self.energy_gateway_app, "chip-energy-gateway-app"),
-            (self.energy_management_app, "chip-energy-management-app"),
-            (self.closure_app, "closure-app"),
-        ]
-
-
-@dataclass
 class CaptureLine:
     when: datetime
     source: str
