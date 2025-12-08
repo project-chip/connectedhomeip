@@ -2836,6 +2836,8 @@ endpoint 1 {
     handle command RecallScene;
     handle command GetSceneMembership;
     handle command GetSceneMembershipResponse;
+    handle command CopySceneResponse;
+    handle command CopyScene;
   }
 
   server cluster ColorControl {

@@ -96,6 +96,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::DeviceEnergyManagement::Id:
+        MatterDeviceEnergyManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ValveConfigurationAndControl::Id:
         MatterValveConfigurationAndControlClusterInitCallback(endpoint);
         break;
@@ -177,6 +180,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::DeviceEnergyManagement::Id:
+        MatterDeviceEnergyManagementClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::ValveConfigurationAndControl::Id:
         MatterValveConfigurationAndControlClusterShutdownCallback(endpoint);

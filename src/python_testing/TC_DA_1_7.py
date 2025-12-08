@@ -51,6 +51,8 @@ import matter.clusters as Clusters
 from matter.testing.conversions import bytes_from_hex, hex_from_bytes
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # Those are SDK samples that are known to be non-production.
 FORBIDDEN_AKID = [
     bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),
@@ -66,12 +68,12 @@ ALLOWED_SKIPPED_FILENAMES = [
 
 
 def load_all_paa(paa_path: Path) -> dict:
-    logging.info("Loading all PAAs in %s" % paa_path)
+    log.info("Loading all PAAs in %s" % paa_path)
 
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
         with open(filename, "rb") as derfile:
-            logging.info(f"Loading PAA: {filename}")
+            log.info(f"Loading PAA: {filename}")
             try:
                 # Load cert
                 paa_der = derfile.read()
@@ -83,9 +85,9 @@ def load_all_paa(paa_path: Path) -> dict:
                         skid = extension.value.key_identifier
                         paa_by_skid[skid] = (Path(filename).name, paa_cert)
             except (ValueError, IOError) as e:
-                logging.error(f"Failed to load {filename}: {str(e)}")
+                log.error(f"Failed to load {filename}: {str(e)}")
                 if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
-                    logging.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
+                    log.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
                     raise
 
     return paa_by_skid
@@ -195,10 +197,10 @@ class TC_DA_1_7(MatterBaseTest):
         asserts.assert_equal(len(pk), len(set(pk)), "Found matching public keys in different DUTs")
 
     async def single_DUT(self, dut_index: int, dut_node_id: int) -> bytes:
-        logging.info("Pre-condition: load all PAAs SKIDs")
+        log.info("Pre-condition: load all PAAs SKIDs")
         conf = self.matter_test_config
         paa_by_skid = load_all_paa(conf.paa_trust_store_path)
-        logging.info("Found %d PAAs" % len(paa_by_skid))
+        log.info("Found %d PAAs" % len(paa_by_skid))
 
         # Test plan step introducing test for each DUT
         self.step(f'{dut_index}')
@@ -221,14 +223,14 @@ class TC_DA_1_7(MatterBaseTest):
         self.record_data({key: hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
-        logging.info("DUT {} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
+        log.info("DUT {} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
             asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
 
         filename, paa_cert = paa_by_skid[pai_akid]
-        logging.info("Matched PAA file %s, subject: %s" % (filename, paa_cert.subject))
+        log.info("Matched PAA file %s, subject: %s" % (filename, paa_cert.subject))
         public_key = paa_cert.public_key()
 
         try:
@@ -236,11 +238,11 @@ class TC_DA_1_7(MatterBaseTest):
                               signature_algorithm=ec.ECDSA(hashes.SHA256()))
         except InvalidSignature as e:
             asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
-        logging.info("Validated PAI signature against PAA")
+        log.info("Validated PAI signature against PAA")
 
-        logging.info("DUT {} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
+        log.info("DUT {} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
         if self.allow_sdk_dac:
-            logging.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
+            log.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:
             for candidate in FORBIDDEN_AKID:
                 asserts.assert_not_equal(hex_from_bytes(pai_akid), hex_from_bytes(candidate), "PAI AKID must not be in denylist")
@@ -256,7 +258,7 @@ class TC_DA_1_7(MatterBaseTest):
 
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
-        logging.info("Subject public key pk: %s" % hex_from_bytes(pk))
+        log.info("Subject public key pk: %s" % hex_from_bytes(pk))
         key = 'pk_{}'.format(dut_index)
         self.record_data({key: hex_from_bytes(pk)})
         return pk

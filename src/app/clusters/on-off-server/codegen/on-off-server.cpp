@@ -29,10 +29,10 @@
 #include <tracing/macros.h>
 
 // integration with other clusters
-#include <app/clusters/on-off-server/level-control-integration.h>
-#include <app/clusters/on-off-server/mode-base-integration.h>
-#include <app/clusters/on-off-server/mode-select-integration.h>
-#include <app/clusters/on-off-server/scenes-integration.h>
+#include <app/clusters/on-off-server/codegen/level-control-integration.h>
+#include <app/clusters/on-off-server/codegen/mode-base-integration.h>
+#include <app/clusters/on-off-server/codegen/mode-select-integration.h>
+#include <app/clusters/on-off-server/codegen/scenes-integration.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
