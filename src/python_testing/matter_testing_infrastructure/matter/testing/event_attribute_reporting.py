@@ -109,10 +109,9 @@ class EventSubscriptionHandler:
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
-    async def cancel(self, timeout_sec: float = 5.0):
+    async def cancel(self):
         """This cancels a subscription."""
         self._subscription.Shutdown()
-        await asyncio.sleep(timeout_sec)
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -252,10 +251,9 @@ class AttributeSubscriptionHandler:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    async def cancel(self, timeout_sec: float = 5.0):
+    async def cancel(self):
         """This cancels a subscription."""
         self._subscription.Shutdown()
-        await asyncio.sleep(timeout_sec)
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
