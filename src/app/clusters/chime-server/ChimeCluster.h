@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {

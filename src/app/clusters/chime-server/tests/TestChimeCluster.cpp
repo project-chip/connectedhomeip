@@ -27,7 +27,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -91,8 +91,11 @@ struct TestChimeCluster : public ::testing::Test
     void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
 
     MockChimeDelegate mMockDelegate;
+
     ChimeCluster mCluster{ kTestEndpointId, mMockDelegate };
-    chip::Test::ClusterTester mClusterTester{ mCluster };
+
+    ClusterTester mClusterTester{ mCluster };
+
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
@@ -240,7 +243,7 @@ TEST_F(TestChimeCluster, TestWriteAttributes)
 
 TEST_F(TestChimeCluster, TestPersistence)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
     app::DefaultSafeAttributePersistenceProvider persistenceProvider;
     EXPECT_EQ(persistenceProvider.Init(&context.Get().storage), CHIP_NO_ERROR);
     app::SetSafeAttributePersistenceProvider(&persistenceProvider);
@@ -250,7 +253,7 @@ TEST_F(TestChimeCluster, TestPersistence)
     {
         ChimeCluster cluster(kTestEndpointId, mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        chip::Test::ClusterTester tester(cluster);
+        ClusterTester tester(cluster);
 
         uint8_t selectedChime;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);
@@ -269,7 +272,7 @@ TEST_F(TestChimeCluster, TestPersistence)
     {
         ChimeCluster cluster(kTestEndpointId, mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        chip::Test::ClusterTester tester(cluster);
+        chip::Testing::ClusterTester tester(cluster);
 
         uint8_t selectedChime;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);

@@ -82,8 +82,11 @@ struct TestChimeClusterBackwardsCompatibility : public ::testing::Test
     void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
 
     MockChimeDelegate mMockDelegate;
+
     ChimeServer mChimeServer{ kTestEndpointId, mMockDelegate };
-    chip::Test::ClusterTester mClusterTester{ mChimeServer.mCluster.Cluster() };
+
+    chip::Testing::ClusterTester mClusterTester{ mChimeServer.mCluster.Cluster() };
+
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
