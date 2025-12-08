@@ -409,7 +409,7 @@ class SignClientCertificate(BaseModel):
 
 class TrackNameRequest(BaseModel):
     """Request model to update track name for a stream"""
-    trackName: str
+    track_name: str
 
 
 class SupportedIngestInterface(str, Enum):
@@ -721,19 +721,9 @@ class PushAvServer:
 
     # Seems unused in the current TH tests
     async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
-        """
-        Updates the trackName for a given stream_id.
-        """
-        stream_details = self._read_stream_details(stream_id)
-
-        stream_details["trackName"] = track_request.trackName
-
-        details_path = self.wd.path("streams", str(stream_id), "details.json")
-        try:
-            with open(details_path, 'w', encoding='utf-8') as f:
-                json.dump(stream_details, f, ensure_ascii=False, indent=4)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
+        """Updates the track_name for a given stream_id."""
+        with self._open_session(stream_id) as session:
+            session.track_name = track_request.track_name
 
     def sign_client_certificate(
         self, name: str, req: SignClientCertificate, override: bool = True
