@@ -15,7 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
+#include <app/clusters/ethernet-network-diagnostics-server/EthernetDiagnosticsCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>

@@ -51,18 +51,16 @@ def is_type(received_value, desired_type):
     """
     if typing.get_origin(desired_type) == typing.Union:
         return any(is_type(received_value, t) for t in typing.get_args(desired_type))
-    elif typing.get_origin(desired_type) == list:
+    if typing.get_origin(desired_type) == list:
         if isinstance(received_value, list):
             # Assume an empty list is of the correct type
             return True if received_value == [] else any(is_type(received_value[0], t) for t in typing.get_args(desired_type))
-        else:
-            return False
-    elif desired_type == uint:
+        return False
+    if desired_type == uint:
         return isinstance(received_value, int) and received_value >= 0
-    elif desired_type == float32:
+    if desired_type == float32:
         return isinstance(received_value, float)
-    else:
-        return isinstance(received_value, desired_type)
+    return isinstance(received_value, desired_type)
 
 
 if __name__ == "__main__":

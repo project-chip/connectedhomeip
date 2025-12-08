@@ -402,7 +402,7 @@ void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * syste
 
     if (self->mCurrentSessionId != 0)
     {
-        self->mRequestorServer->RemoveSession(self->mCurrentSessionId);
+        self->mRequestorServer->RemoveSession(self->mCurrentSessionId, self->mPeerId.GetNodeId(), self->mPeerId.GetFabricIndex());
         self->mCurrentSessionId = 0;
     }
 
@@ -453,13 +453,14 @@ void WebRTCProviderClient::HandleSolicitOfferResponse(TLV::TLVReader & data)
         ChipLogProgress(Camera, "DeferredOffer=TRUE -- there will be a larger than normal amount of time to receive Offer command");
 
         // Longer timeout because the provider is in low-power standby
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kDeferredOfferTimeoutSeconds), OnSessionEstablishTimeout,
-                                              this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kDeferredOfferTimeoutSeconds),
+                                                                       OnSessionEstablishTimeout, this);
     }
     else
     {
         // Normal (shorter) timeout for an imminent Offer round-trip
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionTimeoutSeconds), OnSessionEstablishTimeout, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionTimeoutSeconds),
+                                                                       OnSessionEstablishTimeout, this);
     }
 
     MoveToState(State::AwaitingOffer);
@@ -497,7 +498,8 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
     // Insert or update the Requestor cluster's CurrentSessions.
     mRequestorServer->UpsertSession(session);
 
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionTimeoutSeconds), OnSessionEstablishTimeout, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionTimeoutSeconds),
+                                                                   OnSessionEstablishTimeout, this);
 
     MoveToState(State::AwaitingAnswer);
 }

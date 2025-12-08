@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/localization-configuration-server/localization-configuration-cluster.h>
+#include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
 #include <app/static-cluster-config/LocalizationConfiguration.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>

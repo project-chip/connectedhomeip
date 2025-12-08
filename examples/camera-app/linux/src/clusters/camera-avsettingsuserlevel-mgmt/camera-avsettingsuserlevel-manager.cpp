@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>
@@ -73,7 +73,7 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
     // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. An actual HAL will
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 
@@ -91,7 +91,7 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
     // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 
@@ -109,7 +109,7 @@ Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optio
     // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 

@@ -489,6 +489,7 @@ if (chip_device_platform != "none") {
       "../include/platform/CommissionableDataProvider.h",
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
+      "../include/platform/DefaultTimerDelegate.h",
       "../include/platform/DeviceControlServer.h",
       "../include/platform/DeviceInstanceInfoProvider.h",
       "../include/platform/GeneralFaults.h",
@@ -533,6 +534,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "CommissionableDataProvider.cpp",
+      "DefaultTimerDelegate.cpp",
       "DeviceControlServer.cpp",
       "DeviceInfoProvider.cpp",
       "DeviceInstanceInfoProvider.cpp",
@@ -576,6 +578,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:timer-delegate",
     ]
 
     if (chip_device_platform == "cc13x4_26x4") {
@@ -587,7 +590,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "efr32") {
       _platform_target = "silabs/efr32"
     } else if (chip_device_platform == "SiWx917") {
-      _platform_target = "silabs/SiWx917"
+      _platform_target = "silabs/SiWx"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
     } else if (chip_device_platform == "linux") {

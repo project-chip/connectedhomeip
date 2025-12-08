@@ -42,6 +42,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 """ Integration test for error path returns via the UnitTesting cluster.
 """
 
@@ -57,7 +59,7 @@ class TestUnitTestingErrorPath(MatterBaseTest):
 
         self.print_step(1, "Set error to 'Failure' for all subsequent reads of FailureInt32U.")
         await self.default_controller.WriteAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(endpoint_id, attributes.ReadFailureCode(int(Status.Failure)))],
         )
 
@@ -78,7 +80,7 @@ class TestUnitTestingErrorPath(MatterBaseTest):
 
         self.print_step(3, "Set error to 'ResourceExhausted' for all subsequent reads of FailureInt32U.")
         await self.default_controller.WriteAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(endpoint_id, attributes.ReadFailureCode(int(Status.ResourceExhausted)))],
         )
 
@@ -99,11 +101,11 @@ class TestUnitTestingErrorPath(MatterBaseTest):
 
         self.print_step(5, "Reset ReadFailureCode error to default 'Failure' code.")
         await self.default_controller.WriteAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(1, attributes.ReadFailureCode(int(Status.Failure)))],
         )
 
-        logging.info("Test completed")
+        log.info("Test completed")
 
 
 if __name__ == "__main__":

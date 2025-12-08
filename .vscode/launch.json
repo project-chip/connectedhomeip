@@ -5,14 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File with Arguments",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": []
-        },
-        {
             "name": "Python: Mock Server Tests",
             "type": "debugpy",
             "request": "launch",
@@ -55,17 +47,94 @@
             "name": "Run application (Darwin x64)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/${input:outAppDarwin}",
-            "args": [],
+            "program": "${workspaceFolder}/examples/chip-tool/out/debug/chip-tool",
+            "args": [
+                "--storage-directory",
+                "./storage",
+                "interactive",
+                "start"
+            ],
+            "cwd": "${workspaceFolder}/examples/chip-tool/out/debug"
+        },
+        {
+            "name": "Run mdns-advertiser product-id 1 (Linux x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/minimal-mdns/out/debug/mdns-advertiser",
+            "args": [
+                "-4",
+                "-m",
+                "commissionable-node",
+                "--vendor-id",
+                "4381",
+                "--product-id",
+                "1",
+                "--device-type",
+                "144",
+                "--commissioning-mode",
+                "0"
+            ],
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Run application Energy-Gtw-Sample (Darwin arm64)",
+            "name": "Run TestFabricTable",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/darwin-arm64-energy-gateway/chip-energy-gateway-app",
-            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
-            "cwd": "${workspaceFolder}/examples/energy-gateway-app"
+            "program": "${workspaceFolder}/src/credentials/tests/out/test/tests/TestFabricTable",
+            "cwd": "${workspaceFolder}/src/credentials/tests/out/test/tests"
+        },
+        {
+            "name": "Run TestJCMCommissioner",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestJCMCommissioner",
+            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestTrustVerification",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestVendorIdVerificationClient",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestVendorIdVerificationClient",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestCommissioningWindowManager",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/app/tests/out/test/tests/TestCommissioningWindowManager",
+            "cwd": "${workspaceFolder}/src/app/tests/out/test/tests"
+        },
+        {
+            "name": "Run TestCommands",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestCommands",
+            "cwd": "${workspaceFolder}/src/controller/tests/out/test/tests"
+        },
+        {
+            "name": "Run application (valgrind jfc-app)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "valgrind",
+            "args": [
+                "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+                "--rpc-server-ip",
+                "192.168.1.64",
+                "--rpc-server-port",
+                "33055",
+                "--storage-directory",
+                "./jfc_b_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF2"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
         },
         {
             "name": "Run application (Linux x64)",
@@ -222,6 +291,82 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Joint Fabric (JFA-A)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug/jfa-app",
+            "args": [
+                "--capabilities",
+                "0x4",
+                "--passcode",
+                "11022033",
+                "--discriminator",
+                "3840",
+                "--secured-device-port",
+                "5533",
+                "--rpc-server-port",
+                "33033",
+                "--KVS",
+                "jfa_a_kvs"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug"
+        },
+        {
+            "name": "Joint Fabric (JFC-A)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "127.0.0.1",
+                "--rpc-server-port",
+                "33033",
+                "--storage-directory",
+                "./jfc_a_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF1"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
+        {
+            "name": "Joint Fabric (JFA-B)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug/jfa-app",
+            "args": [
+                "--capabilities",
+                "0x4",
+                "--passcode",
+                "11022055",
+                "--discriminator",
+                "3841",
+                "--secured-device-port",
+                "5555",
+                "--rpc-server-port",
+                "33055",
+                "--KVS",
+                "jfa_b_kvs"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug"
+        },
+        {
+            "name": "Joint Fabric (JFC-B)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "127.0.0.1",
+                "--rpc-server-port",
+                "33055",
+                "--storage-directory",
+                "./jfc_b_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF2"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
+        {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
             "request": "launch",
@@ -269,6 +414,41 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "Run TestFabricTable",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/out/test/tests/TestFabricTable",
+            "cwd": "${workspaceFolder}/src/credentials/tests/out/test/tests"
+        },
+        {
+            "name": "Run TestJCMCommissioner",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestJCMCommissioner",
+            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestTrustVerification",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestVendorIdVerificationClient",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestVendorIdVerificationClient",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestCommands",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestCommands",
+            "cwd": "${workspaceFolder}/src/controller/tests/out/test/tests"
         }
     ],
     "inputs": [

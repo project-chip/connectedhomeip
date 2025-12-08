@@ -189,20 +189,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                     continue
 
     # Grabbing the header from the XML templates
-    inputFile = open(f"{xmlPath}{fileName}", "r")
-    outputFile = open(f"{outputPathStr}/{fileName}", "ab")
-    xmlHeader = ""
-    inputLine = inputFile.readline().lstrip()
+    with (open(f"{xmlPath}{fileName}") as inputFile,
+          open(f"{outputPathStr}/{fileName}", "ab") as outputFile):
 
-    while 'clusterPICS' not in inputLine:
-        xmlHeader += inputLine
+        xmlHeader = ""
         inputLine = inputFile.readline().lstrip()
 
-    # Write the PICS XML header
-    outputFile.write(xmlHeader.encode())
+        while 'clusterPICS' not in inputLine:
+            xmlHeader += inputLine
+            inputLine = inputFile.readline().lstrip()
 
-    # Write the PICS XML data
-    tree.write(outputFile)
+        # Write the PICS XML header
+        outputFile.write(xmlHeader.encode())
+
+        # Write the PICS XML data
+        tree.write(outputFile)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
@@ -365,6 +366,10 @@ parser.add_argument('--pics-output', required=True)
 parser.add_argument('--dm-xml')
 args, unknown = parser.parse_known_args()
 
+# The matter_testing framework does not accept unknown args,
+# so all the handled args are removed from argv
+sys.argv = sys.argv[:1] + unknown
+
 xmlTemplatePathStr = args.pics_template
 if not xmlTemplatePathStr.endswith('/'):
     xmlTemplatePathStr += '/'
@@ -432,6 +437,8 @@ class DeviceMappingTest(MatterBaseTest):
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
             elif specVersion == 0x1040200:
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+            elif specVersion == 0x1050000:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
             else:
                 console.print("FAILURE: Specification version reported by device not supported")
                 return
