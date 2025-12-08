@@ -311,11 +311,13 @@ namespace System {
         }
 
         for (auto & block : queuedBlocks) {
+            // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate delete in TimerCompleteBlockCallback
             __auto_type * ctx = new TimerCompleteBlockCallbackContext { .block = block };
             VerifyOrDie(nullptr != ctx);
             CHIP_ERROR error = ScheduleWork(TimerCompleteBlockCallback, ctx);
             LogErrorOnFailure(error);
             VerifyOrDo(CHIP_NO_ERROR == error, delete ctx);
+            // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
         }
 
         // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
