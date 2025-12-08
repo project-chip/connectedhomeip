@@ -715,7 +715,7 @@ void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * sys
 
 void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
 {
-    sIdentifyEffect        = identify->mCurrentEffectIdentifier;
+    sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
     if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
