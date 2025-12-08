@@ -303,7 +303,7 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
     if (cluster == nullptr)
     {
-        ChipLogError(Zcl, "No thermostat cluster!");
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return;
     }
     // Register the delegate for the Thermostat
