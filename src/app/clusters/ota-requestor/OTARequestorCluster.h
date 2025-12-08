@@ -53,8 +53,7 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     void OnStateTransition(OTARequestorEventHandler::UpdateStateEnum previousState,
-                           OTARequestorEventHandler::UpdateStateEnum newState,
-                           OTARequestorEventHandler::ChangeReasonEnum reason,
+                           OTARequestorEventHandler::UpdateStateEnum newState, OTARequestorEventHandler::ChangeReasonEnum reason,
                            DataModel::Nullable<uint32_t> const & targetSoftwareVersion) override;
 
     void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) override;
