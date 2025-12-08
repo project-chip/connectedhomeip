@@ -52,7 +52,7 @@ endpoint {{endpointId}} {
     {{~#first}}
 
     {{/first}}
-    {{#if (isStrEqual source "client")}}
+    {{#if (is_str_equal source "client")}}
     handle command {{asUpperCamelCase name}};
     {{/if}}
     {{/user_cluster_commands}}
