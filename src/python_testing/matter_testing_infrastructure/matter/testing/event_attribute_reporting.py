@@ -26,7 +26,6 @@ Both classes allow tests to start and manage subscriptions, queue received updat
 block until epected reports are received or fail on timeouts
 """
 
-import asyncio
 import inspect
 import logging
 import queue
