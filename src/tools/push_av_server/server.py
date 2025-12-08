@@ -680,7 +680,7 @@ class PushAvServer:
         p = self.wd.path("streams", str(stream_id), file_path)
 
         if not p.exists():
-            return HTTPException(404, detail="Stream doesn't exists")
+            raise HTTPException(404, detail="Media file doesn't exists")
 
         proc = subprocess.run(
             ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())],
@@ -689,7 +689,7 @@ class PushAvServer:
 
         if proc.returncode != 0:
             # TODO Add more details (maybe stderr) to the response
-            return HTTPException(500)
+            raise HTTPException(500)
 
         return json.loads(proc.stdout)
 
