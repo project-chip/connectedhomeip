@@ -21,6 +21,7 @@ import("${chip_root}/build/chip/tools.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/device.gni")
 
 chip_test_suite("jcm") {
