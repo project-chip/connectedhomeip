@@ -111,31 +111,30 @@ CHIP_ERROR BLEManagerImpl::_InitImpl()
     int ret;
 
     ret = bt_initialize();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_initialize() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_initialize() failed: %s", get_error_message(ret)));
 
     ret = bt_adapter_set_state_changed_cb(
         +[](int result, bt_adapter_state_e adapterState, void * self) {
             return reinterpret_cast<BLEManagerImpl *>(self)->AdapterStateChangedCb(result, adapterState);
         },
         this);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
 
     ret = bt_gatt_server_initialize();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed: %s", get_error_message(ret)));
 
     ret = bt_gatt_set_connection_state_changed_cb(
         +[](int result, bool connected, const char * remoteAddress, void * self) {
             return reinterpret_cast<BLEManagerImpl *>(self)->GattConnectionStateChangedCb(result, connected, remoteAddress);
         },
         this);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
 
     return CHIP_NO_ERROR;
-
-exit:
-    return MATTER_PLATFORM_ERROR(ret);
 }
 
 static int __GetAttInfo(bt_gatt_h gattHandle, char ** uuid, bt_gatt_type_e * type)
@@ -612,8 +611,9 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     return CHIP_NO_ERROR;
 
 exit:
-    NotifyBLEPeripheralGATTServerRegisterComplete(MATTER_PLATFORM_ERROR(ret));
-    return MATTER_PLATFORM_ERROR(ret);
+    auto err = MATTER_PLATFORM_ERROR(ret);
+    NotifyBLEPeripheralGATTServerRegisterComplete(err);
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
@@ -713,8 +713,9 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     return CHIP_NO_ERROR;
 
 exit:
-    NotifyBLEPeripheralAdvStopComplete(MATTER_PLATFORM_ERROR(ret));
-    return MATTER_PLATFORM_ERROR(ret);
+    auto err = MATTER_PLATFORM_ERROR(ret);
+    NotifyBLEPeripheralAdvStopComplete(err);
+    return err;
 }
 
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
@@ -1151,14 +1152,12 @@ CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, 
 
     ChipLogProgress(DeviceLayer, "Sending Notification Enable Request to CHIP Peripheral: %s", conId->peerAddr.c_str());
     int ret = bt_gatt_client_set_characteristic_value_changed_cb(conId->gattCharC2Handle, CharacteristicIndicationCb, conId);
-    VerifyOrExit(
-        ret == BT_ERROR_NONE,
+    VerifyOrReturnError(
+        ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
         ChipLogError(DeviceLayer, "bt_gatt_client_set_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
 
     NotifySubscribeOpComplete(conId, true);
-
-exit:
-    return MATTER_PLATFORM_ERROR(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
@@ -1175,14 +1174,12 @@ CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId
 
     ChipLogProgress(DeviceLayer, "Disable Notification Request to CHIP Peripheral: %s", conId->peerAddr.c_str());
     int ret = bt_gatt_client_unset_characteristic_value_changed_cb(conId->gattCharC2Handle);
-    VerifyOrExit(
-        ret == BT_ERROR_NONE,
+    VerifyOrReturnError(
+        ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
         ChipLogError(DeviceLayer, "bt_gatt_client_unset_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
 
     NotifySubscribeOpComplete(conId, false);
-
-exit:
-    return MATTER_PLATFORM_ERROR(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
@@ -1207,7 +1204,8 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
     VerifyOrReturnError(CanCastTo<int>(pBuf->DataLength()), CHIP_ERROR_INTERNAL);
 
     int ret = bt_gatt_set_value(mGattCharC2Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conId->peerAddr.c_str(),
                     static_cast<int>(pBuf->DataLength()));
@@ -1220,12 +1218,11 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
                                                                                       completed);
         },
         conId->peerAddr.c_str(), this);
-    VerifyOrExit(
-        ret == BT_ERROR_NONE,
+    VerifyOrReturnError(
+        ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
         ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed: %s", get_error_message(ret)));
 
-exit:
-    return MATTER_PLATFORM_ERROR(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
@@ -1241,17 +1238,17 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const B
     VerifyOrReturnError(CanCastTo<int>(pBuf->DataLength()), CHIP_ERROR_INTERNAL);
 
     int ret = bt_gatt_set_value(conId->gattCharC1Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending Write Request for CHIPoBLE TX characteristic (con %s, len %u)", conId->peerAddr.c_str(),
                     static_cast<int>(pBuf->DataLength()));
 
     ret = bt_gatt_client_write_value(conId->gattCharC1Handle, WriteCompletedCb, conId);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed: %s", get_error_message(ret)));
 
-exit:
-    return MATTER_PLATFORM_ERROR(ret);
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
