@@ -166,10 +166,10 @@ CHIP_ERROR UserLabelCluster::Startup(ServerClusterContext & context)
     return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
-void UserLabelCluster::Shutdown()
+void UserLabelCluster::Shutdown(ClusterShutdownType type)
 {
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(type);
 }
 
 void UserLabelCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)

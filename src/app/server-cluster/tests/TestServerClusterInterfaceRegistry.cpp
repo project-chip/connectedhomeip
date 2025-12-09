@@ -104,7 +104,7 @@ public:
         mStartupCalls++;
         return CHIP_ERROR_CANCELLED;
     }
-    void Shutdown() override { mShutdownCalls++; }
+    void Shutdown(ClusterShutdownType type) override { mShutdownCalls++; DefaultServerCluster::Shutdown(type); }
 
     uint32_t GetStartupCallCount() const { return mStartupCalls; }
     uint32_t GetShutdownCallCount() const { return mShutdownCalls; }

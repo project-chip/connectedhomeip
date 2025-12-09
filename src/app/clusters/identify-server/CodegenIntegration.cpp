@@ -16,6 +16,7 @@
  */
 
 #include "identify-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,6 +27,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
@@ -148,9 +150,8 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
                    EffectVariantEnum effectVariant, chip::TimerDelegate * timerDelegate) :
 
-    mOnIdentifyStart(onIdentifyStart),
-    mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
-    mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
+    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
+    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
     mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
                  .WithIdentifyType(identifyType)
                  .WithDelegate(&gLegacyDelegate)
@@ -183,7 +184,7 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
-void MatterIdentifyClusterShutdownCallback(EndpointId endpointId) {}
+void MatterIdentifyClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 
 // Legacy PluginServer callback stubs
 void MatterIdentifyPluginServerInitCallback() {}

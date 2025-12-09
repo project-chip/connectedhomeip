@@ -103,9 +103,9 @@ public:
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
-    void Shutdown() override
+    void Shutdown(ClusterShutdownType type) override
     {
-        DefaultServerCluster::Shutdown();
+        DefaultServerCluster::Shutdown(type);
         mLogic.Shutdown();
     }
 

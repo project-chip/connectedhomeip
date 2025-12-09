@@ -32,6 +32,13 @@
 namespace chip {
 namespace app {
 
+/// Defines how a cluster is being shut down, so that its
+/// cleanup behavior can be more controlled.
+enum class ClusterShutdownType {
+    kClusterShutdown,  // normal shutdown, generally assume timer and delegate cleanup
+    kPermanentRemove,  // permanent removal, can consider persistent storage cleanup
+};
+
 /// Handles cluster interactions for a specific set of cluster instances
 ///
 /// A `ServerClusterInterface` instance may be associated with multiple `endpointId/clusterId` paths.
@@ -54,7 +61,7 @@ public:
     virtual CHIP_ERROR Startup(ServerClusterContext & context) = 0;
 
     /// A shutdown will always be paired with a corresponding Startup.
-    virtual void Shutdown() = 0;
+    virtual void Shutdown(ClusterShutdownType shutdownType) = 0;
 
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
 

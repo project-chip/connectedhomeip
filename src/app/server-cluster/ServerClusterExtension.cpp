@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "ServerClusterInterface.h"
 #include <app/server-cluster/ServerClusterExtension.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -28,9 +29,9 @@ CHIP_ERROR ServerClusterExtension::Startup(ServerClusterContext & context)
     return mUnderlying.Startup(context);
 }
 
-void ServerClusterExtension::Shutdown()
+void ServerClusterExtension::Shutdown(ClusterShutdownType type)
 {
-    mUnderlying.Shutdown();
+    mUnderlying.Shutdown(type);
     mContext = nullptr;
 }
 

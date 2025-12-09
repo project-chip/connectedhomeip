@@ -150,7 +150,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 enum class MatterClusterShutdownType {
-    kClusterShutdown, // "normal" shutdown, e.g. application stop
+    kClusterShutdown, // "normal" shutdown, e.g. application stop. Assume time and delegate cleanup.
     kPermanentRemove, // full "remove", generally for bridged devices.
 };
 
@@ -159,8 +159,9 @@ enum class MatterClusterShutdownType {
  *
  * In most cases, this is a result of dynamic endpoint disabling, so this is assumed
  * to need to perform any cleanup such as:
- *   - cancel pending timers (this applies for ALL shutdowns)
- *   - clean up storage (this applies to brided endpoints where the shutdown is a full removal)
+ *   - cancel pending timers
+ *   - remove delegates added during startup
+ *   - Permanent remove only (e.g. bridges): clean up storage
  */
 void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, MatterClusterShutdownType shutdownType);
 
