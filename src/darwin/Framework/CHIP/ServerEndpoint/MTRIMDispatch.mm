@@ -89,7 +89,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
-void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, MatterClusterShutdownType)
+void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, MatterClusterShutdownType shutdownType)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -97,7 +97,7 @@ void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::Cluste
     // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
     case app::Clusters::Descriptor::Id:
-        MatterDescriptorClusterShutdownCallback(endpoint);
+        MatterDescriptorClusterShutdownCallback(endpoint, shutdownType);
         break;
     }
 }
