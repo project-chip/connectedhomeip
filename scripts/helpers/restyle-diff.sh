@@ -27,8 +27,8 @@
 # -d enables debug logging for Restyle CLI
 #
 # Note: This script requires sudo to restore file ownership after restyle
-#  (which uses Docker and changes ownership of restyled files to root); You can either run the
-#  script directly and be prompted for sudo, or run it with sudo.
+#  (which uses Docker and changes ownership of restyled files to root). Run this script as a regular user;
+#  it will prompt for sudo only when needed to restore file ownership.
 
 here=${0%/*}
 
@@ -49,7 +49,7 @@ restyle-paths() {
 
     echo
     echo "[restyle-diff.sh] Restoring file ownership to current user (sudo required)"
-    sudo chown -h "$uid:$gid" "$@"
+    sudo chown -h "$uid:$gid" -- "$@"
 }
 
 ensure_restyle_installed() {
@@ -79,10 +79,10 @@ ensure_restyle_installed() {
         exit 1
     fi
 
-    echo "[restyle-diff.sh] Installing restyle to ""$HOME/.local/bin"
+    echo "[restyle-diff.sh] Installing restyle to $HOME/.local/bin"
     mkdir -p "$HOME/.local/bin"
     install "$tmpdir/$asset/restyle" "$HOME/.local/bin"
-    rm -rf "$tmpdir"
+    export PATH="$HOME/.local/bin:$PATH"
 
 }
 
