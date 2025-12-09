@@ -90,7 +90,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
     while (mServerClusterRegistry.AllServerClusterInstances().begin() != mServerClusterRegistry.AllServerClusterInstances().end())
     {
         ServerClusterInterface * clusterToRemove = *mServerClusterRegistry.AllServerClusterInstances().begin();
-        if (mServerClusterRegistry.Unregister(clusterToRemove) != CHIP_NO_ERROR)
+        if (mServerClusterRegistry.Unregister(clusterToRemove, ClusterShutdownType::kClusterShutdown) != CHIP_NO_ERROR)
         {
             had_failure = true;
         }
