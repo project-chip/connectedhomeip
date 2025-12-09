@@ -74,7 +74,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 void MatterDescriptorClusterInitCallback(EndpointId endpointId);
-void MatterDescriptorClusterShutdownCallback(EndpointId endpointId);
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
