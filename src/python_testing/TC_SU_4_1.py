@@ -92,13 +92,10 @@ class TC_SU_4_1(MatterBaseTest):
 
     def pics_TC_SU_4_1(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
-            "MCORE.S",      # Pics
-        ]
-        return pics
+        return ["MCORE.OTA.Requestor"]
 
     def steps_TC_SU_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. TH2 is set as the default Provider for the fabric.",
                      "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
@@ -123,30 +120,9 @@ class TC_SU_4_1(MatterBaseTest):
                      "Verify that the attribute value is set to one of the following values.\n"
                      "Idle, Querying, DelayedOnQuery, Downloading, Applying, DelayedOnApply, RollingBack, DelayedOnUserConsent."),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_SU_4_1(self):
-        # ------------------------------------------------------------------------------------
-        # Manual Setup
-        # ------------------------------------------------------------------------------------
-        # 1. Launch OTA Requestor (TH1 / DUT) from Terminal 3:
-        #     ./out/debug/chip-ota-requestor-app \
-        #         --discriminator 1234 \
-        #         --passcode 20202021 \
-        #         --secured-device-port 5541 \
-        #         --autoApplyImage \
-        #         --KVS /tmp/chip_kvs_requestor
-        # 2. Run Python test with commission Provisioner/Requestor (Terminal 2):
-        #     python3 src/python_testing/TC_SU_4_1.py \
-        #         --commissioning-method on-network \
-        #         --discriminator 1234 \
-        #         --passcode 20202021 \
-        #         --vendor-id 65521 \
-        #         --product-id 32769 \
-        #         --nodeId 2
-        # ------------------------------------------------------------------------------------
-
         self.step(0)
 
         # Read the Steps
