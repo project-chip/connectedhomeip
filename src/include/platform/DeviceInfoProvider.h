@@ -131,6 +131,14 @@ public:
      */
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
+    uint16_t GetSimultaneousInvocationsSupported();
+
+    uint16_t GetSimultaneousWritesSupported();
+    
+    uint16_t GetReadPathsSupported();
+
+    uint16_t GetSubscribePathsSupported();
+
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of labels associated with the given endpoint.

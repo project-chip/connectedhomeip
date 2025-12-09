@@ -23,6 +23,7 @@
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/PlatformManager.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace chip {
 namespace app {

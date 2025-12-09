@@ -194,12 +194,17 @@ inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager
 inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
+    DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
 
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
     capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
+    capabilityMinima.simultaneousInvocationsSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSimultaneousInvocationsSupported());
+    capabilityMinima.simultaneousWritesSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSimultaneousWritesSupported());
+    capabilityMinima.readPathsSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetReadPathsSupported());
+    capabilityMinima.subscribePathsSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSubscribePathsSupported());
 
     return aEncoder.Encode(capabilityMinima);
 }
