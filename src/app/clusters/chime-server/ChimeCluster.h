@@ -111,10 +111,10 @@ public:
 protected:
     friend class ChimeCluster;
 
-    ChimeCluster * mChimeCluster = nullptr;
+    ChimeCluster * mChimeServer = nullptr;
 
-    void SetChimeCluster(ChimeCluster * chimeCluster) { mChimeCluster = chimeCluster; }
-    ChimeCluster * GetChimeCluster() const { return mChimeCluster; }
+    void SetChimeCluster(ChimeCluster * chimeCluster) { mChimeServer = chimeCluster; }
+    ChimeCluster * GetChimeCluster() const { return mChimeServer; }
 };
 
 } // namespace Clusters
