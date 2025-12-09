@@ -27,6 +27,7 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
+#include <app/util/generic-callbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CommonIterator.h>
@@ -1152,14 +1153,16 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
+void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint, MatterClusterShutdownType shutdownType)
 {
     uint16_t endpointTableSize = 0;
     VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
 
-    // Get Scene Table Instance
-    SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
-    TEMPORARY_RETURN_IGNORED sceneTable->RemoveEndpoint();
+    if (shutdownType == MatterClusterShutdownType::kPermanentRemove)
+    {
+        SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
+        TEMPORARY_RETURN_IGNORED sceneTable->RemoveEndpoint();
+    }
 }
 
 void MatterScenesManagementPluginServerInitCallback()
