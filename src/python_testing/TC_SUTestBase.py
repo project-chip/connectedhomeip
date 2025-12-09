@@ -311,21 +311,18 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    def restart_requestor(self, requestor_th):
-        """This method restart the requestor to restore Softwareupdate version.
-
-        Args:
-            controller (_type_): _description_
-        """
+    def restart_requestor(self):
+        """This method restart the requestor to restore Softwareupdate version."""
         restart_flag_file = self.get_restart_flag_file()
-        logger.info(f"RESTART FILE at {restart_flag_file}")
+        log.info(f"RESTART FILE at {restart_flag_file}")
         if not restart_flag_file:
-            # No restart flag file: ask user to manually reboot
-            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
-
+            log.info("Restart file not found. Entering Manual Reboot.")
+            # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
+            # restore to the previous software version.
+            self.controller.ExpireSessions(self.requestor_node_id)
+            self.wait_for_user_input(
+                prompt_msg="Manually restart the DUT and restore to it's original version. Please type Enter when its ready.",)
             # After manual reboot, expire previous sessions so that we can re-establish connections
-            logging.info("Expiring sessions after manual device reboot")
-            requestor_th.ExpireSessions(self.requestor_node_id)
             logging.info("Manual device reboot completed")
 
         else:
@@ -341,7 +338,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
                 # Expire sessions and re-establish connections
                 logging.info("Expiring sessions after manual device reboot")
-                requestor_th.ExpireSessions(self.requestor_node_id)
+                self.controller.ExpireSessions(self.requestor_node_id)
                 logging.info("App restart completed successfully")
 
             except Exception as e:
@@ -363,7 +360,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, attr_clear)],
             nodeId=requestor_node_id
         )
-        logger.info('Cleanup - DefaultOTAProviders cleared')
+        log.info('Cleanup - DefaultOTAProviders cleared')
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
 
@@ -378,4 +375,4 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if kvs_prefix is None:
             kvs_prefix = "/tmp/chip_kvs"
         subprocess.run(f"rm -rf {kvs_prefix}*", shell=True)
-        logger.info(f"KVS files removed with prefix {kvs_prefix}")
+        log.info(f"KVS files removed with prefix {kvs_prefix}")

@@ -313,6 +313,47 @@ class AttributeSubscriptionHandler:
         asserts.assert_equal(item.attribute, self._expected_attribute,
                              f"[AttributeSubscriptionHandler] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
 
+    def await_all_period_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports until timeout.
+
+        Waits for all `timeout_sec` seconds.
+
+        Verify the matcher does not change the expected attribute report.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        # Matchers are true as we expect them to be true during all the report time.
+        report_matches: dict[int, bool] = {idx: True for idx, _ in enumerate(expected_matchers)}
+
+        for matcher in expected_matchers:
+            LOGGER.info(
+                f"--> Matcher waiting: {matcher.description}")
+        LOGGER.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, matcher in enumerate(expected_matchers):
+                for attribute, reports in all_reports.items():
+                    for report in reports:
+                        # if one the report does not match, terminate the check.
+                        if not matcher.matches(report) and report_matches[expected_idx]:
+                            asserts.fail(f"Unexpected report value {report.value} found within the timeframe {timeout_sec}")
+                        if matcher.matches(report) and report_matches[expected_idx]:
+                            report_matches[expected_idx] = True
+                            # LOGGER.info(f"  --> Expected value still the same. : {matcher.description}")
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        if all(report_matches.values()):
+            LOGGER.info("Found all expected matchers did match in the period of time.")
+            return
+
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
 

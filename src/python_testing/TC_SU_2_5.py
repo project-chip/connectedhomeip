@@ -36,6 +36,7 @@
 #       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
@@ -135,6 +136,25 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id, endpoint=0)
         super().setup_test()
 
+    async def _restart_requestor_device(self):
+        if self.is_pics_sdk_ci_only:
+            self.restart_requestor(self.controller)
+        else:
+            self.wait_for_user_input(prompt_msg="Manually restart you device and restore to original version. Please type \"y\" when its ready.",
+                                     default_value="y")
+            # After this device is manually restarted and wiped is required to re-commission the device.
+            await self.controller.CommissionOnNetwork(
+                nodeId=self.provider_node_id,
+                setupPinCode=self.provider_setup_pincode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=self.provider_discriminator
+            )
+            logger.info("Create ACL Entries")
+            await self.create_acl_entry(dev_ctrl=self.controller,
+                                        provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
+            logger.info("Write OTA Providers")
+            await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id, endpoint=0)
+
     def desc_TC_SU_2_5(self) -> str:
         return " [TC-SU-2.5] Handling Different ApplyUpdateResponse Scenarios on Requestor"
 
@@ -172,9 +192,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         )
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        basicinformation_handler = EventSubscriptionHandler(
-            expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*2)
+        # basicinformation_handler = EventSubscriptionHandler(
+        #     expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
+        # await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*2)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
@@ -188,19 +208,17 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
-        # Wait for shutdown event ( this is triggered after the SU Completition)
+        # Wait to the idle status for good period of time like 600 seconds.
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Idle",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=600)
+
         update_state_attr_handler.flush_reports()
         await update_state_attr_handler.cancel()
-        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60)
-        logger.info(f"Event report for ShutDown : {shutdown_event}")
-        # Cancel eventhandlers
 
-        basicinformation_handler.flush_events()
-        await basicinformation_handler.cancel()
-
-        # Just wait for the device to StartUp after ShutDown
-        await asyncio.sleep(5)
-        # Verify software version after StartUp
+        # Once in idle verify the version match the expected software version
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
 
@@ -209,8 +227,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state should be idle")
+
         self.terminate_provider()
-        self.restart_requestor(self.controller)
+        await self._restart_requestor_device()
 
         self.step(2)
         # Set values for step 2
@@ -285,7 +304,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         # Terminate the provider
         self.terminate_provider()
-        self.restart_requestor(self.controller)
+        await self._restart_requestor_device()
 
         self.step(3)
         delayed_apply_action_time = 60
@@ -365,7 +384,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
-        self.restart_requestor(self.controller)
+        await self._restart_requestor_device()
 
         self.step(4)
         delayed_apply_action_time = 180
@@ -430,7 +449,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
-        self.restart_requestor(self.controller)
+        await self._restart_requestor_device()
 
         self.step(5)
         extra_arguments = ['--applyUpdateAction', 'discontinue']
