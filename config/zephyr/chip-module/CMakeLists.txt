@@ -70,6 +70,10 @@ if(CONFIG_CHIP)
         zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
     endif()
 
+    if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+        set_compiler_property(PROPERTY debug -g0)
+    endif()
+
     # ==============================================================================
     # Generate configuration for CHIP GN build system
     # ==============================================================================
@@ -78,6 +82,7 @@ if(CONFIG_CHIP)
         LIB_SHELL CONFIG_CHIP_LIB_SHELL
         LIB_TESTS CONFIG_CHIP_BUILD_TESTS
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
+        DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     )
 
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
@@ -129,6 +134,10 @@ if(CONFIG_CHIP)
         matter_add_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
     endif()
 
+    if(NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+        matter_add_gn_arg_string("symbol_level" "0")
+    endif()
+
     matter_generate_args_tmp_file()
 
     # ==============================================================================
@@ -137,6 +146,7 @@ if(CONFIG_CHIP)
     matter_build(chip
         LIB_SHELL ${CONFIG_CHIP_LIB_SHELL}
         LIB_TESTS ${CONFIG_CHIP_BUILD_TESTS}
+        DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
         GN_DEPENDENCIES kernel
     )
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)

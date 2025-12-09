@@ -58,6 +58,25 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	  full configuration enabled by this option in the
 	  platform CHIPPlatformConfig.h file.
 
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Enables building the application with debug symbols.
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+config CHIP_IPV4
+	bool "IPv4 support for Matter"
+	default n
+	depends on NET_IPV4
+	help
+	  If disabled, it allows to build the Zephyr application
+	  with IPv4 support independently of the Matter stack still
+	  running over IPv6.
+
 # Device and firmware identifers
 
 config CHIP_DEVICE_VENDOR_ID

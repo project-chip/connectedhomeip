@@ -96,16 +96,6 @@ config CHIP_OTA_REQUESTOR
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
 
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
-
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
 	help
@@ -281,15 +271,6 @@ endif # CHIP_FACTORY_DATA_BUILD
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
-
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n
-	depends on NET_IPV4
-	help
-	  If disabled, it allows to build nRF Connect SDK application
-	  with IPv4 support independently of the Matter stack still
-	  running over IPv6.
 
 config CHIP_ENABLE_READ_CLIENT
 	bool "Enable Read Client in the Interaction Model"

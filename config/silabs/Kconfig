@@ -41,16 +41,6 @@ config CHIP_OTA_IMAGE_BUILD
 	depends on SIGN_IMAGES
 	select DFU_MULTI_IMAGE_PACKAGE_BUILD
 
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
-
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
 	default y
