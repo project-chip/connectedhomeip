@@ -24,6 +24,7 @@ import re
 import subprocess
 import threading
 import typing
+from contextlib import suppress
 from dataclasses import dataclass, replace
 from typing import IO, TYPE_CHECKING, Any, Literal, Protocol
 
@@ -177,17 +178,19 @@ class Executor:
         return process
 
     def terminate(self) -> None:
-        while not self._processes.empty():
-            process = self._processes.get_nowait()
-            cmd = str(process.args)
-            if process.poll() is None:
-                log.debug('Killing process "%s"', cmd)
+        with suppress(queue.Empty):
+            while True:
+                if (process := self._processes.get_nowait()).poll() is not None:
+                    continue
+                cmd = str(process.args)
+
+                log.debug('Killing leftover process "%s"', cmd)
                 process.kill()
-            try:
-                process.wait(1)
-            except subprocess.TimeoutExpired:
-                log.warning('Failed to kill the process "%s". Terminating instead', cmd)
-                process.terminate()
+                try:
+                    process.wait(1)
+                except subprocess.TimeoutExpired:
+                    log.warning('Failed to kill the process "%s". Terminating instead', cmd)
+                    process.terminate()
 
 
 class Runner:

@@ -466,6 +466,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         else:
             log.warning("No platform-specific executor for '%s'", sys.platform)
             executor = Executor()
+        to_terminate.append(executor)
 
         runner = chiptest.runner.Runner(executor=executor)
 
