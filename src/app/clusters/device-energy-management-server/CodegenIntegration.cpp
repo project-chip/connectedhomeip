@@ -43,7 +43,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -63,8 +63,8 @@ bool Instance::HasFeature(Feature aFeature) const
 } // namespace chip
 
 // The current implementation already manually instantiates and initializes the cluster, so no need for the codegen integration.
-void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId) {}
-void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId) {}
+void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId) {}
+void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
 
 // Legacy callback stubs
 void MatterDeviceEnergyManagementPluginServerInitCallback() {}
