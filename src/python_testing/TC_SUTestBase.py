@@ -321,7 +321,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # restore to the previous software version.
             self.controller.ExpireSessions(self.requestor_node_id)
             self.wait_for_user_input(
-                prompt_msg="Manually restart the DUT and restore to it's original version. Please type Enter when its ready.",)
+                prompt_msg="Manually restart the DUT and restore to it's original version. Please type Enter when its ready.")
             # After manual reboot, expire previous sessions so that we can re-establish connections
             logging.info("Manual device reboot completed")
 

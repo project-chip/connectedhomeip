@@ -48,7 +48,6 @@
 
 import asyncio
 import logging
-from time import time
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
@@ -56,7 +55,7 @@ from TC_SUTestBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -108,6 +107,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
+        self.requestor_passcode = self.matter_test_config.setup_passcodes[0]
         self.controller = self.default_controller
         # Extra Arguments required for the step 1
         extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0']
@@ -135,25 +135,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         logger.info("Write OTA Providers")
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id, endpoint=0)
         super().setup_test()
-
-    async def _restart_requestor_device(self):
-        if self.is_pics_sdk_ci_only:
-            self.restart_requestor(self.controller)
-        else:
-            self.wait_for_user_input(prompt_msg="Manually restart you device and restore to original version. Please type \"y\" when its ready.",
-                                     default_value="y")
-            # After this device is manually restarted and wiped is required to re-commission the device.
-            await self.controller.CommissionOnNetwork(
-                nodeId=self.provider_node_id,
-                setupPinCode=self.provider_setup_pincode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter=self.provider_discriminator
-            )
-            logger.info("Create ACL Entries")
-            await self.create_acl_entry(dev_ctrl=self.controller,
-                                        provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
-            logger.info("Write OTA Providers")
-            await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id, endpoint=0)
 
     def desc_TC_SU_2_5(self) -> str:
         return " [TC-SU-2.5] Handling Different ApplyUpdateResponse Scenarios on Requestor"
@@ -192,9 +173,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         )
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        # basicinformation_handler = EventSubscriptionHandler(
-        #     expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        # await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*2)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
@@ -221,15 +199,12 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Once in idle verify the version match the expected software version
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-
-        # Verify on te OTA-P Logs  and confirm there is no other ApplyUpdateRequest form the DUT
         update_state = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state should be idle")
-
         self.terminate_provider()
-        await self._restart_requestor_device()
+        self.restart_requestor()
 
         self.step(2)
         # Set values for step 2
@@ -281,30 +256,27 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
-        start_time = time()
-        update_sw_vesion = AttributeMatcher.from_callable(
-            f"Waiting Sofware version update to {self.expected_software_version}",
-            lambda report: report.value > current_sw_version)
-        software_version_attr_handler.await_all_expected_report_matches(
-            [update_sw_vesion], timeout_sec=(delayed_apply_action_time+10))
-        end_time = time()
-        total_wait_time = end_time - start_time
-        asserts.assert_greater_equal(
-            total_wait_time, delayed_apply_action_time, f"Software Udpate occured before the defined time of: {total_wait_time}")
-        logger.info(f"Time taken after the update was done applied {total_wait_time} seconds.")
+        # Device should stay in ApplyingState During 180 seconds and not Apply the software Update after the 60 seconds.
+        software_version_match = AttributeMatcher.from_callable(
+            f"Sofware Version should be: {current_sw_version}",
+            lambda report: report.value == current_sw_version)
+        software_version_attr_handler.await_all_period_expected_report_matches(
+            expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
+
         software_version_attr_handler.flush_reports()
         await software_version_attr_handler.cancel()
-        update_state_after = await self.read_single_attribute_check_success(
-            Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id)
-        logger.info("UpdateState after update" + str(update_state_after))
-        # Just want to make sure we did change the update state meaning we applied the update
-        asserts.assert_equal(update_state_after, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                             "UpdateState is not Idle")
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kIdle",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=600)
+        update_state_attr_handler.flush_reports()
+        await update_state_attr_handler.cancel()
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         # Terminate the provider
         self.terminate_provider()
-        await self._restart_requestor_device()
+        self.restart_requestor()
 
         self.step(3)
         delayed_apply_action_time = 60
@@ -320,7 +292,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
-        start_software_version = await self.read_single_attribute_check_success(
+        current_sw_version = await self.read_single_attribute_check_success(
             dev_ctrl=self.controller,
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
@@ -346,37 +318,35 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
 
+        # Waits for nextAction
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
+
+        # Wwitches to Applying
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kApplying",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=5)
+
+        # Device should stay in ApplyingState During 120 seconds and not Apply the software Update after the 60 seconds.
+        software_version_match = AttributeMatcher.from_callable(
+            f"Sofware Version should be: {current_sw_version}",
+            lambda report: report.value == current_sw_version)
+        software_version_attr_handler.await_all_period_expected_report_matches(
+            expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
+
+        # Lets wait the device to switch idle state (After Update)
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kIdle",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=600)
         update_state_attr_handler.reset()
-        await update_state_attr_handler.cancel()
-
-        # Delayed on apply and software version is still the same
-        current_sw_version = await self.read_single_attribute_check_success(
-            dev_ctrl=self.controller,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
-            node_id=self.requestor_node_id)
-        asserts.assert_equal(start_software_version, current_sw_version, "Software versions are different")
-
-        start_time = time()
-        # Waiting for Software Version to change in the range for spec wait time then verify it did took more than 120 seconds to change the version
-        # To Apply the new version it should have re send the ApplyUpdateRequest
-        update_sw_version = AttributeMatcher.from_callable(
-            f"Sofware version was updated to {self.expected_software_version}",
-            lambda report: report.value > start_software_version)
-        software_version_attr_handler.await_all_expected_report_matches(
-            [update_sw_version], timeout_sec=(spec_wait_time+10))
-        end_time = time()
-        total_wait_time = end_time - start_time
-        asserts.assert_greater_equal(
-            total_wait_time, delayed_apply_action_time, f"Software Udpate occurred before the defined time of: {spec_wait_time}")
-
         # Cancel handlers
-        update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
         software_version_attr_handler.reset()
         await software_version_attr_handler.cancel()
@@ -384,7 +354,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
-        await self._restart_requestor_device()
+        self.restart_requestor()
 
         self.step(4)
         delayed_apply_action_time = 180
@@ -399,7 +369,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
-        start_software_version = await self.read_single_attribute_check_success(
+        current_sw_version = await self.read_single_attribute_check_success(
             dev_ctrl=self.controller,
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
@@ -430,26 +400,30 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
+        logger.info(f"Waiting the time of DelayedApplyAction of {delayed_apply_action_time} seconds.")
 
-        start_time = time()
+        # Device should stay in ApplyingState and not apply the update during the 180 seconds. Only after this timeframe.
+        software_version_match = AttributeMatcher.from_callable(
+            f"Sofware Version should be: {current_sw_version}",
+            lambda report: report.value == current_sw_version)
+        software_version_attr_handler.await_all_period_expected_report_matches(
+            expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
+
+        # Lets wait the device to switch idle state (After Update)
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kIdle",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=600)
+
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
-        # Waiting for Software Version to change in the range defined in the delayedApplyTimeSec of 180 seconds
-        update_sw_version = AttributeMatcher.from_callable(
-            f"Sofware version was updated to {self.expected_software_version}",
-            lambda report: report.value > start_software_version)
-        software_version_attr_handler.await_all_expected_report_matches(
-            [update_sw_version], timeout_sec=(delayed_apply_action_time+10))
-        end_time = time()
-        total_wait_time = end_time - start_time
-        asserts.assert_greater_equal(
-            total_wait_time, delayed_apply_action_time, f"Software Udpate occurred before the defined time of: {delayed_apply_action_time}")
         software_version_attr_handler.reset()
         await software_version_attr_handler.cancel()
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
-        await self._restart_requestor_device()
+        self.restart_requestor()
 
         self.step(5)
         extra_arguments = ['--applyUpdateAction', 'discontinue']
@@ -475,15 +449,14 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
-
-        # Wait Until Downlading
+        # Wait Until Downloading
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
 
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=90)
-        # Wait some time to check if is downloading
-        await asyncio.sleep(5)
+        # State is Downloading, let it run a few secnods to have some data to check.
+        await asyncio.sleep(3)
         # Verify the default download path and the file size
         # Read file for /tmp/test.bin should exists and greater than 0
         ota_file_data = self.get_downloaded_ota_image_info()
@@ -501,12 +474,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Idle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
-
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
-
         # Make sure attr is Idle
         update_state = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
