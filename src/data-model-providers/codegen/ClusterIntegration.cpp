@@ -72,11 +72,13 @@ ClusterShutdownType ToServerClusterInterfaceShutdown(MatterClusterShutdownType t
 {
     switch (t)
     {
-    case MatterClusterShutdownType::kClusterShutdown:
-        return ClusterShutdownType::kClusterShutdown;
     case MatterClusterShutdownType::kPermanentRemove:
         return ClusterShutdownType::kPermanentRemove;
+    case MatterClusterShutdownType::kClusterShutdown:
+        return ClusterShutdownType::kClusterShutdown;
     }
+    // we are handling all cases above, but compiler does not seem to detect this...
+    return ClusterShutdownType::kClusterShutdown;
 }
 
 } // namespace
