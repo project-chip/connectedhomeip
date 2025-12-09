@@ -207,7 +207,7 @@ TEST_F(TestServerClusterInterfaceRegistry, AllClustersIteration)
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster2), found_clusters.end());
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster3), found_clusters.end());
 
-    EXPECT_SUCCESS(registry.Unregister(&cluster2));
+    EXPECT_SUCCESS(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown));
 
     found_clusters.clear();
     for (auto * cluster : registry.AllServerClusterInstances())
@@ -268,7 +268,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // removing clears the context/shuts clusters down
-        EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -349,10 +349,10 @@ TEST_F(TestServerClusterInterfaceRegistry, UnregisterErrors)
     EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
 
     // Can't unregister a cluster that was not registered.
-    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown), CHIP_ERROR_NOT_FOUND);
 
     // Can't unregister a null cluster.
-    EXPECT_EQ(registry.Unregister(nullptr), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.Unregister(nullptr, ClusterShutdownType::kClusterShutdown), CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
@@ -392,7 +392,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
         EXPECT_EQ(cluster3.Cluster().GetShutdownCallCount(), 0u);
 
         // unregister will call shutdown
-        EXPECT_EQ(registry.Unregister(&cluster2.Cluster()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Unregister(&cluster2.Cluster(), ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
         EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 1u);
     }
 

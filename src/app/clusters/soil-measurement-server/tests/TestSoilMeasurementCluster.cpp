@@ -69,7 +69,7 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(soilMeasurement.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { soilMeasurement.Shutdown(); }
+    void TearDown() override { soilMeasurement.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestSoilMeasurementCluster() : soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits) {}
 

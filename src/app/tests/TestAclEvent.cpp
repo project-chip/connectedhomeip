@@ -499,7 +499,7 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
     engine->SetDataModelProvider(mOldProvider);
 
-    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer, ClusterShutdownType::kClusterShutdown));
     EXPECT_SUCCESS(model.Shutdown());
 }
 
