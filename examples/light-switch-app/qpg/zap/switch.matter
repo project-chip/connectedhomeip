@@ -211,16 +211,6 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
-enum ServerAttributionContextInformation : enum8 {
-  kServerAutomationRule = 11;
-  kServerSchedule = 12;
-  kServerTimer = 13;
-  kSecurity = 14;
-  kDemandResponseEventOrSimilarServiceProviderSignalling = 15;
-  kPhysicalInteractionOnDevice = 16;
-  kInteractionViaAProtocolNotDefinedInThisSpecification = 17;
-}
-
 enum SoftwareVersionCertificationStatusEnum : enum8 {
   kDevTest = 0;
   kProvisional = 1;
@@ -233,14 +223,6 @@ enum StreamUsageEnum : enum8 {
   kRecording = 1;
   kAnalysis = 2;
   kLiveView = 3;
-}
-
-enum SuppliedAttributionContextInformation : enum8 {
-  kDefaultClientAction = 0;
-  kUserInteraction = 1;
-  kClientAutomationRule = 2;
-  kClientSchedule = 3;
-  kClientTimer = 4;
 }
 
 enum TariffPriceTypeEnum : enum8 {
@@ -324,16 +306,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-struct AttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  optional node_id nodeID = 2;
-  optional group_id groupID = 3;
-  optional systime_ms systemTimeStamp = 4;
-  optional posix_ms epochTimeStamp = 5;
-  nullable fabric_idx fabricIndex = 6;
-}
-
 struct ICECandidateStruct {
   char_string candidate = 0;
   nullable char_string SDPMid = 1;
@@ -364,12 +336,6 @@ struct SemanticTagStruct {
   enum8 namespaceID = 1;
   enum8 tag = 2;
   optional nullable char_string<64> label = 3;
-}
-
-fabric_scoped struct SuppliedAttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  fabric_idx fabricIndex = 254;
 }
 
 struct TestGlobalStruct {
