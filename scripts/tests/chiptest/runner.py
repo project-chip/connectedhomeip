@@ -21,6 +21,7 @@ import re
 import subprocess
 import threading
 import typing
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import Literal
 
@@ -147,8 +148,27 @@ class SubprocessInfo:
 
 
 class Executor:
+    def __init__(self) -> None:
+        self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
+
     def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
-        return subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+        self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr))
+        return process
+
+    def terminate(self) -> None:
+        with suppress(queue.Empty):
+            while True:
+                if (process := self._processes.get_nowait()).poll() is not None:
+                    continue
+                cmd = str(process.args)
+
+                log.debug('Killing leftover process "%s"', cmd)
+                process.kill()
+                try:
+                    process.wait(1)
+                except subprocess.TimeoutExpired:
+                    log.warning('Failed to kill the process "%s". Terminating instead', cmd)
+                    process.terminate()
 
 
 class Runner:

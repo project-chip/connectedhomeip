@@ -207,6 +207,7 @@ class IsolatedNetworkNamespace:
 
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
+        super().__init__()
         self.ns = ns
 
     def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
