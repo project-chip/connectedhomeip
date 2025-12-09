@@ -35,7 +35,7 @@ using Protocols::InteractionModel::Status;
 using namespace CameraAvSettingsUserLevelManagement;
 
 CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) 
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return mLogic.AcceptedCommands(builder);
 }
@@ -135,49 +135,49 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelManagement
     case Commands::MPTZSetPosition::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Setting MPTZ Position", request.path.mEndpointId);
         Commands::MPTZSetPosition::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));        
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleMPTZSetPosition(*handler, request.path, data);
     }
 
     case Commands::MPTZRelativeMove::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Relative move of MPTZ Position", request.path.mEndpointId);
         Commands::MPTZRelativeMove::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));  
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleMPTZRelativeMove(*handler, request.path, data);
     }
 
     case Commands::MPTZMoveToPreset::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Moving to an indicated MPTZ Preset", request.path.mEndpointId);
         Commands::MPTZMoveToPreset::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));  
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleMPTZMoveToPreset(*handler, request.path, data);
     }
 
     case Commands::MPTZSavePreset::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving MPTZ Preset", request.path.mEndpointId);
         Commands::MPTZSavePreset::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));  
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleMPTZSavePreset(*handler, request.path, data);
     }
 
     case Commands::MPTZRemovePreset::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Remove indicated MPTZ Preset", request.path.mEndpointId);
         Commands::MPTZRemovePreset::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));  
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleMPTZRemovePreset(*handler, request.path, data);
     }
 
     case Commands::DPTZSetViewport::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Setting DPTZ Viewport", request.path.mEndpointId);
         Commands::DPTZSetViewport::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));  
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleDPTZSetViewport(*handler, request.path, data);
     }
 
     case Commands::DPTZRelativeMove::Id: {
         ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Relative move within a defined DPTZ Viewport", request.path.mEndpointId);
         Commands::DPTZRelativeMove::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));  
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleDPTZRelativeMove(*handler, request.path, data);
     }
     }

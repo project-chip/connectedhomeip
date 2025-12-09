@@ -43,7 +43,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId, 
+CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
                                                                                    BitFlags<Feature> aFeatures) :
     mEndpointId(aEndpointId), mFeatures(aFeatures) {}
 
@@ -84,7 +84,7 @@ bool CameraAvSettingsUserLevelMgmtServerLogic::HasFeature(Feature aFeature) cons
     return mFeatures.Has(aFeature);
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) 
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if ((HasFeature(Feature::kMechanicalPan)) || (HasFeature(Feature::kMechanicalTilt)) || (HasFeature(Feature::kMechanicalZoom)))
     {
@@ -509,7 +509,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData)
 {
     bool hasAtLeastOneValue = false;
@@ -615,7 +615,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData)
 {
     bool hasAtLeastOneValue = false;
@@ -778,7 +778,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZMoveToPreset(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZMoveToPreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData)
 {
     uint8_t preset = commandData.presetID;
@@ -848,7 +848,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSavePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSavePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData)
 {
     Status status = Status::Success;
@@ -940,7 +940,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRemovePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRemovePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData)
 {
     uint8_t presetToRemove = commandData.presetID;
@@ -984,7 +984,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZSetViewport(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZSetViewport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData)
 {
     uint16_t videoStreamID                          = commandData.videoStreamID;
@@ -1013,7 +1013,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData)
 {
     uint16_t videoStreamID     = commandData.videoStreamID;

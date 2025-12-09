@@ -71,7 +71,7 @@ public:
     // My known values for MPTZ.
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mMptzPosition;
 
-    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially overwritten by the delegate. 
+    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially overwritten by the delegate.
     // Exception is MaxPresets that is an F quality attribute and assigned by the constructor
     const uint8_t mMaxPresets = 5;
     int16_t mPanMin  = CameraAvSettingsUserLevelManagement::kPanMinMinValue;
@@ -147,19 +147,19 @@ public:
     void SetZoom(Optional<uint8_t> aZoom);
 
     // Command handlers
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleMPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZMoveToPreset(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleMPTZMoveToPreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZSavePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleMPTZSavePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZRemovePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleMPTZRemovePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleDPTZSetViewport(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleDPTZSetViewport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleDPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath, 
+    std::optional<DataModel::ActionReturnStatus> HandleDPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
 
     /**
@@ -213,7 +213,7 @@ private:
     /**
      * Helper function that loads all the persistent attributes from the KVS.
      */
-    void LoadPersistentAttributes();    
+    void LoadPersistentAttributes();
 
     /**
      * Helper function that manages preset IDs

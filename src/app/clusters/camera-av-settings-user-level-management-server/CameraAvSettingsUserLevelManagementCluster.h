@@ -211,7 +211,7 @@ public:
     void SetDelegate(CameraAvSettingsUserLevelManagementDelegate * delegate)
     {
         mLogic.SetDelegate(delegate);
-        if (delegate != nullptr) 
+        if (delegate != nullptr)
         {
             delegate->SetServer(this);
         }
@@ -311,7 +311,7 @@ private:
 
     // Helper Read functions for complex attribute types
     CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder); 
+    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
 };
 
 } // namespace Clusters
