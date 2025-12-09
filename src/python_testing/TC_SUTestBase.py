@@ -313,16 +313,17 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
     def clear_kvs(self, kvs_path_prefix: str = None):
         """
-        Remove all temporary KVS files matching a given prefix.
+        Remove all temporary KVS files created.
+
+        OTA Provider/Requestor use "/tmp/chip_kvs" as the default KVS location when no --KVS is provided.
+        Tests may also specify custom prefixes such as "/tmp/chip_kvs_provider".
 
         Args:
             kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
-            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files
-
-        Returns:
-            None
+            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files.
         """
+
         if kvs_path_prefix is None:
             kvs_path_prefix = "/tmp/chip_kvs"
         subprocess.run(f"rm -rf {kvs_path_prefix}*", shell=True)
-        log.info(f'Cleared KVS files with prefix: {kvs_path_prefix}')
+        log.info(f"Removed all KVS files/folders with prefix: {kvs_path_prefix}")
