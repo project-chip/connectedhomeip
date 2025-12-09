@@ -843,7 +843,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         )
 
-        await subscription_state_no_download.cancel()
+        subscription_state_no_download.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step # 6.4 - Verify NO image transfer occurs from TH/OTA-P to DUT if UpdateAvailable version is same or lower
@@ -941,7 +941,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         )
 
-        await subscription_state_invalid_uri.cancel()
+        subscription_state_invalid_uri.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step # 7.4 - Verify NO image transfer occurs from TH/OTA-P to DUT due to invalid BDX ImageURI in UpdateAvailable.
