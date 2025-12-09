@@ -60,7 +60,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
 from matter.testing.spec_parsing import XmlCluster
 from matter.tlv import uint
@@ -111,7 +111,7 @@ def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
     return [cmd_id for cmd_id in all_cmds if is_known_cluster_cmd(cmd_id)]
 
 
-class AccessChecker(MatterBaseTest, BasicCompositionTests):
+class AccessChecker(BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         # TODO: Make this into a proper default in the class so we're not overriding the command lines
