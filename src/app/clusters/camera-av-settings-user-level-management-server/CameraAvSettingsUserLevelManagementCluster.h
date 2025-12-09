@@ -285,16 +285,10 @@ public:
 
 private:
     CameraAvSettingsUserLevelMgmtServerLogic mLogic;
-    EndpointId mEndpointId;
     BitFlags<CameraAvSettingsUserLevelManagement::Feature> mFeatures;
-
-    // Next available preset ID
-    uint8_t mCurrentPresetID = 1;
 
     std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;
-
-    CameraAvSettingsUserLevelManagement::PhysicalMovementEnum mMovementState;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
