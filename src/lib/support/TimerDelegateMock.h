@@ -26,7 +26,7 @@ namespace chip {
 class TimerDelegateMock : public TimerDelegate
 {
 public:
-    CHIP_ERROR StartTimer(TimerContext * context, chip::System::Clock::Timeout aTimeout) override
+    CriticalFailure StartTimer(TimerContext * context, chip::System::Clock::Timeout aTimeout) override
     {
         mTimerContext = context;
         mTimerTimeout = mMockSystemTimestamp + aTimeout;
