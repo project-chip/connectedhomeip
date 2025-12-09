@@ -43,8 +43,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 
