@@ -17,6 +17,8 @@
  */
 
 #include <app/clusters/power-topology-server/CodegenIntegration.h>
+
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
@@ -49,4 +51,4 @@ void Instance::Shutdown()
 
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpoint) {}
 
-void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpoint) {}
+void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpoint, MatterClusterShutdownType) {}
