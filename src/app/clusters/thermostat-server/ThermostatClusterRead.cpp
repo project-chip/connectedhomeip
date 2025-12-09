@@ -174,7 +174,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         auto & delegate = mDelegate;
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        return encoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
             for (uint8_t i = 0; true; i++)
             {
                 ScheduleTypeStruct::Type scheduleType;
@@ -184,13 +184,13 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                     return CHIP_NO_ERROR;
                 }
                 ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+                ReturnErrorOnFailure(enc.Encode(scheduleType));
             }
         });
     }
     break;
     case Schedules::Id: {
-        return encoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     break;
     case MaxThermostatSuggestions::Id: {
@@ -203,7 +203,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         auto & delegate = mDelegate;
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        return encoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
                 ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
@@ -213,7 +213,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                     return CHIP_NO_ERROR;
                 }
                 ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(thermostatSuggestion));
+                ReturnErrorOnFailure(enc.Encode(thermostatSuggestion));
             }
         });
     }
