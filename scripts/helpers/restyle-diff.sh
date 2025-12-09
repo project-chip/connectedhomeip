@@ -73,7 +73,6 @@ ensure_restyle_installed() {
     tmpdir=$(mktemp -d)
     trap 'rm -rf "$tmpdir"' EXIT
 
-
     if ! curl -sSfL "https://github.com/restyled-io/restyler/releases/latest/download/$asset.tar.gz" | tar xz -C "$tmpdir"; then
         echo "[restyle-diff.sh] Failed to download restyle for $(uname -s)-$(uname -m)"
         echo "[restyle-diff.sh] Check available binaries at: https://github.com/restyled-io/restyler/releases"
