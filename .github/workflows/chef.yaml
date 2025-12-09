@@ -38,6 +38,8 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
@@ -97,6 +99,8 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
@@ -119,6 +123,8 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build-nrf-platform:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
@@ -140,6 +146,8 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build-telink:175
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:

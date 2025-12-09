@@ -21,6 +21,7 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <vector>
 
 namespace chip {
 namespace Testing {
@@ -44,6 +45,14 @@ namespace Testing {
 /// ```
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
                              std::initializer_list<const app::DataModel::AttributeEntry> expected);
+
+/// Overload of IsAttributesListEqualTo that accepts a standard vector of attribute entries.
+///
+/// Parameters:
+///     cluster - The cluster interface to test.
+///     expected - A vector containing the expected attribute entries (must include all
+///                non-global, non-optional attributes).
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected);
 
 /// Compares the accepted commands of a cluster against an expected set.
 ///

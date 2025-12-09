@@ -47,6 +47,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_I_2_4(MatterBaseTest):
     def desc_TC_I_2_4(self) -> str:

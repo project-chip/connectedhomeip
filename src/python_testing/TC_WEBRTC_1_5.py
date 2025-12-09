@@ -45,6 +45,8 @@ from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRe
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_5(MatterBaseTest):
     def steps_TC_WEBRTC_1_5(self) -> list[TestStep]:
@@ -139,7 +141,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
 
         self.step(5)
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only:
@@ -203,7 +205,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             return response.videoStreamID
 
         except Exception as e:
-            logging.error(f"Failed to allocate video stream. {e}")
+            log.error(f"Failed to allocate video stream. {e}")
             return None
 
 
