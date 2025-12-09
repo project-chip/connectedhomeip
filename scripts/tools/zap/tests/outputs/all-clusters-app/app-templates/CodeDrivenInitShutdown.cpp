@@ -99,6 +99,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::DeviceEnergyManagement::Id:
         MatterDeviceEnergyManagementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Thermostat::Id:
+        MatterThermostatClusterInitCallback(endpoint);
+        break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterInitCallback(endpoint);
         break;
@@ -180,6 +183,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::DeviceEnergyManagement::Id:
         MatterDeviceEnergyManagementClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Thermostat::Id:
+        MatterThermostatClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint);

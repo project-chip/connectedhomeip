@@ -77,6 +77,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Soil Measurement
     - TLS Certificate Management
     - TLS Client Management
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Directory
     - Time Synchronization
@@ -111,7 +112,6 @@ ClustersWithAttributeChangedFunctions:
     - Door Lock
     - Fan Control
     - Pump Configuration and Control
-    - Thermostat
     - Window Covering
     # keep-sorted end
 
@@ -136,7 +136,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Laundry Washer Controls
     - Mode Select
     - Pump Configuration and Control
-    - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
 
@@ -170,6 +169,7 @@ CodeDrivenClusters:
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
+    - Thermostat
     - Time Format Localization
     - Time Synchronization
     - User Label

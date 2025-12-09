@@ -51,7 +51,7 @@
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
-#include <app/clusters/thermostat-server/thermostat-server.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
@@ -295,12 +295,33 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 }
 
 using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
+
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
+    ChipLogError(Zcl, "emberAfThermostatClusterServerInitCallback!");
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
+        return;
+    }
     // Register the delegate for the Thermostat
     auto & delegate = ThermostatDelegate::GetInstance();
+    cluster->SetDelegate(&delegate);
 
-    SetDefaultDelegate(endpoint, &delegate);
+    // TODO
+    // Get from the "real thermostat"
+    // current mode
+    // current occupied heating setpoint
+    // current unoccupied heating setpoint
+    // current occupied cooling setpoint
+    // current unoccupied cooling setpoint
+    // and update the zcl cluster values
+    // This should be a callback defined function
+    // with weak binding so that real thermostat
+    // can get the values.
+    // or should this just be the responsibility of the thermostat application?
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
