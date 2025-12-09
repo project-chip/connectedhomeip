@@ -164,13 +164,30 @@ class SubprocessInfo:
 
 
 class Executor:
+    def __init__(self) -> None:
+        self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
+
     def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None,
             stdout: IO[Any] | LogPipe | None = None,
             stderr: IO[Any] | LogPipe | None = None):
         # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr,
         # but mypy doesn't think the same.
-        return subprocess.Popen(subproc.to_cmd(), stdin=stdin,
-                                stdout=stdout, stderr=stderr)  # type: ignore[arg-type]
+        self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin,
+                                                        stdout=stdout, stderr=stderr))  # type: ignore[arg-type]
+        return process
+
+    def terminate(self) -> None:
+        while not self._processes.empty():
+            process = self._processes.get_nowait()
+            cmd = str(process.args)
+            if process.poll() is None:
+                log.debug('Killing process "%s"', cmd)
+                process.kill()
+            try:
+                process.wait(1)
+            except subprocess.TimeoutExpired:
+                log.warning('Failed to kill the process "%s". Terminating instead', cmd)
+                process.terminate()
 
 
 class Runner:
