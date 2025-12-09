@@ -273,11 +273,11 @@ CHIP_ERROR ICDManagementClusterWithCIP::Startup(ServerClusterContext & context)
     return mFabricTable.AddFabricDelegate(&mFabricDelegate);
 }
 
-void ICDManagementClusterWithCIP::Shutdown()
+void ICDManagementClusterWithCIP::Shutdown(ClusterShutdownType shutdownType)
 {
     mFabricTable.RemoveFabricDelegate(&mFabricDelegate);
 
-    ICDManagementCluster::Shutdown();
+    ICDManagementCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus ICDManagementClusterWithCIP::ReadAttribute(const DataModel::ReadAttributeRequest & request,

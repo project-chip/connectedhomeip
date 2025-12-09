@@ -161,7 +161,7 @@ public:
                                 CharSpan userActiveModeTriggerInstruction);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & aEncoder) override;
