@@ -156,7 +156,7 @@ enum class MatterClusterShutdownType
 };
 
 /**
- * Mark the given endpoint as being shut down (i.e. not active anymore)
+ * Mark the given cluster as being shut down (i.e. not active anymore)
  *
  * In many cases, this is a result of dynamic endpoint disabling (i.e. kPermanentRemove shutdownType)
  * This is assumed to perform any cleanup such as:
