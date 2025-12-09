@@ -71,9 +71,13 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         initParams.operationalKeystore = &sTestOpKeystore;
         initParams.opCertStore         = &sTestOpCertStore;
         ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
+
+        // Initialize CommissioningWindowManager so it has a valid Server pointer
+        ASSERT_EQ(Server::GetInstance().GetCommissioningWindowManager().Init(&Server::GetInstance()), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
+        chip::Server::GetInstance().GetCommissioningWindowManager().Shutdown();
         chip::Server::GetInstance().GetFabricTable().Shutdown();
         sTestOpCertStore.Finish();
         sTestOpKeystore.Finish();
@@ -283,23 +287,24 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
 
     auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
     // ASSERT_EQ(result.status, std::nullopt);
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess());
+    // ASSERT_TRUE(result.status.has_value());
+    // ASSERT_TRUE(result.status->IsSuccess());
+    ASSERT_TRUE(result.IsSuccess());
 
-    if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
-    {
-        status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-        ASSERT_TRUE(status.IsSuccess());
-        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
+    // if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
+    // {
+    status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+    ASSERT_TRUE(status.IsSuccess());
+    EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
 
-        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
-        status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
-        ASSERT_TRUE(status.IsSuccess());
-        ASSERT_FALSE(adminFabric.IsNull());
+    Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+    status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
+    ASSERT_TRUE(status.IsSuccess());
+    ASSERT_FALSE(adminFabric.IsNull());
 
-        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
-        status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
-        ASSERT_TRUE(status.IsSuccess());
-        ASSERT_FALSE(adminVendor.IsNull());
-    }
+    Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+    status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
+    ASSERT_TRUE(status.IsSuccess());
+    ASSERT_FALSE(adminVendor.IsNull());
+    // }
 }
