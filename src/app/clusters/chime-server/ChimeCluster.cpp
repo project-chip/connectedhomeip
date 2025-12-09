@@ -15,6 +15,11 @@
  *    limitations under the License.
  */
 
+/****************************************************************************'
+ * @file
+ * @brief Implementation for the Chime Server Cluster
+ ***************************************************************************/
+
 #include "ChimeCluster.h"
 
 #include <app/SafeAttributePersistenceProvider.h>
@@ -28,6 +33,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::Chime::Attributes;
+using ChimeSoundStructType = Structs::ChimeSoundStruct::Type;
 
 namespace chip {
 namespace app {
@@ -48,31 +55,40 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // TODO: Migrate to use context.attributeStorage
-    // Load SelectedChime
+    LoadPersistentAttributes();
+    return CHIP_NO_ERROR;
+}
+
+// TODO: Migrate to use context.attributeStorage instead of SafeAttributePersistenceProvider
+void ChimeCluster::LoadPersistentAttributes()
+{
+    // Load Active Chime ID
     uint8_t storedSelectedChime = 0;
     CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id }, storedSelectedChime);
+        ConcreteAttributePath(GetEndpointId(), Chime::Id, SelectedChime::Id), storedSelectedChime);
     if (err == CHIP_NO_ERROR)
     {
         mSelectedChime = storedSelectedChime;
     }
+    else
+    {
+        // otherwise defaults
+        ChipLogDetail(Zcl, "Chime: Unable to load the SelectedChime attribute from the KVS. Defaulting to %u", mSelectedChime);
+    }
 
     // Load Enabled
     bool storedEnabled = false;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue({ mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id },
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(GetEndpointId(), Chime::Id, Enabled::Id),
                                                                  storedEnabled);
     if (err == CHIP_NO_ERROR)
     {
         mEnabled = storedEnabled;
     }
-
-    return CHIP_NO_ERROR;
-}
-
-void ChimeCluster::ReportInstalledChimeSoundsChange()
-{
-    NotifyAttributeChanged(Attributes::InstalledChimeSounds::Id);
+    else
+    {
+        // otherwise take the default
+        ChipLogDetail(Zcl, "Chime: Unable to load the Enabled attribute from the KVS. Defaulting to %u", mEnabled);
+    }
 }
 
 DataModel::ActionReturnStatus ChimeCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -80,20 +96,67 @@ DataModel::ActionReturnStatus ChimeCluster::ReadAttribute(const DataModel::ReadA
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::ClusterRevision::Id:
+    case ClusterRevision::Id:
         return encoder.Encode(Chime::kRevision);
-    case Attributes::FeatureMap::Id:
+    case FeatureMap::Id:
         return encoder.Encode(static_cast<uint32_t>(0));
-    case Attributes::SelectedChime::Id:
+    case SelectedChime::Id:
         return encoder.Encode(mSelectedChime);
-    case Attributes::Enabled::Id:
+    case Enabled::Id:
         return encoder.Encode(mEnabled);
-    case Attributes::InstalledChimeSounds::Id:
+    case InstalledChimeSounds::Id:
         return encoder.EncodeList(
             [this](const auto & subEncoder) -> CHIP_ERROR { return this->EncodeSupportedChimeSounds(subEncoder); });
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+}
+
+uint8_t ChimeCluster::GetSelectedChime() const
+{
+    return mSelectedChime;
+}
+
+bool ChimeCluster::GetEnabled() const
+{
+    return mEnabled;
+}
+
+// helper method to get the Chime Sounds one by one and encode into a list
+CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (uint8_t i = 0; true; i++)
+    {
+        ChimeSoundStructType chimeSound;
+
+        // Get the chime sound
+        // We pass in a MutableCharSpan to avoid any ownership issues - Delegate needs to use
+        // CopyCharSpanToMutableCharSpan to copy data in
+        char buffer[kMaxChimeSoundNameSize];
+        MutableCharSpan name(buffer);
+        auto err = mDelegate.GetChimeSoundByIndex(i, chimeSound.chimeID, name);
+
+        // return if we've run off the end of the Chime Sound List on the delegate
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        ReturnErrorOnFailure(err);
+
+        // set the name on the struct
+        chimeSound.name = name;
+
+        // and now encode the struct
+        ReturnErrorOnFailure(encoder.Encode(chimeSound));
+
+        if (i == UINT8_MAX) // prevent overflow / infinite loop
+        {
+            // This should never happen if the delegate is well-behaved
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus ChimeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -185,45 +248,16 @@ bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
 
         if (i == UINT8_MAX) // prevent overflow / infinite loop
         {
-            break;
+            // This should never happen if the delegate is well-behaved
+            return false;
         }
     }
     return false;
 }
 
-CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder)
+void ChimeCluster::ReportInstalledChimeSoundsChange()
 {
-    for (uint8_t i = 0; true; i++)
-    {
-        Structs::ChimeSoundStruct::Type chimeSound;
-
-        // Get the chime sound
-        // We pass in a MutableCharSpan to avoid any ownership issues - Delegate needs to use
-        // CopyCharSpanToMutableCharSpan to copy data in
-        char buffer[kMaxChimeSoundNameSize];
-        MutableCharSpan name(buffer);
-        auto err = mDelegate.GetChimeSoundByIndex(i, chimeSound.chimeID, name);
-
-        // return if we've run off the end of the Chime Sound List on the delegate
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        ReturnErrorOnFailure(err);
-
-        // set the name on the struct
-        chimeSound.name = name;
-
-        // and now encode the struct
-        ReturnErrorOnFailure(encoder.Encode(chimeSound));
-
-        if (i == UINT8_MAX) // prevent overflow / infinite loop
-        {
-            break;
-        }
-    }
-    return CHIP_NO_ERROR;
+    NotifyAttributeChanged(Attributes::InstalledChimeSounds::Id);
 }
 
 } // namespace Clusters

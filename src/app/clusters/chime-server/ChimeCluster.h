@@ -30,9 +30,58 @@ class ChimeDelegate;
 class ChimeCluster : public DefaultServerCluster
 {
 public:
+    /**
+     * Creates a Chime Cluster instance.
+     * @param aEndpointId The endpoint on which this cluster exists.
+     * @param aDelegate A reference to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     */
     ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate);
     ~ChimeCluster();
 
+    // Attribute Setters
+    /**
+     * Sets the SelectedChime attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param chimeSoundID The value to which the SelectedChime  is to be set.
+     * @return Returns a ConstraintError if the chimeSoundID value is not valid. Returns Success otherwise.
+     */
+    Protocols::InteractionModel::Status SetSelectedChime(uint8_t chimeSoundID);
+
+    /**
+     * Sets the Enabled attribute. Note, this also handles writing the new value into non-volatile storage.
+     * @param Enabled The value to which the Enabled  is to be set.
+     */
+    Protocols::InteractionModel::Status SetEnabled(bool Enabled);
+
+    // Attribute Getters
+    /**
+     * @return The Current SelectedChime.
+     */
+    uint8_t GetSelectedChime() const;
+
+    /**
+     * @return The Enabled attribute.
+     */
+    bool GetEnabled() const;
+
+    /**
+     * @return The endpoint ID.
+     */
+    EndpointId GetEndpointId() { return mPath.mEndpointId; }
+
+    // Cluster constants from the spec
+    static constexpr uint8_t kMaxChimeSoundNameSize = 48;
+
+    // List Change Reporting
+    /**
+     * Reports that the contents of the InstalledChimeSounds attribute have changed.
+     * The device SHALL call this method whenever it changes the list of installed chime sounds.
+     */
+    void ReportInstalledChimeSoundsChange();
+
+    /**
+     * @brief ServerClusterInterface methods.
+     */
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -44,22 +93,21 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    Protocols::InteractionModel::Status SetSelectedChime(uint8_t chimeID);
-    Protocols::InteractionModel::Status SetEnabled(bool enabled);
-    uint8_t GetSelectedChime() const { return mSelectedChime; }
-    bool GetEnabled() const { return mEnabled; }
-    void ReportInstalledChimeSoundsChange();
-
-    // Cluster constants from the spec
-    static constexpr uint8_t kMaxChimeSoundNameSize = 48;
-
 private:
-    CHIP_ERROR EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    ChimeDelegate & mDelegate;
+
+    // Attribute local storage
+    uint8_t mSelectedChime;
+    bool mEnabled;
+    // Helpers
+    // Loads all the persistent attributes from the KVS.
+    void LoadPersistentAttributes();
+
+    // Checks if the chimeID is supported by the delegate
     bool IsSupportedChimeID(uint8_t chimeID);
 
-    ChimeDelegate & mDelegate;
-    uint8_t mSelectedChime = 0;
-    bool mEnabled          = true;
+    // Encodes all Installed Chime Sounds
+    CHIP_ERROR EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 /** @brief
@@ -83,7 +131,7 @@ public:
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED. if the index is beyond the list of available chime sounds.
      *
      * Note: This is used by the SDK to populate the InstalledChimeSounds attribute. If the contents of this list change,
-     * the device SHALL call the Instance’s ReportInstalledChimeSoundsChange method to report that this attribute has changed.
+     * the device SHALL call the Instance's ReportInstalledChimeSoundsChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) = 0;
 
@@ -96,7 +144,7 @@ public:
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is beyond the list of available chime sounds.
      *
      * Note: This is used by the SDK to help populate the InstalledChimeSounds attribute. If the contents of this list change,
-     * the device SHALL call the Instance’s ReportInstalledChimeSoundsChange method to report that this attribute has changed.
+     * the device SHALL call the Instance's ReportInstalledChimeSoundsChange method to report that this attribute has changed.
      */
     virtual CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) = 0;
 
@@ -111,6 +159,7 @@ public:
 protected:
     friend class ChimeCluster;
 
+    // This is named mChimeServer instead of mChimeCluster to preserve backwards compatibility with legacy usage.
     ChimeCluster * mChimeServer = nullptr;
 
     void SetChimeCluster(ChimeCluster * chimeCluster) { mChimeServer = chimeCluster; }
