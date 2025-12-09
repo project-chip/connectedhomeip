@@ -1153,16 +1153,14 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint, MatterClusterShutdownType shutdownType)
+void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
     uint16_t endpointTableSize = 0;
     VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
 
-    if (shutdownType == MatterClusterShutdownType::kPermanentRemove)
-    {
-        SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
-        TEMPORARY_RETURN_IGNORED sceneTable->RemoveEndpoint();
-    }
+    // TODO: only do this in case of permanent shutdown
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
+    TEMPORARY_RETURN_IGNORED sceneTable->RemoveEndpoint();
 }
 
 void MatterScenesManagementPluginServerInitCallback()
