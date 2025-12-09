@@ -32,7 +32,7 @@
 
 namespace chip {
 
-namespace Test {
+namespace Testing {
 // Provides access to private/protected members of AutoCommissioner class for testing
 class AutoCommissionerTestAccess
 {
@@ -103,5 +103,5 @@ private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
