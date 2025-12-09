@@ -21,12 +21,12 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-constants.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
-#include <protocols/interaction_model/StatusCode.h>
-#include <lib/support/ReadOnlyBuffer.h>
-#include <app/data-model-provider/MetadataTypes.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-constants.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
 
@@ -49,7 +49,8 @@ public:
      *                                           instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId, BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures);
+    CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
+                                             BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures);
     ~CameraAvSettingsUserLevelMgmtServerLogic();
 
     void SetDelegate(CameraAvSettingsUserLevelManagementDelegate * delegate)
@@ -71,14 +72,14 @@ public:
     // My known values for MPTZ.
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mMptzPosition;
 
-    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially overwritten by the delegate.
-    // Exception is MaxPresets that is an F quality attribute and assigned by the constructor
+    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially
+    // overwritten by the delegate. Exception is MaxPresets that is an F quality attribute and assigned by the constructor
     const uint8_t mMaxPresets = 5;
-    int16_t mPanMin  = CameraAvSettingsUserLevelManagement::kPanMinMinValue;
-    int16_t mPanMax  = CameraAvSettingsUserLevelManagement::kPanMaxMaxValue;
-    int16_t mTiltMin = CameraAvSettingsUserLevelManagement::kTiltMinMinValue;
-    int16_t mTiltMax = CameraAvSettingsUserLevelManagement::kTiltMaxMaxValue;
-    uint8_t mZoomMax = CameraAvSettingsUserLevelManagement::kZoomMaxMaxValue;
+    int16_t mPanMin           = CameraAvSettingsUserLevelManagement::kPanMinMinValue;
+    int16_t mPanMax           = CameraAvSettingsUserLevelManagement::kPanMaxMaxValue;
+    int16_t mTiltMin          = CameraAvSettingsUserLevelManagement::kTiltMinMinValue;
+    int16_t mTiltMax          = CameraAvSettingsUserLevelManagement::kTiltMaxMaxValue;
+    uint8_t mZoomMax          = CameraAvSettingsUserLevelManagement::kZoomMaxMaxValue;
 
     CameraAvSettingsUserLevelManagement::PhysicalMovementEnum mMovementState;
 
@@ -116,7 +117,10 @@ public:
 
     uint8_t GetMaxPresets() const { return mMaxPresets; }
 
-    const std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> GetDptzRelativeMove() const { return mDptzStreams; }
+    const std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> GetDptzRelativeMove() const
+    {
+        return mDptzStreams;
+    }
 
     uint8_t GetZoomMax() const { return mZoomMax; }
 
@@ -147,20 +151,27 @@ public:
     void SetZoom(Optional<uint8_t> aZoom);
 
     // Command handlers
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZMoveToPreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZSavePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleMPTZRemovePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleDPTZSetViewport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleDPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                          const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleMPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                           const CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleMPTZMoveToPreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                           const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleMPTZSavePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                         const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleMPTZRemovePreset(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                           const CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleDPTZSetViewport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                          const CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleDPTZRelativeMove(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                           const CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
 
     /**
      * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of
@@ -193,7 +204,6 @@ public:
 
     // Is a command already being processed
     bool IsMoving() const { return mMovementState == CameraAvSettingsUserLevelManagement::PhysicalMovementEnum::kMoving; }
-
 
 private:
     CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;

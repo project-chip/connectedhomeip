@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/camera-av-settings-user-level-management-server/CodegenIntegration.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CodegenIntegration.h>
 #include <camera-av-settings-user-level-management-instance.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -159,7 +159,8 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> & dptzStreams)
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(
+    std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> & dptzStreams)
 {
     dptzStreams.clear();
     return CHIP_NO_ERROR;

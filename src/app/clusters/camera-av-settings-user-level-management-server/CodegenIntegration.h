@@ -28,7 +28,7 @@ namespace CameraAvSettingsUserLevelManagement {
 /// Sets the given delegate on an endpoint configured via code-generation
 void SetDelegate(chip::EndpointId endpointId, CameraAvSettingsUserLevelmanagementDelegate * delegate);
 
-} // namespace PushAvStreamTransport
+} // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

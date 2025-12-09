@@ -17,8 +17,8 @@
  */
 
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Commands.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Ids.h>
@@ -34,14 +34,15 @@ namespace Clusters {
 using Protocols::InteractionModel::Status;
 using namespace CameraAvSettingsUserLevelManagement;
 
-CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR
+CameraAvSettingsUserLevelManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return mLogic.AcceptedCommands(builder);
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Attributes(const ConcreteClusterPath & path,
-                                                                 ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     return mLogic.Attributes(builder);
 }
@@ -89,8 +90,9 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::ReadAndEncodeDPTZStreams(
     });
 }
 
-
-DataModel::ActionReturnStatus CameraAvSettingsUserLevelManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus
+CameraAvSettingsUserLevelManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                          AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(request.path.mClusterId == CameraAvSettingsUserLevelManagement::Id);
     ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: ReadAttribute");
@@ -124,9 +126,9 @@ DataModel::ActionReturnStatus CameraAvSettingsUserLevelManagementCluster::ReadAt
     return Status::UnsupportedAttribute;
 }
 
-std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                                chip::TLV::TLVReader & input_arguments,
-                                                                                                CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+CameraAvSettingsUserLevelManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                          chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", request.path.mEndpointId);
 
@@ -175,7 +177,8 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelManagement
     }
 
     case Commands::DPTZRelativeMove::Id: {
-        ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Relative move within a defined DPTZ Viewport", request.path.mEndpointId);
+        ChipLogProgress(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Relative move within a defined DPTZ Viewport",
+                        request.path.mEndpointId);
         Commands::DPTZRelativeMove::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         return mLogic.HandleDPTZRelativeMove(*handler, request.path, data);
@@ -185,68 +188,70 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelManagement
     return Status::UnsupportedCommand;
 }
 
-    /**
-     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of
-     * digital movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream
-     * Management cluster.
-     */
-    void CameraAvSettingsUserLevelManagementCluster::AddMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
-    {
-        mLogic.AddMoveCapableVideoStream(aVideoStreamID, aViewport);
-    }
+/**
+ * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of
+ * digital movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream
+ * Management cluster.
+ */
+void CameraAvSettingsUserLevelManagementCluster::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                           Globals::Structs::ViewportStruct::Type aViewport)
+{
+    mLogic.AddMoveCapableVideoStream(aVideoStreamID, aViewport);
+}
 
-    /**
-     * Allows for a delegate or application to update the viewport of an already allocated video stream.
-     * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
-     */
-    void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport)
-    {
-        mLogic.UpdateMoveCapableVideoStream(aVideoStreamID, aViewport);
-    }
+/**
+ * Allows for a delegate or application to update the viewport of an already allocated video stream.
+ * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
+ */
+void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                              Globals::Structs::ViewportStruct::Type aViewport)
+{
+    mLogic.UpdateMoveCapableVideoStream(aVideoStreamID, aViewport);
+}
 
-    /**
-     * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
-     * This should be invoked whenever the device default viewport is updated via a write to Viewport on the
-     * AV Stream Management Cluster
-     */
-    void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
-    {
-        mLogic.UpdateMoveCapableVideoStreams(aViewport);
-    }
+/**
+ * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
+ * This should be invoked whenever the device default viewport is updated via a write to Viewport on the
+ * AV Stream Management Cluster
+ */
+void CameraAvSettingsUserLevelManagementCluster::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
+{
+    mLogic.UpdateMoveCapableVideoStreams(aViewport);
+}
 
-    /**
-     * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.
-     * This should be invoked by a delegate on the conclusion of deallocating a video stream via the AV Stream Management cluster.
-     */
-    void CameraAvSettingsUserLevelManagementCluster::RemoveMoveCapableVideoStream(uint16_t aVideoStreamID)
-    {
-        mLogic.RemoveMoveCapableVideoStream(aVideoStreamID);
-    }
+/**
+ * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.
+ * This should be invoked by a delegate on the conclusion of deallocating a video stream via the AV Stream Management cluster.
+ */
+void CameraAvSettingsUserLevelManagementCluster::RemoveMoveCapableVideoStream(uint16_t aVideoStreamID)
+{
+    mLogic.RemoveMoveCapableVideoStream(aVideoStreamID);
+}
 
-    CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMin(int16_t aTiltMin)
-    {
-        return mLogic.SetTiltMin(aTiltMin);
-    }
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMin(int16_t aTiltMin)
+{
+    return mLogic.SetTiltMin(aTiltMin);
+}
 
-    CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMax(int16_t aTiltMax)
-    {
-        return mLogic.SetTiltMax(aTiltMax);
-    }
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetTiltMax(int16_t aTiltMax)
+{
+    return mLogic.SetTiltMax(aTiltMax);
+}
 
-    CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMin(int16_t aPanMin)
-    {
-        return mLogic.SetPanMin(aPanMin);
-    }
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMin(int16_t aPanMin)
+{
+    return mLogic.SetPanMin(aPanMin);
+}
 
-    CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMax(int16_t aPanMax)
-    {
-        return mLogic.SetPanMax(aPanMax);
-    }
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetPanMax(int16_t aPanMax)
+{
+    return mLogic.SetPanMax(aPanMax);
+}
 
-    CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetZoomMax(uint8_t aZoomMax)
-    {
-        return mLogic.SetZoomMax(aZoomMax);
-    }
+CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::SetZoomMax(uint8_t aZoomMax)
+{
+    return mLogic.SetZoomMax(aZoomMax);
+}
 
 } // namespace Clusters
 } // namespace app

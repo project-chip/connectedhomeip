@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
-#include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
@@ -163,15 +163,18 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVSettingsUserLevelMgmtServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to register CameraAvSettingsUserLevelManagement on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
-                     err.Format());
+        ChipLogError(Camera, "Failed to register CameraAvSettingsUserLevelManagement on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     mEndpoint, err.Format());
     }
 
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetTiltMin(
+        mCameraDevice->GetCameraHALInterface().GetTiltMin());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetTiltMax(
+        mCameraDevice->GetCameraHALInterface().GetTiltMax());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetZoomMax(
+        mCameraDevice->GetCameraHALInterface().GetZoomMax());
 
     // Fetch all initialization parameters for the ZoneManagement Server
     BitFlags<ZoneManagement::Feature, uint32_t> zoneMgmtFeatures(
