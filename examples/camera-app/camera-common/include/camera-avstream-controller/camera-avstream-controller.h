@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
+#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 
 namespace chip {
 namespace app {

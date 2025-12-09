@@ -38,7 +38,7 @@ extern void MemoryAllocatorShutdown();
 
 static std::atomic_int memoryInitializationCount{ 0 };
 
-CriticalFailure MemoryInit(void * buf, size_t bufSize)
+CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
 {
     if (memoryInitializationCount++ > 0)
     {

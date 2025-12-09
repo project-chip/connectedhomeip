@@ -15,10 +15,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/power-topology-server/PowerTopologyCluster.h>
-#include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
-#include <clusters/PowerTopology/Metadata.h>
+#include "power-topology-server.h"
+
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -34,88 +39,89 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 
-CHIP_ERROR PowerTopologyCluster::GetAvailableEndpoints(AttributeValueEncoder & aEncoder) const
+CHIP_ERROR Instance::Init()
 {
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
+
+void Instance::Shutdown()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+}
+
+bool Instance::HasFeature(Feature aFeature) const
+{
+    return mFeature.Has(aFeature);
+}
+
+bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+{
+    return mOptionalAttrs.Has(aOptionalAttrs);
+}
+
+// AttributeAccessInterface
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
+    case AvailableEndpoints::Id:
+        return ReadAvailableEndpoints(aEncoder);
+    case ActiveEndpoints::Id:
+        return ReadActiveEndpoints(aEncoder);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::ReadAvailableEndpoints(AttributeValueEncoder & aEncoder)
+{
+    if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeAvailableEndpoints))
+    {
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    }
+    VerifyOrReturnError(HasFeature(Feature::kSetTopology), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                        ChipLogError(Zcl, "Power Topology: can not get AvailableEndpoints, feature is not supported"));
+
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
             EndpointId endpointId;
             auto err = mDelegate.GetAvailableEndpointAtIndex(i, endpointId);
-
-            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR);
-
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+            {
+                return CHIP_NO_ERROR;
+            }
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(endpointId));
         }
     });
 }
 
-CHIP_ERROR PowerTopologyCluster::GetActiveEndpoints(AttributeValueEncoder & aEncoder) const
+CHIP_ERROR Instance::ReadActiveEndpoints(AttributeValueEncoder & aEncoder)
 {
+    if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveEndpoints))
+    {
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    }
+    VerifyOrReturnError(HasFeature(Feature::kDynamicPowerFlow), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                        ChipLogError(Zcl, "Power Topology: can not get ActiveEndpoints, feature is not supported"));
+
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
             EndpointId endpointId;
             auto err = mDelegate.GetActiveEndpointAtIndex(i, endpointId);
-
-            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR);
-
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+            {
+                return CHIP_NO_ERROR;
+            }
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(endpointId));
         }
     });
-}
-
-CHIP_ERROR PowerTopologyCluster::Startup(ServerClusterContext & context)
-{
-
-    VerifyOrReturnError(
-        mFeatureFlags.Has(Feature::kSetTopology) || !mFeatureFlags.Has(Feature::kDynamicPowerFlow), CHIP_ERROR_INCORRECT_STATE,
-        ChipLogError(Zcl, "Power Topology Cluster: DynamicPowerFlow feature requires SetTopology feature to be enabled"));
-    return DefaultServerCluster::Startup(context);
-}
-
-DataModel::ActionReturnStatus PowerTopologyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                  AttributeValueEncoder & encoder)
-{
-    switch (request.path.mAttributeId)
-    {
-    case FeatureMap::Id:
-        return encoder.Encode(mFeatureFlags);
-
-    case ClusterRevision::Id:
-        return encoder.Encode(kRevision);
-
-    case AvailableEndpoints::Id:
-        return GetAvailableEndpoints(encoder);
-
-    case ActiveEndpoints::Id:
-        return GetActiveEndpoints(encoder);
-
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-}
-
-CHIP_ERROR PowerTopologyCluster::Attributes(const ConcreteClusterPath & path,
-                                            ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
-{
-    DataModel::AttributeEntry optionalAttributes[] = {
-        AvailableEndpoints::kMetadataEntry, //
-        ActiveEndpoints::kMetadataEntry,    //
-    };
-
-    OptionalAttributeSet<                   //
-        Attributes::AvailableEndpoints::Id, //
-        Attributes::ActiveEndpoints::Id     //
-        >
-        enabledOptionalAttributeSet;
-
-    enabledOptionalAttributeSet.Set<Attributes::AvailableEndpoints::Id>(mFeatureFlags.Has(Feature::kSetTopology));
-    enabledOptionalAttributeSet.Set<Attributes::ActiveEndpoints::Id>(mFeatureFlags.Has(Feature::kDynamicPowerFlow));
-
-    AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), enabledOptionalAttributeSet);
 }
 
 } // namespace PowerTopology

@@ -144,7 +144,7 @@ enum class StreamType
 template <AttributeId TAttributeId>
 struct StreamTraits;
 
-class CameraAVStreamManagementCluster;
+class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
 struct ImageSnapshot
@@ -158,12 +158,12 @@ struct ImageSnapshot
  *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvStreamManagement Cluster.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
-class CameraAVStreamManagementDelegate
+class CameraAVStreamMgmtDelegate
 {
 public:
-    CameraAVStreamManagementDelegate() = default;
+    CameraAVStreamMgmtDelegate() = default;
 
-    virtual ~CameraAVStreamManagementDelegate() = default;
+    virtual ~CameraAVStreamMgmtDelegate() = default;
 
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
@@ -347,7 +347,7 @@ public:
      * @brief Provides read-only access to the list of currently allocated video streams.
      * This allows other components (like PushAVStreamTransportManager) to query
      * allocated stream parameters (e.g., for bandwidth calculation) without directly
-     * accessing the CameraAVStreamManagementCluster instance.
+     * accessing the CameraAVStreamMgmtServer instance.
      *
      * @return A const reference to the vector of allocated video stream structures.
      */
@@ -357,32 +357,31 @@ public:
      * @brief Provides read-only access to the list of currently allocated audio streams.
      * This allows other components (like PushAVStreamTransportManager) to query
      * allocated stream parameters (e.g., for bandwidth calculation) without directly
-     * accessing the CameraAVStreamManagementCluster instance.
+     * accessing the CameraAVStreamMgmtServer instance.
      *
      * @return A const reference to the vector of allocated audio stream structures.
      */
     virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
 
 private:
-    friend class CameraAVStreamManagementCluster;
+    friend class CameraAVStreamMgmtServer;
 
-    CameraAVStreamManagementCluster * mCameraAVStreamManagementCluster = nullptr;
+    CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
 
     /**
      * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
      * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
      * the pointer to the server instance.
      *
-     * @param aCameraAVStreamManagementCluster A pointer to the CameraAVStreamManagementCluster object related to this delegate
-     * object.
+     * @param aCameraAVStreamMgmtServer A pointer to the CameraAVStreamMgmtServer object related to this delegate object.
      */
-    void SetCameraAVStreamManagementCluster(CameraAVStreamManagementCluster * aCameraAVStreamManagementCluster)
+    void SetCameraAVStreamMgmtServer(CameraAVStreamMgmtServer * aCameraAVStreamMgmtServer)
     {
-        mCameraAVStreamManagementCluster = aCameraAVStreamManagementCluster;
+        mCameraAVStreamMgmtServer = aCameraAVStreamMgmtServer;
     }
 
 protected:
-    CameraAVStreamManagementCluster * GetCameraAVStreamManagementCluster() const { return mCameraAVStreamManagementCluster; }
+    CameraAVStreamMgmtServer * GetCameraAVStreamMgmtServer() const { return mCameraAVStreamMgmtServer; }
 };
 
 enum class OptionalAttribute : uint32_t
@@ -397,7 +396,7 @@ enum class OptionalAttribute : uint32_t
     kStatusLightBrightness = 0x0080,
 };
 
-class CameraAVStreamManagementCluster : public CommandHandlerInterface, public AttributeAccessInterface
+class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
     /**
@@ -435,24 +434,22 @@ public:
      * for the transmission of its media streams.
      *
      */
-    CameraAVStreamManagementCluster(CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
-                                    const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
-                                    uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
-                                    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
-                                    const VideoResolutionStruct & aMinViewPort,
-                                    const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
-                                    uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
-                                    const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                                    const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities,
-                                    uint32_t aMaxNetworkBandwidth,
-                                    const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-                                    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+    CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                             const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
+                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
+                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
+                             const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
+                             uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
+                             const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
+                             const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
+                             const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
+                             const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
-    ~CameraAVStreamManagementCluster() override;
+    ~CameraAVStreamMgmtServer() override;
 
     /**
      * @brief Initialise the Camera AV Stream Management server instance.
-     * This function must be called after defining an CameraAVStreamManagementCluster class object.
+     * This function must be called after defining an CameraAVStreamMgmtServer class object.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
      * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
      * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
@@ -644,12 +641,12 @@ public:
      *
      */
     std::optional<uint16_t>
-    GetReusableSnapshotStreamId(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
+    GetReusableSnapshotStreamId(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
-                                               const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & snapshotStream);
+                                               const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 
@@ -681,11 +678,11 @@ private:
     CHIP_ERROR PersistAndNotify();
 
     // Declared friend so that it can access the private stream vector members
-    // from CameraAVStreamManagementCluster.
+    // from CameraAVStreamMgmtServer.
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
-    CameraAVStreamManagementDelegate & mDelegate;
+    CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;

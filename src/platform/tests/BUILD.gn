@@ -30,7 +30,6 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     output_name = "libPlatformTests"
 
     test_sources = []
-    defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
 
     if (current_os != "zephyr") {
       # TODO: unclear as to why this fails on zephyr
@@ -62,6 +61,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
         "TestPlatformTime.cpp",
       ]
 
+      defines = []
       if (chip_device_platform == "esp32") {
         # SleepMillis can undersleep by as much as 10ms on esp32-qemu.
         defines += [ "CONFIG_WIDER_SLEEP_MARGIN" ]

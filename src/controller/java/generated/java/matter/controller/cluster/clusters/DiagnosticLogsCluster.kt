@@ -132,9 +132,13 @@ class DiagnosticLogsCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_LOG_CONTENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_LOG_CONTENT)) {
         logContent_decoded = tlvReader.getByteArray(tag)
-      } else if (tag == ContextSpecificTag(TAG_UTC_TIME_STAMP)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_UTC_TIME_STAMP)) {
         UTCTimeStamp_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -146,7 +150,9 @@ class DiagnosticLogsCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_TIME_SINCE_BOOT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_TIME_SINCE_BOOT)) {
         timeSinceBoot_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

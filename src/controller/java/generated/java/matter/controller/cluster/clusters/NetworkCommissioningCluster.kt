@@ -201,7 +201,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -213,7 +215,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS)) {
         wiFiScanResults_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -236,7 +240,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_THREAD_SCAN_RESULTS)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_THREAD_SCAN_RESULTS)) {
         threadScanResults_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -349,7 +355,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -361,7 +369,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -373,7 +383,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -385,7 +397,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -466,7 +480,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -478,7 +494,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -490,7 +508,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -502,7 +522,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -583,7 +605,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -595,7 +619,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -607,7 +633,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -619,7 +647,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -694,7 +724,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -706,7 +738,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_ERROR_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ERROR_VALUE)) {
         errorValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -786,7 +820,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
         networkingStatus_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -798,7 +834,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
         networkIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -810,7 +848,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
         clientIdentity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -822,7 +862,9 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -896,7 +938,9 @@ class NetworkCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_IDENTITY)) {
         identity_decoded = tlvReader.getByteArray(tag)
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
         possessionSignature_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

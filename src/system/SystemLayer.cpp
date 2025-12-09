@@ -21,7 +21,7 @@
 namespace chip {
 namespace System {
 
-CriticalFailure Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
+CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
 {
     CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, std::move(bridge));
     if (lReturn != CHIP_NO_ERROR)

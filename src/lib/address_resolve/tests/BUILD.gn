@@ -23,7 +23,6 @@ chip_test_suite("tests") {
   output_name = "libAddressResolveTests"
 
   if (chip_address_resolve_strategy == "default") {
-    defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
     test_sources = [ "TestAddressResolve_DefaultImpl.cpp" ]
   }
 

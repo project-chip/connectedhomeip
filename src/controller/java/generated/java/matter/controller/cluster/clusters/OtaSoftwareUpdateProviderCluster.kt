@@ -178,7 +178,9 @@ class OtaSoftwareUpdateProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
         delayedActionTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -190,7 +192,9 @@ class OtaSoftwareUpdateProviderCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_IMAGE_URI)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_IMAGE_URI)) {
         imageURI_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -202,7 +206,9 @@ class OtaSoftwareUpdateProviderCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_SOFTWARE_VERSION)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_SOFTWARE_VERSION)) {
         softwareVersion_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -214,7 +220,9 @@ class OtaSoftwareUpdateProviderCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_SOFTWARE_VERSION_STRING)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_SOFTWARE_VERSION_STRING)) {
         softwareVersionString_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -226,7 +234,9 @@ class OtaSoftwareUpdateProviderCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_UPDATE_TOKEN)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_UPDATE_TOKEN)) {
         updateToken_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -238,7 +248,9 @@ class OtaSoftwareUpdateProviderCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_USER_CONSENT_NEEDED)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_CONSENT_NEEDED)) {
         userConsentNeeded_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -250,7 +262,9 @@ class OtaSoftwareUpdateProviderCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_METADATA_FOR_REQUESTOR)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_METADATA_FOR_REQUESTOR)) {
         metadataForRequestor_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -325,7 +339,9 @@ class OtaSoftwareUpdateProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_ACTION)) {
         action_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
         delayedActionTime_decoded = tlvReader.getUInt(tag)
       } else {
         tlvReader.skipElement()

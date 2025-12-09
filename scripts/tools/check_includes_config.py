@@ -139,8 +139,8 @@ ALLOW: Dict[str, Set[str]] = {
     # WebRTCTransportProvider is for Camera and is intended to run on devices that are capable of handling these types.
     'src/app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h': {'string', 'vector'},
     # Camera AV Stream Management and Camera AV Settings User Level Management clusters are expected to run on resource-capable devices
-    'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h': {'vector'},
-    'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp': {'set'},
+    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
+    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
     'src/app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h': {'string', 'vector'},
     'src/app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h': {'string', 'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},

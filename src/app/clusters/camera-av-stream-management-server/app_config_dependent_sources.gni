@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "CameraAVStreamManagementCluster.cpp",
-  "CameraAVStreamManagementCluster.h",
+  "camera-av-stream-management-server.cpp",
+  "camera-av-stream-management-server.h",
 ]

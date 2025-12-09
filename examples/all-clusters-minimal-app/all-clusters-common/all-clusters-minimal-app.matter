@@ -6460,9 +6460,13 @@ endpoint 0 {
     ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
+    handle command AddGroupResponse;
     handle command ViewGroup;
+    handle command ViewGroupResponse;
     handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
     handle command RemoveGroup;
+    handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
     handle command AddGroupIfIdentifying;
   }
@@ -6590,8 +6594,11 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ArmFailSafe;
+    handle command ArmFailSafeResponse;
     handle command SetRegulatoryConfig;
+    handle command SetRegulatoryConfigResponse;
     handle command CommissioningComplete;
+    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -6613,10 +6620,13 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ScanNetworks;
+    handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
+    handle command NetworkConfigResponse;
     handle command ConnectNetwork;
+    handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
   }
 
@@ -6640,7 +6650,9 @@ endpoint 0 {
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
     handle command PayloadTestRequest;
+    handle command PayloadTestResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -6724,15 +6736,20 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
+    handle command AttestationResponse;
     handle command CertificateChainRequest;
+    handle command CertificateChainResponse;
     handle command CSRRequest;
+    handle command CSRResponse;
     handle command AddNOC;
     handle command UpdateNOC;
+    handle command NOCResponse;
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
     handle command SetVIDVerificationStatement;
     handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -6748,8 +6765,10 @@ endpoint 0 {
 
     handle command KeySetWrite;
     handle command KeySetRead;
+    handle command KeySetReadResponse;
     handle command KeySetRemove;
     handle command KeySetReadAllIndices;
+    handle command KeySetReadAllIndicesResponse;
   }
 
   server cluster FixedLabel {
@@ -6799,9 +6818,13 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
+    handle command AddGroupResponse;
     handle command ViewGroup;
+    handle command ViewGroupResponse;
     handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
     handle command RemoveGroup;
+    handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
     handle command AddGroupIfIdentifying;
   }
@@ -6943,12 +6966,18 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
+    handle command AddSceneResponse;
     handle command ViewScene;
+    handle command ViewSceneResponse;
     handle command RemoveScene;
+    handle command RemoveSceneResponse;
     handle command RemoveAllScenes;
+    handle command RemoveAllScenesResponse;
     handle command StoreScene;
+    handle command StoreSceneResponse;
     handle command RecallScene;
     handle command GetSceneMembership;
+    handle command GetSceneMembershipResponse;
   }
 
   server cluster DoorLock {
@@ -7116,6 +7145,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command NavigateTarget;
+    handle command NavigateTargetResponse;
   }
 
   server cluster MediaPlayback {
@@ -7126,6 +7156,7 @@ endpoint 1 {
     handle command Play;
     handle command Pause;
     handle command Stop;
+    handle command PlaybackResponse;
   }
 
   server cluster MediaInput {
@@ -7151,6 +7182,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command SendKey;
+    handle command SendKeyResponse;
   }
 
   server cluster ContentLauncher {
@@ -7174,6 +7206,7 @@ endpoint 1 {
     handle command LaunchApp;
     handle command StopApp;
     handle command HideApp;
+    handle command LauncherResponse;
   }
 
   server cluster ApplicationBasic {
@@ -7191,6 +7224,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command GetSetupPIN;
+    handle command GetSetupPINResponse;
     handle command Login;
     handle command Logout;
   }
@@ -7289,17 +7323,27 @@ endpoint 1 {
     ram      attribute meiInt8u default = 0;
 
     handle command Test;
+    handle command TestSpecificResponse;
     handle command TestNotHandled;
+    handle command TestAddArgumentsResponse;
     handle command TestSpecific;
     handle command TestAddArguments;
+    handle command TestListInt8UReverseResponse;
+    handle command TestEnumsResponse;
+    handle command TestNullableOptionalResponse;
     handle command TestStructArgumentRequest;
     handle command TestNestedStructArgumentRequest;
     handle command TestListStructArgumentRequest;
+    handle command SimpleStructResponse;
     handle command TestListInt8UArgumentRequest;
+    handle command TestEmitTestEventResponse;
     handle command TestNestedStructListArgumentRequest;
+    handle command TestEmitTestFabricScopedEventResponse;
     handle command TestListNestedStructListArgumentRequest;
     handle command TestListInt8UReverseRequest;
+    handle command StringEchoResponse;
     handle command TestEnumsRequest;
+    handle command GlobalEchoResponse;
     handle command TestNullableOptionalRequest;
     handle command SimpleStructEchoRequest;
     handle command TimedInvokeRequest;
@@ -7311,6 +7355,7 @@ endpoint 1 {
     handle command StringEchoRequest;
     handle command GlobalEchoRequest;
     handle command TestDifferentVendorMeiRequest;
+    handle command TestDifferentVendorMeiResponse;
   }
 }
 endpoint 2 {
@@ -7340,9 +7385,13 @@ endpoint 2 {
     ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
+    handle command AddGroupResponse;
     handle command ViewGroup;
+    handle command ViewGroupResponse;
     handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
     handle command RemoveGroup;
+    handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
     handle command AddGroupIfIdentifying;
   }
@@ -7401,12 +7450,18 @@ endpoint 2 {
     ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
+    handle command AddSceneResponse;
     handle command ViewScene;
+    handle command ViewSceneResponse;
     handle command RemoveScene;
+    handle command RemoveSceneResponse;
     handle command RemoveAllScenes;
+    handle command RemoveAllScenesResponse;
     handle command StoreScene;
+    handle command StoreSceneResponse;
     handle command RecallScene;
     handle command GetSceneMembership;
+    handle command GetSceneMembershipResponse;
   }
 
   server cluster OccupancySensing {
@@ -7449,10 +7504,13 @@ endpoint 65534 {
     callback attribute clusterRevision;
 
     handle command ScanNetworks;
+    handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
+    handle command NetworkConfigResponse;
     handle command ConnectNetwork;
+    handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
   }
 }

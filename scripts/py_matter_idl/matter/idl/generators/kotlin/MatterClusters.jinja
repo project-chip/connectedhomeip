@@ -280,9 +280,10 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
         {%- else -%}
         {{field.name | lowfirst_except_acronym}}_decoded = {{decode_tlv(cluster, encodable, "tag", 0)}}
         {%- endif -%}
-      } else
-      {% endfor -%}
-      {
+      }  
+      {% endfor %}
+
+      else {
         tlvReader.skipElement()
       }
     }

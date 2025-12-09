@@ -80,8 +80,6 @@ if (chip_build_tests) {
     ]
     sources = []
 
-    defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
-
     if (chip_system_config_use_sockets && current_os != "zephyr") {
       test_sources += [ "TestInetEndPoint.cpp" ]
     }

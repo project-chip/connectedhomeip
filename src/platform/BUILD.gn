@@ -544,8 +544,6 @@ if (chip_device_platform != "none") {
       "Globals.cpp",
       "LockTracker.cpp",
       "PersistedStorage.cpp",
-      "PlatformError.cpp",
-      "PlatformError.h",
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
     ]

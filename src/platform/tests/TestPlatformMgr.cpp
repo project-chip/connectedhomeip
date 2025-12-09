@@ -237,12 +237,12 @@ class MockSystemLayer : public System::LayerImpl
 {
 public:
     // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-    CriticalFailure StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
+    CHIP_ERROR StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
     {
         return CHIP_APPLICATION_ERROR(1);
     }
     // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-    CriticalFailure ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
+    CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
     {
         return CHIP_APPLICATION_ERROR(2);
     }

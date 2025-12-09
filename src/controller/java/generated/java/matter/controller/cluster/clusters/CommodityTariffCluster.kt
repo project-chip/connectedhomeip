@@ -341,7 +341,9 @@ class CommodityTariffCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_DAY_ENTRY_I_DS)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DAY_ENTRY_I_DS)) {
         dayEntryIDs_decoded =
           buildList<UInt> {
             tlvReader.enterArray(tag)
@@ -350,7 +352,9 @@ class CommodityTariffCluster(
             }
             tlvReader.exitContainer()
           }
-      } else if (tag == ContextSpecificTag(TAG_TARIFF_COMPONENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_TARIFF_COMPONENT)) {
         tariffComponent_decoded =
           CommodityTariffClusterTariffComponentStruct.fromTlv(tag, tlvReader)
       } else {

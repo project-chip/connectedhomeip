@@ -39,7 +39,7 @@ public:
     /// CancelTimer) before starting a new one for that context.
     /// @param context context to pass to the timer callback.
     /// @param aTimeout time in milliseconds before the timer expires
-    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) = 0;
+    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) = 0;
     /// @brief Cancel a timer for a given context
     /// @param context used to identify the timer to cancel
     virtual void CancelTimer(TimerContext * context)                = 0;

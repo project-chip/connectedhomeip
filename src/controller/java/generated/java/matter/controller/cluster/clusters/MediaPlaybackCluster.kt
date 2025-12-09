@@ -202,7 +202,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -258,7 +260,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -314,7 +318,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -370,7 +376,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -426,7 +434,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -482,7 +492,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -546,7 +558,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -610,7 +624,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -675,7 +691,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -740,7 +758,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -799,7 +819,9 @@ class MediaPlaybackCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DATA)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
         data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

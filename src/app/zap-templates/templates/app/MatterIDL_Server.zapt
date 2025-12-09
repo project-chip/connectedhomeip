@@ -31,7 +31,7 @@ endpoint {{endpointId}} {
       {{#if included}}
     emits event {{name}};
       {{/if}}
-    {{/user_cluster_events}}
+    {{/user_cluster_events}} 
     {{#user_cluster_attributes}}
        {{#if included}}
         {{~#if (is_str_equal storageOption "NVM")}}
@@ -42,7 +42,7 @@ endpoint {{endpointId}} {
     ram      {{!align~}}
         {{~/if~}}
         attribute {{asLowerCamelCase name}}
-        {{~#if defaultValue~}}
+        {{~#if defaultValue~}} 
           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
         {{~/if~}}
         ;
@@ -52,9 +52,7 @@ endpoint {{endpointId}} {
     {{~#first}}
 
     {{/first}}
-    {{#if (is_str_equal source "client")}}
     handle command {{asUpperCamelCase name}};
-    {{/if}}
     {{/user_cluster_commands}}
   }
       {{/if}}

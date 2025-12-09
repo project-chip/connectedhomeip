@@ -64,7 +64,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
     uint16_t looseAudioStreamID;
 
     // Is the requested stream usage supported by the camera?
-    auto myStreamUsages = GetCameraAVStreamManagementCluster()->GetSupportedStreamUsages();
+    auto myStreamUsages = GetCameraAVStreamMgmtServer()->GetSupportedStreamUsages();
     auto it             = std::find(myStreamUsages.begin(), myStreamUsages.end(), streamUsage);
     if (it == myStreamUsages.end())
     {
@@ -74,8 +74,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
     if (videoStreamId.HasValue())
     {
-        const std::vector<VideoStreamStruct> & allocatedVideoStreams =
-            GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+        const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
 
         // If no Video ID is provided, match to an allocated ID. Exact is preferred if found.  We know the stream requested is in
         // supported streams.
@@ -104,8 +103,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
     if (audioStreamId.HasValue())
     {
-        const std::vector<AudioStreamStruct> & allocatedAudioStreams =
-            GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+        const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
 
         // If no Audio ID is provided, match to an allocated ID. Exact is preferred if found.  We know the stream requested is in
         // supported streams.
@@ -150,13 +148,13 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> &
 CameraAVStreamManager::GetAllocatedVideoStreams() const
 {
-    return GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+    return GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
 }
 
 const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> &
 CameraAVStreamManager::GetAllocatedAudioStreams() const
 {
-    return GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+    return GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
 }
 
 void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -168,7 +166,7 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
     {
         uint16_t vStreamId           = videoStreamId.Value().Value();
-        auto & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+        auto & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
         for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : allocatedVideoStreams)
         {
             if (stream.videoStreamID == vStreamId)
@@ -182,7 +180,7 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
     if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
     {
         uint16_t aStreamId           = audioStreamId.Value().Value();
-        auto & allocatedAudioStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+        auto & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
         for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : allocatedAudioStreams)
         {
             if (stream.audioStreamID == aStreamId)
@@ -198,7 +196,7 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
 
 CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
 {
-    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
 
     // Check if the videoStreamId exists in allocated streams
     for (const auto & stream : allocatedVideoStreams)
@@ -216,7 +214,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
 
 CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
 {
-    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
 
     // Check if the audioStreamId exists in allocated streams
     for (const auto & stream : allocatedAudioStreams)
@@ -235,38 +233,38 @@ CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
 CHIP_ERROR CameraAVStreamManager::IsHardPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    isActive = GetCameraAVStreamManagementCluster()->GetHardPrivacyModeOn();
+    isActive = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVStreamManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    isActive = GetCameraAVStreamManagementCluster()->GetSoftRecordingPrivacyModeEnabled();
+    isActive = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVStreamManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    isActive = GetCameraAVStreamManagementCluster()->GetSoftLivestreamPrivacyModeEnabled();
+    isActive = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVStreamManager::SetHardPrivacyModeOn(bool hardPrivacyMode)
 {
-    return GetCameraAVStreamManagementCluster()->SetHardPrivacyModeOn(hardPrivacyMode);
+    return GetCameraAVStreamMgmtServer()->SetHardPrivacyModeOn(hardPrivacyMode);
 }
 
 bool CameraAVStreamManager::HasAllocatedVideoStreams()
 {
-    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
     return !allocatedVideoStreams.empty();
 }
 
 bool CameraAVStreamManager::HasAllocatedAudioStreams()
 {
-    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
     return !allocatedAudioStreams.empty();
 }
 
@@ -292,7 +290,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     }
 
     // Try to reuse an allocated stream
-    std::optional<uint16_t> reusableStreamId = GetCameraAVStreamManagementCluster()->GetReusableVideoStreamId(allocateArgs);
+    std::optional<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableVideoStreamId(allocateArgs);
 
     if (reusableStreamId.has_value())
     {
@@ -310,8 +308,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             uint32_t candidateEncodedPixelRate =
                 allocateArgs.maxFrameRate * allocateArgs.maxResolution.height * allocateArgs.maxResolution.width;
             bool encoderRequired = true;
-            if (!GetCameraAVStreamManagementCluster()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate,
-                                                                                              encoderRequired))
+            if (!GetCameraAVStreamMgmtServer()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate, encoderRequired))
             {
                 return Status::ResourceExhausted;
             }
@@ -325,7 +322,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
             // Set the current frame rate attribute from HAL
-            TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
+            TEMPORARY_RETURN_IGNORED GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(
                 mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             return Status::Success;
@@ -345,7 +342,7 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
         mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
 
         // Set the current frame rate attribute from HAL once stream has started
-        TEMPORARY_RETURN_IGNORED GetCameraAVStreamManagementCluster()->SetCurrentFrameRate(
+        TEMPORARY_RETURN_IGNORED GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(
             mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
         break;
 
@@ -491,7 +488,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     }
 
     // Try to reuse an allocated stream.
-    std::optional<uint16_t> reusableStreamId = GetCameraAVStreamManagementCluster()->GetReusableSnapshotStreamId(allocateArgs);
+    std::optional<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableSnapshotStreamId(allocateArgs);
 
     if (reusableStreamId.has_value())
     {
@@ -513,7 +510,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         }
     }
 
-    if (!GetCameraAVStreamManagementCluster()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate, encoderRequired))
+    if (!GetCameraAVStreamMgmtServer()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate, encoderRequired))
     {
         return Status::ResourceExhausted;
     }
@@ -605,8 +602,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
     ChipLogProgress(Camera, "Stream usage priorities changed");
-    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(
-        GetCameraAVStreamManagementCluster()->GetStreamUsagePriorities());
+    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(GetCameraAVStreamMgmtServer()->GetStreamUsagePriorities());
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
@@ -617,25 +613,25 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     {
     case HDRModeEnabled::Id: {
 
-        mCameraDeviceHAL->GetCameraHALInterface().SetHDRMode(GetCameraAVStreamManagementCluster()->GetHDRModeEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetHDRMode(GetCameraAVStreamMgmtServer()->GetHDRModeEnabled());
         break;
     }
     case SoftRecordingPrivacyModeEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(
-            GetCameraAVStreamManagementCluster()->GetSoftRecordingPrivacyModeEnabled());
+            GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
         break;
     }
     case SoftLivestreamPrivacyModeEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(
-            GetCameraAVStreamManagementCluster()->GetSoftLivestreamPrivacyModeEnabled());
+            GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
         break;
     }
     case HardPrivacyModeOn::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetHardPrivacyMode(GetCameraAVStreamManagementCluster()->GetHardPrivacyModeOn());
+        mCameraDeviceHAL->GetCameraHALInterface().SetHardPrivacyMode(GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn());
         break;
     }
     case NightVision::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetNightVision(GetCameraAVStreamManagementCluster()->GetNightVision());
+        mCameraDeviceHAL->GetCameraHALInterface().SetNightVision(GetCameraAVStreamMgmtServer()->GetNightVision());
         break;
     }
     case NightVisionIllum::Id: {
@@ -643,63 +639,59 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     }
     case Viewport::Id: {
         // Update the device default
-        mCameraDeviceHAL->GetCameraHALInterface().SetViewport(GetCameraAVStreamManagementCluster()->GetViewport());
+        mCameraDeviceHAL->GetCameraHALInterface().SetViewport(GetCameraAVStreamMgmtServer()->GetViewport());
 
         // Update the per stream viewports on the camera
         for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
         {
-            mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream, GetCameraAVStreamManagementCluster()->GetViewport());
+            mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream, GetCameraAVStreamMgmtServer()->GetViewport());
         }
 
         // Inform DPTZ (the server) that the camera default viewport has changed
         mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().DefaultViewportUpdated(
-            GetCameraAVStreamManagementCluster()->GetViewport());
+            GetCameraAVStreamMgmtServer()->GetViewport());
         break;
     }
     case SpeakerMuted::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetSpeakerMuted(GetCameraAVStreamManagementCluster()->GetSpeakerMuted());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSpeakerMuted(GetCameraAVStreamMgmtServer()->GetSpeakerMuted());
         break;
     }
     case SpeakerVolumeLevel::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetSpeakerVolume(GetCameraAVStreamManagementCluster()->GetSpeakerVolumeLevel());
+        mCameraDeviceHAL->GetCameraHALInterface().SetSpeakerVolume(GetCameraAVStreamMgmtServer()->GetSpeakerVolumeLevel());
         break;
     }
     case MicrophoneMuted::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneMuted(GetCameraAVStreamManagementCluster()->GetMicrophoneMuted());
+        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneMuted(GetCameraAVStreamMgmtServer()->GetMicrophoneMuted());
         break;
     }
     case MicrophoneVolumeLevel::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(
-            GetCameraAVStreamManagementCluster()->GetMicrophoneVolumeLevel());
+        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(GetCameraAVStreamMgmtServer()->GetMicrophoneVolumeLevel());
         break;
     }
     case LocalVideoRecordingEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetLocalVideoRecordingEnabled(
-            GetCameraAVStreamManagementCluster()->GetLocalVideoRecordingEnabled());
+            GetCameraAVStreamMgmtServer()->GetLocalVideoRecordingEnabled());
         break;
     }
     case LocalSnapshotRecordingEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetLocalSnapshotRecordingEnabled(
-            GetCameraAVStreamManagementCluster()->GetLocalSnapshotRecordingEnabled());
+            GetCameraAVStreamMgmtServer()->GetLocalSnapshotRecordingEnabled());
         break;
     }
     case StatusLightEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(
-            GetCameraAVStreamManagementCluster()->GetStatusLightEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(GetCameraAVStreamMgmtServer()->GetStatusLightEnabled());
         break;
     }
     case ImageRotation::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetImageRotation(GetCameraAVStreamManagementCluster()->GetImageRotation());
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageRotation(GetCameraAVStreamMgmtServer()->GetImageRotation());
         break;
     }
     case ImageFlipHorizontal::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipHorizontal(
-            GetCameraAVStreamManagementCluster()->GetImageFlipHorizontal());
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipHorizontal(GetCameraAVStreamMgmtServer()->GetImageFlipHorizontal());
         break;
     }
     case ImageFlipVertical::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipVertical(
-            GetCameraAVStreamManagementCluster()->GetImageFlipVertical());
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipVertical(GetCameraAVStreamMgmtServer()->GetImageFlipVertical());
         break;
     }
     default:
@@ -724,7 +716,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
 CHIP_ERROR
 CameraAVStreamManager::AllocatedVideoStreamsLoaded()
 {
-    const std::vector<VideoStreamStruct> & persistedStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+    const std::vector<VideoStreamStruct> & persistedStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
     auto & halStreams                                       = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams();
 
     for (auto & halStream : halStreams)
@@ -751,7 +743,7 @@ CameraAVStreamManager::AllocatedVideoStreamsLoaded()
 CHIP_ERROR
 CameraAVStreamManager::AllocatedAudioStreamsLoaded()
 {
-    const std::vector<AudioStreamStruct> & persistedStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+    const std::vector<AudioStreamStruct> & persistedStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
     auto & halStreams                                       = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams();
 
     for (auto & halStream : halStreams)
@@ -783,8 +775,7 @@ CameraAVStreamManager::AllocatedAudioStreamsLoaded()
 CHIP_ERROR
 CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
 {
-    const std::vector<SnapshotStreamStruct> & persistedStreams =
-        GetCameraAVStreamManagementCluster()->GetAllocatedSnapshotStreams();
+    const std::vector<SnapshotStreamStruct> & persistedStreams = GetCameraAVStreamMgmtServer()->GetAllocatedSnapshotStreams();
     auto & halStreams = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams();
     std::set<uint16_t> halStreamIds;
 
@@ -828,7 +819,7 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
                             persistedStream.snapshotStreamID);
 
             // Convert SnapshotStreamStruct to SnapshotStreamAllocateArgs
-            CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
+            CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
 
             snapshotStreamArgs.imageCodec       = persistedStream.imageCodec;
             snapshotStreamArgs.maxFrameRate     = persistedStream.frameRate;
@@ -925,14 +916,12 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
     }
 
     // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) !=
-        CHIP_NO_ERROR)
+    if (GetCameraAVStreamMgmtServer()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to increment audio stream %u ref count in SDK", audioStreamID);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) !=
-        CHIP_NO_ERROR)
+    if (GetCameraAVStreamMgmtServer()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to increment video stream %u ref count in SDK", videoStreamID);
     }
@@ -976,14 +965,12 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     }
 
     // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) !=
-        CHIP_NO_ERROR)
+    if (GetCameraAVStreamMgmtServer()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to decrement audio stream %u ref count in SDK", audioStreamID);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) !=
-        CHIP_NO_ERROR)
+    if (GetCameraAVStreamMgmtServer()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to decrement video stream %u ref count in SDK", videoStreamID);
     }

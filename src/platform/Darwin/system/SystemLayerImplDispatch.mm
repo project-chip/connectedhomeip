@@ -101,7 +101,7 @@ namespace System {
         timer->mTimerSource = nullptr;
     }
 
-    CriticalFailure LayerImplDispatch::Init()
+    CHIP_ERROR LayerImplDispatch::Init()
     {
         VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -133,7 +133,7 @@ namespace System {
         mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     }
 
-    CriticalFailure LayerImplDispatch::ScheduleWorkWithBlock(dispatch_block_t block)
+    CHIP_ERROR LayerImplDispatch::ScheduleWorkWithBlock(dispatch_block_t block)
     {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (block: %p)", __func__, block);
@@ -156,7 +156,7 @@ namespace System {
         return CHIP_NO_ERROR;
     }
 
-    CriticalFailure LayerImplDispatch::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+    CHIP_ERROR LayerImplDispatch::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
     {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (onComplete: %p - appState: %p)", __func__, onComplete, appState);
@@ -164,7 +164,7 @@ namespace System {
         return StartTimer(System::Clock::kZero, onComplete, appState, false /* shouldCancel */);
     }
 
-    CriticalFailure LayerImplDispatch::StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay)
+    CHIP_ERROR LayerImplDispatch::StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -176,7 +176,7 @@ namespace System {
         return StartTimer(delay, TimerCompleteBlockCallback, ctx);
     }
 
-    CriticalFailure LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+    CHIP_ERROR LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
     {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (onComplete: %p - appState: %p)", __func__, onComplete, appState);
@@ -184,7 +184,7 @@ namespace System {
         return StartTimer(delay, onComplete, appState, true /* shouldCancel */);
     }
 
-    CriticalFailure LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel)
+    CHIP_ERROR LayerImplDispatch::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -311,13 +311,11 @@ namespace System {
         }
 
         for (auto & block : queuedBlocks) {
-            // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate delete in TimerCompleteBlockCallback
             __auto_type * ctx = new TimerCompleteBlockCallbackContext { .block = block };
             VerifyOrDie(nullptr != ctx);
             CHIP_ERROR error = ScheduleWork(TimerCompleteBlockCallback, ctx);
             LogErrorOnFailure(error);
             VerifyOrDo(CHIP_NO_ERROR == error, delete ctx);
-            // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
         }
 
         // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,

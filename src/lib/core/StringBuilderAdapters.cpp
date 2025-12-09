@@ -29,12 +29,6 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
 }
 
 template <>
-StatusWithSize ToString<chip::CriticalFailure>(const chip::CriticalFailure & err, pw::span<char> buffer)
-{
-    return ToString<CHIP_ERROR>(err.GetError(), buffer);
-}
-
-template <>
 StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time,
                                                                      pw::span<char> buffer)
 {
@@ -63,11 +57,6 @@ void PrintTo(const CHIP_ERROR & err, std::ostream * os)
         return;
     }
     *os << "CHIP_ERROR:<" << err.Format() << ">";
-}
-
-void PrintTo(const CriticalFailure & err, std::ostream * os)
-{
-    PrintTo(err.GetError(), os);
 }
 
 void PrintTo(const std::chrono::duration<uint64_t, std::milli> & time, std::ostream * os)

@@ -166,13 +166,21 @@ class CommissionerControlCluster(
 
       if (tag == ContextSpecificTag(TAG_COMMISSIONING_TIMEOUT)) {
         commissioningTimeout_decoded = tlvReader.getUShort(tag)
-      } else if (tag == ContextSpecificTag(TAG_PAKE_PASSCODE_VERIFIER)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_PAKE_PASSCODE_VERIFIER)) {
         PAKEPasscodeVerifier_decoded = tlvReader.getByteArray(tag)
-      } else if (tag == ContextSpecificTag(TAG_DISCRIMINATOR)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_DISCRIMINATOR)) {
         discriminator_decoded = tlvReader.getUShort(tag)
-      } else if (tag == ContextSpecificTag(TAG_ITERATIONS)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ITERATIONS)) {
         iterations_decoded = tlvReader.getUInt(tag)
-      } else if (tag == ContextSpecificTag(TAG_SALT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_SALT)) {
         salt_decoded = tlvReader.getByteArray(tag)
       } else {
         tlvReader.skipElement()

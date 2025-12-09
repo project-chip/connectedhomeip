@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
+#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -57,7 +57,7 @@ struct SnapshotStream
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVStreamManager : public CameraAVStreamManagementDelegate
+class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
 {
 public:
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,

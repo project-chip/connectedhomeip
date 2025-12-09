@@ -32,7 +32,7 @@ namespace System {
 
 LayerImplZephyr::LayerImplZephyr() {}
 
-CriticalFailure LayerImplZephyr::Init()
+CHIP_ERROR LayerImplZephyr::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -45,7 +45,7 @@ void LayerImplZephyr::Shutdown()
     mLayerState.ResetFromInitialized();
 }
 
-CriticalFailure LayerImplZephyr::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplZephyr::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -125,7 +125,7 @@ void LayerImplZephyr::CancelTimer(TimerCompleteCallback onComplete, void * appSt
     mTimerPool.Release(timer);
 }
 
-CriticalFailure LayerImplZephyr::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplZephyr::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 

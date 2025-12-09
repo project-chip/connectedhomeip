@@ -47,15 +47,11 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CriticalFailure.h>
 
 namespace pw {
 
 template <>
 StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer);
-
-template <>
-StatusWithSize ToString<chip::CriticalFailure>(const chip::CriticalFailure & err, pw::span<char> buffer);
 
 // Adapters for chip::System::Clock::Microseconds64 and Milliseconds64
 template <>
@@ -83,7 +79,6 @@ namespace chip {
 ///
 /// This enhances the readability and diagnostic information in GoogleTest test logs.
 void PrintTo(const CHIP_ERROR & err, std::ostream * os);
-void PrintTo(const CriticalFailure & err, std::ostream * os);
 
 // Adapters for chip::System::Clock::Microseconds64 and Milliseconds64
 void PrintTo(const std::chrono::duration<uint64_t, std::milli> & time, std::ostream * os);

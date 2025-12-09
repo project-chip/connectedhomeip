@@ -126,7 +126,9 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
         statusText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

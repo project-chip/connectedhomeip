@@ -889,7 +889,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      } else if (tag == ContextSpecificTag(TAG_ARG2)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG2)) {
         arg2_decoded =
           buildList<UnitTestingClusterSimpleStruct> {
             tlvReader.enterArray(tag)
@@ -898,7 +900,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      } else if (tag == ContextSpecificTag(TAG_ARG3)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG3)) {
         arg3_decoded =
           buildList<UByte> {
             tlvReader.enterArray(tag)
@@ -907,7 +911,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      } else if (tag == ContextSpecificTag(TAG_ARG4)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG4)) {
         arg4_decoded =
           buildList<Boolean> {
             tlvReader.enterArray(tag)
@@ -916,9 +922,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      } else if (tag == ContextSpecificTag(TAG_ARG5)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG5)) {
         arg5_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_ARG6)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG6)) {
         arg6_decoded = tlvReader.getBoolean(tag)
       } else {
         tlvReader.skipElement()
@@ -1353,7 +1363,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = tlvReader.getUShort(tag)
-      } else if (tag == ContextSpecificTag(TAG_ARG2)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG2)) {
         arg2_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -1415,7 +1427,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_WAS_PRESENT)) {
         wasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_WAS_NULL)) {
         wasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1427,7 +1441,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1439,7 +1455,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_ORIGINAL_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ORIGINAL_VALUE)) {
         originalValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1665,7 +1683,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_NULLABLE_INT_WAS_NULL)) {
         nullableIntWasNull_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_INT_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_INT_VALUE)) {
         nullableIntValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1677,9 +1697,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_WAS_PRESENT)) {
         optionalIntWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_VALUE)) {
         optionalIntValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1691,9 +1715,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT)) {
         nullableOptionalIntWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL)) {
         nullableOptionalIntWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1705,7 +1733,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE)) {
         nullableOptionalIntValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1717,9 +1747,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_WAS_NULL)) {
         nullableStringWasNull_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_VALUE)) {
         nullableStringValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1731,9 +1765,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_WAS_PRESENT)) {
         optionalStringWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE)) {
         optionalStringValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1745,9 +1783,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT)) {
         nullableOptionalStringWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL)) {
         nullableOptionalStringWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1759,7 +1801,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE)) {
         nullableOptionalStringValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1771,9 +1815,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_WAS_NULL)) {
         nullableStructWasNull_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE)) {
         nullableStructValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1785,9 +1833,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_WAS_PRESENT)) {
         optionalStructWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE)) {
         optionalStructValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1799,9 +1851,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT)) {
         nullableOptionalStructWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL)) {
         nullableOptionalStructWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1813,7 +1869,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE)) {
         nullableOptionalStructValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1825,9 +1883,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_WAS_NULL)) {
         nullableListWasNull_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_VALUE)) {
         nullableListValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1845,9 +1907,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_WAS_PRESENT)) {
         optionalListWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE)) {
         optionalListValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1865,9 +1931,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT)) {
         nullableOptionalListWasPresent_decoded = tlvReader.getBoolean(tag)
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL)) {
         nullableOptionalListWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1879,7 +1949,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE)) {
         nullableOptionalListValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -2378,7 +2450,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_FIELD1)) {
         field1_decoded = UnitTestingClusterTestGlobalStruct.fromTlv(tag, tlvReader)
-      } else if (tag == ContextSpecificTag(TAG_FIELD2)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_FIELD2)) {
         field2_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -2452,7 +2526,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_EVENT_NUMBER)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_EVENT_NUMBER)) {
         eventNumber_decoded = tlvReader.getULong(tag)
       } else {
         tlvReader.skipElement()

@@ -40,7 +40,6 @@ buildconfig_header("chip_buildconfig") {
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
   defines = [
-    "CALLER_HANDLES_CRITICAL_FAILURE=${chip_build_tests}",
     "CHIP_FUZZING_ENABLED=false",
     "CHIP_CONFIG_TEST=${chip_build_tests}",
     "CHIP_ERROR_LOGGING=${chip_error_logging}",
@@ -127,7 +126,6 @@ source_set("string-builder-adapters") {
     ":error",
     "$dir_pw_string",
     "$dir_pw_unit_test",
-    "${chip_root}/src/lib/support",
   ]
 }
 

@@ -44,7 +44,7 @@ class TimerAndMockClock : public Clock::Internal::MockClock, public Layer
 {
 public:
     // System Layer overrides
-    CriticalFailure Init() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
     void Shutdown() override { Clear(); }
     void Clear()
     {
@@ -53,7 +53,7 @@ public:
     }
     bool IsInitialized() const override { return true; }
 
-    CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
+    CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
     {
         Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
         TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
@@ -80,10 +80,9 @@ public:
     {
         return mTimerList.GetRemainingTime(onComplete, appState);
     }
-    CriticalFailure ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // Clock overrides
-    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void SetMonotonic(Clock::Milliseconds64 timestamp)
     {
         MockClock::SetMonotonic(timestamp);
@@ -97,7 +96,6 @@ public:
         }
     }
 
-    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void AdvanceMonotonic(Clock::Milliseconds64 increment) { SetMonotonic(GetMonotonicMilliseconds64() + increment); }
 
 private:

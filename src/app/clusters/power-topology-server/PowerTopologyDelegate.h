@@ -17,9 +17,7 @@
  */
 #pragma once
 
-#include <clusters/PowerTopology/Enums.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/Optional.h>
 
 namespace chip {
@@ -49,6 +47,12 @@ public:
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is greater than or equal to the length of the list of active endpoints.
      */
     virtual CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) = 0;
+};
+
+enum class OptionalAttributes : uint32_t
+{
+    kOptionalAttributeAvailableEndpoints = 0x1,
+    kOptionalAttributeActiveEndpoints    = 0x2,
 };
 
 } // namespace PowerTopology

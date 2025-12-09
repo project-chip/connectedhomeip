@@ -190,7 +190,9 @@ class GeneralDiagnosticsCluster(
 
       if (tag == ContextSpecificTag(TAG_SYSTEM_TIME_MS)) {
         systemTimeMs_decoded = tlvReader.getULong(tag)
-      } else if (tag == ContextSpecificTag(TAG_POSIX_TIME_MS)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSIX_TIME_MS)) {
         posixTimeMs_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

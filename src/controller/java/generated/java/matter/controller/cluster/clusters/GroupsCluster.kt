@@ -119,7 +119,9 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
@@ -175,9 +177,13 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      } else if (tag == ContextSpecificTag(TAG_GROUP_NAME)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_NAME)) {
         groupName_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -252,7 +258,9 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_GROUP_LIST)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_LIST)) {
         groupList_decoded =
           buildList<UShort> {
             tlvReader.enterArray(tag)
@@ -311,7 +319,9 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()

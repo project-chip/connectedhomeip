@@ -32,14 +32,14 @@ namespace System {
 
 using namespace ::chip::DeviceLayer;
 
-CriticalFailure PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge)
+CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge)
 {
     ChipDeviceEvent event{ .Type = DeviceEventType::kChipLambdaEvent, .LambdaEvent = std::move(bridge) };
 
     return PlatformMgr().PostEvent(&event);
 }
 
-CriticalFailure PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::Timeout delay)
+CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::Timeout delay)
 {
     return PlatformMgr().StartChipTimer(delay);
 }

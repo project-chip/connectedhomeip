@@ -1006,11 +1006,9 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
 
     descriptor_id = uint(Clusters.Descriptor.id)
     code = 'TAGLIST'
-    # Data Model versions prior to 1.2 do not support TAGLIST.
-    if code in clusters[descriptor_id].feature_map:
-        mask = clusters[descriptor_id].feature_map[code]
-        clusters[descriptor_id].features[mask].conformance = optional()
-        remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
+    mask = clusters[descriptor_id].feature_map[code]
+    clusters[descriptor_id].features[mask].conformance = optional()
+    remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
 
     action_id = uint(Clusters.Actions.id)
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:

@@ -220,7 +220,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok,
@@ -302,7 +302,7 @@ def check_no_duplicates(obj: Any) -> None:
         raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
-class TC_DeviceBasicComposition(BasicCompositionTests):
+class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()

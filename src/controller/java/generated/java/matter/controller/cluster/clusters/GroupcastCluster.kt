@@ -186,7 +186,9 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
       if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      } else if (tag == ContextSpecificTag(TAG_ENDPOINTS)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_ENDPOINTS)) {
         endpoints_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -204,7 +206,9 @@ class GroupcastCluster(private val controller: MatterController, private val end
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_LIST_TOO_LARGE)) {
+      }
+
+      if (tag == ContextSpecificTag(TAG_LIST_TOO_LARGE)) {
         listTooLarge_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

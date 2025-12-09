@@ -29,7 +29,7 @@ static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     TimerContext * context = static_cast<TimerContext *>(aAppState);
     context->TimerFired();
 }
-CriticalFailure DefaultTimerDelegate::StartTimer(TimerContext * context, Timeout aTimeout)
+CHIP_ERROR DefaultTimerDelegate::StartTimer(TimerContext * context, Timeout aTimeout)
 {
     return DeviceLayer::SystemLayer().StartTimer(aTimeout, TimerCallbackInterface, context);
 }

@@ -16,16 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
-    "${CLUSTER_DIR}/power-topology-server.h"
-)
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
     "${CLUSTER_DIR}/PowerTopologyCluster.cpp"
-    "${CLUSTER_DIR}/PowerTopologyCluster.h"
+    "${CLUSTER_DIR}/power-topology-server.h"
     "${CLUSTER_DIR}/PowerTopologyDelegate.h"
 )

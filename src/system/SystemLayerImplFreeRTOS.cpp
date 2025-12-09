@@ -33,7 +33,7 @@ namespace System {
 
 LayerImplFreeRTOS::LayerImplFreeRTOS() : mHandlingTimerComplete(false) {}
 
-CriticalFailure LayerImplFreeRTOS::Init()
+CHIP_ERROR LayerImplFreeRTOS::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -50,7 +50,7 @@ void LayerImplFreeRTOS::Shutdown()
     mLayerState.ResetFromInitialized();
 }
 
-CriticalFailure LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -116,7 +116,7 @@ void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * app
     }
 }
 
-CriticalFailure LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -153,7 +153,7 @@ CriticalFailure LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete
 /**
  * Start the platform timer with specified millsecond duration.
  */
-CriticalFailure LayerImplFreeRTOS::StartPlatformTimer(System::Clock::Timeout aDelay)
+CHIP_ERROR LayerImplFreeRTOS::StartPlatformTimer(System::Clock::Timeout aDelay)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR status = PlatformEventing::StartTimer(*this, aDelay);

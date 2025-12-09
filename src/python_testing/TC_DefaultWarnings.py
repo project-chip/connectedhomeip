@@ -39,11 +39,10 @@ from test_testing.DefaultChecker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAUL
                                          FLAG_FIXED_LABEL_EMPTY, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI, FLAG_UNIT_TESTING,
                                          FLAG_VENDOR_ID, FLAG_VENDOR_NAME, DefaultChecker)
 
-from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_DefaultChecker(BasicCompositionTests, DefaultChecker):
+class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
     @async_test_body
     async def setup_class(self):
         super().setup_class()

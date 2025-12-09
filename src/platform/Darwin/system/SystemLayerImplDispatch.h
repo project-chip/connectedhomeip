@@ -43,22 +43,22 @@ public:
     ~LayerImplDispatch() override { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
-    CriticalFailure Init() override;
+    CHIP_ERROR Init() override;
     void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
     Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
-    CriticalFailure ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
     // LayerDispatch overrides.
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleDispatchQueueEvents(Clock::Timeout timeout) override;
-    CriticalFailure ScheduleWorkWithBlock(dispatch_block_t block) override;
-    CriticalFailure StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) override;
+    CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override;
+    CHIP_ERROR StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) override;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // LayerSockets overrides.
@@ -126,7 +126,7 @@ protected:
     TimerList mExpiredTimers;
     void EnableTimer(const char * source, TimerList::Node *);
     void DisableTimer(const char * source, TimerList::Node *);
-    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
     void HandleTimerEvents(Clock::Timeout timeout);
 
     ObjectLifeCycle mLayerState;
