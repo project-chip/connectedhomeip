@@ -41,7 +41,6 @@
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import os
 import time
