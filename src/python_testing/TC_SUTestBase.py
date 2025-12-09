@@ -16,6 +16,7 @@
 
 
 import logging
+import subprocess
 import tempfile
 from os import path
 from typing import Optional
@@ -321,8 +322,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         Returns:
             None
         """
-        import subprocess
-
         if kvs_path_prefix is None:
             kvs_path_prefix = "/tmp/chip_kvs"
         subprocess.run(f"rm -rf {kvs_path_prefix}*", shell=True)
