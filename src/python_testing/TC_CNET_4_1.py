@@ -25,7 +25,7 @@ from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_CNET_4_1(MatterBaseTest):
@@ -47,7 +47,7 @@ class TC_CNET_4_1(MatterBaseTest):
         return ['CNET.S.F00']
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
@@ -74,7 +74,6 @@ class TC_CNET_4_1(MatterBaseTest):
                      "Verify that LastConnectErrorValue attribute value is null"),
 
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
@@ -86,14 +85,14 @@ class TC_CNET_4_1(MatterBaseTest):
         max_networks_count = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.MaxNetworks)
-        logger.info(f"Max networks attribute: {max_networks_count}")
+        log.info(f"Max networks attribute: {max_networks_count}")
         matter_asserts.assert_int_in_range(max_networks_count, min_value=1, max_value=255, description="MaxNetworks")
 
         self.step(2)
         supported_wifi_bands = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedWiFiBands)
-        logger.info(supported_wifi_bands)
+        log.info(supported_wifi_bands)
         asserts.assert_greater_equal(len(
             supported_wifi_bands), 1, "Verify that SupportedWiFiBands attribute value has 1 or more entries, all of which are in the range of WiFiBandEnum.")
         matter_asserts.assert_list_element_type(supported_wifi_bands, Clusters.NetworkCommissioning.Enums.WiFiBandEnum,
@@ -116,17 +115,17 @@ class TC_CNET_4_1(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        logger.info(f"List of network obj {list(networks_dict.values())}")
+        log.info(f"List of network obj {list(networks_dict.values())}")
 
         network_count = {}
         network_ids = {}
         network_ids_list = []
         # Search for connected networks and ids in all endpoints. Gather by endpoints. Join all the networks in a single list.
         for ep in networks_dict:
-            network_count[ep] = sum((x.connected for x in networks_dict[ep]))
+            network_count[ep] = sum(x.connected for x in networks_dict[ep])
             network_ids[ep] = [x.networkID for x in networks_dict[ep]]
             network_ids_list.extend(network_ids[ep])
-        logger.info(f"All networkd ids found: {network_ids_list}")
+        log.info(f"All networkd ids found: {network_ids_list}")
         # Check network attribute if is connected in the current cluster
         connected_networks = sum(network_count.values())
         asserts.assert_equal(connected_networks, 1, "Verify that only one entry has connected status as TRUE")
@@ -136,7 +135,7 @@ class TC_CNET_4_1(MatterBaseTest):
 
         # Read Network if is connected in the current enpoint
         if current_cluster_connected:
-            logger.info("Current cluster is connected on the endpoint.")
+            log.info("Current cluster is connected on the endpoint.")
             network = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
             asserts.assert_true(network, "NetworkInfoStruct list should not be empty")
             matter_asserts.assert_list_element_type(network, Clusters.NetworkCommissioning.Structs.NetworkInfoStruct,
@@ -146,7 +145,7 @@ class TC_CNET_4_1(MatterBaseTest):
             matter_asserts.assert_all(network, lambda x: isinstance(x.connected, bool),
                                       "NetworkID field is an octet string within a length range 1 to 32")
         else:
-            logger.info(f"Current cluster is not connected in the endpoint: {self.get_endpoint()}, skipping.")
+            log.info(f"Current cluster is not connected in the endpoint: {self.get_endpoint()}, skipping.")
             self.mark_all_remaining_steps_skipped()
             return
 
@@ -167,8 +166,8 @@ class TC_CNET_4_1(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
-        logger.info(f"Last connected network: {last_network_id}")
-        matching_networks_count = sum((x == last_network_id for x in network_ids_list))
+        log.info(f"Last connected network: {last_network_id}")
+        matching_networks_count = sum(x == last_network_id for x in network_ids_list)
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID count of the entries")
         asserts.assert_in(last_network_id, network_ids_list,

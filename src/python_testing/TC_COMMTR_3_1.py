@@ -42,15 +42,11 @@
 
 """Define Matter test case TC_COMMTR_3_1."""
 
-import logging
-
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityMetering
 
@@ -70,7 +66,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
 
     def steps_TC_COMMTR_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Commodity Metering cluster attributes:
                      - MinIntervalFloor: 0
@@ -114,8 +110,6 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
                      EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.""", "Status code must be SUCCESS."),
             TestStep("14", "TH removes the subscription the Commodity Metering cluster.", "Subscription is removed successfully."),
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_TC_COMMTR_3_1(self):

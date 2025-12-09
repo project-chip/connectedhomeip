@@ -79,7 +79,7 @@ def _IsValidYamlTest(name: str) -> bool:
 
 
 def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
-    with open(json_file_path, 'rt') as f:
+    with open(json_file_path) as f:
         data = json.load(f)
         for c in data["collection"]:
             for name in data[c]:

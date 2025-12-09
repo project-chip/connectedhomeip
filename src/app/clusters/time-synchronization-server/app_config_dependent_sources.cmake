@@ -24,8 +24,8 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/time-synchronization-cluster.cpp"
-    "${CLUSTER_DIR}/time-synchronization-cluster.h"
+    "${CLUSTER_DIR}/TimeSynchronizationCluster.cpp"
+    "${CLUSTER_DIR}/TimeSynchronizationCluster.h"
     "${CLUSTER_DIR}/time-synchronization-server.h"
     "${CLUSTER_DIR}/DefaultTimeSyncDelegate.cpp"
     "${CLUSTER_DIR}/DefaultTimeSyncDelegate.h"
