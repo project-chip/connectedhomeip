@@ -343,17 +343,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             self.success = False
             return False
 
-        except InteractionModelError as e:
-            if e.status != Status.UnsupportedAccess:
-                self.record_error(test_name=test_name,
-                                  location=AttributePathLocation(endpoint_id=endpoint_id,
-                                                                 cluster_id=cluster_id, attribute_id=attribute_id),
-                                  problem=f"Subscription failed with {e.status} but expected UnsupportedAccess for privilege {privilege}")
-                self.success = False
-                return False
-            log.info("Subscription correctly failed with UnsupportedAccess")
-            return True
-
         except ChipStackError as e:  # chipstack-ok
             if e.err == 0x00000580:  # INVALID_ACTION - some attributes don't support subscription
                 # This occurs for attributes that cannot be subscribed to when testing with insufficient privileges.
