@@ -73,7 +73,7 @@ except ImportError:
     from matter.testing.basic_composition import BasicCompositionTests
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
+    from matter.testing.matter_testing import TestStep, async_test_body, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl
@@ -131,7 +131,7 @@ class Hooks():
         return self.failures
 
 
-class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
+class TestEventTriggersCheck(BasicCompositionTests):
     @async_test_body
     async def test_TestEventTriggersCheck(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
@@ -141,7 +141,7 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
 
 
-class DclCheck(MatterBaseTest, BasicCompositionTests):
+class DclCheck(BasicCompositionTests):
     def get_versions_and_assert_all_keys_exist(self):
         entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
         key_model_versions = 'modelVersions'
