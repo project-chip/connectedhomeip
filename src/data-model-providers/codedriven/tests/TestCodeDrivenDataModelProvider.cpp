@@ -40,7 +40,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 
 class TestProviderChangeListener : public DataModel::ProviderChangeListener
 {
@@ -222,7 +222,7 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
 protected:
-    TestProviderChangeListener mChangeListener;
+    ::TestProviderChangeListener mChangeListener;
     chip::Testing::LogOnlyEvents mEventGenerator;
     TestActionContext mActionContext;
     DataModel::InteractionModelContext mContext{
