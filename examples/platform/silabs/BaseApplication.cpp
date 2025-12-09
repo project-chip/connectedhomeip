@@ -438,7 +438,6 @@ bool BaseApplication::ActivateStatusLedPatterns()
             }
             isPatternSet = true;
         }
-        break;
     }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
