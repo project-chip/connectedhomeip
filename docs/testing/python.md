@@ -502,6 +502,25 @@ Fabric admin for default controller:
   second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 ```
 
+Reboot the DUT during testing:
+
+```python
+# Simple reboot - device state persists
+await self.device_reboot()
+
+# Factory reset - clears device state (removes KVS)
+await self.device_reboot(factory_reset=True)
+```
+
+The `device_reboot()` method works differently depending on the environment. When
+running through `scripts/tests/run_python_test.py` a restart_flag_file var which is assigned a file name is created at the start of the test. The runner monitors this file, stops the app when the file is created, optionally removes the KVS for factory resets (Implementation being created by Raul in PR 40802), then restarts the app and waits for the `app-ready-pattern` before continuing the test. For manual testing without the runner, you'll be prompted to reboot the device manually.
+
+After reboot, the method automatically expires existing controller sessions to force reconnection.
+
+See
+[TC-ACL-2.10](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_ACL_2_10.py)
+for an example testing ACL persistence across reboots.
+
 ## Automating manual steps
 
 Some test plans have manual steps that require the tester to manually change the

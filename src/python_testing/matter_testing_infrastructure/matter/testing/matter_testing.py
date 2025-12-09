@@ -1370,16 +1370,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
 
     async def device_reboot(self, factory_reset: bool = False):
-        '''
-        Reboots the DUT. If factory_reset is True, it signals the test runner to perform a factory reset. Otherwise, the DUT will just be restarted.
-        This method currently only works in the CI and while running the tests through the test runner script (python_testing/scripts/tests/run_python_test.py)
+        """Reboot the Device Under Test (DUT), optionally performing a factory reset.
 
+        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script) 
+        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect 
+        to the DUT after the reboot. If factory_reset is True, it will clear previously connected controllers by removing KVS file.
+        
         Args:
-            factory_reset: Whether to factory reset the DUT.
+            factory_reset: If True, signals the test runner to perform a factory reset
+                (by removing KVS file). # Functionality implemented by Raul.
+                If False, performs a simple reboot. Default is False. 
 
         Returns:
             None
-        '''
+        """
         # Check if restart flag file is available (indicates test runner supports app restart)
         restart_flag_file = self.get_restart_flag_file()
 
@@ -1414,7 +1418,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                     self.th1.ExpireSessions(self.dut_node_id)
                 if hasattr(self, 'th2') and self.th2:
                     self.th2.ExpireSessions(self.dut_node_id)
-
                 LOGGER.info("App restart completed successfully")
 
             except Exception as e:
