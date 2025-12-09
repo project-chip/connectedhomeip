@@ -37,7 +37,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/network-commissioning:thread-response-encoding",
     "${chip_root}/src/app/clusters/network-commissioning:wifi-response-encoding",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
-    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
