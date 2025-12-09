@@ -202,11 +202,11 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)
 
     ClusterTester tester(valveCluster);
 
-    uint16_t revision;
+    uint16_t revision{};
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
     ASSERT_EQ(revision, kRevision);
 
-    uint32_t featureMap;
+    uint32_t featureMap{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
     OpenDuration::TypeInfo::DecodableType openDuration;
@@ -239,10 +239,10 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
 
     ClusterTester tester(valveCluster);
 
-    uint16_t revision;
+    uint16_t revision{};
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-    chip::Percent defaultOpenLevel;
+    chip::Percent defaultOpenLevel{};
     ASSERT_EQ(tester.ReadAttribute(DefaultOpenLevel::Id, defaultOpenLevel), CHIP_NO_ERROR);
 
     valveCluster.Shutdown();
@@ -284,7 +284,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestLevel)
     TargetLevel::TypeInfo::DecodableType targetLevel;
     ASSERT_EQ(tester.ReadAttribute(TargetLevel::Id, targetLevel), CHIP_NO_ERROR);
 
-    uint8_t levelStep;
+    uint8_t levelStep{};
     ASSERT_EQ(tester.ReadAttribute(LevelStep::Id, levelStep), CHIP_NO_ERROR);
 
     valveCluster.Shutdown();
