@@ -48,7 +48,7 @@ restyle-paths() {
 
     echo
     echo "[restyle-diff.sh] Restoring file ownership to current user (sudo required)"
-    sudo chown "$uid:$gid" "$@"
+    sudo chown -h "$uid:$gid" "$@"
 }
 
 if ! command -v restyle >/dev/null 2>&1; then
