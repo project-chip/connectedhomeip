@@ -18,9 +18,8 @@
 #include "ErrorUtils.h"
 
 #include <PlatformError.h>
+#include <lib/core/ErrorStr.h>
 
-#include <app_preference.h>
-#include <dns-sd.h>
 #include <tizen.h>
 
 namespace chip {
@@ -54,27 +53,6 @@ void RegisterTizenPlatformErrorFormatter()
 {
     static ErrorFormatter sTizenPlatformErrorFormatter = { FormatTizenPlatformError, nullptr };
     RegisterErrorFormatter(&sTizenPlatformErrorFormatter);
-}
-
-CHIP_ERROR TizenToChipError(int tizenError)
-{
-    switch (tizenError)
-    {
-    case TIZEN_ERROR_NONE:
-        return CHIP_NO_ERROR;
-    case TIZEN_ERROR_OUT_OF_MEMORY:
-        return CHIP_ERROR_NO_MEMORY;
-    default:
-        return MATTER_PLATFORM_ERROR(tizenError);
-
-    // Tizen DNSSD API errors
-    case DNSSD_ERROR_NAME_CONFLICT:
-        return CHIP_ERROR_MDNS_COLLISION;
-
-    // Tizen Preference API errors
-    case PREFERENCE_ERROR_NO_KEY:
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
 }
 
 } // namespace Internal

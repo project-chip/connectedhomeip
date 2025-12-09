@@ -24,8 +24,6 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "ErrorUtils.h"
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -48,7 +46,7 @@ CHIP_ERROR SystemInfo::GetPlatformVersion(PlatformVersion & version)
     if (ret != SYSTEM_INFO_ERROR_NONE)
     {
         ChipLogError(DeviceLayer, "system_info_get_platform_string() failed: %s", get_error_message(ret));
-        return TizenToChipError(ret);
+        return MATTER_PLATFORM_ERROR(ret);
     }
 
     sInstance.mMajor = version.mMajor = (uint8_t) (platformVersion[0] - '0');
