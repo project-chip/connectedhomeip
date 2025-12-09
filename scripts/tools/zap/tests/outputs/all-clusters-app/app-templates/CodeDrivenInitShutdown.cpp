@@ -186,7 +186,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         MatterDeviceEnergyManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::PowerTopology::Id:
-        MatterPowerTopologyClusterShutdownCallback(endpoint);
+        MatterPowerTopologyClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint, shutdownType);
