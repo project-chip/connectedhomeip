@@ -56,7 +56,7 @@ public:
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Trying to set delegate to null")
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Trying to set delegate to null");
         }
     }
 
