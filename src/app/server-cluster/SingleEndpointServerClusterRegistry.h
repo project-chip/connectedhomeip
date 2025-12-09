@@ -118,7 +118,8 @@ public:
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
 
     /// Unregister all registrations for the given endpoint.
-    void UnregisterAllFromEndpoint(EndpointId endpointId, ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
+    void UnregisterAllFromEndpoint(EndpointId endpointId,
+                                   ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
 };
 
 } // namespace app

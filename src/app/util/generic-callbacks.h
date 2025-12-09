@@ -149,7 +149,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
-enum class MatterClusterShutdownType {
+enum class MatterClusterShutdownType
+{
     kClusterShutdown, // "normal" shutdown, e.g. application stop. Assume time and delegate cleanup.
     kPermanentRemove, // full "remove", generally for bridged devices.
 };
@@ -163,5 +164,5 @@ enum class MatterClusterShutdownType {
  *   - remove delegates added during startup
  *   - Permanent remove only (e.g. bridges): clean up storage
  */
-void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, MatterClusterShutdownType shutdownType);
-
+void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                         MatterClusterShutdownType shutdownType);

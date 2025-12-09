@@ -506,7 +506,8 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
             // to be used for bridged devices and has historically been used for storage cleanup for scenes.
             //
             // As a result, we flag these as kPermanentRemove for shutdown.
-            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId, MatterClusterShutdownType::kPermanentRemove);
+            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId,
+                                                MatterClusterShutdownType::kPermanentRemove);
         }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)

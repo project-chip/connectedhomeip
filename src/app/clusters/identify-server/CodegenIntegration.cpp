@@ -150,8 +150,9 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
                    EffectVariantEnum effectVariant, chip::TimerDelegate * timerDelegate) :
 
-    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
-    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
+    mOnIdentifyStart(onIdentifyStart),
+    mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
+    mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
     mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
                  .WithIdentifyType(identifyType)
                  .WithDelegate(&gLegacyDelegate)
@@ -168,7 +169,8 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
 
 Identify::~Identify()
 {
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()),
+                                                                                     ClusterShutdownType::kClusterShutdown);
     UnregisterLegacyIdentify(this);
 }
 

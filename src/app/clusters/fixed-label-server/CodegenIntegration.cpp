@@ -72,7 +72,7 @@ void MatterFixedLabelClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId)
+void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -83,7 +83,7 @@ void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kFixedLabelFixedClusterCount,
             .maxClusterInstanceCount   = kFixedLabelMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterFixedLabelPluginServerInitCallback() {}

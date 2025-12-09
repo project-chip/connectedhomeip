@@ -68,6 +68,17 @@ uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
     return Traits::StorageToWorking(temp);
 }
 
+ClusterShutdownType ToServerClusterInterfaceShutdown(MatterClusterShutdownType t)
+{
+    switch (t)
+    {
+    case MatterClusterShutdownType::kClusterShutdown:
+        return ClusterShutdownType::kClusterShutdown;
+    case MatterClusterShutdownType::kPermanentRemove:
+        return ClusterShutdownType::kPermanentRemove;
+    }
+}
+
 } // namespace
 
 void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & options, Delegate & delegate)
@@ -120,7 +131,8 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     }
 }
 
-void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate)
+void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate,
+                                                 MatterClusterShutdownType shutdownType)
 {
     uint16_t clusterInstanceIndex;
     if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
@@ -129,7 +141,8 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
         return;
     }
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(delegate.FindRegistration(clusterInstanceIndex));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(delegate.FindRegistration(clusterInstanceIndex),
+                                                                                ToServerClusterInterfaceShutdown(shutdownType));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS

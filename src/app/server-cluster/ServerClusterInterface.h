@@ -34,9 +34,10 @@ namespace app {
 
 /// Defines how a cluster is being shut down, so that its
 /// cleanup behavior can be more controlled.
-enum class ClusterShutdownType {
-    kClusterShutdown,  // normal shutdown, generally assume timer and delegate cleanup
-    kPermanentRemove,  // permanent removal, can consider persistent storage cleanup
+enum class ClusterShutdownType
+{
+    kClusterShutdown, // normal shutdown, generally assume timer and delegate cleanup
+    kPermanentRemove, // permanent removal, can consider persistent storage cleanup
 };
 
 /// Handles cluster interactions for a specific set of cluster instances
