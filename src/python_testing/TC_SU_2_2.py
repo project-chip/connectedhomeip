@@ -901,7 +901,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             min_interval_sec=1,
             max_interval_sec=1
         )
-        await asyncio.sleep(1)
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.0 - Controller sends AnnounceOTAProvider command

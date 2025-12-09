@@ -29,7 +29,7 @@ from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
@@ -64,7 +64,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        logger.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
+        log.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
+
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -79,11 +80,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         if log_file is None:
             # Assign the file descriptor to log_file
-            log_file = tempfile.NamedTemporaryFile(
+            log_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
                 dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
-            logger.info(f"Writing Provider logs at :{log_file.name}")
+            log.info(f"Writing Provider logs at :{log_file.name}")
         else:
-            logger.info(f"Writing Provider logs at : {log_file}")
+            log.info(f"Writing Provider logs at : {log_file}")
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
             provider_app_path,
@@ -101,15 +102,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        log.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
 
     def terminate_provider(self):
         if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
-            logger.info("Terminating existing OTA Provider")
+            log.info("Terminating existing OTA Provider")
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
         else:
-            logger.info("Provider process not found. Unable to terminate.")
+            log.info("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -138,14 +139,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             metadataForNode=None,
             endpoint=endpoint
         )
-        logger.info("Sending AnnounceOTA Provider Command")
+        log.info("Sending AnnounceOTA Provider Command")
         cmd_resp = await self.send_single_cmd(
             cmd=cmd_announce_ota_provider,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        logger.info(f"Announce command sent {cmd_resp}")
+        log.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
 
     async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
@@ -163,7 +164,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers: {current_otap_info}")
+        log.info(f"OTA Providers: {current_otap_info}")
 
         # Create Provider Location into Requestor
         provider_location_struct = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
@@ -188,7 +189,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers List: {after_otap_info}")
+        log.info(f"OTA Providers List: {after_otap_info}")
 
     async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
@@ -225,7 +226,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ota_image_info['size'] = path.getsize(ota_path)
             ota_image_info['exists'] = True
         except OSError:
-            logger.info(f"OTA IMAGE at {ota_path} does not exists")
+            log.info(f"OTA IMAGE at {ota_path} does not exists")
             return ota_image_info
 
         return ota_image_info
@@ -245,7 +246,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             target_version (Optional[int], optional): Software version to verify if not provided ignore this check.. Defaults to None.
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
-        logger.info(f"Verifying the event {event_report}")
+        log.info(f"Verifying the event {event_report}")
         asserts.assert_equal(event_report.previousState, expected_previous_state,
                              f"Previous state was not {expected_previous_state}")
         asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")
@@ -309,27 +310,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
-        """
-        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
-
-        Args:
-            controller (ChipDeviceCtrl): The controller to use for writing attributes.
-            requestor_node_id (int): Node ID of the Requestor device.
-
-        Returns:
-            None
-        """
-        # Set DefaultOTAProviders to empty list
-        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr_clear)],
-            nodeId=requestor_node_id
-        )
-        logger.info('Cleanup - DefaultOTAProviders cleared')
-
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
-
     def clear_kvs(self, kvs_path_prefix: str = None):
         """
         Remove all temporary KVS files matching a given prefix.
@@ -346,5 +326,4 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if kvs_path_prefix is None:
             kvs_path_prefix = "/tmp/chip_kvs"
         subprocess.run(f"rm -rf {kvs_path_prefix}*", shell=True)
-
-        logger.info(f'Removed KVS files matching: {kvs_path_prefix}*')
+        log.info(f'Cleared KVS files with prefix: {kvs_path_prefix}')
