@@ -169,7 +169,7 @@ class AccessChecker(BasicCompositionTests):
                     cmds[cluster_id] = set()
 
                 if GlobalAttributeIds.ATTRIBUTE_LIST_ID not in device_cluster_data:
-                    location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster does not have the AttributeList attribute")
                 else:
@@ -178,7 +178,7 @@ class AccessChecker(BasicCompositionTests):
                         {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
 
                 if GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID not in device_cluster_data:
-                    location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster does not have the AcceptedCommandList attribute")
                 else:
