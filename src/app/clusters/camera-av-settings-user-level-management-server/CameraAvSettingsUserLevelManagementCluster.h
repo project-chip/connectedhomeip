@@ -208,7 +208,7 @@ public:
                                                BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures,
                                                uint8_t aMaxPresets) :
         DefaultServerCluster({ aEndpointId, CameraAvSettingsUserLevelManagement::Id }),
-        mLogic(aEndpointId, aFeatures), mMaxPresets(aMaxPresets)
+        mLogic(aEndpointId, aFeatures, aMaxPresets)
     {}
 
     CameraAvSettingsUserLevelMgmtServerLogic & GetLogic() { return mLogic; }
@@ -290,18 +290,6 @@ private:
 
     // Next available preset ID
     uint8_t mCurrentPresetID = 1;
-
-    // My known values for MPTZ.
-    CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mMptzPosition;
-
-    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially
-    // overwritten by the delegate. Exception is MaxPresets that is an F quality attribute and assigned by the constructor
-    const uint8_t mMaxPresets;
-    int16_t mPanMin  = CameraAvSettingsUserLevelManagement::kPanMinMinValue;
-    int16_t mPanMax  = CameraAvSettingsUserLevelManagement::kPanMaxMaxValue;
-    int16_t mTiltMin = CameraAvSettingsUserLevelManagement::kTiltMinMinValue;
-    int16_t mTiltMax = CameraAvSettingsUserLevelManagement::kTiltMaxMaxValue;
-    uint8_t mZoomMax = CameraAvSettingsUserLevelManagement::kZoomMaxMaxValue;
 
     std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;

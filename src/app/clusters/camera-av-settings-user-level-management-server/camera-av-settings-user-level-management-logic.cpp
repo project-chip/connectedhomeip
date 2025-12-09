@@ -43,9 +43,11 @@ namespace app {
 namespace Clusters {
 
 CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
-                                                                                   BitFlags<Feature> aFeatures) :
+                                                                                   BitFlags<Feature> aFeatures,
+                                                                                   uint8_t aMaxPresets) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures)
+    mFeatures(aFeatures),
+    mMaxPresets(aMaxPresets)
 {}
 
 CameraAvSettingsUserLevelMgmtServerLogic::~CameraAvSettingsUserLevelMgmtServerLogic() {}
