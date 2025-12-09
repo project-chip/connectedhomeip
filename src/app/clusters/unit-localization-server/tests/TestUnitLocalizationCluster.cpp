@@ -31,6 +31,7 @@
 #include <clusters/UnitLocalization/Metadata.h>
 
 using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
