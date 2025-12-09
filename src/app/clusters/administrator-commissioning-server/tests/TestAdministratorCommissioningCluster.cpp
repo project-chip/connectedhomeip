@@ -61,8 +61,9 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+        git
 
-        ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
+            ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
         ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
 
         auto & fabricTable = Server::GetInstance().GetFabricTable();
@@ -73,7 +74,7 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
 
         // Initialize CommissioningWindowManager so it has a valid Server pointer
-        ASSERT_EQ(Server::GetInstance().GetCommissioningWindowManager().Init(&Server::GetInstance()), CHIP_NO_ERROR);
+        -ASSERT_EQ(Server::GetInstance().GetCommissioningWindowManager().Init(&Server::GetInstance()), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
@@ -191,7 +192,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
 TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
 {
     AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     {
         Attributes::FeatureMap::TypeInfo::Type feature{};
@@ -228,7 +229,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
 TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
 {
     AdministratorCommissioningCluster cluster(kRootEndpointId, {});
-    chip::Test::ClusterTester tester(cluster);
+    chip::Testing::ClusterTester tester(cluster);
 
     Attributes::WindowStatus::TypeInfo::DecodableType winStatus;
     auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
@@ -265,7 +266,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     //                                                    .commissioningWindowManager =
     //                                                        Server::GetInstance().GetCommissioningWindowManager() };
     // OperationalCredentialsCluster opCreds(kRootEndpointId, context);
-    // chip::Test::ClusterTester opCredsTester(opCreds);
+    // chip::Testing::ClusterTester opCredsTester(opCreds);
     // EXPECT_EQ(opCreds.Startup(opCredsTester.GetServerClusterContext()), CHIP_NO_ERROR);
     // opCredsTester.SetFabricIndex(testFabricIndex);
 
@@ -286,13 +287,8 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     // ASSERT_TRUE(stat.IsSuccess());
 
     auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
-    // ASSERT_EQ(result.status, std::nullopt);
-    // ASSERT_TRUE(result.status.has_value());
-    // ASSERT_TRUE(result.status->IsSuccess());
     ASSERT_TRUE(result.IsSuccess());
 
-    // if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
-    // {
     status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
     ASSERT_TRUE(status.IsSuccess());
     EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
@@ -306,5 +302,4 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
     ASSERT_TRUE(status.IsSuccess());
     ASSERT_FALSE(adminVendor.IsNull());
-    // }
 }
