@@ -320,10 +320,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Args:
             kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
-            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files
-
-        Returns:
-            None
+            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files.
         """
 
         if kvs_path_prefix is None:
