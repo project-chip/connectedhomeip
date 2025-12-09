@@ -512,10 +512,18 @@ await self.device_reboot()
 await self.device_reboot(factory_reset=True)
 ```
 
-The `device_reboot()` method works differently depending on the environment. When
-running through `scripts/tests/run_python_test.py` a restart_flag_file var which is assigned a file name is created at the start of the test. The runner monitors this file, stops the app when the file is created, optionally checks the restart flag file for "reset" written to the file if so it removes the KVS to perform factory reset (Implementation being created by Raul in PR 40802), then reboots the app and waits for the `app-ready-pattern` before continuing the test. For manual testing without the runner, you'll be prompted to reboot the device manually.
+The `device_reboot()` method works differently depending on the environment.
+When running through `scripts/tests/run_python_test.py` a restart_flag_file var
+which is assigned a file name is created at the start of the test. The runner
+monitors this file, stops the app when the file is created, optionally checks
+the restart flag file for "reset" written to the file if so it removes the KVS
+to perform factory reset (Implementation being created by Raul in PR 40802),
+then reboots the app and waits for the `app-ready-pattern` before continuing the
+test. For manual testing without the runner, you'll be prompted to reboot the
+device manually.
 
-After reboot, the method automatically expires existing controller sessions to force reconnection.
+After reboot, the method automatically expires existing controller sessions to
+force reconnection.
 
 See
 [TC-ACL-2.10](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_ACL_2_10.py)
