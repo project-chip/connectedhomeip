@@ -194,7 +194,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=600)
 
         update_state_attr_handler.flush_reports()
-        await update_state_attr_handler.cancel()
+        update_state_attr_handler.cancel()
 
         # Once in idle verify the version match the expected software version
         await self.verify_version_applied_basic_information(
@@ -264,14 +264,14 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
 
         software_version_attr_handler.flush_reports()
-        await software_version_attr_handler.cancel()
+        software_version_attr_handler.cancel()
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kIdle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=600)
         update_state_attr_handler.flush_reports()
-        await update_state_attr_handler.cancel()
+        update_state_attr_handler.cancel()
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         # Terminate the provider
@@ -347,9 +347,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=600)
         update_state_attr_handler.reset()
         # Cancel handlers
-        await update_state_attr_handler.cancel()
+        update_state_attr_handler.cancel()
         software_version_attr_handler.reset()
-        await software_version_attr_handler.cancel()
+        software_version_attr_handler.cancel()
 
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -417,9 +417,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=600)
 
         update_state_attr_handler.reset()
-        await update_state_attr_handler.cancel()
+        update_state_attr_handler.cancel()
         software_version_attr_handler.reset()
-        await software_version_attr_handler.cancel()
+        software_version_attr_handler.cancel()
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
@@ -476,7 +476,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
         update_state_attr_handler.reset()
-        await update_state_attr_handler.cancel()
+        update_state_attr_handler.cancel()
         # Make sure attr is Idle
         update_state = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)

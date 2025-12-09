@@ -180,15 +180,6 @@ class EventSubscriptionHandler:
         """Resets state as if no events had ever been received."""
         self.flush_events()
 
-    async def cancel(self):
-        """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
-        try:
-            self._subscription.Shutdown()
-            await asyncio.sleep(5)
-        except asyncio.CancelledError:
-            pass
-
     @property
     def event_queue(self) -> queue.Queue:
         return self._q
