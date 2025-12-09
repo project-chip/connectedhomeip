@@ -136,8 +136,7 @@ CHIP_ERROR ElectricalSensorManager::Init()
     VerifyOrReturnError(gPTDelegate, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for PT Delegate"));
 
     gPTInstance = std::make_unique<PowerTopologyInstance>(
-        PTEndpointId, *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
-        BitMask<PowerTopology::OptionalAttributes, uint32_t>());
+        PTEndpointId, *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology));
 
     VerifyOrReturnError(gPTInstance, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for PT Instance");
                         gPTDelegate.reset());
