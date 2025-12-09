@@ -17,21 +17,27 @@
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Enums.h>
+#include <clusters/GroupKeyManagement/Ids.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
+#include <clusters/GroupKeyManagement/Structs.h>
+#include <credentials/GroupDataProvider.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <platform/DiagnosticDataProvider.h>
-
 namespace {
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+using namespace chip::Testing;
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
@@ -73,9 +79,9 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
               GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
 
     // Check required generated commands are present
-    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
+    ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
     ASSERT_EQ(cluster.GeneratedCommands(groupKeyManagementPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+    ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
     ASSERT_EQ(generatedCommands.size(), GroupKeyManagement::Commands::kGeneratedCommandsCount);
     ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
@@ -85,17 +91,145 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
     GroupKeyManagementCluster cluster;
-    ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-    ASSERT_EQ(cluster.Attributes(groupKeyManagementPath, attributesBuilder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+    std::vector<app::DataModel::AttributeEntry> mandatoryAttributes(GroupKeyManagement::Attributes::kMandatoryMetadata.begin(),
+                                                                    GroupKeyManagement::Attributes::kMandatoryMetadata.end());
 
     // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    ASSERT_EQ(expectedBuilder.AppendElements(GroupKeyManagement::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, std::move(mandatoryAttributes)));
 }
 
+namespace TestHelpers {
+
+constexpr GroupId kTestGroupId     = 0x1001;
+constexpr uint16_t kTestKeySetId   = 1;
+const FabricIndex kTestFabricIndex = 1;
+
+GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(GroupId groupId, uint16_t keySetId, FabricIndex fabricIndex)
+{
+    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key;
+    key.groupId       = groupId;
+    key.groupKeySetID = keySetId;
+    key.fabricIndex   = fabricIndex;
+    return key;
+}
+std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupId = kTestGroupId,
+                      uint16_t startKeySetId = kTestKeySetId, uint16_t groupIdIncrement = 1, uint16_t keySetIdIncrement = 1)
+{
+    std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> list;
+    for (size_t i = 0; i < count; ++i)
+    {
+        GroupId currentGroupId   = static_cast<GroupId>(startGroupId + (i * groupIdIncrement));
+        uint16_t currentKeySetId = static_cast<uint16_t>(startKeySetId + (i * keySetIdIncrement));
+        list.push_back(CreateKey(currentGroupId, currentKeySetId, fabricIndex));
+    }
+    return list;
+}
+
+} // namespace TestHelpers
+
+struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
+{
+    TestServerClusterContext mTestContext;
+    Credentials::GroupDataProviderImpl mRealProvider;
+    Crypto::DefaultSessionKeystore mMockKeystore;
+    GroupKeyManagementCluster mCluster;
+    ClusterTester tester;
+
+    TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
+
+    void SetUp() override
+    {
+        auto * storage = &mTestContext.StorageDelegate();
+
+        mRealProvider.SetStorageDelegate(storage);
+        mRealProvider.SetSessionKeystore(&mMockKeystore);
+        ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
+        ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
+
+        Credentials::SetGroupDataProvider(&mRealProvider);
+        tester.SetFabricIndex(TestHelpers::kTestFabricIndex);
+    }
+
+    void TearDown() override
+    {
+        tester.SetFabricIndex(kUndefinedFabricIndex);
+        mCluster.Shutdown();
+        Credentials::SetGroupDataProvider(nullptr);
+        mRealProvider.Finish();
+    }
+    // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
+    // Used to set up test scenarios with pre-existing keys.
+    void PrepopulateGroupKeyMap(const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys,
+                                FabricIndex fabricIndex)
+    {
+        auto listToWrite =
+            app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    // Checks that the stored group keys for a fabric match the expected list.
+    // Validates group IDs and keyset IDs to ensure attribute writes succeeded.
+    void VerifyGroupKeysMatch(const FabricIndex fabricIndex,
+                              const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
+    {
+        auto * iterator = mRealProvider.IterateGroupKeys(fabricIndex);
+        ASSERT_NE(iterator, nullptr);
+
+        ASSERT_EQ(iterator->Count(), expectedKeys.size());
+
+        size_t i = 0;
+        Credentials::GroupDataProvider::GroupKey storedKey;
+        while (iterator->Next(storedKey))
+        {
+            ASSERT_LT(i, expectedKeys.size());
+            EXPECT_EQ(storedKey.group_id, expectedKeys[i].groupId);
+            EXPECT_EQ(storedKey.keyset_id, expectedKeys[i].groupKeySetID);
+            ++i;
+        }
+
+        ASSERT_EQ(i, expectedKeys.size());
+        iterator->Release(); // ensure this frees memory or returns to pool
+    }
+};
+// Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
+{
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, TestHelpers::kTestFabricIndex, TestHelpers::kTestGroupId,
+                                                   TestHelpers::kTestKeySetId, 1, 0);
+    PrepopulateGroupKeyMap(keys, TestHelpers::kTestFabricIndex);
+    VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, keys);
+}
+
+// Cluster should reject a write containing duplicate keys for the same group/keyset combination.
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
+{
+    //  Intentionally creates two identical entries (duplicate group/keyset combination).
+    // by setting increments  to 0 (groupIdIncrement = 0, keySetIdIncrement = 0)
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, TestHelpers::kTestFabricIndex, TestHelpers::kTestGroupId,
+                                                   TestHelpers::kTestKeySetId, 0, 0);
+
+    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
+
+    ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
+
+    // Explicitly check that the write stops at the first duplicate entry,
+    // but the valid entries processed *before* the error (i.e., keys[0]) are persisted.
+    std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> expectedKeys;
+    expectedKeys.push_back(keys[0]);
+
+    VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, expectedKeys);
+}
+
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
+{
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, TestHelpers::kTestFabricIndex);
+
+    PrepopulateGroupKeyMap(keys, TestHelpers::kTestFabricIndex);
+    VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, keys);
+}
 } // namespace
