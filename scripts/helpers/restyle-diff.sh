@@ -44,7 +44,7 @@ restyle-paths() {
     local uid="${SUDO_UID:-$(id -u)}"
     local gid="${SUDO_GID:-$(id -g)}"
 
-    echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler docker images if needed)"
+    echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
     restyle --config-file=.restyled.yaml "$@"
 
     echo
@@ -71,6 +71,8 @@ ensure_restyle_installed() {
     esac
 
     tmpdir=$(mktemp -d)
+    trap 'rm -rf "$tmpdir"' EXIT
+
 
     if ! curl -sSfL "https://github.com/restyled-io/restyler/releases/latest/download/$asset.tar.gz" | tar xz -C "$tmpdir"; then
         echo "[restyle-diff.sh] Failed to download restyle for $(uname -s)-$(uname -m)"
@@ -78,13 +80,14 @@ ensure_restyle_installed() {
         exit 1
     fi
 
-    echo "[restyle-diff.sh] Installing restyle to /usr/local/bin (sudo required)..."
-    sudo install "$tmpdir/$asset/restyle" /usr/local/bin/restyle
+    echo "[restyle-diff.sh] Installing restyle to ""$HOME/.local/bin"
+    mkdir -p "$HOME/.local/bin"
+    install "$tmpdir/$asset/restyle" "$HOME/.local/bin"
     rm -rf "$tmpdir"
 
 }
 
-#This was added to be able to use xargs to call the function restyle-paths
+# This was added to be able to use xargs to call the function restyle-paths
 export -f restyle-paths
 while [[ $# -gt 0 ]]; do
     case "$1" in
