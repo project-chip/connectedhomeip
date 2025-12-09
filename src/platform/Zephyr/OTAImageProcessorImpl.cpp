@@ -49,7 +49,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
@@ -146,7 +146,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
         {
             ChipLogDetail(SoftwareUpdate, "Downloaded %u/%u bytes", static_cast<unsigned>(mParams.downloadedBytes),
                           static_cast<unsigned>(mParams.totalFileBytes));
-            mDownloader->FetchNextData();
+            TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
         }
         else
         {
