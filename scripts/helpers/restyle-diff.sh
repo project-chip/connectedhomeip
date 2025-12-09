@@ -82,10 +82,6 @@ if [[ -z "$ref" ]]; then
     git remote | grep -qxF upstream && ref="upstream/master"
 fi
 
-if [[ $pull_image -eq 1 ]]; then
-    docker pull restyled/restyler:edge
-fi
-
 paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
 
 echo "$paths" | xargs -n "$MAX_ARGS" "$BASH" -c 'restyle-paths "$@"' -
