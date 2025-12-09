@@ -323,26 +323,26 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Manually restart the DUT and restore to it's original version. Please type Enter when its ready.")
             # After manual reboot, expire previous sessions so that we can re-establish connections
-            logging.info("Manual device reboot completed")
+            log.info("Manual device reboot completed")
 
         else:
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
-                logging.info("Created restart flag file to signal app restart")
+                log.info("Created restart flag file to signal app restart")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
                 # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
                 sleep(1)
 
                 # Expire sessions and re-establish connections
-                logging.info("Expiring sessions after manual device reboot")
+                log.info("Expiring sessions after manual device reboot")
                 self.controller.ExpireSessions(self.requestor_node_id)
-                logging.info("App restart completed successfully")
+                log.info("App restart completed successfully")
 
             except Exception as e:
-                logging.error(f"Failed to restart Requestor: {e}")
+                log.error(f"Failed to restart Requestor: {e}")
                 asserts.fail(f"Requestor restart failed: {e}")
 
     async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
