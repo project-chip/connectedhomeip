@@ -289,7 +289,7 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed()
 {
     if (mpConnectCallback)
     {
-        Status status = Status::kSuccess;
+        Status status = Status::kOtherConnectionFailure;
         switch (mLastDisconnectedReason)
         {
         case WIFI_REASON_AUTH_FAIL:
@@ -303,7 +303,6 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed()
             status = Status::kNetworkNotFound;
             break;
         default:
-            status = Status::kOtherConnectionFailure;
             break;
         }
         mpConnectCallback->OnResult(status, CharSpan(), 0);

@@ -248,10 +248,20 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 {
     wifi_config_t stationConfig;
 
+    esp_err_t err = esp_wifi_disconnect();
+    if (err != ESP_OK)
+    {
+        ChipLogProgress(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
+        // Does not return error here as we just call esp_wifi_disconnect() to ensure that the Wi-Fi is not connecting.
+    }
     // Clear the ESP WiFi station configuration.
-    esp_wifi_disconnect();
     memset(&stationConfig, 0, sizeof(stationConfig));
-    esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
+    err = esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
+        return MapError(err);
+    }
 
     return CHIP_NO_ERROR;
 }
