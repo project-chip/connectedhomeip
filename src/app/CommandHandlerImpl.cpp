@@ -335,7 +335,8 @@ void CommandHandlerImpl::Close()
                        static_cast<unsigned int>(mPendingWork));
     InvalidateHandles();
 
-    if (!IsGroupRequest()) {
+    if (!IsGroupRequest())
+    {
         if (mpCallback)
         {
             mpCallback->OnDone(*this);
