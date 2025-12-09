@@ -151,7 +151,7 @@ void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId 
 
 enum class MatterClusterShutdownType
 {
-    kClusterShutdown, // "normal" shutdown, e.g. application stop. Perform cleanups like: timeer and delegate cleanup.
+    kClusterShutdown, // "normal" shutdown, e.g. application stop. Perform cleanups like: timer and delegate cleanup.
     kPermanentRemove, // full "remove", generally for bridged devices.
 };
 
