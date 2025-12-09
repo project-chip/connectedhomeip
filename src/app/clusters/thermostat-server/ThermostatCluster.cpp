@@ -254,7 +254,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
             return mAtomicWriteSession.CommitAtomicWrite(handler, request.path, request_data);
         case Globals::AtomicRequestTypeEnum::kRollbackWrite:
             return mAtomicWriteSession.RollbackAtomicWrite(handler, request.path, request_data);
-        case Globals::AtomicRequestTypeEnum::kUnknownEnumValue:
+        default:
             return Status::InvalidCommand;
         }
     }
