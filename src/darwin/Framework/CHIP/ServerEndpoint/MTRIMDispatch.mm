@@ -20,6 +20,7 @@
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-table.h>
+#include <app/util/generic-callbacks.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Global.h>
 #include <lib/core/Optional.h>
