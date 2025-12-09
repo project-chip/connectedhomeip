@@ -315,7 +315,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         Remove all temporary KVS files created.
 
-        OTA Provider/Requestor use "/tmp/chip_kvs" as the default KVS location when no --KVS is provided. 
+        OTA Provider/Requestor use "/tmp/chip_kvs" as the default KVS location when no --KVS is provided.
         Tests may also specify custom prefixes such as "/tmp/chip_kvs_provider".
 
         Args:
