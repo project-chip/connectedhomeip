@@ -43,6 +43,173 @@
 namespace chip {
 namespace Testing {
 
+/**
+ * @brief Helper class to manage the lifecycle of a Fabric for testing.
+ *
+ * This encapsulates the logic required to initialize a FabricTable,
+ * create a mock Fabric, and manage related certificate storage.
+ * It is designed to be used by ClusterTester or a test fixture.
+ */
+class FabricTestHelper
+{
+public:
+    FabricTestHelper(PersistentStorageDelegate * storage) : mStorage(storage), mRootCertSpan(mRootCertDER), mNocSpan(mNocDER) {}
+
+    /**
+     * @brief Initializes the Fabric table and adds a new test fabric.
+     *
+     * @param fabricIndexOut Output parameter for the newly created FabricIndex.
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR SetUpFabric(FabricIndex & fabricIndexOut);
+
+    /**
+     * @brief Tears down the created fabric and cleans up storage.
+     *
+     * @param fabricIndex The FabricIndex to tear down.
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR TearDownFabric(FabricIndex fabricIndex);
+
+    FabricTable & GetFabricTable() { return mfabricTable; }
+
+private:
+    void SetUpCertificates();
+
+    PersistentStorageDelegate * mStorage;
+
+    // Certificates and keys
+    uint8_t mRootCertDER[chip::Credentials::kMaxDERCertLength];
+    MutableByteSpan mRootCertSpan;
+    uint8_t mNocDER[chip::Credentials::kMaxDERCertLength];
+    MutableByteSpan mNocSpan;
+    Crypto::P256SerializedKeypair mSerializedOpKey;
+
+    // Fabric-related storage
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    FabricTable mfabricTable;
+    FabricTable::InitParams initParams;
+
+    // Test constants (copied from test fixture)
+    static constexpr FabricId kTestFabricId                    = 0xDEADBEEF00000001;
+    static constexpr NodeId kTestNodeId                        = 0xDEADBEEF00000002;
+    static constexpr uint64_t kTestRcacId                      = 0x1111222233334444;
+    static constexpr uint64_t kRootCertSerial                  = 1;
+    static constexpr uint64_t kNocSerial                       = 2;
+    static constexpr uint64_t kCertValidityStart               = 0;
+    static constexpr uint32_t kRootCertValidityDurationSeconds = 315360000; // 10 years
+    static constexpr uint32_t kNocCertValidityDurationSeconds  = 31536000;  // 1 year
+};
+
+CHIP_ERROR FabricTestHelper::SetUpFabric(FabricIndex & fabricIndexOut)
+{
+    ReturnErrorOnFailure(mOpCertStore.Init(mStorage));
+    initParams.opCertStore         = &mOpCertStore;
+    initParams.storage             = mStorage;
+    initParams.operationalKeystore = nullptr; // Use default
+    ReturnErrorOnFailure(mfabricTable.Init(initParams));
+
+    ReturnErrorOnFailure(mfabricTable.SetFabricIndexForNextAddition(fabricIndexOut));
+    SetUpCertificates();
+
+    CHIP_ERROR err = mfabricTable.AddNewFabricForTest(
+        mRootCertSpan, ByteSpan(), mNocSpan, ByteSpan(mSerializedOpKey.Bytes(), mSerializedOpKey.Length()), &fabricIndexOut);
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorOnFailure(mfabricTable.CommitPendingFabricData());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTestHelper::TearDownFabric(FabricIndex fabricIndex)
+{
+    if (fabricIndex != chip::kUndefinedFabricIndex)
+    {
+        // Credentials::SetGroupDataProvider(nullptr); // Done in the test fixture's TearDown
+        // GroupDataProviderImpl::RemoveFabric is usually done separately
+        // However, we just need to ensure the fabric is deleted from FabricTable and storage is cleaned.
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if ((err = mOpCertStore.RemoveOpCertsForFabric(fabricIndex)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "TearDownFabric: RemoveOpCertsForFabric failed: %s", err.AsString());
+        }
+        if ((err = mfabricTable.Delete(fabricIndex)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "TearDownFabric: Delete fabric failed: %s", err.AsString());
+        }
+
+        mfabricTable.Shutdown();
+        mOpCertStore.Finish();
+    }
+    return CHIP_NO_ERROR;
+}
+
+void FabricTestHelper::SetUpCertificates()
+{
+    Crypto::P256Keypair rootCACredentials;
+    if (rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA) != CHIP_NO_ERROR)
+        return;
+
+    Crypto::P256Keypair deviceOpKey;
+    if (deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA) != CHIP_NO_ERROR)
+        return;
+
+    if (deviceOpKey.Serialize(mSerializedOpKey) != CHIP_NO_ERROR)
+        return;
+
+    // Create temporary X.509 (DER) buffers
+    uint8_t rootCertDER_temp[chip::Credentials::kMaxDERCertLength];
+    MutableByteSpan rootCertDERSpan(rootCertDER_temp);
+
+    uint8_t nocDER_temp[chip::Credentials::kMaxDERCertLength];
+    MutableByteSpan nocDERSpan(nocDER_temp);
+
+    mRootCertSpan = MutableByteSpan(mRootCertDER);
+    mNocSpan      = MutableByteSpan(mNocDER);
+
+    chip::Credentials::X509CertRequestParams rootRequestParams;
+    rootRequestParams.SerialNumber  = kRootCertSerial;
+    rootRequestParams.ValidityStart = kCertValidityStart;
+    rootRequestParams.ValidityEnd   = kRootCertValidityDurationSeconds;
+
+    const char * rootName = "My Test Root CA";
+    CHIP_ERROR err        = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
+                                                                    CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
+           );
+    if (err != CHIP_NO_ERROR)
+        return;
+    err = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId);
+    if (err != CHIP_NO_ERROR)
+        return;
+    rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;
+
+    if (chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan) != CHIP_NO_ERROR)
+        return;
+
+    // Convert X.509 DER to Matter TLV
+    if (chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan) != CHIP_NO_ERROR)
+        return;
+
+    chip::Credentials::X509CertRequestParams nocRequestParams;
+    nocRequestParams.SerialNumber  = kNocSerial;
+    nocRequestParams.ValidityStart = kCertValidityStart;
+    nocRequestParams.ValidityEnd   = kNocCertValidityDurationSeconds;
+    nocRequestParams.IssuerDN      = rootRequestParams.SubjectDN;
+    if ((err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId)) !=
+        CHIP_NO_ERROR)
+        return;
+    if ((err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId)) != CHIP_NO_ERROR)
+        return;
+    if (chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan) !=
+        CHIP_NO_ERROR)
+        return;
+
+    if (chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan) != CHIP_NO_ERROR)
+        return;
+}
+
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
@@ -73,9 +240,9 @@ namespace Testing {
 class ClusterTester
 {
 public:
-    // Constructor using internal default handler
-    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster) {}
-
+    ClusterTester(app::ServerClusterInterface & cluster) :
+        mCluster(cluster), mFabricHelper(&mTestServerClusterContext.StorageDelegate())
+    {}
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.
@@ -273,6 +440,32 @@ public:
 
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
 
+    CHIP_ERROR SetUpMockFabric()
+    {
+        FabricIndex currentHandlerIndex = mHandler.GetAccessingFabricIndex();
+
+        CHIP_ERROR err = mFabricHelper.SetUpFabric(currentHandlerIndex);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            SetFabricIndex(currentHandlerIndex);
+        }
+        return err;
+    }
+
+    CHIP_ERROR TearDownMockFabric()
+    {
+        FabricIndex currentFabricIndex = mHandler.GetAccessingFabricIndex();
+
+        CHIP_ERROR err = mFabricHelper.TearDownFabric(currentFabricIndex);
+
+        SetFabricIndex(chip::kUndefinedFabricIndex);
+
+        return err;
+    }
+
+    FabricTestHelper & GetFabricHelper() { return mFabricHelper; }
+
 private:
     bool VerifyClusterPathsValid()
     {
@@ -296,7 +489,9 @@ private:
 
     chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
-    std::vector<std::unique_ptr<chip::Testing::ReadOperation>> mReadOperations;
+    std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
+
+    FabricTestHelper mFabricHelper;
 };
 
 } // namespace Testing

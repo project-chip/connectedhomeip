@@ -98,11 +98,11 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, std::move(mandatoryAttributes)));
 }
 
-namespace TestHelpers {
+const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
+const chip::GroupId kTestGroupId         = 0x1234;
+constexpr uint16_t kTestKeySetId         = 1;
 
-constexpr GroupId kTestGroupId     = 0x1001;
-constexpr uint16_t kTestKeySetId   = 1;
-const FabricIndex kTestFabricIndex = 1;
+namespace TestHelpers {
 
 GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(GroupId groupId, uint16_t keySetId, FabricIndex fabricIndex)
 {
@@ -149,7 +149,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
 
         Credentials::SetGroupDataProvider(&mRealProvider);
-        tester.SetFabricIndex(TestHelpers::kTestFabricIndex);
+        tester.SetFabricIndex(kTestFabricIndex);
     }
 
     void TearDown() override
@@ -198,10 +198,9 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, TestHelpers::kTestFabricIndex, TestHelpers::kTestGroupId,
-                                                   TestHelpers::kTestKeySetId, 1, 0);
-    PrepopulateGroupKeyMap(keys, TestHelpers::kTestFabricIndex);
-    VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, keys);
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 1, 0);
+    PrepopulateGroupKeyMap(keys, kTestFabricIndex);
+    VerifyGroupKeysMatch(kTestFabricIndex, keys);
 }
 
 // Cluster should reject a write containing duplicate keys for the same group/keyset combination.
@@ -209,8 +208,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
 {
     //  Intentionally creates two identical entries (duplicate group/keyset combination).
     // by setting increments  to 0 (groupIdIncrement = 0, keySetIdIncrement = 0)
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, TestHelpers::kTestFabricIndex, TestHelpers::kTestGroupId,
-                                                   TestHelpers::kTestKeySetId, 0, 0);
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 0, 0);
 
     auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
@@ -223,24 +221,20 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
     std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> expectedKeys;
     expectedKeys.push_back(keys[0]);
 
-    VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, expectedKeys);
+    VerifyGroupKeysMatch(kTestFabricIndex, expectedKeys);
 }
 
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
 {
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, TestHelpers::kTestFabricIndex);
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex);
 
-    PrepopulateGroupKeyMap(keys, TestHelpers::kTestFabricIndex);
-    VerifyGroupKeysMatch(TestHelpers::kTestFabricIndex, keys);
+    PrepopulateGroupKeyMap(keys, kTestFabricIndex);
+    VerifyGroupKeysMatch(kTestFabricIndex, keys);
 }
 
-
-const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
-const chip::GroupId kTestGroupId         = 0x1234;
-const chip::EndpointId kTestEndpoint1    = 10;
-const chip::EndpointId kTestEndpoint2    = 11;
-constexpr uint16_t kTestKeySetId         = 1;
-constexpr uint64_t kStartTimeOffset      = 100;
+const chip::EndpointId kTestEndpoint1 = 10;
+const chip::EndpointId kTestEndpoint2 = 11;
+constexpr uint64_t kStartTimeOffset   = 100;
 
 // spec states - group should be deleted if the endpoint member list's last member is removed
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestGroupEndpointLifecycle)
@@ -306,138 +300,25 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestGroupEndpointLifecycle)
     ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 0u);
 }
 
-constexpr FabricId kTestFabricId                    = 0xDEADBEEF00000001;
-constexpr NodeId kTestNodeId                        = 0xDEADBEEF00000002;
-constexpr uint64_t kTestRcacId                      = 0x1111222233334444;
-constexpr uint64_t kRootCertSerial                  = 1;
-constexpr uint64_t kNocSerial                       = 2;
-constexpr uint64_t kCertValidityStart               = 0;
-constexpr uint32_t kRootCertValidityDurationSeconds = 315360000; // 10 years
-constexpr uint32_t kNocCertValidityDurationSeconds  = 31536000;  // 1 year
-
 struct TestGroupKeyManagementWithFabric : public TestGroupKeyManagementClusterWithStorage
 {
-    uint8_t mRootCertDER[chip::Credentials::kMaxDERCertLength];
-    MutableByteSpan mRootCertSpan;
-    uint8_t mNocDER[chip::Credentials::kMaxDERCertLength];
-    MutableByteSpan mNocSpan;
-    Crypto::P256SerializedKeypair mSerializedOpKey;
-
-    chip::FabricIndex mTestFabricIndex = kUndefinedFabricIndex;
-    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-
-    FabricTable mfabricTable;
-    FabricTable::InitParams initParams;
-
     void SetUp() override
     {
-
         TestGroupKeyManagementClusterWithStorage::SetUp();
 
-        initParams.opCertStore         = &mOpCertStore;
-        initParams.storage             = &mTestContext.StorageDelegate();
-        initParams.operationalKeystore = nullptr;
-
-        GroupKeyManagementCluster::SetFabricTableForTest(&mfabricTable);
-
-        ASSERT_EQ(mOpCertStore.Init(&mTestContext.StorageDelegate()), CHIP_NO_ERROR);
-        ASSERT_EQ(mfabricTable.Init(initParams), CHIP_NO_ERROR);
-
-        ASSERT_EQ(mfabricTable.PeekFabricIndexForNextAddition(mTestFabricIndex), CHIP_NO_ERROR);
-        SetUpCertificates();
-
-        CHIP_ERROR err = mfabricTable.AddNewFabricForTest(
-            mRootCertSpan, ByteSpan(), mNocSpan, ByteSpan(mSerializedOpKey.Bytes(), mSerializedOpKey.Length()), &mTestFabricIndex);
+        CHIP_ERROR err = tester.SetUpMockFabric();
         ASSERT_EQ(err, CHIP_NO_ERROR);
 
-        ASSERT_EQ(mfabricTable.CommitPendingFabricData(), CHIP_NO_ERROR);
-
-        tester.SetFabricIndex(mTestFabricIndex);
-    }
-
-    void SetUpCertificates()
-    {
-
-        Crypto::P256Keypair rootCACredentials;
-        ASSERT_EQ(rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
-
-        Crypto::P256Keypair deviceOpKey;
-        ASSERT_EQ(deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
-
-        ASSERT_EQ(deviceOpKey.Serialize(mSerializedOpKey), CHIP_NO_ERROR);
-
-        // Create temporary X.509 (DER) buffers
-        // store the final TLV certs in the member variables
-        uint8_t rootCertDER_temp[chip::Credentials::kMaxDERCertLength];
-        MutableByteSpan rootCertDERSpan(rootCertDER_temp);
-
-        uint8_t nocDER_temp[chip::Credentials::kMaxDERCertLength];
-        MutableByteSpan nocDERSpan(nocDER_temp);
-
-        mRootCertSpan = MutableByteSpan(mRootCertDER);
-        mNocSpan      = MutableByteSpan(mNocDER);
-
-        chip::Credentials::X509CertRequestParams rootRequestParams;
-        rootRequestParams.SerialNumber  = kRootCertSerial;
-        rootRequestParams.ValidityStart = kCertValidityStart;
-        rootRequestParams.ValidityEnd   = kRootCertValidityDurationSeconds;
-
-        const char * rootName = "My Test Root CA";
-        CHIP_ERROR err        = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
-                                                                        CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
-               );
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-        err = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-        rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;
-
-        err = chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-
-        // Convert X.509 DER to Matter TLV
-        err = chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-
-        chip::Credentials::X509CertRequestParams nocRequestParams;
-        nocRequestParams.SerialNumber  = kNocSerial;
-        nocRequestParams.ValidityStart = kCertValidityStart;
-        nocRequestParams.ValidityEnd   = kNocCertValidityDurationSeconds;
-        nocRequestParams.IssuerDN      = rootRequestParams.SubjectDN;
-        err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-        err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-        err = chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-
-        err = chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan);
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-    }
-
-    void TearDownFabric()
-    {
-
-        if (mTestFabricIndex != chip::kUndefinedFabricIndex)
-        {
-            CHIP_ERROR err = mRealProvider.RemoveFabric(mTestFabricIndex);
-            EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_FOUND);
-
-            EXPECT_EQ(mOpCertStore.RemoveOpCertsForFabric(mTestFabricIndex), CHIP_NO_ERROR);
-            err = mfabricTable.Delete(mTestFabricIndex);
-            EXPECT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_FOUND);
-
-            mTestFabricIndex = chip::kUndefinedFabricIndex;
-            mfabricTable.Shutdown();
-            mOpCertStore.Finish();
-        }
-        tester.SetFabricIndex(kUndefinedFabricIndex);
+        GroupKeyManagementCluster::SetFabricTableForTest(&tester.GetFabricHelper().GetFabricTable());
     }
 
     void TearDown() override
     {
-
-        TearDownFabric();
         GroupKeyManagementCluster::SetFabricTableForTest(nullptr);
+
+        CHIP_ERROR err = tester.TearDownMockFabric();
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
         TestGroupKeyManagementClusterWithStorage::TearDown();
     }
 };
@@ -472,7 +353,7 @@ TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteCommand)
     auto result = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData);
     EXPECT_TRUE(result.IsSuccess());
     Credentials::GroupDataProvider::KeySet storedKeySet;
-    CHIP_ERROR err = mRealProvider.GetKeySet(mTestFabricIndex, kTestKeySetId, storedKeySet);
+    CHIP_ERROR err = mRealProvider.GetKeySet(kTestFabricIndex, kTestKeySetId, storedKeySet);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(storedKeySet.keyset_id, kTestKeySetId);
     ASSERT_EQ(storedKeySet.policy, GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst);
@@ -498,7 +379,7 @@ TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteSameId)
 
     EXPECT_TRUE(result1.IsSuccess());
     chip::Credentials::GroupDataProvider::KeySet storedKeySet;
-    CHIP_ERROR err = mRealProvider.GetKeySet(mTestFabricIndex, kTestKeySetId, storedKeySet);
+    CHIP_ERROR err = mRealProvider.GetKeySet(kTestFabricIndex, kTestKeySetId, storedKeySet);
 
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(storedKeySet.policy, GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst);
@@ -519,7 +400,7 @@ TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteSameId)
 
     EXPECT_TRUE(result2.IsSuccess());
 
-    err = mRealProvider.GetKeySet(mTestFabricIndex, kTestKeySetId, storedKeySet);
+    err = mRealProvider.GetKeySet(kTestFabricIndex, kTestKeySetId, storedKeySet);
 
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(storedKeySet.policy, GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst);
