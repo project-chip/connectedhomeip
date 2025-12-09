@@ -150,7 +150,8 @@ public:
     /// Remove an existing registration
     ///
     /// Will return CHIP_ERROR_NOT_FOUND if the given registration is not found.
-    CHIP_ERROR Unregister(ServerClusterInterface *, ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
+    CHIP_ERROR Unregister(ServerClusterInterface *,
+                          ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
 
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * Get(const ConcreteClusterPath & path);
