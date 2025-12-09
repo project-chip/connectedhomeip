@@ -89,19 +89,23 @@ void DeviceInfoProvider::SetStorageDelegate(PersistentStorageDelegate * storage)
     mStorage = storage;
 }
 
-uint16_t DeviceInfoProvider::GetSimultaneousInvocationsSupported() {
+uint16_t DeviceInfoProvider::GetSimultaneousInvocationsSupported()
+{
     return CHIP_IM_MAX_NUM_COMMAND_HANDLER;
 }
 
-uint16_t DeviceInfoProvider::GetSimultaneousWritesSupported() {
+uint16_t DeviceInfoProvider::GetSimultaneousWritesSupported()
+{
     return CHIP_IM_MAX_NUM_WRITE_HANDLER;
 }
 
-uint16_t DeviceInfoProvider::GetReadPathsSupported() {
+uint16_t DeviceInfoProvider::GetReadPathsSupported()
+{
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS;
 }
 
-uint16_t DeviceInfoProvider::GetSubscribePathsSupported() {
+uint16_t DeviceInfoProvider::GetSubscribePathsSupported()
+{
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS;
 }
 

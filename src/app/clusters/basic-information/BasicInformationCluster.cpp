@@ -201,9 +201,11 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
 
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
     capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
-    capabilityMinima.simultaneousInvocationsSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSimultaneousInvocationsSupported());
-    capabilityMinima.simultaneousWritesSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSimultaneousWritesSupported());
-    capabilityMinima.readPathsSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetReadPathsSupported());
+    capabilityMinima.simultaneousInvocationsSupported =
+        chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSimultaneousInvocationsSupported());
+    capabilityMinima.simultaneousWritesSupported =
+        chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSimultaneousWritesSupported());
+    capabilityMinima.readPathsSupported      = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetReadPathsSupported());
     capabilityMinima.subscribePathsSupported = chip::MakeOptional<uint16_t>(deviceInfoProvider->GetSubscribePathsSupported());
 
     return aEncoder.Encode(capabilityMinima);
