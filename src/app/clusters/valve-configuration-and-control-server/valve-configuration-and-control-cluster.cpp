@@ -495,10 +495,11 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent curre
     }
 }
 
-CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
+CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullable<Percent> level,
+                                                              DataModel::Nullable<uint32_t> openDuration)
 {
     // Check for the AutoCloseTime feature
-    if(mFeatures.Has(Feature::kTimeSync))
+    if (mFeatures.Has(Feature::kTimeSync))
     {
         VerifyOrReturnValue(mTsTracker->IsTimeSyncClusterSupported(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
