@@ -159,7 +159,8 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 
 void ElectricalEnergyMeasurementAttrAccess::Shutdown()
 {
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+    CHIP_ERROR err =
+        CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
 
     if (err != CHIP_NO_ERROR)
     {
