@@ -28,8 +28,7 @@ class ChimeServer
 {
 public:
     /**
-     * Creates a chime server instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
+     * Creates a chime server instance. This is just a backwards compatibility wrapper around the ChimeCluster.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
@@ -76,16 +75,8 @@ public:
     // Cluster constants from the spec
     static constexpr uint8_t kMaxChimeSoundNameSize = 48;
 
-    // List Change Reporting
-    /**
-     * Reports that the contents of the InstalledChimeSounds attribute have changed.
-     * The device SHALL call this method whenever it changes the list of installed chime sounds.
-     */
-    void ReportInstalledChimeSoundsChange();
-
     // Compatibility related
-    ChimeServer * nextChimeServer = nullptr;
-    chip::app::RegisteredServerCluster<chip::app::Clusters::ChimeCluster> mCluster;
+    chip::app::RegisteredServerCluster<ChimeCluster> mCluster;
 };
 
 } // namespace Clusters

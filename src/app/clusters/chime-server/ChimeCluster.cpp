@@ -255,11 +255,6 @@ bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
     return false;
 }
 
-void ChimeCluster::ReportInstalledChimeSoundsChange()
-{
-    NotifyAttributeChanged(Attributes::InstalledChimeSounds::Id);
-}
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip

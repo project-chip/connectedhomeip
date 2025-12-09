@@ -20,50 +20,13 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 
-namespace {
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
 using chip::app::Clusters::ChimeServer;
 
-ChimeServer * firstChimeServer = nullptr;
-
-inline void RegisterChimeServer(ChimeServer * inst)
-{
-    inst->nextChimeServer = firstChimeServer;
-    firstChimeServer      = inst;
-}
-
-inline void UnregisterChimeServer(ChimeServer * inst)
-{
-    if (firstChimeServer == inst)
-    {
-        firstChimeServer = firstChimeServer->nextChimeServer;
-    }
-    else if (firstChimeServer != nullptr)
-    {
-        ChimeServer * previous = firstChimeServer;
-        ChimeServer * current  = firstChimeServer->nextChimeServer;
-
-        while (current != nullptr && current != inst)
-        {
-            previous = current;
-            current  = current->nextChimeServer;
-        }
-
-        if (current != nullptr)
-        {
-            previous->nextChimeServer = current->nextChimeServer;
-        }
-    }
-}
-
-} // namespace
-
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate)
 {
-    RegisterChimeServer(this);
     // CodegenDataModelProvider::Instance() is a Meyer’s singleton so it's safe to call this here without worrying about
     // intialization order. It's also OK to Register() the cluster in the provider even if the endpoint is not yet started up. It
     // will be started up when the endpoint is started and a context is set.
@@ -73,7 +36,6 @@ ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mClu
 ChimeServer::~ChimeServer()
 {
     RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
-    UnregisterChimeServer(this);
 }
 
 CHIP_ERROR ChimeServer::Init()
@@ -100,11 +62,6 @@ uint8_t ChimeServer::GetSelectedChime() const
 bool ChimeServer::GetEnabled() const
 {
     return mCluster.Cluster().GetEnabled();
-}
-
-void ChimeServer::ReportInstalledChimeSoundsChange()
-{
-    mCluster.Cluster().ReportInstalledChimeSoundsChange();
 }
 
 void MatterChimeClusterInitCallback(EndpointId endpointId) {}

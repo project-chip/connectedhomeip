@@ -72,13 +72,6 @@ public:
     // Cluster constants from the spec
     static constexpr uint8_t kMaxChimeSoundNameSize = 48;
 
-    // List Change Reporting
-    /**
-     * Reports that the contents of the InstalledChimeSounds attribute have changed.
-     * The device SHALL call this method whenever it changes the list of installed chime sounds.
-     */
-    void ReportInstalledChimeSoundsChange();
-
     /**
      * @brief ServerClusterInterface methods.
      */
