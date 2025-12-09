@@ -44,6 +44,7 @@ restyle-paths() {
     local uid="${SUDO_UID:-$(id -u)}"
     local gid="${SUDO_GID:-$(id -g)}"
 
+    echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler docker images if needed)"
     restyle --config-file=.restyled.yaml "$@"
 
     echo
@@ -51,19 +52,40 @@ restyle-paths() {
     sudo chown -h "$uid:$gid" "$@"
 }
 
-if ! command -v restyle >/dev/null 2>&1; then
-    echo
-    echo "Restyle CLI is not installed or is not in PATH."
-    echo
-    echo "Install it by following the installation instructions in the restyled-io/restyler GitHub README and then run again:"
-    echo "  https://github.com/restyled-io/restyler#installation"
-    echo
-    exit 1
-fi
+ensure_restyle_installed() {
+    if command -v restyle >/dev/null 2>&1; then
+        return 0
+    fi
+
+    echo "[restyle-diff.sh] Restyle CLI not found, downloading it from GitHub restyled-io/restyler releases..."
+
+    # It seems that restyler releases only linux x86_64 and darwin arm64 binaries at this time
+    case "$(uname -s)-$(uname -m)" in
+        Linux-x86_64) asset="restyler-linux-x86_64" ;;
+        Darwin-arm64) asset="restyler-darwin-arm64" ;;
+        *)
+            echo "[restyle-diff.sh] Unsupported platform: $(uname -s)-$(uname -m)"
+            echo "[restyle-diff.sh] Check available binaries at: https://github.com/restyled-io/restyler/releases"
+            exit 1
+            ;;
+    esac
+
+    tmpdir=$(mktemp -d)
+
+    if ! curl -sSfL "https://github.com/restyled-io/restyler/releases/latest/download/$asset.tar.gz" | tar xz -C "$tmpdir"; then
+        echo "[restyle-diff.sh] Failed to download restyle for $(uname -s)-$(uname -m)"
+        echo "[restyle-diff.sh] Check available binaries at: https://github.com/restyled-io/restyler/releases"
+        exit 1
+    fi
+
+    echo "[restyle-diff.sh] Installing restyle to /usr/local/bin (sudo required)..."
+    sudo install "$tmpdir/$asset/restyle" /usr/local/bin/restyle
+    rm -rf "$tmpdir"
+
+}
 
 #This was added to be able to use xargs to call the function restyle-paths
 export -f restyle-paths
-
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d)
@@ -83,5 +105,7 @@ if [[ -z "$ref" ]]; then
 fi
 
 paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
+
+ensure_restyle_installed
 
 echo "$paths" | xargs -n "$MAX_ARGS" "$BASH" -c 'restyle-paths "$@"' -
