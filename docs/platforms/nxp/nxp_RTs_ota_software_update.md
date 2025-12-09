@@ -242,23 +242,46 @@ To sign the image and wrap the raw binary of the application with the header and
 trailer, "`imgtool`" is provided in the SDK and can be found in
 "`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/`".
 
-The following commands can be run (make sure to replace the /path/to/file/binary
-with the adequate files):
+First, change to the scripts directory:
+
+```bash
+cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
+```
+
+Then, run one of the following signing commands (make sure to replace the /path/to/file/binary with the adequate files):
 
 -   Signing with ECDSA (for MCUBoot version >= 2.2)
 
-```sh
-user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
-
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-ecdsa-p256-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
+```bash
+python3 imgtool.py sign \
+    --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-ecdsa-p256-priv.pem \
+    --align 4 \
+    --header-size 0x1000 \
+    --pad-header \
+    --pad \
+    --confirm \
+    --slot-size 0x440000 \
+    --max-sectors 1088 \
+    --version "1.0" \
+    ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin \
+    ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
 ```
 
 -   Signing with RSA (for MCUBoot version < 2.2)
 
-```sh
-user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
-
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
+```bash
+python3 imgtool.py sign \
+    --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem \
+    --align 4 \
+    --header-size 0x1000 \
+    --pad-header \
+    --pad \
+    --confirm \
+    --slot-size 0x440000 \
+    --max-sectors 1088 \
+    --version "1.0" \
+    ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example.bin \
+    ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/<"rt_board">/out/debug/chip-<"rt_board">-all-cluster-example_SIGNED.bin
 ```
 
 Notes :
