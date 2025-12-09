@@ -128,6 +128,9 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mConnClosedCb   = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
+    // Ensure MessageStats struct is at default state on Init
+    mMessageStats = MessageStats();
+
     return CHIP_NO_ERROR;
 }
 
@@ -397,6 +400,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
 
+    CountMessagesSent(sessionHandle, payloadHeader);
     return CHIP_NO_ERROR;
 }
 
@@ -848,6 +852,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
                                     messageTotalSize);
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, unsecuredSession, peerAddress, msg->Start(), msg->TotalLength());
+        CountMessagesReceived(session, payloadHeader);
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msg));
     }
     else
@@ -1002,6 +1007,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
             secureSession->SetCaseCommissioningSessionStatus(secureSession->GetFabricIndex() ==
                                                              mFabricTable->GetPendingNewFabricIndex());
         }
+
+        CountMessagesReceived(session.Value(), payloadHeader);
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
     }
     else
@@ -1227,8 +1234,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
                                     messageTotalSize);
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeaderCopy, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, SessionHandle(groupSession),
-                               SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
+        SessionHandle session(groupSession);
+
+        CountMessagesReceived(session, payloadHeader);
+        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, session, SessionMessageDelegate::DuplicateMessage::No,
+                               std::move(msg));
     }
     else
     {
@@ -1337,6 +1347,24 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
         return Loop::Continue;
     });
     return CHIP_NO_ERROR;
+}
+
+// Session handle parameter included here for future counting usage.
+void SessionManager::CountMessagesReceived(const SessionHandle &, const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
+    {
+        mMessageStats.interactionModelMessagesReceived++;
+    }
+}
+
+// Session handle parameter included here for future counting usage.
+void SessionManager::CountMessagesSent(const SessionHandle &, const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
+    {
+        mMessageStats.interactionModelMessagesSent++;
+    }
 }
 
 } // namespace chip

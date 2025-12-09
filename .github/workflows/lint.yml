@@ -116,6 +116,7 @@ jobs:
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
                      --known-failure app/WriteHandler.h \
+                     --known-failure lib/core/CriticalFailure.h \
                      --known-failure platform/DeviceSafeQueue.cpp \
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \

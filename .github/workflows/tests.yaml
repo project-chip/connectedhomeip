@@ -912,7 +912,7 @@ jobs:
               uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
-              uses: namespace-actions/download-artifact@v1
+              uses: namespace-actions/download-artifact@v2
               with:
                 name: repl-build-data
 
