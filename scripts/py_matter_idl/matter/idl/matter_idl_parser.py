@@ -620,15 +620,15 @@ class GlobalMapping:
                 if type_name in self.bitmap_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.bitmaps.append(self.bitmap_map[type_name])
+                    cluster.bitmaps.insert(0, self.bitmap_map[type_name])
                 elif type_name in self.enum_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.enums.append(self.enum_map[type_name])
+                    cluster.enums.insert(0, self.enum_map[type_name])
                 elif type_name in self.struct_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.structs.append(self.struct_map[type_name])
+                    cluster.structs.insert(0, self.struct_map[type_name])
 
         return cluster
 

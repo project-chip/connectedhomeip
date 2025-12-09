@@ -143,6 +143,7 @@ template("chip_test_suite") {
                                    "public_deps",
                                    "cflags",
                                    "configs",
+                                   "defines",
                                  ])
 
           # Link to the common lib for this suite so we get its `sources`.

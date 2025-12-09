@@ -96,8 +96,14 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::DeviceEnergyManagement::Id:
+        MatterDeviceEnergyManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::PowerTopology::Id:
+        MatterPowerTopologyClusterInitCallback(endpoint);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterInitCallback(endpoint);
@@ -178,8 +184,13 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::DeviceEnergyManagement::Id:
+        MatterDeviceEnergyManagementClusterShutdownCallback(endpoint);
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::PowerTopology::Id:
+        MatterPowerTopologyClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint);

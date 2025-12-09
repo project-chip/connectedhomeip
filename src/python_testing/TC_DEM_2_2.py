@@ -57,7 +57,7 @@ from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
@@ -197,7 +197,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         self.step("5b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        logging.info(powerAdjustCapabilityStruct)
+        log.info(powerAdjustCapabilityStruct)
         asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
@@ -214,7 +214,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             max_duration = max(max_duration, entry.maxDuration)
 
         result = f"min_power {min_power} max_power {max_power} min_duration {min_duration} max_duration {max_duration}"
-        logging.info(result)
+        log.info(result)
 
         self.step("5c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)

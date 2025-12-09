@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "level-control-integration.cpp",
-  "level-control-integration.h",
-  "mode-base-integration.cpp",
-  "mode-base-integration.h",
-  "mode-select-integration.cpp",
-  "mode-select-integration.h",
-  "on-off-server.cpp",
+  "codegen/level-control-integration.cpp",
+  "codegen/level-control-integration.h",
+  "codegen/mode-base-integration.cpp",
+  "codegen/mode-base-integration.h",
+  "codegen/mode-select-integration.cpp",
+  "codegen/mode-select-integration.h",
+  "codegen/on-off-server.cpp",
+  "codegen/on-off-server.h",
+  "codegen/scenes-integration.cpp",
+  "codegen/scenes-integration.h",
   "on-off-server.h",
-  "scenes-integration.cpp",
-  "scenes-integration.h",
 ]

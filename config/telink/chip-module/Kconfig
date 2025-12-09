@@ -35,12 +35,7 @@ config CHIP_NFC_ONBOARDING_PAYLOAD
 	default n
 	imply I2C
 	imply ST25DVXXKC
-	imply NFC		
-	imply NFC_NDEF
-	imply NFC_NDEF_MSG
-	imply NFC_NDEF_RECORD
-	imply NFC_NDEF_URI_REC
-	imply NFC_NDEF_URI_MSG
+	imply NFC
 	help
 	  Enables sharing the onboarding payload in the NFC tag.
 
@@ -218,14 +213,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default n
 
 endif
-
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/telink/CHIPPlatformConfig.h file.
 
 config CHIP_IPV4
 	bool "IPv4 support for Matter"
