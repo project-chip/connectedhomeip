@@ -22,8 +22,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <zephyr/kernel.h>
-#include <zephyr/nfc/ndef/uri_msg.h>
-#include <zephyr/nfc/nfc_tag.h>
+#include <zephyr/drivers/nfc/nfc_tag.h>
 
 void nfc_callback(const struct device * dev, enum nfc_tag_event event, const uint8_t * data, size_t data_len)
 {
@@ -50,10 +49,23 @@ CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StartTagEmulation(const char * payl
 
     int err;
 
+    if (device_is_ready(dev))
+    {
+        ChipLogError(DeviceLayer, "NFC device is not ready for use");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    err = device_init(dev);
+    if (err != 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize NFC device: %d", err);
+        return CHIP_ERROR_INTERNAL;
+    }
+
     err = nfc_tag_init(dev, nfc_callback);
     if (err != 0)
     {
-        ChipLogError(DeviceLayer, "Cannot setup NFC subsys!");
+        ChipLogError(DeviceLayer, "Cannot setup NFC subsys!, err=%d", err);
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -65,17 +77,20 @@ CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StartTagEmulation(const char * payl
         return CHIP_ERROR_INTERNAL;
     }
 
-    err = nfc_ndef_uri_msg_encode(NFC_URI_NONE, (const uint8_t *) payload, payloadLength, ndef_msg_buf, &len);
-    if (err != 0)
+    size_t encoded_len = _EncodeNDEFURI((const uint8_t *) payload, payloadLength, ndef_msg_buf);
+    if (encoded_len == 0)
     {
         ChipLogError(DeviceLayer, "Cannot encode message!");
         return CHIP_ERROR_INTERNAL;
     }
 
-    err = nfc_tag_set_ndef(dev, ndef_msg_buf, len);
+    ChipLogDetail(DeviceLayer, "NDEF URI of %d length encoded!", encoded_len);
+    ChipLogDetail(DeviceLayer, "Payload: %s", payload);
+
+    err = nfc_tag_set_ndef(dev, ndef_msg_buf, encoded_len);
     if (err != 0)
     {
-        ChipLogError(DeviceLayer, "Cannot set payload!");
+        ChipLogError(DeviceLayer, "Cannot set payload! err=%d", err);
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -97,6 +112,31 @@ CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StopTagEmulation()
     }
     sInstance.mIsStarted = false;
     return CHIP_NO_ERROR;
+}
+
+size_t NFCOnboardingPayloadManagerImpl::_EncodeNDEFURI(const uint8_t* uri, size_t uri_len, uint8_t* out_buf)
+{
+    size_t max_len = 128;
+    // NDEF Record Header for short record, TNF = Well Known, Type = 'U'
+    const uint8_t type_field = 'U';
+    const uint8_t tnf = 0xD1; // MB=1, ME=1, SR=1, TNF=1
+    const uint8_t payload_prefix = 0x00; // No prefix, full URI follows
+
+    if (max_len < 5 + uri_len) {
+        ChipLogError(DeviceLayer, "NDEF message is too long, (5 + uri_len) required for TNF URI NDEF record");
+        return 0;
+    }
+
+    size_t offset = 0;
+    out_buf[offset++] = tnf;
+    out_buf[offset++] = 1;               // Type length
+    out_buf[offset++] = uri_len + 1;     // Payload length (1 prefix + uri)
+    out_buf[offset++] = type_field;
+    out_buf[offset++] = payload_prefix;
+    memcpy(out_buf + offset, uri, uri_len);
+    offset += uri_len;
+
+    return offset;
 }
 
 } // namespace DeviceLayer
