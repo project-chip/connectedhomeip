@@ -73,14 +73,14 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-factory \
+                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory \
                       build \
                   "
             - name: Get MCXW71 contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
-                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm/app.elf \
+                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm-ota-factory/app.elf \
                     /tmp/bloat_reports/
 
             - name: Build MCXW72 examples
