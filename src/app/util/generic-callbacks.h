@@ -79,8 +79,8 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * application was not able to read the attribute.
  */
 chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-    const EmberAfAttributeMetadata * attributeMetadata,
-    uint8_t * buffer, uint16_t maxReadLength);
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -123,9 +123,9 @@ chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(c
  * attribute.
  */
 chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint,
-    chip::ClusterId clusterId,
-    const EmberAfAttributeMetadata * attributeMetadata,
-    uint8_t * buffer);
+                                                                                chip::ClusterId clusterId,
+                                                                                const EmberAfAttributeMetadata * attributeMetadata,
+                                                                                uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *
@@ -136,7 +136,7 @@ chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(
  * any other code to reject it.
  */
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
-    uint8_t type, uint16_t size, uint8_t * value);
+                                                                           uint8_t type, uint16_t size, uint8_t * value);
 
 /** @brief Post Attribute Change
  *
@@ -145,11 +145,12 @@ chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const
  * the attribute was set by the framework.
  */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-    uint8_t * value);
+                                       uint8_t * value);
 
 void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
-enum class MatterClusterShutdownType {
+enum class MatterClusterShutdownType
+{
     kClusterShutdown, // "normal" shutdown, e.g. application stop. Perform cleanups like: timeer and delegate cleanup.
     kPermanentRemove, // full "remove", generally for bridged devices.
 };
@@ -164,4 +165,4 @@ enum class MatterClusterShutdownType {
  *   - Permanent remove only (e.g. bridges): clean up storage
  */
 void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-    MatterClusterShutdownType shutdownType);
+                                         MatterClusterShutdownType shutdownType);
