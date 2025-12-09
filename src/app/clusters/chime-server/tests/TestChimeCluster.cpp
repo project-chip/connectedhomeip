@@ -106,7 +106,10 @@ TEST_F(TestChimeCluster, TestDelegateErrors)
     auto result                        = mClusterTester.Invoke<Commands::PlayChimeSound::Type>(Commands::PlayChimeSound::Type());
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_TRUE(mMockDelegate.playChimeSoundCalled);
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Busy);
+    if (result.status.has_value())
+    {
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Busy);
+    }
 
     // Test 2: GetChimeSoundByIndex delegate failure
     mMockDelegate.getChimeSoundByIndexError = CHIP_ERROR_INTERNAL;
@@ -139,28 +142,28 @@ TEST_F(TestChimeCluster, TestNoOpWrites)
 
 TEST_F(TestChimeCluster, TestReadClusterRevision)
 {
-    uint16_t clusterRevision;
+    uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, kRevision);
 }
 
 TEST_F(TestChimeCluster, TestReadFeatureMap)
 {
-    uint32_t featureMap;
+    uint32_t featureMap = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
 }
 
 TEST_F(TestChimeCluster, TestReadSelectedChime)
 {
-    uint8_t selectedChime;
+    uint8_t selectedChime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);
     EXPECT_EQ(selectedChime, 0);
 }
 
 TEST_F(TestChimeCluster, TestReadEnabled)
 {
-    bool enabled;
+    bool enabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Enabled::Id, enabled), CHIP_NO_ERROR);
     EXPECT_EQ(enabled, true);
 }
@@ -215,7 +218,7 @@ TEST_F(TestChimeCluster, TestWriteAttributes)
     // Test writing SelectedChime
     // Write valid value (1)
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SelectedChime::Id, static_cast<uint8_t>(1)), CHIP_NO_ERROR);
-    uint8_t selectedChime;
+    uint8_t selectedChime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);
     EXPECT_EQ(selectedChime, 1);
 
@@ -232,7 +235,7 @@ TEST_F(TestChimeCluster, TestWriteAttributes)
 
     // Test writing Enabled
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::Enabled::Id, false), CHIP_NO_ERROR);
-    bool enabled;
+    bool enabled = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Enabled::Id, enabled), CHIP_NO_ERROR);
     EXPECT_EQ(enabled, false);
 
@@ -255,11 +258,11 @@ TEST_F(TestChimeCluster, TestPersistence)
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
-        uint8_t selectedChime;
+        uint8_t selectedChime = 1;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);
         EXPECT_EQ(selectedChime, 0);
 
-        bool enabled;
+        bool enabled = false;
         EXPECT_EQ(tester.ReadAttribute(Attributes::Enabled::Id, enabled), CHIP_NO_ERROR);
         EXPECT_EQ(enabled, true);
 

@@ -175,13 +175,17 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
 bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
 {
     uint8_t supportedChimeID;
-    for (uint8_t i = 0; i <= UINT8_MAX &&
-         mDelegate.GetChimeIDByIndex(static_cast<uint8_t>(i), supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-         i++)
+    for (uint8_t i = 0;
+         mDelegate.GetChimeIDByIndex(static_cast<uint8_t>(i), supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
         if (supportedChimeID == chimeID)
         {
             return true;
+        }
+
+        if (i == UINT8_MAX) // prevent overflow / infinite loop
+        {
+            break;
         }
     }
     return false;
@@ -189,7 +193,7 @@ bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
 
 CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    for (uint8_t i = 0; i <= UINT8_MAX; i++)
+    for (uint8_t i = 0; true; i++)
     {
         Structs::ChimeSoundStruct::Type chimeSound;
 
@@ -213,6 +217,11 @@ CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder:
 
         // and now encode the struct
         ReturnErrorOnFailure(encoder.Encode(chimeSound));
+
+        if (i == UINT8_MAX) // prevent overflow / infinite loop
+        {
+            break;
+        }
     }
     return CHIP_NO_ERROR;
 }

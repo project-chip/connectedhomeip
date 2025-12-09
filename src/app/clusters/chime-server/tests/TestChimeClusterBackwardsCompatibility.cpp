@@ -96,7 +96,7 @@ TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacyInstantiation)
     EXPECT_TRUE(CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, Chime::Id)) != nullptr);
 
     // Test Reading Attribute (via ChimeCluster logic)
-    uint8_t selectedChime;
+    uint8_t selectedChime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);
     EXPECT_EQ(selectedChime, 0);
 
@@ -118,7 +118,7 @@ TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacySetters)
     EXPECT_EQ(mChimeServer.GetSelectedChime(), 1);
 
     // Verify it affected the attribute
-    uint8_t selectedChime;
+    uint8_t selectedChime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SelectedChime::Id, selectedChime), CHIP_NO_ERROR);
     EXPECT_EQ(selectedChime, 1);
 
@@ -126,7 +126,7 @@ TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacySetters)
     EXPECT_EQ(mChimeServer.SetEnabled(false), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(mChimeServer.GetEnabled(), false);
 
-    bool enabled;
+    bool enabled = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Enabled::Id, enabled), CHIP_NO_ERROR);
     EXPECT_EQ(enabled, false);
 }
