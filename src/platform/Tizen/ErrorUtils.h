@@ -24,7 +24,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 void RegisterTizenPlatformErrorFormatter();
-CHIP_ERROR TizenToChipError(int tizenError);
 
 } // namespace Internal
 } // namespace DeviceLayer

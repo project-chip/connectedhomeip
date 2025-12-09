@@ -54,11 +54,8 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/PlatformManager.h>
 
-#include <platform/Tizen/ErrorUtils.h>
 #include <platform/Tizen/ThreadStackManagerImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-using chip::DeviceLayer::Internal::TizenToChipError;
 
 namespace chip {
 namespace DeviceLayer {
@@ -495,7 +492,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 
 #if defined(TIZEN_NETWORK_THREAD_VERSION) && TIZEN_NETWORK_THREAD_VERSION >= 0x000900
     int threadErr = thread_get_version(mThreadInstance, &version);
-    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, TizenToChipError(threadErr),
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, MATTER_PLATFORM_ERROR(threadErr),
                         ChipLogError(DeviceLayer, "FAIL: Get thread version: %s", get_error_message(threadErr)));
     ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
     return CHIP_NO_ERROR;
