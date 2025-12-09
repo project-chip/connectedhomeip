@@ -16,6 +16,7 @@
 
 #include <app/clusters/device-energy-management-server/CodegenIntegration.h>
 
+#include <app/util/generic-callbacks.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
