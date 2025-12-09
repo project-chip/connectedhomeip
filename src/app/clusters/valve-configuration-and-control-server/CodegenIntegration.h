@@ -30,6 +30,7 @@ ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointI
 void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate);
 
 CHIP_ERROR CloseValve(chip::EndpointId ep);
+CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
 CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel);
 CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState);
 CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);

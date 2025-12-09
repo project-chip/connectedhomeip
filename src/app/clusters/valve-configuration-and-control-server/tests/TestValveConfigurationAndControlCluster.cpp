@@ -35,7 +35,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using namespace chip::app::Clusters::ValveConfigurationAndControl::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 class DummyDelegate : public Delegate
 {
@@ -67,7 +67,7 @@ struct TestValveConfigurationAndControlCluster : public ::testing::Test
 
     TestValveConfigurationAndControlCluster() {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     DummyDelegate delegate;
     DummyTimeSyncTracker timeSyncTracker;
 };

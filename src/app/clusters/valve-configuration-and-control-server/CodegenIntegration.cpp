@@ -147,6 +147,13 @@ CHIP_ERROR CloseValve(chip::EndpointId ep)
     return interface->CloseValve();
 }
 
+CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    return interface->SetValveLevel(level, openDuration);
+}
+
 CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel)
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);

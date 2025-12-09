@@ -57,6 +57,7 @@ public:
     static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
 
     CHIP_ERROR CloseValve();
+    CHIP_ERROR SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
     void UpdateCurrentLevel(chip::Percent currentLevel);
     void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
     void EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
@@ -73,7 +74,7 @@ private:
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
-    CHIP_ERROR SetAutoCloseTime();
+    CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
     void emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState);
     void emitValveLevelEvent(chip::Percent currentLevel);
 

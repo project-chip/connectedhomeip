@@ -313,7 +313,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // If TimeSync feature is enabled, set the value according the OpenDuration attribute.
     if (mFeatures.Has(Feature::kTimeSync))
     {
-        ReturnErrorOnFailure(SetAutoCloseTime());
+        ReturnErrorOnFailure(SetAutoCloseTime(mOpenDuration));
     }
 
     // Check rules for TargetLevel if enabled
@@ -345,9 +345,9 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
 }
 
 // Internal functions.
-CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime()
+CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration)
 {
-    if (!mOpenDuration.IsNull() && mTsTracker->IsValidUTCTime())
+    if (!openDuration.IsNull() && mTsTracker->IsValidUTCTime())
     {
         // We have a synchronized UTC time in the TimeSync cluster, we can proceed to set the AutoCloseTime attribute
         System::Clock::Microseconds64 utcTime;
@@ -355,7 +355,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime()
         ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
         VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
-        uint64_t time = mOpenDuration.Value() * chip::kMicrosecondsPerSecond;
+        uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
         SaveAndReportIfChanged(mAutoCloseTime, DataModel::Nullable<uint64_t>(time + chipEpochTime), Attributes::AutoCloseTime::Id);
     }
     else
@@ -493,6 +493,48 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent curre
             UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
         }
     }
+}
+
+CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
+{
+    // Check for the AutoCloseTime feature
+    if(mFeatures.Has(Feature::kTimeSync))
+    {
+        VerifyOrReturnValue(mTsTracker->IsTimeSyncClusterSupported(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
+    }
+
+    // level can only be null if LVL feature is not supported
+    if (mFeatures.Has(Feature::kLevel) && !level.IsNull())
+    {
+        SaveAndReportIfChanged(mTargetLevel, level, Attributes::TargetLevel::Id);
+    }
+
+    SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
+
+    SetRemainingDuration(openDuration);
+    // set targetstate to open
+    // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
+    SaveAndReportIfChanged(mTargetState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen), Attributes::TargetState::Id);
+    SaveAndReportIfChanged(mCurrentState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning),
+                           Attributes::CurrentState::Id);
+
+    // start movement towards target
+    emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
+
+    if (mDelegate != nullptr)
+    {
+        DataModel::Nullable<Percent> cLevel = mDelegate->HandleOpenValve(level);
+        if (mFeatures.Has(Feature::kLevel) && !cLevel.IsNull())
+        {
+            UpdateCurrentLevel(cLevel.Value());
+        }
+    }
+
+    // start countdown
+    HandleUpdateRemainingDurationInternal();
+
+    return CHIP_NO_ERROR;
 }
 
 void ValveConfigurationAndControlCluster::emitValveLevelEvent(chip::Percent currentLevel)
