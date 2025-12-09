@@ -28,8 +28,8 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/user-label-server",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
   ]

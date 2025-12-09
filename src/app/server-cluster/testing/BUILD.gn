@@ -13,20 +13,41 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 source_set("testing") {
   sources = [
+    "AttributeTesting.cpp",
+    "AttributeTesting.h",
+    "ClusterTester.h",
     "EmptyProvider.cpp",
     "EmptyProvider.h",
+    "MockCommandHandler.cpp",
+    "MockCommandHandler.h",
     "TestEventGenerator.h",
     "TestProviderChangeListener.h",
     "TestServerClusterContext.h",
+    "ValidateGlobalAttributes.cpp",
+    "ValidateGlobalAttributes.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app:command-handler",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/MessageDef:MessageDef",
+    "${chip_root}/src/app/data-model:data-model",
+    "${chip_root}/src/app/data-model-provider:core",
+    "${chip_root}/src/app/data-model-provider:data-model-provider",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster:server-cluster",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/messaging:messaging",
+    "${chip_root}/src/protocols/interaction_model:interaction_model",
   ]
 }

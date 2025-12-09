@@ -17,10 +17,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralCommissioning/Metadata.h>
@@ -51,16 +51,15 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 
 GeneralCommissioningCluster::Context CreateStandardContext()
 {
-    return
-    {
+    return {
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager        = DeviceLayer::PlatformMgr(),                            //
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+        .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+        .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+        .platformManager            = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 }
