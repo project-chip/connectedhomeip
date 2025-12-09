@@ -109,7 +109,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
     }
 
-    RegisterTizenPlatformErrorFormatter();
+    Internal::RegisterTizenPlatformErrorFormatter();
 
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 

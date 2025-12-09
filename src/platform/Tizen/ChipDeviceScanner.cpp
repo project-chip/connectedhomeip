@@ -36,6 +36,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {

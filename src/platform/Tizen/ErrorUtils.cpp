@@ -17,7 +17,7 @@
 
 #include "ErrorUtils.h"
 
-#include <PlatformError.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
 
 #include <tizen.h>

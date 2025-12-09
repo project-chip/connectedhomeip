@@ -40,6 +40,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

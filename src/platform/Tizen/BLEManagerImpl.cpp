@@ -58,6 +58,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>

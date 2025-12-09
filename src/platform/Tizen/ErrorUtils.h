@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
