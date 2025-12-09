@@ -46,8 +46,7 @@ CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLog
                                                                                    BitFlags<Feature> aFeatures,
                                                                                    uint8_t aMaxPresets) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures),
-    mMaxPresets(aMaxPresets)
+    mFeatures(aFeatures), mMaxPresets(aMaxPresets)
 {}
 
 CameraAvSettingsUserLevelMgmtServerLogic::~CameraAvSettingsUserLevelMgmtServerLogic() {}

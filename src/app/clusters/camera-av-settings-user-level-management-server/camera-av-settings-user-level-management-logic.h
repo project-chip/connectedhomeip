@@ -48,8 +48,7 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
-                                             BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures,
-                                             uint8_t aMaxPresets);
+                                             BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures, uint8_t aMaxPresets);
     ~CameraAvSettingsUserLevelMgmtServerLogic();
 
     void SetDelegate(CameraAvSettingsUserLevelManagementDelegate * delegate)
