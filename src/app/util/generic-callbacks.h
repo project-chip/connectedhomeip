@@ -148,4 +148,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                        uint8_t * value);
 
 void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
-void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+enum class MatterClusterShutdownType {
+    kClusterShutdown, // "normal" shutdown, e.g. application stop
+    kPermanentRemove, // full "remove", generally for bridged devices.
+};
+
+/**
+ * Mark the given endpoint as being shut down (i.e. not active anymore)
+ *
+ * In most cases, this is a result of dynamic endpoint disabling, so this is assumed
+ * to need to perform any cleanup such as:
+ *   - cancel pending timers (this applies for ALL shutdowns)
+ *   - clean up storage (this applies to brided endpoints where the shutdown is a full removal)
+ */
+void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, MatterClusterShutdownType shutdownType);
+

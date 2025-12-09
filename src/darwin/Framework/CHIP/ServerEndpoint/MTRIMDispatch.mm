@@ -88,7 +88,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
-void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, MatterClusterShutdownType)
 {
     assertChipStackLockedByCurrentThread();
 

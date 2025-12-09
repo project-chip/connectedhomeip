@@ -502,7 +502,11 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         if (cluster->IsServer())
         {
-            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId);
+            // shutdownEndpoint is currently only ever called from `emberAfEndpointEnableDisable` which is expected
+            // to be used for bridged devices and has historically been used for storage cleanup for scenes.
+            //
+            // As a result, we flag these as kPermanentRemove for shutdown.
+            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId, MatterClusterShutdownType::kPermanentRemove);
         }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)
