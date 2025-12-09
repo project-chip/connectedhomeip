@@ -46,7 +46,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        DataModel::Nullable<LightSensorTypeEnum> lightSensorType = LightSensorTypeEnum::kPhotodiode;
+        LightSensorType::TypeInfo::Type lightSensorType;
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
             VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);

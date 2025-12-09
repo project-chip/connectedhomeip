@@ -72,7 +72,7 @@ public:
     chip::app::Clusters::IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
 
 protected:
-    DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> mLightSensorType{};
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type mLightSensorType{};
     chip::app::Clusters::IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
     chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type mMeasuredValue{};
     chip::app::Clusters::IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};
