@@ -243,7 +243,7 @@
         "GROUP_KEY_MANAGEMENT_CLUSTER": ["group-key-mgmt-server"],
         "ICD_MANAGEMENT_CLUSTER": ["icd-management-server"],
         "IDENTIFY_CLUSTER": ["identify-server"],
-        "ILLUMINANCE_MEASUREMENT_CLUSTER": ["illuminance-measurement-server"],
+        "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
         "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
             "joint-fabric-administrator-server"
