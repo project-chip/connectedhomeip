@@ -40,6 +40,7 @@
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 
+#include "ErrorUtils.h"
 #include "PosixConfig.h"
 #include "SystemInfo.h"
 #include "platform/internal/GenericPlatformManagerImpl.h"
@@ -107,6 +108,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
         std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
     }
+
+    RegisterTizenPlatformErrorFormatter();
 
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 

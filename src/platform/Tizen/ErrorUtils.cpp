@@ -17,12 +17,44 @@
 
 #include "ErrorUtils.h"
 
+#include <PlatformError.h>
+
 #include <app_preference.h>
 #include <dns-sd.h>
+#include <tizen.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+namespace {
+
+bool FormatTizenPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!err.IsRange(ChipError::Range::kPlatform))
+    {
+        return false;
+    }
+
+    const char * desc = nullptr;
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    // The get_error_message() returns a pointer to a thread local storage. Subsequent
+    // call will override it, however, FormatError() should consume it before the next
+    // call to FormatTizenPlatformError() on the same thread.
+    desc = get_error_message(static_cast<int>(err.GetValue()));
+#endif
+
+    FormatError(buf, bufSize, "Platform", err, desc);
+    return true;
+}
+
+}; // namespace
+
+void RegisterTizenPlatformErrorFormatter()
+{
+    static ErrorFormatter sTizenPlatformErrorFormatter = { FormatTizenPlatformError, nullptr };
+    RegisterErrorFormatter(&sTizenPlatformErrorFormatter);
+}
 
 CHIP_ERROR TizenToChipError(int tizenError)
 {
@@ -33,7 +65,7 @@ CHIP_ERROR TizenToChipError(int tizenError)
     case TIZEN_ERROR_OUT_OF_MEMORY:
         return CHIP_ERROR_NO_MEMORY;
     default:
-        return CHIP_ERROR_INTERNAL;
+        return MATTER_PLATFORM_ERROR(tizenError);
 
     // Tizen DNSSD API errors
     case DNSSD_ERROR_NAME_CONFLICT:
