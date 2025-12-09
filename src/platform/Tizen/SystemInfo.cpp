@@ -23,6 +23,7 @@
 #include <tizen.h>
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformError.h>
 
 namespace chip {
 namespace DeviceLayer {

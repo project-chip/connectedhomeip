@@ -52,6 +52,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 
 #include <platform/Tizen/ThreadStackManagerImpl.h>

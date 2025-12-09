@@ -32,6 +32,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformError.h>
 
 namespace chip {
 namespace DeviceLayer {
