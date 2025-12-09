@@ -90,8 +90,8 @@ private:
     ChimeDelegate & mDelegate;
 
     // Attribute local storage
-    uint8_t mSelectedChime;
-    bool mEnabled;
+    uint8_t mSelectedChime = 0;
+    bool mEnabled          = true;
     // Helpers
     // Loads all the persistent attributes from the KVS.
     void LoadPersistentAttributes();

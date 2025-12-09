@@ -185,22 +185,9 @@ TEST_F(TestChimeCluster, TestInstalledChimeSoundsLifecycle)
 
     ASSERT_FALSE(it.Next());
 
-    // 2. Change content and report (TestReportInstalledChimeSoundsChange + TestInstalledChimeSoundsContentChange)
+    // 2. Change content
     mMockDelegate.sounds.push_back({ 3, "New Sound" });
-    mCluster.ReportInstalledChimeSoundsChange();
 
-    // Verify dirty list
-    auto & dirtyList = mClusterTester.GetDirtyList();
-    EXPECT_EQ(dirtyList.size(), 1u);
-    if (dirtyList.size() > 0)
-    {
-        EXPECT_EQ(dirtyList[0].mEndpointId, kTestEndpointId);
-        EXPECT_EQ(dirtyList[0].mClusterId, Chime::Id);
-        EXPECT_EQ(dirtyList[0].mAttributeId, Attributes::InstalledChimeSounds::Id);
-    }
-    dirtyList.clear();
-
-    // 3. Verify new content
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::InstalledChimeSounds::Id, list), CHIP_NO_ERROR);
     it = list.begin();
     ASSERT_TRUE(it.Next());

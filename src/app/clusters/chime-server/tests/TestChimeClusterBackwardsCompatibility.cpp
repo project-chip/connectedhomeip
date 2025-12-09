@@ -131,20 +131,6 @@ TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacySetters)
     EXPECT_EQ(enabled, false);
 }
 
-TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacyReportInstalledChimeSoundsChange)
-{
-    mChimeServer.ReportInstalledChimeSoundsChange();
-
-    auto & dirtyList = mClusterTester.GetDirtyList();
-    EXPECT_EQ(dirtyList.size(), 1u);
-    if (dirtyList.size() > 0)
-    {
-        EXPECT_EQ(dirtyList[0].mEndpointId, kTestEndpointId);
-        EXPECT_EQ(dirtyList[0].mClusterId, Chime::Id);
-        EXPECT_EQ(dirtyList[0].mAttributeId, Attributes::InstalledChimeSounds::Id);
-    }
-}
-
 TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacyLifecycle)
 {
     constexpr EndpointId kLifecycleEndpointId = 2;

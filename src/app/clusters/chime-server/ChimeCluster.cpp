@@ -34,6 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::Chime::Attributes;
+using chip::Protocols::InteractionModel::Status;
 using ChimeSoundStructType = Structs::ChimeSoundStruct::Type;
 
 namespace chip {
@@ -125,6 +126,7 @@ bool ChimeCluster::GetEnabled() const
 // helper method to get the Chime Sounds one by one and encode into a list
 CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+
     for (uint8_t i = 0; true; i++)
     {
         ChimeSoundStructType chimeSound;
@@ -159,17 +161,37 @@ CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder:
     return CHIP_NO_ERROR;
 }
 
+// helper method to check if the chimeID param is supported by the delegate
+bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
+{
+    uint8_t supportedChimeID;
+    for (uint8_t i = 0; mDelegate.GetChimeIDByIndex(i, supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    {
+        if (supportedChimeID == chimeID)
+        {
+            return true;
+        }
+
+        if (i == UINT8_MAX) // prevent overflow / infinite loop
+        {
+            // This should never happen if the delegate is well-behaved
+            return false;
+        }
+    }
+    return false;
+}
+
 DataModel::ActionReturnStatus ChimeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                            AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::SelectedChime::Id: {
+    case SelectedChime::Id: {
         uint8_t newValue;
         ReturnErrorOnFailure(decoder.Decode(newValue));
         return DataModel::ActionReturnStatus(SetSelectedChime(newValue));
     }
-    case Attributes::Enabled::Id: {
+    case Enabled::Id: {
         bool newValue;
         ReturnErrorOnFailure(decoder.Decode(newValue));
         return DataModel::ActionReturnStatus(SetEnabled(newValue));
@@ -179,7 +201,7 @@ DataModel::ActionReturnStatus ChimeCluster::WriteAttribute(const DataModel::Writ
     }
 }
 
-Protocols::InteractionModel::Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
+Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
 {
     if (!IsSupportedChimeID(chimeID))
     {
@@ -197,7 +219,7 @@ Protocols::InteractionModel::Status ChimeCluster::SetSelectedChime(uint8_t chime
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status ChimeCluster::SetEnabled(bool enabled)
+Status ChimeCluster::SetEnabled(bool enabled)
 {
     if (mEnabled != enabled)
     {
@@ -219,7 +241,7 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
     {
     case Commands::PlayChimeSound::Id: {
         ChipLogDetail(Zcl, "Chime: PlayChimeSound");
-        Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
+        Status status = Status::Success;
 
         // Only invoke the delegate if enabled, otherwise don't play a sound, and "silently" return
         if (mEnabled)
@@ -231,28 +253,8 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
         return DataModel::ActionReturnStatus(status);
     }
     default:
-        return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::UnsupportedCommand);
+        return DataModel::ActionReturnStatus(Status::UnsupportedCommand);
     }
-}
-
-bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
-{
-    uint8_t supportedChimeID;
-    for (uint8_t i = 0;
-         mDelegate.GetChimeIDByIndex(static_cast<uint8_t>(i), supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
-    {
-        if (supportedChimeID == chimeID)
-        {
-            return true;
-        }
-
-        if (i == UINT8_MAX) // prevent overflow / infinite loop
-        {
-            // This should never happen if the delegate is well-behaved
-            return false;
-        }
-    }
-    return false;
 }
 
 } // namespace Clusters
