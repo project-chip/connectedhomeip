@@ -248,7 +248,8 @@ First, change to the scripts directory:
 cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/middleware/mcuboot_opensource/scripts/
 ```
 
-Then, run one of the following signing commands (make sure to replace the /path/to/file/binary with the adequate files):
+Then, run one of the following signing commands (make sure to replace the
+/path/to/file/binary with the adequate files):
 
 -   Signing with ECDSA (for MCUBoot version >= 2.2)
 
