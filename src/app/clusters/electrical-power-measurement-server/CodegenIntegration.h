@@ -55,11 +55,12 @@ public:
             .features           = aFeature,
             .optionalAttributes = FromLegacyOptionalAttributes(aOptionalAttributes),
         })
-    {
-        RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-    }
+    {}
 
-    ~Instance() { RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster())); }
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    ~Instance() {}
 
 private:
     static ElectricalPowerMeasurementCluster::OptionalAttributesSet

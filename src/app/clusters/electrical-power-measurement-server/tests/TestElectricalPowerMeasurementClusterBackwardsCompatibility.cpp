@@ -41,7 +41,7 @@ struct TestElectricalPowerMeasurementClusterBackwardsCompatibility : public ::te
     void SetUp() override {}
     void TearDown() override {}
 
-    chip::Test::TestServerClusterContext mContext;
+    Testing::TestServerClusterContext mContext;
 };
 
 TEST_F(TestElectricalPowerMeasurementClusterBackwardsCompatibility, TestInstanceLifecycle)
@@ -57,10 +57,14 @@ TEST_F(TestElectricalPowerMeasurementClusterBackwardsCompatibility, TestInstance
     {
         Instance instance(kTestEndpointId, delegate, features, optionalAttrs);
 
+        EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
+
         // Verify the cluster is registered
         chip::app::ServerClusterInterface * cluster = registry.Get({ kTestEndpointId, ElectricalPowerMeasurement::Id });
         EXPECT_NE(cluster, nullptr);
         EXPECT_EQ(cluster->Startup(mContext.Get()), CHIP_NO_ERROR);
+
+        instance.Shutdown();
     }
 
     // After instance is destroyed, cluster should be unregistered
@@ -80,10 +84,16 @@ TEST_F(TestElectricalPowerMeasurementClusterBackwardsCompatibility, TestInstance
     {
         Instance instance(kTestEndpointId, delegate, features, optionalAttrs);
 
-        // Verify the cluster is registered and handles the error.
+        EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
+
+        // Verify the cluster is registered
         chip::app::ServerClusterInterface * cluster = registry.Get({ kTestEndpointId, ElectricalPowerMeasurement::Id });
         EXPECT_NE(cluster, nullptr);
+
+        // Startup should fail due to invalid configuration
         EXPECT_EQ(cluster->Startup(mContext.Get()), CHIP_ERROR_INCORRECT_STATE);
+
+        instance.Shutdown();
     }
 
     // After instance is destroyed, cluster should be unregistered

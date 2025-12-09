@@ -29,46 +29,36 @@ namespace ElectricalPowerMeasurement {
 
 CHIP_ERROR ElectricalPowerMeasurementCluster::Startup(ServerClusterContext & context)
 {
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     // If we don't have AlternatingCurrent feature, ensure that all dependents that require it are not enabled
     if (!mFeatureFlags.Has(Feature::kAlternatingCurrent))
     {
-        // PolyphasePower,Harmonics and PowerQuality features conformance: [ALTC]
+        // Conformance: [ALTC]
         VerifyOrReturnError(!mFeatureFlags.HasAny(Feature::kPolyphasePower, Feature::kHarmonics, Feature::kPowerQuality),
                             CHIP_ERROR_INCORRECT_STATE);
 
-        // ReactiveCurrent conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::ReactiveCurrent::Id), CHIP_ERROR_INCORRECT_STATE);
-        // ApparentCurrent conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::ApparentCurrent::Id), CHIP_ERROR_INCORRECT_STATE);
-        // ReactivePower conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::ReactivePower::Id), CHIP_ERROR_INCORRECT_STATE);
-        // ApparentPower conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::ApparentPower::Id), CHIP_ERROR_INCORRECT_STATE);
-        // RMSVoltage conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::RMSVoltage::Id), CHIP_ERROR_INCORRECT_STATE);
-        // RMSCurrent conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::RMSCurrent::Id), CHIP_ERROR_INCORRECT_STATE);
-        // RMSPower conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::RMSPower::Id), CHIP_ERROR_INCORRECT_STATE);
-        // Frequency conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::Frequency::Id), CHIP_ERROR_INCORRECT_STATE);
-        // PowerFactor conformance: [ALTC]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::PowerFactor::Id), CHIP_ERROR_INCORRECT_STATE);
     }
 
     // If we don't have PolyphasePower feature, ensure that NeutralCurrent attribute is not enabled
     if (!mFeatureFlags.Has(Feature::kPolyphasePower))
     {
-        // NeutralCurrent conformance: [POLY]
+        // Conformance: [POLY]
         VerifyOrReturnError(!mEnabledOptionalAttributes.IsSet(Attributes::NeutralCurrent::Id), CHIP_ERROR_INCORRECT_STATE);
     }
 
     // Note: HarmonicCurrents (conformance: HARM) and HarmonicPhases (conformance: PWRQ) are automatically set based on features in
     // constructor
 
-    return CHIP_NO_ERROR;
+    return DefaultServerCluster::Startup(context);
 }
 
 DataModel::ActionReturnStatus ElectricalPowerMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

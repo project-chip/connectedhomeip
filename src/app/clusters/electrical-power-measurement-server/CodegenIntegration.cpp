@@ -43,6 +43,15 @@ Instance::FromLegacyOptionalAttributes(BitMask<OptionalAttributes> aOptionalAttr
     return attrs;
 }
 
+CHIP_ERROR Instance::Init()
+{
+    return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+}
+void Instance::Shutdown()
+{
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+}
+
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters
 } // namespace app
