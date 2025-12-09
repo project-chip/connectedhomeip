@@ -1372,14 +1372,14 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def device_reboot(self, factory_reset: bool = False):
         """Reboot the Device Under Test (DUT), optionally performing a factory reset.
 
-        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script) 
-        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect 
+        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
         to the DUT after the reboot. If factory_reset is True, it will clear previously connected controllers by removing KVS file.
 
         Args:
             factory_reset: If True, signals the test runner to perform a factory reset
                 (by removing KVS file) by writing "reset" to the restart_flag_file. # Functionality implemented by Raul.
-                If False, performs a simple reboot. Default is False. 
+                If False, performs a simple reboot. Default is False.
 
         Returns:
             None
