@@ -156,7 +156,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             controller (ChipDeviceCtrl): Controller to write the providers.
             provider_node_id (int): Node where the provider is located.
             requestor_node_id (int): Node of the requestor to write the providers.
-            endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
+            endpoint (int, optional): Endpoint to write the providers. Defaults to 0.
         """
 
         current_otap_info = await self.read_single_attribute_check_success(
