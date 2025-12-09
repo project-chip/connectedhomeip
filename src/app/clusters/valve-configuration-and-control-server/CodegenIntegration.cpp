@@ -16,13 +16,15 @@
  *    limitations under the License.
  */
 #include "CodegenIntegration.h"
-#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <app/static-cluster-config/ValveConfigurationAndControl.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -42,15 +44,24 @@ LazyRegisteredServerCluster<ValveConfigurationAndControlCluster> gServers[kValve
 class CodegenTimeSyncTracker : public TimeSyncTracker
 {
 public:
-    bool IsTimeSyncClusterSupported() override { return (nullptr != TimeSynchronization::GetClusterInstance()); }
+    bool IsTimeSyncClusterSupported() override
+    {
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+        return (nullptr != TimeSynchronization::GetClusterInstance());
+#else
+        return false;
+#endif
+    }
 
     bool IsValidUTCTime() override
     {
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
         if (IsTimeSyncClusterSupported())
         {
             return TimeSynchronization::GetClusterInstance()->GetGranularity() !=
                 TimeSynchronization::GranularityEnum::kNoTimeGranularity;
         }
+#endif
         return false;
     }
 };
