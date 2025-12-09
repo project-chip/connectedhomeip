@@ -236,16 +236,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             # Send write request with suppressResponse=True
             # Device may respond or not - we just ensure it doesn't crash
-            try:
-                res = await self.default_controller.WriteAttribute(
-                    nodeid=self.dut_node_id,
-                    attributes=[(self.endpoint, test_attribute(test_value))],
-                    suppressResponse=True
-                )
-                log.info(f"Device responded to suppressResponse=True request: {res}")
-            except Exception as e:
-                # Device didn't respond (timeout or other error) - this is also acceptable
-                log.info(f"Device did not respond or encountered error: {e}")
+            res = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(self.endpoint, test_attribute(test_value))],
+                suppressResponse=True
+            )
+            log.info(f"Device responded to suppressResponse=True request: {res}")
 
             # Verify the write operation succeeded by reading back the value
             log.info("Verifying that the write operation succeeded")
