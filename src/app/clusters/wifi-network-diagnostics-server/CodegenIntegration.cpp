@@ -16,11 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -38,79 +39,59 @@ static constexpr size_t kWiFiNetworkDiagnosticsMaxClusterCount =
 
 LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServers[kWiFiNetworkDiagnosticsMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, WiFiNetworkDiagnostics::Id, kWiFiNetworkDiagnosticsFixedClusterCount);
-
-    if (arrayIndex >= kWiFiNetworkDiagnosticsMaxClusterCount)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
-        return false;
+        // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
+        // and do not properly support secondary network interfaces or per-endpoint diagnostics.
+        // See issue:#40317
+        gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
+                                              WiFiDiagnosticsServerCluster::OptionalAttributeSet(optionalAttributeBits),
+                                              BitFlags<WiFiNetworkDiagnostics::Feature>(featureMap));
+        return gServers[clusterInstanceIndex].Registration();
     }
-    outArrayIndex = arrayIndex;
 
-    return true;
-}
-// Runtime method to check if an attribute is enabled using Ember functions.
-bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    return emberAfContainsAttribute(endpointId, WiFiNetworkDiagnostics::Id, attributeId);
-}
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+};
 
 } // namespace
 
-// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!FindEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
-    const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCurrentMaxRate = IsAttributeEnabled(endpointId, Attributes::CurrentMaxRate::Id),
-    };
+    IntegrationDelegate integrationDelegate;
 
-    uint32_t rawFeatureMap;
-    if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-    {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u, defaulting to 0", endpointId);
-        rawFeatureMap = 0;
-    }
-    // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
-    // and do not properly support secondary network interfaces or per-endpoint diagnostics.
-    // See issue:#40317
-    gServers[arrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes,
-                                BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register WiFiNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = WiFiNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
 }
 
-// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!FindEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister WiFiNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-
-    gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = WiFiNetworkDiagnostics::Id,
+            .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
+            .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback() {}

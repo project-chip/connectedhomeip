@@ -34,23 +34,25 @@
 import logging
 import random
 
-import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CADMIN_1_22_24(CADMINBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
-            params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
+            return await self.th1.OpenCommissioningWindow(
+                nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
 
         except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
+            log.exception('Error running OpenCommissioningWindow %s', e)
             asserts.fail('Failed to open commissioning window')
 
     def pics_TC_CADMIN_1_22(self) -> list[str]:
@@ -86,11 +88,11 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
 
         self.step(2)
         await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         self.step(3)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         window_status = await self.get_window_status(th=self.th1)
         asserts.assert_equal(window_status, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
@@ -104,7 +106,7 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
         self.step(5)
         with asserts.assert_raises(ChipStackError) as cm:
             await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=901, iteration=10000, discriminator=self.discriminator, option=1)
+                nodeId=self.dut_node_id, timeout=901, iteration=10000, discriminator=self.discriminator, option=1)
         # Since we provided 901 seconds as the timeout duration,
         # we should not be able to open comm window as duration is too long.
         # we are expected receive Failed to open commissioning window: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
@@ -119,11 +121,11 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
 
         self.step(7)
         await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=180, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=180, iteration=10000, discriminator=self.discriminator, option=1)
 
         self.step(8)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         window_status3 = await self.get_window_status(th=self.th1)
         asserts.assert_equal(window_status3, Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
@@ -132,7 +134,7 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
         self.step(9)
         with asserts.assert_raises(ChipStackError) as cm:
             await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
+                nodeId=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
 
         # Since we provided 179 seconds as the timeout duration,
         # we should not be able to open comm window as duration is too long.

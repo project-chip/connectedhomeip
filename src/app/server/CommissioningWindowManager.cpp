@@ -73,8 +73,9 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-            [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role);
+        });
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
@@ -111,7 +112,7 @@ void CommissioningWindowManager::Shutdown()
 {
     VerifyOrReturn(nullptr != mServer);
 
-    StopAdvertisement(/* aShuttingDown = */ true);
+    TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ true);
 
     ResetState();
 }
@@ -137,13 +138,11 @@ void CommissioningWindowManager::ResetState()
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
     mCommissioningTimeoutTimerArmed = false;
-
-    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::Cleanup()
 {
-    StopAdvertisement(/* aShuttingDown = */ false);
+    TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ false);
     ResetState();
 }
 
@@ -191,7 +190,8 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
 {
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
-    DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout,
+                                                                   HandleSessionEstablishmentTimeout, this);
 
     ChipLogProgress(AppServer, "Commissioning session establishment step started");
     if (mAppDelegate != nullptr)
@@ -210,9 +210,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         mAppDelegate->OnCommissioningSessionStarted();
     }
 
-    DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
-
-    StopAdvertisement(/* aShuttingDown = */ false);
+    TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ false);
 
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
@@ -242,6 +240,8 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         // When the now-armed fail-safe is disarmed or expires it will handle
         // clearing out mPASESession.
         mPASESession.Grab(session);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper,
+                                                                            reinterpret_cast<intptr_t>(this));
     }
 }
 
@@ -322,7 +322,7 @@ System::Clock::Seconds32 CommissioningWindowManager::MaxCommissioningTimeout() c
 CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 commissioningTimeout,
                                                                     CommissioningWindowAdvertisement advertisementMode)
 {
-    RestoreDiscriminator();
+    TEMPORARY_RETURN_IGNORED RestoreDiscriminator();
 
 #if CONFIG_NETWORK_LAYER_BLE
     // Enable BLE advertisements if commissioning window is to be opened on all supported
@@ -400,6 +400,11 @@ CHIP_ERROR CommissioningWindowManager::OpenJointCommissioningWindow(Seconds32 co
 {
     mJCM = true;
     return OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt, fabricIndex, vendorId);
+}
+
+bool CommissioningWindowManager::IsJCM() const
+{
+    return mJCM;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
@@ -519,9 +524,10 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 
 CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 {
-    RestoreDiscriminator();
+    TEMPORARY_RETURN_IGNORED RestoreDiscriminator();
 
-    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    TEMPORARY_RETURN_IGNORED mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(
+        Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mListeningForPASE = false;
     mPairingSession.Clear();
 
@@ -583,6 +589,8 @@ void CommissioningWindowManager::OnSessionReleased()
     // session, since we arm it when the PASE session is set up, and anything
     // that disarms the fail-safe would also tear down the PASE session.
     ExpireFailSafeIfArmed();
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::ExpireFailSafeIfArmed()
@@ -669,7 +677,7 @@ CHIP_ERROR CommissioningWindowManager::OnUnsolicitedMessageReceived(const Payloa
     //
     // It's very important that we stop listening here, so that new incoming
     // PASE establishment attempts don't interrupt our existing establishment.
-    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest);
+    TEMPORARY_RETURN_IGNORED mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest);
     newDelegate = &mPairingSession;
     return CHIP_NO_ERROR;
 }
@@ -681,7 +689,8 @@ void CommissioningWindowManager::OnExchangeCreationFailed(Messaging::ExchangeDel
     // We couldn't create an exchange, so didn't manage to call
     // OnMessageReceived on mPairingSession.  Just go back to listening for
     // PBKDFParamRequest messages.
-    mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest, this);
+    TEMPORARY_RETURN_IGNORED mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest,
+                                                                                                    this);
 }
 
 } // namespace chip

@@ -39,9 +39,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 cluster = Clusters.ElectricalGridConditions
 
@@ -61,7 +62,7 @@ class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         ]
 
     def steps_TC_EGC_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -71,7 +72,6 @@ class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
             TestStep("3a", "TH reads from the DUT the ForecastConditions attribute.",
                      "Verify that the DUT response contains a list of  ElectricalGridConditionsStruct (or empty)."),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_TC_EGC_2_3(self):

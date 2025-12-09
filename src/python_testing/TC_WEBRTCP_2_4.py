@@ -36,26 +36,27 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_4(self) -> str:
+class TC_WebRTCP_2_4(MatterBaseTest, WEBRTCPTestBase):
+
+    def desc_TC_WebRTCP_2_4(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.4] Validate setting an SDP Offer for an existing session with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_4(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_4(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Allocate Audio and Video Streams"),
             TestStep(3, "Send ProvideOffer with non‑existent WebRTCSessionID => expect NotFound error"),
@@ -64,15 +65,32 @@ class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "Send ProvideOffer with (saved WebRTCSessionID + 1) => expect NotFound error"),
             TestStep(7, "Send ProvideOffer with saved WebRTCSessionID (re‑offer) => expect ProvideOfferResponse with same IDs"),
         ]
-        return steps
+
+    def pics_TC_WebRTCP_2_4(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        return [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
-    async def test_TC_WebRTCProvider_2_4(self):
+    async def test_TC_WebRTCP_2_4(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         self.step(1)
@@ -157,9 +175,6 @@ class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
         saved_session_id = resp.webRTCSessionID
         asserts.assert_equal(videoStreamID, resp.videoStreamID, "Video stream ID does not match that in the command")
         asserts.assert_equal(audioStreamID, resp.audioStreamID, "Audio stream ID does not match that in the command")
-        asserts.assert_not_equal(
-            saved_session_id, 0, "Allocated WebRTCSessionID must be non‑zero"
-        )
 
         self.step(5)
         current_sessions = await self.read_single_attribute_check_success(

@@ -37,6 +37,8 @@ config("openthread_rt1170_config") {
     "${openthread_nxp_root}/examples/utils/cli_addons",
     "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key",
     "${openthread_nxp_root}/examples/utils/cli_addons/lwip",
+    "${openthread_nxp_root}/examples/utils/cli_addons/debug",
+    "${openthread_nxp_root}/examples/utils/cli_addons/platform",
   ]
   defines = [ "OT_PLAT_SPINEL_OVER_SPI" ]
 
@@ -69,7 +71,9 @@ config("openthread_rt1170_config") {
     if (nxp_enable_matter_cli) {
       defines += [
         "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
+        "OT_APP_CLI_DEBUG_ADDON=1",
         "OT_APP_CLI_LWIP_ADDON=1",
+        "OT_APP_CLI_PLATFORM_ADDON=1",
       ]
     }
   }
@@ -127,8 +131,10 @@ source_set("libopenthread-rt1170") {
     if (nxp_enable_matter_cli) {
       sources += [
         "${openthread_nxp_root}/examples/utils/cli_addons/addons_cli.c",
+        "${openthread_nxp_root}/examples/utils/cli_addons/debug/debug_cli.c",
         "${openthread_nxp_root}/examples/utils/cli_addons/ephemeral_key/ephemeral_key_cli.c",
         "${openthread_nxp_root}/examples/utils/cli_addons/lwip/lwip_cli.c",
+        "${openthread_nxp_root}/examples/utils/cli_addons/platform/radio_cli.c",
       ]
     }
 

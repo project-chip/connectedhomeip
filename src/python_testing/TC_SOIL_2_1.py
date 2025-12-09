@@ -32,10 +32,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_SOIL_2_1(MatterBaseTest):
@@ -47,7 +48,7 @@ class TC_SOIL_2_1(MatterBaseTest):
         return "[TC-SOIL-2.1] Attributes with DUT as Server"
 
     def steps_TC_SOIL_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read SoilMoistureMeasurementLimits attribute and saves the value as soil_moisture_limits"),
             TestStep(3, "Verify the MeasurementType field in soil_moisture_limits"),
@@ -60,18 +61,16 @@ class TC_SOIL_2_1(MatterBaseTest):
             TestStep(10, "Verify no other fields is present in the AccuracyRanges entry"),
             TestStep(11, "Read SoilMoistureMeasuredValue attribute."),
         ]
-        return steps
 
     def pics_TC_SOIL_2_1(self) -> list[str]:
-        pics = [
+        return [
             "SOIL.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.SoilMeasurement))
     async def test_TC_SOIL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.SoilMeasurement.Attributes

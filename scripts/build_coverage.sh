@@ -38,6 +38,13 @@ _install_lcov() {
 
 _install_lcov
 
+_install_gcovr() {
+    if ! gcovr --version >/dev/null 2>&1; then
+        echo "gcovr not installed. Installing..."
+        pip3 install gcovr==8.3
+    fi
+}
+
 # Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
 _abspath() {
     python3 -c "import os.path; print(os.path.abspath('$@'))"
@@ -57,6 +64,8 @@ TEST_TARGETS=(check)
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
 ENABLE_PYTHON=false
+
+GENERATE_XML=false
 
 help() {
     echo "Usage: $file_name [--output_root=<output_root>] [--code=<core|clusters|all>] [Test options"
@@ -117,6 +126,10 @@ for i in "$@"; do
             ;;
         --python)
             ENABLE_PYTHON=true
+            shift
+            ;;
+        --xml)
+            GENERATE_XML=true
             shift
             ;;
         -q | --quiet)
@@ -282,8 +295,30 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --prefix "$CHIP_ROOT/src" \
     "${QUIET_FLAG[@]}"
 
-cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
-    "$COVERAGE_ROOT/webapp_config.yaml"
+if [ "$GENERATE_XML" == true ]; then
+    _install_gcovr
+
+    gcovr --exclude=zzz_generated/ \
+        --exclude=third_party/ \
+        --exclude=".*tests/.*" \
+        --exclude=".*testing/.*" \
+        --include=src/ \
+        --gcov-ignore-parse-errors \
+        --merge-mode-functions=merge-use-line-min \
+        --xml="$COVERAGE_ROOT"/coverage.xml
+
+    XML_INDEX=$(_abspath "$COVERAGE_ROOT/coverage.xml")
+    if [ -f "$XML_INDEX" ]; then
+        echo
+        echo "============================================================"
+        echo "Coverage report successfully generated:"
+        echo "    file://$XML_INDEX"
+        echo "============================================================"
+    else
+        echo "WARNING: Coverage XML index was not found at expected path:"
+        echo "    $XML_INDEX"
+    fi
+fi
 
 HTML_INDEX=$(_abspath "$COVERAGE_ROOT/html/index.html")
 if [ -f "$HTML_INDEX" ]; then
@@ -296,3 +331,6 @@ else
     echo "WARNING: Coverage HTML index was not found at expected path:"
     echo "    $HTML_INDEX"
 fi
+
+cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
+    "$COVERAGE_ROOT/webapp_config.yaml"

@@ -24,6 +24,8 @@ import coloredlogs
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
 
+log = logging.getLogger(__name__)
+
 
 class Compatibility(enum.Enum):
     UNKNOWN = enum.auto()
@@ -70,10 +72,9 @@ class CompatibilityChecker:
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
         self.errors: List[str] = []
-        self.logger = logging.getLogger(__name__)
 
     def _mark_incompatible(self, reason: str):
-        self.logger.error(reason)
+        log.error(reason)
         self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
@@ -157,7 +158,7 @@ class CompatibilityChecker:
             f"Event {cluster_name}::{event.name}", event.fields, updated_event.fields)
 
     def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Optional[Command]):
-        self.logger.debug(f"  Checking command {cluster_name}::{command.name}")
+        log.debug("  Checking command '%s::%s'", cluster_name, command.name)
         if not updated_command:
             self._mark_incompatible(
                 f"Command {cluster_name}::{command.name} was removed")
@@ -180,7 +181,7 @@ class CompatibilityChecker:
                 f"Command {cluster_name}::{command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
 
     def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Optional[Struct]):
-        self.logger.debug(f"  Checking struct {original.name}")
+        log.debug("  Checking struct '%s'", original.name)
         if not updated:
             self._mark_incompatible(
                 f"Struct {cluster_name}::{original.name} has been deleted.")
@@ -202,8 +203,7 @@ class CompatibilityChecker:
                 f"Struct {cluster_name}::{original.name} has modified qualities")
 
     def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Optional[Attribute]):
-        self.logger.debug(
-            f"  Checking attribute {cluster_name}::{original.definition.name}")
+        log.debug("  Checking attribute '%s::%s'", cluster_name, original.definition.name)
         if not updated:
             self._mark_incompatible(
                 f"Attribute {cluster_name}::{original.definition.name} has been deleted.")
@@ -293,8 +293,7 @@ class CompatibilityChecker:
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
     def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
-        self.logger.debug(
-            f"Checking cluster {original_cluster.name}")
+        log.debug("Checking cluster '%s'", original_cluster.name)
         if not updated_cluster:
             self._mark_incompatible(
                 f"Cluster {original_cluster.name} was deleted")
@@ -344,12 +343,7 @@ def is_backwards_compatible(original: Idl, updated: Idl):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @click.command()
@@ -377,11 +371,13 @@ def main(log_level, old_idl, new_idl):
         fmt='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    logging.info("Parsing OLD idl from %s" % old_idl)
-    old_tree = CreateParser().parse(open(old_idl, "rt").read())
+    log.info("Parsing OLD idl from '%s'", old_idl)
+    with open(old_idl) as f:
+        old_tree = CreateParser().parse(f.read())
 
-    logging.info("Parsing NEW idl from %s" % new_idl)
-    new_tree = CreateParser().parse(open(new_idl, "rt").read())
+    log.info("Parsing NEW idl from '%s'", new_idl)
+    with open(new_idl) as f:
+        new_tree = CreateParser().parse(f.read())
 
     if not is_backwards_compatible(original=old_tree, updated=new_tree):
         sys.exit(1)

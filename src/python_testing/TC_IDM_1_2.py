@@ -39,13 +39,16 @@ import logging
 import random
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-import chip.discovery as Discovery
-from chip import ChipUtility
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.discovery as Discovery
+from matter import ChipUtility
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+
+log = logging.getLogger(__name__)
 
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
@@ -93,7 +96,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # command, but it is sent on an unsupported endpoint
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1)
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=non_existent_endpoint, payload=cmd)
+            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=non_existent_endpoint, payload=cmd)
             asserts.fail("Unexpected success return from sending command to unsupported endpoint")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedEndpoint, "Unexpected error returned from unsupported endpoint")
@@ -125,9 +128,9 @@ class TC_IDM_1_2(MatterBaseTest):
                     continue
                 # just use the first command with default values
                 name, cmd = members[0]
-                logging.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
+                log.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
                 try:
-                    await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=i, payload=cmd())
+                    await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail("Unexpected success return from sending command to unsupported cluster")
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.UnsupportedCluster, "Unexpected error returned from unsupported cluster")
@@ -146,7 +149,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 break
             for cid in supported_clusters[i]:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-                logging.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
+                log.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
                 members = get_all_cmds_for_cluster_id(cid)
                 if not members:
                     continue
@@ -162,7 +165,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 id = unsupported_commands[0]
                 cmd = next(filter(lambda x: x.command_id == id, all_supported_cmds))
                 try:
-                    ret = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=i, payload=cmd())
+                    ret = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail(f'Unexpected success sending unsupported cmd {cmd} to {cluster} cluster on ep {i}')
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.UnsupportedCommand, "Unexpected error returned from unsupported command")
@@ -172,7 +175,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # It might actually be the case that all the supported clusters support all the commands. In that case, let's just put a warning.
         # We could, in theory, send a command with a fully out of bounds command ID, but that's not supported by the controller
         if not sent:
-            logging.warning("Unable to find a supported cluster with unsupported commands on any endpoint - SKIPPING")
+            log.warning("Unable to find a supported cluster with unsupported commands on any endpoint - SKIPPING")
 
         self.print_step(4, "Setup TH to have no privileges for a cluster, send Invoke")
         # Setup the ACL
@@ -187,7 +190,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # For the unsupported access test, let's use a cluster that's known to be there and supports commands - general commissioning on EP0
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1)
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Unexpected success return when sending a command with no privileges")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess, "Unexpected error returned")
@@ -207,7 +210,7 @@ class TC_IDM_1_2(MatterBaseTest):
         discriminator = random.randint(0, 4095)
 
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
 
         # TH2 = new controller that's not connected over CASE
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -221,31 +224,31 @@ class TC_IDM_1_2(MatterBaseTest):
         for a in device.addresses:
             try:
                 await TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
-                                                 nodeid=self.dut_node_id+1, port=device.port)
+                                                 nodeId=self.dut_node_id+1, port=device.port)
                 break
             except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Some device IPs may fail, it tries all addresses until one works
                 continue
 
         try:
-            await TH2.GetConnectedDevice(nodeid=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
+            await TH2.GetConnectedDevice(nodeId=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
         try:
             # Any group ID is fine since we'll fail before this
-            await TH2.SendCommand(nodeid=self.dut_node_id + 1, endpoint=0, payload=Clusters.GroupKeyManagement.Commands.KeySetRead(groupKeySetID=0x0001))
+            await TH2.SendCommand(nodeId=self.dut_node_id + 1, endpoint=0, payload=Clusters.GroupKeyManagement.Commands.KeySetRead(groupKeySetID=0x0001))
             asserts.fail("Incorrectly received a success response from a fabric-scoped command")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess, "Incorrect error from fabric-sensitive read over PASE")
 
         # Cleanup - RevokeCommissioning so we can use ArmFailSafe etc. again.
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=6000)
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=6000)
 
         self.print_step(6, "Send invoke request with requires a data response")
         # ArmFailSafe sends a data response
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
-        ret = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(type_matches(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        ret = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
+        asserts.assert_true(matchers.is_type(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected response type from ArmFailSafe")
 
         self.print_step(7, "Send a command with suppress Response")
@@ -256,10 +259,10 @@ class TC_IDM_1_2(MatterBaseTest):
         # Lucky candidate ArmFailSafe is at it again - command side effect is to set breadcrumb attribute
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
+            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
         except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
-            logging.info("DUT correctly supressed the response")
+            log.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent
         breadcrumb = await self.read_single_attribute_check_success(
@@ -268,13 +271,13 @@ class TC_IDM_1_2(MatterBaseTest):
 
         # Cleanup - Unset the failsafe
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
 
         self.print_step(8, "Send Invoke with timedRequest marked, but no timed request sent")
         # We can do this with any command, but to be thorough, test first with a command that does not
         # require a timed interaction (ArmFailSafe) and then one that does (RevokeCommissioning)
         try:
-            await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+            await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Unexpected success response from sending an Invoke with TimedRequest flag and no timed interaction")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.TimedRequestMismatch,
@@ -283,10 +286,10 @@ class TC_IDM_1_2(MatterBaseTest):
         # Try with RevokeCommissioning
         # First open a commissioning window for us to revoke, so we know this command is able to succeed absent this error
         _ = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
         cmd = FakeRevokeCommissioning()
         try:
-            await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+            await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Unexpected success response from sending an Invoke with TimedRequest flag and no timed interaction")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.TimedRequestMismatch,
@@ -296,13 +299,13 @@ class TC_IDM_1_2(MatterBaseTest):
         # RevokeCommissioning requires a timed interaction. This is enforced in the python layer because
         # the generated class indicates that a timed interaction is required. The fake class overrides this.
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Incorrectly received a success response for a command that required TimedInvoke action")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NeedsTimedInteraction)
 
         # Cleanup - actually revoke commissioning to close the open window
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=6000)
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=6000)
 
 
 if __name__ == "__main__":

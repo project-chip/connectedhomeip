@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ThreadNetworkDirectory {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace PreferredExtendedPanID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PreferredExtendedPanID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -32,10 +34,17 @@ namespace ThreadNetworkTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadNetworkTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ThreadNetworkTableSize
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    PreferredExtendedPanID::kMetadataEntry,
+    ThreadNetworks::kMetadataEntry,
+    ThreadNetworkTableSize::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AddNetwork {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AddNetwork::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

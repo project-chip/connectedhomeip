@@ -32,13 +32,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_VALCC_4_2(MatterBaseTest):
@@ -50,7 +51,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         return "[TC-VALCC-4.2] DefaultOpenDuration functionality with DUT as Server"
 
     def steps_TC_VALCC_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read DefaultOpenDuration attribute"),
             TestStep("2b", "Write DefaultOpenDuration attribute"),
@@ -64,18 +65,20 @@ class TC_VALCC_4_2(MatterBaseTest):
             TestStep(10, "Read RemainingDuration attribute"),
             TestStep(11, "Write DefaultOpenDuration back to original value")
         ]
-        return steps
 
     def pics_TC_VALCC_4_2(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_VALCC_4_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -107,7 +110,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         asserts.assert_less_equal(remaining_duration_dut, defaultOpenDuration, "RemainingDuration is not in the expected range")
 
         self.step(6)
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.step(7)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)

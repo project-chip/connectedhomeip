@@ -25,11 +25,10 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/Optional.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
-#include <protocols/secure_channel/PASESession.h>
 
 namespace chip {
 
@@ -114,15 +113,6 @@ public:
         return *this;
     }
 
-    bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    const Crypto::Spake2pVerifier & GetPASEVerifier() const { return mPASEVerifier; }
-    RendezvousParameters & SetPASEVerifier(Crypto::Spake2pVerifier & verifier)
-    {
-        memmove(&mPASEVerifier, &verifier, sizeof(verifier));
-        mHasPASEVerifier = true;
-        return *this;
-    }
-
 #if CONFIG_NETWORK_LAYER_BLE
     bool HasBleLayer() const { return mBleLayer != nullptr; }
     Ble::BleLayer * GetBleLayer() const { return mBleLayer; }
@@ -178,9 +168,6 @@ private:
     Transport::PeerAddress mPeerAddress; ///< the peer node address
     uint32_t mSetupPINCode = 0;          ///< the target peripheral setup PIN Code
     std::optional<SetupDiscriminator> mSetupDiscriminator;
-
-    Crypto::Spake2pVerifier mPASEVerifier;
-    bool mHasPASEVerifier = false;
 
     Optional<ReliableMessageProtocolConfig> mMRPConfig;
 

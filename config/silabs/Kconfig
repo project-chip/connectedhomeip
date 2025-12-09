@@ -87,7 +87,7 @@ config CHIP_LOG_FILE_NAME
 	  assertion macros.
 
 config CHIP_MALLOC_SYS_HEAP
-	default y if !ARCH_POSIX
+	default n if !ARCH_POSIX
 
 config CHIP_TASK_STACK_SIZE
 	int "The Matter thread stack size"
@@ -213,14 +213,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/silabs/CHIPPlatformConfig.h file.
-
 config CHIP_OPENTHREAD_JOINER_ENABLED
 	bool "Specify whether the Thread Joiner functionality is used when it is enabled"
 	default n
@@ -303,6 +295,7 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 config CHIP_WIFI
 	bool "Enable Silicon Labs Wi-Fi support"
 	default y if BOARD_SIWX917_RB4338A
+	default y if BOARD_SIWX917_RB4342A
 	select WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
@@ -413,10 +406,6 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
 
-config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 8192 if NET_L2_OPENTHREAD
-    #default 20480 if CHIP_WIFI
-
 # ==============================================================================
 # System configuration
 # ==============================================================================
@@ -448,16 +437,10 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560 if CHIP_WIFI
     default 2048 if CHIP_ICD_LIT_SUPPORT
 
-config HEAP_MEM_POOL_SIZE
-    default 110720 if CHIP_WIFI
-
 config HEAP_MEM_POOL_IGNORE_MIN
     default y if CHIP_WIFI
 
 #We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
-
-config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default -1
 
 config NVS_LOOKUP_CACHE_SIZE
     default 512 if NVS

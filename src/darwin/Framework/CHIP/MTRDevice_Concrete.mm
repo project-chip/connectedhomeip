@@ -732,6 +732,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // Check user default to disable time sync detection
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kDisableTimeSyncLossDetectionKey]) {
+        return NO;
+    }
+
     if (_timeSynchronizationLossDetectedTime == nil) {
         return YES;
     }
@@ -2231,57 +2236,59 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     MTR_LOG("%@ handling report end", self);
 
-    os_unfair_lock_lock(&self->_lock);
+    uint64_t newUpdateDelay;
+    BOOL timeSynchronizationLossDetected;
+    {
+        std::lock_guard lock(_lock);
 
-    _receivingReport = NO;
-    _receivingPrimingReport = NO;
-    _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+        _receivingReport = NO;
+        _receivingPrimingReport = NO;
+        _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 
-    [self _commitPendingDataVersions];
-    [self _scheduleClusterDataPersistence];
+        [self _commitPendingDataVersions];
+        [self _scheduleClusterDataPersistence];
 
-    // After the handling of the report, if we detected a device configuration change, notify the delegate
-    // of the same.
-    if (_deviceConfigurationChanged) {
-        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
-                [delegate deviceConfigurationChanged:self];
+        // After the handling of the report, if we detected a device configuration change, notify the delegate
+        // of the same.
+        if (_deviceConfigurationChanged) {
+            [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+                if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
+                    [delegate deviceConfigurationChanged:self];
+                }
+            }];
+            [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+            _deviceConfigurationChanged = NO;
+        }
+
+        // Do this after the _deviceConfigurationChanged check, so that we don't
+        // call deviceConfigurationChanged: immediately after telling our delegate
+        // we are now primed.
+        //
+        // TODO: Maybe we shouldn't dispatch deviceConfigurationChanged: for the
+        // initial priming bits?
+        if (!_deviceCachePrimed) {
+            // This is the end of the priming sequence of data reports, so we have
+            // all the data for the device now.
+            _deviceCachePrimed = YES;
+            [self _callDelegateDeviceCachePrimed];
+            [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+        }
+
+        // For unit testing only
+#ifdef DEBUG
+        [self _callDelegatesWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+                [testDelegate unitTestReportEndForDevice:self];
             }
         }];
-        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
-        _deviceConfigurationChanged = NO;
-    }
-
-    // Do this after the _deviceConfigurationChanged check, so that we don't
-    // call deviceConfigurationChanged: immediately after telling our delegate
-    // we are now primed.
-    //
-    // TODO: Maybe we shouldn't dispatch deviceConfigurationChanged: for the
-    // initial priming bits?
-    if (!_deviceCachePrimed) {
-        // This is the end of the priming sequence of data reports, so we have
-        // all the data for the device now.
-        _deviceCachePrimed = YES;
-        [self _callDelegateDeviceCachePrimed];
-        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
-    }
-
-// For unit testing only
-#ifdef DEBUG
-    [self _callDelegatesWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
-            [testDelegate unitTestReportEndForDevice:self];
-        }
-    }];
 #endif
 
-    uint64_t newUpdateDelay = [self timeUpdateShortDelayInSeconds];
+        newUpdateDelay = [self timeUpdateShortDelayInSeconds];
 
-    BOOL timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+        timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+    }
 
-    os_unfair_lock_unlock(&self->_lock);
-
-    os_unfair_lock_lock(&self->_timeSyncLock);
+    std::lock_guard timeSyncLock(_timeSyncLock);
 
     // If we haven't scheduled a time update, then time synchronization will be
     // handled by us eventually scheduling that update (e.g. when subscription
@@ -2297,8 +2304,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         self.timeUpdateTimer = nil;
         [self _scheduleNextUpdate:newUpdateDelay];
     }
-
-    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (void)_handleCASESessionEstablished:(const SessionHandle &)session
@@ -3751,26 +3756,65 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // AttributeList) to determine this set, because we might be in the middle
     // of priming right now and have not gotten those yet.  Just use the set of
     // attribute paths we actually have.
-    NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
+    NSMutableArray<MTRAttributePath *> * existentPaths = [[NSMutableArray alloc] init];
     {
-        std::lock_guard lock(_lock);
+        // Separate paths that ask for wildcard attributes from specific attributes
+        NSMutableArray<MTRAttributeRequestPath *> * wildcardAttributePaths = [[NSMutableArray alloc] init];
+        NSMutableArray<MTRAttributeRequestPath *> * specificAttributePaths = [[NSMutableArray alloc] init];
         for (MTRAttributeRequestPath * requestPath in attributePaths) {
-            for (MTRClusterPath * clusterPath in [self _knownClusters]) {
-                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
-                    continue;
-                }
+            if (requestPath.attribute == nil) {
+                [wildcardAttributePaths addObject:requestPath];
+            } else {
+                [specificAttributePaths addObject:requestPath];
+            }
+        }
+
+        std::lock_guard lock(_lock);
+        for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+            MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+            // First pass to check whether any request path includes all attributes from this cluster.
+            BOOL allAttributesRequestedForCluster = NO;
+            for (MTRAttributeRequestPath * requestPath in wildcardAttributePaths) {
                 if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
                     continue;
                 }
-                MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
-                if (requestPath.attribute == nil) {
-                    for (NSNumber * attributeID in clusterData.attributes) {
-                        [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
-                    }
-                } else if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
-                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+
+                // Looping over wildcardAttributePaths, and so requestPath.attribute is known to be nil
+                allAttributesRequestedForCluster = YES;
+                break;
+            }
+            if (allAttributesRequestedForCluster) {
+                // add all attributes - no need to check other paths
+                for (NSNumber * attributeID in clusterData.attributes) {
+                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
+                }
+                continue;
+            }
+
+            // Otherwise, we build the list of unique attributes in this cluster that match requested paths.
+
+#define MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX (32)
+            // Use a reasonable maximum as a starting size to avoid re-hashing of the temporary set
+            //  (vast majority of clusters in spec have fewer than 32 attributes as of 2025-10-04)
+            NSUInteger reasonableClusterSize = MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX;
+            reasonableClusterSize = std::min({ reasonableClusterSize, specificAttributePaths.count, clusterData.attributes.count });
+            NSMutableSet<MTRAttributePath *> * requestedAttributesInCluster = [[NSMutableSet alloc] initWithCapacity:reasonableClusterSize];
+            for (MTRAttributeRequestPath * requestPath in specificAttributePaths) {
+                if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
+                    continue;
+                }
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+                if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
+                    [requestedAttributesInCluster addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
                 }
             }
+            [existentPaths addObjectsFromArray:[requestedAttributesInCluster allObjects]];
         }
     }
 
@@ -4568,8 +4612,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    if (attributePathsToReport.count > 0) {
-        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    // Log each changed path on a separate line, so log line truncation does not
+    // hide which attributes actually changed in this report.  Note that for
+    // things that did not change we log them one per line above in the
+    // !shouldReportAttribute case.
+    for (MTRAttributePath * path in attributePathsToReport) {
+        MTR_LOG("%@ report from reported values %@", self, path);
     }
 
     return attributesToReport;

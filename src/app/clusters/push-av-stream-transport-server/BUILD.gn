@@ -16,16 +16,18 @@ import("//build_overrides/chip.gni")
 
 source_set("push-av-stream-transport-server") {
   sources = [
-    "push-av-stream-transport-cluster.cpp",
-    "push-av-stream-transport-cluster.h",
+    "PushAVStreamTransportCluster.cpp",
+    "PushAVStreamTransportCluster.h",
+    "PushAVStreamTransportLogic.cpp",
+    "PushAVStreamTransportLogic.h",
     "push-av-stream-transport-delegate.h",
-    "push-av-stream-transport-logic.cpp",
-    "push-av-stream-transport-logic.h",
     "push-av-stream-transport-storage.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app/",
+    "${chip_root}/src/app/clusters/tls-certificate-management-server",
+    "${chip_root}/src/app/clusters/tls-client-management-server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/zzz_generated/app-common/clusters/PushAvStreamTransport",

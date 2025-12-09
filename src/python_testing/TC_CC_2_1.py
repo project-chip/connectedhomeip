@@ -39,14 +39,16 @@ import logging
 from enum import Enum
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
+
+log = logging.getLogger(__name__)
 
 
 class ValueTypesEnum(Enum):
@@ -65,14 +67,13 @@ class TC_CC_2_1(MatterBaseTest):
 
     def pics_TC_CC_2_1(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "CC.S"
         ]
-        return pics
 
     def steps_TC_CC_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep(1, 'Wait for the commissioned device to be retrieved', is_commissioning=True),
             TestStep(2, 'TH reads from the DUT the (0x0000) CurrentHue attribute'),
             TestStep(3, 'TH reads from the DUT the (0x0001) CurrentSaturation attribute'),
@@ -141,12 +142,9 @@ class TC_CC_2_1(MatterBaseTest):
             TestStep(53, 'TH reads from the DUT the (0x003c) ColorPointBIntensity attribute')
         ]
 
-        return steps
-
     async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
-        instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
-        ) if attr.startswith('Primary')]
+        instance_attribute_names = [attr for attr in self.attributes.__dict__ if attr.startswith('Primary')]
         # Attributes to search
         primary_list = ["Primary{primary}X", "Primary{primary}Y", "Primary{primary}Intensity"]
         # Validate the expected attribute is found.
@@ -170,7 +168,7 @@ class TC_CC_2_1(MatterBaseTest):
                 numberofprimaries += 1
             else:
                 # Don't break to count all
-                logger.warning(f"PrimaryN<X,Y,Intensity> with index {pindex} was not found in the cluster.")
+                log.warning(f"PrimaryN<X,Y,Intensity> with index {pindex} was not found in the cluster.")
         return numberofprimaries
 
     async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None, nullable: bool = False):
@@ -184,33 +182,33 @@ class TC_CC_2_1(MatterBaseTest):
             max_len (int, optional): If present verify the high range of the attribute.
         """
         # If attribute_guard return false it set the current step as skipped so we can finish the step here.
-        logger.info(f"Verifying the attribute :  {attribute}")
+        log.info(f"Verifying the attribute :  {attribute}")
         # Verify if the attribute is implemented in the current cluster.
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attribute):
             # it is so retrieve the value to check the type.
             attr_val = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute, endpoint=self.endpoint)
-            logger.info(f"Current value for {attribute} is {attr_val}")
+            log.info(f"Current value for {attribute} is {attr_val}")
             if nullable and attr_val is NullValue:
-                logger.info("Value is NULL (ok)")
+                log.info("Value is NULL (ok)")
                 return attr_val
             if data_type == ValueTypesEnum.UINT8:
-                logger.info("Checking is uint8")
+                log.info("Checking is uint8")
                 matter_asserts.assert_valid_uint8(attr_val, "Is not uint8")
             elif data_type == ValueTypesEnum.UINT16:
-                logger.info("Checking is uint16")
+                log.info("Checking is uint16")
                 matter_asserts.assert_valid_uint16(attr_val, "Is not uint16")
             elif data_type == ValueTypesEnum.UINT32:
-                logger.info("Checking is uint32")
+                log.info("Checking is uint32")
                 matter_asserts.assert_valid_uint32(attr_val, "Is not uint32")
             elif data_type == ValueTypesEnum.ENUM:
                 if len(enum_range) >= 0:
-                    logger.info(f"Checking for enum with range {enum_range}")
+                    log.info(f"Checking for enum with range {enum_range}")
                     asserts.assert_in(attr_val, enum_range, f"Value is not in range for enum with range {enum_range}")
                 else:
                     asserts.fail("Range list is empty")
             elif data_type == ValueTypesEnum.STRING and isinstance(attr_val, str):
                 if max_len > 0:
-                    logger.info(f"Validating string with a max len of {max_len}")
+                    log.info(f"Validating string with a max len of {max_len}")
                     asserts.assert_true((len(attr_val) <= max_len), "String len is out of range.")
                 else:
                     asserts.fail("Invalid String range provided.")
@@ -221,28 +219,33 @@ class TC_CC_2_1(MatterBaseTest):
             # Check if string has uint and verify is we need to compare against a min or max value_verify_first_4bits
             if 'uint' in data_type.name.lower() and (max_len is not None or min_len is not None):
                 if isinstance(min_len, int):
-                    logger.info(f"Min len defined validation max range for uint {min_len}")
+                    log.info(f"Min len defined validation max range for uint {min_len}")
                     asserts.assert_true((attr_val >= min_len),
                                         f"Attribute {attribute} with value {attr_val} is out of range (min): {min_len}")
                 if isinstance(max_len, int):
-                    logger.info(f"Max len defined validation max range for uint {max_len}")
+                    log.info(f"Max len defined validation max range for uint {max_len}")
                     asserts.assert_true((attr_val <= max_len),
                                         f"Attribute {attribute} with value {attr_val} is out of range (max): {max_len}")
             return attr_val
+        return None
 
     def _verify_lower_4bits(self, numa, numb):
         # Get the lowest 4 bits and compare them
         tmp_a = numa & (2**4-1)
         tmp_b = numb & (2**4-1)
-        logger.info("Verifying if lower 4 bits are equal.")
-        logger.info(f"Num a : {bin(tmp_a)}")
-        logger.info(f"Num b : {bin(tmp_b)}")
+        log.info("Verifying if lower 4 bits are equal.")
+        log.info(f"Num a : {bin(tmp_a)}")
+        log.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CC_2_1(self):
         self.cluster = Clusters.ColorControl
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
         self.attributes = Clusters.ColorControl.Attributes
 
         self.step(1)
@@ -331,12 +334,12 @@ class TC_CC_2_1(MatterBaseTest):
         # Read NumberOfPrimaries from the cluster.
         number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6, nullable=True)
         if number_of_primaries_value is NullValue or number_of_primaries_value == 0:
-            logger.info("NumberOfPrimaries is Null or 0 - skipping steps 25 through 42.")
+            log.info("NumberOfPrimaries is Null or 0 - skipping steps 25 through 42.")
             for i in range(25, 43):
                 self.skip_step(i)
         else:
             primariesfound = await self._get_totalnumberofprimaries(primaries=number_of_primaries_value)
-            logger.info(f"Fetched Primaries attributes {primariesfound}")
+            log.info(f"Fetched Primaries attributes {primariesfound}")
             asserts.assert_equal(number_of_primaries_value, primariesfound,
                                  "NumberOfPrimaries does not match with the Primaries attributes found in the cluster.")
             # Verify for NumberOfPrimaries section
@@ -344,11 +347,11 @@ class TC_CC_2_1(MatterBaseTest):
             current_step = 24
             # Range is defined from 1-6
             for primariesindex in range(1, 7):
-                logger.info(
+                log.info(
                     f"Skip if the test index {primariesindex} is graeter than NumberOfPrimaries {number_of_primaries_value} ?")
                 if primariesindex > number_of_primaries_value:
                     # Skip the 3 steps
-                    logger.info(f"Skipping for NumberOfPrimaries {primariesindex}")
+                    log.info(f"Skipping for NumberOfPrimaries {primariesindex}")
                     for i in range(1, 4):
                         current_step += 1
                         self.skip_step(current_step)

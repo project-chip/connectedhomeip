@@ -248,7 +248,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 /**
  * The certificate issuer delegate to use for issuing operational certificates
- * when commmissioning devices.  Allowed to be nil if this controller either
+ * when commissioning devices.  Allowed to be nil if this controller either
  * does not issue operational certificates at all or internally generates the
  * certificates to be issued.  In the latter case, nocSigner must not be nil.
  */

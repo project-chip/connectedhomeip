@@ -38,9 +38,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OVENOPSTATE_2_2(MatterBaseTest, TC_OPSTATE_BASE):
@@ -61,9 +62,13 @@ class TC_OVENOPSTATE_2_2(MatterBaseTest, TC_OPSTATE_BASE):
     def pics_TC_OVENOPSTATE_2_2(self) -> list[str]:
         return ["OVENOPSTATE.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_OVENOPSTATE_2_2(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         await self.TEST_TC_OPSTATE_BASE_2_2(endpoint=endpoint)
 

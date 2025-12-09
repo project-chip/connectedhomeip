@@ -26,10 +26,10 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <uart.h>
 
 // Macro to flush UART TX queue if enabled
 #if SILABS_LOG_OUT_UART
+#include <uart.h>
 #define SILABS_UART_FLUSH() uartFlushTxQueue()
 #else
 #define SILABS_UART_FLUSH() ((void) 0)
@@ -80,7 +80,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.id = taskDetails.xTaskNumber;
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
-    SystemLayer().ScheduleLambda(
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
         [&softwareFault] { Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault); });
     // Allow some time for the Fault event to be sent as the next action after exiting this function
     // is typically an assert or reboot.

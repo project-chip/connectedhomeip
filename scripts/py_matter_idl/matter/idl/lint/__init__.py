@@ -26,12 +26,9 @@ __all__ = ['CreateParser']
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
+
+log = logging.getLogger(__name__)
 
 
 @click.command()
@@ -60,26 +57,27 @@ def main(log_level, rules, idl_path):
     )
 
     lint_rules = []
-    logging.info("Loading rules from %s" % rules)
-    lint_rules.extend(CreateParser().parse(open(rules, 'rt').read()))
+    log.info("Loading rules from '%s'", rules)
+    with open(rules) as f:
+        lint_rules.extend(CreateParser().parse(f.read()))
 
-    logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = matter_idl_parser.CreateParser().parse(
-        open(idl_path, "rt").read(), file_name=idl_path)
+    log.info("Parsing idl from '%s'", idl_path)
+    with open(idl_path) as f:
+        idl_tree = matter_idl_parser.CreateParser().parse(f.read(), file_name=idl_path)
 
-    logging.info("Running %d lint rules" % len(lint_rules))
+    log.info("Running %d lint rules", len(lint_rules))
 
     errors = []
     for rule in lint_rules:
-        logging.info("   Running %s" % rule.name)
+        log.info("   Running '%s'", rule.name)
         errors.extend(rule.LintIdl(idl_tree))
-    logging.info("Done")
+    log.info("Done")
 
     for e in errors:
-        logging.error("ERROR: %s" % e)
+        log.error("ERROR: '%s'", e)
 
     if errors:
-        logging.error("Found %d lint errors" % len(errors))
+        log.error("Found %d lint errors", len(errors))
         sys.exit(1)
 
 
@@ -90,7 +88,7 @@ def main(log_level, rules, idl_path):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.argument("filename", type=click.Path(exists=True, dir_okay=False))
-def parser(log_level, filename=None):
+def parser(log_level, filename):
     """
     Parse Matter IDL linter RULES file.
     """
@@ -99,9 +97,10 @@ def parser(log_level, filename=None):
         format='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    logging.info("Starting to parse ...")
-    data = CreateParser().parse(open(filename, 'rt').read())
-    logging.info("Parse completed")
+    log.info("Starting to parse ...")
+    with open(filename) as f:
+        data = CreateParser().parse(f.read())
+    log.info("Parse completed")
 
-    logging.info("Data:")
-    logging.info("%r" % data)
+    log.info("Data:")
+    log.info("%r", data)

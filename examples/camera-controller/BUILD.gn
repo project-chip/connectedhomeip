@@ -19,7 +19,6 @@ import("//build_overrides/editline.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples/camera-controller/camera-controller.gni")
-import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
 assert(chip_build_tools)
@@ -54,8 +53,6 @@ config("config") {
 
 static_library("camera-controller-utils") {
   sources = [
-    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.cpp",
-    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
@@ -96,7 +93,10 @@ static_library("camera-controller-utils") {
     "webrtc-manager/WebRTCRequestorDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server",
+  ]
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
@@ -111,9 +111,10 @@ static_library("camera-controller-utils") {
 
   public_deps = [
     "${chip_root}/examples/common/tracing:commandline",
-    "${chip_root}/src/app:required-privileges",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/webrtc/access_control",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
@@ -122,19 +123,6 @@ static_library("camera-controller-utils") {
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]
-
-  defines = [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
-
-  deps += [ "${chip_root}/src/controller:nodatamodel" ]
-
-  # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
-  # defined and application is supposed to provide it. This adds the sources
-  # in the same way "data_model" implementations do
-  #
-  # DynamicDispatcher in src/app:interaction-model implements the actual required
-  # ember callbacks in this case...
-  sources += codegen_data_model_SOURCES
-  public_deps += codegen_data_model_PUBLIC_DEPS
 
   public_configs = [ ":config" ]
 

@@ -51,12 +51,8 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
         bool isOtaEndpoint =
             (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
 
-        // Check for WebRTC Transport Requestor endpoint
-        bool isWebRtcEndpoint =
-            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
-
         // Only allow these specific endpoints
-        if (!isOtaEndpoint && !isWebRtcEndpoint)
+        if (!isOtaEndpoint)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -85,7 +81,7 @@ struct ControllerAccessControl
 {
     DeviceTypeResolver mDeviceTypeResolver;
     AccessControlDelegate mDelegate;
-    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+    ControllerAccessControl() { TEMPORARY_RETURN_IGNORED GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
 };
 
 Global<ControllerAccessControl> gControllerAccessControl;

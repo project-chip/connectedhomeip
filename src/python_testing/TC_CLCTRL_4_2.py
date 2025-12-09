@@ -38,14 +38,17 @@
 import logging
 import typing
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable, NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
+from matter.tlv import uint
+
+log = logging.getLogger(__name__)
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -87,7 +90,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         return "[TC-CLCTRL-4.2] MoveTo Command Latching Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
@@ -151,18 +154,20 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                      "OverallCurrentState.Latch should be False"),
             TestStep("6k", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_2(self) -> list[str]:
-        pics = [
-            "CLCTRL.S",
+        return [
+            "CLCTRL.S", "CLCTRL.S.F01"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_4_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
 
         self.step(1)
@@ -172,19 +177,18 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
-        logging.info(f"FeatureMap: {feature_map}")
+        log.info(f"FeatureMap: {feature_map}")
 
         self.step("2b")
         if not is_latching_supported:
-            logging.info("Latching feature is not supported, skipping remaining steps.")
+            log.info("Latching feature is not supported, skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
-        else:
-            logging.info("Latching feature is supported, proceeding with the test.")
+        log.info("Latching feature is supported, proceeding with the test.")
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-        logging.info(f"LatchControlModes: {latch_control_modes}")
+        log.info(f"LatchControlModes: {latch_control_modes}")
 
         self.step("2d")
         overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -193,7 +197,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             current_latch = NullValue
         else:
             current_latch = overall_current_state.latch
-        logging.info(f"CurrentLatch: {current_latch}")
+        log.info(f"CurrentLatch: {current_latch}")
 
         self.step("2e")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
@@ -201,27 +205,23 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("2f")
         if current_latch is False:
-            logging.info("CurrentLatch is False, skipping Latch = False preparation steps")
-            self.skip_step("2g")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
+            log.info("CurrentLatch is False, skipping Latch = False preparation steps")
+            self.mark_step_range_skipped("2g", "2k")
         else:
-            logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
+            log.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
 
             self.step("2g")
             # Check if LatchControlModes Bit 1 is 0
             if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 self.skip_step("2h")
                 self.step("2i")
-                logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
+                log.info("LatchControlModes Bit 1 is 0, unlatch device manually")
                 self.step("2j")
                 self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
 
             else:
                 self.step("2h")
-                logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
+                log.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
@@ -237,22 +237,19 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("3a")
         if latch_control_modes != 0:
-            logging.info("LatchControlModes is not 0, skipping steps 3b to 3e")
-            self.skip_step("3b")
-            self.skip_step("3c")
-            self.skip_step("3d")
-            self.skip_step("3e")
+            log.info("LatchControlModes is not 0, skipping steps 3b to 3e")
+            self.mark_step_range_skipped("3b", "3e")
         else:
-            logging.info("LatchControlModes is 0, proceeding with fully manual latch tests")
+            log.info("LatchControlModes is 0, proceeding with fully manual latch tests")
             self.step("3b")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
-                logging.error("MoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 0")
+                log.error("MoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 0")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState,
                                      f"MoveTo command with Latch = True failed with unexpected status: {e.status}")
-                logging.info("Received INVALID_IN_STATE error as expected")
+                log.info("Received INVALID_IN_STATE error as expected")
 
             self.step("3c")
             self.wait_for_user_input(prompt_msg="Manually latch the device and press enter when done")
@@ -261,12 +258,12 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("3d")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
-                logging.error("MoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 0")
+                log.error("MoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 0")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState,
                                      f"MoveTo command with Latch = False failed with unexpected status: {e.status}")
-                logging.info("Received INVALID_IN_STATE error as expected")
+                log.info("Received INVALID_IN_STATE error as expected")
             self.step("3e")
             self.wait_for_user_input(prompt_msg="Manually unlatch the device and press enter when done")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
@@ -274,19 +271,13 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("4a")
         if latch_control_modes != 1:
-            logging.info("LatchControlModes is not 1, skipping steps 4b to 4h")
-            self.skip_step("4b")
-            self.skip_step("4c")
-            self.skip_step("4d")
-            self.skip_step("4e")
-            self.skip_step("4f")
-            self.skip_step("4g")
-            self.skip_step("4h")
+            log.info("LatchControlModes is not 1, skipping steps 4b to 4h")
+            self.mark_step_range_skipped("4b", "4h")
         else:
             self.step("4b")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
-                logging.info("MoveTo command with Latch = True sent successfully")
+                log.info("MoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = True failed: {e}")
 
@@ -303,12 +294,12 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("4g")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
-                logging.error("MoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 1")
+                log.error("MoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 1")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState,
                                      f"MoveTo command with Latch = False failed with unexpected status: {e.status}")
-                logging.info("Received INVALID_IN_STATE error as expected")
+                log.info("Received INVALID_IN_STATE error as expected")
             self.step("4h")
             self.wait_for_user_input(prompt_msg="Manually unlatch the device and press enter when done")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
@@ -316,24 +307,18 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("5a")
         if latch_control_modes != 2:
-            logging.info("LatchControlModes is not 2, skipping steps 5b to 5h")
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
-            self.skip_step("5e")
-            self.skip_step("5f")
-            self.skip_step("5g")
-            self.skip_step("5h")
+            log.info("LatchControlModes is not 2, skipping steps 5b to 5h")
+            self.mark_step_range_skipped("5b", "5h")
         else:
             self.step("5b")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
-                logging.error("MoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 2")
+                log.error("MoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 2")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState,
                                      f"MoveTo command with Latch = True failed with unexpected status: {e.status}")
-                logging.info("Received INVALID_IN_STATE error as expected")
+                log.info("Received INVALID_IN_STATE error as expected")
 
             self.step("5c")
             self.wait_for_user_input(prompt_msg="Manually latch the device and press enter when done")
@@ -342,7 +327,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("5d")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
-                logging.info("MoveTo command with Latch = False sent successfully")
+                log.info("MoveTo command with Latch = False sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -360,22 +345,13 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("6a")
         if latch_control_modes != 3:
-            logging.info("LatchControlModes is not 3, skipping steps 6b to 6k")
-            self.skip_step("6b")
-            self.skip_step("6c")
-            self.skip_step("6d")
-            self.skip_step("6e")
-            self.skip_step("6f")
-            self.skip_step("6g")
-            self.skip_step("6h")
-            self.skip_step("6i")
-            self.skip_step("6j")
-            self.skip_step("6k")
+            log.info("LatchControlModes is not 3, skipping steps 6b to 6k")
+            self.mark_step_range_skipped("6b", "6k")
         else:
             self.step("6b")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
-                logging.info("MoveTo command with Latch = True sent successfully")
+                log.info("MoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = True failed: {e}")
 
@@ -393,7 +369,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("6g")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
-                logging.info("MoveTo command with Latch = False sent successfully")
+                log.info("MoveTo command with Latch = False sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 

@@ -15,13 +15,10 @@
 #    limitations under the License.
 
 
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 
 
 class CHIMETestBase:

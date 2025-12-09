@@ -33,13 +33,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:177
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - run: apt-get update
             - run: apt-get install --fix-missing llvm-10 clang-10
             - name: Try to ensure the objdir-clone dir exists
@@ -58,7 +58,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: objdir-linux
@@ -68,12 +68,12 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        runs-on: macos-13
+        runs-on: macos-14
         if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Setup Environment
               run: brew install llvm
             - name: Try to ensure the objdir-clone dir exists
@@ -92,7 +92,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: crash-darwin

@@ -37,14 +37,15 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
@@ -113,7 +114,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
     )
     async def test_TC_AVSM_2_10(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -124,7 +125,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
         self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
         asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
@@ -134,7 +135,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
         aResolution = aAllocatedSnapshotStreams[0].minResolution
@@ -146,7 +147,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-            logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
+            log.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
                 captureSnapshotResponse.imageCodec,
@@ -162,8 +163,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
+            if not self.is_pics_sdk_ci_only:
+                asserts.fail(f"Snapshot capture failed: {e}")
             pass
 
         self.step(4)
@@ -189,7 +190,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-            logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
+            log.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
                 captureSnapshotResponse.imageCodec,
@@ -205,15 +206,15 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
+            if not self.is_pics_sdk_ci_only:
+                asserts.fail(f"Snapshot capture failed: {e}")
             pass
 
         if self.privacySupport:
             self.step(6)
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
+            log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
 
             self.step(7)
             try:
@@ -246,7 +247,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
         self.step(10)
@@ -262,6 +263,11 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
             )
             pass
+        if self.privacySupport:
+            # Cleanup Privacy state after test completion
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
 
 
 if __name__ == "__main__":

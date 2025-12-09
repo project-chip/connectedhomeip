@@ -44,16 +44,12 @@
 
 """Define Matter test case TC_DEM_2_5."""
 
-
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
@@ -65,15 +61,14 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_5(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             # Depends on Feature 05 (ForecastAdjustment) & Feature 01 (PowerForecastReporting)
             "DEM.S.F05", "DEM.S.F01"
         ]
-        return pics
 
     def steps_TC_DEM_2_5(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -154,8 +149,6 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_5(self):
         # pylint: disable=too-many-locals, too-many-statements
@@ -190,7 +183,7 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
 
         self.step("5")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
-            slotIndex=0, duration=forecast.slots[0].minDurationAdjustment)]
+            slotIndex=0, duration=forecast.slots[0].maxDurationAdjustment)]
         await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.ConstraintError)
 
         self.step("6")

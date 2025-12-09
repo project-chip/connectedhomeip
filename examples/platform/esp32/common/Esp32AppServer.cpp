@@ -51,6 +51,15 @@
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
 #include <app/clusters/electrical-grid-conditions-server/ElectricalGridConditionsTestEventTriggerHandler.h>
 #endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+#include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
+#endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+#include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
+#endif
 
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
@@ -193,6 +202,18 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
 #endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+    static MeterIdentificationTestEventTriggerHandler sMeterIdentificationTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
+#endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+    static CommodityMeteringTestEventTriggerHandler sCommodityMeteringTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityMeteringTestEventTriggerHandler);
+#endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+    static CommodityTariffTestEventTriggerHandler sCommodityTariffTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
+#endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
@@ -206,7 +227,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     {
         initParams.appDelegate = sAppDelegate;
     }
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     ESPOpenThreadInit();
 
@@ -217,7 +238,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif
 
 #if CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 #endif // CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
 #if CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
     sEthernetNetworkCommissioningInstance.Init();

@@ -42,18 +42,19 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
-    """This test case verifies the primary functionality of the Energy EVSE Cluster server 
+    """This test case verifies the primary functionality of the Energy EVSE Cluster server
     with the optional RFID feature supported."""
 
     def desc_TC_EEVSE_2_9(self) -> str:
@@ -65,7 +66,7 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S", "EEVSE.S.F03"]
 
     def steps_TC_EEVSE_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -76,8 +77,6 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("5", "TH checks its subscription to RFID from DUT has yielded one new event within 5 seconds",
                      "Verify the data of the RFID event received by TH contains a UID with a maximum of 10 bytes."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EEVSE_2_9(self):
@@ -107,7 +106,7 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
             uid is not NullValue and len(uid) <= 10,
             f"RFID event received with UID: {uid}")
 
-        logger.info(f"RFID event received with UID: 0x{bytes(uid).hex()}")
+        log.info(f"RFID event received with UID: 0x{bytes(uid).hex()}")
 
 
 if __name__ == "__main__":

@@ -29,6 +29,8 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
                                          StructQuality, StructTag)
 
+LOGGER = logging.getLogger(__name__)
+
 
 def UnionOfAllFlags(flags_list):
     if not flags_list:
@@ -145,8 +147,7 @@ class MatterIdlTransformer(Transformer):
         n = tokens[0].value
         if n.startswith('0x'):
             return int(n[2:], 16)
-        else:
-            return int(n)
+        return int(n)
 
     @v_args(inline=True)
     def negative_integer(self, value):
@@ -195,10 +196,9 @@ class MatterIdlTransformer(Transformer):
         if len(tokens) == 1:
             return DataType(name=tokens[0])
             # Just a string for data type
-        elif len(tokens) == 2:
+        if len(tokens) == 2:
             return DataType(name=tokens[0], max_length=tokens[1])
-        else:
-            raise Exception("Unexpected size for data type")
+        raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
     def constant_entry(self, api_maturity, id, number, spec_name):
@@ -315,14 +315,12 @@ class MatterIdlTransformer(Transformer):
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
-        cmd = Command(
+        return Command(
             parse_meta=meta,
             qualities=args[0],
             input_param=args[2], output_param=args[3], code=args[4],
             **args[1],
         )
-
-        return cmd
 
     def event_access(self, privilege):
         return privilege[0]
@@ -622,15 +620,15 @@ class GlobalMapping:
                 if type_name in self.bitmap_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.bitmaps.append(self.bitmap_map[type_name])
+                    cluster.bitmaps.insert(0, self.bitmap_map[type_name])
                 elif type_name in self.enum_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.enums.append(self.enum_map[type_name])
+                    cluster.enums.insert(0, self.enum_map[type_name])
                 elif type_name in self.struct_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.structs.append(self.struct_map[type_name])
+                    cluster.structs.insert(0, self.struct_map[type_name])
 
         return cluster
 
@@ -689,7 +687,7 @@ class ParserWithLines:
                         f"Different cluster definition for {c.name}/{c.code}")
             else:
                 clusters[c.code] = c
-        idl.clusters = [c for c in clusters.values()]
+        idl.clusters = list(clusters.values())
 
         for comment in self.transformer.doc_comments:
             comment.apply_to_idl(idl, file)
@@ -723,7 +721,7 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -735,7 +733,7 @@ __LOG_LEVELS__ = {
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.argument('filename')
-def main(log_level, filename=None):
+def main(log_level, filename):
     # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
 
@@ -744,9 +742,10 @@ def main(log_level, filename=None):
         format='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    logging.info("Starting to parse ...")
-    data = CreateParser().parse(open(filename).read(), file_name=filename)
-    logging.info("Parse completed")
+    LOGGER.info("Starting to parse ...")
+    with open(filename) as f:
+        data = CreateParser().parse(f.read(), file_name=filename)
+    LOGGER.info("Parse completed")
 
-    logging.info("Data:")
+    LOGGER.info("Data:")
     pprint.pp(data)

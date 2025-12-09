@@ -36,18 +36,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:177
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
-
-            # Bootstrap and checkout for internal scripts (like idl_lint)
-            # to run
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                  platform: linux
+              uses: actions/checkout@v5
 
             - name: Check for orphaned gn files
               if: always()
@@ -63,8 +56,12 @@ jobs:
               # This check enforces that for any newly added file, it must be part of some
               # BUILD.gn file
               run: |
-                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
-                     src \
+                  # These ARE actually orphaned but due to dynamic-server we have code paths
+                  # for them. Keeping them as a list as they still need review ...
+                  #   --known-failure app/util/attribute-table.cpp \
+                  #   --known-failure app/util/ember-io-storage.cpp \
+                  #   --known-failure app/util/attribute-storage.cpp \
+                  scripts/tools/not_known_to_gn.py \
                      --skip-dir app/clusters \
                      --skip-dir darwin \
                      --skip-dir include \
@@ -81,7 +78,6 @@ jobs:
                      --skip-dir platform/FreeRTOS \
                      --skip-dir platform/Infineon \
                      --skip-dir platform/Linux \
-                     --skip-dir platform/mbed \
                      --skip-dir platform/mt793x \
                      --skip-dir platform/nxp \
                      --skip-dir platform/OpenThread \
@@ -108,8 +104,6 @@ jobs:
                      --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-table-detail.h \
                      --known-failure app/util/attribute-table.h \
-                     --known-failure app/util/binding-table.cpp \
-                     --known-failure app/util/binding-table.h \
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
@@ -122,44 +116,41 @@ jobs:
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
                      --known-failure app/WriteHandler.h \
+                     --known-failure lib/core/CriticalFailure.h \
                      --known-failure platform/DeviceSafeQueue.cpp \
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \
                      --known-failure platform/SingletonConfigurationManager.cpp \
-                  "
-                  # These ARE actually orphaned but due to dynamic-server we have code paths
-                  # for them. Keeping them as a list as they still need review ...
-                  #   --known-failure app/util/attribute-table.cpp \
-                  #   --known-failure app/util/ember-io-storage.cpp \
-                  #   --known-failure app/util/attribute-storage.cpp \
-            - name: Check for matter lint errors
-              if: always()
-              run: |
-                  for idl_file in $(find . -name '*.matter'); do
-                      # TODO: all these conformance failures should be fixed
-                      #       Issues exist for most of them:
-                      #       https://github.com/project-chip/connectedhomeip/issues/19176
-                      #       https://github.com/project-chip/connectedhomeip/issues/19175
-                      #       https://github.com/project-chip/connectedhomeip/issues/19173
-                      if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
-                      # Example is intentionally not spe compliant for use in cert testing
-                      if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
-
-                      # Test files are intentionally small and not spec-compliant, just parse-compliant
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
-                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
-
-                      ./scripts/run_in_build_env.sh "matter-idl-lint --log-level warn $idl_file" >/dev/null || exit 1
-                  done
+                     src
+                  scripts/tools/not_known_to_gn.py \
+                     -e py -e matter -e lark -e yaml -e cpp -e java -e kt -e jinja -e proto \
+                     --gn-extra scripts/py_matter_idl/files.gni \
+                     --skip-dir scripts/py_matter_idl/build \
+                     scripts/py_matter_idl
+                  scripts/tools/not_known_to_gn.py \
+                     -e py -e cpp -e cc -e c -e h -e hpp -e mm \
+                     --known-failure build-matter-wheel.py \
+                     --known-failure tests/scripts/base.py \
+                     --known-failure tests/scripts/cirque_restart_remote_device.py \
+                     --known-failure tests/scripts/cluster_objects.py \
+                     --known-failure tests/scripts/commissioning_failure_test.py \
+                     --known-failure tests/scripts/commissioning_test.py \
+                     --known-failure tests/scripts/commissioning_window_test.py \
+                     --known-failure tests/scripts/example_python_commissioning_flow.py \
+                     --known-failure tests/scripts/failsafe_tests.py \
+                     --known-failure tests/scripts/icd_device_test.py \
+                     --known-failure tests/scripts/mobile-device-test.py \
+                     --known-failure tests/scripts/network_commissioning.py \
+                     --known-failure tests/scripts/python_commissioning_flow_test.py \
+                     --known-failure tests/scripts/split_commissioning_test.py \
+                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl1.py \
+                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl2.py \
+                     --known-failure tests/scripts/subscription_resumption_test.py \
+                     --known-failure tests/scripts/subscription_resumption_timeout_test.py \
+                     --known-failure tests/test_cluster_objects.py \
+                     --known-failure tests/test_generated_cluster_objects.py \
+                     --known-failure tests/test_tlv.py \
+                     src/controller/python
 
             - name: Check broken links
               # On-push disabled until the job can run fully green
@@ -216,6 +207,23 @@ jobs:
               if: always()
               run: |
                   git grep -I -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            #
+            # Known client-side clusters are allowed to use this only.
+            - name:
+                  emberAfClusterInit/Shutdown callbacks are for client side use,
+                  not server side. Use ClusterServerInit/Shutdown for server
+                  clusters
+              if: always()
+              run: |
+                  git grep -I -n "void emberAf.*Cluster\(Init\|Shutdown\)Callback("  -- \
+                  src/app/clusters \
+                  ':(exclude).github/workflows/lint.yml' \
+                  ':(exclude)src/app/clusters/pump-configuration-and-control-client' \
+                  && exit 1 || exit 0
 
             # Comments like '{{! ... }}' should be used in zap files
             - name: Do not allow TODO in generated files
@@ -285,6 +293,18 @@ jobs:
                   --skip-subtree src/controller/tests \
                   --skip-from-file scripts/ember_exclusions.txt
 
+            # This check ensures that `SafeAttributePersistenceProvider` nor `AttributePersistenceProvider`
+            # are being used. Exclusions should be removed as soon as a refactor of the file affected is done.
+            - name:
+                  Check for use of 'SafeAttributePersistenceProvider' and
+                  'AttributePersistenceProvider' symbols
+              if: always()
+              run: |
+                  scripts/find_attribute_persistence_provider_usage.sh \
+                  --skip-subtree .github/ \
+                  --skip-subtree scripts/ \
+                  --skip-from-file scripts/attribute_persistence_provider_exclusions.txt
+
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
@@ -294,7 +314,7 @@ jobs:
                   type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp' && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp' ':(exclude)src/data-model-providers/codegen/ClusterIntegration.cpp' ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -321,14 +341,12 @@ jobs:
                       ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' \
                       && exit 1 || exit 0
 
-            # Run ruff python linter
             - name: Check for errors using ruff Python linter
               if: always()
               run: |
-                  ruff check
+                  ruff check --output-format=github
 
-            # Run ChipStackError linter
-            - name: Check for errors using ruff Python linter
+            - name: Check for 'except ChipStackError' usage
               if: always()
               run: |
                   python3 scripts/check_chipstack.py
@@ -363,10 +381,46 @@ jobs:
               run: |
                   # Various platforms have `using namespace chip::Ble` in their BLEManager* headers; just exclude those for now.
                   #
-                  # Exclude platform openiotsdk bits that do this in their persistent storage header.
-                  #
-                  # Also exclude examples (for now) and third_party, which have various instances of this.
+                  # Exclude examples (for now) and third_party, which have various instances of this.
                   #
                   # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
                   # in a header file.
-                  git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)src/platform/openiotsdk/KVPsaPsStore.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
+                  git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
+
+            # Bootstrap and checkout for internal scripts (like idl_lint)
+            # to run
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+
+            - name: Check for matter lint errors
+              run: |
+                  for idl_file in $(find . -name '*.matter'); do
+                      # TODO: all these conformance failures should be fixed
+                      #       Issues exist for most of them:
+                      #       https://github.com/project-chip/connectedhomeip/issues/19176
+                      #       https://github.com/project-chip/connectedhomeip/issues/19175
+                      #       https://github.com/project-chip/connectedhomeip/issues/19173
+                      if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+                      # Example is intentionally not spe compliant for use in cert testing
+                      if [ "$idl_file" = './examples/lighting-app-data-mode-no-unique-id/lighting-common/lighting-app.matter' ]; then continue; fi
+
+                      # Test files are intentionally small and not spec-compliant, just parse-compliant
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
+
+                      ./scripts/run_in_build_env.sh "matter-idl-lint --log-level warn $idl_file" >/dev/null || exit 1
+                  done
+
+# NOTE: Actions which do not require bootstrapping the build environment
+#       should be added above the "Checkout submodules & Bootstrap" step.

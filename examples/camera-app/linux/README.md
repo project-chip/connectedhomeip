@@ -24,6 +24,7 @@ sudo apt install \
   gstreamer1.0-plugins-base \
   gstreamer1.0-plugins-good \
   gstreamer1.0-plugins-bad \
+  gstreamer1.0-plugins-ugly \
   gstreamer1.0-libav \
   libgstreamer1.0-dev \
   libgstreamer-plugins-base1.0-dev \
@@ -77,7 +78,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:153
+docker pull ghcr.io/project-chip/chip-build-crosscompile:177
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -85,7 +86,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:153
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:153 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:177 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute
@@ -115,4 +116,12 @@ git config --global --add safe.directory /var/connectedhomeip/third_party/pigwee
 
 # SCP command to transfer the file
 scp ./out/linux-arm64-camera-clang/chip-camera-app ubuntu@<RASPBERRY_PI_IP_ADDRESS>:/home/ubuntu
+```
+
+5. Add your user to the video group
+
+```
+sudo usermod -aG video $USER
+# Then, either log out and log back in, or run the following for the current session:
+newgrp video
 ```

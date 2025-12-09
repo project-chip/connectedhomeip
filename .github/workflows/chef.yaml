@@ -37,12 +37,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:177
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -58,7 +60,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:177
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -67,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -96,16 +98,19 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:153
+            image: ghcr.io/project-chip/chip-build-esp32:177
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
+
             - name: CI Examples ESP32
               shell: bash
               run: |
@@ -117,12 +122,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:153
+            image: ghcr.io/project-chip/chip-build-nrf-platform:177
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -138,19 +145,21 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:153
+            image: ghcr.io/project-chip/chip-build-telink:177
+            volumes:
+                - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 522ce11c5ddfd004b5640a1f51a5fce2e0f14c35"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 86fb5f1142c99e04abc923f4c0aa5fafb2ea9ace"
             - name: CI Examples Telink
               shell: bash
               run: |

@@ -35,3 +35,23 @@ chip_config_network_layer_ble = false
 chip_max_discovered_ip_addresses = 20
 
 enable_rtti = true
+
+# Build Configuration: Fast Development Mode
+optimize_for_size = false  # -O2 (speed) vs -Os (size) - faster compilation
+symbol_level =
+    0  # -g0 (no debug symbols) - fastest compilation, no stack traces
+
+#is_debug = false            # Release mode: faster execution, removes safety checks
+
+# Symbol Level Options:
+# 0 = No debug symbols (-g0): Fastest build, smallest binary, no crash stack traces
+# 1 = Minimal symbols (-g1): Moderate build speed, crash reports with function names
+# 2 = Full symbols (-g2): Slowest build, largest binary, full debugging capability
+# Note: These settings affect C++ compilation only, not Java/Kotlin code
+
+# is_debug Options:
+# false = Release mode: Removes assert() checks, bounds checking, extra logging
+# true = Debug mode: Keeps all safety checks, slower execution but catches bugs
+# Default: true (if not specified, GN defaults to debug mode)
+
+# For Release Builds: Use optimize_for_size=true, symbol_level=1

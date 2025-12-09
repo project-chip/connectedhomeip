@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,12 @@
 # the build directory, but an external directory can be specified using the
 # --build-env-dir option. The build environment directory can be shared by any
 # number of build directories, independently of target / tool chain.
+
+# Check if this script is being sourced; this could be in any shell, not just bash.
+if [ -z "$BASH" -o "$BASH_SOURCE" != "$0" ]; then
+    echo "configure does not support being sourced" >&2
+    return 1
+fi
 
 set -o pipefail
 shopt -s extglob

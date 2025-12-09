@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <new>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -57,7 +58,10 @@ struct RegisteredServerCluster
     {}
 
     [[nodiscard]] constexpr ServerClusterRegistration & Registration() { return registration; }
+    [[nodiscard]] constexpr const ServerClusterRegistration & Registration() const { return registration; }
+
     [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return cluster; }
+    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const { return cluster; }
 
 private:
     SERVER_CLUSTER cluster;
@@ -132,82 +136,12 @@ private:
 class ServerClusterInterfaceRegistry
 {
 public:
-    /// represents an iterable list of clusters
-    class ClustersList
-    {
-    public:
-        class Iterator
-        {
-        public:
-            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mEndpointId(endpoint), mRegistration(interface)
-            {
-                if (mRegistration != nullptr)
-                {
-                    mSpan = interface->serverClusterInterface->GetPaths();
-                }
-                AdvanceUntilMatchingEndpoint();
-            }
-
-            Iterator & operator++()
-            {
-                if (!mSpan.empty())
-                {
-                    mSpan = mSpan.SubSpan(1);
-                }
-                AdvanceUntilMatchingEndpoint();
-                return *this;
-            }
-            bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
-            bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
-            ClusterId operator*() { return mSpan.begin()->mClusterId; }
-
-        private:
-            const EndpointId mEndpointId;
-            ServerClusterRegistration * mRegistration;
-            Span<const ConcreteClusterPath> mSpan;
-
-            void AdvanceUntilMatchingEndpoint()
-            {
-                while (mRegistration != nullptr)
-                {
-                    if (mSpan.empty())
-                    {
-                        mRegistration = mRegistration->next;
-                        if (mRegistration != nullptr)
-                        {
-                            mSpan = mRegistration->serverClusterInterface->GetPaths();
-                        }
-                        continue;
-                    }
-                    if (mSpan.begin()->mEndpointId == mEndpointId)
-                    {
-                        return;
-                    }
-
-                    // need to keep searching
-                    mSpan = mSpan.SubSpan(1);
-                }
-            }
-        };
-
-        constexpr ClustersList(ServerClusterRegistration * start, EndpointId endpointId) : mEndpointId(endpointId), mStart(start) {}
-        Iterator begin() { return { mStart, mEndpointId }; }
-        Iterator end() { return { nullptr, mEndpointId }; }
-
-    private:
-        const EndpointId mEndpointId;
-        ServerClusterRegistration * mStart;
-    };
-
     ~ServerClusterInterfaceRegistry();
 
     /// Add the given entry to the registry.
-    /// NOTE the requirement of entries to be part of the same endpoint.
     ///
     /// Requirements:
     ///   - entry MUST NOT be part of any other registration
-    ///   - paths MUST be part of the same endpoint (requirement for codegen server cluster interface implementations)
-    ///
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
@@ -221,24 +155,57 @@ public:
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * Get(const ConcreteClusterPath & path);
 
-    /// Provides a list of clusters that are registered for the given endpoint.
-    ///
-    /// ClustersList points inside the internal registrations of the registry, so
-    /// the list is only valid as long as the registry is not modified.
-    ClustersList ClustersOnEndpoint(EndpointId endpointId);
-
-    /// Unregister all registrations for the given endpoint.
-    void UnregisterAllFromEndpoint(EndpointId endpointId);
-
     // Set up the underlying context for all clusters that are managed by this registry.
     //
-    // The values within context will be copied and used.
+    // The values within context will be moved and used as-is.
+    //
+    // Returns:
+    //   - CHIP_NO_ERROR on success
+    //   - CHIP_ERROR_HAD_FAILURES if some cluster `Startup` calls had errors (Startup
+    //     will be called for all clusters).
     CHIP_ERROR SetContext(ServerClusterContext && context);
 
     // Invalidates current context.
     void ClearContext();
 
-private:
+    // Represents an iterable list of all clusters registered in this registry.
+    // The list is only valid as long as the registry is not modified.
+    // The list is not guaranteed to be in any particular order.
+    class ServerClusterInstances
+    {
+    public:
+        class Iterator
+        {
+        public:
+            Iterator(ServerClusterRegistration * registration) : mRegistration(registration) {}
+
+            Iterator & operator++()
+            {
+                if (mRegistration)
+                {
+                    mRegistration = mRegistration->next;
+                }
+                return *this;
+            }
+            bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
+            bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
+            ServerClusterInterface * operator*() { return mRegistration ? mRegistration->serverClusterInterface : nullptr; }
+
+        private:
+            ServerClusterRegistration * mRegistration;
+        };
+
+        constexpr ServerClusterInstances(ServerClusterRegistration * start) : mStart(start) {}
+        Iterator begin() { return { mStart }; }
+        Iterator end() { return { nullptr }; }
+
+    private:
+        ServerClusterRegistration * mStart;
+    };
+
+    ServerClusterInstances AllServerClusterInstances();
+
+protected:
     ServerClusterRegistration * mRegistrations = nullptr;
 
     // A one-element cache to speed up finding a cluster within an endpoint.

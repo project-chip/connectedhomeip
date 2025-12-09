@@ -41,6 +41,7 @@
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
+#include <transport/MessageStats.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/Session.h>
 #include <transport/SessionDelegate.h>
@@ -152,6 +153,7 @@ public:
     /**
      * @brief
      *   This function takes the payload and returns an encrypted message which can be sent multiple times.
+     *   Every successful call to this function MUST be followed by a send attempt with the prepared message.
      *
      * @details
      *   It does the following:
@@ -312,8 +314,7 @@ public:
         auto * targetFabric = mFabricTable->FindFabricWithIndex(fabricIndex);
         VerifyOrReturnError(targetFabric != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-        auto err = targetFabric->FetchRootPubkey(targetPubKey);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(targetFabric->FetchRootPubkey(targetPubKey));
 
         mSecureSessions.ForEachSession([&](auto * session) {
             Crypto::P256PublicKey comparePubKey;
@@ -331,8 +332,7 @@ public:
             auto * compareFabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
             VerifyOrDie(compareFabric != nullptr);
 
-            err = compareFabric->FetchRootPubkey(comparePubKey);
-            VerifyOrDie(err == CHIP_NO_ERROR);
+            SuccessOrDie(compareFabric->FetchRootPubkey(comparePubKey));
 
             if (comparePubKey.Matches(targetPubKey) && targetFabric->GetFabricId() == compareFabric->GetFabricId())
             {
@@ -475,24 +475,20 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionState ** peerConnState);
+                          Transport::ActiveTCPConnectionHandle & peerConnState);
 
-    CHIP_ERROR TCPDisconnect(const Transport::PeerAddress & peerAddress);
+    void HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn) override;
 
-    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0);
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 
-    void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn) override;
-
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
-
-    void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+    void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
     // Functors for callbacks into higher layers
-    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionState * conn);
+    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionHandle & conn);
 
-    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
 
-    using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -534,6 +530,8 @@ public:
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
+    MessageStats GetMessageStats() const { return mMessageStats; }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -557,6 +555,7 @@ private:
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
+    MessageStats mMessageStats;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
@@ -617,7 +616,7 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
@@ -625,6 +624,9 @@ private:
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
+
+    void CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
+    void CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
 };
 
 namespace MessagePacketBuffer {

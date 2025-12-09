@@ -67,14 +67,14 @@ public:
 
     static void SetUpTestSuite()
     {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(DeviceLayer::SystemLayer().Init(), CHIP_NO_ERROR);
     }
 
     static void TearDownTestSuite()
     {
         DeviceLayer::SystemLayer().Shutdown();
-        chip::Platform::MemoryShutdown();
+        Platform::MemoryShutdown();
     }
 
     void SetUp() override
@@ -176,6 +176,7 @@ public:
     {
         return CHIP_NO_ERROR;
     }
+
     CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
         return CHIP_NO_ERROR;
@@ -413,6 +414,29 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
+namespace {
+BLEEndPoint * MakeCentralEndPoint(TestBleLayer & ble, BLE_CONNECTION_OBJECT connObj)
+{
+    BLEEndPoint * ep = nullptr;
+    EXPECT_EQ(ble.NewBleEndPoint(&ep, connObj, kBleRole_Central, true), CHIP_NO_ERROR);
+    EXPECT_NE(ep, nullptr);
+
+    return ep;
+}
+} // namespace
+
+TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
+{
+    const auto connObj = GetConnectionObject();
+    BLEEndPoint * ep   = MakeCentralEndPoint(*this, connObj);
+    ASSERT_NE(ep, nullptr);
+
+    ASSERT_EQ(ep->StartConnect(), CHIP_NO_ERROR);              // first call OK
+    EXPECT_EQ(ep->StartConnect(), CHIP_ERROR_INCORRECT_STATE); // second should fail
+
+    ep->Abort();
+}
+
 // This test checks that the BLE layer can handle a new connection
 // and that the connection complete callback is invoked.
 TEST_F(TestBleLayer, OnConnectionCompleteCallbackPath)
@@ -485,7 +509,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
 {
     // Set up the BleLayerTestAccess accessor class to manipulate the BleConnectionDelegate of BleLayer
-    chip::Test::BleLayerTestAccess access(this);
+    Testing::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(nullptr);
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator() };
@@ -514,7 +538,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
 // Simulate successful connection callback from delegate
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 {
-    chip::Test::BleLayerTestAccess access(this);
+    Testing::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(this);
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator() };
@@ -523,7 +547,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
         BleLayer * testLayer = static_cast<BleLayer *>(appState);
-        chip::Test::BleLayerTestAccess tempAccess(testLayer);
+        Testing::BleLayerTestAccess tempAccess(testLayer);
 
         tempAccess.CallOnConnectionComplete(appState, connObj);
     };
@@ -543,7 +567,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 // Checks that the connection could not be established due to an error
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
 {
-    chip::Test::BleLayerTestAccess access(this);
+    Testing::BleLayerTestAccess access(this);
 
     access.SetConnectionDelegate(this);
 
@@ -557,7 +581,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
 
     auto OnError = [](void * appState, CHIP_ERROR err) {
         BleLayer * testLayer = static_cast<BleLayer *>(appState);
-        chip::Test::BleLayerTestAccess tempAccess(testLayer);
+        Testing::BleLayerTestAccess tempAccess(testLayer);
 
         tempAccess.CallOnConnectionError(appState, err);
     };
@@ -576,7 +600,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
 // Connection attempt with empty list of discriminators
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsEmptySpan)
 {
-    chip::Test::BleLayerTestAccess access(this);
+    Testing::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(this);
 
     Span<const SetupDiscriminator> discriminatorsSpan;

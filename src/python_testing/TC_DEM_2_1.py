@@ -47,13 +47,14 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
@@ -65,14 +66,13 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_1(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S",
         ]
-        return pics
 
     def steps_TC_DEM_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT FeatureMap attribute.",
@@ -95,8 +95,6 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                      "Verify that the DUT response contains an OptOutStateEnum (enum8) value."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_1(self):
         # pylint: disable=too-many-locals, too-many-statements
@@ -111,7 +109,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         # Get the feature map for later
         self.step("2")
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
-        logger.info(f"FeatureMap: {feature_map}")
+        log.info(f"FeatureMap: {feature_map}")
 
         self.step("3")
         esa_type = await self.read_dem_attribute_expect_success(attribute="ESAType")
@@ -135,7 +133,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
 
         self.step("5")
         esa_state = await self.read_dem_attribute_expect_success(attribute="ESAState")
-        logger.info(f"ESAState is {esa_state}")
+        log.info(f"ESAState is {esa_state}")
         asserts.assert_is_instance(esa_state, Clusters.DeviceEnergyManagement.Enums.ESAStateEnum)
 
         self.step("6")
@@ -166,7 +164,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         self.step("8")
         if Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment & feature_map:
             power_adjustment_capability = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-            logger.info(f"PowerAdjustmentCapability is {power_adjustment_capability}")
+            log.info(f"PowerAdjustmentCapability is {power_adjustment_capability}")
 
             if power_adjustment_capability is not NullValue:
                 asserts.assert_is_instance(power_adjustment_capability,
@@ -185,7 +183,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
         if Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting & feature_map or \
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting & feature_map:
             forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-            logger.info(f"Forecast is {forecast}")
+            log.info(f"Forecast is {forecast}")
 
             if forecast is not NullValue:
                 asserts.assert_is_instance(forecast,
@@ -198,7 +196,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kForecastAdjustment & feature_map or \
                 Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment & feature_map:
             opt_out_state = await self.read_dem_attribute_expect_success(attribute="OptOutState")
-            logger.info(f"OptOutState is {opt_out_state.name}:{opt_out_state}")
+            log.info(f"OptOutState is {opt_out_state.name}:{opt_out_state}")
 
 
 if __name__ == "__main__":

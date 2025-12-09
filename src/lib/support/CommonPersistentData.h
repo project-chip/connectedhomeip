@@ -31,9 +31,9 @@ inline constexpr uint8_t kdefaultUndefinedEntry = 0;
 
 /// @brief Generic class to implement storage of a list persistently
 /// @tparam EntryType : Type of entry depends on the stored data
-/// @tparam kMaxSerializedSize : inherited from PersistentData class
+/// @tparam kMaxSerializedSize : inherited from PersistableData
 template <typename EntryType, size_t kMaxSerializedSize>
-struct StoredDataList : public PersistentData<kMaxSerializedSize>
+struct StoredDataList : public PersistableData<kMaxSerializedSize>
 {
     static constexpr TLV::Tag TagFirstEntry() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagEntryCount() { return TLV::ContextTag(2); }

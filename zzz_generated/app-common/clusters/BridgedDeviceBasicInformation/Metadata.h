@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace BridgedDeviceBasicInformation {
 
-inline constexpr uint32_t kRevision = 5;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
+
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -91,10 +93,15 @@ namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    Reachable::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace KeepActive {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(KeepActive::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

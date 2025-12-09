@@ -39,12 +39,15 @@ import random
 import tempfile
 from configparser import ConfigParser
 
-import chip.clusters as Clusters
-from chip import CertificateAuthority
-from chip.storage import PersistentStorage
-from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import CertificateAuthority
+from matter.storage import VolatileTemporaryPersistentStorage
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_JFADMIN_2_1(MatterBaseTest):
@@ -73,7 +76,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
         #####################################################################################################################################
         #
@@ -149,7 +152,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
     def steps_TC_JFADMIN_2_1(self) -> list[TestStep]:
         return [
             TestStep("1", "TH1 read AdministratorFabricIndex attribute.",
-                     "DUT reply contains AdministratorFabricIndex with a value in range 1..255."),
+                     "DUT reply contains AdministratorFabricIndex with a value in range 1..254."),
             TestStep("2", "TH1 read Fabrics attribute from Operation Cluster on EP0.",
                      "DUT reply FabricDescriptorStruct with FabricID equal to AdministratorFabricIndex from step 1.")
         ]
@@ -157,7 +160,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JFADMIN_2_1(self):
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
@@ -169,17 +173,17 @@ class TC_JFADMIN_2_1(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
             returnClusterObject=True)
         attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
         asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
                                      "AdministratorFabricIndex is < 1. Expected AdministratorFabricIndex >= 1")
-        asserts.assert_less_equal(attributeAdminFabricIndex, 255,
-                                  "AdministratorFabricIndex is > 255. Expected AdministratorFabricIndex <= 255")
+        asserts.assert_less_equal(attributeAdminFabricIndex, 254,
+                                  "AdministratorFabricIndex is > 254. Expected AdministratorFabricIndex <= 254")
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(attributeAdminFabricIndex,
                              response[0][Clusters.OperationalCredentials].fabrics[0].fabricIndex, "AdministratorFabricIndex != fabricIndex")

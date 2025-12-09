@@ -20,8 +20,11 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <controller/CHIPDeviceController.h>
+
+// Forward declaration
+struct ICECandidateInfo;
 
 /**
  * @brief This class handles sending CHIP commands for WebRTCTransportProvider cluster, including
@@ -111,17 +114,17 @@ public:
      * @brief Sends a ProvideICECandidates command to the remote device.
      *
      * This method populates the ProvideICECandidates command parameters, packages the provided ICE
-     * candidate strings, and queues them for sending to the target device. This is typically used
-     * to inform the remote side about potential network endpoints it can use to establish or
-     * enhance a WebRTC session.
+     * candidate information including SDPMid and SDPMLineIndex, and queues them for sending to the
+     * target device. This is typically used to inform the remote side about potential network
+     * endpoints it can use to establish or enhance a WebRTC session.
      *
      * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
      *                          ICE candidates apply.
-     * @param ICECandidates     A list of ICE candidate structs.
+     * @param iceCandidates     A list of ICE candidate structs.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
-    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates);
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<ICECandidateInfo> & iceCandidates);
 
     /**
      * @brief Notify WebRTCProviderClient that the Offer command has been received.
@@ -231,7 +234,7 @@ private:
     std::string mSdpString;
 
     // Store the ICECandidates here to use to send asynchronously.
-    std::vector<std::string> mClientICECandidates;
+    std::vector<ICECandidateInfo> mClientICECandidates;
     std::vector<ICECandidateStruct> mICECandidateStructList;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

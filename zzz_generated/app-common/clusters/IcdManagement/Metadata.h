@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace IcdManagement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace IdleModeDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(IdleModeDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -64,10 +66,17 @@ namespace MaximumCheckInBackOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumCheckInBackOff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaximumCheckInBackOff
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    IdleModeDuration::kMetadataEntry,
+    ActiveModeDuration::kMetadataEntry,
+    ActiveModeThreshold::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace RegisterClient {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(RegisterClient::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
@@ -80,7 +89,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace UnregisterClient
 namespace StayActiveRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(StayActiveRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace StayActiveRequest
 
 } // namespace Commands

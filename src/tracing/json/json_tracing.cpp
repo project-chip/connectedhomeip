@@ -348,6 +348,7 @@ void JsonBackend::LogMessageSend(MessageSendInfo & info)
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload, info.payloadHeader->GetProtocolID(), info.payloadHeader->GetMessageType());
+    value["messageTotalSize"] = static_cast<int>(info.messageTotalSize);
 
     OutputValue(value);
 }
@@ -374,6 +375,7 @@ void JsonBackend::LogMessageReceived(MessageReceivedInfo & info)
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
     DecodePacketHeader(value["packetHeader"], info.packetHeader);
     DecodePayloadData(value["payload"], info.payload, info.payloadHeader->GetProtocolID(), info.payloadHeader->GetMessageType());
+    value["messageTotalSize"] = static_cast<int>(info.messageTotalSize);
 
     OutputValue(value);
 }

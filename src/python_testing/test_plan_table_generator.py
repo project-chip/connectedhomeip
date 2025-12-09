@@ -22,8 +22,11 @@ import sys
 from pathlib import Path
 
 import click
-from chip.testing.matter_testing import MatterTestConfig
-from chip.testing.runner import generate_mobly_test_config
+
+from matter.testing.matter_testing import MatterTestConfig
+from matter.testing.runner import generate_mobly_test_config
+
+log = logging.getLogger(__name__)
 
 
 def indent_multiline(multiline: str, num_spaces: int) -> str:
@@ -58,20 +61,20 @@ def main(filename, classname, test):
     try:
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
     except ModuleNotFoundError:
-        logging.error(f'Unable to load python module from {filename}. Please ensure this is a valid python file path')
+        log.error(f'Unable to load python module from {filename}. Please ensure this is a valid python file path')
         return -1
 
     try:
         test_class = getattr(module, classname)
     except AttributeError:
-        logging.error(f'Unable to load the test class {classname}. Please ensure this class is implemented in {filename}')
+        log.error(f'Unable to load the test class {classname}. Please ensure this class is implemented in {filename}')
         return -1
 
     config = generate_mobly_test_config(MatterTestConfig())
     test_instance = test_class(config)
     steps = test_instance.get_defined_test_steps(test)
     if not steps:
-        logging.error(f'Unable to find steps for test {test}. Please ensure the steps_ function is implemented')
+        log.error(f'Unable to find steps for test {test}. Please ensure the steps_ function is implemented')
         return -1
 
     indent = 6
@@ -90,6 +93,7 @@ def main(filename, classname, test):
     s += '|===\n'
 
     print(s)
+    return None
 
 
 if __name__ == "__main__":

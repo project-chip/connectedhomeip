@@ -37,14 +37,16 @@
 import asyncio
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms, utc_time_in_matter_epoch
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.timeoperations import (utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms,
+                                           utc_time_in_matter_epoch)
+
+log = logging.getLogger(__name__)
 
 
 class TC_DGGEN_2_4(MatterBaseTest):
@@ -129,7 +131,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("3c", "Send a first TimeSnapshot command and verify")
             response = await self.send_time_snapshot_expect_success()
-            logging.info(f"Step 3c: {response}")
+            log.info(f"Step 3c: {response}")
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following conditions met:
             #   - Value of PosixTimeMs field is not null.
@@ -158,7 +160,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
             self.print_step("3e", "Send a second TimeSnapshot command and verify")
 
             response = await self.send_time_snapshot_expect_success()
-            logging.info(f"Step 3e: {response}")
+            log.info(f"Step 3e: {response}")
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is not null and greater than PosixTimeMs1.
@@ -180,7 +182,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("4a", "Send a first TimeSnapshot command and verify")
             response = await self.send_time_snapshot_expect_success()
-            logging.info(f"Step 4a: {response}")
+            log.info(f"Step 4a: {response}")
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is null.
@@ -200,7 +202,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
             self.print_step("4c", "Send a second TimeSnapshot command and verify")
 
             response = await self.send_time_snapshot_expect_success()
-            logging.info(f"Step 4c: {response}")
+            log.info(f"Step 4c: {response}")
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is null.

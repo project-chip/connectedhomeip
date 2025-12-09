@@ -26,7 +26,6 @@ assert(chip_device_platform == "linux")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
 }
 
 if (chip_enable_nfc_based_commissioning) {
@@ -80,6 +79,7 @@ static_library("Linux") {
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
@@ -133,6 +133,8 @@ static_library("Linux") {
       "NFCCommissioningManagerImpl.h",
     ]
     public_configs += [ ":nfc_commissioning_config" ]
+
+    deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 
   if (chip_mdns == "platform") {

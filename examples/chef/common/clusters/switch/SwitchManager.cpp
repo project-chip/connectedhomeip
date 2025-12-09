@@ -175,6 +175,7 @@ void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 #if CONFIG_ENABLE_PW_RPC
     ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, gSwitchActionsDelegate);
 #endif // CONFIG_ENABLE_PW_RPC
-    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 1,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
 #endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0

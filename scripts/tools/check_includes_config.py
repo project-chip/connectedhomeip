@@ -119,7 +119,6 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
-    'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
     'src/lib/core/StringBuilderAdapters.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
@@ -138,19 +137,24 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
     # WebRTCTransportProvider is for Camera and is intended to run on devices that are capable of handling these types.
-    'src/app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h': {'string', 'vector'},
     # Camera AV Stream Management and Camera AV Settings User Level Management clusters are expected to run on resource-capable devices
-    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
-    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
-    'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
-    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
+    'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h': {'vector'},
+    'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp': {'set'},
+    'src/app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h': {'string', 'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
-    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.cpp': {'set'},
+    'src/app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h': {'vector'},
+    'src/app/clusters/zone-management-server/zone-management-server.h': {'vector'},
+    'src/app/clusters/zone-management-server/zone-geometry.h': {'vector', 'set'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
+    # Commodity Tariff Cluster are expected to run on resource-capable devices
+    'src/app/clusters/commodity-tariff-server/CommodityTariffAttrsDataMgmt.h': {'map', 'set', 'unordered_map', 'unordered_set', 'string'},
 
     'src/setup_payload/AdditionalDataPayload.h': {'string'},
     'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector', 'string'},
@@ -175,14 +179,16 @@ ALLOW: Dict[str, Set[str]] = {
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
     'src/controller/ExamplePersistentStorage.h': {'string'},
-    'src/controller/jcm/TrustVerification.h': {'string'},
+    'src/credentials/jcm/TrustVerification.h': {'string'},
+    'src/credentials/jcm/VendorIdVerificationClient.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map', 'string'},
 
     # esp32 diagnostic tracing
-    'src/tracing/esp32_diagnostic_trace/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/DiagnosticTracing.h': {'unordered_set'},
 
     # esp32 tracing
     'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},

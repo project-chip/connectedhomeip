@@ -43,12 +43,13 @@
 """Define Matter test case TC_SEPR_2_2."""
 
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 cluster = Clusters.CommodityPrice
 
@@ -62,14 +63,13 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     def pics_TC_SEPR_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "SEPR.S"
         ]
-        return pics
 
     def steps_TC_SEPR_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "Set up a subscription to all CommodityPrice cluster events"),
@@ -131,8 +131,6 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
                              Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
 
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):

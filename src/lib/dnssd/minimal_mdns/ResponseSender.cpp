@@ -290,13 +290,12 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
 
     if (!mResponseBuilder.HasPacketBuffer())
     {
-        mSendState.SetError(PrepareNewReplyPacket());
+        TEMPORARY_RETURN_IGNORED mSendState.SetError(PrepareNewReplyPacket());
         ReturnOnFailure(mSendState.GetError());
     }
-
     if (!mResponseBuilder.Ok())
     {
-        mSendState.SetError(CHIP_ERROR_INCORRECT_STATE);
+        TEMPORARY_RETURN_IGNORED mSendState.SetError(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
@@ -317,7 +316,7 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
         {
             // Very much unexpected: single record addition should fit (our records should not be that big).
             ChipLogError(Discovery, "Failed to add single record to mDNS response.");
-            mSendState.SetError(CHIP_ERROR_INTERNAL);
+            TEMPORARY_RETURN_IGNORED mSendState.SetError(CHIP_ERROR_INTERNAL);
         }
     }
 }

@@ -37,10 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 # This test requires several additional command line arguments
 # run with
@@ -57,25 +60,27 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
         return "[TC-MWOCTRL-2.4] WATTS functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedWatts attribute"),
             TestStep(3, "Read the SelectedWattIndex attribute"),
             TestStep(4, "Send the SetCookingParameters command"),
             TestStep(5, "Read and verify the SelectedWattIndex attribute"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_4(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_MWOCTRL_2_4(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
@@ -88,7 +93,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
         only_watts_supported = feature_map == features.kPowerInWatts
 
         if not only_watts_supported:
-            logging.info("PowerInWatts is not supported so skipping the rest of the tests.")
+            log.info("PowerInWatts is not supported so skipping the rest of the tests.")
             self.mark_all_remaining_steps_skipped(2)
             return
 
@@ -98,7 +103,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
 
         self.step(3)
         selectedWattIndex = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
-        logging.info("SelectedWattIndex is %s" % selectedWattIndex)
+        log.info("SelectedWattIndex is %s" % selectedWattIndex)
         asserts.assert_true(selectedWattIndex >= 0 and selectedWattIndex < len(
             supportedWattsList), "SelectedWattIndex is out of range")
 

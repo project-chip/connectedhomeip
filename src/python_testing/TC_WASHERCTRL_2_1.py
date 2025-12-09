@@ -36,15 +36,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
-
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 MAX_SPIN_SPEEDS = 16
 
@@ -56,15 +52,14 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
         return "[TC-WASHERCTRL-2.1] Optional Spin attributes with DUT as Server"
 
     def pics_TC_WASHERCTRL_2_1(self) -> list[str]:
-        pics = [
+        return [
             "WASHERCTRL.S.F00",
             "WASHERCTRL.S.A0000",
             "WASHERCTRL.S.A0001"
         ]
-        return pics
 
     def steps_TC_WASHERCTRL_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done",
                      is_commissioning=True),
             TestStep(2, description="TH reads from the DUT the SpinSpeeds attribute",
@@ -78,13 +73,11 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
                      expectation="Verify that the DUT response contains Status CONSTRAINT_ERROR response")
         ]
 
-        return steps
-
     @run_if_endpoint_matches(has_feature(Clusters.LaundryWasherControls,
                                          Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
     async def test_TC_WASHERCTRL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 

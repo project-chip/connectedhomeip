@@ -66,14 +66,17 @@ import struct
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.commissioning import SetupParameters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+
+log = logging.getLogger(__name__)
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -94,6 +97,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         super().setup_class()
 
         self._partslist_subscription = None
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -106,14 +110,14 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         if self.is_pics_sdk_ci_only:
             # Get the named pipe path for the DUT_FSA app input from the user params.
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = th_server_port
         self.th_server_setup_params = SetupParameters(
@@ -135,6 +139,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         if self._partslist_subscription is not None:
             self._partslist_subscription.Shutdown()
             self._partslist_subscription = None
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -153,7 +159,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep("precondition", "Commission DUT if not done", is_commissioning=True),
             TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
             TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
             TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
@@ -173,7 +179,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
     async def test_TC_MCORE_FS_1_2(self):
 
         # Commissioning - done
-        self.step(0)
+        self.step("precondition")
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
@@ -185,7 +191,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
@@ -198,7 +204,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:
@@ -214,7 +220,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
-        logging.info("Waiting for update to PartsList.")
+        log.info("Waiting for update to PartsList.")
         start_time = time.time()
         elapsed = 0
         time_remaining = report_waiting_timeout_delay_sec

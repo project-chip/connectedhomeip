@@ -30,11 +30,11 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
            lwip_platform == "nxp" || lwip_platform == "silabs" ||
-           lwip_platform == "qpg" || lwip_platform == "mbed" ||
-           lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
-           lwip_platform == "bl602" || lwip_platform == "bl616" ||
-           lwip_platform == "bl702" || lwip_platform == "bl702l" ||
-           lwip_platform == "mt793x" || lwip_platform == "asr",
+           lwip_platform == "qpg" || lwip_platform == "psoc6" ||
+           lwip_platform == "cyw30739" || lwip_platform == "bl602" ||
+           lwip_platform == "bl616" || lwip_platform == "bl702" ||
+           lwip_platform == "bl702l" || lwip_platform == "mt793x" ||
+           lwip_platform == "asr",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -90,7 +90,7 @@ buildconfig_header("lwip_buildconfig") {
   }
 }
 
-if (current_os == "zephyr" || current_os == "mbed") {
+if (current_os == "zephyr") {
   group("lwip") {
   }
 } else if (get_path_info(lwip_root, "abspath") !=
@@ -193,7 +193,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
-    if (lwip_platform != "standalone" && lwip_platform != "mbed") {
+    if (lwip_platform != "standalone") {
       include_dirs += [ "freertos" ]
     }
   }
@@ -230,7 +230,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
       sources += [
-        "${lwip_platform}/lwipopts-rs911x.h",
+        "${lwip_platform}/lwipopts-siwx.h",
         "${lwip_platform}/lwipopts-wf200.h",
       ]
     } else if (lwip_platform == "standalone") {

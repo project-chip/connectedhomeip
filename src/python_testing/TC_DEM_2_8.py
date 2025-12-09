@@ -44,16 +44,12 @@
 
 """Define Matter test case TC_DEM_2_8."""
 
-
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
@@ -65,15 +61,14 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_8(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             # Depends on Feature 06 (ConstraintBasedAdjustment) & Feature 02 (StateForecastReporting)
             "DEM.S.F06", "DEM.S.F02"
         ]
-        return pics
 
     def steps_TC_DEM_2_8(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -147,8 +142,6 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
             TestStep("23", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Adjustment Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_DEM_2_8(self):

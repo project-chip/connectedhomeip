@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_13(MatterBaseTest):
@@ -75,8 +76,8 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 5,
-                "TH reads MinViewport attribute from CameraAVStreamManagement Cluster on DUT.",
-                "Store this value in aMinViewport.",
+                "TH reads MinViewportResolution attribute from CameraAVStreamManagement Cluster on DUT.",
+                "Store this value in aMinViewportResolution.",
             ),
             TestStep(
                 6,
@@ -90,7 +91,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 8,
-                "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the MinFragmentLen and MaxFragmentLen = 4000. TH sends the VideoStreamAllocate command with these arguments.",
+                "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the KeyFrameInterval = 4000. TH sends the VideoStreamAllocate command with these arguments.",
                 "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID.",
                 "Store as `aVideoStreamID`",
             ),
@@ -116,7 +117,7 @@ class TC_AVSM_2_13(MatterBaseTest):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
     async def test_TC_AVSM_2_13(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -125,13 +126,16 @@ class TC_AVSM_2_13(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        logger.info("Verified Video feature is supported")
+        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
+        asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
         self.step(2)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(3)
@@ -139,32 +143,32 @@ class TC_AVSM_2_13(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
-        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        log.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
         asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
-        logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
+        log.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
 
         self.step(5)
-        aMinViewport = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+        aMinViewportResolution = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewport: {aMinViewport}")
+        log.info(f"Rx'd MinViewportResolution: {aMinViewportResolution}")
 
         self.step(6)
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
-        logger.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
+        log.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
 
         self.step(7)
         aMaxEncodedPixelRate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
         )
-        logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
+        log.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
         # Basic sanity check on stream's expected pixel rate
         streamPixelRate = (aVideoSensorParams.sensorWidth * aVideoSensorParams.sensorHeight
@@ -172,9 +176,9 @@ class TC_AVSM_2_13(MatterBaseTest):
         asserts.assert_greater_equal(aMaxEncodedPixelRate, streamPixelRate, "Stream Pixel rate exceeds camera maxEncodedPixelRate")
 
         self.step(8)
-        logger.info("Fetch feature map to check if WMark and OSD are supported")
+        log.info("Fetch feature map to check if WMark and OSD are supported")
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         try:
             watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
             osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
@@ -184,19 +188,18 @@ class TC_AVSM_2_13(MatterBaseTest):
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewport,
+                minResolution=aMinViewportResolution,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minKeyFrameInterval=4000,
-                maxKeyFrameInterval=4000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
@@ -209,7 +212,7 @@ class TC_AVSM_2_13(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
 
         self.step(10)
@@ -219,19 +222,18 @@ class TC_AVSM_2_13(MatterBaseTest):
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewport,
+                minResolution=aMinViewportResolution,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minKeyFrameInterval=4000,
-                maxKeyFrameInterval=4000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
@@ -245,8 +247,19 @@ class TC_AVSM_2_13(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
+
+        # Clear all allocated streams
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+
+        for stream in aAllocatedVideoStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(stream.videoStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

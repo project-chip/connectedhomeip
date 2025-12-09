@@ -32,10 +32,10 @@ set(SRC_DIRS_LIST
                       "${CHIP_ROOT}/examples/providers"
 )
 
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics")
     list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics")
-endif (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+endif (CONFIG_ENABLE_ESP_DIAGNOSTICS)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
@@ -68,7 +68,6 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common/temperature-measurement.zap
 )
 
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"

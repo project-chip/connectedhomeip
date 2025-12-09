@@ -37,22 +37,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:153
+            image: ghcr.io/project-chip/chip-build:177
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-
-            - name: Set Up Environment for Size Reports
-              uses: ./.github/actions/setup-size-reports
-              if: ${{ !env.ACT }}
-              with:
-                  gh-context: ${{ toJson(github) }}
 
             - name: Build Linux tv-app
               run: |
@@ -79,9 +73,3 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
               timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
-
-            - name: Uploading Size Reports
-              uses: ./.github/actions/upload-size-reports
-              if: ${{ !env.ACT }}
-              with:
-                  platform-name: Linux

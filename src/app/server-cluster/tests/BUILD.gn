@@ -21,13 +21,18 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAttributeListBuilder.cpp",
     "TestDefaultServerCluster.cpp",
+    "TestOptionalAttributeSet.cpp",
+    "TestServerClusterExtension.cpp",
     "TestServerClusterInterfaceRegistry.cpp",
+    "TestSingleEndpointServerClusterRegistry.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/app/server-cluster:registry",
