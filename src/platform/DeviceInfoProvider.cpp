@@ -96,7 +96,7 @@ uint16_t DeviceInfoProvider::GetSimultaneousInvocationsSupported() {
 uint16_t DeviceInfoProvider::GetSimultaneousWritesSupported() {
     return CHIP_IM_MAX_NUM_WRITE_HANDLER;
 }
-    
+
 uint16_t DeviceInfoProvider::GetReadPathsSupported() {
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS;
 }

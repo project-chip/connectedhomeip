@@ -134,7 +134,7 @@ public:
     uint16_t GetSimultaneousInvocationsSupported();
 
     uint16_t GetSimultaneousWritesSupported();
-    
+
     uint16_t GetReadPathsSupported();
 
     uint16_t GetSubscribePathsSupported();
