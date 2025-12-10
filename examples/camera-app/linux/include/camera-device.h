@@ -45,8 +45,8 @@ static constexpr uint32_t kMaxEncodedPixelRate       = 248832000; // 1080p at 12
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
-static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
-static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
+static constexpr uint16_t kMinResolutionWidth        = 640;  // Low VGA resolution
+static constexpr uint16_t kMinResolutionHeight       = 480;  // Low VGA resolution
 static constexpr uint16_t k720pResolutionWidth       = 1280; // 720p resolution
 static constexpr uint16_t k720pResolutionHeight      = 720;  // 720p resolution
 static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
@@ -87,10 +87,12 @@ class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface:
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
-    chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() override;
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    void
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
+    GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
@@ -126,7 +128,7 @@ public:
 
     // Allocate snapshot stream
     CameraError AllocateSnapshotStream(
-        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
         uint16_t & outStreamID) override;
 
     // Start snapshot stream

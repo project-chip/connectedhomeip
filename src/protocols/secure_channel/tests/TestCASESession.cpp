@@ -86,7 +86,7 @@ public:
     using CASESession::ParseSigma3TBEData;
 };
 
-class TestCASESession : public Test::LoopbackMessagingContext
+class TestCASESession : public chip::Testing::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
@@ -97,7 +97,7 @@ public:
     virtual void SetUp() override
     {
         ConfigInitializeNodes(false);
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 
     void ServiceEvents();
@@ -115,8 +115,9 @@ void TestCASESession::ServiceEvents()
     {
         DrainAndServiceIO();
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+        EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
+            (intptr_t) nullptr));
         chip::DeviceLayer::PlatformMgr().RunEventLoop();
     }
 }
@@ -619,10 +620,9 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
                                                     ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
                                                     nullptr, nullptr, &delegateCommissioner1, NullOptional),
               CHIP_NO_ERROR);
-    EXPECT_EQ(pairingCommissioner2.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
-                                                    nullptr, nullptr, &delegateCommissioner2, NullOptional),
-              CHIP_NO_ERROR);
+    EXPECT_SUCCESS(pairingCommissioner2.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
+                                                         nullptr, nullptr, &delegateCommissioner2, NullOptional));
 
     ServiceEvents();
 
@@ -671,14 +671,12 @@ TEST_F(TestCASESession, BadSignatureFailsCASE)
                   CHIP_NO_ERROR);
         pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
 
-        EXPECT_EQ(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
-                                                                  &delegateResponder, ScopedNodeId(),
-                                                                  Optional<ReliableMessageProtocolConfig>::Missing()),
-                  CHIP_NO_ERROR);
-        EXPECT_EQ(pairingInitiator.EstablishSession(
-                      sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator,
-                      nullptr, nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()),
-                  CHIP_NO_ERROR);
+        EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                       &delegateResponder, ScopedNodeId(),
+                                                                       Optional<ReliableMessageProtocolConfig>::Missing()));
+        EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+            sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+            nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
 
         ServiceEvents();
 
@@ -1637,7 +1635,7 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
         if (mSharedSecret != nullptr)
         {
             memcpy(sharedSecret.Bytes(), mSharedSecret->Bytes(), mSharedSecret->Length());
-            sharedSecret.SetLength(mSharedSecret->Length());
+            EXPECT_SUCCESS(sharedSecret.SetLength(mSharedSecret->Length()));
         }
         peerCATs = CATValues{};
         return mFindMethodReturnCode;
@@ -1649,7 +1647,7 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
         if (mSharedSecret != nullptr)
         {
             memcpy(sharedSecret.Bytes(), mSharedSecret->Bytes(), mSharedSecret->Length());
-            sharedSecret.SetLength(mSharedSecret->Length());
+            EXPECT_SUCCESS(sharedSecret.SetLength(mSharedSecret->Length()));
         }
         peerCATs = CATValues{};
         return mFindMethodReturnCode;
@@ -1694,9 +1692,9 @@ TEST_F(TestCASESession, SessionResumptionStorage)
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionIdB.data(), resumptionIdB.size()), CHIP_NO_ERROR);
 
     // Generate a shared secrets.
-    sharedSecretA.SetLength(sharedSecretA.Capacity());
+    EXPECT_SUCCESS(sharedSecretA.SetLength(sharedSecretA.Capacity()));
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecretA.Bytes(), sharedSecretA.Length()), CHIP_NO_ERROR);
-    sharedSecretB.SetLength(sharedSecretB.Capacity());
+    EXPECT_SUCCESS(sharedSecretB.SetLength(sharedSecretB.Capacity()));
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecretB.Bytes(), sharedSecretB.Length()), CHIP_NO_ERROR);
 
     struct
@@ -1890,14 +1888,14 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
     ExchangeContext * exchange = GetExchangeManager().NewContext(session.Value(), &delegate);
     ASSERT_NE(exchange, nullptr);
 
-    EXPECT_EQ(exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse));
 
     ServiceEvents();
 
     EXPECT_EQ(caseDelegate.mNumPairingErrors, 1u);
     EXPECT_EQ(caseDelegate.mNumPairingComplete, 0u);
 
-    GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1);
+    EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1));
     caseSession.Clear();
 }
 

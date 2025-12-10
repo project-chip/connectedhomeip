@@ -73,25 +73,16 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </feature>
     <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="2" code="PNC" name="PlugAndCharge" summary="EVSE supports PLC to support Plug and Charge">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
     <feature bit="3" code="RFID" name="RFID" summary="EVSE is fitted with an RFID reader">
       <optionalConform/>
     </feature>
     <feature bit="4" code="V2X" name="V2X" summary="EVSE supports bi-directional charging / discharging">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>

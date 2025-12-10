@@ -79,11 +79,6 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </feature>
       </features>
-      <attributes>
-        <attribute code="0x001C" name="SystemMode">
-          <disallowConform/>
-        </attribute>
-      </attributes>
     </cluster>
   </clusters>
   <composedDeviceTypes>
@@ -115,11 +110,6 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </feature>
       </features>
-      <attributes>
-        <attribute code="0x001C" name="SystemMode">
-          <disallowConform/>
-        </attribute>
-      </attributes>
     </cluster>
   </composedDeviceTypes>
 </deviceType>

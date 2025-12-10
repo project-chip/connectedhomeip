@@ -27,6 +27,7 @@
 #if !CHIP_DEVICE_LAYER_TARGET_FAKE
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -60,7 +61,7 @@ public:
             delete function;
         };
         auto * function = new std::function<void()>(lambda);
-        SystemLayer().StartTimer(delay, callback, function);
+        EXPECT_SUCCESS(SystemLayer().StartTimer(delay, callback, function));
         return [=] {
             SystemLayer().CancelTimer(callback, function);
             delete function;
@@ -102,7 +103,7 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerSequence)
                 loopHandler.trace.append("R");
                 ScheduleNextTick([&] {
                     loopHandler.trace.append("4");
-                    DeviceLayer::PlatformMgr().StopEventLoopTask();
+                    EXPECT_SUCCESS(DeviceLayer::PlatformMgr().StopEventLoopTask());
                 });
             });
         });
@@ -133,14 +134,14 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerWake)
             if (++count == 2)
             {
                 wakeTimestamp = System::SystemClock().GetMonotonicTimestamp();
-                DeviceLayer::PlatformMgr().StopEventLoopTask();
+                EXPECT_SUCCESS(DeviceLayer::PlatformMgr().StopEventLoopTask());
             }
         }
     } loopHandler;
 
     SystemLayer().AddLoopHandler(loopHandler);
     // Schedule a fallback timer to ensure the test stops.
-    auto cancelFallback = Schedule(1000_ms, [] { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+    auto cancelFallback = Schedule(1000_ms, [] { EXPECT_SUCCESS(DeviceLayer::PlatformMgr().StopEventLoopTask()); });
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     SystemLayer().RemoveLoopHandler(loopHandler);
     cancelFallback(); // avoid leaking the fallback timer

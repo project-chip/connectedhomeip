@@ -39,7 +39,9 @@ from matter.ChipStack import ChipStack
 from matter.storage import PersistentStorageJSON
 from matter.yaml.runner import ReplTestRunner
 from matter.yamltests.definitions import SpecDefinitionsFromPaths
-from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
+from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig, build_revision_var_name
+
+log = logging.getLogger(__name__)
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -54,6 +56,20 @@ async def execute_test(yaml, runner):
     for test_step in yaml.tests:
         if not test_step.is_pics_enabled:
             continue
+
+        if not test_step.is_revision_condition_passed:
+            # Try to get the var name and value for a more informative message
+            try:
+                var_name = build_revision_var_name(
+                    test_step.endpoint, test_step.cluster)
+                current_val = test_step.get_runtime_variable(var_name)
+            except (ValueError, IndexError, KeyError):
+                current_val = "unknown"
+
+            log.warning("Step '%s' skipped due to ClusterRevision range not matching (val=%s, min=%s, max=%s)",
+                        test_step.label, current_val, test_step.min_revision, test_step.max_revision)
+            continue
+
         test_action = runner.encode(test_step)
         if test_action is None:
             raise Exception(
@@ -64,12 +80,12 @@ async def execute_test(yaml, runner):
         post_processing_result = test_step.post_process_response(
             decoded_response)
         if not post_processing_result.is_success():
-            logging.warning(f"Test step failure in {test_step.label}")
+            log.warning("Test step failure in '%s'", test_step.label)
             for entry in post_processing_result.entries:
                 if entry.state == PostProcessCheckStatus.SUCCESS:
                     continue
-                logging.warning("%s: %s", entry.state, entry.message)
-            raise Exception(f'Test step failed {test_step.label}')
+                log.warning("%s: %s", entry.state, entry.message)
+            raise Exception(f"Test step failed '{test_step.label}'")
 
 
 def asyncio_executor(f):

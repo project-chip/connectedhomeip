@@ -32,12 +32,12 @@ bool HandleBooleanStateConfigurationTestEventTrigger(uint64_t eventTrigger)
     {
     case BooleanStateConfigurationTrigger::kSensorTrigger:
         ChipLogProgress(Support, "[BooleanStateConfiguration-Test-Event] => Trigger sensor");
-        SetAllEnabledAlarmsActive(1);
+        TEMPORARY_RETURN_IGNORED SetAllEnabledAlarmsActive(1);
         break;
 
     case BooleanStateConfigurationTrigger::kSensorUntrigger:
         ChipLogProgress(Support, "[BooleanStateConfiguration-Test-Event] => Untrigger sensor");
-        ClearAllAlarms(1);
+        TEMPORARY_RETURN_IGNORED ClearAllAlarms(1);
         break;
 
     default:

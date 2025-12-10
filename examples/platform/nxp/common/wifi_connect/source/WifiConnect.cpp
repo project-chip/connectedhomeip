@@ -45,6 +45,10 @@ CHIP_ERROR WifiConnectAtboot(chip::DeviceLayer::NetworkCommissioning::WiFiDriver
         VerifyOrReturnError(status == chip::DeviceLayer::NetworkCommissioning::Status::kSuccess, CHIP_ERROR_CONNECTION_ABORTED);
         wifiDriver->ConnectNetwork(ssidSpan, nullptr);
     }
+    if (networks != nullptr)
+    {
+        networks->Release();
+    }
     return CHIP_NO_ERROR;
 }
 

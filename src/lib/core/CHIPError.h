@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ namespace chip {
  * CHIP SDK errors inside Range::kSDK consist of a component identifier given by SdkPart and an arbitrary small
  * integer Code.
  */
-class ChipError
+class [[nodiscard]] ChipError
 {
 public:
     /// Internal representation of an error.
@@ -202,8 +202,8 @@ public:
      *  This only compares the error code. Under the CHIP_CONFIG_ERROR_SOURCE configuration, errors compare equal
      *  if they have the same error code, even if they have different source locations.
      */
-    bool operator==(const ChipError & other) const { return mError == other.mError; }
-    bool operator!=(const ChipError & other) const { return mError != other.mError; }
+    __attribute__((always_inline)) inline bool operator==(const ChipError & other) const { return mError == other.mError; }
+    __attribute__((always_inline)) inline bool operator!=(const ChipError & other) const { return mError != other.mError; }
 
     /**
      * Return an integer code for the error.
@@ -350,6 +350,9 @@ public:
 #endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 
 #endif // CHIP_CONFIG_ERROR_SOURCE
+
+    // Helper method to convert common failures which are expected into CHIP_NO_ERROR.
+    ChipError NoErrorIf(ChipError suppressed);
 
 private:
     /*
@@ -1849,10 +1852,25 @@ using CHIP_ERROR = ::chip::ChipError;
 // of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
 // in core/tests/TestCHIPErrorStr.cpp
 
+// Prior to ChipError being marked [[nodiscard]], there were numerous places
+// where the return value was ignored.
+// This grandfathers those usages.
+// NEW CODE SHOULD NOT USE THIS
+#define TEMPORARY_RETURN_IGNORED (void)
+
+// Explicitly ignores a ChipError returned from a method, if a failure can be safely ignored.
+// USE WITH EXTREME CAUTION
+// LogOnFailure may be a better approach
+#define RETURN_SAFELY_IGNORED (void)
+
 namespace chip {
 
 extern void RegisterCHIPLayerErrorFormatter();
 extern void DeregisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
+__attribute__((always_inline)) inline ChipError ChipError::NoErrorIf(ChipError suppressed)
+{
+    return (*this == suppressed) ? CHIP_NO_ERROR : *this;
+}
 } // namespace chip

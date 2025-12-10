@@ -173,21 +173,21 @@ private:
     {
         if (mInstance)
         {
-            mInstance->SetMeterType(mMeterType);
-            mInstance->SetPointOfDelivery(mPointOfDelivery);
-            mInstance->SetMeterSerialNumber(mMeterSerialNumber);
-            mInstance->SetProtocolVersion(mProtocolVersion);
-            mInstance->SetPowerThreshold(mPowerThreshold);
+            TEMPORARY_RETURN_IGNORED mInstance->SetMeterType(mMeterType);
+            TEMPORARY_RETURN_IGNORED mInstance->SetPointOfDelivery(mPointOfDelivery);
+            TEMPORARY_RETURN_IGNORED mInstance->SetMeterSerialNumber(mMeterSerialNumber);
+            TEMPORARY_RETURN_IGNORED mInstance->SetProtocolVersion(mProtocolVersion);
+            TEMPORARY_RETURN_IGNORED mInstance->SetPowerThreshold(mPowerThreshold);
         }
     }
 
     void UpdAttrsByPresetIdx()
     {
-        mInstance->SetMeterType(TestsDataPresets[mPresetsIdx].meterType);
-        mInstance->SetPointOfDelivery(TestsDataPresets[mPresetsIdx].pointOfDelivery);
-        mInstance->SetMeterSerialNumber(TestsDataPresets[mPresetsIdx].meterSerialNumber);
-        mInstance->SetProtocolVersion(TestsDataPresets[mPresetsIdx].protocolVersion);
-        mInstance->SetPowerThreshold(TestsDataPresets[mPresetsIdx].powerThreshold);
+        TEMPORARY_RETURN_IGNORED mInstance->SetMeterType(TestsDataPresets[mPresetsIdx].meterType);
+        TEMPORARY_RETURN_IGNORED mInstance->SetPointOfDelivery(TestsDataPresets[mPresetsIdx].pointOfDelivery);
+        TEMPORARY_RETURN_IGNORED mInstance->SetMeterSerialNumber(TestsDataPresets[mPresetsIdx].meterSerialNumber);
+        TEMPORARY_RETURN_IGNORED mInstance->SetProtocolVersion(TestsDataPresets[mPresetsIdx].protocolVersion);
+        TEMPORARY_RETURN_IGNORED mInstance->SetPowerThreshold(TestsDataPresets[mPresetsIdx].powerThreshold);
 
         mPresetsIdx = !mPresetsIdx;
     }

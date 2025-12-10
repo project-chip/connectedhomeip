@@ -167,7 +167,7 @@ void BLEManagerImpl::HandleAdvertisingTimeout(chip::System::Layer *, void * appS
     VerifyOrReturn(self->mFlags.Has(Flags::kFastAdvertisingEnabled));
 
     ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-    self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    TEMPORARY_RETURN_IGNORED self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 }
 
 BLEManagerImpl::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() const
@@ -300,23 +300,23 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
     {
         mFlags.Set(Flags::kAdvertising);
         NotifyBLEPeripheralAdvStartComplete(CHIP_NO_ERROR);
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
             // Start a timer to make sure that the fast advertising is stopped after specified timeout.
-            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimeout, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimeout, this);
         });
     }
     else
     {
         mFlags.Clear(Flags::kAdvertising);
         NotifyBLEPeripheralAdvStopComplete(CHIP_NO_ERROR);
-        DeviceLayer::SystemLayer().ScheduleLambda(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
             [this] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimeout, this); });
     }
 
     if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))
     {
         mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
-        DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
     }
 
     mAdvReqInProgress = false;
@@ -480,14 +480,14 @@ void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimeout, this);
-    mDeviceScanner.StopScan();
+    TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     /* Initiate Connect */
     auto params = std::make_pair(this, scanInfo.remote_address);
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](decltype(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
 }
 
@@ -843,7 +843,7 @@ void BLEManagerImpl::RemoveConnection(const char * remoteAddr)
     // immediately, because the BLE layer might still use it. Instead, we will also
     // schedule the deletion of the connection object, so it will happen after the
     // BLE layer has processed the disconnection event.
-    DeviceLayer::SystemLayer().ScheduleLambda([conn] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([conn] {
         ChipLogDetail(DeviceLayer, "Freeing BLE connection");
         chip::Platform::Delete(conn);
     });
@@ -1271,7 +1271,8 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     }
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
@@ -1288,11 +1289,11 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     /* Send StartScan Request to Scanner Class */
     strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
     err = mDeviceScanner.StartScan(ScanFilterType::kServiceData, data);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
+    SuccessOrExitAction(err, ChipLogFailure(err, Ble, "Failed to start BLE scan"));
 
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimeout, this);
-    VerifyOrExit(err == CHIP_NO_ERROR, mDeviceScanner.StopScan();
-                 ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format()));
+    SuccessOrExitAction(err, TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
+                        ChipLogFailure(err, Ble, "Failed to start BLE scan timeout"));
 
     mBLEScanConfig.mBleScanState = scanType;
     return;
@@ -1306,7 +1307,7 @@ void BLEManagerImpl::HandleScanTimeout(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
     manager->OnScanError(CHIP_ERROR_TIMEOUT);
-    manager->mDeviceScanner.StopScan();
+    TEMPORARY_RETURN_IGNORED manager->mDeviceScanner.StopScan();
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
@@ -1315,7 +1316,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimeout, this);
-        mDeviceScanner.StopScan();
+        TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     }
     return CHIP_NO_ERROR;
 }
