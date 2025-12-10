@@ -1427,7 +1427,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
 
-
     async def request_device_factory_reset(self):
         """Request a factory reset of the Device Under Test (DUT).
 
