@@ -68,5 +68,36 @@ TEST(ChipErrorTest, StorageTypeConstructor)
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 
+TEST(ChipErrorTest, PlatformEncapsulationPositiveValue)
+{
+    ChipError error(ChipError::Range::kPlatform, /*value=*/42 CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetPlatformValue(), 42);
+}
+
+TEST(ChipErrorTest, PlatformEncapsulationPositiveBigValue)
+{
+    // Because the platform encapsulation uses 31 bits to store the platform error value
+    // the maximal possible value which can be store is 0x3FFFFFFF (the highest bit in the
+    // 31-bit integer needs to be 0 so it would be possible to restore the sign).
+    ChipError error(ChipError::Range::kPlatform, /*value=*/0x3FFFFFFF CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetPlatformValue(), 0x3FFFFFFF);
+}
+
+TEST(ChipErrorTest, PlatformEncapsulationNegativeValue)
+{
+    ChipError error(ChipError::Range::kPlatform, /*value=*/-42 CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetPlatformValue(), -42);
+}
+
+TEST(ChipErrorTest, PlatformEncapsulationNegativeBigValue)
+{
+    ChipError error(ChipError::Range::kPlatform, /*value=*/-0x3FFFFFFF - 1 CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetPlatformValue(), -0x3FFFFFFF - 1);
+}
+
 } // namespace
 } // namespace chip
