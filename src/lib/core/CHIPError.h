@@ -419,8 +419,9 @@ private:
     {
         // Mask value for every range except kPlatform range. The kPlatform range
         // is special, because we are using only the highest bit to determine whether
-        // the range is kPlatform and the rest is used to sore the value itself.
-        return (range != Range::kPlatform) ? (value & MakeMask(kValueStart, kValueLength)) : value;
+        // the range is kPlatform and the rest is used to store the value itself.
+        return (range != Range::kPlatform) ? (static_cast<StorageType>(value) & MakeMask(kValueStart, kValueLength))
+                                           : static_cast<StorageType>(value);
     }
 
     template <unsigned int START, unsigned int LENGTH>
