@@ -40,6 +40,9 @@ RUN apt-get update \
     docker.io \
     iputils-ping \
     icecc \
+    # emacs pulls in libgccjit0 -> libgcc-14-dev without libstdc++-14-dev which causes clang++ to fail \
+    # See-Also: https://bugs.launchpad.net/ubuntu/+source/llvm-defaults/+bug/2077130 \
+    libstdc++-14-dev \
     && :
 
 RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -f1) || true) \
