@@ -1678,7 +1678,6 @@ TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-#if 0
 TEST_F(TestCommandInteraction, TestCommandSenderCommandAsyncSuccessResponseFlow)
 {
 
@@ -2146,7 +2145,6 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchan
     asyncCommandHandle.Get()->GetExchangeContext()->OnSessionReleased();
     asyncCommandHandle = nullptr;
 }
-#endif
 #endif
 
 } // namespace app
