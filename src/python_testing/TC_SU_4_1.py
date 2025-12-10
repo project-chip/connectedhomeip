@@ -43,18 +43,23 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import os
+import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_SUTestBase import SoftwareUpdateBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 # Create a logger
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_4_1(MatterBaseTest):
+class TC_SU_4_1(SoftwareUpdateBaseTest):
     """
         Validate OTA Requestor (DUT) attribute behavior across fabrics:
         - DefaultOTAProviders
@@ -82,8 +87,8 @@ class TC_SU_4_1(MatterBaseTest):
             AssertionError: If writing the ACL attribute fails (status is not Status.Success).
         """
         result = await controller.WriteAttribute(
-            self.dut_node_id,
-            [(0, Clusters.AccessControl.Attributes.Acl(acl))]
+            nodeId=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
@@ -222,8 +227,8 @@ class TC_SU_4_1(MatterBaseTest):
 
         # Write updated DefaultOTAProviders attribute to DUT (TH1)
         resp = await th3.WriteAttribute(
-            attributes=[(0, attr)],
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
+            attributes=[(0, attr)]
         )
         logger.info(f'Step #3 - Write DefaultOTAProviders response: {resp}')
         # Status=<Status.Success: 0
@@ -342,8 +347,8 @@ class TC_SU_4_1(MatterBaseTest):
 
         # Write updated DefaultOTAProviders attribute to TH4
         resp = await th4.WriteAttribute(
-            attributes=[(0, attr)],
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
+            attributes=[(0, attr)]
         )
         logger.info(f'Step #5- Write DefaultOTAProviders response: {resp}')
         #  Status=<Status.ConstraintError: 135
@@ -375,8 +380,8 @@ class TC_SU_4_1(MatterBaseTest):
 
         # Write updated DefaultOTAProviders attribute to TH3
         resp = await th3.WriteAttribute(
+            nodeId=self.dut_node_id,
             attributes=[(0, attr)],
-            nodeid=self.dut_node_id,
         )
         logger.info(f'Step #6- Write DefaultOTAProviders response on TH3 Fabric 2: {resp}')
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
