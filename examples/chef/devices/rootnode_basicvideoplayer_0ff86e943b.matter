@@ -2002,7 +2002,7 @@ cluster TargetNavigator = 1285 {
   info event TargetUpdated = 0 {
     TargetInfoStruct targetList[] = 0;
     int8u currentTarget = 1;
-    octet_string data = 2;
+    long_octet_string data = 2;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
