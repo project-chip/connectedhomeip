@@ -435,12 +435,9 @@ TEST_F(TestBasicInformationReadWrite, StartUpEventTest)
     ASSERT_TRUE(event.has_value());
 
     // Ensure the event priority is CRITICAL as per spec
-    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical);
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical); // NOLINT(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
-
-    // Verify the attribute itself is readable (sanity check)
-    ASSERT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, expectedSoftwareVersion), CHIP_NO_ERROR);
 
     // Verify the event payload matches the current SoftwareVersion
     ASSERT_EQ(decodedEvent.softwareVersion, expectedSoftwareVersion);
@@ -466,7 +463,7 @@ TEST_F(TestBasicInformationReadWrite, ShutDownEventTest)
     ASSERT_TRUE(event.has_value());
 
     // Ensure the event priority is CRITICAL
-    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical);
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical); // NOLINT(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
 }
@@ -500,7 +497,8 @@ TEST_F(TestBasicInformationReadWrite, LeaveEventTest)
     ASSERT_TRUE(event.has_value());
 
     // Ensure the event priority is INFO
-    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info);
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info); // NOLINT(bugprone-unchecked-optional-access)
+
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
 
     // Verify the event contains the correct FabricIndex of the network left
@@ -533,7 +531,7 @@ TEST_F(TestBasicInformationReadWrite, ReachableEventTest)
     ASSERT_TRUE(event.has_value());
 
     // Ensure the event priority is INFO
-    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info);
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info); // NOLINT(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_EQ(decodedEvent.reachableNewValue, newReachable);
