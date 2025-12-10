@@ -1640,11 +1640,13 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
 {
     mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+    mPushAVTransportManager.HandleZoneTrigger(zoneID);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
 {
     mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+    // Note: PushAVTransportManager doesn't need zone stopped notification currently
 }
 
 void CameraDevice::InitializeVideoStreams()
