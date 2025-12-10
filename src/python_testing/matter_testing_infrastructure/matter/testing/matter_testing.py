@@ -1369,17 +1369,30 @@ class MatterBaseTest(base_test.BaseTestClass):
             error_message='Push AV Stream validation failed'
         )
 
-    async def device_reboot(self, factory_reset: bool = False):
-        """Reboot the Device Under Test (DUT), optionally performing a factory reset.
+    def _expire_sessions_on_all_controllers(self):
+        """Helper method to expire sessions on all active controllers via the fabric admin interface.
+
+        This method iterates through all certificate authorities and their fabric admins to expire
+        sessions on all active controllers. This ensures all controllers can reconnect after a device
+        reboot or factory reset.
+        """
+        LOGGER.info(f"Expiring sessions on all active controllers")
+        for ca in self.matter_stack.certificate_authorities:
+            for fabric_admin in ca.adminList:
+                for controller in fabric_admin._activeControllers:
+                    if controller.isActive:
+                        try:
+                            controller.ExpireSessions(self.dut_node_id)
+                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                        except Exception as e:
+                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+
+    async def request_device_reboot(self):
+        """Request a reboot of the Device Under Test (DUT).
 
         This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
         and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
-        to the DUT after the reboot. If factory_reset is True, it will clear previously connected controllers by removing KVS file.
-
-        Args:
-            factory_reset: If True, signals the test runner to perform a factory reset
-                (by removing KVS file) by writing "reset" to the restart_flag_file. # Functionality implemented by Raul.
-                If False, performs a simple reboot. Default is False.
+        to the DUT after the reboot.
 
         Returns:
             None
@@ -1392,37 +1405,65 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
 
             # After manual reboot, expire previous sessions so that we can re-establish connections
-            LOGGER.info("Expiring sessions after manual device reboot")
-            if hasattr(self, 'th1') and self.th1:
-                self.th1.ExpireSessions(self.dut_node_id)
-            if hasattr(self, 'th2') and self.th2:
-                self.th2.ExpireSessions(self.dut_node_id)
+            self._expire_sessions_on_all_controllers()
             LOGGER.info("Manual device reboot completed")
 
         else:
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
-                    if factory_reset:
-                        f.write("reset")
-                    else:
-                        f.write("restart")
-                    LOGGER.info("Created restart flag file to signal app restart")
+                    f.write("restart")
+                LOGGER.info("Created restart flag file to signal app restart")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
                 # Waiting a bit longer for the app to be ready and stable after restart.
                 await asyncio.sleep(1)
 
                 # Expire sessions and re-establish connections
-                if hasattr(self, 'th1') and self.th1:
-                    self.th1.ExpireSessions(self.dut_node_id)
-                if hasattr(self, 'th2') and self.th2:
-                    self.th2.ExpireSessions(self.dut_node_id)
+                self._expire_sessions_on_all_controllers()
                 LOGGER.info("App restart completed successfully")
 
             except Exception as e:
                 LOGGER.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
+
+
+    async def request_device_factory_reset(self):
+        """Request a factory reset of the Device Under Test (DUT).
+
+        This method handles factory resets in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input) this functionality is implemented by Raul in DA_1_1 test module. 
+        It will expire existing sessions to allow for controllers to reconnect to the DUT after the factory reset.
+        """
+        # Check if restart flag file is available (indicates test runner supports app reboot)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Factory reset the DUT. Press Enter when ready.\n")
+
+            # After manual factory reset, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device factory reset completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("reset")
+                    LOGGER.info("Created restart flag file to signal app reboot and wrote reset to trigger factory reset (remove KVS file)")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting a bit longer for the app to be ready and stable after reboot.
+                await asyncio.sleep(1)
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("App reboot completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to reboot app: {e}")
+                asserts.fail(f"App reboot failed: {e}")
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

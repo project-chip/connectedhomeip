@@ -228,7 +228,7 @@ class TC_ACL_2_10(MatterBaseTest):
         self.step(9)
         # Reboot DUT
         # Check if restart flag file is available (indicates test runner supports app restart)
-        await self.device_reboot()
+        await self.request_device_reboot()
 
         self.step(10)
         # TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute
