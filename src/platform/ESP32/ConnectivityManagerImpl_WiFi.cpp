@@ -548,9 +548,8 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             // Initiate a connection to the AP if we haven't done so before, or if enough
             // time has passed since the last attempt.
-            if ((mLastStationConnectFailTime == System::Clock::kZero ||
-                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval) &&
-                mWiFiStationState != kWiFiStationState_Connecting)
+            if (mLastStationConnectFailTime == System::Clock::kZero ||
+                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
                 esp_err_t err = esp_wifi_connect();
