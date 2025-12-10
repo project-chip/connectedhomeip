@@ -60,7 +60,6 @@ class RunContext:
     root: str
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
-    dry_run: bool
     runtime: TestRunTime
 
     # If not empty, include only the specified test tags
@@ -76,11 +75,6 @@ class RunContext:
     default='info',
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
-@click.option(
-    '--dry-run',
-    default=False,
-    is_flag=True,
-    help='Only print out shell commands that would be executed')
 @click.option(
     '--target',
     default=['all'],
@@ -131,7 +125,7 @@ class RunContext:
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.pass_context
-def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
+def main(context, log_level, target, target_glob, target_skip_glob,
          no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, runner):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
@@ -203,7 +197,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
-                             dry_run=dry_run, runtime=runtime,
+                             runtime=runtime,
                              include_tags=include_tags,
                              exclude_tags=exclude_tags)
 
@@ -223,16 +217,21 @@ def cmd_list(context):
 @main.command(
     'run', help='Execute the tests')
 @click.option(
+    '--dry-run',
+    default=False,
+    is_flag=True,
+    help='Only print out shell commands that would be executed')
+@click.option(
     '--iterations',
     default=1,
     help='Number of iterations to run')
 @click.option(
     '--app-path', multiple=True,
-    help='Set path for an application, value should be <key>:<path>'
+    help='Set path for an application (run in app network namespace), value should be <key>:<path>'
 )
 @click.option(
     '--tool-path', multiple=True,
-    help='Set path for a tool, value should be <key>:<path>'
+    help='Set path for a tool (run in tool network namespace), value should be <key>:<path>'
 )
 @click.option(
     '--custom-path', multiple=True,
@@ -275,7 +274,7 @@ def cmd_list(context):
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
-def cmd_run(context, iterations, app_path, tool_path, custom_path, discover_paths,
+def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, discover_paths,
             pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
@@ -366,18 +365,18 @@ def cmd_run(context, iterations, app_path, tool_path, custom_path, discover_path
 
             test_start = time.monotonic()
             try:
-                if context.obj.dry_run:
+                if dry_run:
                     log.info("Would run test: '%s'", test.name)
                 else:
                     log.info("%-20s - Starting test", test.name)
                 test.Run(
                     runner, apps_register, subproc_info_repo,
-                    pics_file, test_timeout_seconds, context.obj.dry_run,
+                    pics_file, test_timeout_seconds, dry_run,
                     test_runtime=context.obj.runtime,
                     ble_controller_app=ble_controller_app,
                     ble_controller_tool=ble_controller_tool,
                 )
-                if not context.obj.dry_run:
+                if not dry_run:
                     test_end = time.monotonic()
                     log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
             except Exception:
