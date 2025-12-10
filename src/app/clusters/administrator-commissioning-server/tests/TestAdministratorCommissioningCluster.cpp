@@ -26,19 +26,18 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/NetworkCommissioning.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
+#include <app/server-cluster/testing/EmptyProvider.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
-
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 
 namespace {
 
@@ -56,30 +55,43 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     static chip::Credentials::PersistentStorageOpCertStore sTestOpCertStore;
     static chip::PersistentStorageOperationalKeystore sTestOpKeystore;
     static chip::TestPersistentStorageDelegate sStorageDelegate;
+    static chip::Testing::EmptyProvider sEmptyProvider;
 
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-        git
 
-            ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
+        SetCommissionableDataProvider(&sTestCommissionableDataProvider);
+
+        ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
         ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
 
-        auto & fabricTable = Server::GetInstance().GetFabricTable();
-        FabricTable::InitParams initParams;
-        initParams.storage             = &sStorageDelegate;
-        initParams.operationalKeystore = &sTestOpKeystore;
-        initParams.opCertStore         = &sTestOpCertStore;
-        ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
+        // auto & fabricTable = Server::GetInstance().GetFabricTable();
+        // FabricTable::InitParams initParams;
+        // initParams.storage             = &sStorageDelegate;
+        // initParams.operationalKeystore = &sTestOpKeystore;
+        // initParams.opCertStore         = &sTestOpCertStore;
+        // ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
 
         // Initialize CommissioningWindowManager so it has a valid Server pointer
-        -ASSERT_EQ(Server::GetInstance().GetCommissioningWindowManager().Init(&Server::GetInstance()), CHIP_NO_ERROR);
+        chip::CommonCaseDeviceServerInitParams serverInitParams;
+        static chip::app::DefaultTimerDelegate sTimerDelegate;
+        static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+        serverInitParams.reportScheduler           = &sReportScheduler;
+        serverInitParams.opCertStore               = &sTestOpCertStore;
+        serverInitParams.operationalKeystore       = &sTestOpKeystore;
+        serverInitParams.persistentStorageDelegate = &sStorageDelegate;
+        (void) serverInitParams.InitializeStaticResourcesBeforeServerInit();
+        serverInitParams.dataModelProvider = &sEmptyProvider;
+        ASSERT_EQ(Server::GetInstance().Init(serverInitParams), CHIP_NO_ERROR);
+        // ASSERT_EQ(Server::GetInstance().GetCommissioningWindowManager().Init(&Server::GetInstance()), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
-        chip::Server::GetInstance().GetCommissioningWindowManager().Shutdown();
-        chip::Server::GetInstance().GetFabricTable().Shutdown();
+        // chip::Server::GetInstance().GetCommissioningWindowManager().Shutdown();
+        // chip::Server::GetInstance().GetFabricTable().Shutdown();
+        // Server::GetInstance().Shutdown();
         sTestOpCertStore.Finish();
         sTestOpKeystore.Finish();
         chip::DeviceLayer::PlatformMgr().Shutdown();
@@ -91,6 +103,7 @@ chip::DeviceLayer::TestOnlyCommissionableDataProvider TestAdministratorCommissio
 chip::Credentials::PersistentStorageOpCertStore TestAdministratorCommissioningCluster::sTestOpCertStore;
 chip::PersistentStorageOperationalKeystore TestAdministratorCommissioningCluster::sTestOpKeystore;
 chip::TestPersistentStorageDelegate TestAdministratorCommissioningCluster::sStorageDelegate;
+chip::Testing::EmptyProvider TestAdministratorCommissioningCluster::sEmptyProvider;
 
 const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
 
@@ -246,9 +259,6 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
     request.salt = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20, 0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
 
-    // auto optCertStore = chip::Server::GetInstance().GetOpCertStore();
-    // chip::CommonCaseDeviceServerInitParams initParams;
-    // EXPECT_EQ(initParams.opCertStore, nullptr);
     auto & fabricTable          = Server::GetInstance().GetFabricTable();
     FabricIndex testFabricIndex = kTestFabricIndex;
     ASSERT_EQ(fabricTable.AddNewFabricForTest(chip::TestCerts::GetRootACertAsset().mCert, chip::TestCerts::GetIAA1CertAsset().mCert,
@@ -257,34 +267,6 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
               CHIP_NO_ERROR);
     ASSERT_NE(testFabricIndex, chip::kUndefinedFabricIndex);
     tester.SetFabricIndex(testFabricIndex);
-    // ASSERT_EQ(optCertStore, nullptr);
-
-    // OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
-    //                                                    .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-    //                                                    .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-    //                                                    .dnssdServer     = app::DnssdServer::Instance(),
-    //                                                    .commissioningWindowManager =
-    //                                                        Server::GetInstance().GetCommissioningWindowManager() };
-    // OperationalCredentialsCluster opCreds(kRootEndpointId, context);
-    // chip::Testing::ClusterTester opCredsTester(opCreds);
-    // EXPECT_EQ(opCreds.Startup(opCredsTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    // opCredsTester.SetFabricIndex(testFabricIndex);
-
-    // 1. Arm FailSafe because AddNOC command requires it.
-    // auto & failSafe = context.failSafeContext;
-    // ASSERT_EQ(failSafe.ArmFailSafe(testFabricIndex, System::Clock::Seconds16(900)), CHIP_NO_ERROR);
-
-    // 2. Add Trusted Root Cert for the fabric.
-    // OperationalCredentials::Commands::AddTrustedRootCertificate::Type addRcaRequest;
-    // addRcaRequest.rootCACertificate = chip::TestCerts::GetRootACertAsset().mCert;
-    // auto root = opCredsTester.Invoke(OperationalCredentials::Commands::AddTrustedRootCertificate::Id, addRcaRequest);
-    // ASSERT_TRUE(root.status.has_value());
-    // ASSERT_TRUE(root.status->IsSuccess());
-
-    // Read Fabrics attribute to verify the fabric was added
-    // OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
-    // auto stat = opCredsTester.ReadAttribute(OperationalCredentials::Attributes::Fabrics::Id, fabrics);
-    // ASSERT_TRUE(stat.IsSuccess());
 
     auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
     ASSERT_TRUE(result.IsSuccess());
