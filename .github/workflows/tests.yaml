@@ -537,6 +537,12 @@ jobs:
             - name: Clean out
               run: rm -rf out/
             - name: Run Tests using the python parser sending commands to chip-tool
+              # Use sudo to avoid Local Network Privacy restrictions on macOS 15+.
+              # macOS 15 introduced Local Network Privacy which restricts multicast traffic in several ways.
+              # Running from ssh, running from Terminal.app, or accepting a UI prompt can allow access, but those 
+              # aren't great options in CI.
+              # Processes run as root are exempt from these restrictions.
+              # For details, see https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#macOS-considerations
               run: |
                   sudo ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -561,6 +567,8 @@ jobs:
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
+              # Use sudo to avoid Local Network Privacy restrictions on macOS 15+.
+              # See comment on earlier step about Local Network Privacy and root exemption.
               run: |
                   sudo ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
