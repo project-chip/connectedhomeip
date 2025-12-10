@@ -51,7 +51,7 @@ from matter.testing.matter_asserts import is_valid_int_value
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, matchers,
                                            run_if_endpoint_matches)
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class TC_DISHM_2_1(MatterBaseTest):
@@ -130,8 +130,8 @@ class TC_DISHM_2_1(MatterBaseTest):
         supported_modes_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=supported_modes_attribute)
         modes = [m.mode for m in supported_modes_dut]
 
-        logging.info(f"SupportedModes: {supported_modes_dut}")
-        logging.info(f"Modes: {modes}")
+        logger.info(f"SupportedModes: {supported_modes_dut}")
+        logger.info(f"Modes: {modes}")
 
         can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
         can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
@@ -201,7 +201,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                                 "Unexpected return type for ChangeToMode")
 
-            logging.info(f"response: {change_to_mode_response}")
+            logger.info(f"response: {change_to_mode_response}")
 
             st = change_to_mode_response.status
 
