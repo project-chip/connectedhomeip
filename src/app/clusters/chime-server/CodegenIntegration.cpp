@@ -25,13 +25,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
 using chip::app::Clusters::ChimeServer;
 
-ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate)
-{
-    // CodegenDataModelProvider::Instance() is a Meyer’s singleton so it's safe to call this here without worrying about
-    // intialization order. It's also OK to Register() the cluster in the provider even if the endpoint is not yet started up. It
-    // will be started up when the endpoint is started and a context is set.
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-}
+ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate) {}
 
 ChimeServer::~ChimeServer()
 {
@@ -40,8 +34,10 @@ ChimeServer::~ChimeServer()
 
 CHIP_ERROR ChimeServer::Init()
 {
-    // Registration is done in constructor
-    return CHIP_NO_ERROR;
+    // CodegenDataModelProvider::Instance() is a Meyer’s singleton so it's safe to call this here without worrying about
+    // intialization order. It's also OK to Register() the cluster in the provider even if the endpoint is not yet started up. It
+    // will be started up when the endpoint is started and a context is set.
+    return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 
 Protocols::InteractionModel::Status ChimeServer::SetSelectedChime(uint8_t chimeSoundID)
