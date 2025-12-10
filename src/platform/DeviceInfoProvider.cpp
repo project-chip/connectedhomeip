@@ -103,13 +103,15 @@ uint16_t DeviceInfoProvider::GetSimultaneousWritesSupported()
 
 uint16_t DeviceInfoProvider::GetReadPathsSupported()
 {
-    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= UINT16_MAX, "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must fit in uint16_t");
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= UINT16_MAX,
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must fit in uint16_t");
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS;
 }
 
 uint16_t DeviceInfoProvider::GetSubscribePathsSupported()
 {
-    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= UINT16_MAX, "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must fit in uint16_t");
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= UINT16_MAX,
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must fit in uint16_t");
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS;
 }
 

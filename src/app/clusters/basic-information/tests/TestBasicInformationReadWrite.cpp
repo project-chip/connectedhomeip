@@ -142,7 +142,7 @@ protected:
     // Simple no-op implementations - we only need these to return success
     // so that the cluster's validation logic can be tested
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override{ return CHIP_NO_ERROR; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override { return CHIP_NO_ERROR; }
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
     CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
 };
@@ -198,7 +198,8 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override {
+    void SetUp() override
+    {
         ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
         DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
     }
