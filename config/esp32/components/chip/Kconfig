@@ -477,7 +477,7 @@ menu "CHIP Device Layer"
 
         config ICD_CLIENTS_SUPPORTED_PER_FABRIC
             int "ICD Clients Number Supported Per Fabric"
-            depends on ENABLE_ICD_SERVER
+            depends on ENABLE_ICD_CIP
             default 1
             help
                 This value indicates the maximum number of entries that the ICD server is able to store
