@@ -22,7 +22,6 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters::Identify;
 using chip::app::Clusters::ChimeServer;
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate) {}

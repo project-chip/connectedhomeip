@@ -51,7 +51,7 @@ public:
      * Sets the Enabled attribute. Note, this also handles writing the new value into non-volatile storage.
      * @param Enabled The value to which the Enabled  is to be set.
      */
-    Protocols::InteractionModel::Status SetEnabled(bool Enabled);
+    Protocols::InteractionModel::Status SetEnabled(bool enabled);
 
     // Attribute Getters
     /**
