@@ -39,7 +39,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::Testing;
 
-
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
