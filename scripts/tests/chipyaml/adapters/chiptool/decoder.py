@@ -92,13 +92,13 @@ class Decoder:
                 elif key == _EVENT_ID:
                     key = _EVENT
                     value = specs.get_event_name(payload[_CLUSTER_ID], value)
-                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR or key == _DATA_VERSION or key == _EVENT_NUMBER:
+                elif key in (_VALUE, _ERROR, _CLUSTER_ERROR, _DATA_VERSION, _EVENT_NUMBER):
                     pass
                 else:
                     # Raise an error since the other fields probably needs to be translated too.
                     raise KeyError(f'Error: field "{key}" not supported')
 
-                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT) and _ERROR not in payload:
+                if value is None and (key in (_CLUSTER, _RESPONSE, _ATTRIBUTE, _EVENT)) and _ERROR not in payload:
                     # If the definition for this cluster/command/attribute/event is missing, there is not
                     # much we can do to convert the response to the proper format. It usually indicates that
                     # the cluster definition is missing something. So we just raise an exception to tell the

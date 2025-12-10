@@ -41,6 +41,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_BOOLCFG_3_1(MatterBaseTest):
     async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
@@ -101,20 +103,20 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         self.step(6)
         for sens_level in range(numberOfSupportedLevels):
-            logging.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
+            log.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(sens_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         self.step(7)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
             selected_non_default_level = choice([i for i in range(numberOfSupportedLevels) if i not in [default_level]])
-            logging.info(f"Write non-default sensitivity level ({selected_non_default_level}) to CurrentSensitivityLevel)")
+            log.info(f"Write non-default sensitivity level ({selected_non_default_level}) to CurrentSensitivityLevel)")
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         self.step(8)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
-            logging.info(f"Write default sensitivity level ({default_level}) to CurrentSensitivityLevel)")
+            log.info(f"Write default sensitivity level ({default_level}) to CurrentSensitivityLevel)")
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 

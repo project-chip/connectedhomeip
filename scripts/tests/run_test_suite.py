@@ -151,7 +151,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     if chip_tool is not None:
         chip_tool = SubprocessInfo(kind='tool', path=chip_tool)
-    elif not runtime == TestRunTime.MATTER_REPL_PYTHON:
+    elif runtime != TestRunTime.MATTER_REPL_PYTHON:
         paths_finder = PathsFinder()
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
             chip_tool_path = paths_finder.get('chip-tool')

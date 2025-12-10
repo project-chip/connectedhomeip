@@ -155,7 +155,7 @@ protected:
     void InitDataModelForTesting() override {}
 };
 
-class TestServerCommandDispatch : public chip::Test::AppContext
+class TestServerCommandDispatch : public chip::Testing::AppContext
 {
 public:
     void SetUp()

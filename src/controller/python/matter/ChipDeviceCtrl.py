@@ -340,7 +340,7 @@ class CommissionableNode(discovery.CommissionableNode):
     def __rich_repr__(self):
         yield "(To Be Commissioned By)", self._devCtrl.name
 
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 
@@ -1492,9 +1492,15 @@ class ChipDeviceControllerBase():
 
         closure = DeviceAvailableClosure(eventLoop, future)
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
-        await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeId, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
-            timeoutMs)
+        try:
+            await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+                self.devCtrl, nodeId, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
+                timeoutMs)
+        except:
+            # Ensure we clean up the future if CallAsync fails (e.g. timeout).
+            # This signals the callback (which might fire later) that we are no longer interested.
+            future.cancel()
+            raise
 
         # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
         # In that case the Future has already been set it will return immediately
