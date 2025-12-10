@@ -22,7 +22,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         MutableByteSpan copyOfBuffer = buffer;
 
         // Quick check to see if migration already happened
-        auto firstAttributePath = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, attributes[0]);
+        auto firstAttributePath = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, attributes[0].first);
         err                     = normProvider.ReadValue(firstAttributePath, copyOfBuffer);
         // If the attribute is already in the standard Attribute provider it means that a migration already happened
         if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
