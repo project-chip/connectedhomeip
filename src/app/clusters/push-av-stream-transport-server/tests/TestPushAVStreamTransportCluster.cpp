@@ -79,7 +79,7 @@ static uint8_t gInfoEventBuffer[120];
 static uint8_t gCritEventBuffer[120];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-class MockEventLogging : public chip::Test::AppContext
+class MockEventLogging : public chip::Testing::AppContext
 {
 public:
     void SetUp() override

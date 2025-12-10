@@ -48,7 +48,7 @@ from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
@@ -121,13 +121,13 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=cfg.ConnectionID),
                         endpoint=endpoint)
                 except InteractionModelError as e:
-                    logging.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
+                    log.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
 
         # Read supported formats (step 2)
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats)
-        logger.info(f"aSupportedFormats={aSupportedFormats}")
+        log.info(f"aSupportedFormats={aSupportedFormats}")
 
         # Read allocated video streams (step 3)
         self.step(3)

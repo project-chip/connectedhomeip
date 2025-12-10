@@ -33,7 +33,7 @@ using namespace chip::Credentials;
 using namespace chip::Credentials::JCM;
 using namespace chip::Messaging;
 using namespace chip::Platform;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::TestCerts;
 using namespace chip::Transport;
 
@@ -114,10 +114,9 @@ private:
     MessagingContext * mMessagingContext;
 };
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
-    using namespace chip::Test;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
@@ -138,7 +137,7 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class VendorIdVerificationClientTest : public chip::Test::AppContext, public Credentials::JCM::VendorIdVerificationClient
+class VendorIdVerificationClientTest : public AppContext, public Credentials::JCM::VendorIdVerificationClient
 {
 public:
     // Performs shared setup for all tests in the test suite.  Run once for the whole suite.
@@ -146,7 +145,7 @@ public:
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
 
-        chip::Test::AppContext::SetUpTestSuite();
+        AppContext::SetUpTestSuite();
     }
 
     // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.
@@ -217,7 +216,7 @@ protected:
 
         ExpireJFSessionAToB();
 
-        chip::Test::ResetMockNodeConfig();
+        ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }

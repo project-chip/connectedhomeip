@@ -149,7 +149,9 @@ public:
 namespace Attributes {
 
 namespace Condition {
-static constexpr AttributeId Id = 0x00000000;
+static constexpr AttributeId Id                           = 0x00000000;
+static constexpr DataModel::AttributeEntry kMetadataEntry = ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = chip::Percent;
@@ -163,6 +165,9 @@ struct TypeInfo
 
 namespace DegradationDirection {
 static constexpr AttributeId Id = 0x00000001;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = DegradationDirectionEnum;
@@ -176,6 +181,9 @@ struct TypeInfo
 
 namespace ChangeIndication {
 static constexpr AttributeId Id = 0x00000002;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = ChangeIndicationEnum;
@@ -189,6 +197,9 @@ struct TypeInfo
 
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = bool;
@@ -202,6 +213,9 @@ struct TypeInfo
 
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<uint32_t>;
@@ -215,7 +229,10 @@ struct TypeInfo
 
 namespace ReplacementProductList {
 static constexpr AttributeId Id = 0x00000005;
-}
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry;
+
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
