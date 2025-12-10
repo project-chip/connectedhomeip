@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:175
+            image: ghcr.io/project-chip/chip-build:177
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -433,6 +433,9 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: ./.github/actions/delete-cache
@@ -452,10 +455,10 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - os: macos-14
+                    - os: macos-26
                       arch: arm64     # observed, not configured
                       build_variant: no-ble-no-shell-asan-clang
-                    - os: macos-14
+                    - os: macos-26
                       arch: arm64     # observed, not configured
                       build_variant: no-ble-no-shell-tsan-clang
         env:
@@ -537,9 +540,14 @@ jobs:
             - name: Clean out
               run: rm -rf out/
             - name: Run Tests using the python parser sending commands to chip-tool
-              # tests that failed macOS 15/26 last check: TestGroupMessaging,Test_TC_ACE_1_6,Test_TC_G_*,Test_TC_GRPKEY_*,Test_TC_S_*
+              # Use sudo to avoid Local Network Privacy restrictions on macOS 15+.
+              # macOS 15 introduced Local Network Privacy which restricts multicast traffic in several ways.
+              # Running from ssh, running from Terminal.app, or accepting a UI prompt can allow access, but those
+              # aren't great options in CI.
+              # Processes run as root are exempt from these restrictions.
+              # For details, see https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#macOS-considerations
               run: |
-                  ./scripts/run_in_build_env.sh \
+                  sudo ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -562,8 +570,10 @@ jobs:
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
+              # Use sudo to avoid Local Network Privacy restrictions on macOS 15+.
+              # See comment on earlier step about Local Network Privacy and root exemption.
               run: |
-                  ./scripts/run_in_build_env.sh \
+                  sudo ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
@@ -598,6 +608,9 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: ./.github/actions/delete-cache
@@ -626,7 +639,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:175
+            image: ghcr.io/project-chip/chip-build:177
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -849,7 +862,9 @@ jobs:
                 retention-days: 2
                 if-no-files-found: error
                 overwrite: true
-
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: ./.github/actions/delete-cache
@@ -887,7 +902,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:175
+            image: ghcr.io/project-chip/chip-build:177
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1019,7 +1034,7 @@ jobs:
         strategy:
             matrix:
                 include:
-                - os: macos-14
+                - os: macos-26
                   arch: arm64   # observed, not configured
                   build_variant: no-ble-no-wifi-tsan-clang
                 # - os: macos-15-intel

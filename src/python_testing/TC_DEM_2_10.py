@@ -301,7 +301,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             await self.send_test_event_trigger_power_adjustment_clear()
 
         self.step("22")
-        await sub_handler.cancel()
+        sub_handler.cancel()
 
 
 if __name__ == "__main__":

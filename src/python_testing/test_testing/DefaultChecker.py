@@ -18,7 +18,6 @@
 from typing import Optional
 
 import matter.clusters as Clusters
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice,
                                             ProblemSeverity)
@@ -59,7 +58,7 @@ def warning_wrapper(override_flag: str):
     return warning_wrapper_internal
 
 
-class DefaultChecker(BasicCompositionTests):
+class DefaultChecker():
     @warning_wrapper(FLAG_PRODUCT_NAME)
     def check_default_product_name(self):
         cluster = Clusters.BasicInformation
