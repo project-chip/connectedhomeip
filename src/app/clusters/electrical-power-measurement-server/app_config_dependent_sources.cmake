@@ -27,5 +27,5 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/ElectricalPowerMeasurementCluster.cpp"
     "${CLUSTER_DIR}/ElectricalPowerMeasurementCluster.h"
-        "${CLUSTER_DIR}/ElectricalPowerMeasurementDelegate.h"
+    "${CLUSTER_DIR}/ElectricalPowerMeasurementDelegate.h"
 )
