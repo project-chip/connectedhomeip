@@ -342,7 +342,7 @@ class AttributeSubscriptionHandler:
             time.sleep(0.1)
 
         if all(report_matches.values()):
-            LOGGER.info("Found all expected matchers did match in the period of time.")
+            LOGGER.info(f"Found all expected matchers did match in the period of time {timeout_sec:.1f}.")
             return
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
