@@ -17,6 +17,7 @@
 
 #include <app/clusters/descriptor/DescriptorCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -36,6 +37,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Descriptor::Attributes;
 using namespace chip::app::DataModel;
+using chip::Testing::IsAttributesListEqualTo;
 
 struct TestDescriptorCluster : public ::testing::Test
 {
@@ -58,14 +60,13 @@ TEST_F(TestDescriptorCluster, AttributesTest)
     chip::Testing::TestServerClusterContext context;
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-    ASSERT_EQ(cluster.Attributes(descriptorPath, attributesBuilder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(expectedBuilder.AppendElements(Descriptor::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Descriptor::Attributes::DeviceTypeList::kMetadataEntry,
+                                            Descriptor::Attributes::ServerList::kMetadataEntry,
+                                            Descriptor::Attributes::ClientList::kMetadataEntry,
+                                            Descriptor::Attributes::PartsList::kMetadataEntry,
+                                        }));
 }
 
 } // namespace

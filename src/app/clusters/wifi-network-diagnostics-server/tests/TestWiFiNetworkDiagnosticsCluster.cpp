@@ -17,6 +17,7 @@
 
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -37,6 +38,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using namespace chip::app::DataModel;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 struct TestWiFiNetworkDiagnosticsCluster : public ::testing::Test
 {
@@ -71,26 +74,17 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                                              BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
         // without any enabled attributes, no commands are accepted
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
 
         // Everything is unimplemented, so attributes are the mandatory and global ones.
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({ WiFiNetworkDiagnostics::Attributes::Bssid::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::SecurityType::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::WiFiVersion::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::ChannelNumber::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::Rssi::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                WiFiNetworkDiagnostics::Attributes::Bssid::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::SecurityType::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::WiFiVersion::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::ChannelNumber::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::Rssi::kMetadataEntry,
+                                            }));
     }
 
     {
@@ -114,15 +108,10 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
             kRootEndpointId, errorCountsProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet(),
             BitFlags<WiFiNetworkDiagnostics::Feature>(WiFiNetworkDiagnostics::Feature::kErrorCounts));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
-        ASSERT_EQ(commands.size(), 1u);
-        ASSERT_EQ(commands[0].commandId, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(),
-                  WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry,
+                                                  }));
 
         DataModel::InvokeRequest request2;
         request2.path =
@@ -130,22 +119,16 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         TLV::TLVReader tlvReader2;
         ASSERT_EQ(cluster.InvokeCommand(request2, tlvReader2, nullptr), Protocols::InteractionModel::Status::Success);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({ WiFiNetworkDiagnostics::Attributes::Bssid::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::SecurityType::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::WiFiVersion::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::ChannelNumber::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::Rssi::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::BeaconLostCount::kMetadataEntry,
-                                                   WiFiNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                WiFiNetworkDiagnostics::Attributes::Bssid::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::SecurityType::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::WiFiVersion::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::ChannelNumber::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::Rssi::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::BeaconLostCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry,
+                                            }));
     }
 
     {
@@ -221,41 +204,28 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         WiFiDiagnosticsServerCluster cluster(
             kRootEndpointId, allProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet().Set<CurrentMaxRate::Id>(), features);
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry,
+                                                  }));
 
-        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
-        ASSERT_EQ(commands.size(), 1u);
-        ASSERT_EQ(commands[0].commandId, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(),
-                  WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
-
-        // Test all ethernet-specific attributes
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      WiFiNetworkDiagnostics::Attributes::Bssid::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::SecurityType::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::WiFiVersion::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::ChannelNumber::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::Rssi::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::BeaconLostCount::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::BeaconRxCount::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::kMetadataEntry,
-                      WiFiNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        // Test all WiFi-specific attributes
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                WiFiNetworkDiagnostics::Attributes::Bssid::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::SecurityType::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::WiFiVersion::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::ChannelNumber::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::Rssi::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::BeaconLostCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::BeaconRxCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::kMetadataEntry,
+                                                WiFiNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry,
+                                            }));
 
         // Test that the provider methods are working correctly by directly accessing the provider
         uint8_t bssIdBuffer[6];
