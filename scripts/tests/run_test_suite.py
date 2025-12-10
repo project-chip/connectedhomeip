@@ -280,7 +280,7 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
-    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(), discover_paths=discover_paths)
+    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder())
 
     for p in app_path:
         try:
