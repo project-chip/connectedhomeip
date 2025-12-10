@@ -14,6 +14,5 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "ElectricalPowerMeasurementDelegate.h",
   "electrical-power-measurement-server.h",
 ]

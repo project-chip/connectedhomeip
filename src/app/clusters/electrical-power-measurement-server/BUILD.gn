@@ -25,6 +25,7 @@ source_set("electrical-power-measurement-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core",
     "${chip_root}/zzz_generated/app-common/clusters/ElectricalPowerMeasurement",
   ]
 }
