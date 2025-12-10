@@ -251,6 +251,10 @@
 #include <clusters/HepaFilterMonitoring/Commands.h>
 #include <clusters/HepaFilterMonitoring/Events.h>
 #include <clusters/HepaFilterMonitoring/Structs.h>
+#include <clusters/Humidistat/Attributes.h>
+#include <clusters/Humidistat/Commands.h>
+#include <clusters/Humidistat/Events.h>
+#include <clusters/Humidistat/Structs.h>
 #include <clusters/IcdManagement/Attributes.h>
 #include <clusters/IcdManagement/Commands.h>
 #include <clusters/IcdManagement/Events.h>

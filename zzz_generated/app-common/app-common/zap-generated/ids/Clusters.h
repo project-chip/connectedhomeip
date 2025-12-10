@@ -77,6 +77,7 @@
 #include <clusters/Groupcast/ClusterId.h>
 #include <clusters/Groups/ClusterId.h>
 #include <clusters/HepaFilterMonitoring/ClusterId.h>
+#include <clusters/Humidistat/ClusterId.h>
 #include <clusters/IcdManagement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
 #include <clusters/IlluminanceMeasurement/ClusterId.h>
