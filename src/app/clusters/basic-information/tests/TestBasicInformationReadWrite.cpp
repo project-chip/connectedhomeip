@@ -198,8 +198,8 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override { 
-        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); 
+    void SetUp() override {
+        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
         DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
     }
 
