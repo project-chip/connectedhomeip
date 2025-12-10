@@ -8,7 +8,8 @@ namespace chip::app {
 
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider,
-                                                       const ConcreteClusterPath & cluster, Span<const AttributeId> attributes,
+                                                       const ConcreteClusterPath & cluster,
+                                                       Span<std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
                                                        MutableByteSpan & buffer)
 {
     ChipError err        = CHIP_NO_ERROR;
@@ -30,7 +31,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
     }
 
-    for (auto attr : attributes)
+    for (const auto [attr, migrator] : attributes)
     {
         // We make a copy of the buffer so it can be resized
         // Still refers to same internal buffer though
@@ -38,7 +39,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
 
         auto attrPath = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, attr);
         // Read Value, will resize copyOfBuffer to read size
-        err = safeProvider.SafeReadValue(attrPath, copyOfBuffer);
+        err = migrator(attrPath, safeProvider, copyOfBuffer);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             // The value does not exist so nothing to migrate, skip

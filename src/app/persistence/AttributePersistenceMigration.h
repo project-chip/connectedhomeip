@@ -22,6 +22,9 @@
 
 namespace chip::app {
 
+using SafeAttributeMigrator = void (*)(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider,
+                                       MutableByteSpan & buffer);
+using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator>;
 /**
  * @brief
  * This overload provides a simple function to migrate from the SafeAttributeProvider to the standard provider mechanism
@@ -35,20 +38,31 @@ namespace chip::app {
  * @return CHIP_NO_ERROR                        On successful migration.
  *         CHIP_ERROR_BUFFER_TOO_SMALL          Value was too big to swap using the chosen buffer size
  *
- *         If the code uses the default implementation the migration can only fail on long strings/lists (choose a bigger buffer)
+ *         If the code uses the default implementation the migration can only fail on long strings/lists (choose a bigger
+ * buffer)
  *
  *         Other errors are dependent of implementations of the providers, on any error it will continue
  *         and return last error encountered
  */
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider,
-                                                       const ConcreteClusterPath & cluster, Span<const AttributeId> attributes,
+                                                       const ConcreteClusterPath & cluster,
+                                                       Span<std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
                                                        MutableByteSpan & buffer);
+
+namespace DefaultMigrators {
+template <class T>
+static CHIP_ERROR ScalarValue(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer)
+{
+    buffer.reduce_size(sizeof(T));
+    return provider.ReadScalarValue(attrPath, *reinterpret_cast<T *>(buffer.data()));
+}
+}; // namespace DefaultMigrators
 
 /**
  * @brief
- * This overload provides a simple function to migrate from the SafeAttributeProvider to the standard provider mechanism over the
- * same storageDelegate.
+ * This overload provides a simple function to migrate from the SafeAttributeProvider to the standard provider mechanism over
+ * the same storageDelegate.
  *
  *
  * @param attributeBufferSize  The size of the buffer to use to as swap memory between providers
@@ -59,13 +73,15 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
  * @return CHIP_NO_ERROR                        On successful migration.
  *         CHIP_ERROR_BUFFER_TOO_SMALL          Value was too big to swap using the chosen buffer size
  *
- *         If the code uses the default implementation the migration should only fail on long strings/lists (choose a bigger buffer)
+ *         If the code uses the default implementation the migration should only fail on long strings/lists (choose a bigger
+ * buffer)
  *
  *         Other errors are dependent of implementations of the providers, on any error it will continue
  *         and return last error encountered
  */
 template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster, Span<const AttributeId> attributes,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster,
+                                                       Span<std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
                                                        PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
