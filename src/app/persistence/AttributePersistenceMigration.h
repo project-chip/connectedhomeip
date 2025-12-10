@@ -22,8 +22,8 @@
 
 namespace chip::app {
 
-using SafeAttributeMigrator = void (*)(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider,
-                                       MutableByteSpan & buffer);
+using SafeAttributeMigrator = CHIP_ERROR (*)(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider,
+                                             MutableByteSpan & buffer);
 using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator>;
 /**
  * @brief
@@ -46,8 +46,7 @@ using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator
  */
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider,
-                                                       const ConcreteClusterPath & cluster,
-                                                       Span<const std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
+                                                       const ConcreteClusterPath & cluster, Span<AttrMigrationData> attributes,
                                                        MutableByteSpan & buffer);
 
 namespace DefaultMigrators {
@@ -80,8 +79,7 @@ static CHIP_ERROR ScalarValue(ConcreteAttributePath attrPath, SafeAttributePersi
  *         and return last error encountered
  */
 template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster,
-                                                       Span<const std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster, Span<AttrMigrationData> attributes,
                                                        PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
