@@ -190,7 +190,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
 
         self.step("14")
         # TH removes the subscription to MeteredQuantity attribute.
-        await subscription_handler.cancel()
+        subscription_handler.cancel()
 
 
 if __name__ == "__main__":
