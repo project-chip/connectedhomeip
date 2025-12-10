@@ -20,7 +20,7 @@
 
 #include "camera-avstream-controller.h"
 #include "camera-device-interface.h"
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -32,7 +32,7 @@ namespace CameraAvStreamManagement {
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVStreamManager : public CameraAVStreamMgmtDelegate, public CameraAVStreamController
+class CameraAVStreamManager : public CameraAVStreamManagementDelegate, public CameraAVStreamController
 {
 public:
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
