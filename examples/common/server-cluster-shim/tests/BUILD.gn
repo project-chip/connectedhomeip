@@ -25,6 +25,6 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/app/server-cluster/testing:testing",
   ]
 }
