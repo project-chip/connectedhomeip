@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, StrEnum, auto
 from pathlib import Path
+from types import MappingProxyType
 
 from .runner import SubprocessInfo, SubprocessKind
 
@@ -237,7 +238,7 @@ class KnowhowEntry:
     target_name: str | None = None
 
 
-BUILTIN_SUBPROC_KNOWHOW = {
+BUILTIN_SUBPROC_KNOWHOW = MappingProxyType({
     # Matter applications
     'all-clusters': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
     'all-devices': KnowhowEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
@@ -272,7 +273,7 @@ BUILTIN_SUBPROC_KNOWHOW = {
 
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
     'chip-tool-with-python': KnowhowEntry(kind=SubprocessKind.TOOL)
-}
+})
 
 
 class PathsFinderProto(typing.Protocol):

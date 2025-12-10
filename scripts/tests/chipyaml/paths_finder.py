@@ -34,8 +34,8 @@ class PathsFinder:
 
     def get(self, target_name: str) -> Path | None:
         path = _PATHS_CACHE.get(target_name)
-        if path and Path(path).is_file():
-            return Path(path)
+        if path and path.is_file():
+            return path
 
         if path:
             del _PATHS_CACHE[target_name]
@@ -44,8 +44,8 @@ class PathsFinder:
             if not path.is_file() or path.name != target_name:
                 continue
 
-            _PATHS_CACHE[target_name] = str(path)
-            return Path(path)
+            _PATHS_CACHE[target_name] = path
+            return path
 
         return None
 
