@@ -8,22 +8,27 @@
 
 <body>
     <nav class="top-level">
-        <a href="/ui/streams">Sessions</a>
+        <a href="/ui/streams">Streams</a>
         <a href="/ui/certificates">Certificates</a>
     </nav>
     <div class="left-bar">
-        <h2>Sessions</h2>
-
+        <h2>Streams</h2>
 
         <ul>
-            {% for session in sessions %}
-            <li> Session {{session['id']}}
+            {% for stream in streams %}
+            <li> Stream {{stream['id']}}
                 <ul>
-                    {% for (file, crt) in session['uploaded_segments'] %}
-                    <li><a href="/ui/streams/{{session['id']}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{session['id']}}/{{crt}}">{{crt}}</a>)</li>
-                    {% endfor %}
-                    {% for (file, crt) in session['uploaded_manifests'] %}
-                    <li><a href="/ui/streams/{{session['id']}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{session['id']}}/{{crt}}">{{crt}}</a>) </li>
+                    {% for session in stream.sessions %}
+                    <li> Session {{session['id']}}
+                        <ul>
+                            {% for (file, crt) in session['uploaded_segments'] %}
+                            <li><a href="/ui/streams/{{stream['id']}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{stream['id']}}/{{crt}}">{{crt}}</a>)</li>
+                            {% endfor %}
+                            {% for (file, crt) in session['uploaded_manifests'] %}
+                            <li><a href="/ui/streams/{{stream['id']}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{stream['id']}}/{{crt}}">{{crt}}</a>) </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                     {% endfor %}
                 </ul>
             </li>

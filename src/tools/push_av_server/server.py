@@ -16,7 +16,7 @@ import string
 import subprocess
 import sys
 import tempfile
-import xmltodict
+import xml.etree.ElementTree
 from enum import Enum
 from pathlib import Path
 from typing import Awaitable, Callable, Literal, Optional, Tuple
@@ -420,24 +420,52 @@ class SupportedIngestInterface(str, Enum):
 
 
 class UploadError(BaseModel):
+    session_id: Optional[int]
     file_path: str
     reasons: list[str]
 
 
 class Session(BaseModel):
+    id: int  # TODO Ignore and use the index in the list instead?
+
+    uploaded_segments: list[Tuple[str, str]] = []
+    uploaded_manifests: list[Tuple[str, str]] = []
+    complete: bool = False
+
+
+class Stream(BaseModel):
+    # Configuration of the PushAv stream
     id: int
     strict_mode: bool = True
     interface: SupportedIngestInterface
     track_name: Optional[str] = None
 
-    uploaded_segments: list[Tuple[str, str]] = []
-    uploaded_manifests: list[Tuple[str, str]] = []
+    # Keep track of the various sessions encountered
+    sessions: list[Session] = []
     errors: list[UploadError] = []
 
+    # Utilities
+
     def save_to_disk(self, wd: WorkingDirectory):
-        p = wd.path("streams", str(self.id), "session.json")
+        p = wd.path("streams", str(self.id), "stream.json")
         with open(p, 'w', encoding='utf-8') as f:
             json.dump(self.model_dump(), f, ensure_ascii=False, indent=4)
+
+    def new_session(self) -> Session:
+        session_id = len(self.sessions) + 1
+        session = Session(id=session_id)
+        self.sessions.append(session)
+        return session
+
+    def last_in_progress_session(self) -> Optional[Session]:
+        if len(self.sessions) == 0:
+            return None
+
+        last_session = self.sessions[-1]
+        if not last_session.complete:
+            return last_session
+
+        return None
 
 
 class PushAvServer:
@@ -450,8 +478,8 @@ class PushAvServer:
         self.strict_mode = strict_mode
         self.router = APIRouter()
 
-        # In-memory map to track camera sessions
-        self.sessions = self._list_sessions()
+        # In-memory map to track camera streams
+        self.streams = self._list_streams()
 
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
@@ -463,7 +491,7 @@ class PushAvServer:
 
         # HTTP APIs
         self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
-        self.router.add_api_route("/sessions", self.list_sessions, methods=["GET"])
+        self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
 
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}.{ext}", self.handle_upload, methods=["PUT"])
@@ -478,6 +506,7 @@ class PushAvServer:
     # Utilities
 
     def _read_stream_details(self, stream_id: int):
+        # TODO Remove
         p = self.wd.path("streams", str(stream_id), "details.json")
 
         try:
@@ -488,33 +517,32 @@ class PushAvServer:
         except Exception as e:
             raise HTTPException(500, f"An unexpected error occurred: {e}")
 
-    def _list_sessions(self):
-        sessions: dict[str, Session] = {}
+    def _list_streams(self):
+        streams: dict[str, Stream] = {}
 
         for stream_path in self.wd.path("streams").iterdir():
             if stream_path.is_dir():
-                session_file = stream_path / "session.json"
-                if session_file.exists():
-                    with open(session_file, 'r', encoding='utf-8') as f:
-                        session_data = json.load(f)
-                        sessions[stream_path.name] = Session.model_validate(session_data)
-
-        return sessions
+                stream_file = stream_path / "stream.json"
+                if stream_file.exists():
+                    with open(stream_file, 'r', encoding='utf-8') as f:
+                        stream_data = json.load(f)
+                        streams[stream_path.name] = Stream.model_validate(stream_data)
+        return streams
 
     @contextlib.contextmanager
-    def _open_session(self, stream_id: int):
-        """Context manager helper to save a session after use.
+    def _open_stream(self, stream_id: int):
+        """Context manager helper to save a stream after use.
 
-        Note that any exceptions raised within the context will prevent sessions from being saved to disk.
+        Note that any exceptions raised within the context will prevent streams from being saved to disk.
         """
         stream_id_str = str(stream_id)
-        yield self.sessions[stream_id_str]
+        yield self.streams[stream_id_str]
 
         # TODO Look if we need the following try/catch block if the default behavior of the framework
         # is good enough for debugging purposes.
         # except Exception as e:
         #    raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
-        self.sessions[stream_id_str].save_to_disk(self.wd)
+        self.streams[stream_id_str].save_to_disk(self.wd)
 
     # UI website
 
@@ -522,14 +550,14 @@ class PushAvServer:
         return RedirectResponse("/ui/streams")
 
     def ui_streams_list(self, request: Request):
-        s = self.list_sessions()
+        s = self.list_streams()
         return self.templates.TemplateResponse(
-            request=request, name="streams_list.jinja2", context={"sessions": s["sessions"]}
+            request=request, name="streams_list.jinja2", context={"streams": s["streams"]}
         )
 
     def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
         context = {}
-        context['sessions'] = self.list_sessions()['sessions']
+        context['streams'] = self.list_streams()['streams']
         context['stream_id'] = stream_id
         context['file_path'] = file_path
 
@@ -569,23 +597,20 @@ class PushAvServer:
         stream_id_str = str(stream_id)
 
         # Initialize entry in stream files map
-        self.sessions[stream_id_str] = Session(
+        stream = Stream(
             id=stream_id,
             strict_mode=self.strict_mode,
             interface=interface,
-            uploaded_segments=[],
-            uploaded_manifests=[],
-            errors=[],
         )
+        self.streams[stream_id_str] = stream
 
         self.wd.mkdir("streams", str(stream_id))
-        self.sessions[stream_id_str].save_to_disk(self.wd)
+        self.streams[stream_id_str].save_to_disk(self.wd)
 
-        # TODO Update TH to use sessions instead
-        return {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
+        return stream  # TODO Update TH to use sessions instead
 
-    def list_sessions(self):
-        return {"sessions": self.sessions.values()}
+    def list_streams(self):
+        return {"streams": self.streams.values()}
 
     async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
         """
@@ -593,38 +618,55 @@ class PushAvServer:
 
             Validate the file name based on the extension and path format.
             Always save the uploaded file to disk for further analysis.
-            If strict mode is enabled, return bad requests with the errors.
+            If strict mode is enabled, return bad requests with the errors if any.
         """
-        with self._open_session(stream_id) as session:
+        with self._open_stream(stream_id) as stream:
+            file_path_with_ext = f"{file_path}.{ext}"
+            session = stream.last_in_progress_session()
+            body = await req.body()
+
             # Validate the incoming file upload (path and extension)
             errors = []
 
-            if ext not in VALID_EXTENSIONS:
-                # Invalid extension
-                errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
-            elif ext == "mpd":
+            if ext == "mpd":
                 # DASH manifest files
-                if (session.interface != SupportedIngestInterface.dash):
+                if (stream.interface != SupportedIngestInterface.dash):
                     errors.append("Unsupported manifest object extension")
 
-                # TODO Probably won't work due to streaming being requested again later on. Let's test.
-                mpd = xmltodict.parse(await req.body())
+                if session is None:
+                    session = stream.new_session()
 
-                mpd_type = mpd.get("MPD", {}).get("@type").lower()
+                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
+
+                root = xml.etree.ElementTree.fromstring(body)
+                mpd_type = root.attrib.get('type')
 
                 if mpd_type == "dynamic" and len(session.uploaded_segments) > 0:
                     errors.append("Dynamic MPD cannot be uploaded after segments have been uploaded")
 
                 if mpd_type == "static" and len(session.uploaded_segments) == 0:
                     errors.append("Static MPD cannot be uploaded before segments have been uploaded")
+
+                if mpd_type == "static":
+                    session.complete = True
             elif ext == "m3u8":
                 # HLS manifest files
-                if session.interface != SupportedIngestInterface.hls:
+                if stream.interface != SupportedIngestInterface.hls:
                     errors.append("Unsupported manifest object extension")
 
+                if session is None:
+                    session = stream.new_session()
+
+                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
+
                 # TODO Lifecycle validation for HLS manifests
-            elif ext == "m4s":
+            elif ext == "m4s" or ext == "init":
                 # Segmented video files
+
+                if session is not None:
+                    session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
+                else:
+                    errors.append("No active session when uploading " + file_path_with_ext)
 
                 # Checks if CMAF extended path matches the pattern session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>
                 # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#12-operation
@@ -635,42 +677,38 @@ class PushAvServer:
                     # Validate if the trackName is same as the one assigned during transport allocation.
                     # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#685-trackname-field
                     track_name_in_path = match.group("trackName")
-                    track_name = session.track_name
+                    track_name = stream.track_name
 
                     if track_name and track_name != track_name_in_path:
                         errors.append("Track name mismatch: "
                                       f"{track_name_in_path} != {track_name}, "
                                       "must match TrackName provided in ContainerOptions")
+            else:
+                errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
 
-            # TODO Add better validation for Interface-1, Interface-2 DASH, or I2-HLS ?
-
-            file_path_with_ext = f"{file_path}.{ext}"
+            # Validation complete, now saving data to disk
 
             if len(errors) > 0:
-                session.errors.append(UploadError(file_path=file_path_with_ext, reasons=errors))
+                session_id = session.id if session else None
+                stream.errors.append(UploadError(session_id=session_id, file_path=file_path_with_ext, reasons=errors))
 
             file_local_path = self.wd.mkdir("streams", str(stream_id), file_path_with_ext, is_file=True)
 
-            # Update the session with the seen segments/manifests
-            if ext == "m4s":
-                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"), )
-            else:
-                session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
-
-            # Save data to disk (certificate details + file content)
             cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
 
+            # TODO If file already exists, come up with a way to version it instead of overwriting it.
             with open(file_local_path.with_suffix(file_local_path.suffix + ".crt"), "w") as f:
                 f.write(json.dumps(cert_details))
 
             with open(file_local_path, "wb") as f:
-                async for chunk in req.stream():
-                    f.write(chunk)
+                f.write(body)
 
-            if session.strict_mode and len(session.errors) > 0:
+            # And finally return the appropriate response to the camera
+
+            if stream.strict_mode and len(errors) > 0:
                 return JSONResponse(
                     status_code=400,
-                    content={"errors": [error.model_dump() for error in session.errors]}
+                    content={"errors": errors}
                 )
             else:
                 return Response(status_code=202)
@@ -682,14 +720,19 @@ class PushAvServer:
         if not p.exists():
             raise HTTPException(404, detail="Media file doesn't exists")
 
+        cmd = ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())]
+
+        print(cmd)
+        # ffprobe -show_streams -show_format -output_format json /Users/francoismonniot/.pavstest/streams/1/index.mpd
+
         proc = subprocess.run(
-            ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())],
+            cmd,
             capture_output=True
         )
 
         if proc.returncode != 0:
             # TODO Add more details (maybe stderr) to the response
-            raise HTTPException(500)
+            raise HTTPException(500, "ffprobe failed to analyze the media file")
 
         return json.loads(proc.stdout)
 
