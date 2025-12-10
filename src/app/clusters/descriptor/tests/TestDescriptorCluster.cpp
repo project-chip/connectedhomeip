@@ -55,7 +55,6 @@ TEST_F(TestDescriptorCluster, AttributesTest)
 {
     // Cluster configuration with only mandatory attributes
     DescriptorCluster cluster(1, DescriptorCluster::OptionalAttributesSet(0), {});
-    ConcreteClusterPath descriptorPath = ConcreteClusterPath(1, Descriptor::Id);
 
     chip::Testing::TestServerClusterContext context;
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
