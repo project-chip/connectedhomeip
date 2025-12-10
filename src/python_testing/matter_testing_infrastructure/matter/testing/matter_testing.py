@@ -1427,11 +1427,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
 
+
     async def request_device_factory_reset(self):
         """Request a factory reset of the Device Under Test (DUT).
 
         This method handles factory resets in both CI and development environments (via run_python_test.py test runner script)
-        and also manual testing scenarios (via user input) this functionality is implemented by Raul in DA_1_1 test module. 
+        and also manual testing scenarios (via user input) this functionality is implemented by Raul in DA_1_1 test module PR 40802.
         It will expire existing sessions to allow for controllers to reconnect to the DUT after the factory reset.
         """
         # Check if restart flag file is available (indicates test runner supports app reboot)
