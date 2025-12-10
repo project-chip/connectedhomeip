@@ -37,7 +37,7 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
-class TestTimedHandler : public chip::Test::AppContext
+class TestTimedHandler : public chip::Testing::AppContext
 {
 public:
     void TestFollowingMessageFastEnough(MsgType aMsgType);

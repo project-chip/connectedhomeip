@@ -55,7 +55,7 @@ using namespace chip::Protocols;
 
 namespace {
 
-void CheckForInvalidAction(chip::Test::MessageCapturer & messageLog)
+void CheckForInvalidAction(chip::Testing::MessageCapturer & messageLog)
 {
     EXPECT_EQ(messageLog.MessageCount(), 1u);
     EXPECT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::StatusResponse));
@@ -98,10 +98,10 @@ public:
     }
 };
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const chip::Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
-    using namespace chip::Test;
+    using namespace chip::Testing;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
@@ -459,19 +459,19 @@ public:
     }
 };
 
-class TestCommandInteraction : public chip::Test::AppContext
+class TestCommandInteraction : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
         AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }
@@ -820,7 +820,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -890,7 +890,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -959,7 +959,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandResponse);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -1026,7 +1026,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our

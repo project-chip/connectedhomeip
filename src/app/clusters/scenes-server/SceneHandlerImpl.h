@@ -18,7 +18,6 @@
 
 #include <app/clusters/scenes-server/AttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTable.h>
-#include <app/util/types_stub.h>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -148,7 +147,8 @@ public:
     template <typename Finder>
     struct TransitionTimeInterface
     {
-        EmberEventControl sceneHandlerEventControls[Finder::kMaxEndpointCount];
+        using ControlType = typename Finder::EventControlType;
+        ControlType sceneHandlerEventControls[Finder::kMaxEndpointCount];
 
         TransitionTimeInterface(void (*callback)(EndpointId)) : mCallback(callback) {}
 
@@ -156,11 +156,11 @@ public:
          * @brief Configures EventControl callback
          *
          * @param[in] endpoint endpoint to start timer for
-         * @return EmberEventControl* configured event control
+         * @return ControlType (typically EmberEventControl*) configured event control
          */
-        EmberEventControl * sceneEventControl(EndpointId endpoint)
+        ControlType * sceneEventControl(EndpointId endpoint)
         {
-            EmberEventControl * controller = getEventControl(endpoint, Span<EmberEventControl>(sceneHandlerEventControls));
+            ControlType * controller = getEventControl(endpoint, Span<ControlType>(sceneHandlerEventControls));
             VerifyOrReturnValue(controller != nullptr, nullptr);
 
             controller->endpoint = endpoint;
@@ -177,9 +177,9 @@ public:
          *
          * @param[in] endpoint target endpoint
          * @param[in] eventControlArray Array where to find the event control
-         * @return EmberEventControl* configured event control
+         * @return ControlType* configured event control
          */
-        EmberEventControl * getEventControl(EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
+        ControlType * getEventControl(EndpointId endpoint, const Span<ControlType> & eventControlArray)
         {
             uint16_t index;
             VerifyOrReturnValue(Finder::EndpointIdToIndex(endpoint, index), nullptr);
