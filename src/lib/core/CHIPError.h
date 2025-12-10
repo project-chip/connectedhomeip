@@ -99,7 +99,7 @@ public:
 
     /**
      * The kPlatform value is a special range where the highest bit of the StorageType is set to
-     * indicate platform encapsulation. Platform encapsulated errors use the all lower 31 bits for
+     * indicate platform encapsulation. Platform encapsulated errors use all the lower 31 bits for
      * the encapsulated value.
      */
     static_assert(Range::kLastRange < Range::kPlatform, "The last range must be less than kPlatform");
@@ -257,7 +257,12 @@ public:
     /**
      * Test whether @a error belongs to the Range @a range.
      */
-    constexpr bool IsRange(Range range) const { return GetRange() == range; }
+    constexpr bool IsRange(Range range) const
+    {
+        if (range == Range::kPlatform)
+            return IsPlatform();
+        return range == static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
+    }
 
     /**
      * Test whether @a error is an encapsulated platform error.
@@ -267,7 +272,12 @@ public:
     /**
      * Get the Range to which the @a error belongs.
      */
-    constexpr Range GetRange() const { return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError)); }
+    constexpr Range GetRange() const
+    {
+        if (IsPlatform())
+            return Range::kPlatform;
+        return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
+    }
 
     /**
      * Get the encapsulated value of an @a error.

@@ -71,7 +71,9 @@ TEST(ChipErrorTest, StorageTypeConstructor)
 TEST(ChipErrorTest, PlatformEncapsulationPositiveValue)
 {
     ChipError error(ChipError::Range::kPlatform, /*value=*/42 CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsRange(ChipError::Range::kPlatform));
     EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetRange(), ChipError::Range::kPlatform);
     EXPECT_EQ(error.GetPlatformValue(), 42);
 }
 
@@ -81,21 +83,27 @@ TEST(ChipErrorTest, PlatformEncapsulationPositiveBigValue)
     // the maximal possible value which can be stored is 0x3FFFFFFF (the highest bit in the
     // 31-bit integer needs to be 0 so it would be possible to restore the sign).
     ChipError error(ChipError::Range::kPlatform, /*value=*/0x3FFFFFFF CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsRange(ChipError::Range::kPlatform));
     EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetRange(), ChipError::Range::kPlatform);
     EXPECT_EQ(error.GetPlatformValue(), 0x3FFFFFFF);
 }
 
 TEST(ChipErrorTest, PlatformEncapsulationNegativeValue)
 {
     ChipError error(ChipError::Range::kPlatform, /*value=*/-42 CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsRange(ChipError::Range::kPlatform));
     EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetRange(), ChipError::Range::kPlatform);
     EXPECT_EQ(error.GetPlatformValue(), -42);
 }
 
 TEST(ChipErrorTest, PlatformEncapsulationNegativeBigValue)
 {
     ChipError error(ChipError::Range::kPlatform, /*value=*/-0x3FFFFFFF - 1 CHIP_ERROR_SOURCE_LOCATION);
+    EXPECT_TRUE(error.IsRange(ChipError::Range::kPlatform));
     EXPECT_TRUE(error.IsPlatform());
+    EXPECT_EQ(error.GetRange(), ChipError::Range::kPlatform);
     EXPECT_EQ(error.GetPlatformValue(), -0x3FFFFFFF - 1);
 }
 
