@@ -19,6 +19,8 @@
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DEMManufacturerDelegate.h"
 #include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 

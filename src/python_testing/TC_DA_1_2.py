@@ -57,8 +57,10 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conversions import hex_from_bytes
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main, matchers
 from matter.tlv import TLVReader
+
+log = logging.getLogger(__name__)
 
 
 def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
@@ -129,7 +131,7 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> Tuple[
 # default is 'credentials/development/cd-certs'.
 
 
-class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
+class TC_DA_1_2(BasicCompositionTests):
     def desc_TC_DA_1_2(self):
         return "Device Attestation Request Validation [DUT - Commissionee]"
 
@@ -395,11 +397,11 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
             if '.der' not in filename:
                 continue
             with open(os.path.join(cd_cert_dir, filename), 'rb') as f:
-                logging.info(f'Parsing CD signing certificate file: {filename}')
+                log.info(f'Parsing CD signing certificate file: {filename}')
                 try:
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
-                    logging.info(f'File {filename} is not a valid certificate, skipping')
+                    log.info(f'File {filename} is not a valid certificate, skipping')
                     pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest

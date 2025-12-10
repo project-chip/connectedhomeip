@@ -32,49 +32,47 @@
 #include <vector>
 
 namespace chip {
-namespace app {
 namespace Testing {
 
-// Test-only fabric index value for test code.
 constexpr FabricIndex kTestFabricIndex = static_cast<FabricIndex>(151);
 
 // Mock class that simulates CommandHandler behavior for unit testing, allowing capture and
 // verification of responses and statuses without real network interactions.
-class MockCommandHandler : public CommandHandler
+class MockCommandHandler : public app::CommandHandler
 {
 public:
     struct ResponseRecord
     {
         CommandId commandId;
         System::PacketBufferHandle encodedData;
-        ConcreteCommandPath path;
+        app::ConcreteCommandPath path;
     };
 
     struct StatusRecord
     {
-        ConcreteCommandPath path;
+        app::ConcreteCommandPath path;
         Protocols::InteractionModel::ClusterStatusCode status;
         const char * context;
     };
 
     ~MockCommandHandler() override = default;
 
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+    CHIP_ERROR FallibleAddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
                                  const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                                  const char * context = nullptr) override;
 
-    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                   const char * context = nullptr) override;
+    void AddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
+                   const Protocols::InteractionModel::ClusterStatusCode & aStatus, const char * context = nullptr) override;
 
     FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
 
     // Encodes and stores response data, returning error if encoding fails (fallible version for robust test handling).
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const DataModel::EncodableToTLV & aEncodable) override;
+    CHIP_ERROR AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const app::DataModel::EncodableToTLV & aEncodable) override;
 
     // Encodes and stores response data, without error return (non-fallible version that assumes successful encoding in tests).
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const DataModel::EncodableToTLV & aEncodable) override;
+    void AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const app::DataModel::EncodableToTLV & aEncodable) override;
 
     bool IsTimedInvoke() const override { return false; }
     void FlushAcksRightAwayOnSlowCommand() override {}
@@ -134,5 +132,4 @@ private:
 };
 
 } // namespace Testing
-} // namespace app
 } // namespace chip
