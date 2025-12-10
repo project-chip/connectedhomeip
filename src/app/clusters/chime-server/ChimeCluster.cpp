@@ -23,6 +23,7 @@
 #include "ChimeCluster.h"
 
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
 #include <clusters/Chime/Metadata.h>
@@ -49,6 +50,7 @@ ChimeCluster::ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate) :
 
 ChimeCluster::~ChimeCluster()
 {
+    Shutdown();
     mDelegate.SetChimeCluster(nullptr);
 }
 
@@ -58,6 +60,19 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
 
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
+}
+
+void ChimeCluster::Shutdown()
+{
+    DefaultServerCluster::Shutdown();
+}
+
+CHIP_ERROR ChimeCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    // Chime does not have optional attributes implemented yet (or exposed via options),
+    // so we just return mandatory ones.
+    return listBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {});
 }
 
 // TODO: Migrate to use context.attributeStorage instead of SafeAttributePersistenceProvider

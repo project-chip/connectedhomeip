@@ -20,8 +20,11 @@
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -98,6 +101,20 @@ struct TestChimeCluster : public ::testing::Test
 
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
+
+TEST_F(TestChimeCluster, TestAttributesList)
+{
+    uint8_t backingStore[512];
+    DataModel::ReadOnlyBufferBuilder<DataModel::AttributeEntry> listBuilder(backingStore);
+    EXPECT_EQ(mCluster.Attributes(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
+
+    uint8_t expectedBackingStore[512];
+    DataModel::ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedListBuilder(expectedBackingStore);
+    AttributeListBuilder attributeListBuilder(expectedListBuilder);
+    EXPECT_EQ(attributeListBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(EqualAttributeSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+}
 
 TEST_F(TestChimeCluster, TestDelegateErrors)
 {

@@ -76,6 +76,9 @@ public:
      * @brief ServerClusterInterface methods.
      */
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown() override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

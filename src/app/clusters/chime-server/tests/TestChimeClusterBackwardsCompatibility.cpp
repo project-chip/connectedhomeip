@@ -76,6 +76,7 @@ struct TestChimeClusterBackwardsCompatibility : public ::testing::Test
     {
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
+        EXPECT_EQ(mChimeServer.Init(), CHIP_NO_ERROR);
         EXPECT_EQ(mChimeServer.mCluster.Cluster().Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
