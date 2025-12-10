@@ -128,8 +128,7 @@ UnitLocalizationClusterWithMigration::UnitLocalizationClusterWithMigration(Endpo
 
 CHIP_ERROR UnitLocalizationClusterWithMigration::Startup(ServerClusterContext & context)
 {
-    static constexpr AttrMigrationData attributesToUpdate[] = { { TemperatureUnit::Id,
-                                                                  &DefaultMigrators::ScalarValue<TempUnitEnum> } };
+    static constexpr AttrMigrationData attributesToUpdate[] = { { TemperatureUnit::Id, &DefaultMigrators::ScalarValue<uint8_t> } };
     ReturnErrorOnFailure(MigrateFromSafeAttributePersistenceProvider(mPath, Span(attributesToUpdate), context.storage));
     return UnitLocalizationCluster::Startup(context);
 }
