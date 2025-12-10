@@ -60,6 +60,7 @@ RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
+    $ZEPHYR_BASE/.. `# Assume $ZEPHYR_BASE is inside the west workspace` \
     && find $AMEBA_PATH \
     -name "inc_lp" -print0      -or \
     -name "inc_hp" -print0      -or \
