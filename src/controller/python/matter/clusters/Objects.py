@@ -428,20 +428,6 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
-        class ServerAttributionContextInformation(MatterIntEnum):
-            kServerAutomationRule = 0x0B
-            kServerSchedule = 0x0C
-            kServerTimer = 0x0D
-            kSecurity = 0x0E
-            kDemandResponseEventOrSimilarServiceProviderSignalling = 0x0F
-            kPhysicalInteractionOnDevice = 0x10
-            kInteractionViaAProtocolNotDefinedInThisSpecification = 0x11
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
-
         class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
             kDevTest = 0x00
             kProvisional = 0x01
@@ -463,18 +449,6 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
-
-        class SuppliedAttributionContextInformation(MatterIntEnum):
-            kDefaultClientAction = 0x00
-            kUserInteraction = 0x01
-            kClientAutomationRule = 0x02
-            kClientSchedule = 0x03
-            kClientTimer = 0x04
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
 
         class TariffPriceTypeEnum(MatterIntEnum):
             kStandard = 0x00
@@ -628,29 +602,6 @@ class Globals:
             statusCode: 'uint' = 0
 
         @dataclass
-        class AttributionData(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=3, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="systemTimeStamp", Tag=4, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="epochTimeStamp", Tag=5, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=6, Type=typing.Union[Nullable, uint]),
-                    ])
-
-            contextInformation: 'uint' = 0
-            sourceContext: 'typing.Optional[uint]' = None
-            nodeID: 'typing.Optional[uint]' = None
-            groupID: 'typing.Optional[uint]' = None
-            systemTimeStamp: 'typing.Optional[uint]' = None
-            epochTimeStamp: 'typing.Optional[uint]' = None
-            fabricIndex: 'typing.Union[Nullable, uint]' = NullValue
-
-        @dataclass
         class ICECandidateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -728,21 +679,6 @@ class Globals:
             namespaceID: 'uint' = 0
             tag: 'uint' = 0
             label: 'typing.Union[None, Nullable, str]' = None
-
-        @dataclass
-        class SuppliedAttributionData(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            contextInformation: 'uint' = 0
-            sourceContext: 'typing.Optional[uint]' = None
-            fabricIndex: 'uint' = 0
 
         @dataclass
         class TestGlobalStruct(ClusterObject):

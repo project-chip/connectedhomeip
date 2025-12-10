@@ -404,23 +404,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ServerAttributionContextInformation val)
-{
-    using EnumType = Globals::ServerAttributionContextInformation;
-    switch (val)
-    {
-    case EnumType::kServerAutomationRule:
-    case EnumType::kServerSchedule:
-    case EnumType::kServerTimer:
-    case EnumType::kSecurity:
-    case EnumType::kDemandResponseEventOrSimilarServiceProviderSignalling:
-    case EnumType::kPhysicalInteractionOnDevice:
-    case EnumType::kInteractionViaAProtocolNotDefinedInThisSpecification:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SoftwareVersionCertificationStatusEnum val)
 {
     using EnumType = Globals::SoftwareVersionCertificationStatusEnum;
@@ -444,21 +427,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::StreamUsageEnu
     case EnumType::kRecording:
     case EnumType::kAnalysis:
     case EnumType::kLiveView:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SuppliedAttributionContextInformation val)
-{
-    using EnumType = Globals::SuppliedAttributionContextInformation;
-    switch (val)
-    {
-    case EnumType::kDefaultClientAction:
-    case EnumType::kUserInteraction:
-    case EnumType::kClientAutomationRule:
-    case EnumType::kClientSchedule:
-    case EnumType::kClientTimer:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

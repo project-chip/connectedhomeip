@@ -414,23 +414,6 @@ enum class RelativePositionTag : uint8_t
     kUnknownEnumValue = 7,
 };
 
-// Enum for ServerAttributionContextInformation
-enum class ServerAttributionContextInformation : uint8_t
-{
-    kServerAutomationRule                                  = 0x0B,
-    kServerSchedule                                        = 0x0C,
-    kServerTimer                                           = 0x0D,
-    kSecurity                                              = 0x0E,
-    kDemandResponseEventOrSimilarServiceProviderSignalling = 0x0F,
-    kPhysicalInteractionOnDevice                           = 0x10,
-    kInteractionViaAProtocolNotDefinedInThisSpecification  = 0x11,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
 // Enum for SoftwareVersionCertificationStatusEnum
 enum class SoftwareVersionCertificationStatusEnum : uint8_t
 {
@@ -457,21 +440,6 @@ enum class StreamUsageEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
-};
-
-// Enum for SuppliedAttributionContextInformation
-enum class SuppliedAttributionContextInformation : uint8_t
-{
-    kDefaultClientAction  = 0x00,
-    kUserInteraction      = 0x01,
-    kClientAutomationRule = 0x02,
-    kClientSchedule       = 0x03,
-    kClientTimer          = 0x04,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
 };
 
 // Enum for TariffPriceTypeEnum

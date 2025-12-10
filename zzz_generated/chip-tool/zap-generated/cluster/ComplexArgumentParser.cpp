@@ -244,77 +244,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Atom
     ComplexArgumentParser::Finalize(request.statusCode);
 }
 
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Globals::Structs::AttributionData::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AttributionData.contextInformation", "contextInformation",
-                                                                  value.isMember("contextInformation")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AttributionData.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "contextInformation");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.contextInformation, value["contextInformation"]));
-    valueCopy.removeMember("contextInformation");
-
-    if (value.isMember("sourceContext"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sourceContext");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sourceContext, value["sourceContext"]));
-    }
-    valueCopy.removeMember("sourceContext");
-
-    if (value.isMember("nodeID"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeID");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeID, value["nodeID"]));
-    }
-    valueCopy.removeMember("nodeID");
-
-    if (value.isMember("groupID"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupID");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupID, value["groupID"]));
-    }
-    valueCopy.removeMember("groupID");
-
-    if (value.isMember("systemTimeStamp"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemTimeStamp");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemTimeStamp, value["systemTimeStamp"]));
-    }
-    valueCopy.removeMember("systemTimeStamp");
-
-    if (value.isMember("epochTimeStamp"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "epochTimeStamp");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.epochTimeStamp, value["epochTimeStamp"]));
-    }
-    valueCopy.removeMember("epochTimeStamp");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::AttributionData::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.contextInformation);
-    ComplexArgumentParser::Finalize(request.sourceContext);
-    ComplexArgumentParser::Finalize(request.nodeID);
-    ComplexArgumentParser::Finalize(request.groupID);
-    ComplexArgumentParser::Finalize(request.systemTimeStamp);
-    ComplexArgumentParser::Finalize(request.epochTimeStamp);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
-}
-
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type & request,
                                         Json::Value & value)
@@ -526,47 +455,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Sema
     ComplexArgumentParser::Finalize(request.namespaceID);
     ComplexArgumentParser::Finalize(request.tag);
     ComplexArgumentParser::Finalize(request.label);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Globals::Structs::SuppliedAttributionData::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SuppliedAttributionData.contextInformation",
-                                                                  "contextInformation", value.isMember("contextInformation")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "contextInformation");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.contextInformation, value["contextInformation"]));
-    valueCopy.removeMember("contextInformation");
-
-    if (value.isMember("sourceContext"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sourceContext");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sourceContext, value["sourceContext"]));
-    }
-    valueCopy.removeMember("sourceContext");
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::SuppliedAttributionData::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.contextInformation);
-    ComplexArgumentParser::Finalize(request.sourceContext);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,

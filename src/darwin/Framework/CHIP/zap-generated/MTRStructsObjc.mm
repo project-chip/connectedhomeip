@@ -196,51 +196,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDataTypeAttributionData
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _contextInformation = @(0);
-
-        _sourceContext = nil;
-
-        _nodeID = nil;
-
-        _groupID = nil;
-
-        _systemTimeStamp = nil;
-
-        _epochTimeStamp = nil;
-
-        _fabricIndex = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypeAttributionData alloc] init];
-
-    other.contextInformation = self.contextInformation;
-    other.sourceContext = self.sourceContext;
-    other.nodeID = self.nodeID;
-    other.groupID = self.groupID;
-    other.systemTimeStamp = self.systemTimeStamp;
-    other.epochTimeStamp = self.epochTimeStamp;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; nodeID:%@; groupID:%@; systemTimeStamp:%@; epochTimeStamp:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _nodeID, _groupID, _systemTimeStamp, _epochTimeStamp, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDataTypeICECandidateStruct
 - (instancetype)init
 {
@@ -407,39 +362,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespaceID:%@; tag:%@; label:%@; >", NSStringFromClass([self class]), _mfgCode, _namespaceID, _tag, _label];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRDataTypeSuppliedAttributionData
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _contextInformation = @(0);
-
-        _sourceContext = nil;
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypeSuppliedAttributionData alloc] init];
-
-    other.contextInformation = self.contextInformation;
-    other.sourceContext = self.sourceContext;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _fabricIndex];
     return descriptionString;
 }
 
