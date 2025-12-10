@@ -27,6 +27,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace {
 
@@ -38,11 +39,39 @@ using namespace chip::app::Clusters::BasicInformation::Attributes;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 
+// Mock DeviceInfoProvider for testing
+class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
+{
+public:
+    MockDeviceInfoProvider()           = default;
+    ~MockDeviceInfoProvider() override = default;
+
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; }
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
+    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
+
+protected:
+    // Simple no-op implementations - we only need these to return success
+    // so that the cluster's validation logic can be tested
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override{ return CHIP_NO_ERROR; }
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
+};
+
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestBasicInformationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void SetUp() override
+    {
+        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
+    }
+
+    MockDeviceInfoProvider mDeviceInfoProvider;
 };
 
 TEST_F(TestBasicInformationCluster, TestAttributes)

@@ -195,6 +195,7 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
     DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;

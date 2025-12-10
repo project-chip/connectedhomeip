@@ -126,6 +126,27 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
 };
 
+// Mock DeviceInfoProvider for testing
+class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
+{
+public:
+    MockDeviceInfoProvider()           = default;
+    ~MockDeviceInfoProvider() override = default;
+
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; }
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
+    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
+
+protected:
+    // Simple no-op implementations - we only need these to return success
+    // so that the cluster's validation logic can be tested
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override{ return CHIP_NO_ERROR; }
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
+};
+
 static constexpr size_t kCountryCodeLength = 2;
 static constexpr const char * kUniqueId    = "TEST_UNIQUE_ID_12345";
 // Mock ConfigurationManager for testing
@@ -177,10 +198,14 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); }
+    void SetUp() override { 
+        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); 
+        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
+    }
 
     void TearDown() override { basicInformationClusterInstance.Shutdown(); }
 
+    MockDeviceInfoProvider mDeviceInfoProvider;
     chip::Testing::TestServerClusterContext testContext;
     static BasicInformationCluster & basicInformationClusterInstance;
     static chip::Testing::ClusterTester tester;

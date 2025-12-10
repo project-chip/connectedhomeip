@@ -91,21 +91,25 @@ void DeviceInfoProvider::SetStorageDelegate(PersistentStorageDelegate * storage)
 
 uint16_t DeviceInfoProvider::GetSimultaneousInvocationsSupported()
 {
+    static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER <= UINT16_MAX, "CHIP_IM_MAX_NUM_COMMAND_HANDLER must fit in uint16_t");
     return CHIP_IM_MAX_NUM_COMMAND_HANDLER;
 }
 
 uint16_t DeviceInfoProvider::GetSimultaneousWritesSupported()
 {
+    static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER <= UINT16_MAX, "CHIP_IM_MAX_NUM_WRITE_HANDLER must fit in uint16_t");
     return CHIP_IM_MAX_NUM_WRITE_HANDLER;
 }
 
 uint16_t DeviceInfoProvider::GetReadPathsSupported()
 {
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= UINT16_MAX, "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must fit in uint16_t");
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS;
 }
 
 uint16_t DeviceInfoProvider::GetSubscribePathsSupported()
 {
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= UINT16_MAX, "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must fit in uint16_t");
     return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS;
 }
 
