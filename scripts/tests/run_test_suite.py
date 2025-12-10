@@ -280,23 +280,23 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
-    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder())
+    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(), discover_paths=discover_paths)
 
     for p in app_path:
         try:
             subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
         except ValueError as e:
-            raise click.BadOptionUsage("app-path", f"Invalid path specifier '{p}': {e.args!r}")
+            raise click.BadOptionUsage("app-path", f"Invalid app path specifier '{p}': {e}")
     for p in tool_path:
         try:
             subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
         except ValueError as e:
-            raise click.BadOptionUsage("tool-path", f"Invalid path specifier '{p}': {e.args!r}")
+            raise click.BadOptionUsage("tool-path", f"Invalid tool path specifier '{p}': {e}")
     for p in custom_path:
         try:
             subproc_info_repo.addSpec(p)
         except ValueError as e:
-            raise click.BadOptionUsage("custom-path", f"Invalid path specifier '{p}': {e.args!r}")
+            raise click.BadOptionUsage("custom-path", f"Invalid custom path specifier '{p}': {e}")
 
     if discover_paths:
         subproc_info_repo.discover()
@@ -314,7 +314,7 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
             subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
             subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
     except (ValueError, LookupError) as e:
-        raise click.BadOptionUsage("{app,tool,custom}-path", f"Missing required path: {e.args!r}")
+        raise click.BadOptionUsage("{app,tool,custom}-path", f"Missing required path: {e}")
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
