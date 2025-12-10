@@ -512,11 +512,17 @@ await self.request_device_reboot()
 await self.request_device_factory_reset()
 ```
 
-The `request_device_reboot()` and `request_device_factory_reset()` methods work differently depending on the environment.
-When the test is started with `run_python_test.py` as it is in the CI, the device is automatically rebooted and possibly factory reset during the test depending on test implementation using the restart_flag_file.
-When the test is started by some other means (e.g., during certification testing), you'll be prompted to manually reboot or factory reset the device using the device-specific mechanism.
+The `request_device_reboot()` and `request_device_factory_reset()` methods work
+differently depending on the environment. When the test is started with
+`run_python_test.py` as it is in the CI, the device is automatically rebooted
+and possibly factory reset during the test depending on test implementation
+using the restart_flag_file. When the test is started by some other means (e.g.,
+during certification testing), you'll be prompted to manually reboot or factory
+reset the device using the device-specific mechanism.
 
-After reboot, the methods automatically expires existing controller sessions to force reconnection for reboot only or the device will automatically re-enter commissioning mode to allow new commissioning.
+After reboot, the methods automatically expires existing controller sessions to
+force reconnection for reboot only or the device will automatically re-enter
+commissioning mode to allow new commissioning.
 
 See
 [TC-ACL-2.10](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_ACL_2_10.py)
