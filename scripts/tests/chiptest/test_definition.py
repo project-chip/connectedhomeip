@@ -305,10 +305,13 @@ class SubprocessInfoRepo(dict):
             path = Path(path)
             if kind is None:
                 if key not in self.subproc_knowhow:
-                    raise KeyError(f"Kind not provided for key '{key}' and not specified in know-how")
+                    raise ValueError(f"Kind not provided for key '{key}' and not specified in know-how")
                 kind = self.subproc_knowhow[key].kind
         else:
-            raise RuntimeError(f"Cannot parse path spec '{spec}'")
+            raise ValueError(f"Cannot parse path spec '{spec}'")
+
+        if key not in self.subproc_knowhow:
+            log.warning("Key '%s' is not present in the subprocess repo know-how, possible typo", key)
 
         s = SubprocessInfo(kind=kind, path=path)
         if path.suffix == '.py':
@@ -345,7 +348,6 @@ class SubprocessInfoRepo(dict):
         Indicate that a subprocess path is required. Throw exception if it's not already in the repo
         and can't be discovered using the paths finder.
         """
-        log.debug("Require key '%s' kind '%s' target_name '%s'", key, kind, target_name)
         if key in self:
             return self[key]
         if kind is None:
@@ -359,7 +361,7 @@ class SubprocessInfoRepo(dict):
             if target_name is None:
                 raise ValueError(f"Key '{key}': Key exists in know-how but no target name specified")
         if (path := self.paths.get(target_name)) is None:
-            raise LookupError(f"Cannot find path for required key '{key}'")
+            raise LookupError(f"Cannot find path for required {kind} key '{key}'")
         log.info("Discovered required key '%s' path '%s'", key, path)
         s = SubprocessInfo(kind=kind, path=path)
         if path.suffix == '.py':
@@ -515,7 +517,7 @@ class TestDefinition:
                     '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
 
                 if dry_run:
-                    log.info(shlex.join(python_cmd))
+                    log.info(shlex.join(python_cmd.to_cmd()))
                 else:
                     runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
@@ -548,8 +550,8 @@ class TestDefinition:
                 test_cmd = test_cmd.with_args(*server_args)
 
                 if dry_run:
-                    log.info("Pairing command: %s", shlex.join(pairing_cmd))
-                    log.info("Testcase command: %s", shlex.join(test_cmd))
+                    log.info("Pairing command: %s", shlex.join(pairing_cmd.to_cmd()))
+                    log.info("Testcase command: %s", shlex.join(test_cmd.to_cmd()))
                 else:
                     runner.RunSubprocess(pairing_cmd,
                                          name='PAIR', dependencies=[apps_register])

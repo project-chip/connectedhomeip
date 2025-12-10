@@ -283,25 +283,38 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder())
 
     for p in app_path:
-        subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
+        try:
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
+        except ValueError as e:
+            raise click.BadOptionUsage("app-path", f"Invalid path specifier '{p}': {e.args!r}")
     for p in tool_path:
-        subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
+        try:
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
+        except ValueError as e:
+            raise click.BadOptionUsage("tool-path", f"Invalid path specifier '{p}': {e.args!r}")
     for p in custom_path:
-        subproc_info_repo.addSpec(p)
+        try:
+            subproc_info_repo.addSpec(p)
+        except ValueError as e:
+            raise click.BadOptionUsage("custom-path", f"Invalid path specifier '{p}': {e.args!r}")
 
     if discover_paths:
         subproc_info_repo.discover()
 
     # We use require here as we want to throw an error as these tools are mandatory for any test run.
-    if context.obj.runtime == TestRunTime.MATTER_REPL_PYTHON:
-        subproc_info_repo.require('matter-repl-yaml-tester')
-    elif context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
-        subproc_info_repo.require('chip-tool')
-        subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
-    else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
-        # `chip-tool` on darwin is `darwin-framework-tool`
-        subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
-        subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
+    try:
+
+        if context.obj.runtime == TestRunTime.MATTER_REPL_PYTHON:
+            subproc_info_repo.require('matter-repl-yaml-tester')
+        elif context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
+            subproc_info_repo.require('chip-tool')
+            subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
+        else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
+            # `chip-tool` on darwin is `darwin-framework-tool`
+            subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
+            subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
+    except (ValueError, LookupError) as e:
+        raise click.BadOptionUsage("{app,tool,custom}-path", f"Missing required path: {e.args!r}")
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
