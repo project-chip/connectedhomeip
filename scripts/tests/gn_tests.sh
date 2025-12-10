@@ -44,10 +44,10 @@ env
 
 set -x
 
-if [[ "$OSTYPE" == "darwin"* ]] && [[ "$GITHUB_ACTION_RUN" == "1" ]]; then
+if [[ "$OSTYPE" == "darwin"* ]] && [[ "$GITHUB_ACTIONS" == "true" ]]; then
     # Use sudo to avoid Local Network Privacy restrictions on macOS 15+.
     # macOS 15 introduced Local Network Privacy which restricts multicast traffic in several ways.
-    # Running from ssh, running from Terminal.app, or accepting a UI prompt can allow access, but those 
+    # Running from ssh, running from Terminal.app, or accepting a UI prompt can allow access, but those
     # aren't great options in CI.
     # Processes run as root are exempt from these restrictions.
     # For details, see https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#macOS-considerations
