@@ -62,39 +62,39 @@ class TC_I_2_4(MatterBaseTest):
                          "Subscription successfully established"),
                 TestStep(3, f"{THwrite} IdentifyTime attribute to 30.", test_plan_support.verify_success()),
                 TestStep(4, "TH waits for the report and verifies the received report has a value of 30",
-                         "The received report contains a value equal to 30 (+/- 1)"),
+                         "The received report contains a value equal to 30 (-2 delta allowed)"),
                 TestStep(5, f"{THwrite} IdentifyTime attribute to 35.", test_plan_support.verify_success()),
                 TestStep(6, "TH waits for the report and verifies the received report has a value of 35",
-                         "The received report contains a value equal to 35 (+/- 1)"),
+                         "The received report contains a value equal to 35 (-2 delta allowed)"),
                 TestStep(7, f"{THwrite} IdentifyTime attribute to 5.", test_plan_support.verify_success()),
                 TestStep(8, "TH waits for the report and verifies the received report has a value of 5",
-                         "The received report contains a value equal to 5 (+/- 1)"),
+                         "The received report contains a value equal to 5 (-2 delta allowed)"),
                 TestStep(9, "TH waits for the report and verifies the received report has a value of 0",
                          "The received report contains a value equal to 0"),
                 TestStep(10, f"{THwrite} IdentifyTime attribute to 35.", test_plan_support.verify_success()),
                 TestStep(11, "TH waits for the report and verifies the received report has a value of 35",
-                         "The received report contains a value equal to 35 (+/- 1)"),
+                         "The received report contains a value equal to 35 (-2 delta allowed)"),
                 TestStep(12, f"{THwrite} IdentifyTime attribute to 0.", test_plan_support.verify_success()),
                 TestStep(13, "TH waits for the report and verifies the received report has a value of 0",
                          "The received report contains a value equal to 0"),
                 TestStep(14, f"{THcommand} Identify command with the value of IdentifyTime field set to 30",
                          test_plan_support.verify_success()),
                 TestStep(15, "TH waits for the report and verifies the received report has a value of 30",
-                         "The received report contains a value equal to 30 (+/- 1)"),
+                         "The received report contains a value equal to 30 (-2 delta allowed)"),
                 TestStep(16, f"{THcommand} Identify command with the value of IdentifyTime field set to 35",
                          test_plan_support.verify_success()),
                 TestStep(17, "TH waits for the report and verifies the received report has a value of 35",
-                         "The received report contains a value equal to 35 (+/- 1)"),
+                         "The received report contains a value equal to 35 (-2 delta allowed)"),
                 TestStep(18, f"{THcommand} Identify command with the value of IdentifyTime field set to 5",
                          test_plan_support.verify_success()),
                 TestStep(19, "TH waits for the report and verifies the received report has a value of 5",
-                         "The received report contains a value equal to 5 (+/- 1)"),
+                         "The received report contains a value equal to 5 (-2 delta allowed)"),
                 TestStep(20, "TH waits for the report and verifies the received report has a value of 0",
                          "The received report contains a value equal to 0"),
                 TestStep(21, f"{THcommand} Identify command with the value of IdentifyTime field set to 35",
                          test_plan_support.verify_success()),
                 TestStep(22, "TH waits for the report and verifies the received report has a value of 35",
-                         "The received report contains a value equal to 35 (+/- 1)"),
+                         "The received report contains a value equal to 35 (-2 delta allowed)"),
                 TestStep(23, f"{THcommand} Identify command with the value of IdentifyTime field set to 0",
                          test_plan_support.verify_success()),
                 TestStep(24, "TH waits for the report and verifies the received report has a value of 0",
@@ -129,7 +129,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    30, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    30, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  30, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(5)
@@ -140,7 +142,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  35, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(7)
@@ -151,7 +155,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    5, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    5, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  5, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(9)
@@ -170,7 +176,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  35, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(12)
@@ -197,7 +205,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    30, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    30, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  30, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(16)
@@ -211,7 +221,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  35, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(18)
@@ -225,7 +237,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    5, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    5, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  5, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(20)
@@ -248,7 +262,9 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=1, msg="Received unexpected value for IdentifyTime")
+                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
+                                  35, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         self.step(23)
