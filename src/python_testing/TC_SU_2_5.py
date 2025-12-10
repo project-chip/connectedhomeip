@@ -47,6 +47,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import logging
 
 from mobly import asserts
@@ -199,10 +200,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Added this block because after AttributeSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
         # this is just to catch it and continue with the test
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await asyncio.sleep(0.1)
-        except asyncio.CancelledError:
-            pass
 
         # Once in idle verify the version match the expected software version
         await self.verify_version_applied_basic_information(
@@ -284,10 +283,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Added this block because after AttributeSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
         # this is just to catch it and continue with the test
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await asyncio.sleep(0.1)
-        except asyncio.CancelledError:
-            pass
 
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -371,10 +368,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Added this block because after AttributeSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
         # this is just to catch it and continue with the test
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await asyncio.sleep(0.1)
-        except asyncio.CancelledError:
-            pass
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
@@ -448,10 +443,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Added this block because after AttributeSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
         # this is just to catch it and continue with the test
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await asyncio.sleep(0.1)
-        except asyncio.CancelledError:
-            pass
 
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -514,10 +507,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Added this block because after AttributeSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
         # this is just to catch it and continue with the test
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await asyncio.sleep(0.1)
-        except asyncio.CancelledError:
-            pass
 
         # Make sure attr is Idle
         update_state = await self.read_single_attribute_check_success(
