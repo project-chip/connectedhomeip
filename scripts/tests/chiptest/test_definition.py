@@ -287,7 +287,7 @@ class SubprocessInfoRepo(dict):
     # Instead we just want a dict-like object
     def __init__(self, paths: PathsFinderProto,
                  subproc_knowhow: dict[str, KnowhowEntry] = BUILTIN_SUBPROC_KNOWHOW,
-                 discover_paths = False,
+                 discover_paths=False,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.paths = paths
@@ -365,7 +365,7 @@ class SubprocessInfoRepo(dict):
                 raise ValueError(f"Key '{key}': Key exists in know-how but no target name specified")
 
         if not self.discover_paths:
-            raise LookupError(f"No path for {kind} '{key}' and path discovery disabled")
+        raise LookupError(f"No path for {kind} '{key}' and path discovery disabled")
 
         if (path := self.paths.get(target_name)) is None:
             raise LookupError(f"Cannot find path for required {kind} key '{key}'")
