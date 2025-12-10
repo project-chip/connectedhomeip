@@ -84,7 +84,7 @@ public:
     FabricTable & GetFabricTable() { return mfabricTable; }
 
 private:
-    void SetUpCertificates();
+    CHIP_ERROR SetUpCertificates();
 
     PersistentStorageDelegate * mStorage;
 
@@ -120,7 +120,7 @@ CHIP_ERROR FabricTestHelper::SetUpFabric(FabricIndex & fabricIndexOut)
     ReturnErrorOnFailure(mfabricTable.Init(initParams));
 
     ReturnErrorOnFailure(mfabricTable.SetFabricIndexForNextAddition(fabricIndexOut));
-    SetUpCertificates();
+    ReturnErrorOnFailure(SetUpCertificates());
 
     CHIP_ERROR err = mfabricTable.AddNewFabricForTest(
         mRootCertSpan, ByteSpan(), mNocSpan, ByteSpan(mSerializedOpKey.Bytes(), mSerializedOpKey.Length()), &fabricIndexOut);
@@ -155,19 +155,15 @@ CHIP_ERROR FabricTestHelper::TearDownFabric(FabricIndex fabricIndex)
     }
     return CHIP_NO_ERROR;
 }
-
-void FabricTestHelper::SetUpCertificates()
+CHIP_ERROR FabricTestHelper::SetUpCertificates()
 {
     Crypto::P256Keypair rootCACredentials;
-    if (rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA) != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     Crypto::P256Keypair deviceOpKey;
-    if (deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA) != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
-    if (deviceOpKey.Serialize(mSerializedOpKey) != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(deviceOpKey.Serialize(mSerializedOpKey));
 
     // Create temporary X.509 (DER) buffers
     uint8_t rootCertDER_temp[chip::Credentials::kMaxDERCertLength];
@@ -185,39 +181,30 @@ void FabricTestHelper::SetUpCertificates()
     rootRequestParams.ValidityEnd   = kRootCertValidityDurationSeconds;
 
     const char * rootName = "My Test Root CA";
-    CHIP_ERROR err        = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
-                                                                    CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
-           );
-    if (err != CHIP_NO_ERROR)
-        return;
-    err = rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId);
-    if (err != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
+                                                                 CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
+                                                                 ));
+    ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId));
     rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;
 
-    if (chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan) != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan));
 
     // Convert X.509 DER to Matter TLV
-    if (chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan) != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan));
 
     chip::Credentials::X509CertRequestParams nocRequestParams;
     nocRequestParams.SerialNumber  = kNocSerial;
     nocRequestParams.ValidityStart = kCertValidityStart;
     nocRequestParams.ValidityEnd   = kNocCertValidityDurationSeconds;
     nocRequestParams.IssuerDN      = rootRequestParams.SubjectDN;
-    if ((err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId)) !=
-        CHIP_NO_ERROR)
-        return;
-    if ((err = nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId)) != CHIP_NO_ERROR)
-        return;
-    if (chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan) !=
-        CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId));
+    ReturnErrorOnFailure(nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId));
+    ReturnErrorOnFailure(
+        chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan));
 
-    if (chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan) != CHIP_NO_ERROR)
-        return;
+    ReturnErrorOnFailure(chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan));
+
+    return CHIP_NO_ERROR;
 }
 
 // Helper class for testing clusters.
