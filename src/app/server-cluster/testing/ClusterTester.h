@@ -30,10 +30,15 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <credentials/FabricTable.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
 
 #include <memory>
 #include <optional>
@@ -53,7 +58,12 @@ namespace Testing {
 class FabricTestHelper
 {
 public:
-    FabricTestHelper(PersistentStorageDelegate * storage) : mStorage(storage), mRootCertSpan(mRootCertDER), mNocSpan(mNocDER) {}
+    FabricTestHelper(PersistentStorageDelegate * storage) : mStorage(storage), mRootCertSpan(mRootCertDER), mNocSpan(mNocDER)
+    {
+        // Zero-initialize the buffers to satisfy compilers treating this as an error.
+        memset(mRootCertDER, 0, sizeof(mRootCertDER)); // <-- ADD THIS
+        memset(mNocDER, 0, sizeof(mNocDER));           // <-- ADD THIS
+    }
 
     /**
      * @brief Initializes the Fabric table and adds a new test fabric.
@@ -489,7 +499,7 @@ private:
 
     chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
-    std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
+    std::vector<std::unique_ptr<ReadOperation>> mReadOperations;
 
     FabricTestHelper mFabricHelper;
 };

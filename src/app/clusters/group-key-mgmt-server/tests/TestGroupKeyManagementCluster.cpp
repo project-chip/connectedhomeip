@@ -97,7 +97,7 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, std::move(mandatoryAttributes)));
 }
 
-const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
+const chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
 const chip::GroupId kTestGroupId         = 0x1234;
 constexpr uint16_t kTestKeySetId         = 1;
 
