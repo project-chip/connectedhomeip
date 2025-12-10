@@ -26,7 +26,6 @@ Both classes allow tests to start and manage subscriptions, queue received updat
 block until epected reports are received or fail on timeouts
 """
 
-import asyncio
 import inspect
 import logging
 import queue
@@ -108,6 +107,10 @@ class EventSubscriptionHandler:
                                                       fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
+
+    def cancel(self):
+        """This cancels a subscription."""
+        self._subscription.Shutdown()
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -247,14 +250,9 @@ class AttributeSubscriptionHandler:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    async def cancel(self):
+    def cancel(self):
         """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
-        try:
-            self._subscription.Shutdown()
-            await asyncio.sleep(5)
-        except asyncio.CancelledError:
-            pass
+        self._subscription.Shutdown()
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
