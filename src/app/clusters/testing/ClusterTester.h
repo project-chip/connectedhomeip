@@ -58,12 +58,9 @@ namespace Testing {
 class FabricTestHelper
 {
 public:
-    FabricTestHelper(PersistentStorageDelegate * storage) : mStorage(storage), mRootCertSpan(mRootCertDER), mNocSpan(mNocDER)
-    {
-        // Zero-initialize the buffers to satisfy compilers treating this as an error.
-        memset(mRootCertDER, 0, sizeof(mRootCertDER)); // <-- ADD THIS
-        memset(mNocDER, 0, sizeof(mNocDER));           // <-- ADD THIS
-    }
+    FabricTestHelper(PersistentStorageDelegate * storage) :
+        mStorage(storage), mRootCertSpan(mRootCertDER, sizeof(mRootCertDER)), mNocSpan(mNocDER, sizeof(mNocDER))
+    {}
 
     /**
      * @brief Initializes the Fabric table and adds a new test fabric.
