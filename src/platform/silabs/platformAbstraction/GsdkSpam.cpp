@@ -48,10 +48,10 @@ extern "C" {
 #else
 #include "sl_simple_led_instances.h"
 #define SL_LED_INIT_INTANCES() sl_simple_led_init_instances();
-#define SL_LED_GET_STATE(x) sl_simple_led_get_state(const_cast<sl_led_t *>(x))
-#define SL_LED_TURN_ON(x) sl_simple_led_turn_on(const_cast<sl_led_t *>(x))
-#define SL_LED_TURN_OFF(x) sl_simple_led_turn_off(const_cast<sl_led_t *>(x))
-#define SL_LED_TOGGLE(x) sl_simple_led_toggle(const_cast<sl_led_t *>(x))
+#define SL_LED_GET_STATE(x) sl_simple_led_get_state(const_cast<sl_led_t *>(x)->context)
+#define SL_LED_TURN_ON(x) sl_simple_led_turn_on(const_cast<sl_led_t *>(x)->context)
+#define SL_LED_TURN_OFF(x) sl_simple_led_turn_off(const_cast<sl_led_t *>(x)->context)
+#define SL_LED_TOGGLE(x) sl_simple_led_toggle(const_cast<sl_led_t *>(x)->context)
 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 }
