@@ -135,7 +135,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(5)
@@ -147,7 +147,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(7)
@@ -159,7 +159,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(9)
@@ -179,7 +179,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(12)
@@ -208,7 +208,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(16)
@@ -223,7 +223,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(18)
@@ -238,7 +238,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(20)
@@ -262,7 +262,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         self.assert_identify_time(
-            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
+            value=sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, min_value=(identify_time_value - accepted_value_delta_in_reports), max_value=identify_time_value)
         sub_handler.reset()
 
         self.step(23)
