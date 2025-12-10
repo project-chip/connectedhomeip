@@ -461,7 +461,7 @@ menu "CHIP Device Layer"
                 Enables or Disables LIT ICD
 
         config ENABLE_ICD_DSLS
-            bool "Enable Dynamic Sit Lit Support"
+            bool "Enable Dynamic SIT LIT Support"
             depends on ENABLE_ICD_LIT
             default y
             help
