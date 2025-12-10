@@ -3820,9 +3820,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command QueryImage;
-    handle command QueryImageResponse;
     handle command ApplyUpdateRequest;
-    handle command ApplyUpdateResponse;
     handle command NotifyUpdateApplied;
   }
 
@@ -3857,11 +3855,8 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ArmFailSafe;
-    handle command ArmFailSafeResponse;
     handle command SetRegulatoryConfig;
-    handle command SetRegulatoryConfigResponse;
     handle command CommissioningComplete;
-    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -3877,13 +3872,10 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ScanNetworks;
-    handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
-    handle command NetworkConfigResponse;
     handle command ConnectNetwork;
-    handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
   }
 
@@ -3907,7 +3899,6 @@ endpoint 0 {
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
-    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -4050,20 +4041,15 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
-    handle command AttestationResponse;
     handle command CertificateChainRequest;
-    handle command CertificateChainResponse;
     handle command CSRRequest;
-    handle command CSRResponse;
     handle command AddNOC;
     handle command UpdateNOC;
-    handle command NOCResponse;
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
     handle command SetVIDVerificationStatement;
     handle command SignVIDVerificationRequest;
-    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -4076,10 +4062,8 @@ endpoint 0 {
 
     handle command KeySetWrite;
     handle command KeySetRead;
-    handle command KeySetReadResponse;
     handle command KeySetRemove;
     handle command KeySetReadAllIndices;
-    handle command KeySetReadAllIndicesResponse;
   }
 
   server cluster UserLabel {
@@ -4149,11 +4133,9 @@ endpoint 1 {
     ram      attribute clusterRevision default = 2;
 
     handle command ChangeChannel;
-    handle command ChangeChannelResponse;
     handle command ChangeChannelByNumber;
     handle command SkipChannel;
     handle command GetProgramGuide;
-    handle command ProgramGuideResponse;
     handle command RecordProgram;
     handle command CancelRecordProgram;
   }
@@ -4166,7 +4148,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 2;
 
     handle command NavigateTarget;
-    handle command NavigateTargetResponse;
   }
 
   server cluster MediaPlayback {
@@ -4198,7 +4179,6 @@ endpoint 1 {
     handle command FastForward;
     handle command SkipForward;
     handle command SkipBackward;
-    handle command PlaybackResponse;
     handle command Seek;
     handle command ActivateAudioTrack;
     handle command ActivateTextTrack;
@@ -4239,7 +4219,6 @@ endpoint 1 {
 
     handle command LaunchContent;
     handle command LaunchURL;
-    handle command LauncherResponse;
   }
 
   server cluster AudioOutput {
@@ -4264,7 +4243,6 @@ endpoint 1 {
     handle command LaunchApp;
     handle command StopApp;
     handle command HideApp;
-    handle command LauncherResponse;
   }
 
   server cluster ContentControl {
@@ -4285,7 +4263,6 @@ endpoint 1 {
 
     handle command UpdatePIN;
     handle command ResetPIN;
-    handle command ResetPINResponse;
     handle command Enable;
     handle command Disable;
     handle command AddBonusTime;
@@ -4381,11 +4358,9 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
 
     handle command ChangeChannel;
-    handle command ChangeChannelResponse;
     handle command ChangeChannelByNumber;
     handle command SkipChannel;
     handle command GetProgramGuide;
-    handle command ProgramGuideResponse;
     handle command RecordProgram;
     handle command CancelRecordProgram;
   }
@@ -4399,7 +4374,6 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
 
     handle command NavigateTarget;
-    handle command NavigateTargetResponse;
   }
 
   server cluster MediaPlayback {
@@ -4428,7 +4402,6 @@ endpoint 3 {
     handle command FastForward;
     handle command SkipForward;
     handle command SkipBackward;
-    handle command PlaybackResponse;
     handle command Seek;
     handle command ActivateAudioTrack;
     handle command ActivateTextTrack;
@@ -4443,7 +4416,6 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
 
     handle command SendKey;
-    handle command SendKeyResponse;
   }
 
   server cluster ContentLauncher {
@@ -4454,7 +4426,6 @@ endpoint 3 {
 
     handle command LaunchContent;
     handle command LaunchURL;
-    handle command LauncherResponse;
   }
 
   server cluster ApplicationLauncher {
@@ -4467,7 +4438,6 @@ endpoint 3 {
     handle command LaunchApp;
     handle command StopApp;
     handle command HideApp;
-    handle command LauncherResponse;
   }
 
   server cluster ApplicationBasic {
@@ -4491,7 +4461,6 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
 
     handle command GetSetupPIN;
-    handle command GetSetupPINResponse;
     handle command Login;
     handle command Logout;
   }
@@ -4514,7 +4483,6 @@ endpoint 3 {
 
     handle command UpdatePIN;
     handle command ResetPIN;
-    handle command ResetPINResponse;
     handle command Enable;
     handle command Disable;
     handle command AddBonusTime;
