@@ -114,7 +114,7 @@ jobs:
               # unit tests)
               #
               run: |
-                  ./scripts/run_in_build_env.sh \
+                  scripts/run_in_build_env.sh \
                     "matter-zapxml-parser \
                       --no-print \
                       --log-level info \
@@ -261,8 +261,8 @@ jobs:
                   "
             - name: Build Apps with Unified Build
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build/build_examples.py \
                         --target linux-x64-bridge-${BUILD_VARIANT}-unified \
                         --target linux-x64-lock-${BUILD_VARIANT}-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-unified \
@@ -276,8 +276,8 @@ jobs:
               run: rm -rf out/
             - name: Build Remaining Apps (part 1)
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
@@ -290,8 +290,8 @@ jobs:
               run: rm -rf out/
             - name: Build Remaining Apps (part 2)
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build/build_examples.py \
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
@@ -304,39 +304,39 @@ jobs:
               run: rm -rf out/
             - name: Build Python
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build_python.sh \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build_python.sh \
                         --install_virtual_env out/venv \
                         --include_pytest_deps yes \
                         $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
-                  ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_build_env.sh \
+                  "scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --tool-path chip-tool:objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
               run: |
-                  ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_build_env.sh \
+                  "scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
                      run \
@@ -344,8 +344,8 @@ jobs:
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tool-path chip-tool:objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Run BLE-WiFi commissioning test
@@ -355,23 +355,23 @@ jobs:
                 # globals (glib internals) that TSAN does not understand...
                 TSAN_OPTIONS: report_bugs=0
               run: |
-                  ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_build_env.sh \
+                  "scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --target TestOperationalState \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tool-path chip-tool:objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --ble-wifi \
                   "
 
             - name: Run Tests using matter-repl (skip slow)
               if: github.event_name == 'pull_request'
               run: |
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_python_env.sh out/venv \
+                  "scripts/tests/run_test_suite.py \
                      --runner matter_repl_python \
                      --exclude-tags MANUAL \
                      --exclude-tags FLAKY \
@@ -382,40 +382,40 @@ jobs:
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --app-path all-clusters:objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
               run: |
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_python_env.sh out/venv \
+                  "scripts/tests/run_test_suite.py \
                      --runner matter_repl_python \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --app-path all-clusters:objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v5
@@ -487,8 +487,8 @@ jobs:
 
             - name: Build Apps Using Unified Build
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build/build_examples.py \
                         --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
@@ -501,8 +501,8 @@ jobs:
               run: rm -rf out/
             - name: Build Remaining Apps That Don't Support Unified Build
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build/build_examples.py \
                         --target darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
@@ -519,32 +519,32 @@ jobs:
             - name: Run Tests using the python parser sending commands to chip-tool
               # tests that failed macOS 15/26 last check: TestGroupMessaging,Test_TC_ACE_1_6,Test_TC_G_*,Test_TC_GRPKEY_*,Test_TC_S_*
               run: |
-                  ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_build_env.sh \
+                  "scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --app-path tv:./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --app-path bridge:./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --app-path lit-icd:./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --app-path microwave-oven:./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --app-path rvc:./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --app-path energy-management:./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --tool-path chip-tool:objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
               run: |
-                  ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py \
+                  scripts/run_in_build_env.sh \
+                  "scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
                      run \
@@ -552,8 +552,8 @@ jobs:
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tool-path chip-tool:objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Uploading core files
@@ -630,12 +630,12 @@ jobs:
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
             - name: Build python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
+              run: scripts/run_in_build_env.sh 'scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
             - name: Build apps for REPL tests with unified build
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh \
+                     "scripts/build/build_examples.py \
                         --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified \
@@ -655,7 +655,7 @@ jobs:
 
             - name: Build linux-x64-all-clusters
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
@@ -663,56 +663,56 @@ jobs:
 
             - name: Build linux-x64-all-devices-app
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-all-devices-app-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-devices-app-tsan-clang-test"
 
             - name: Build linux-x64-lit-icd
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-gateway
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-management
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-network-manager
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-sync
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
@@ -720,49 +720,49 @@ jobs:
             # TODO: camera app needs clang support
             - name: Build linux-x64-camera
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-camera
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera"
 
             - name: Build linux-x64-camera-controller
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-camera-controller
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera-controller"
 
             - name: Build linux-x64-light-data-model-no-unique-id
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-terms-and-conditions
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-terms-and-conditions
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-terms-and-conditions"
 
             - name: Build linux-x64-python-bindings
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-python-bindings-webrtc
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-python-bindings-webrtc"
 
             - name: Build linux-x64-jf-control-app
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-jf-control-app
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-control-app"
 
             - name: Build linux-x64-jf-admin-app
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-jf-admin-app
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-admin-app"
@@ -772,21 +772,21 @@ jobs:
 
             - name: Build linux-x64-requestor-app
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-provider-app
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build Software Update ota images with new version.
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+                  scripts/run_in_build_env.sh "scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
 
@@ -795,7 +795,7 @@ jobs:
 
             - name: Install push_av_server dependencies
               run: >-
-                  ./scripts/run_in_python_env.sh out/venv \
+                  scripts/run_in_python_env.sh out/venv \
                   "python3 -m pip install -r src/tools/push_av_server/requirements.txt \
                     && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
                   "
@@ -963,7 +963,7 @@ jobs:
               if: ${{matrix.filter == ''}}
               run: |
                   # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
-                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test out/linux-x64-all-clusters
+                  ln -s .objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test out/linux-x64-all-clusters
 
                   scripts/run_in_python_env.sh out/venv \
                   "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
@@ -1023,9 +1023,9 @@ jobs:
 
             - name: Build Python REPL and example apps
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
-                  ./scripts/run_in_build_env.sh \
-                   "./scripts/build/build_examples.py \
+                  scripts/run_in_build_env.sh 'scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_build_env.sh \
+                   "scripts/build/build_examples.py \
                       --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}-test \
                       build \
                       --copy-artifacts-to objdir-clone \
@@ -1033,7 +1033,7 @@ jobs:
             - name: Run Tests
               if: false # disable darwin test runs for now as they were very flaky in the past
               run: |
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
