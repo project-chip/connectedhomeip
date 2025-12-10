@@ -1376,7 +1376,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         sessions on all active controllers. This ensures all controllers can reconnect after a device
         reboot or factory reset.
         """
-        LOGGER.info(f"Expiring sessions on all active controllers")
+        LOGGER.info("Expiring sessions on all active controllers")
         for ca in self.matter_stack.certificate_authorities:
             for fabric_admin in ca.adminList:
                 for controller in fabric_admin._activeControllers:
