@@ -20,6 +20,7 @@ This module contains classes and functions designed to handle the commissioning 
 """
 
 import asyncio
+import contextlib
 import logging
 from dataclasses import dataclass
 from typing import Any, List, Optional
@@ -519,10 +520,8 @@ async def _establish_pase_or_case_session(
                 # Cancel any remaining
                 for task in pending2:
                     task.cancel()
-                    try:
+                    with contextlib.suppress(asyncio.CancelledError):
                         await task
-                    except asyncio.CancelledError:
-                        pass
                 return
             except Exception as e2:
                 raise RuntimeError(
@@ -535,10 +534,8 @@ async def _establish_pase_or_case_session(
     # Cancel pending tasks
     for task in pending:
         task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await task
-        except asyncio.CancelledError:
-            pass
 
 
 async def is_commissioned(

@@ -32,7 +32,7 @@ import asyncio
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch, PropertyMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add the python_testing directory to path so mdns_discovery module can be found
 PYTHON_TESTING_DIR = Path(__file__).parent.parent
@@ -353,7 +353,7 @@ async def test_parallel_session_case_wins():
     # PASE is slow (will be cancelled)
     async def pase_slow(*args, **kwargs):
         await asyncio.sleep(10)  # Will be cancelled when CASE succeeds
-        return None
+        return
 
     # CASE succeeds immediately
     async def case_success(*args, **kwargs):
@@ -392,7 +392,7 @@ async def test_parallel_session_first_fails_second_succeeds():
     async def pase_success(*args, **kwargs):
         call_order.append('pase')
         await asyncio.sleep(0.1)  # Slight delay
-        return None
+        return
 
     async def case_fail(*args, **kwargs):
         call_order.append('case')

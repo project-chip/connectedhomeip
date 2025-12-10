@@ -45,27 +45,26 @@ These tests verify that the commissioning status detection functions work correc
 with a real Matter application server.
 """
 
+import asyncio
 import logging
 import os
 import sys
 import tempfile
 from pathlib import Path
-from time import sleep
 
 from mobly import asserts
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import (
-    _is_device_operational_via_dnssd,
-    is_commissioned,
-)
+from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 # Add python_testing directory to path so mdns_discovery module is available
 PYTHON_TESTING_DIR = Path(__file__).parent.parent
 if str(PYTHON_TESTING_DIR) not in sys.path:
     sys.path.insert(0, str(PYTHON_TESTING_DIR))
+
+LOGGER = logging.getLogger(__name__)
 
 
 class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
@@ -117,7 +116,7 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
 
         # Create a temporary storage directory for KVS files
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        LOGGER.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server = AppServerSubprocess(
             self.th_server_app,
@@ -130,17 +129,17 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=60
         )
-        logging.info("TH server started successfully")
+        LOGGER.info("TH server started successfully")
 
     @async_test_body
     async def test_TC_COMMISSION_DETECT_1_1_factory_fresh_dnssd(self):
         """
         Test that DNS-SD check returns False for factory-fresh device.
         """
-        logging.info("=== Test: Factory Fresh Device - DNS-SD Check ===")
+        LOGGER.info("=== Test: Factory Fresh Device - DNS-SD Check ===")
         self.start_th_server()
 
-        logging.info("Checking DNS-SD for factory-fresh device")
+        LOGGER.info("Checking DNS-SD for factory-fresh device")
         is_operational = await _is_device_operational_via_dnssd(
             self.default_controller,
             self.th_server_local_nodeid
@@ -149,14 +148,14 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             is_operational,
             "Factory-fresh device should NOT be found operational via DNS-SD"
         )
-        logging.info("PASS: Factory-fresh device not found operational via DNS-SD")
+        LOGGER.info("PASS: Factory-fresh device not found operational via DNS-SD")
 
     @async_test_body
     async def test_TC_COMMISSION_DETECT_1_2_factory_fresh_is_commissioned(self):
         """
         Test that is_commissioned() returns False for factory-fresh device.
         """
-        logging.info("=== Test: Factory Fresh Device - is_commissioned() ===")
+        LOGGER.info("=== Test: Factory Fresh Device - is_commissioned() ===")
         self.start_th_server()
 
         pase_params = {
@@ -164,7 +163,7 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             'passcode': self.th_server_passcode
         }
 
-        logging.info("Checking is_commissioned() on factory-fresh device")
+        LOGGER.info("Checking is_commissioned() on factory-fresh device")
         commissioned = await is_commissioned(
             self.default_controller,
             self.th_server_local_nodeid,
@@ -174,30 +173,30 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             commissioned,
             "Factory-fresh device should report is_commissioned=False"
         )
-        logging.info("PASS: Factory-fresh device reports is_commissioned=False")
+        LOGGER.info("PASS: Factory-fresh device reports is_commissioned=False")
 
     @async_test_body
     async def test_TC_COMMISSION_DETECT_1_3_commissioned_dnssd(self):
         """
         Test that DNS-SD finds a commissioned device as operational.
         """
-        logging.info("=== Test: Commissioned Device - DNS-SD Check ===")
+        LOGGER.info("=== Test: Commissioned Device - DNS-SD Check ===")
         self.start_th_server()
 
         # Commission device (same pattern as TC_SC_3_5)
-        logging.info("Commissioning TH server to TH fabric")
+        LOGGER.info("Commissioning TH server to TH fabric")
         await self.default_controller.CommissionOnNetwork(
             nodeId=self.th_server_local_nodeid,
             setupPinCode=self.th_server_passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_server_discriminator
         )
-        logging.info("Commissioning TH_SERVER complete")
+        LOGGER.info("Commissioning TH_SERVER complete")
 
-        # Wait for mDNS advertisement to propagate (using time.sleep like TC_SC_3_5)
-        sleep(2)
+        # Wait for mDNS advertisement to propagate
+        await asyncio.sleep(2)
 
-        logging.info("Checking DNS-SD for commissioned device")
+        LOGGER.info("Checking DNS-SD for commissioned device")
 
         # Retry a few times for flaky mDNS
         is_operational = False
@@ -208,14 +207,14 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             )
             if is_operational:
                 break
-            logging.info(f"DNS-SD check attempt {attempt + 1} returned False, retrying...")
-            sleep(2)
+            LOGGER.info(f"DNS-SD check attempt {attempt + 1} returned False, retrying...")
+            await asyncio.sleep(2)
 
         asserts.assert_true(
             is_operational,
             "Commissioned device SHOULD be found operational via DNS-SD"
         )
-        logging.info("PASS: Commissioned device found operational via DNS-SD")
+        LOGGER.info("PASS: Commissioned device found operational via DNS-SD")
 
 
 if __name__ == "__main__":
