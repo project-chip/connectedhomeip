@@ -30,7 +30,6 @@
 #include <clusters/UnitLocalization/Enums.h>
 #include <clusters/UnitLocalization/Metadata.h>
 
-using namespace chip::Test;
 using namespace chip::Testing;
 using namespace chip;
 using namespace chip::app;
