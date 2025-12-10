@@ -486,7 +486,7 @@ async def _establish_pase_or_case_session(
 
     # Always add CASE task (allowPASE=False to force CASE)
     LOGGER.info(f"Creating CASE task for node {node_id}")
-    case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+    case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
     task_list.append(asyncio.create_task(case_future, name="case"))
 
     if not task_list:
@@ -594,7 +594,7 @@ async def is_commissioned(
         await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
 
         result = await dev_ctrl.ReadAttribute(
-            nodeid=node_id,
+            nodeId=node_id,
             attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
         )
 
@@ -649,7 +649,7 @@ async def get_commissioned_fabric_count(
             # Device is operational on this fabric - use CASE
             LOGGER.info(f"Device {node_id} is operational via DNS-SD, using CASE connection")
             result = await dev_ctrl.ReadAttribute(
-                nodeid=node_id,
+                nodeId=node_id,
                 attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
         elif pase_params is not None:
@@ -660,7 +660,7 @@ async def get_commissioned_fabric_count(
             LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
             await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
             result = await dev_ctrl.ReadAttribute(
-                nodeid=node_id,
+                nodeId=node_id,
                 attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
         else:
