@@ -346,7 +346,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=60.0)
         logger.info(f'{step_number}: Step #1.3 - UpdateState (Available sequence) matcher has completed.')
-        await subscription_attr.cancel()
+        subscription_attr.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.4 - Verify image transfer from TH/OTA-P to DUT is successful
@@ -465,7 +465,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Wait for the 120s minimum interval to complete (overall task timeout is 150s)
         subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=150.0)
         logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
-        await subscription_attr_state_busy.cancel()
+        subscription_attr_state_busy.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.4 - Verify Busy sequence
@@ -586,7 +586,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         subscription_attr_state_updatenotavailable.await_all_expected_report_matches(
             [matcher_not_available_state_obj], timeout_sec=150.0)
         logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
-        await subscription_attr_state_updatenotavailable.cancel()
+        subscription_attr_state_updatenotavailable.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.4 - Verify updateNotAvailable sequence
@@ -712,7 +712,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         subscription_attr_state_busy_180s.await_all_expected_report_matches(
             [matcher_busy_state_delayed_180s_obj], timeout_sec=210.0)
         logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
-        await subscription_attr_state_busy_180s.cancel()
+        subscription_attr_state_busy_180s.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.4 - Verify Busy, 180s DelayedActionTime sequence
