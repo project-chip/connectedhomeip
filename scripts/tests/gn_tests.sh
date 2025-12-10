@@ -44,8 +44,8 @@ env
 
 set -x
 
-# Run tests with sudo on Darwin to allow mDNS/multicast operations (e.g., TestDnssd)
-if [[ "$OSTYPE" == "darwin"* ]]; then
+# Run tests with sudo on Darwin in CI to allow mDNS/multicast operations (e.g., TestDnssd)
+if [[ "$OSTYPE" == "darwin"* ]] && [[ "$GITHUB_ACTION_RUN" == "1" ]]; then
     sudo ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" -k 0 check
 else
     ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" -k 0 check
