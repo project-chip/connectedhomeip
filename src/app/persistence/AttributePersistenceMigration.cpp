@@ -9,7 +9,7 @@ namespace chip::app {
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider,
                                                        const ConcreteClusterPath & cluster,
-                                                       Span<std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
+                                                       Span<const std::pair<const AttributeId, SafeAttributeMigrator>> attributes,
                                                        MutableByteSpan & buffer)
 {
     ChipError err        = CHIP_NO_ERROR;

@@ -46,8 +46,8 @@ using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator
  */
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider,
-                                                       const ConcreteClusterPath & cluster, Span<AttrMigrationData> attributes,
-                                                       MutableByteSpan & buffer);
+                                                       const ConcreteClusterPath & cluster,
+                                                       Span<const AttrMigrationData> attributes, MutableByteSpan & buffer);
 
 namespace DefaultMigrators {
 template <class T>
@@ -79,7 +79,8 @@ static CHIP_ERROR ScalarValue(ConcreteAttributePath attrPath, SafeAttributePersi
  *         and return last error encountered
  */
 template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster, Span<AttrMigrationData> attributes,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster,
+                                                       Span<const AttrMigrationData> attributes,
                                                        PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
