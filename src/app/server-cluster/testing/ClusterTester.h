@@ -68,7 +68,26 @@ public:
      * @param fabricIndexOut Output parameter for the newly created FabricIndex.
      * @return CHIP_ERROR
      */
-    CHIP_ERROR SetUpFabric(FabricIndex & fabricIndexOut);
+
+    CHIP_ERROR SetUpFabric(FabricIndex & fabricIndexOut)
+    {
+        ReturnErrorOnFailure(mOpCertStore.Init(mStorage));
+        initParams.opCertStore         = &mOpCertStore;
+        initParams.storage             = mStorage;
+        initParams.operationalKeystore = nullptr; // Use default
+        ReturnErrorOnFailure(mfabricTable.Init(initParams));
+
+        ReturnErrorOnFailure(mfabricTable.SetFabricIndexForNextAddition(fabricIndexOut));
+        ReturnErrorOnFailure(SetUpCertificates());
+
+        CHIP_ERROR err = mfabricTable.AddNewFabricForTest(
+            mRootCertSpan, ByteSpan(), mNocSpan, ByteSpan(mSerializedOpKey.Bytes(), mSerializedOpKey.Length()), &fabricIndexOut);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(mfabricTable.CommitPendingFabricData());
+
+        return CHIP_NO_ERROR;
+    }
 
     /**
      * @brief Tears down the created fabric and cleans up storage.
@@ -76,12 +95,85 @@ public:
      * @param fabricIndex The FabricIndex to tear down.
      * @return CHIP_ERROR
      */
-    CHIP_ERROR TearDownFabric(FabricIndex fabricIndex);
+    CHIP_ERROR TearDownFabric(FabricIndex fabricIndex)
+    {
+        if (fabricIndex != chip::kUndefinedFabricIndex)
+        {
+            // Credentials::SetGroupDataProvider(nullptr); // Done in the test fixture's TearDown
+            // GroupDataProviderImpl::RemoveFabric is usually done separately
+            // However, we just need to ensure the fabric is deleted from FabricTable and storage is cleaned.
+
+            CHIP_ERROR err = CHIP_NO_ERROR;
+
+            if ((err = mOpCertStore.RemoveOpCertsForFabric(fabricIndex)) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Test, "TearDownFabric: RemoveOpCertsForFabric failed: %s", err.AsString());
+            }
+            if ((err = mfabricTable.Delete(fabricIndex)) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Test, "TearDownFabric: Delete fabric failed: %s", err.AsString());
+            }
+
+            mfabricTable.Shutdown();
+            mOpCertStore.Finish();
+        }
+        return CHIP_NO_ERROR;
+    }
 
     FabricTable & GetFabricTable() { return mfabricTable; }
 
 private:
-    CHIP_ERROR SetUpCertificates();
+    CHIP_ERROR SetUpCertificates()
+    {
+        Crypto::P256Keypair rootCACredentials;
+        ReturnErrorOnFailure(rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA));
+
+        Crypto::P256Keypair deviceOpKey;
+        ReturnErrorOnFailure(deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
+
+        ReturnErrorOnFailure(deviceOpKey.Serialize(mSerializedOpKey));
+
+        // Create temporary X.509 (DER) buffers
+        uint8_t rootCertDER_temp[chip::Credentials::kMaxDERCertLength];
+        MutableByteSpan rootCertDERSpan(rootCertDER_temp);
+
+        uint8_t nocDER_temp[chip::Credentials::kMaxDERCertLength];
+        MutableByteSpan nocDERSpan(nocDER_temp);
+
+        mRootCertSpan = MutableByteSpan(mRootCertDER);
+        mNocSpan      = MutableByteSpan(mNocDER);
+
+        chip::Credentials::X509CertRequestParams rootRequestParams;
+        rootRequestParams.SerialNumber  = kRootCertSerial;
+        rootRequestParams.ValidityStart = kCertValidityStart;
+        rootRequestParams.ValidityEnd   = kRootCertValidityDurationSeconds;
+
+        const char * rootName = "My Test Root CA";
+        ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(
+            chip::ASN1::kOID_AttributeType_CommonName, CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
+            ));
+        ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId));
+        rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;
+
+        ReturnErrorOnFailure(chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan));
+
+        // Convert X.509 DER to Matter TLV
+        ReturnErrorOnFailure(chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan));
+
+        chip::Credentials::X509CertRequestParams nocRequestParams;
+        nocRequestParams.SerialNumber  = kNocSerial;
+        nocRequestParams.ValidityStart = kCertValidityStart;
+        nocRequestParams.ValidityEnd   = kNocCertValidityDurationSeconds;
+        nocRequestParams.IssuerDN      = rootRequestParams.SubjectDN;
+        ReturnErrorOnFailure(nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId));
+        ReturnErrorOnFailure(nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId));
+        ReturnErrorOnFailure(
+            chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan));
+
+        ReturnErrorOnFailure(chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan));
+
+        return CHIP_NO_ERROR;
+    }
 
     PersistentStorageDelegate * mStorage;
 
@@ -107,103 +199,6 @@ private:
     static constexpr uint32_t kRootCertValidityDurationSeconds = 315360000; // 10 years
     static constexpr uint32_t kNocCertValidityDurationSeconds  = 31536000;  // 1 year
 };
-
-CHIP_ERROR FabricTestHelper::SetUpFabric(FabricIndex & fabricIndexOut)
-{
-    ReturnErrorOnFailure(mOpCertStore.Init(mStorage));
-    initParams.opCertStore         = &mOpCertStore;
-    initParams.storage             = mStorage;
-    initParams.operationalKeystore = nullptr; // Use default
-    ReturnErrorOnFailure(mfabricTable.Init(initParams));
-
-    ReturnErrorOnFailure(mfabricTable.SetFabricIndexForNextAddition(fabricIndexOut));
-    ReturnErrorOnFailure(SetUpCertificates());
-
-    CHIP_ERROR err = mfabricTable.AddNewFabricForTest(
-        mRootCertSpan, ByteSpan(), mNocSpan, ByteSpan(mSerializedOpKey.Bytes(), mSerializedOpKey.Length()), &fabricIndexOut);
-    ReturnErrorOnFailure(err);
-
-    ReturnErrorOnFailure(mfabricTable.CommitPendingFabricData());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FabricTestHelper::TearDownFabric(FabricIndex fabricIndex)
-{
-    if (fabricIndex != chip::kUndefinedFabricIndex)
-    {
-        // Credentials::SetGroupDataProvider(nullptr); // Done in the test fixture's TearDown
-        // GroupDataProviderImpl::RemoveFabric is usually done separately
-        // However, we just need to ensure the fabric is deleted from FabricTable and storage is cleaned.
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if ((err = mOpCertStore.RemoveOpCertsForFabric(fabricIndex)) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Test, "TearDownFabric: RemoveOpCertsForFabric failed: %s", err.AsString());
-        }
-        if ((err = mfabricTable.Delete(fabricIndex)) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Test, "TearDownFabric: Delete fabric failed: %s", err.AsString());
-        }
-
-        mfabricTable.Shutdown();
-        mOpCertStore.Finish();
-    }
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR FabricTestHelper::SetUpCertificates()
-{
-    Crypto::P256Keypair rootCACredentials;
-    ReturnErrorOnFailure(rootCACredentials.Initialize(Crypto::ECPKeyTarget::ECDSA));
-
-    Crypto::P256Keypair deviceOpKey;
-    ReturnErrorOnFailure(deviceOpKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
-
-    ReturnErrorOnFailure(deviceOpKey.Serialize(mSerializedOpKey));
-
-    // Create temporary X.509 (DER) buffers
-    uint8_t rootCertDER_temp[chip::Credentials::kMaxDERCertLength];
-    MutableByteSpan rootCertDERSpan(rootCertDER_temp);
-
-    uint8_t nocDER_temp[chip::Credentials::kMaxDERCertLength];
-    MutableByteSpan nocDERSpan(nocDER_temp);
-
-    mRootCertSpan = MutableByteSpan(mRootCertDER);
-    mNocSpan      = MutableByteSpan(mNocDER);
-
-    chip::Credentials::X509CertRequestParams rootRequestParams;
-    rootRequestParams.SerialNumber  = kRootCertSerial;
-    rootRequestParams.ValidityStart = kCertValidityStart;
-    rootRequestParams.ValidityEnd   = kRootCertValidityDurationSeconds;
-
-    const char * rootName = "My Test Root CA";
-    ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_CommonName,
-                                                                 CharSpan(rootName, strlen(rootName)), true /* isPrintableString */
-                                                                 ));
-    ReturnErrorOnFailure(rootRequestParams.IssuerDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterRCACId, kTestRcacId));
-    rootRequestParams.SubjectDN = rootRequestParams.IssuerDN;
-
-    ReturnErrorOnFailure(chip::Credentials::NewRootX509Cert(rootRequestParams, rootCACredentials, rootCertDERSpan));
-
-    // Convert X.509 DER to Matter TLV
-    ReturnErrorOnFailure(chip::Credentials::ConvertX509CertToChipCert(rootCertDERSpan, mRootCertSpan));
-
-    chip::Credentials::X509CertRequestParams nocRequestParams;
-    nocRequestParams.SerialNumber  = kNocSerial;
-    nocRequestParams.ValidityStart = kCertValidityStart;
-    nocRequestParams.ValidityEnd   = kNocCertValidityDurationSeconds;
-    nocRequestParams.IssuerDN      = rootRequestParams.SubjectDN;
-    ReturnErrorOnFailure(nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterFabricId, kTestFabricId));
-    ReturnErrorOnFailure(nocRequestParams.SubjectDN.AddAttribute(chip::ASN1::kOID_AttributeType_MatterNodeId, kTestNodeId));
-    ReturnErrorOnFailure(
-        chip::Credentials::NewNodeOperationalX509Cert(nocRequestParams, deviceOpKey.Pubkey(), rootCACredentials, nocDERSpan));
-
-    ReturnErrorOnFailure(chip::Credentials::ConvertX509CertToChipCert(nocDERSpan, mNocSpan));
-
-    return CHIP_NO_ERROR;
-}
-
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
