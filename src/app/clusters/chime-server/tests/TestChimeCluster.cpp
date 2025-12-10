@@ -104,12 +104,10 @@ struct TestChimeCluster : public ::testing::Test
 
 TEST_F(TestChimeCluster, TestAttributesList)
 {
-    uint8_t backingStore[512];
-    DataModel::ReadOnlyBufferBuilder<DataModel::AttributeEntry> listBuilder(backingStore);
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> listBuilder;
     EXPECT_EQ(mCluster.Attributes(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
 
-    uint8_t expectedBackingStore[512];
-    DataModel::ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedListBuilder(expectedBackingStore);
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedListBuilder;
     AttributeListBuilder attributeListBuilder(expectedListBuilder);
     EXPECT_EQ(attributeListBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
 
