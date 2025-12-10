@@ -323,7 +323,7 @@ async def test_parallel_session_pase_wins():
         await asyncio.sleep(0.1)  # Delay so PASE wins the race
         raise Exception("CASE failed - no fabric")
 
-    mock_controller.EstablishPASESession = pase_success
+    mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail_slow
 
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
@@ -359,7 +359,7 @@ async def test_parallel_session_case_wins():
     async def case_success(*args, **kwargs):
         return MagicMock()
 
-    mock_controller.EstablishPASESession = pase_slow
+    mock_controller.FindOrEstablishPASESession = pase_slow
     mock_controller.GetConnectedDevice = case_success
 
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
@@ -398,7 +398,7 @@ async def test_parallel_session_first_fails_second_succeeds():
         call_order.append('case')
         raise Exception("CASE failed immediately")
 
-    mock_controller.EstablishPASESession = pase_success
+    mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail
 
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
@@ -434,7 +434,7 @@ async def test_parallel_session_both_fail():
         await asyncio.sleep(0.1)  # Delay so PASE fails first
         raise Exception("CASE failed")
 
-    mock_controller.EstablishPASESession = pase_fail_fast
+    mock_controller.FindOrEstablishPASESession = pase_fail_fast
     mock_controller.GetConnectedDevice = case_fail_slow
 
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
