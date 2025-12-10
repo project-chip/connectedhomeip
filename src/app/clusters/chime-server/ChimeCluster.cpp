@@ -67,6 +67,15 @@ void ChimeCluster::Shutdown()
     DefaultServerCluster::Shutdown();
 }
 
+CHIP_ERROR ChimeCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+        Chime::Commands::PlayChimeSound::kMetadataEntry,
+    };
+    return builder.ReferenceExisting(kAcceptedCommands);
+}
+
 CHIP_ERROR ChimeCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);

@@ -80,6 +80,9 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,

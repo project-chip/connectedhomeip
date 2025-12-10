@@ -114,6 +114,21 @@ TEST_F(TestChimeCluster, TestAttributesList)
     EXPECT_TRUE(EqualAttributeSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
 }
 
+TEST_F(TestChimeCluster, TestAcceptedCommands)
+{
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> listBuilder;
+    EXPECT_EQ(mCluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
+
+    static constexpr DataModel::AcceptedCommandEntry kExpectedCommands[] = {
+        Chime::Commands::PlayChimeSound::kMetadataEntry,
+    };
+
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedListBuilder;
+    EXPECT_EQ(expectedListBuilder.ReferenceExisting(kExpectedCommands), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(EqualAcceptedCommandSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+}
+
 TEST_F(TestChimeCluster, TestDelegateErrors)
 {
     // Test 1: PlayChimeSound delegate failure
