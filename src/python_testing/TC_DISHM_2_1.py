@@ -118,6 +118,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # Commissioning, already done
         self.step(1)
@@ -132,11 +133,12 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
         can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
+        failure_and_manual = can_test_mode_failure and can_manually_control
 
         # Check if the list of supported modes is larger than 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
 
-        if can_test_mode_failure and can_manually_control:
+        if failure_and_manual:
             # Verify that PIXIT.DISHM.MODE_CHANGE_FAIL is one of supported_modes_dut
             asserts.assert_true(self.mode_fail in modes,
                                 f"{self.mode_fail} is not in supported_modes_dut: {modes}")
@@ -171,28 +173,25 @@ class TC_DISHM_2_1(MatterBaseTest):
         # would fail (e.g. device is busy/incompatible state). On real devices this can be done
         # manually, in CI the example app does not expose a way to synthesize the internal condition.
 
-        if not can_test_mode_failure:
-            self.skip_step(5)
-        elif not can_manually_control:
-            self.step(5)
-            self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
-        else:
-            self.step(5)
-            self.wait_for_user_input(prompt_msg=(
-                f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready"))
+        self.step(5)
+        if self.pics_guard(failure_and_manual):
+            if self.is_ci:
+                self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
+            else:
+                self.wait_for_user_input(prompt_msg=(
+                    f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready"))
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(6)
-        old_current_mode_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        if self.pics_guard(failure_and_manual):
+            old_current_mode_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-        # CurrentMode attribute value is an integer value
-        is_valid_int_value(old_current_mode_dut)
+            # CurrentMode attribute value is an integer value
+            is_valid_int_value(old_current_mode_dut)
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
-        if not can_test_mode_failure:
-            self.skip_step(7)
-        else:
-            self.step(7)
+        self.step(7)
+        if self.pics_guard(failure_and_manual):
             cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
             change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
@@ -214,25 +213,24 @@ class TC_DISHM_2_1(MatterBaseTest):
 
        # TH reads from the DUT the CurrentMode attribute
         self.step(8)
-        old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        if self.pics_guard(failure_and_manual):
+            old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-        # CurrentMode attribute value is an integer value
-        is_valid_int_value(old_current_mode_dut_2)
+            # CurrentMode attribute value is an integer value
+            is_valid_int_value(old_current_mode_dut_2)
 
-        # old_current_mode_dut_2 is equal to old_current_mode_dut
-        asserts.assert_equal(old_current_mode_dut_2, old_current_mode_dut,
-                             f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
+            # old_current_mode_dut_2 is equal to old_current_mode_dut
+            asserts.assert_equal(old_current_mode_dut_2, old_current_mode_dut,
+                                 f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
 
         # Manually put the device in a state from which it will SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK
-        if not can_test_mode_failure:
-            self.skip_step(9)
-        elif not can_manually_control:
-            self.step(9)
-            self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
-        else:
-            self.step(9)
-            self.wait_for_user_input(
-                prompt_msg=f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}, and press Enter when ready.")
+        self.step(9)
+        if self.pics_guard(failure_and_manual):
+            if self.is_ci:
+                self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
+            else:
+                self.wait_for_usser_input(
+                    prompt_msg=f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}, and press Enter when ready.")
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(10)
