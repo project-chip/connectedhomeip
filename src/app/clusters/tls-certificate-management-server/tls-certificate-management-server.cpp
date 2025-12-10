@@ -257,7 +257,11 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
     }
 
     VerifyOrDieWithMsg(response.caid <= kMaxRootCertId, NotSpecified, "Spec requires CAID to be < kMaxRootCertId");
+
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+
+    MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                           TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id);
 }
 
 void TlsCertificateManagementServer::HandleFindRootCertificate(HandlerContext & ctx, const FindRootCertificate::DecodableType & req)
@@ -338,6 +342,13 @@ void TlsCertificateManagementServer::HandleRemoveRootCertificate(HandlerContext 
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     auto result = mDelegate.RemoveRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.caid);
+
+    if (result == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                               TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
 }
 
@@ -412,6 +423,13 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound));
 
     auto status = mDelegate.ProvisionClientCert(ctx.mRequestPath.mEndpointId, fabric, req);
+
+    if (status == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                               TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -498,6 +516,13 @@ void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContex
 
     auto result =
         mDelegate.RemoveClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.ccdid);
+
+    if (result == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                               TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
 }
 
