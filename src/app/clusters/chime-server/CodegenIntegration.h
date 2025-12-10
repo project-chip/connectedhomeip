@@ -37,8 +37,8 @@ public:
     ~ChimeServer();
 
     /**
-     * Initialise the chime server instance.
-     * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
+     * Register the chime cluster instance with the codegen data model provider.
+     * @return Returns an error if registration fails.
      */
     CHIP_ERROR Init();
 
@@ -73,9 +73,9 @@ public:
     EndpointId GetEndpointId() { return mCluster.Cluster().GetPaths()[0].mEndpointId; }
 
     // Cluster constants from the spec
-    static constexpr uint8_t kMaxChimeSoundNameSize = 48;
+    static constexpr uint8_t kMaxChimeSoundNameSize = ChimeCluster::kMaxChimeSoundNameSize;
 
-    // Compatibility related
+    // The Code Driven ChimeCluster instance
     chip::app::RegisteredServerCluster<ChimeCluster> mCluster;
 };
 
