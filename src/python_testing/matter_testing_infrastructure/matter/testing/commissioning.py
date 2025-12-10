@@ -442,7 +442,7 @@ async def _is_device_operational_via_dnssd(
         return False
 
 
-async def _establish_session_parallel(
+async def _establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
     pase_params: Optional[dict] = None
@@ -480,7 +480,7 @@ async def _establish_session_parallel(
 
         if setup_code:
             LOGGER.info(f"Creating PASE task for node {node_id}")
-            pase_future = dev_ctrl.EstablishPASESession(setup_code, node_id)
+            pase_future = dev_ctrl.FindOrEstablishPASESession(setup_code, node_id)
             task_list.append(asyncio.create_task(pase_future, name="pase"))
 
     # Always add CASE task (allowPASE=False to force CASE)
@@ -594,7 +594,7 @@ async def is_commissioned(
 
         # Try both PASE and CASE in parallel - use whichever succeeds first
         LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-        await _establish_session_parallel(dev_ctrl, node_id, pase_params)
+        await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
 
         result = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
@@ -661,7 +661,7 @@ async def get_commissioned_fabric_count(
             # 2. Commissioned but DNS-SD failed - CASE will work
             # Try both in parallel for fastest response
             LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-            await _establish_session_parallel(dev_ctrl, node_id, pase_params)
+            await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
             result = await dev_ctrl.ReadAttribute(
                 nodeid=node_id,
                 attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]

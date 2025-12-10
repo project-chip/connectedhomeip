@@ -20,7 +20,7 @@ Unit tests for commissioning status detection functions in commissioning.py.
 
 Tests cover:
 - DNS-SD discovery (_is_device_operational_via_dnssd)
-- Parallel session establishment (_establish_session_parallel)
+- Parallel session establishment (_establish_pase_or_case_session)
 - is_commissioned() integration scenarios
 - get_commissioned_fabric_count() integration scenarios
 
@@ -329,7 +329,7 @@ async def test_parallel_session_pase_wins():
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
 
     try:
-        await commissioning._establish_session_parallel(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         # Should succeed via PASE
     except Exception as e:
         return f"Should have succeeded via PASE: {e}"
@@ -365,7 +365,7 @@ async def test_parallel_session_case_wins():
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
 
     try:
-        await commissioning._establish_session_parallel(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         # Should succeed via CASE
     except Exception as e:
         return f"Should have succeeded via CASE: {e}"
@@ -404,7 +404,7 @@ async def test_parallel_session_first_fails_second_succeeds():
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
 
     try:
-        await commissioning._establish_session_parallel(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         # Should succeed eventually via PASE
     except Exception as e:
         return f"Should have succeeded via PASE fallback: {e}"
@@ -440,7 +440,7 @@ async def test_parallel_session_both_fail():
     pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
 
     try:
-        await commissioning._establish_session_parallel(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
         return "Should have raised RuntimeError when both fail"
     except RuntimeError as e:
         error_msg = str(e)
@@ -475,7 +475,7 @@ async def test_parallel_session_no_pase_params():
     mock_controller.GetConnectedDevice = case_success
 
     try:
-        await commissioning._establish_session_parallel(mock_controller, TEST_NODE_ID, pase_params=None)
+        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params=None)
         # Should succeed via CASE only
         if not case_called:
             return "CASE should have been attempted"
@@ -532,7 +532,7 @@ async def test_is_commissioned_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_session_parallel', new_callable=AsyncMock) as mock_parallel, \
+            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
             patch('matter.clusters.OperationalCredentials') as MockOpCreds:
 
         mock_dnssd.return_value = False
@@ -575,7 +575,7 @@ async def test_is_commissioned_scenario3_other_fabric():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_session_parallel', new_callable=AsyncMock) as mock_parallel, \
+            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
             patch('matter.clusters.OperationalCredentials') as MockOpCreds:
 
         mock_dnssd.return_value = False
@@ -669,7 +669,7 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_session_parallel', new_callable=AsyncMock) as mock_parallel, \
+            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
             patch('matter.clusters.OperationalCredentials') as MockOpCreds:
 
         mock_dnssd.return_value = False
