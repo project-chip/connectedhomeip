@@ -24,7 +24,6 @@
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
-#include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 
 using namespace chip;
