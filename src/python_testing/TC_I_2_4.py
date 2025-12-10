@@ -106,9 +106,14 @@ class TC_I_2_4(MatterBaseTest):
             "I.S",
         ]
 
+    def assert_identify_time(self, value: int, min_value: int, max_value: int):
+        asserts.assert_greater_equal(value, min_value, msg="Received unexpected value for IdentifyTime")
+        asserts.assert_less_equal(value, max_value, msg="Received unexpected value for IdentifyTime")
+
     @run_if_endpoint_matches(has_cluster(Clusters.Identify))
     async def test_TC_I_2_4(self):
         endpoint = self.get_endpoint()
+        accepted_value_delta_in_reports = 2
 
         # Commissioning - already done
         self.step(1)
@@ -122,42 +127,39 @@ class TC_I_2_4(MatterBaseTest):
         # Verify Q requirements for IdentifyTime attribute by write to IdentifyTime
 
         self.step(3)
-        await self.write_single_attribute(cluster.Attributes.IdentifyTime(30), endpoint_id=endpoint, expect_success=True)
+        identify_time_value = 30
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(identify_time_value), endpoint_id=endpoint, expect_success=True)
 
         self.step(4)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    30, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  30, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(5)
-        await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint, expect_success=True)
+        identify_time_value = 35
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(identify_time_value), endpoint_id=endpoint, expect_success=True)
 
         self.step(6)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  35, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(7)
-        await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint, expect_success=True)
+        identify_time_value = 5
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(identify_time_value), endpoint_id=endpoint, expect_success=True)
 
         self.step(8)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    5, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  5, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(9)
@@ -169,34 +171,35 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(10)
-        await self.write_single_attribute(cluster.Attributes.IdentifyTime(35), endpoint_id=endpoint, expect_success=True)
+        identify_time_value = 35
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(identify_time_value), endpoint_id=endpoint, expect_success=True)
 
         self.step(11)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  35, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(12)
-        await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint, expect_success=True)
+        identify_time_value = 0
+        await self.write_single_attribute(cluster.Attributes.IdentifyTime(identify_time_value), endpoint_id=endpoint, expect_success=True)
 
         self.step(13)
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                             0, msg="Received unexpected value for IdentifyTime")
+                             identify_time_value, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
         # Verify Q requirements for IdentifyTime attribute by invoke of Identify command
 
         self.step(14)
+        identify_time_value = 30
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=30), endpoint=endpoint)
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=identify_time_value), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
@@ -204,15 +207,14 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    30, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  30, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(16)
+        identify_time_value = 35
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=35), endpoint=endpoint)
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=identify_time_value), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
@@ -220,15 +222,14 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  35, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(18)
+        identify_time_value = 5
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=identify_time_value), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
@@ -236,10 +237,8 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    5, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  5, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(20)
@@ -251,8 +250,9 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.reset()
 
         self.step(21)
+        identify_time_value = 35
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=35), endpoint=endpoint)
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=identify_time_value), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
@@ -261,15 +261,14 @@ class TC_I_2_4(MatterBaseTest):
         sub_handler.wait_for_attribute_report(timeout_sec=30)
 
         # Verify the received value is as expected
-        asserts.assert_almost_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                    35, delta=2, msg="Received unexpected value for IdentifyTime")
-        asserts.assert_less_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                                  35, msg="Received unexpected value for IdentifyTime")
+        self.assert_identify_time(
+            sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value, identify_time_value - accepted_value_delta_in_reports, identify_time_value)
         sub_handler.reset()
 
         self.step(23)
+        identify_time_value = 0
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=0), endpoint=endpoint)
+            await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=identify_time_value), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
@@ -278,7 +277,7 @@ class TC_I_2_4(MatterBaseTest):
 
         # Verify the received value is as expected
         asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.IdentifyTime][0].value,
-                             0, msg="Received unexpected value for IdentifyTime")
+                             identify_time_value, msg="Received unexpected value for IdentifyTime")
         sub_handler.reset()
 
 
