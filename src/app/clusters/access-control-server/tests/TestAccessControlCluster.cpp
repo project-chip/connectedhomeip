@@ -31,7 +31,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/ScopedBuffer.h>
 #include <platform/NetworkCommissioning.h>
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include <app-common/zap-generated/cluster-objects.h>
