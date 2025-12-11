@@ -1646,7 +1646,7 @@ void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneId)
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
 {
     mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
-    // Note: PushAVTransportManager doesn't need zone stopped notification currently
+    // Note: PushAVTransportManager doesn't need zone stopped event currently
 }
 
 void CameraDevice::InitializeVideoStreams()
