@@ -146,7 +146,7 @@ class AppsRegister:
         cmd = [str(otaImageTool), 'create', '-v', vid, '-p', pid, '-vn', '2',
                '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
         s = subprocess.Popen(cmd)
-        s.wait()
+        s.wait(60)
         if s.returncode != 0:
             raise Exception('Cannot create OTA image file')
         return True
