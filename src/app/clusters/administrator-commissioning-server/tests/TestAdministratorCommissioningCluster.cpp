@@ -67,31 +67,24 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
         ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
 
-        // auto & fabricTable = Server::GetInstance().GetFabricTable();
-        // FabricTable::InitParams initParams;
-        // initParams.storage             = &sStorageDelegate;
-        // initParams.operationalKeystore = &sTestOpKeystore;
-        // initParams.opCertStore         = &sTestOpCertStore;
-        // ASSERT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
-
-        // Initialize CommissioningWindowManager so it has a valid Server pointer
-        chip::CommonCaseDeviceServerInitParams serverInitParams;
+        static chip::CommonCaseDeviceServerInitParams serverInitParams;
         static chip::app::DefaultTimerDelegate sTimerDelegate;
         static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
         serverInitParams.reportScheduler           = &sReportScheduler;
         serverInitParams.opCertStore               = &sTestOpCertStore;
         serverInitParams.operationalKeystore       = &sTestOpKeystore;
         serverInitParams.persistentStorageDelegate = &sStorageDelegate;
+        serverInitParams.operationalServicePort    = 0;
         (void) serverInitParams.InitializeStaticResourcesBeforeServerInit();
         serverInitParams.dataModelProvider = &sEmptyProvider;
         ASSERT_EQ(Server::GetInstance().Init(serverInitParams), CHIP_NO_ERROR);
-        // ASSERT_EQ(Server::GetInstance().GetCommissioningWindowManager().Init(&Server::GetInstance()), CHIP_NO_ERROR);
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     }
     static void TearDownTestSuite()
     {
-        // chip::Server::GetInstance().GetCommissioningWindowManager().Shutdown();
-        // chip::Server::GetInstance().GetFabricTable().Shutdown();
-        // Server::GetInstance().Shutdown();
+        chip::Server::GetInstance().GetCommissioningWindowManager().Shutdown();
+        chip::Server::GetInstance().GetFabricTable().Shutdown();
+        Server::GetInstance().Shutdown();
         sTestOpCertStore.Finish();
         sTestOpKeystore.Finish();
         chip::DeviceLayer::PlatformMgr().Shutdown();
