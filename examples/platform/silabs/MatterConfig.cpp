@@ -332,7 +332,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.appDelegate       = &BaseApplication::sAppDelegate;
 
     // This is needed by localization configuration cluster so we set it before the initialization
-    // The server
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
