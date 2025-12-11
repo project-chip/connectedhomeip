@@ -524,9 +524,14 @@ async def _establish_pase_or_case_session(
                         await task
                 return
             except Exception as e2:
+                # Use task names to correctly label which error came from which connection type
+                if completed_name == "pase":
+                    pase_error, case_error = e, e2
+                else:
+                    pase_error, case_error = e2, e
                 raise RuntimeError(
                     f"Both PASE and CASE connection attempts failed for node {node_id}. "
-                    f"PASE error: {e}, CASE error: {e2}"
+                    f"PASE error: {pase_error}, CASE error: {case_error}"
                 ) from e2
         else:
             raise
