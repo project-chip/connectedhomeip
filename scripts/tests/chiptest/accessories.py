@@ -145,7 +145,7 @@ class AppsRegister:
                 if process is not None:
                     process.join()
 
-    def init(self):
+    def init(self) -> None:
         if self._server_thread.is_alive():
             log.debug("XMLRPC server is already running.")
             return
@@ -154,7 +154,7 @@ class AppsRegister:
         self._server_thread.start()
         log.debug("AppsRegister: XMLRPC Manager started")
 
-    def uninit(self):
+    def uninit(self) -> None:
         log.debug("AppsRegister: Stopping XMLRPC Manager")
         self._server_thread_cancel.set()
         self._server_thread.join()
@@ -170,29 +170,29 @@ class AppsRegister:
         return self._accessories.values()
 
     @with_accessories_lock
-    def add(self, name: str, accessory: App):
+    def add(self, name: str, accessory: App) -> None:
         self._accessories[name] = accessory
 
     @with_accessories_lock
-    def remove(self, name: str):
+    def remove(self, name: str) -> None:
         self._accessories.pop(name)
 
     @with_accessories_lock
-    def remove_all(self):
+    def remove_all(self) -> None:
         self._accessories.clear()
 
     @with_accessories_lock
-    def get(self, name: str):
+    def get(self, name: str) -> App:
         return self._accessories[name]
 
     @with_accessories_lock
-    def kill(self, name: str):
+    def kill(self, name: str) -> bool:
         if accessory := self._accessories[name]:
             return accessory.kill()
         return False
 
     @with_accessories_lock
-    def kill_all(self):
+    def kill_all(self) -> bool:
         # Make sure to do kill() on all of our apps, even if some of them returned False
         results = [accessory.kill() for accessory in self._accessories.values()]
         return all(results)
@@ -218,7 +218,7 @@ class AppsRegister:
         return False
 
     @with_accessories_lock
-    def factory_reset_all(self):
+    def factory_reset_all(self) -> None:
         for accessory in self._accessories.values():
             accessory.factoryReset()
 
