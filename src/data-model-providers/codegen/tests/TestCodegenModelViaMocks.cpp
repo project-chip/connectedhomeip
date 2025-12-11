@@ -77,9 +77,8 @@
 #include <vector>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
-using namespace chip::app::Testing;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
@@ -939,7 +938,7 @@ void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType val
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
     typename NumericAttributeTraits<T>::StorageType storage;
     NumericAttributeTraits<T>::WorkingToStorage(value, storage);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&storage), sizeof(storage)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&storage), sizeof(storage)));
 
     // Data read via the encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -973,7 +972,7 @@ void TestEmberScalarNullRead()
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
     typename NumericAttributeTraits<T>::StorageType nullValue;
     NumericAttributeTraits<T>::SetNull(nullValue);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&nullValue), sizeof(nullValue)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&nullValue), sizeof(nullValue)));
 
     // Data read via the encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1010,7 +1009,7 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
 
         // Validate data after write
-        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+        chip::ByteSpan writtenData = chip::Testing::GetEmberBuffer();
 
         typename NumericAttributeTraits<T>::StorageType storage;
         ASSERT_GE(writtenData.size(), sizeof(storage));
@@ -1057,7 +1056,7 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 
         // Validate data after write
-        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+        chip::ByteSpan writtenData = chip::Testing::GetEmberBuffer();
 
         typename NumericAttributeTraits<T>::StorageType storage;
         ASSERT_GE(writtenData.size(), sizeof(storage));
@@ -1091,7 +1090,7 @@ void TestEmberScalarNullWrite()
     ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
 
     // Validate data after write
-    chip::ByteSpan writtenData = Test::GetEmberBuffer();
+    chip::ByteSpan writtenData = chip::Testing::GetEmberBuffer();
 
     using Traits = NumericAttributeTraits<T>;
 
@@ -1165,7 +1164,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    chip::Test::ResetVersion();
+    chip::Testing::ResetVersion();
 
     ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
 
@@ -1187,7 +1186,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     EXPECT_EQ(serverClusters[1].dataVersion, 0u);
     EXPECT_EQ(serverClusters[1].flags.Raw(), 0u);
 
-    chip::Test::BumpVersion();
+    chip::Testing::BumpVersion();
 
     EXPECT_EQ(model.ServerClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
     serverClusters = builder.TakeBuffer();
@@ -1703,7 +1702,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
                                   MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
         testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
 
         // Actual read via an encoder
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1715,7 +1714,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
                                   MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
         testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
 
         // Actual read via an encoder
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1723,7 +1722,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
     }
 
     // reset things to success to not affect other tests
-    chip::Test::SetEmberReadOutput(ByteSpan());
+    chip::Testing::SetEmberReadOutput(ByteSpan());
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
@@ -1738,7 +1737,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 
     // NOTE: This is a pascal string of size 0xFFFF which for null strings is a null marker
     char data[] = "\xFF\xFFInvalid length string is null";
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1775,7 +1774,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0\0testing here with overflow";
     WriteLe16(data, 4);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1812,7 +1811,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
     // NOTE: This is a pascal string, so actual data is "test"
     //       the longer encoding is to make it clear we do not encode the overflow
     const char data[] = "\x04testing here with overflow";
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1850,7 +1849,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadShortString)
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0abcdef...this is the alphabet";
     *data       = 5;
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1886,7 +1885,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadLongString)
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0\0abcdef...this is the alphabet";
     WriteLe16(data, 5);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -2559,16 +2558,16 @@ TEST_F(TestCodegenModelViaMocks, EmberWriteFailure)
 
     {
         AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Failure);
     }
     {
         AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Busy);
     }
     // reset things to success to not affect other tests
-    chip::Test::SetEmberReadOutput(ByteSpan());
+    chip::Testing::SetEmberReadOutput(ByteSpan());
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
@@ -2627,13 +2626,13 @@ TEST_F(TestCodegenModelViaMocks, EmberInvokeTest)
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(model.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre + 1); // single dispatch
+        EXPECT_EQ(chip::Testing::GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 
     {
@@ -2641,13 +2640,13 @@ TEST_F(TestCodegenModelViaMocks, EmberInvokeTest)
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
 
         // Using a handler set to nullpotr as it is not used by the impl
         ASSERT_EQ(model.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre + 1); // single dispatch
+        EXPECT_EQ(chip::Testing::GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 }
 
