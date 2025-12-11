@@ -33,6 +33,9 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include <app-common/zap-generated/cluster-objects.h>
+#endif
 
 namespace {
 
@@ -271,10 +274,10 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // each specifying an endpoint, cluster, and list of restrictions.
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
 
-    // Create a single ARL entry for endpoint 1, OnOff cluster (0x0006)
+    // Create a single ARL entry for endpoint 1, OnOff cluster
     AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entry;
     entry.endpoint = 1;
-    entry.cluster  = 0x0006; // OnOff cluster ID
+    entry.cluster  = OnOff::Id;
 
     // Create a restriction that forbids access to attribute 0x0000
     // This restriction type means attribute reads/writes are forbidden
@@ -299,7 +302,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
     ASSERT_EQ(mMockProvider.mLastArl.size(), 1u);
     ASSERT_EQ(mMockProvider.mLastArl[0].endpointNumber, 1u);
-    ASSERT_EQ(mMockProvider.mLastArl[0].clusterId, 0x0006u);
+    ASSERT_EQ(mMockProvider.mLastArl[0].clusterId, OnOff::Id);
 
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions[0].restrictionType,
@@ -338,15 +341,15 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
 
     // First entry: endpoint 1, OnOff cluster with attribute access restriction
     entries[0].endpoint = 1;
-    entries[0].cluster  = 0x0006; // OnOff cluster
+    entries[0].cluster  = OnOff::Id;
     AccessControl::Structs::AccessRestrictionStruct::Type restriction1;
     restriction1.type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
     restriction1.id.SetNonNull(0x0000);
     entries[0].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restriction1, 1);
 
-    // Second entry: endpoint 2, Level Control cluster (0x0008) with command restriction
+    // Second entry: endpoint 2, Level Control cluster with command restriction
     entries[1].endpoint = 2;
-    entries[1].cluster  = 0x0008; // Level Control cluster
+    entries[1].cluster  = LevelControl::Id;
     AccessControl::Structs::AccessRestrictionStruct::Type restriction2;
     restriction2.type = AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden;
     restriction2.id.SetNonNull(0x0000);
@@ -363,12 +366,12 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
     ASSERT_EQ(mMockProvider.mLastArl.size(), 2u);
     ASSERT_EQ(mMockProvider.mLastArl[0].endpointNumber, 1u);
-    ASSERT_EQ(mMockProvider.mLastArl[0].clusterId, 0x0006u);
+    ASSERT_EQ(mMockProvider.mLastArl[0].clusterId, OnOff::Id);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions[0].restrictionType,
               Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mMockProvider.mLastArl[1].endpointNumber, 2u);
-    ASSERT_EQ(mMockProvider.mLastArl[1].clusterId, 0x0008u);
+    ASSERT_EQ(mMockProvider.mLastArl[1].clusterId, LevelControl::Id);
     ASSERT_EQ(mMockProvider.mLastArl[1].restrictions.size(), 1u);
     ASSERT_EQ(mMockProvider.mLastArl[1].restrictions[0].restrictionType,
               Access::AccessRestrictionProvider::Type::kCommandForbidden);
@@ -384,7 +387,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
     AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entry;
     entry.endpoint = 1;
-    entry.cluster  = 0x0006; // OnOff cluster
+    entry.cluster  = OnOff::Id;
 
     // Create a restriction with null ID (wildcard)
     // This means "forbid access to all attributes" on this cluster/endpoint
@@ -412,7 +415,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // Create an entry with multiple restrictions
     AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entry;
     entry.endpoint = 1;
-    entry.cluster  = 0x0006; // OnOff cluster
+    entry.cluster  = OnOff::Id;
 
     // Create multiple restrictions for the same entry
     AccessControl::Structs::AccessRestrictionStruct::Type restrictions[3];
@@ -462,7 +465,7 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
     AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entry;
     entry.endpoint     = 1;
-    entry.cluster      = 0x0006;
+    entry.cluster      = OnOff::Id;
     entry.restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(nullptr, 0);
     request.arl        = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(&entry, 1);
 
@@ -484,28 +487,28 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
 
     // Entry 0: AttributeAccessForbidden
     entries[0].endpoint  = 1;
-    entries[0].cluster   = 0x0006;
+    entries[0].cluster   = OnOff::Id;
     restrictions[0].type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
     restrictions[0].id.SetNonNull(0x0000);
     entries[0].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[0], 1);
 
     // Entry 1: AttributeWriteForbidden
     entries[1].endpoint  = 1;
-    entries[1].cluster   = 0x0006;
+    entries[1].cluster   = OnOff::Id;
     restrictions[1].type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeWriteForbidden;
     restrictions[1].id.SetNonNull(0x0001);
     entries[1].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[1], 1);
 
     // Entry 2: CommandForbidden
     entries[2].endpoint  = 1;
-    entries[2].cluster   = 0x0006;
+    entries[2].cluster   = OnOff::Id;
     restrictions[2].type = AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden;
     restrictions[2].id.SetNonNull(0x0000);
     entries[2].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[2], 1);
 
     // Entry 3: EventForbidden
     entries[3].endpoint  = 1;
-    entries[3].cluster   = 0x0006;
+    entries[3].cluster   = OnOff::Id;
     restrictions[3].type = AccessControl::Enums::AccessRestrictionTypeEnum::kEventForbidden;
     restrictions[3].id.SetNonNull(0x0000);
     entries[3].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[3], 1);
