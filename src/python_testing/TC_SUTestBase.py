@@ -65,8 +65,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        log.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
-
+        log.info(f"Launching provider app with with ota image {ota_image_path}")
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -111,15 +110,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
         else:
-            log.info("Provider process not found. Unable to terminate.")
-
-    def terminate_provider(self):
-        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
-            logger.info("Terminating existing OTA Provider")
-            self.current_provider_app_proc.terminate()
-            self.current_provider_app_proc = None
-        else:
-            logger.warning("Provider process not found. Unable to terminate.")
+            log.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -319,40 +310,42 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    def restart_requestor(self, requestor_th):
-        """This method restart the requestor so stops using updated requestor image.
-
-        Args:
-            controller (_type_): _description_
-        """
+    def restart_requestor(self, restore: bool = False):
+        """This method Reboots or Restore the DUT."""
         restart_flag_file = self.get_restart_flag_file()
-        logger.info(f"RESTART FILE at {restart_flag_file}")
+        log.info(f"RESTART FILE at {restart_flag_file}")
         if not restart_flag_file:
-            # No restart flag file: ask user to manually reboot
-            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+            action_str = "Reboot"
+            prompt_message = "Reboot the DUT. Press Enter when ready.\n"
+            if restore:
+                action_str = "Restore"
+                prompt_message = "Manually restore the DUT to it's original version. Please type Enter when its ready.\n"
 
+            log.info(f"Restart file not found. Entering Manual {action_str}.")
+            # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
+            # restore to the previous software version.
+            self.controller.ExpireSessions(self.requestor_node_id)
+            self.wait_for_user_input(prompt_msg=prompt_message)
             # After manual reboot, expire previous sessions so that we can re-establish connections
-            logging.info("Expiring sessions after manual device reboot")
-            requestor_th.ExpireSessions(self.requestor_node_id)
-            logging.info("Manual device reboot completed")
+            log.info(f"Manual device {action_str} completed")
 
         else:
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
-                logging.info("Created restart flag file to signal app restart")
+                log.info("Created restart flag file to signal app restart")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
                 # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
                 sleep(1)
 
                 # Expire sessions and re-establish connections
-                requestor_th.ExpireSessions(self.requestor_node_id)
-                logging.info("App restart completed successfully")
+                log.info("Expiring sessions after manual device reboot")
+                self.controller.ExpireSessions(self.requestor_node_id)
+                log.info("App restart completed successfully")
 
             except Exception as e:
-                logging.error(f"Failed to restart Requestor: {e}")
                 asserts.fail(f"Requestor restart failed: {e}")
 
     async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
@@ -372,7 +365,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, attr_clear)],
             nodeId=requestor_node_id
         )
-        logger.info('Cleanup - DefaultOTAProviders cleared')
+        log.info('Cleanup - DefaultOTAProviders cleared')
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
 
@@ -387,4 +380,4 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if kvs_prefix is None:
             kvs_prefix = "/tmp/chip_kvs"
         subprocess.run(f"rm -rf {kvs_prefix}*", shell=True)
-        logger.info(f"KVS files removed with prefix {kvs_prefix}")
+        log.info(f"KVS files removed with prefix {kvs_prefix}")
