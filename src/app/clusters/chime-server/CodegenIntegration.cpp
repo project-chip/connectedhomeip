@@ -26,6 +26,11 @@ using chip::app::Clusters::ChimeServer;
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate) {}
 
+ChimeServer::~ChimeServer()
+{
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+}
+
 CHIP_ERROR ChimeServer::Init()
 {
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
@@ -52,10 +57,7 @@ bool ChimeServer::GetEnabled() const
 }
 
 void MatterChimeClusterInitCallback(EndpointId endpointId) {}
-void MatterChimeClusterShutdownCallback(EndpointId endpointId)
-{
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
-}
+void MatterChimeClusterShutdownCallback(EndpointId endpointId) {}
 
 // Stub callbacks for ZAP generated code
 void MatterChimePluginServerInitCallback() {}
