@@ -252,7 +252,7 @@ class AppsRegister:
 
     def compare_files(self, file1: str | Path, file2: str | Path) -> bool:
         if not filecmp.cmp(file1, file2, shallow=False):
-            raise RuntimeError('Files %s and %s do not match' % (file1, file2))
+            raise RuntimeError(f'Files {file1} and {file2} do not match')
         return True
 
     def create_file(self, filePath: str | Path, fileContent: str) -> bool:

@@ -51,9 +51,9 @@ class DarwinToolRunner:
                 died_str = ('Process died while waiting for %s, returncode %d' %
                             (message, self.process.returncode))
                 log.error(died_str)
-                raise Exception(died_str)
+                raise RuntimeError(died_str)
             if time.monotonic() - start_time > 10:
-                raise Exception('Timeout while waiting for %s' % message)
+                raise TimeoutError('Timeout while waiting for %s' % message)
             time.sleep(0.1)
             ready, self.lastLogIndex = self.outpipe.CapturedLogContains(
                 message, self.lastLogIndex)
@@ -161,7 +161,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         darwin_tool.waitForMessage(": Commissioner Node Id")
         nodeIdLine = darwin_tool.outpipe.FindLastMatchingLine('.*: Commissioner Node Id (0x[0-9A-F]+)')
         if not nodeIdLine:
-            raise Exception("Unable to find commissioner node id")
+            raise RuntimeError("Unable to find commissioner node id")
         commissionerNodeId = nodeIdLine.group(1)
         darwin_tool.stop()
 

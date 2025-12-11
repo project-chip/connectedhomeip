@@ -258,7 +258,7 @@ def runner_base(ctx, configuration_directory: str, test_name: str, configuration
 
     test_list = tests_finder.get(test_name)
     if len(test_list) == 0:
-        raise Exception(f"No tests found for test name '{test_name}'")
+        raise KeyError(f"No tests found for test name '{test_name}'")
 
     parser_config = TestParserConfig(pics, specifications, kwargs)
     parser_builder_config = TestParserBuilderConfig(test_list, parser_config, hooks=TestParserLogger())

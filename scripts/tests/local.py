@@ -872,7 +872,8 @@ def python_tests(
     app_filter_list = None
     if app_filter:
         if not extract_runs_args:
-            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
+            raise click.BadOptionUsage("--app-filter",
+                                       "The flag requires the python testing environment: ./scripts/tests/local.py build-python")
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
@@ -908,9 +909,7 @@ def python_tests(
     }
 
     if not os.path.isdir("src/python_testing"):
-        raise Exception(
-            "Script meant to be run from the CHIP checkout root (src/python_testing must exist)."
-        )
+        raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
