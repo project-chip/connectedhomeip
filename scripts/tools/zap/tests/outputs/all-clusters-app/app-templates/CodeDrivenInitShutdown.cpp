@@ -105,6 +105,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Chime::Id:
+        MatterChimeClusterInitCallback(endpoint);
+        break;
     }
 }
 
@@ -189,6 +192,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Chime::Id:
+        MatterChimeClusterShutdownCallback(endpoint);
         break;
     }
 }
