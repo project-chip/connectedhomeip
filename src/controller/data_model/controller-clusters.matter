@@ -8709,7 +8709,7 @@ provisional cluster SoilMeasurement = 1072 {
 }
 
 /** This cluster provides data modeling and protocol implementation of ambient context sensing features. */
-cluster AmbientContextSensing = 1073 {
+provisional cluster AmbientContextSensing = 1073 {
   revision 1;
 
   bitmap Feature : bitmap32 {
