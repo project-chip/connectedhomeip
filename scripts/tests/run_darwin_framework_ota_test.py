@@ -48,12 +48,11 @@ class DarwinToolRunner:
             message, self.lastLogIndex)
         while not ready:
             if self.process.poll() is not None:
-                died_str = ('Process died while waiting for %s, returncode %d' %
-                            (message, self.process.returncode))
+                died_str = f'Process died while waiting for {message}, returncode {self.process.returncode}'
                 log.error(died_str)
                 raise RuntimeError(died_str)
             if time.monotonic() - start_time > 10:
-                raise TimeoutError('Timeout while waiting for %s' % message)
+                raise TimeoutError(f'Timeout while waiting for {message}')
             time.sleep(0.1)
             ready, self.lastLogIndex = self.outpipe.CapturedLogContains(
                 message, self.lastLogIndex)
