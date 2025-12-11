@@ -181,7 +181,7 @@ class IsolatedNetworkNamespace:
                 self.app_link_up(wait_for_dad=False)
             if tool_link_up:
                 self._tool_link_up(wait_for_dad=False)
-        except Exception:
+        except BaseException:
             # Ensure that we leave a clean state on any exception.
             self.terminate()
             raise
