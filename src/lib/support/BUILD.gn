@@ -81,15 +81,20 @@ source_set("verifymacros_no_logging") {
   public_deps = [ "${nlassert_root}:nlassert" ]
 }
 
+source_set("safeint") {
+  sources = [ "SafeInt.h" ]
+}
+
 source_set("numeric-primitives") {
   sources = [
-    "SafeInt.h",
     "attribute-storage-null-handling.h",
     "odd-sized-integers.h",
   ]
 
   deps = [
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
   ]
   public_configs = [ "${chip_root}/src:includes" ]
 }
@@ -112,7 +117,7 @@ source_set("memory") {
   public_deps = [ "${chip_root}/src/lib/core:error" ]
 
   deps = [
-    ":numeric-primitives",
+    ":safeint",
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
   ]
@@ -316,7 +321,7 @@ static_library("support") {
     ":chip_version_header",
     ":logging_constants",
     ":memory",
-    ":numeric-primitives",
+    ":safeint",
     ":span",
     ":text_only_logging",
     ":type-traits",
