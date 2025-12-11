@@ -28,7 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessInfo
-from chiptest.test_definition import TestRunTime, TestTag
+from chiptest.test_definition import TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -394,6 +394,18 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_tool_with_python_cmd=chip_tool_with_python,
     )
 
+    tests_filtered: list[TestDefinition] = []
+    for test in context.obj.tests:
+        if context.obj.include_tags and not (test.tags & context.obj.include_tags):
+            log.debug("Test '%s' not included", test.name)
+            continue
+
+        if context.obj.exclude_tags and test.tags & context.obj.exclude_tags:
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
     ble_controller_app = None
     ble_controller_tool = None
 
@@ -440,17 +452,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     for i in range(iterations):
         log.info("Starting iteration %d", i+1)
         observed_failures = 0
-        for test in context.obj.tests:
-            if context.obj.include_tags:
-                if not (test.tags & context.obj.include_tags):
-                    log.debug("Test '%s' not included", test.name)
-                    continue
-
-            if context.obj.exclude_tags:
-                if test.tags & context.obj.exclude_tags:
-                    log.debug("Test '%s' excluded", test.name)
-                    continue
-
+        for test in tests_filtered:
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
