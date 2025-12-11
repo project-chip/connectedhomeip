@@ -75,7 +75,7 @@ public:
 
     // Test verification fields - these are populated when DoRequestFabricRestrictionReview is called
     FabricIndex mLastFabricIndex = kUndefinedFabricIndex;
-    uint64_t mLastToken                = 0;
+    uint64_t mLastToken          = 0;
     std::vector<Entry> mLastArl;
     size_t mRequestCount = 0;
 
@@ -148,13 +148,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -239,6 +239,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
     // This allows us to verify that the command handler correctly processes
     // the command and calls the provider with the expected parameters.
     TestAccessRestrictionProvider mockProvider;
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     // Initialize the cluster and tester
@@ -286,6 +288,9 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
               Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_TRUE(mockProvider.mLastArl[0].restrictions[0].id.HasValue());
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].id.Value(), 0x0000u);
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
@@ -293,6 +298,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
     // Test the case where an empty ARL list is sent.
     // According to the spec, an empty list means "review all restrictions" for the fabric.
     TestAccessRestrictionProvider mockProvider;
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
@@ -311,6 +318,9 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
     ASSERT_GT(result.response->token, 0u);
     ASSERT_EQ(mockProvider.mRequestCount, 1u);
     ASSERT_EQ(mockProvider.mLastArl.size(), 0u);
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries)
@@ -319,6 +329,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries
     // This verifies that the command handler correctly processes and forwards
     // all entries to the AccessRestrictionProvider.
     TestAccessRestrictionProvider mockProvider;
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
@@ -362,8 +374,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries
     ASSERT_EQ(mockProvider.mLastArl[1].endpointNumber, 2u);
     ASSERT_EQ(mockProvider.mLastArl[1].clusterId, 0x0008u);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions.size(), 1u);
-    ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType,
-              Access::AccessRestrictionProvider::Type::kCommandForbidden);
+    ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType, Access::AccessRestrictionProvider::Type::kCommandForbidden);
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestriction)
@@ -372,6 +386,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestric
     // A null ID means the restriction applies to all attributes/commands/events
     // of the specified type for the given cluster and endpoint.
     TestAccessRestrictionProvider mockProvider;
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
@@ -400,6 +416,9 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestric
     ASSERT_EQ(mockProvider.mLastArl.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_FALSE(mockProvider.mLastArl[0].restrictions[0].id.HasValue());
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestrictionsPerEntry)
@@ -407,6 +426,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestric
     // Test the command with an ARL entry containing multiple restrictions.
     // A single entry can have multiple restrictions of different types.
     TestAccessRestrictionProvider mockProvider;
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
@@ -449,8 +470,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestric
               Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[1].restrictionType,
               Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
-    ASSERT_EQ(mockProvider.mLastArl[0].restrictions[2].restrictionType,
-              Access::AccessRestrictionProvider::Type::kCommandForbidden);
+    ASSERT_EQ(mockProvider.mLastArl[0].restrictions[2].restrictionType, Access::AccessRestrictionProvider::Type::kCommandForbidden);
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
@@ -463,6 +486,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
     // This simulates a failure scenario (e.g., provider unable to process the request)
     mockProvider.mReturnError = CHIP_ERROR_INTERNAL;
 
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
@@ -481,6 +506,9 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
 
     ASSERT_FALSE(result.IsSuccess());
     ASSERT_EQ(mockProvider.mRequestCount, 1u);
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionTypes)
@@ -489,6 +517,8 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
     // This verifies that the command handler correctly converts enum values
     // from the Matter data model to the internal AccessRestrictionProvider types.
     TestAccessRestrictionProvider mockProvider;
+    // Save the previous provider to restore it after the test
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
     Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
@@ -540,10 +570,11 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
               Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType,
               Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
-    ASSERT_EQ(mockProvider.mLastArl[2].restrictions[0].restrictionType,
-              Access::AccessRestrictionProvider::Type::kCommandForbidden);
-    ASSERT_EQ(mockProvider.mLastArl[3].restrictions[0].restrictionType,
-              Access::AccessRestrictionProvider::Type::kEventForbidden);
+    ASSERT_EQ(mockProvider.mLastArl[2].restrictions[0].restrictionType, Access::AccessRestrictionProvider::Type::kCommandForbidden);
+    ASSERT_EQ(mockProvider.mLastArl[3].restrictions[0].restrictionType, Access::AccessRestrictionProvider::Type::kEventForbidden);
+
+    // Restore the previous provider to avoid use-after-free issues
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
 }
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
