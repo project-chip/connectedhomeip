@@ -127,4 +127,4 @@ class CommissioningTest:
             if code != 0:
                 raise RuntimeError(f"Testing pairing code failed with error {code}")
         else:
-            raise RuntimeError(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

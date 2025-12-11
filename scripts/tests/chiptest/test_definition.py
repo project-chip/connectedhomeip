@@ -418,7 +418,7 @@ class TestDefinition:
             elif self.target == TestTarget.CLOSURE:
                 target_app = apps.closure_app
             else:
-                raise KeyError("Unknown test target - don't know which application to run")
+                raise ValueError("Unknown test target - don't know which application to run")
 
             if not dry_run:
                 for command, key in apps.items_with_key():
