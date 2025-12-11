@@ -183,13 +183,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -477,53 +477,48 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // This verifies that the command handler correctly converts enum values
     // from the Matter data model to the internal AccessRestrictionProvider types.
 
-    // Create entries for each restriction type
-    AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entries[4];
-    AccessControl::Structs::AccessRestrictionStruct::Type restrictions[4];
+    constexpr size_t kNumRestrictionTypes = 4;
+    AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entries[kNumRestrictionTypes];
+    AccessControl::Structs::AccessRestrictionStruct::Type restrictions[kNumRestrictionTypes];
 
-    // Entry 0: AttributeAccessForbidden
-    entries[0].endpoint  = 1;
-    entries[0].cluster   = OnOff::Id;
-    restrictions[0].type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden;
-    restrictions[0].id.SetNonNull(0x0000);
-    entries[0].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[0], 1);
+    const struct
+    {
+        AccessControl::Enums::AccessRestrictionTypeEnum dmType;
+        Access::AccessRestrictionProvider::Type internalType;
+    } typeMappings[kNumRestrictionTypes] = {
+        { AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeAccessForbidden,
+          Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden },
+        { AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeWriteForbidden,
+          Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden },
+        { AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden,
+          Access::AccessRestrictionProvider::Type::kCommandForbidden },
+        { AccessControl::Enums::AccessRestrictionTypeEnum::kEventForbidden,
+          Access::AccessRestrictionProvider::Type::kEventForbidden },
+    };
 
-    // Entry 1: AttributeWriteForbidden
-    entries[1].endpoint  = 1;
-    entries[1].cluster   = OnOff::Id;
-    restrictions[1].type = AccessControl::Enums::AccessRestrictionTypeEnum::kAttributeWriteForbidden;
-    restrictions[1].id.SetNonNull(0x0001);
-    entries[1].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[1], 1);
-
-    // Entry 2: CommandForbidden
-    entries[2].endpoint  = 1;
-    entries[2].cluster   = OnOff::Id;
-    restrictions[2].type = AccessControl::Enums::AccessRestrictionTypeEnum::kCommandForbidden;
-    restrictions[2].id.SetNonNull(0x0000);
-    entries[2].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[2], 1);
-
-    // Entry 3: EventForbidden
-    entries[3].endpoint  = 1;
-    entries[3].cluster   = OnOff::Id;
-    restrictions[3].type = AccessControl::Enums::AccessRestrictionTypeEnum::kEventForbidden;
-    restrictions[3].id.SetNonNull(0x0000);
-    entries[3].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[3], 1);
+    for (size_t i = 0; i < kNumRestrictionTypes; ++i)
+    {
+        entries[i].endpoint  = 1;
+        entries[i].cluster   = OnOff::Id;
+        restrictions[i].type = typeMappings[i].dmType;
+        restrictions[i].id.SetNonNull(static_cast<uint32_t>(i));
+        entries[i].restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(&restrictions[i], 1);
+    }
 
     // Build request with all entries
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
-    request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(entries, 4);
+    request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(
+        entries, kNumRestrictionTypes);
 
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_EQ(mMockProvider.mLastArl.size(), 4u);
-    ASSERT_EQ(mMockProvider.mLastArl[0].restrictions[0].restrictionType,
-              Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
-    ASSERT_EQ(mMockProvider.mLastArl[1].restrictions[0].restrictionType,
-              Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
-    ASSERT_EQ(mMockProvider.mLastArl[2].restrictions[0].restrictionType,
-              Access::AccessRestrictionProvider::Type::kCommandForbidden);
-    ASSERT_EQ(mMockProvider.mLastArl[3].restrictions[0].restrictionType, Access::AccessRestrictionProvider::Type::kEventForbidden);
+    ASSERT_EQ(mMockProvider.mLastArl.size(), kNumRestrictionTypes);
+
+    for (size_t i = 0; i < kNumRestrictionTypes; ++i)
+    {
+        ASSERT_EQ(mMockProvider.mLastArl[i].restrictions[0].restrictionType, typeMappings[i].internalType);
+    }
 }
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
