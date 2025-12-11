@@ -21,7 +21,7 @@
 #include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/PlatformManager.h>

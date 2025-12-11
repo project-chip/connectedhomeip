@@ -36,7 +36,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/BuildTime.h>
 #include <platform/CommissionableDataProvider.h>

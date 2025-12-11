@@ -31,7 +31,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/Protocols.h>
 

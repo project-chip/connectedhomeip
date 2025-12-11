@@ -20,7 +20,7 @@
 #include <inet/TCPEndPointImplOpenThread.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/OpenThread/OpenThreadUtils.h>

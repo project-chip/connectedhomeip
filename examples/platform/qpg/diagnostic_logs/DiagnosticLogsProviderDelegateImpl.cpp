@@ -19,7 +19,7 @@
 #include "DiagnosticLogsProviderDelegateImpl.h"
 
 #include <app/server/Server.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 
 using namespace chip;

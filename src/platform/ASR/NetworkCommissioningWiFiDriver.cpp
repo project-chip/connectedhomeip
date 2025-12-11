@@ -17,7 +17,7 @@
 
 #include "lega_wlan_api.h"
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <limits>
 #include <platform/ASR/ASRConfig.h>
 #include <platform/ASR/ASRUtils.h>

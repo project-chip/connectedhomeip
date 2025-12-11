@@ -23,7 +23,7 @@
 
 #include "ManualSetupPayloadParser.h"
 
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/verhoeff/Verhoeff.h>
 

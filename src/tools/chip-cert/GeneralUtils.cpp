@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <stddef.h>
 
 using namespace chip;

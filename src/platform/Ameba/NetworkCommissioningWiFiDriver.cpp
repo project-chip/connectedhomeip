@@ -16,7 +16,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <platform/Ameba/AmebaUtils.h>
 #include <platform/Ameba/ConnectivityManagerImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>

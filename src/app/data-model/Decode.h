@@ -25,7 +25,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
-#include <lib/core/attribute-storage-null-handling.h>
+#include <lib/support/attribute-storage-null-handling.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {

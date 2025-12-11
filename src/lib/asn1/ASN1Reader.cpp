@@ -31,7 +31,7 @@
 
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace ASN1 {

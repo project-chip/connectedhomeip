@@ -25,7 +25,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 using namespace chip;
 

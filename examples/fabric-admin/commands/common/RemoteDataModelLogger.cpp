@@ -18,7 +18,7 @@
 
 #include "RemoteDataModelLogger.h"
 
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/jsontlv/TlvJson.h>
 
 constexpr char kEventNumberKey[]    = "eventNumber";

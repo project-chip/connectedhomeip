@@ -25,7 +25,7 @@
 
 #include "chip-cert.h"
 
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <openssl/x509.h>
 

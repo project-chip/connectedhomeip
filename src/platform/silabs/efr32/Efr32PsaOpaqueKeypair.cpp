@@ -22,7 +22,7 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 using chip::Platform::MemoryCalloc;
 using chip::Platform::MemoryFree;
 

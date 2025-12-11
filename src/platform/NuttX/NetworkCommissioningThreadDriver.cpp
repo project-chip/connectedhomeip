@@ -16,7 +16,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/NuttX/NetworkCommissioningDriver.h>
 #include <platform/NuttX/ThreadStackManagerImpl.h>

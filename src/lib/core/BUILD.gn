@@ -101,16 +101,6 @@ source_set("chip_config_header") {
   }
 }
 
-source_set("numeric-primitives") {
-  sources = [
-    "SafeInt.h",
-    "attribute-storage-null-handling.h",
-    "odd-sized-integers.h",
-  ]
-
-  public_configs = [ "${chip_root}/src:includes" ]
-}
-
 source_set("error") {
   sources = [
     "CHIPError.cpp",

@@ -23,7 +23,7 @@
 #endif // CHIP_HAVE_CONFIG_H
 
 #include <lib/support/Base64.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>

@@ -33,7 +33,7 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/Constants.h>
 #include <lib/support/logging/TextOnlyLogging.h>

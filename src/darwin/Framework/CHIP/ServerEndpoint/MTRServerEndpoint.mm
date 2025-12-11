@@ -26,7 +26,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <platform/LockTracker.h>
 
 // TODO: These af-types.h and attribute-storage.h and

@@ -35,7 +35,7 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/SessionParameters.h>

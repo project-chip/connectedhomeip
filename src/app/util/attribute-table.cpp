@@ -24,7 +24,7 @@
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>

@@ -31,7 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/TLV.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {

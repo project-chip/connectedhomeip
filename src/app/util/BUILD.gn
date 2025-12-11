@@ -33,7 +33,7 @@ source_set("types") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:types",
-    "${chip_root}/src/lib/core:numeric-primitives",
+    "${chip_root}/src/lib/support:numeric-primitives",
   ]
   public_configs = [ "${chip_root}/src:includes" ]
 }

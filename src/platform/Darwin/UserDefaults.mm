@@ -16,7 +16,7 @@
  */
 
 #include "UserDefaults.h"
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #import <Foundation/Foundation.h>

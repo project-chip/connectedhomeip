@@ -28,7 +28,7 @@
 #include <type_traits>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include "TimeUtils.h"
 

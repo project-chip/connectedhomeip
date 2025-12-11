@@ -28,7 +28,7 @@
 // Include module header
 #include <system/SystemStats.h>
 
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <platform/LockTracker.h>
 
 #include <string.h>

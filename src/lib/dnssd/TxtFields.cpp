@@ -31,7 +31,7 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Dnssd {

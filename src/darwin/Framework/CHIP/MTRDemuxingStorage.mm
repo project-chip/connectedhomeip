@@ -21,7 +21,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <platform/LockTracker.h>
 
 using namespace chip;

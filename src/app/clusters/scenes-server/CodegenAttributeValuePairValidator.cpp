@@ -17,7 +17,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <lib/core/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 
 namespace chip::scenes {
 namespace {

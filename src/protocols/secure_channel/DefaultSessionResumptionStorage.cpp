@@ -18,7 +18,7 @@
 #include <protocols/secure_channel/DefaultSessionResumptionStorage.h>
 
 #include <lib/support/Base64.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 

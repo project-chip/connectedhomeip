@@ -15,7 +15,7 @@
 
 #include <errno.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>

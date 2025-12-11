@@ -30,7 +30,7 @@
 #include <string.h>
 
 #include <lib/support/DLLUtil.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #define ASN1_DEFINE_OID_TABLE
 #define ASN1_DEFINE_OID_NAME_TABLE

@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>

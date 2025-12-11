@@ -46,7 +46,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <tracing/metric_event.h>
 
 using namespace chip::Tracing::DarwinPlatform;

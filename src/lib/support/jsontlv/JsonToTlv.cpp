@@ -25,7 +25,7 @@
 
 #include <json/json.h>
 #include <lib/support/Base64.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/jsontlv/ElementTypes.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 

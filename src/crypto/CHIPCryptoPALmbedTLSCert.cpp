@@ -26,7 +26,7 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <mbedtls/ecp.h>
 #include <mbedtls/oid.h>

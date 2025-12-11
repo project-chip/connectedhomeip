@@ -21,7 +21,7 @@
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 using namespace chip;
 

@@ -24,7 +24,7 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>

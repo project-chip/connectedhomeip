@@ -47,7 +47,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvToJson.h>

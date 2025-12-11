@@ -24,7 +24,7 @@
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 // Log error each time sync storage takes longer than this threshold
 #define SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS (2.0)

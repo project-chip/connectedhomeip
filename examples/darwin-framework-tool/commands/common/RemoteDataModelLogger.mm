@@ -22,7 +22,7 @@
 #import <objc/runtime.h>
 
 #include <json/json.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <string>

@@ -37,7 +37,7 @@
 #include <lib/core/Global.h>
 #include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>

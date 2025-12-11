@@ -24,7 +24,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/core/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/SafePointerCast.h>
