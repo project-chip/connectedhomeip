@@ -18,6 +18,6 @@ TARGET_SOURCES(
         PRIVATE
         "${CLUSTER_DIR}/CertificateTableImpl.cpp"
         "${CLUSTER_DIR}/CertificateTableImpl.h"
-        "${CLUSTER_DIR}/tls-certificate-management-server.cpp"
-        "${CLUSTER_DIR}/tls-certificate-management-server.h"
+        "${CLUSTER_DIR}/TlsCertificateManagementServer.cpp"
+        "${CLUSTER_DIR}/TlsCertificateManagementServer.h"
 )
