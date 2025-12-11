@@ -121,6 +121,7 @@ struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluste
 
     void TearDown() override
     {
+        mCluster.Shutdown();
         // Restore the previous provider to avoid use-after-free issues
         Access::GetAccessControl().SetAccessRestrictionProvider(mPreviousProvider);
     }
@@ -182,13 +183,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -264,6 +265,8 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     ASSERT_EQ(CountListElements(arl, arlCount), CHIP_NO_ERROR);
     ASSERT_EQ(arlCount, 0u);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+
+    cluster.Shutdown();
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
