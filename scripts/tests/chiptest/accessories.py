@@ -139,8 +139,7 @@ class AppsRegister:
 
     def create_ota_image(self, otaImageFilePath, rawImageFilePath, rawImageContent, vid='0xDEAD', pid='0xBEEF'):
         # Write the raw image content
-        with open(rawImageFilePath, 'w') as rawFile:
-            rawFile.write(rawImageContent)
+        Path(rawImageFilePath).write_text(rawImageContent)
 
         # Add an OTA header to the raw file
         otaImageTool = _DEFAULT_CHIP_ROOT / 'src/app/ota_image_tool.py'
