@@ -326,5 +326,5 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if not kvs_path_prefix.startswith('/tmp/'):
             raise ValueError(
                 f"kvs_path_prefix must be an absolute path starting with /tmp/, but was: {kvs_path_prefix}")
-        subprocess.run(f"rm -rf {kvs_path_prefix}*", shell=True)
+        subprocess.run(['rm', '-rf', f'{kvs_path_prefix}*'])
         log.info(f"Removed all KVS files/folders with prefix: {kvs_path_prefix}")
