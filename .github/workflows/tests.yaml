@@ -998,7 +998,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStatusDetection.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStatusDetectionIntegration.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestCommissioningStatusDetectionIntegration.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
