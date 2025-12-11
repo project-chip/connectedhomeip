@@ -32,7 +32,7 @@ constexpr uint32_t kDeferredOfferTimeoutSeconds = 30;
 } // namespace
 
 void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpointId,
-                                Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer)
+                                Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster * requestorServer)
 {
     mPeerId          = peerId;
     mEndpointId      = endpointId;

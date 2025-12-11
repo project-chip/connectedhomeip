@@ -425,6 +425,18 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         chip_tool_with_python_cmd=chip_tool_with_python_info,
     )
 
+    tests_filtered: list[TestDefinition] = []
+    for test in context.obj.tests:
+        if context.obj.include_tags and not (test.tags & context.obj.include_tags):
+            log.debug("Test '%s' not included", test.name)
+            continue
+
+        if context.obj.exclude_tags and test.tags & context.obj.exclude_tags:
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
     ble_controller_app = None
     ble_controller_tool = None
     ns_rpc: str | None = None
@@ -478,17 +490,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         for i in range(iterations):
             log.info("Starting iteration %d", i+1)
             observed_failures = 0
-            for test in context.obj.tests:
-                if context.obj.include_tags:
-                    if not (test.tags & context.obj.include_tags):
-                        log.debug("Test '%s' not included", test.name)
-                        continue
-
-                if context.obj.exclude_tags:
-                    if test.tags & context.obj.exclude_tags:
-                        log.debug("Test '%s' excluded", test.name)
-                        continue
-
+            for test in tests_filtered:
                 test_start = time.monotonic()
                 try:
                     if context.obj.dry_run:

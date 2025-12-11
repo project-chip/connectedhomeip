@@ -83,6 +83,6 @@ private:
     WebRTCTransportRequestorManager()  = default;
     ~WebRTCTransportRequestorManager() = default;
 
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;
 };

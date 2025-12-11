@@ -74,7 +74,7 @@ struct TestWebRTCTransportRequestorCluster : public ::testing::Test
 TEST_F(TestWebRTCTransportRequestorCluster, TestAttributes)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     ASSERT_TRUE(IsAttributesListEqualTo(server, { WebRTCTransportRequestor::Attributes::CurrentSessions::kMetadataEntry }));
 }
@@ -82,7 +82,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestAttributes)
 TEST_F(TestWebRTCTransportRequestorCluster, TestCommands)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server,
                                               {
@@ -96,7 +96,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCommands)
 TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     // Initially, no sessions should exist
     auto sessions = server.GetCurrentSessions();
@@ -110,7 +110,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
     testSession.streamUsage = StreamUsageEnum::kLiveView;
 
     auto result = server.UpsertSession(testSession);
-    EXPECT_EQ(result, WebRTCTransportRequestorServer::UpsertResultEnum::kInserted);
+    EXPECT_EQ(result, WebRTCTransportRequestorCluster::UpsertResultEnum::kInserted);
 
     // Verify session was added
     sessions = server.GetCurrentSessions();
@@ -120,7 +120,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
     // Update the same session
     testSession.streamUsage = StreamUsageEnum::kRecording;
     result                  = server.UpsertSession(testSession);
-    EXPECT_EQ(result, WebRTCTransportRequestorServer::UpsertResultEnum::kUpdated);
+    EXPECT_EQ(result, WebRTCTransportRequestorCluster::UpsertResultEnum::kUpdated);
 
     // Verify session was updated, not duplicated
     sessions = server.GetCurrentSessions();
@@ -136,7 +136,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
 TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     // Test adding multiple sessions
     WebRTCSessionStruct session1;
@@ -170,7 +170,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadCurrentSessionsAttribute)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     // Create a mock attribute request for CurrentSessions
     chip::app::DataModel::ReadAttributeRequest request;
@@ -202,7 +202,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestReadCurrentSessionsAttribute)
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadClusterRevisionAttribute)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     // Create a mock attribute request for ClusterRevision
     chip::app::DataModel::ReadAttributeRequest request;
@@ -232,7 +232,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestReadClusterRevisionAttribute)
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadUnsupportedAttribute)
 {
     MockWebRTCTransportRequestorDelegate mockDelegate;
-    WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
     // Create a mock attribute request for an unsupported attribute
     chip::app::DataModel::ReadAttributeRequest request;

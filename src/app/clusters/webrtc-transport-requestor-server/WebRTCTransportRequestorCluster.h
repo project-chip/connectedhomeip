@@ -106,7 +106,7 @@ public:
     virtual CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) = 0;
 };
 
-class WebRTCTransportRequestorServer : public DefaultServerCluster
+class WebRTCTransportRequestorCluster : public DefaultServerCluster
 {
 public:
     enum class UpsertResultEnum : uint8_t
@@ -117,13 +117,13 @@ public:
 
     /**
      * @brief
-     *  Creates a WebRTCTransportRequestorServer instance with a given endpoint and delegate.
+     *  Creates a WebRTCTransportRequestorCluster instance with a given endpoint and delegate.
      *
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      *                 The caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    WebRTCTransportRequestorServer(EndpointId endpointId, Delegate & delegate);
+    WebRTCTransportRequestorCluster(EndpointId endpointId, Delegate & delegate);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
