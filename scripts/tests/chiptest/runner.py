@@ -162,13 +162,18 @@ class Executor:
                     continue
                 cmd = str(process.args)
 
-                log.debug('Killing leftover process "%s"', cmd)
-                process.kill()
+                log.debug('Terminating leftover process "%s"', cmd)
+                process.terminate()
                 try:
                     process.wait(1)
                 except subprocess.TimeoutExpired:
-                    log.warning('Failed to kill the process "%s". Terminating instead', cmd)
-                    process.terminate()
+                    log.warning('Failed to terminate the process "%s". Killing instead', cmd)
+                    process.kill()
+
+                    try:
+                        process.wait(1)
+                    except subprocess.TimeoutExpired:
+                        log.error('Failed to kill process "%s". It may become a zombie.', cmd)
 
 
 class Runner:
