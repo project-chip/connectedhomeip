@@ -295,5 +295,11 @@ private:
      * @param reason Zero for normal clip finalization or Positive number for abrupt finalization
      */
     void FinalizeCurrentClip(int reason);
+    /**
+     * @brief Uploads the MPD file if it's ready
+     *
+     * @return true if MPD was uploaded or is not ready yet, false on error
+     */
+    bool UploadMPDIfReady(const std::filesystem::path & mpdPath);
     /// @}
 };
