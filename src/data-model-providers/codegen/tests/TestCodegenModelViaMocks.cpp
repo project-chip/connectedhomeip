@@ -197,6 +197,10 @@ public:
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
 
 private:
+    // Test cases that explicitly manage the provider should not use this sub-class
+    using CodegenDataModelProvider::SetPersistentStorageDelegate;
+    using CodegenDataModelProvider::Startup;
+
     LogOnlyEvents mEventGenerator;
     TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
@@ -2178,7 +2182,7 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2232,7 +2236,7 @@ TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2745,7 +2749,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2787,7 +2791,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2815,7 +2819,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2939,7 +2943,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
