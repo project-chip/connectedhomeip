@@ -52,7 +52,7 @@ namespace System {
 
 constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 24 * 30); // Month [sec]
 
-CHIP_ERROR LayerImplSelect::Init()
+CriticalFailure LayerImplSelect::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -135,7 +135,7 @@ void LayerImplSelect::Signal()
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
-CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -244,7 +244,7 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 #endif
 }
 
-CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
