@@ -88,14 +88,14 @@ public:
      */
     enum class Range : uint8_t
     {
-        kSDK                     = 0x0,  ///< CHIP SDK errors.
-        kOS                      = 0x1,  ///< Encapsulated OS errors, other than POSIX errno.
-        kPOSIX                   = 0x2,  ///< Encapsulated POSIX errno values.
-        kLwIP                    = 0x3,  ///< Encapsulated LwIP errors.
-        kOpenThread              = 0x4,  ///< Encapsulated OpenThread errors.
-        kPlatform [[deprecated]] = 0x5,  ///< Platform-defined encapsulation.
-        kPlatformExtended        = 0x80, ///< Platform-defined encapsulation with 31-bit value.
-        kLastRange               = kPlatform,
+        kSDK              = 0x0,  ///< CHIP SDK errors.
+        kOS               = 0x1,  ///< Encapsulated OS errors, other than POSIX errno.
+        kPOSIX            = 0x2,  ///< Encapsulated POSIX errno values.
+        kLwIP             = 0x3,  ///< Encapsulated LwIP errors.
+        kOpenThread       = 0x4,  ///< Encapsulated OpenThread errors.
+        kPlatform         = 0x5,  ///< Platform-defined encapsulation.
+        kPlatformExtended = 0x80, ///< Platform-defined encapsulation with 31-bit value.
+        kLastRange        = kPlatform,
     };
 
     /**
@@ -404,6 +404,8 @@ private:
     template <typename T = StorageType>
     static constexpr T GetField(unsigned int start, unsigned int length, StorageType value)
     {
+        // For signed types T, the right shift performs sign extension, so the following code
+        // correctly preserves the sign of the extracted field.
         return static_cast<T>(value << (std::numeric_limits<decltype(value)>::digits - start - length)) >>
             (std::numeric_limits<decltype(value)>::digits - length);
     }
@@ -426,6 +428,7 @@ private:
         // Mask value for every range except kPlatformExtended range. The kPlatformExtended
         // range is special, because we are using only the highest bit to determine whether
         // the range is kPlatformExtended and the rest is used to store the value itself.
+        // No masking is needed for kPlatform because MakeInteger will set the MSB.
         return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStart, kValueLength))
                                                    : static_cast<StorageType>(value);
     }
