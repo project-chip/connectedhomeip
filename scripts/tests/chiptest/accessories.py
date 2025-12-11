@@ -147,6 +147,8 @@ class AppsRegister:
         cmd = [str(otaImageTool), 'create', '-v', vid, '-p', pid, '-vn', '2',
                '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
         s = subprocess.Popen(cmd)
+        # We need to have some timeout so that in case the process hangs we don't wait infinitely in CI. 60 seconds is large enough
+        # for the OTA tool.
         s.wait(60)
         if s.returncode != 0:
             raise RuntimeError('Cannot create OTA image file')
