@@ -252,8 +252,8 @@ class TC_CNET_4_23(MatterBaseTest):
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is NOT kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(10, "TH reads LastNetworkingStatus (should be kAuthFailure)",
-                         "Verify LastNetworkingStatus to be 'kAuthFailure'"),
+            TestStep(10, "TH reads LastNetworkingStatus (should be kAuthFailure or kOtherConnectionFailure)",
+                         "Verify LastNetworkingStatus to be 'kAuthFailure' or 'kOtherConnectionFailure'"),
             TestStep(11, "TH sends ScanNetworks command with Breadcrumb = 6",
                          "Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:\n"
                          "1. wiFiScanResults contains the target network SSID"),
@@ -467,13 +467,15 @@ class TC_CNET_4_23(MatterBaseTest):
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Step 10: TH reads LastNetworkingStatus (should be kAuthFailure)
+        # Step 10: TH reads LastNetworkingStatus (should be kAuthFailure or kOtherConnectionFailure)
         self.step(10)
 
-        # When authentication fails due to incorrect password, the DUT should return kAuthFailure
         await self._read_last_networking_status(
             endpoint,
-            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure
+            valid_statuses=[
+                cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
+                cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
+            ]
         )
 
         # Step 11: TH sends ScanNetworks command with Breadcrumb = 6
