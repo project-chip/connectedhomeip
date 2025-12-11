@@ -106,3 +106,7 @@ void MatterTlsCertificateManagementClusterShutdownCallback(chip::EndpointId endp
 void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterChimeClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterChimeClusterShutdownCallback(chip::EndpointId endpointId);
