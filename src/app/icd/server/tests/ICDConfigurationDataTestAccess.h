@@ -24,7 +24,7 @@
 #include <system/SystemLayerImpl.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 /**
  * @brief Class acts as an accessor to private methods of the ICDConfigurationData class without needing to give friend access to
  *        each individual test.
@@ -55,5 +55,5 @@ private:
     ICDConfigurationData * mData = nullptr;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
