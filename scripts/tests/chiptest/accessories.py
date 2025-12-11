@@ -90,7 +90,8 @@ class AppsRegister:
     @with_accessories_lock
     def kill(self, name):
         if accessory := self._accessories[name]:
-            accessory.kill()
+            return accessory.kill()
+        return False
 
     @with_accessories_lock
     def kill_all(self):
