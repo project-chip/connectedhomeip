@@ -311,7 +311,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-
     def restart_requestor(self, restore: bool = False):
         """This method Reboots or Restore the DUT."""
         restart_flag_file = self.get_restart_flag_file()
