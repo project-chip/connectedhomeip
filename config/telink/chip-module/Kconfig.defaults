@@ -391,7 +391,6 @@ config NET_CONFIG_INIT_TIMEOUT
 
 
 config CHIP_WIFI
-    bool "Enable Telink Wi-Fi support"
     default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     select WIFI_W91
     select WIFI

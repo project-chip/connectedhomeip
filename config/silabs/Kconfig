@@ -265,9 +265,6 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 
 
 config CHIP_WIFI
-	bool "Enable Silicon Labs Wi-Fi support"
-	default y if BOARD_SIWX917_RB4338A
-	default y if BOARD_SIWX917_RB4342A
 	select WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME

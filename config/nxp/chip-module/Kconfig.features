@@ -20,7 +20,6 @@
 if CHIP
 
 config CHIP_WIFI
-	bool "Enable NXP Wi-Fi support"
 	default y
 	select WIFI
 	select WIFI_NXP
@@ -73,7 +72,6 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  within range [-JITTER; +JITTER].
 
 config CHIP_ETHERNET
-	bool "Enable NXP Ethernet support"
 	default n
 	depends on !CHIP_WIFI
 	select NET_MGMT_EVENT
