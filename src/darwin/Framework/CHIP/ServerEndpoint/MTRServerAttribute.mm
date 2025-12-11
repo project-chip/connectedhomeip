@@ -29,7 +29,7 @@
 #include <app/reporting/reporting.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #import <os/lock.h>
 
 using namespace chip;

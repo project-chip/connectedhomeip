@@ -27,7 +27,7 @@
 #include <inet/UDPEndPointImplSockets.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS

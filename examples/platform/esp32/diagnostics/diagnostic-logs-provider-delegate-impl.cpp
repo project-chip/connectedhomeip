@@ -17,7 +17,7 @@
  */
 
 #include <diagnostic-logs-provider-delegate-impl.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <tracing/esp32_diagnostics/DiagnosticTracing.h>
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)

@@ -16,7 +16,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/Linux/ThreadStackManagerImpl.h>

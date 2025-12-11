@@ -36,7 +36,7 @@
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 
 #include <zap-generated/endpoint_config.h>
 

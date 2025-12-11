@@ -35,7 +35,7 @@
 
 #include <inet/IPPacketInfo.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include "TestInetCommon.h"
 

@@ -32,7 +32,7 @@
 #include <app/util/ember-strings.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 
 namespace chip {
 namespace app {

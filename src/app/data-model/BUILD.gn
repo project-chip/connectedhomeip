@@ -23,7 +23,7 @@ source_set("nullable") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:numeric-primitives",
+    "${chip_root}/src/lib/core:numeric-primitives",
   ]
 }
 
@@ -47,7 +47,7 @@ source_set("data-model") {
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:numeric-primitives",
+    "${chip_root}/src/lib/core:numeric-primitives",
     "${chip_root}/src/protocols/interaction_model",
   ]
 

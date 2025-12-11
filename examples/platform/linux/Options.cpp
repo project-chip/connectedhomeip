@@ -33,7 +33,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>

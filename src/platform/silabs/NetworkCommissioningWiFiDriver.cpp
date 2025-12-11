@@ -16,7 +16,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/SilabsConfig.h>

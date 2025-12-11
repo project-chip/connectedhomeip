@@ -23,7 +23,7 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/StatusCode.h>
 

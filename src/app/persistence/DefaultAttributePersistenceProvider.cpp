@@ -19,7 +19,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 namespace chip {
 namespace app {

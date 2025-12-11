@@ -34,7 +34,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemError.h>

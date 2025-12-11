@@ -23,7 +23,7 @@
 
 #include <lib/support/BufferWriter.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <platform/ConfigurationManager.h>
 
 namespace chip {

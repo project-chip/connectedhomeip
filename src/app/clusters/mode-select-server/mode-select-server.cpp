@@ -28,7 +28,7 @@
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>

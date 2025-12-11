@@ -51,7 +51,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceEvent.h>

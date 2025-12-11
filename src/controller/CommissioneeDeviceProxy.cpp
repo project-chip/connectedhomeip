@@ -34,7 +34,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Callback;

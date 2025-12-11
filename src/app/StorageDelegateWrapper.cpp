@@ -15,7 +15,7 @@
  */
 #include <app/StorageDelegateWrapper.h>
 
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 namespace chip {
 namespace app {

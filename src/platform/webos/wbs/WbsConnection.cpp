@@ -2,7 +2,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>

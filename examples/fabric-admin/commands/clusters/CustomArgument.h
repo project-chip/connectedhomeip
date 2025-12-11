@@ -22,7 +22,7 @@
 #include <commands/common/HexConversion.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include <string>
 

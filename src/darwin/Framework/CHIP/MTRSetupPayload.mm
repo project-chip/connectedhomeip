@@ -23,7 +23,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRUtilities.h"
 
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>

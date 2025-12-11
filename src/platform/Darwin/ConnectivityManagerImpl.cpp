@@ -22,7 +22,7 @@
 #include <platform/internal/BLEManager.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>

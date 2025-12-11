@@ -20,7 +20,7 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include <cstring>
 #include <type_traits>

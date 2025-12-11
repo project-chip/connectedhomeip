@@ -22,7 +22,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include "Efr32OpaqueKeypair.h"
 #include <platform/silabs/SilabsConfig.h>

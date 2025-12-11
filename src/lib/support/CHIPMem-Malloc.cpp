@@ -36,7 +36,7 @@
 
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 #include <dmalloc.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
 #if CHIP_CONFIG_MEMORY_MGMT_MALLOC

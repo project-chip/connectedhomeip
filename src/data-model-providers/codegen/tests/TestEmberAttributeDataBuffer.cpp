@@ -34,7 +34,7 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 
 #include <limits>
 #include <optional>

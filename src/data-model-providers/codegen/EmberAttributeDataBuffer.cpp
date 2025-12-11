@@ -24,7 +24,7 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
 

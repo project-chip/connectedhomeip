@@ -17,7 +17,7 @@
 #import "MTRConversion.h"
 #import "MTRLogging_Internal.h"
 
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/TimeUtils.h>
 
 CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)

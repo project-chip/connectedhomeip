@@ -22,7 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/Server.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 using namespace chip;
 using namespace chip::app;

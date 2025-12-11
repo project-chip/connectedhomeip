@@ -29,7 +29,7 @@
 
 // Include local headers
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemMutex.h>

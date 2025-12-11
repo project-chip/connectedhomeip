@@ -25,7 +25,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 

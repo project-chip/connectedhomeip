@@ -41,7 +41,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include "JsonParser.h"
 

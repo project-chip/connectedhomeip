@@ -31,7 +31,7 @@
 #include <pw_unit_test/framework.h>
 
 // We are testing the odd-sized-integers.h module
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 
 using namespace chip;
 using namespace chip::app;

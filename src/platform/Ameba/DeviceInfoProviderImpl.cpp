@@ -19,7 +19,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/Span.h>
 #include <matter_data_providers.h>
 #include <platform/Ameba/DeviceInfoProviderImpl.h>

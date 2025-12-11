@@ -40,7 +40,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <optional>

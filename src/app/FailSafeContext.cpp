@@ -24,7 +24,7 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>

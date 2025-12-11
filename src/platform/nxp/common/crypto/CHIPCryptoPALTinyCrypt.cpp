@@ -54,7 +54,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 

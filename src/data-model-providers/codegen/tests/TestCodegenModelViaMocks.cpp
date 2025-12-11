@@ -68,7 +68,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/odd-sized-integers.h>
+#include <lib/core/odd-sized-integers.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/StatusCode.h>
 

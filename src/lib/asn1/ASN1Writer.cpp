@@ -35,7 +35,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 namespace chip {
 namespace ASN1 {

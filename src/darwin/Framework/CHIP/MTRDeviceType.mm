@@ -22,7 +22,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

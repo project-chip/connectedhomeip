@@ -27,7 +27,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>

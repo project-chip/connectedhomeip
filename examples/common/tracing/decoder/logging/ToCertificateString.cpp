@@ -19,7 +19,7 @@
 #include "ToCertificateString.h"
 
 #include <lib/support/Base64.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 
 namespace {

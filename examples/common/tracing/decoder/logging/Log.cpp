@@ -21,7 +21,7 @@
 #include "ToCertificateString.h"
 
 #include <lib/support/BytesToHex.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 namespace chip {
 namespace trace {

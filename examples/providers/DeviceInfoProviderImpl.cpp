@@ -20,7 +20,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

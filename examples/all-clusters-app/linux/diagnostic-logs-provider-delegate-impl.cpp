@@ -18,7 +18,7 @@
 
 #include "include/diagnostic-logs-provider-delegate-impl.h"
 
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 
 #include <string>
 

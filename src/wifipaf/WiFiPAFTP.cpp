@@ -30,7 +30,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>

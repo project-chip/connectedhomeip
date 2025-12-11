@@ -44,7 +44,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/DeviceInstanceInfoProvider.h>

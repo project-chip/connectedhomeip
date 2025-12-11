@@ -55,7 +55,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <messaging/ExchangeMgr.h>

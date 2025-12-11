@@ -23,7 +23,7 @@
 
 #include <ble/Ble.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING

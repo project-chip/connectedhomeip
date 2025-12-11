@@ -34,7 +34,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
+#include <lib/core/SafeInt.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 
