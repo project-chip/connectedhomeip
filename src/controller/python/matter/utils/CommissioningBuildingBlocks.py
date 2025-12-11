@@ -34,11 +34,8 @@ LOGGER = logging.getLogger(__name__)
 async def _IsNodeInFabricList(devCtrl, nodeId):
     resp = await devCtrl.ReadAttribute(nodeId, [(opCreds.Attributes.Fabrics)])
     listOfFabricsDescriptor = resp[0][opCreds][Clusters.OperationalCredentials.Attributes.Fabrics]
-    for fabricDescriptor in listOfFabricsDescriptor:
-        if fabricDescriptor.nodeID == nodeId:
-            return True
-
-    return False
+    return any(fabricDescriptor.nodeID == nodeId
+               for fabricDescriptor in listOfFabricsDescriptor)
 
 
 async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController,

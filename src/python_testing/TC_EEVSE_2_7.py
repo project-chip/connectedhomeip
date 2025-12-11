@@ -50,7 +50,7 @@ from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
@@ -196,7 +196,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         soc_reporting_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kSoCReporting) > 0
         charging_preferences_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences) > 0
 
-        logger.info(
+        log.info(
             f"Received FeatureMap: {feature_map:#x} = SoCReporting ({soc_reporting_supported}), ChargingPreferences ({charging_preferences_supported})")
 
         self.step("3")
@@ -292,7 +292,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             # TH reads from the DUT the NextChargeStartTime
             # Value has to be before the next TargetTime above.
             next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-            logger.info(
+            log.info(
                 f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
             expected_next_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(
@@ -426,7 +426,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             # TH reads from the DUT the NextChargeStartTime
             # Value has to be before the next TargetTime above
             next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-            logger.info(
+            log.info(
                 f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
             expected_next_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(

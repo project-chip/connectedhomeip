@@ -657,7 +657,7 @@ def _raw_profile_to_info(profile: RawProfile):
     #
     # We assume that the info lines fit in RAM
     lines = []
-    with open(info_path, 'rt') as f:
+    with open(info_path) as f:
         for line in f.readlines():
             line = line.rstrip()
             if line.startswith("SF:"):
@@ -898,7 +898,8 @@ def python_tests(
     if fail_log_dir and not os.path.exists(fail_log_dir):
         os.mkdir(fail_log_dir)
 
-    metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
+    with open("src/python_testing/test_metadata.yaml") as f:
+        metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
@@ -1198,7 +1199,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:175
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:177
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

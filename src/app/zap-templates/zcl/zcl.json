@@ -12,6 +12,7 @@
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
         "air-quality-cluster.xml",
+        "ambient-context-sensing-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",
@@ -179,6 +180,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
+        "Ambient Context Sensing": ["HoldTimeLimits"],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",
@@ -573,7 +575,8 @@
             "InPlaceIndicator",
             "LastChangedTime",
             "ReplacementProductList",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "HEPA Filter Monitoring": [
             "Condition",
@@ -582,7 +585,8 @@
             "InPlaceIndicator",
             "LastChangedTime",
             "ReplacementProductList",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Carbon Monoxide Concentration Measurement": [
             "MeasuredValue",
