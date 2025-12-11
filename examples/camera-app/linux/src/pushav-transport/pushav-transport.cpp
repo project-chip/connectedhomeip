@@ -384,8 +384,8 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
             mUploader = std::make_unique<PushAVUploader>();
             mUploader->Start();
             InitializeRecorder();
-            mClipInfo.activationTime            = std::chrono::steady_clock::now();
-            mRecorder->mClipInfo.activationTime = mClipInfo.activationTime;
+            mClipInfo.activationTimeS            = std::chrono::steady_clock::now();
+            mRecorder->mClipInfo.activationTimeS = mClipInfo.activationTimeS;
             return;
         }
         bool zoneFound = false; // Zone found flag
@@ -565,9 +565,9 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         // Clear activationTime for manual triggers when setting status to inactive
         if (mActivationTimeSetByManualTrigger)
         {
-            mClipInfo.activationTime = std::chrono::steady_clock::time_point();
+            mClipInfo.activationTimeS = std::chrono::steady_clock::time_point();
             mActivationTimeSetByManualTrigger = false;
-            ChipLogProgress(Camera, "PushAVTransport, cleared activationTime for manual trigger");
+            ChipLogProgress(Camera, "PushAVTransport, cleared activationTimeS for manual trigger");
         }
         mRecorder.reset();
         ChipLogProgress(Camera, "Recorder destruction done");
