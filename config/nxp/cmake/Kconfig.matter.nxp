@@ -24,13 +24,9 @@ config CHIP_NXP_PLATFORM
 	  what can be used to conditionally deviate from Zephyr generic configuration
 	  for NXP platform related purposes.
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
-
-config CHIP_STRIP_SYMBOLS
-	bool "Strip symbols"
-	help
-	  Remove all symbol table and relocation information from the binary.
 
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
@@ -119,7 +115,6 @@ config CHIP_DEVICE_PART_NUMBER
 
 config CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 	bool "Load real factory data"
-	default y
 	help
 	  Allows to load the factory data provisioned in flash.
 
@@ -211,10 +206,6 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	  Enables the generation of a random Rotating device ID unique ID.
 
 endif #CHIP_FACTORY_DATA_BUILD
-
-config CHIP_FACTORY_RESET_ERASE_NVS
-	bool
-	default y
 
 config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
 	bool "Use Multiple BLE connections after commissioning"

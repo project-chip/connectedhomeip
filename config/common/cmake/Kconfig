@@ -60,6 +60,11 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_STRIP_SYMBOLS
+	bool "Strip symbols"
+	help
+	  Remove all symbol table and relocation information from the binary.
+
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
 	default y
