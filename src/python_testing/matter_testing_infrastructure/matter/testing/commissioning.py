@@ -465,8 +465,7 @@ async def _establish_pase_or_case_session(
                     If not provided, only CASE will be attempted.
 
     Raises:
-        ValueError: If no pase_params provided (can't attempt PASE)
-        Exception: If both connection attempts fail
+        RuntimeError: If both connection attempts fail
     """
     task_list = []
 
@@ -488,11 +487,6 @@ async def _establish_pase_or_case_session(
     LOGGER.info(f"Creating CASE task for node {node_id}")
     case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
     task_list.append(asyncio.create_task(case_future, name="case"))
-
-    if not task_list:
-        raise ValueError(
-            f"Cannot establish session to node {node_id}: no PASE params provided and CASE task creation failed"
-        )
 
     LOGGER.info(f"Attempting parallel PASE/CASE connection to node {node_id}")
 
