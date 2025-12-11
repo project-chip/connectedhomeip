@@ -238,22 +238,21 @@ class AppsRegister:
     def create_ota_image(self, otaImageFilePath: str, rawImageFilePath: str, rawImageContent: str, vid: str = '0xDEAD',
                          pid: str = '0xBEEF') -> bool:
         # Write the raw image content
-        with open(rawImageFilePath, 'w') as rawFile:
-            rawFile.write(rawImageContent)
+        Path(rawImageFilePath).write_text(rawImageContent)
 
         # Add an OTA header to the raw file
         otaImageTool = _DEFAULT_CHIP_ROOT / 'src/app/ota_image_tool.py'
         cmd = [str(otaImageTool), 'create', '-v', vid, '-p', pid, '-vn', '2',
                '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
         s = subprocess.Popen(cmd)
-        s.wait()
+        s.wait(60)
         if s.returncode != 0:
-            raise Exception('Cannot create OTA image file')
+            raise RuntimeError('Cannot create OTA image file')
         return True
 
     def compare_files(self, file1: str | Path, file2: str | Path) -> bool:
         if not filecmp.cmp(file1, file2, shallow=False):
-            raise Exception('Files %s and %s do not match' % (file1, file2))
+            raise RuntimeError('Files %s and %s do not match' % (file1, file2))
         return True
 
     def create_file(self, filePath: str | Path, fileContent: str) -> bool:
