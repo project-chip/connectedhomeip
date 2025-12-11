@@ -71,8 +71,8 @@ struct AudioStream
     bool IsCompatible(const AudioStreamStruct & inputParams) const
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
-                audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
+                audioStreamParams.channelCount >= inputParams.channelCount &&
+                audioStreamParams.sampleRate >= inputParams.sampleRate && audioStreamParams.bitDepth >= inputParams.bitDepth);
     }
 };
 
