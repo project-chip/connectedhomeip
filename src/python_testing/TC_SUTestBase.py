@@ -311,7 +311,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    def clear_kvs(self, kvs_path_prefix: Optional[str] = "/tmp/chip_kvs"):
+    def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
         """
         Remove all temporary KVS files created.
 
@@ -323,8 +323,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files.
         """
         # Do not allow relative paths or paths outside of /tmp/
-        if not kvs_path_prefix.startswith('/tmp/'):
+        real_kvs_path_prefix = path.realpath(kvs_path_prefix)
+        if not real_kvs_path_prefix.startswith('/tmp/'):
             raise ValueError(
                 f"kvs_path_prefix must be an absolute path starting with /tmp/, but was: {kvs_path_prefix}")
-        subprocess.run(['rm', '-rf', f'{kvs_path_prefix}*'])
-        log.info(f"Removed all KVS files/folders with prefix: {kvs_path_prefix}")
+        subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
+        log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
