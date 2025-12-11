@@ -1931,13 +1931,9 @@ NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
 
     // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
     // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
-    uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
-    uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
-    NSTimeInterval eventTimestampValueRemainder
-        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / static_cast<double>(chip::kMillisecondsPerSecond);
-    NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
-
-    return eventTimestampValue;
+    NSTimeInterval eventTimestampValueSeconds = static_cast<NSTimeInterval>(timeValue / chip::kMillisecondsPerSecond);
+    NSTimeInterval eventTimestampValueRemainder = static_cast<NSTimeInterval>(timeValue % chip::kMillisecondsPerSecond) / chip::kMillisecondsPerSecond;
+    return eventTimestampValueSeconds + eventTimestampValueRemainder;
 }
 
 #pragma mark - Utility for event priority conversion
