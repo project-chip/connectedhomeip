@@ -4716,6 +4716,19 @@ static id _Nullable DecodeEventPayloadForSoilMeasurementCluster(EventId aEventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aEventId) {
+    default: {
+        // Not a known AmbientContextSensing event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWiFiNetworkManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -5935,6 +5948,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::SoilMeasurement::Id: {
         return DecodeEventPayloadForSoilMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return DecodeEventPayloadForAmbientContextSensingCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeEventPayloadForWiFiNetworkManagementCluster(aPath.mEventId, aReader, aError);
