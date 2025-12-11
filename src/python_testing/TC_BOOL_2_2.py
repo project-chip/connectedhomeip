@@ -58,17 +58,16 @@ class TC_BOOL_2_2(MatterBaseTest):
 
     async def read_state_value_from_dut(self, endpoint):
         """Read the StateValue attribute from the DUT."""
-        state_value = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.BooleanState,
             attribute=Clusters.BooleanState.Attributes.StateValue)
-        return state_value
 
     def desc_TC_BOOL_2_2(self) -> str:
         return "[TC-BOOL-2.2] Primary Functionality with Server as DUT"
 
     def steps_TC_BOOL_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH", is_commissioning=True),
             TestStep("1a", "Set up subscription to StateChange event."),
             TestStep("2a", "Bring the DUT into a state so StateValue is FALSE."),
@@ -83,13 +82,11 @@ class TC_BOOL_2_2(MatterBaseTest):
             TestStep("3c", "Verify StateChange event was received.",
                      "Receive StateChange event with StateValue set to FALSE."),
         ]
-        return steps
 
     def pics_TC_BOOL_2_2(self) -> list[str]:
-        pics = [
+        return [
             "BOOL.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_attribute(Clusters.BooleanState.Attributes.StateValue))
     async def test_TC_BOOL_2_2(self):
