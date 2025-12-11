@@ -65,6 +65,13 @@ public:
         Iterator() = default;
     };
 
+    struct DeviceInfoCapabilityMinimas {
+        uint16_t simultaneousInvocationsSupported;
+        uint16_t simultaneousWritesSupported;
+        uint16_t readPathsSupported;
+        uint16_t subscribePathsSupported;
+    };
+
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
     using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
     using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
@@ -131,13 +138,11 @@ public:
      */
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
-    uint16_t GetSimultaneousInvocationsSupported();
-
-    uint16_t GetSimultaneousWritesSupported();
-
-    uint16_t GetReadPathsSupported();
-
-    uint16_t GetSubscribePathsSupported();
+    /**
+     * Get infromation that is used to report minima capability values for the device.
+     * @retval An instance of the DeviceInfoCapabilityMinimas struct
+     */
+    virtual DeviceInfoCapabilityMinimas GetSupportedCapabilityMinimaValues();
 
     // Iterators
     /**
