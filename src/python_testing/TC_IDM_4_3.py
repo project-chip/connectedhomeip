@@ -255,9 +255,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                                 logging.info(
                                     f"{test_step}: Skipping {attribute.__name__} - empty list")
                                 continue
-                            else:
-                                # Non-empty list -> write empty list (safe change)
-                                new_val = []
+                            # Non-empty list -> write empty list (safe change)
+                            new_val = []
                         elif isinstance(cached_val, bool):
                             # Boolean attribute - flip the value to trigger actual change
                             new_val = not cached_val
