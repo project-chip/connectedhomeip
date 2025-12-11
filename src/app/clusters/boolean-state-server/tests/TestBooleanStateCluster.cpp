@@ -30,7 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanState;
 using namespace chip::app::Clusters::BooleanState::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -46,7 +46,7 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     TestBooleanStateCluster() : booleanState(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     BooleanStateCluster booleanState;
 };
 

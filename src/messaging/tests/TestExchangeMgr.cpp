@@ -49,14 +49,14 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext
+struct TestExchangeMgr : public chip::Testing::LoopbackMessagingContext
 {
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 };
 

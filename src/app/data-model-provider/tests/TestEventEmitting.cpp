@@ -33,7 +33,7 @@ using namespace chip::app::DataModel;
 
 using StartUpEventType              = chip::app::Clusters::BasicInformation::Events::StartUp::Type;
 using AccessControlEntryChangedType = chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::Type;
-using chip::Test::LogOnlyEvents;
+using chip::Testing::LogOnlyEvents;
 
 constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
 

@@ -2220,7 +2220,7 @@ cluster TargetNavigator = 1285 {
   info event TargetUpdated = 0 {
     TargetInfoStruct targetList[] = 0;
     int8u currentTarget = 1;
-    octet_string data = 2;
+    long_octet_string data = 2;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -3225,11 +3225,8 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ArmFailSafe;
-    handle command ArmFailSafeResponse;
     handle command SetRegulatoryConfig;
-    handle command SetRegulatoryConfigResponse;
     handle command CommissioningComplete;
-    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -3245,13 +3242,10 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ScanNetworks;
-    handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
-    handle command NetworkConfigResponse;
     handle command ConnectNetwork;
-    handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
   }
 
@@ -3268,7 +3262,6 @@ endpoint 0 {
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
-    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -3340,20 +3333,15 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
-    handle command AttestationResponse;
     handle command CertificateChainRequest;
-    handle command CertificateChainResponse;
     handle command CSRRequest;
-    handle command CSRResponse;
     handle command AddNOC;
     handle command UpdateNOC;
-    handle command NOCResponse;
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
     handle command SetVIDVerificationStatement;
     handle command SignVIDVerificationRequest;
-    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -3406,13 +3394,9 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
-    handle command AddGroupResponse;
     handle command ViewGroup;
-    handle command ViewGroupResponse;
     handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
     handle command RemoveGroup;
-    handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
     handle command AddGroupIfIdentifying;
   }
@@ -3446,7 +3430,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command ContentAppMessage;
-    handle command ContentAppMessageResponse;
   }
 }
 

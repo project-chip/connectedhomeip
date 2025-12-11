@@ -1109,6 +1109,7 @@ PASE
 Passcode
 passRetained
 passwd
+Pausable
 PBKDF
 pbuf
 pbufs

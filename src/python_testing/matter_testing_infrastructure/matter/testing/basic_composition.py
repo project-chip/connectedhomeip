@@ -35,7 +35,7 @@ from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
-from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
+from matter.testing.matter_testing import MatterBaseTest, MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
 LOGGER = logging.getLogger(__name__)
@@ -136,7 +136,7 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
         return converter.convert_dump_to_cache(json_tlv)
 
 
-class BasicCompositionTests:
+class BasicCompositionTests(MatterBaseTest):
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
@@ -148,18 +148,6 @@ class BasicCompositionTests:
     endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
     xml_clusters: dict[int, Any]
     xml_device_types: dict[int, Any]
-
-    def get_code(self, dev_ctrl):
-        created_codes = []
-        for idx, discriminator in enumerate(self.matter_test_config.discriminators):
-            created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
-
-        setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
-        if not setup_codes:
-            return None
-        asserts.assert_greater_equal(len(setup_codes), 1,
-                                     "Require at least one of either --qr-code, --manual-code or (--discriminator and --passcode).")
-        return setup_codes[0]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
@@ -198,9 +186,8 @@ class BasicCompositionTests:
         node_id = self.dut_node_id
 
         task_list = []
-        if allow_pase and self.get_code(dev_ctrl):
-            setup_code = self.get_code(dev_ctrl)
-            pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
+        if allow_pase and self.first_setup_code:
+            pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
 
         case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)

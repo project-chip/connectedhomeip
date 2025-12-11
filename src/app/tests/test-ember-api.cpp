@@ -20,7 +20,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 
-chip::EndpointId chip::Test::numEndpoints = 0;
+chip::EndpointId chip::Testing::numEndpoints = 0;
 
 // Used by the code in TestPowerSourceCluster.cpp (and generally things using mock ember functions may need this).
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
@@ -28,7 +28,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
 {
     // Very simple mapping here, we're just going to return the endpoint that matches the given endpoint index because the test
     // uses the endpoints in order.
-    if (endpoint >= chip::Test::numEndpoints)
+    if (endpoint >= chip::Testing::numEndpoints)
     {
         return kEmberInvalidEndpointIndex;
     }

@@ -29,7 +29,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -73,7 +73,7 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
     TestSoilMeasurementCluster() : soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     SoilMeasurementClusterLocal soilMeasurement;
 };
 

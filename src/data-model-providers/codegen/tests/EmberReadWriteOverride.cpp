@@ -37,7 +37,7 @@ Status gEmberStatusCode = Status::InvalidAction;
 } // namespace
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
 {
@@ -74,7 +74,7 @@ ByteSpan GetEmberBuffer()
     return ByteSpan(gEmberIoBuffer, gEmberIoBufferFill);
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
 
 /// TODO: this SHOULD be part of attribute-storage mocks and allow proper I/O control

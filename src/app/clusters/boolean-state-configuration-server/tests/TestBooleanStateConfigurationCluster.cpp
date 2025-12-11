@@ -38,10 +38,10 @@ using namespace chip::app::Clusters::BooleanStateConfiguration;
 using chip::app::Clusters::BooleanStateConfiguration::Feature;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
-using chip::Test::ClusterTester;
-using chip::Test::TestServerClusterContext;
+using chip::Testing::ClusterTester;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
+using chip::Testing::TestServerClusterContext;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestBooleanStateConfigurationCluster : public ::testing::Test

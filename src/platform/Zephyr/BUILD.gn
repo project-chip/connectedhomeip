@@ -39,7 +39,6 @@ static_library("Zephyr") {
     "DeviceInstanceInfoProviderImpl.cpp",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "DiagnosticDataProviderImplGetter.cpp",
     "InetPlatformConfig.h",
     "InetUtils.cpp",
     "KeyValueStoreManagerImpl.cpp",
@@ -82,11 +81,17 @@ static_library("Zephyr") {
     sources += [
       "wifi/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/DiagnosticDataProviderImplWiFi.cpp",
+      "wifi/DiagnosticDataProviderImplWiFi.h",
       "wifi/WiFiManager.cpp",
       "wifi/WiFiManager.h",
       "wifi/ZephyrWifiDriver.cpp",
       "wifi/ZephyrWifiDriver.h",
     ]
+  } else {
+    # Non-WiFi builds use the base diagnostic provider getter.
+    # Wi-Fi implementation provides its own.
+    sources += [ "DiagnosticDataProviderImplGetter.cpp" ]
   }
 
   if (chip_malloc_sys_heap) {

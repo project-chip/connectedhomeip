@@ -181,13 +181,13 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     void TearDown() override { basicInformationClusterInstance.Shutdown(); }
 
-    chip::Test::TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     static BasicInformationCluster & basicInformationClusterInstance;
-    static chip::Test::ClusterTester tester;
+    static chip::Testing::ClusterTester tester;
 };
 
 BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
-chip::Test::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
+chip::Testing::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {

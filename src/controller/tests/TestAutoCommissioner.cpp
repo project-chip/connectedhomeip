@@ -32,7 +32,7 @@
 using namespace chip;
 using namespace chip::Dnssd;
 using namespace chip::Controller;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 

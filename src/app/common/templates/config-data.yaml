@@ -65,6 +65,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
+    - Power Topology
     - Push AV Stream Transport
     - RVC Clean Mode
     - RVC Operational State
@@ -153,6 +154,7 @@ CodeDrivenClusters:
     - Boolean State
     - Boolean State Configuration
     - Descriptor
+    - Device Energy Management
     - Diagnostic Logs
     - Ethernet Network Diagnostics
     - Fixed Label
@@ -167,6 +169,7 @@ CodeDrivenClusters:
     - OTA Software Update Provider
     - Occupancy Sensing
     - Operational Credentials
+    - Power Topology
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization

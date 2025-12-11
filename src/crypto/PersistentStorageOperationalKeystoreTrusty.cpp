@@ -39,6 +39,11 @@ TrustyMatter & GetTrustyMatter()
     return instance;
 }
 
+bool PersistentStorageOperationalKeystore::HasPendingOpKeypair() const
+{
+    return (mPendingKeypair != nullptr);
+}
+
 bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), false);

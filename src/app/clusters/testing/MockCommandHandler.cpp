@@ -26,10 +26,9 @@
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
-namespace app {
 namespace Testing {
 
-CHIP_ERROR MockCommandHandler::FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+CHIP_ERROR MockCommandHandler::FallibleAddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
                                                  const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                                                  const char * context)
 {
@@ -37,22 +36,22 @@ CHIP_ERROR MockCommandHandler::FallibleAddStatus(const ConcreteCommandPath & aRe
     return CHIP_NO_ERROR;
 }
 
-void MockCommandHandler::AddStatus(const ConcreteCommandPath & aRequestCommandPath,
+void MockCommandHandler::AddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
                                    const Protocols::InteractionModel::ClusterStatusCode & aStatus, const char * context)
 {
     CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
-CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                               const DataModel::EncodableToTLV & aEncodable)
+CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const app::DataModel::EncodableToTLV & aEncodable)
 {
     chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(chip::kMaxAppMessageLen);
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     TLV::TLVWriter baseWriter;
     baseWriter.Init(handle->Start(), handle->MaxDataLength());
-    DataModel::FabricAwareTLVWriter writer(baseWriter, mFabricIndex);
+    app::DataModel::FabricAwareTLVWriter writer(baseWriter, mFabricIndex);
     TLV::TLVType ct;
 
     ReturnErrorOnFailure(writer.mTLVWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
@@ -64,8 +63,8 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
     return CHIP_NO_ERROR;
 }
 
-void MockCommandHandler::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                     const DataModel::EncodableToTLV & aEncodable)
+void MockCommandHandler::AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const app::DataModel::EncodableToTLV & aEncodable)
 {
     CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
     VerifyOrDie(err == CHIP_NO_ERROR);
@@ -93,5 +92,4 @@ CHIP_ERROR MockCommandHandler::GetResponseReader(TLV::TLVReader & reader, size_t
 }
 
 } // namespace Testing
-} // namespace app
 } // namespace chip

@@ -55,7 +55,7 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 //
 constexpr EndpointId kTestEndpointId = 2;
 
-class TestEventNumberCaching : public chip::Test::AppContext
+class TestEventNumberCaching : public chip::Testing::AppContext
 {
 protected:
     // Performs setup for each test in the suite

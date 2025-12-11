@@ -20,8 +20,6 @@
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/storage/FabricTableImpl.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
@@ -59,7 +57,7 @@ public:
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };
 
-    CHIP_ERROR Init(PersistentStorageDelegate & storage) override;
+    CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) override;
     void Finish() override;
 
     // Scene count
@@ -102,11 +100,13 @@ protected:
     // Endpoint scene count
     CHIP_ERROR SetEndpointSceneCount(const uint8_t & scene_count);
 
-    // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
-    virtual uint8_t GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen);
+    // List clusters available on the current endpoint. Virtual to allow for more unit test logic.
+    //
+    // TODO: control over this SHOULD be done via the datamodel provider instead (use that for testing).
+    virtual CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder);
 
-    // wrapper function around emberAfGetClusterCountForEndpoint to allow override when testing
-    virtual uint8_t GetClusterCountFromEndpoint();
+private:
+    app::DataModel::Provider * mDataModel = nullptr;
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint

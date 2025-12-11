@@ -28,7 +28,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 namespace internal {
 
@@ -155,5 +155,5 @@ struct MockNodeConfig
     const std::vector<MockEndpointConfig> endpoints;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

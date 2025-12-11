@@ -115,6 +115,14 @@ void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoin
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);

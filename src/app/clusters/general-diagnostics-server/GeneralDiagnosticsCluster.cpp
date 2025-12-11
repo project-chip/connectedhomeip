@@ -16,12 +16,15 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/InteractionModelEngine.h>
+#include <app/SubscriptionStats.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
+#include <transport/MessageStats.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -275,6 +278,21 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return encoder.Encode(isTestEventTriggersEnabled);
     }
+    case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
+        static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
+                      "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
+        const SubscriptionStats subscriptionStats = mDeviceLoadStatusProvider->GetSubscriptionStats(encoder.AccessingFabricIndex());
+        const MessageStats messageStatistics      = mDeviceLoadStatusProvider->GetMessageStats();
+
+        GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
+            .currentSubscriptions                  = subscriptionStats.numCurrentSubscriptions,
+            .currentSubscriptionsForFabric         = subscriptionStats.numCurrentSubscriptionsForFabric,
+            .totalSubscriptionsEstablished         = subscriptionStats.numTotalSubscriptions,
+            .totalInteractionModelMessagesSent     = messageStatistics.interactionModelMessagesSent,
+            .totalInteractionModelMessagesReceived = messageStatistics.interactionModelMessagesReceived,
+        };
+        return encoder.Encode(load);
+    }
         // Note: Attribute ID 0x0009 was removed (#30002).
 
     case GeneralDiagnostics::Attributes::FeatureMap::Id: {
@@ -327,6 +345,11 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
         GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
     };
+
+    if (mFeatureFlags.Has(GeneralDiagnostics::Feature::kDeviceLoad))
+    {
+        mOptionalAttributeSet.Set<GeneralDiagnostics::Attributes::DeviceLoadStatus::Id>();
+    }
 
     return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries),
                               mOptionalAttributeSet);

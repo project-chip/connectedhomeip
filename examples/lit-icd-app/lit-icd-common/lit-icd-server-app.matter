@@ -2200,11 +2200,8 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ArmFailSafe;
-    handle command ArmFailSafeResponse;
     handle command SetRegulatoryConfig;
-    handle command SetRegulatoryConfigResponse;
     handle command CommissioningComplete;
-    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -2223,13 +2220,10 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ScanNetworks;
-    handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
-    handle command NetworkConfigResponse;
     handle command ConnectNetwork;
-    handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
   }
 
@@ -2246,7 +2240,6 @@ endpoint 0 {
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
-    handle command TimeSnapshotResponse;
   }
 
   server cluster ThreadNetworkDiagnostics {
@@ -2325,20 +2318,15 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
-    handle command AttestationResponse;
     handle command CertificateChainRequest;
-    handle command CertificateChainResponse;
     handle command CSRRequest;
-    handle command CSRResponse;
     handle command AddNOC;
     handle command UpdateNOC;
-    handle command NOCResponse;
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
     handle command SetVIDVerificationStatement;
     handle command SignVIDVerificationRequest;
-    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -2354,10 +2342,8 @@ endpoint 0 {
 
     handle command KeySetWrite;
     handle command KeySetRead;
-    handle command KeySetReadResponse;
     handle command KeySetRemove;
     handle command KeySetReadAllIndices;
-    handle command KeySetReadAllIndicesResponse;
   }
 
   server cluster UserLabel {
@@ -2384,10 +2370,8 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command RegisterClient;
-    handle command RegisterClientResponse;
     handle command UnregisterClient;
     handle command StayActiveRequest;
-    handle command StayActiveResponse;
   }
 }
 endpoint 1 {

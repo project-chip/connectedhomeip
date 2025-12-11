@@ -46,7 +46,7 @@
 #include <transport/raw/tests/TCPBaseTestAccess.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::Inet;
 using namespace chip::Transport;
 

@@ -13,9 +13,7 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-static_library("scenes") {
-  output_name = "libCHIPScenes"
-
+source_set("scenes") {
   sources = [
     "AttributeValuePairValidator.h",
     "ExtensionFieldSets.h",
@@ -30,14 +28,19 @@ static_library("scenes") {
 
   deps = [ "${chip_root}/src/app" ]
 
-  public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
-
-  cflags = [
-    "-Wconversion",
-    "-Wshadow",
+  public_deps = [
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/storage:fabric-table",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/ScenesManagement",
   ]
+
+  cflags = [ "-Wconversion" ]
 }
 
 # Empty default target, so that data_model.gni can properly depend on this
 group("scenes-server") {
+  public_deps = [ ":scenes" ]
 }

@@ -82,8 +82,7 @@ CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId)
     }
 
     gPTInstance = std::make_unique<PowerTopologyInstance>(
-        EndpointId(endpointId), *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
-        BitMask<PowerTopology::OptionalAttributes, uint32_t>(0));
+        EndpointId(endpointId), *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology));
 
     if (!gPTInstance)
     {

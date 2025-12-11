@@ -21,7 +21,7 @@
 #include <ble/BleLayer.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 /**
  * @brief Class acts as an accessor to private methods of the BleLayer class without needing to give friend access to
  *        each individual test.
@@ -45,5 +45,5 @@ public:
 private:
     Ble::BleLayer * mLayer = nullptr;
 };
-} // namespace Test
+} // namespace Testing
 } // namespace chip

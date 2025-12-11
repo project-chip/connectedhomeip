@@ -65,7 +65,7 @@ struct ValidationInstruction
 
 using InstructionListType = std::vector<ValidationInstruction>;
 
-using TestBufferedReadCallback = chip::Test::AppContext;
+using TestBufferedReadCallback = chip::Testing::AppContext;
 
 class DataSeriesValidator : public BufferedReadCallback::Callback
 {

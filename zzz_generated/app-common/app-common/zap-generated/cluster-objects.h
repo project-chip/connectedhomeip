@@ -47,6 +47,10 @@
 #include <clusters/AirQuality/Commands.h>
 #include <clusters/AirQuality/Events.h>
 #include <clusters/AirQuality/Structs.h>
+#include <clusters/AmbientContextSensing/Attributes.h>
+#include <clusters/AmbientContextSensing/Commands.h>
+#include <clusters/AmbientContextSensing/Events.h>
+#include <clusters/AmbientContextSensing/Structs.h>
 #include <clusters/ApplicationBasic/Attributes.h>
 #include <clusters/ApplicationBasic/Commands.h>
 #include <clusters/ApplicationBasic/Events.h>

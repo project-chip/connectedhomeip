@@ -66,6 +66,7 @@ class RunContext:
     chip_tool: SubprocessInfo | None
     dry_run: bool
     runtime: TestRunTime
+    find_path: typing.List[str]
 
     # If not empty, include only the specified test tags
     include_tags: set[TestTag] = field(default_factory=set[TestTag])
@@ -134,6 +135,12 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--find-path',
+    default=[DEFAULT_CHIP_ROOT],
+    multiple=True,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Default directory path for finding compiled targets.')
+@click.option(
     '--runner',
     type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
@@ -145,7 +152,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, dry_run: bool, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], runner: str, chip_tool: Path | None) -> None:
+         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -162,7 +169,7 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
     if chip_tool is not None:
         chip_tool_info = SubprocessInfo(kind=SubprocessKind.TOOL, path=chip_tool)
     elif runtime != TestRunTime.MATTER_REPL_PYTHON:
-        paths_finder = PathsFinder()
+        paths_finder = PathsFinder(find_path)
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
             chip_tool_path = paths_finder.get('chip-tool')
         else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
@@ -226,6 +233,7 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
                              in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool_info, dry_run=dry_run,
                              runtime=runtime,
+                             find_path=find_path,
                              include_tags=set(include_tags),
                              exclude_tags=exclude_tags_set)
 
@@ -358,7 +366,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
     if expected_failures != 0 and not keep_going:
         raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
-    paths_finder = PathsFinder()
+    paths_finder = PathsFinder(context.obj.find_path)
 
     def build_app(arg_value: Path | None, kind: Literal['app', 'tool'], key: str) -> SubprocessInfo | None:
         log.debug("Constructing app %s...", key)

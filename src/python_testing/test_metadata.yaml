@@ -9,6 +9,10 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
+    - name: TC_BRBINFO_3_1.py
+      reason:
+          Attribute is not implemented in the bridge app. Same code as
+          BINFO-3.1, which is run in the CI
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
