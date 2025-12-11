@@ -16,7 +16,6 @@
 
 menuconfig CHIP
 	bool "Matter protocol stack"
-	default n
 	help
 	  Enables Matter libraries required for the Matter protocol stack to work.
 
@@ -35,7 +34,7 @@ config CHIP_ETHERNET
 config CHIP_APP_LOG_LEVEL
 	int "Logging level in application"
     default LOG_DEFAULT_LEVEL if LOG
-	default 4
+	default 4 # detail logging
 	help
 	  Sets the logging level in the Matter application. Use this configuration
 	  option only within the application. To set the logging level for the
@@ -86,6 +85,7 @@ config CHIP_DEVICE_VENDOR_NAME
 	help
 	  Provides a human-readable name of the device manufacturer. The name is
 	  exposed as an attribute of the Basic Information cluster.
+	  (Macro value is in quotes.)
 
 config CHIP_DEVICE_PRODUCT_ID
 	int "Product ID"
@@ -103,7 +103,7 @@ config CHIP_DEVICE_PRODUCT_NAME
 	help
 	  Provides a human-readable product name, such as the model number, assigned
 	  by the device manufacturer. The name is exposed as an attribute of the
-	  Basic Information cluster.
+	  Basic Information cluster. (Macro value is in quotes.)
 
 config CHIP_DEVICE_HARDWARE_VERSION
 	int "Hardware version"
@@ -120,7 +120,7 @@ config CHIP_DEVICE_HARDWARE_VERSION_STRING
 	  Provides a human-readable representation of the hardware version number.
 	  This must be an ASCII string of a length between 1 and 64 characters. The
 	  hardware version string is exposed as an attribute of the Basic
-	  Information cluster.
+	  Information cluster. (Macro value is in quotes.)
 
 if "$(APPVERSION)"=""
 config CHIP_DEVICE_SOFTWARE_VERSION
@@ -143,7 +143,7 @@ config CHIP_DEVICE_SOFTWARE_VERSION_STRING
 	  This must be an ASCII string of a length between 1 and 64 characters. The
 	  software version string is exposed as an attribute of the Basic
 	  Information cluster, and included in the header of the generated Matter
-	  over-the-air (OTA) update image.
+	  over-the-air (OTA) update image. (Macro value is in quotes.)
 endif
 
 config CHIP_DEVICE_MANUFACTURING_DATE
@@ -151,6 +151,7 @@ config CHIP_DEVICE_MANUFACTURING_DATE
 	default "2022-01-01"
 	help
 	  Provides the device manufacturing date in the ISO 8601 format: YYYY-MM-DD.
+	  (Macro value is in quotes.)
 
 config CHIP_DEVICE_SERIAL_NUMBER
 	string "Device serial number"
@@ -158,7 +159,7 @@ config CHIP_DEVICE_SERIAL_NUMBER
 	help
 	  Provides a human-readable representation of the device serial number that
 	  uniquely identifies the device. This must be an ASCII string of no more
-	  than 32 characters.
+	  than 32 characters. (Macro value is in quotes.)
 
 config CHIP_DEVICE_ROTATING_DEVICE_UID
 	string "Rotating device ID unique ID (HEX format)"
@@ -167,7 +168,7 @@ config CHIP_DEVICE_ROTATING_DEVICE_UID
 	  Provides a unique identifier of the device. This ID is used to derive the
 	  rotating device identifier, which allows commissioners to discover the
 	  device in a privacy-preserving way. The identifier must be a string of at
-	  least 16 bytes encoded in HEX.
+	  least 16 bytes encoded in HEX. (Macro value is in quotes.)
 
 config CHIP_DEVICE_TYPE
 	int "Primary device type"
@@ -210,7 +211,7 @@ config CHIP_DEVICE_SPAKE2_SALT
 	  Provides the SPAKE2+ salt, which is one of the input parameters for the
 	  PBKDF operation, used to generate the SPAKE2+ verifier. The salt must be
 	  of a length between 16 and 32 bytes and it should be randomly generated
-	  for each SPAKE2+ passcode.
+	  for each SPAKE2+ passcode. (Macro value is in quotes.)
 
 config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
 	string "SPAKE2+ verifier for testing purposes (base64 format)"
@@ -221,6 +222,7 @@ config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
 	  be used for development or testing purposes. The default value was
 	  generated using the following command:
 	  ./scripts/tools/spake2p/spake2p.py gen-verifier -i 1000 -s U1BBS0UyUCBLZXkgU2FsdA== -p 20202021
+	  (Macro value is in quotes.)
 
 config CHIP_DEVICE_ENABLE_KEY
 	string "Enable Key for triggering test actions (HEX format)"
@@ -230,6 +232,7 @@ config CHIP_DEVICE_ENABLE_KEY
 	  must be provided in the TestEventTrigger command to trigger a requested
 	  test action. This value is used during certification tests, and should not
 	  be present on devices in production environment.
+	  (Macro value is in quotes.)
 
 config CHIP_DEVICE_PRODUCT_FINISH
 	string "Description of the product's external case finish method"
@@ -238,6 +241,7 @@ config CHIP_DEVICE_PRODUCT_FINISH
 	  provides a description of the product's external case finish method.
 	  Possible values:
 	  other; matte; satin; polished; rugged; fabric
+	  (Macro value is in quotes.)
 
 config CHIP_DEVICE_PRODUCT_COLOR
 	string "Description of the product's primary color"
@@ -246,13 +250,12 @@ config CHIP_DEVICE_PRODUCT_COLOR
 	  Possible values:
 	  black; navy; green; teal; maroon; purple; olive; gray; blue; lime; 
 	  aqua; red; fuchsia; yellow; white; nickel; chrome; brass; cooper; 
-	  silver; gold.
+	  silver; gold. (Macro value is in quotes.)
 
 # Matter optional features and parameters
 
 config CHIP_ENABLE_PAIRING_AUTOSTART
 	bool "Open commissioning window on boot"
-	default n
 	help
 	  Opens the commissioning window automatically at application boot time if
 	  the node is not yet commissioned.
@@ -300,6 +303,11 @@ choice CHIP_OTA_REQUEST_UPGRADE_TYPE
 		  becomes permanent, otherwise the new image is reverted.
 
 endchoice
+
+config CHIP_OTA_IMAGE_BUILD
+	bool "Generate OTA image"
+	help
+	  Enables building Matter over-the-air (OTA) update image.
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
@@ -363,7 +371,6 @@ config CHIP_STATISTICS
 
 config CHIP_LIB_SHELL
 	bool "Matter shell commands"
-	default n
 	help
 	  Enables linking the application with the library that contains Matter
 	  shell commands.
@@ -375,7 +382,18 @@ config CHIP_PROJECT_CONFIG
 	  be either absolute or relative to the application directory. If specified,
 	  Matter's generic configuration files will include the project
 	  configuration file that can be used to override any of Matter's default or
-	  platform-specific settings.
+	  platform-specific settings. (Macro value is in quotes.)
+
+config CHIP_STACK_LOCK_TRACKING
+	string "Matter stack lock tracking"
+	default "none"
+	help
+	  Enable Matter stack lock tracking. (Macro value is in quotes.)
+
+config CHIP_NFC_ONBOARDING_PAYLOAD
+	bool "Share onboarding payload in NFC tag"
+	help
+		Enables sharing onboarding payload in the NFC tag.
 
 # Thread network features
 
@@ -508,7 +526,7 @@ config CHIP_OPENTHREAD_CONFIG
 	  Provides a path to an OpenThread configuration file. The path can be
 	  either absolute or relative to the application directory. When this option
 	  is specified, it replaces the OpenThread configuration file supplied by
-	  the platform.
+	  the platform. (Macro value is in quotes.)
 
 # Wi-Fi network features
 
@@ -569,18 +587,27 @@ config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 
 # Build system options
 
+config CHIP_WITH_LWIP
+	bool "CHIP with lwIP library available"
+	help
+	  Enable the lwIP library support in Matter.
+
 config CHIP_PW_RPC
 	bool "Pigweed RPC library"
-	default n
 	help
 	  Links the application with the libraries containing Pigweed RPC
 	  functionalities.
 
 config CHIP_BUILD_TESTS
 	bool "Build Matter unit tests"
-	default n
 	help
 	  Enables building Matter unit tests.
+
+config BUILD_FOR_HOST_UNIT_TEST
+	bool "build host unit test"
+	default y if CHIP_BUILD_TESTS
+	help
+		Enable matter host unit test build.
 
 config CHIP_BLE_EXT_ADVERTISING
 	bool "Bluetooth LE extended advertising"

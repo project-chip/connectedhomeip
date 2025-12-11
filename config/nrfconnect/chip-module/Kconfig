@@ -38,8 +38,8 @@ config CHIP_NRF_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
-	bool "Share onboarding payload in NFC tag"
 	default n
 	imply NFC_T2T_NRFXLIB
 	imply NFC_NDEF
@@ -47,8 +47,6 @@ config CHIP_NFC_ONBOARDING_PAYLOAD
 	imply NFC_NDEF_RECORD
 	imply NFC_NDEF_URI_REC
 	imply NFC_NDEF_URI_MSG
-	help
-	  Enables sharing the onboarding payload in the NFC tag.
 
 choice CHIP_BOOTLOADER
 	prompt "Bootloader implementation for Matter purposes"

@@ -157,11 +157,6 @@ config APP_LINK_WITH_CHIP
 	  Adds Matter directories to the 'app' target include paths and links the
 	  'app' target with Matter libraries.
 
-config CHIP_OTA_IMAGE_BUILD
-	bool "Generate OTA image"
-	help
-	  Enables building Matter over-the-air (OTA) update image.
-
 if CHIP_OTA_IMAGE_BUILD
 
 config CHIP_OTA_IMAGE_FILE_NAME

@@ -138,6 +138,9 @@ if(CONFIG_CHIP)
         matter_add_gn_arg_string("symbol_level" "0")
     endif()
 
+    # Allows to set chip_stack_lock_tracking level
+    matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
+
     matter_generate_args_tmp_file()
 
     # ==============================================================================

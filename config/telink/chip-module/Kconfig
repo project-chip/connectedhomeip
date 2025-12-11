@@ -30,14 +30,12 @@ config CHIP_TELINK_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
-	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C
 	imply ST25DVXXKC
 	imply NFC
-	help
-	  Enables sharing the onboarding payload in the NFC tag.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
