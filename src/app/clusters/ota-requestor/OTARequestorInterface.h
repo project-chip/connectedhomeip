@@ -192,9 +192,6 @@ public:
     // Get the current state of the OTA update
     virtual OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
-    // Get the progress of the current state of the OTA update
-    virtual chip::app::DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() = 0;
-
     // Get the target version of the OTA update
     virtual uint32_t GetTargetVersion() = 0;
 

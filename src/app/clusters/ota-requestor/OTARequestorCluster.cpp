@@ -109,6 +109,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
         }
         return encoder.Encode(mOtaRequestor->GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
+    {
         if (!mOtaRequestor)
         {
             // There are examples which enable the OTA requestor cluster in their zap configuration but don't
@@ -120,7 +121,10 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
             return encoder.EncodeNull();
 #endif
         }
-        return encoder.Encode(mOtaRequestor->GetCurrentUpdateStateProgress());
+        DataModel::Nullable<uint8_t> progress;
+        ReturnErrorOnFailure(mOtaRequestor->GetUpdateStateProgressAttribute(mPath.mEndpointId, progress));
+        return encoder.Encode(progress);
+    }
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:

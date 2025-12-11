@@ -75,9 +75,6 @@ public:
     // Get the current state of the OTA update
     OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
-    // Get the progress of the current OTA update state
-    app::DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override { return mCurrentUpdateStateProgress; }
-
     // Get the target version of the OTA update
     uint32_t GetTargetVersion() override { return mTargetVersion; }
 

@@ -74,11 +74,11 @@ public:
     void NotifyUpdateApplied() override {}
     CHIP_ERROR GetUpdateStateProgressAttribute(EndpointId endpointId, DataModel::Nullable<uint8_t> & progress) override
     {
+        progress = mUpdateStateProgress;
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override { return CHIP_NO_ERROR; }
     OTAUpdateStateEnum GetCurrentUpdateState() override { return OTAUpdateStateEnum::kIdle; }
-    DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override { return mUpdateStateProgress; }
     uint32_t GetTargetVersion() override { return 0; }
     void CancelImageUpdate() override {}
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
