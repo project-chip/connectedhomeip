@@ -44,10 +44,10 @@ class AppsRegister:
     def __init__(self) -> None:
         self.__accessories: dict[str, App] = {}
 
-    def init(self):
+    def init(self) -> None:
         self.__startXMLRPCServer()
 
-    def uninit(self):
+    def uninit(self) -> None:
         self.__stopXMLRPCServer()
 
     @property
@@ -55,24 +55,25 @@ class AppsRegister:
         """List of registered accessory applications."""
         return self.__accessories.values()
 
-    def add(self, name: str, accessory: App):
+    def add(self, name: str, accessory: App) -> None:
         self.__accessories[name] = accessory
 
-    def remove(self, name: str):
+    def remove(self, name: str) -> None:
         self.__accessories.pop(name)
 
-    def removeAll(self):
+    def removeAll(self) -> None:
         self.__accessories = {}
 
-    def get(self, name: str):
+    def get(self, name: str) -> App:
         return self.__accessories[name]
 
-    def kill(self, name: str):
+    def kill(self, name: str) -> bool:
         accessory = self.__accessories[name]
         if accessory:
-            accessory.kill()
+            return accessory.kill()
+        return False
 
-    def killAll(self):
+    def killAll(self) -> bool:
         ok = True
         for accessory in self.__accessories.values():
             # make sure to do kill() on all of our apps, even if some of them returned False
@@ -100,7 +101,7 @@ class AppsRegister:
             return accessory.stop() and accessory.start()
         return False
 
-    def factoryResetAll(self):
+    def factoryResetAll(self) -> None:
         for accessory in self.__accessories.values():
             accessory.factoryReset()
 
@@ -110,8 +111,7 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
-    def waitForMessage(self, name: str, message: list[str],
-                       timeoutInSeconds: float = 10) -> bool:
+    def waitForMessage(self, name: str, message: list[str], timeoutInSeconds: float = 10) -> bool:
         accessory = self.__accessories[name]
         if accessory:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
@@ -119,8 +119,7 @@ class AppsRegister:
             return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
-    def createOtaImage(self, otaImageFilePath: str, rawImageFilePath: str,
-                       rawImageContent: str, vid: str = '0xDEAD',
+    def createOtaImage(self, otaImageFilePath: str, rawImageFilePath: str, rawImageContent: str, vid: str = '0xDEAD',
                        pid: str = '0xBEEF') -> bool:
         # Write the raw image content
         with open(rawImageFilePath, 'w') as rawFile:
@@ -151,7 +150,7 @@ class AppsRegister:
             os.remove(filePath)
         return True
 
-    def __startXMLRPCServer(self):
+    def __startXMLRPCServer(self) -> None:
         self.server = SimpleXMLRPCServer((IP, PORT))
 
         # Typeshed issue: https://github.com/python/typeshed/issues/4837
@@ -168,7 +167,7 @@ class AppsRegister:
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
-    def __stopXMLRPCServer(self):
+    def __stopXMLRPCServer(self) -> None:
         self.server.shutdown()
 
     def __createCommandLineOptions(self, args: list[str]) -> dict[str, str]:

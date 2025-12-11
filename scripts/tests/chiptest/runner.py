@@ -59,7 +59,7 @@ class LogPipe(threading.Thread):
 
         self.start()
 
-    def CapturedLogContains(self, txt: str, index: int = 0):
+    def CapturedLogContains(self, txt: str, index: int = 0) -> tuple[bool, int]:
         for i, line in enumerate(self.captured_logs[index:]):
             if txt in line:
                 return True, index + i
