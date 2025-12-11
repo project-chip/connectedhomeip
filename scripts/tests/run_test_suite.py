@@ -68,10 +68,10 @@ class RunContext:
     find_path: typing.List[str]
 
     # If not empty, include only the specified test tags
-    include_tags: set[TestTag] = field(default_factory=set[TestTag])
+    include_tags: set[TestTag] = field(default_factory=set)
 
     # If not empty, exclude tests tagged with these tags
-    exclude_tags: set[TestTag] = field(default_factory=set[TestTag])
+    exclude_tags: set[TestTag] = field(default_factory=set)
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)

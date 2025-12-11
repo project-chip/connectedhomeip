@@ -365,7 +365,7 @@ class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
-    tags: set[TestTag] = field(default_factory=set[TestTag])
+    tags: set[TestTag] = field(default_factory=set)
 
     @property
     def is_manual(self) -> bool:
