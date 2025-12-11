@@ -183,13 +183,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -460,13 +460,9 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     // This simulates a failure scenario (e.g., provider unable to process the request)
     mMockProvider.mReturnError = CHIP_ERROR_INTERNAL;
 
-    // Create a valid request
+    // Create a minimal valid request with empty ARL list
     AccessControl::Commands::ReviewFabricRestrictions::Type request;
-    AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type entry;
-    entry.endpoint     = 1;
-    entry.cluster      = OnOff::Id;
-    entry.restrictions = DataModel::List<const AccessControl::Structs::AccessRestrictionStruct::Type>(nullptr, 0);
-    request.arl        = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(&entry, 1);
+    request.arl = DataModel::List<const AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>(nullptr, 0);
 
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
