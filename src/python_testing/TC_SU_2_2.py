@@ -222,7 +222,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         requestor_node_id = self.dut_node_id
 
         # Prerequisite #1.0 - Provider info
-        provider_node_id = 1
+        provider_node_id = self.dut_node_id + 1
         provider_discriminator = 1111
         provider_setup_pincode = 20202021
         provider_port = self.user_params.get('ota_provider_port', 5541)
@@ -278,8 +278,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=0.5,
-            max_interval_sec=1,
+            min_interval_sec=0,
+            max_interval_sec=20,
             keepSubscriptions=True
         )
 
@@ -297,8 +297,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "range 1–100" and final "None"
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number}: Step #1.1 - Started subscription for UpdateState and UpdateStateProgress attributes '
-            'before AnnounceOTAProvider to avoid missing OTA events')
+            f'{step_number}: Step #1.1 - Started subscription for UpdateState and UpdateStateProgress attributes. '
+            'Waiting for the device to start downloading the image. This step may take several minutes to complete.')
 
         state_sequence = []
         progress_values = []
@@ -345,12 +345,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_1]: Step #1.3 - Start tasks to track OTA attributes:
         # UpdateState and UpdateStateProgress (updateAvailable sequence) with validations
         # ------------------------------------------------------------------------------------
-        subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=60.0)
+        subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=800.0)
         logger.info(f'{step_number}: Step #1.3 - UpdateState (Available sequence) matcher has completed.')
         subscription_attr.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.4 - Verify image transfer from TH/OTA-P to DUT is successful
+        # [STEP_1]: Step #1.4 - Verify image transfer from TH/OTA-P to DUT is successfully started.
         # ------------------------------------------------------------------------------------
 
         # Log the full sequence
@@ -441,8 +441,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info(
-            f'{step_number_s2}: Step #2.1 - Started subscription for UpdateState attribute (Busy sequence) '
-            'before AnnounceOTAProvider to avoid missing OTA events')
+            f'{step_number_s2}: Step #2.1 - Started subscription for UpdateState attribute (Busy sequence). '
+            'Waiting for the device to start downloading the image. This step may take several minutes to complete.')
 
         # Create the reusable matcher for this step
         matcher_busy_state_obj, state_sequence_busy, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
@@ -463,8 +463,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]:  Step #2.3 - Start tasks to track OTA attributes:
         # ------------------------------------------------------------------------------------
 
-        # Wait for the 120s minimum interval to complete (overall task timeout is 150s)
-        subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=150.0)
+        # Wait for the 120s minimum interval to complete (overall task timeout is 920s)
+        subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=920.0)
         logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
         subscription_attr_state_busy.cancel()
 
@@ -561,9 +561,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Any unexpected states during the 120s interval are asserted.
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s3}: Step #3.1 - Started subscription for UpdateState attribute '
+            f'{step_number_s3}: Step #3.1 - Started subscription for UpdateState attribute. '
             '(updateNotAvailable sequence) '
-            'before AnnounceOTAProvider to avoid missing OTA events')
+            'Waiting for the device to query. This step may take several minutes to complete.')
 
         # Create the reusable matcher for this step
         matcher_not_available_state_obj, state_sequence_notavailable, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
@@ -585,7 +585,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
 
         subscription_attr_state_updatenotavailable.await_all_expected_report_matches(
-            [matcher_not_available_state_obj], timeout_sec=150.0)
+            [matcher_not_available_state_obj], timeout_sec=920.0)
         logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
         subscription_attr_state_updatenotavailable.cancel()
 
@@ -685,9 +685,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # After the interval, Downloading is verified.
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute '
+            f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute. '
             '(Busy, 180s DelayedActionTime sequence) '
-            'before AnnounceOTAProvider to avoid missing OTA events')
+            'Waiting for the device to start downloading the image. This step may take several minutes to complete.')
 
         # Create the reusable matcher for this step
         matcher_busy_state_delayed_180s_obj, state_sequence_busy_180, observed_states_during_interval, interval_duration_ref = self.matcher_ota_updatestate(
@@ -711,7 +711,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # Wait until the final state (Downloading) is reached or timeout (3.5 min)
         subscription_attr_state_busy_180s.await_all_expected_report_matches(
-            [matcher_busy_state_delayed_180s_obj], timeout_sec=210.0)
+            [matcher_busy_state_delayed_180s_obj], timeout_sec=980.0)
         logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
         subscription_attr_state_busy_180s.cancel()
 
@@ -919,7 +919,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Transition 1: Idle > Querying
         event1 = subscription_state_invalid_uri.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-            timeout_sec=30
+            timeout_sec=620
         )
         logger.info(f"{step_number_s7}: Event 1: {event1}")
 
