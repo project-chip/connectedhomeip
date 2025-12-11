@@ -314,7 +314,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::Endpoin
 /// The given endpoint index will be shut down and marked as not valid anymore.
 ///
 /// `index` represents the 0-based index of the dynamic endpoints (i.e. the offset from
-/// FIXED_ENDPOINT_COUNT). Use `emberAfGetDynamicIndexFromEndpoint` to convert an endpoinid
+/// FIXED_ENDPOINT_COUNT). Use `emberAfGetDynamicIndexFromEndpoint` to convert an EndpointId
 /// to an index.
 ///
 /// Note that default shutdown type here is `assume endpoint removal` so clusters
