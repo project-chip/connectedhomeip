@@ -375,7 +375,8 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
 async def assert_is_commissioned(
     dev_ctrl,
     node_id: int,
-    description: str = "Device"
+    description: str = "Device",
+    pase_params: Optional[dict] = None
 ) -> None:
     """
     Asserts that the device has at least one commissioned fabric.
@@ -383,12 +384,14 @@ async def assert_is_commissioned(
     Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
     and verifies that the list is not empty. An empty list indicates factory fresh state.
 
-    This assertion works over PASE (before a CASE session is established).
+    This assertion works over PASE (before a CASE session is established) or CASE.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
+        pase_params: Optional parameters for establishing PASE if needed.
+                    See is_commissioned() for format details.
 
     Raises:
         AssertionError: If device has no commissioned fabrics (is factory fresh)
@@ -400,10 +403,14 @@ async def assert_is_commissioned(
 
         # Check that device has been successfully commissioned in previous step
         await assert_is_commissioned(controller, node_id=1234, "Newly commissioned device")
+
+        # Verify device is commissioned (establishes PASE if needed)
+        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        await assert_is_commissioned(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import is_commissioned
 
-    commissioned = await is_commissioned(dev_ctrl, node_id)
+    commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_true(
         commissioned,
         f"{description} must have at least one commissioned fabric. "
