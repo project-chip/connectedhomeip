@@ -74,6 +74,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     provider_discriminator = 321
     provider_setup_pincode = 2321
     ota_image_download_timeout = None
+    requestor_node_id = None
 
     @async_test_body
     async def teardown_test(self):
@@ -211,7 +212,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state should be idle")
         self.terminate_provider()
-        self.restart_requestor()
+        self.restart_requestor(restore=True)
 
         self.step(2)
         # Set values for step 2
@@ -290,7 +291,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         # Terminate the provider
         self.terminate_provider()
-        self.restart_requestor()
+        self.restart_requestor(restore=True)
 
         self.step(3)
         delayed_apply_action_time = 60
@@ -373,7 +374,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
-        self.restart_requestor()
+        self.restart_requestor(restore=True)
 
         self.step(4)
         delayed_apply_action_time = 180
@@ -449,7 +450,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
-        self.restart_requestor()
+        self.restart_requestor(restore=True)
 
         self.step(5)
         extra_arguments = ['--applyUpdateAction', 'discontinue']

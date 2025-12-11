@@ -311,19 +311,24 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    def restart_requestor(self):
-        """This method restart the requestor to restore Softwareupdate version."""
+    def restart_requestor(self, restore: bool = False):
+        """This method Reboots or Restore the DUT."""
         restart_flag_file = self.get_restart_flag_file()
         log.info(f"RESTART FILE at {restart_flag_file}")
         if not restart_flag_file:
-            log.info("Restart file not found. Entering Manual Reboot.")
+            action_str = "Reboot"
+            prompt_message = "Reboot the DUT. Press Enter when ready.\n"
+            if restore:
+                action_str = "Restore"
+                prompt_message = "Manually restore the DUT to it's original version. Please type Enter when its ready.\n"
+
+            log.info(f"Restart file not found. Entering Manual {action_str}.")
             # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
             # restore to the previous software version.
             self.controller.ExpireSessions(self.requestor_node_id)
-            self.wait_for_user_input(
-                prompt_msg="Manually restart the DUT and restore to it's original version. Please type Enter when its ready.")
+            self.wait_for_user_input(prompt_msg=prompt_message)
             # After manual reboot, expire previous sessions so that we can re-establish connections
-            log.info("Manual device reboot completed")
+            log.info(f"Manual device {action_str} completed")
 
         else:
             try:
@@ -342,7 +347,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 log.info("App restart completed successfully")
 
             except Exception as e:
-                log.error(f"Failed to restart Requestor: {e}")
                 asserts.fail(f"Requestor restart failed: {e}")
 
     async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
