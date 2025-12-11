@@ -28,7 +28,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 
-// Forward declaration of the callback to emulate ember initialization
 void MatterChimePluginServerInitCallback();
 // Stub for DataModelHandler init function
 void InitDataModelHandler() {}

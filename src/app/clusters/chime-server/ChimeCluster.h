@@ -18,8 +18,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/Chime/Attributes.h>
+#include <clusters/Chime/Commands.h>
+#include <clusters/Chime/Structs.h>
 
 namespace chip {
 namespace app {
@@ -64,11 +66,6 @@ public:
      */
     bool GetEnabled() const;
 
-    /**
-     * @return The endpoint ID.
-     */
-    EndpointId GetEndpointId() { return mPath.mEndpointId; }
-
     // Cluster constants from the spec
     static constexpr uint8_t kMaxChimeSoundNameSize = 48;
 
@@ -76,7 +73,6 @@ public:
      * @brief ServerClusterInterface methods.
      */
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 

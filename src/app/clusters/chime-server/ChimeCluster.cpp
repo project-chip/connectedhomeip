@@ -50,7 +50,6 @@ ChimeCluster::ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate) :
 
 ChimeCluster::~ChimeCluster()
 {
-    Shutdown();
     mDelegate.SetChimeCluster(nullptr);
 }
 
@@ -60,11 +59,6 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
 
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
-}
-
-void ChimeCluster::Shutdown()
-{
-    DefaultServerCluster::Shutdown();
 }
 
 CHIP_ERROR ChimeCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -90,7 +84,7 @@ void ChimeCluster::LoadPersistentAttributes()
     // Load Active Chime ID
     uint8_t storedSelectedChime = 0;
     CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(GetEndpointId(), Chime::Id, SelectedChime::Id), storedSelectedChime);
+        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id), storedSelectedChime);
     if (err == CHIP_NO_ERROR)
     {
         mSelectedChime = storedSelectedChime;
@@ -103,7 +97,7 @@ void ChimeCluster::LoadPersistentAttributes()
 
     // Load Enabled
     bool storedEnabled = false;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(GetEndpointId(), Chime::Id, Enabled::Id),
+    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id),
                                                                  storedEnabled);
     if (err == CHIP_NO_ERROR)
     {
@@ -274,10 +268,10 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
             status = mDelegate.PlayChimeSound();
         }
 
-        return DataModel::ActionReturnStatus(status);
+        return status;
     }
     default:
-        return DataModel::ActionReturnStatus(Status::UnsupportedCommand);
+        return Status::UnsupportedCommand;
     }
 }
 

@@ -26,16 +26,8 @@ using chip::app::Clusters::ChimeServer;
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate) {}
 
-ChimeServer::~ChimeServer()
-{
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
-}
-
 CHIP_ERROR ChimeServer::Init()
 {
-    // CodegenDataModelProvider::Instance() is a Meyer’s singleton so it's safe to call this here without worrying about
-    // intialization order. It's also OK to Register() the cluster in the provider even if the endpoint is not yet started up. It
-    // will be started up when the endpoint is started and a context is set.
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 
@@ -60,7 +52,10 @@ bool ChimeServer::GetEnabled() const
 }
 
 void MatterChimeClusterInitCallback(EndpointId endpointId) {}
-void MatterChimeClusterShutdownCallback(EndpointId endpointId) {}
+void MatterChimeClusterShutdownCallback(EndpointId endpointId)
+{
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+}
 
 // Stub callbacks for ZAP generated code
 void MatterChimePluginServerInitCallback() {}

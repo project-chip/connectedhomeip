@@ -25,6 +25,7 @@ source_set("chime-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/clusters/Chime",
   ]
 }

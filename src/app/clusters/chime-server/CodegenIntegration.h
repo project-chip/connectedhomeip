@@ -34,7 +34,6 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     ChimeServer(EndpointId endpointId, ChimeDelegate & delegate);
-    ~ChimeServer();
 
     /**
      * Register the chime cluster instance with the codegen data model provider.

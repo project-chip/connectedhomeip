@@ -8,7 +8,7 @@ available sounds and trigger them.
 
 This directory contains a code-driven C++ implementation of the Matter Chime
 cluster server. This implementation (`ChimeCluster.h`) is designed for
-flexibility, avoiding the tight coupling present in older ZAP/Ember based
+flexibility, avoiding the tight coupling present in older codegen-based
 implementations.
 
 It uses a delegate pattern (`chip::app::Clusters::ChimeDelegate`) to interact
@@ -34,8 +34,8 @@ public:
     {
         // Logic to return chime sound details by index
         if (chimeIndex == 0) {
-             chimeID = 1;
-             return chip::CopyCharSpanToMutableCharSpan(chip::CharSpan("Ding Dong", 9), name);
+            chimeID = 1;
+            return chip::CopyCharSpanToMutableCharSpan(chip::CharSpan("Ding Dong", 9), name);
         }
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
