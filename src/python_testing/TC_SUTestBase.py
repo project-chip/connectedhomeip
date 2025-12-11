@@ -16,6 +16,7 @@
 
 
 import logging
+import subprocess
 import tempfile
 from os import path
 from typing import Optional
@@ -156,7 +157,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             controller (ChipDeviceCtrl): Controller to write the providers.
             provider_node_id (int): Node where the provider is located.
             requestor_node_id (int): Node of the requestor to write the providers.
-            endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
+            endpoint (int, optional): Endpoint to write the providers. Defaults to 0.
         """
 
         current_otap_info = await self.read_single_attribute_check_success(
@@ -309,3 +310,22 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
+        """
+        Remove all temporary KVS files created.
+
+        OTA Provider/Requestor use "/tmp/chip_kvs" as the default KVS location when no --KVS is provided.
+        Tests may also specify custom prefixes such as "/tmp/chip_kvs_provider".
+
+        Args:
+            kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
+            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files.
+        """
+        # Do not allow relative paths or paths outside of /tmp/
+        real_kvs_path_prefix = path.realpath(kvs_path_prefix)
+        if not real_kvs_path_prefix.startswith('/tmp/'):
+            raise ValueError(
+                f"kvs_path_prefix must be an absolute path starting with /tmp/, but was: {kvs_path_prefix}")
+        subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
+        log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")

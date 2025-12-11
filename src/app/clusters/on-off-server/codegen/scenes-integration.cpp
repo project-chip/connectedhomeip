@@ -19,10 +19,10 @@
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/on-off-server/on-off-server.h>
-#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
-#include <app/clusters/scenes-server/CodegenEndpointToIndex.h> // nogncheck
-#include <app/clusters/scenes-server/scenes-server.h>          // nogncheck
+#include <app/clusters/on-off-server/on-off-server.h>                      // nogncheck
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h> // nogncheck
+#include <app/clusters/scenes-server/CodegenEndpointToIndex.h>             // nogncheck
+#include <app/clusters/scenes-server/scenes-server.h>                      // nogncheck
 
 using namespace chip;
 using namespace chip::app::Clusters;

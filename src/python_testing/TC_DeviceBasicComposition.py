@@ -87,7 +87,9 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
-#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     script-args:
+#       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: false
 #     quiet: true
 #   run10:
@@ -218,7 +220,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok,
@@ -300,7 +302,7 @@ def check_no_duplicates(obj: Any) -> None:
         raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
-class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
+class TC_DeviceBasicComposition(BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -717,19 +719,22 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         self.print_step(12, "Validate that event wildcard subscription works")
 
         test_failure = None
-        try:
-            subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
-                                                                   events=[('*')],
-                                                                   fabricFiltered=False,
-                                                                   reportInterval=(100, 1000))
-            if len(subscription.GetEvents()) == 0:
-                test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
-            # Connection over PASE will fail subscriptions with "Unsupported access"
-            # TODO: ideally we should SKIP this test for PASE connections
-            _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
-            if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
-                test_failure = f"Failed to wildcard subscribe events(*): {e}"
+        if self.test_from_file:
+            log.warning("Skipping check of event wildcards as this test is being run from an attribute file")
+        else:
+            try:
+                subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
+                                                                       events=[('*')],
+                                                                       fabricFiltered=False,
+                                                                       reportInterval=(100, 1000))
+                if len(subscription.GetEvents()) == 0:
+                    test_failure = 'Wildcard event subscription returned no events'
+            except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
+                # Connection over PASE will fail subscriptions with "Unsupported access"
+                # TODO: ideally we should SKIP this test for PASE connections
+                _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
+                if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
+                    test_failure = f"Failed to wildcard subscribe events(*): {e}"
 
         if test_failure:
             self.record_error(self.get_test_name(), problem=test_failure, location=UnknownProblemLocation())
