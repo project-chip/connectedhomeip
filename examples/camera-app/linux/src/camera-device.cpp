@@ -1571,20 +1571,22 @@ CameraError CameraDevice::UpdateZoneTrigger(const ZoneTriggerControlStruct & zon
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
+CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 {
 
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneId)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+    mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    mPushAVTransportManager.HandleZoneTrigger(zoneId);
 }
 
-void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
+void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
 {
-    mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+    mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
+    // Note: PushAVTransportManager doesn't need zone stopped event currently
 }
 
 void CameraDevice::InitializeVideoStreams()
@@ -1808,11 +1810,6 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
-}
-
-void CameraDevice::HandlePushAvZoneTrigger(uint16_t zoneId)
-{
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
 }
 
 size_t CameraDevice::GetPreRollBufferSize()
