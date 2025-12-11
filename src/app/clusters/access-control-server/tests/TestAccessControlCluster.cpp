@@ -42,7 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
 // Simple DeviceTypeResolver for tests
-class TestDeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+class TestDeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
 {
 public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
@@ -55,12 +55,12 @@ static TestDeviceTypeResolver gTestDeviceTypeResolver;
 // This mock captures the parameters passed to RequestFabricRestrictionReview
 // and allows tests to verify that the command handler correctly processes
 // the request and calls the provider with the expected data.
-class TestAccessRestrictionProvider : public chip::Access::AccessRestrictionProvider
+class TestAccessRestrictionProvider : public Access::AccessRestrictionProvider
 {
 public:
     // Override DoRequestFabricRestrictionReview to capture call parameters
     // and allow tests to control the return value.
-    CHIP_ERROR DoRequestFabricRestrictionReview(const chip::FabricIndex fabricIndex, uint64_t token,
+    CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token,
                                                 const std::vector<Entry> & arl) override
     {
         // Store the parameters passed to this method so tests can verify them
@@ -74,7 +74,7 @@ public:
     }
 
     // Test verification fields - these are populated when DoRequestFabricRestrictionReview is called
-    chip::FabricIndex mLastFabricIndex = chip::kUndefinedFabricIndex;
+    FabricIndex mLastFabricIndex = kUndefinedFabricIndex;
     uint64_t mLastToken                = 0;
     std::vector<Entry> mLastArl;
     size_t mRequestCount = 0;
@@ -88,15 +88,15 @@ struct TestAccessControlCluster : public ::testing::Test
 {
     static void SetUpTestSuite()
     {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         // Initialize AccessControl for reading mandatory attributes
-        chip::Access::AccessControl::Delegate * delegate = chip::Access::Examples::GetAccessControlDelegate();
-        ASSERT_EQ(chip::Access::GetAccessControl().Init(delegate, gTestDeviceTypeResolver), CHIP_NO_ERROR);
+        Access::AccessControl::Delegate * delegate = Access::Examples::GetAccessControlDelegate();
+        ASSERT_EQ(Access::GetAccessControl().Init(delegate, gTestDeviceTypeResolver), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
-        chip::Access::GetAccessControl().Finish();
-        chip::Platform::MemoryShutdown();
+        Access::GetAccessControl().Finish();
+        Platform::MemoryShutdown();
     }
 };
 
@@ -115,9 +115,9 @@ TEST_F(TestAccessControlCluster, CommandsTest)
     ASSERT_EQ(cluster.AcceptedCommands(accessControlPath, acceptedCommandsBuilder), CHIP_NO_ERROR);
     ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = acceptedCommandsBuilder.TakeBuffer();
 
-    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
+    ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
     ASSERT_EQ(cluster.GeneratedCommands(accessControlPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+    ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Check accepted commands
@@ -157,7 +157,7 @@ TEST_F(TestAccessControlCluster, AttributesTest)
     }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
 // Helper function to count elements in a decodable list
@@ -179,7 +179,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
 {
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -239,11 +239,11 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
     // This allows us to verify that the command handler correctly processes
     // the command and calls the provider with the expected parameters.
     TestAccessRestrictionProvider mockProvider;
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     // Initialize the cluster and tester
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Build a ReviewFabricRestrictions command request with ARL entries.
@@ -283,7 +283,7 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
 
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
+              Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_TRUE(mockProvider.mLastArl[0].restrictions[0].id.HasValue());
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].id.Value(), 0x0000u);
 }
@@ -293,10 +293,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_EmptyArl)
     // Test the case where an empty ARL list is sent.
     // According to the spec, an empty list means "review all restrictions" for the fabric.
     TestAccessRestrictionProvider mockProvider;
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create a request with an empty ARL list
@@ -319,10 +319,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries
     // This verifies that the command handler correctly processes and forwards
     // all entries to the AccessRestrictionProvider.
     TestAccessRestrictionProvider mockProvider;
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create an array of ARL entries for different endpoints and clusters
@@ -358,12 +358,12 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleEntries
     ASSERT_EQ(mockProvider.mLastArl[0].clusterId, 0x0006u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
+              Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[1].endpointNumber, 2u);
     ASSERT_EQ(mockProvider.mLastArl[1].clusterId, 0x0008u);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden);
+              Access::AccessRestrictionProvider::Type::kCommandForbidden);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestriction)
@@ -372,10 +372,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_WildcardRestric
     // A null ID means the restriction applies to all attributes/commands/events
     // of the specified type for the given cluster and endpoint.
     TestAccessRestrictionProvider mockProvider;
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create a request with a wildcard restriction
@@ -407,10 +407,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestric
     // Test the command with an ARL entry containing multiple restrictions.
     // A single entry can have multiple restrictions of different types.
     TestAccessRestrictionProvider mockProvider;
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create an entry with multiple restrictions
@@ -446,11 +446,11 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_MultipleRestric
     ASSERT_EQ(mockProvider.mLastArl.size(), 1u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions.size(), 3u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
+              Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[1].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
+              Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[2].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden);
+              Access::AccessRestrictionProvider::Type::kCommandForbidden);
 }
 
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
@@ -463,10 +463,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_ProviderError)
     // This simulates a failure scenario (e.g., provider unable to process the request)
     mockProvider.mReturnError = CHIP_ERROR_INTERNAL;
 
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create a valid request
@@ -489,10 +489,10 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
     // This verifies that the command handler correctly converts enum values
     // from the Matter data model to the internal AccessRestrictionProvider types.
     TestAccessRestrictionProvider mockProvider;
-    chip::Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
+    Access::GetAccessControl().SetAccessRestrictionProvider(&mockProvider);
 
     AccessControlCluster cluster;
-    chip::Testing::ClusterTester tester(cluster);
+    Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Create entries for each restriction type
@@ -537,13 +537,13 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
     ASSERT_TRUE(result.response.has_value());
     ASSERT_EQ(mockProvider.mLastArl.size(), 4u);
     ASSERT_EQ(mockProvider.mLastArl[0].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
+              Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
     ASSERT_EQ(mockProvider.mLastArl[1].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
+              Access::AccessRestrictionProvider::Type::kAttributeWriteForbidden);
     ASSERT_EQ(mockProvider.mLastArl[2].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kCommandForbidden);
+              Access::AccessRestrictionProvider::Type::kCommandForbidden);
     ASSERT_EQ(mockProvider.mLastArl[3].restrictions[0].restrictionType,
-              chip::Access::AccessRestrictionProvider::Type::kEventForbidden);
+              Access::AccessRestrictionProvider::Type::kEventForbidden);
 }
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
