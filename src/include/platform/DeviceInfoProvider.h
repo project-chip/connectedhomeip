@@ -65,7 +65,8 @@ public:
         Iterator() = default;
     };
 
-    struct DeviceInfoCapabilityMinimas {
+    struct DeviceInfoCapabilityMinimas
+    {
         uint16_t simultaneousInvocationsSupported;
         uint16_t simultaneousWritesSupported;
         uint16_t readPathsSupported;
