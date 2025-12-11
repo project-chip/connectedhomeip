@@ -314,6 +314,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
@@ -337,6 +339,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
                      --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -357,6 +361,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
                      --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -372,6 +378,8 @@ jobs:
               run: |
                   ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner matter_repl_python \
                      --exclude-tags MANUAL \
                      --exclude-tags FLAKY \
@@ -400,6 +408,8 @@ jobs:
               run: |
                   ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner matter_repl_python \
                      run \
                      --iterations 1 \
@@ -549,6 +559,8 @@ jobs:
               run: |
                   sudo ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
@@ -575,6 +587,8 @@ jobs:
               run: |
                   sudo ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
                      --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
