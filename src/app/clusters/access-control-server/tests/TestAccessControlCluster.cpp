@@ -183,13 +183,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -301,7 +301,6 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
     ASSERT_GT(result.response->token, 0u);
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
     ASSERT_EQ(mMockProvider.mLastArl.size(), 1u);
@@ -328,7 +327,6 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
     ASSERT_GT(result.response->token, 0u);
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
     ASSERT_EQ(mMockProvider.mLastArl.size(), 0u);
@@ -366,7 +364,6 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
     ASSERT_EQ(mMockProvider.mLastArl.size(), 2u);
     ASSERT_EQ(mMockProvider.mLastArl[0].endpointNumber, 1u);
@@ -405,7 +402,6 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
     ASSERT_EQ(mMockProvider.mLastArl.size(), 1u);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions.size(), 1u);
     ASSERT_FALSE(mMockProvider.mLastArl[0].restrictions[0].id.HasValue());
@@ -445,7 +441,6 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
     ASSERT_EQ(mMockProvider.mLastArl.size(), 1u);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions.size(), 3u);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions[0].restrictionType,
@@ -475,7 +470,8 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
 
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
-    ASSERT_FALSE(result.IsSuccess());
+    ASSERT_TRUE(result.status.has_value());
+    ASSERT_EQ(result.status->GetStatus(), CHIP_ERROR_INTERNAL);
     ASSERT_EQ(mMockProvider.mRequestCount, 1u);
 }
 
@@ -524,7 +520,6 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
     auto result = mTester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
 
     ASSERT_TRUE(result.IsSuccess());
-    ASSERT_TRUE(result.response.has_value());
     ASSERT_EQ(mMockProvider.mLastArl.size(), 4u);
     ASSERT_EQ(mMockProvider.mLastArl[0].restrictions[0].restrictionType,
               Access::AccessRestrictionProvider::Type::kAttributeAccessForbidden);
