@@ -88,21 +88,22 @@ public:
      */
     enum class Range : uint8_t
     {
-        kSDK        = 0x0,  ///< CHIP SDK errors.
-        kOS         = 0x1,  ///< Encapsulated OS errors, other than POSIX errno.
-        kPOSIX      = 0x2,  ///< Encapsulated POSIX errno values.
-        kLwIP       = 0x3,  ///< Encapsulated LwIP errors.
-        kOpenThread = 0x4,  ///< Encapsulated OpenThread errors.
-        kPlatform   = 0x80, ///< Platform-defined encapsulation.
-        kLastRange  = kOpenThread,
+        kSDK                     = 0x0,  ///< CHIP SDK errors.
+        kOS                      = 0x1,  ///< Encapsulated OS errors, other than POSIX errno.
+        kPOSIX                   = 0x2,  ///< Encapsulated POSIX errno values.
+        kLwIP                    = 0x3,  ///< Encapsulated LwIP errors.
+        kOpenThread              = 0x4,  ///< Encapsulated OpenThread errors.
+        kPlatform [[deprecated]] = 0x5,  ///< Platform-defined encapsulation.
+        kPlatformExtended        = 0x80, ///< Platform-defined encapsulation with 31-bit value.
+        kLastRange               = kPlatform,
     };
 
     /**
-     * The kPlatform value is a special range where the highest bit of the StorageType is set to
-     * indicate platform encapsulation. Platform encapsulated errors use all the lower 31 bits for
+     * The kPlatformExtended value is a special range where the highest bit of the StorageType is set
+     * to indicate platform encapsulation. Platform encapsulated errors use all the lower 31 bits for
      * the encapsulated value.
      */
-    static_assert(Range::kLastRange < Range::kPlatform, "The last range must be less than kPlatform");
+    static_assert(Range::kLastRange < Range::kPlatformExtended, "The last range must be less than kPlatformExtended");
 
     /**
      * Secondary classification of CHIP SDK errors (Range::kSDK).
@@ -259,35 +260,30 @@ public:
      */
     constexpr bool IsRange(Range range) const
     {
-        if (range == Range::kPlatform)
-            return IsPlatform();
+        if (range == Range::kPlatformExtended)
+            return mError & (1u << (kPlatformBit - 1));
         return range == static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
     }
-
-    /**
-     * Test whether @a error is an encapsulated platform error.
-     */
-    constexpr bool IsPlatform() const { return mError & (1u << (kPlatformBit - 1)); }
 
     /**
      * Get the Range to which the @a error belongs.
      */
     constexpr Range GetRange() const
     {
-        if (IsPlatform())
-            return Range::kPlatform;
+        if (mError & (1u << (kPlatformBit - 1)))
+            return Range::kPlatformExtended;
         return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
     }
 
     /**
      * Get the encapsulated value of an @a error.
      */
-    constexpr ValueType GetValue() const { return GetField<ValueType>(kValueStart, kValueLength, mError); }
-
-    /**
-     * Get the platform encapsulated value of an @a error.
-     */
-    constexpr ValueType GetPlatformValue() const { return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError); }
+    constexpr ValueType GetValue() const
+    {
+        if (mError & (1u << (kPlatformBit - 1)))
+            return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError);
+        return GetField<ValueType>(kValueStart, kValueLength, mError);
+    }
 
     /**
      * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
@@ -427,11 +423,11 @@ private:
 
     static constexpr StorageType MaskValue(Range range, ValueType value)
     {
-        // Mask value for every range except kPlatform range. The kPlatform range
-        // is special, because we are using only the highest bit to determine whether
-        // the range is kPlatform and the rest is used to store the value itself.
-        return (range != Range::kPlatform) ? (static_cast<StorageType>(value) & MakeMask(kValueStart, kValueLength))
-                                           : static_cast<StorageType>(value);
+        // Mask value for every range except kPlatformExtended range. The kPlatformExtended
+        // range is special, because we are using only the highest bit to determine whether
+        // the range is kPlatformExtended and the rest is used to store the value itself.
+        return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStart, kValueLength))
+                                                   : static_cast<StorageType>(value);
     }
 
     template <unsigned int START, unsigned int LENGTH>

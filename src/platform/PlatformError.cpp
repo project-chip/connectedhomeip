@@ -30,17 +30,17 @@ namespace Internal {
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 ::chip::ChipError MapPlatformError(int aError, std::source_location location)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, aError, location));
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatformExtended, aError, location));
 }
 #elif CHIP_CONFIG_ERROR_SOURCE
 ::chip::ChipError MapPlatformError(int aError, const char * file, unsigned int line)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, aError, file, line));
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatformExtended, aError, file, line));
 }
 #else
 ::chip::ChipError MapPlatformError(int aError)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, aError));
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatformExtended, aError));
 }
 #endif
 
@@ -97,7 +97,7 @@ void RegisterPlatformErrorFormatter()
 
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    if (err.IsRange(ChipError::Range::kPlatform))
+    if (err.IsRange(ChipError::Range::kPlatformExtended))
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
