@@ -934,21 +934,57 @@ void DefaultOTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::Ch
     driver->OTACommissioningCallback();
 }
 
+CHIP_ERROR DefaultOTARequestor::RegisterEventHandler(app::OTARequestorEventHandler * eventHandler)
+{
+    VerifyOrReturnError(eventHandler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
+    {
+        if (!mEventHandlers[i])
+        {
+            mEventHandlers[i] = eventHandler;
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR DefaultOTARequestor::UnregisterEventHandler(app::OTARequestorEventHandler * eventHandler)
+{
+    VerifyOrReturnError(eventHandler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
+    {
+        if (mEventHandlers[i] == eventHandler)
+        {
+            mEventHandlers[i] = nullptr;
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 void DefaultOTARequestor::SendStateTransitionEvent(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState,
                                                    OTAChangeReasonEnum reason,
                                                    DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
 {
-    for (auto iterator = mEventHandlers.begin(); iterator != mEventHandlers.end(); ++iterator)
+    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
     {
-        iterator->eventHandler->OnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+        if (mEventHandlers[i])
+        {
+            mEventHandlers[i]->OnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+        }
     }
 }
 
 void DefaultOTARequestor::SendVersionAppliedEvent(uint32_t softwareVersion, uint16_t productId)
 {
-    for (auto iterator = mEventHandlers.begin(); iterator != mEventHandlers.end(); ++iterator)
+    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
     {
-        iterator->eventHandler->OnVersionApplied(softwareVersion, productId);
+        if (mEventHandlers[i])
+        {
+            mEventHandlers[i]->OnVersionApplied(softwareVersion, productId);
+        }
     }
 }
 
@@ -956,9 +992,12 @@ void DefaultOTARequestor::SendDownloadErrorEvent(uint32_t softwareVersion, uint6
                                                  DataModel::Nullable<uint8_t> progressPercent,
                                                  DataModel::Nullable<int64_t> platformCode)
 {
-    for (auto iterator = mEventHandlers.begin(); iterator != mEventHandlers.end(); ++iterator)
+    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
     {
-        iterator->eventHandler->OnDownloadError(softwareVersion, bytesDownloaded, progressPercent, platformCode);
+        if (mEventHandlers[i])
+        {
+            mEventHandlers[i]->OnDownloadError(softwareVersion, bytesDownloaded, progressPercent, platformCode);
+        }
     }
 }
 

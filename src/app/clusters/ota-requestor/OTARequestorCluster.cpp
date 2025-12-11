@@ -38,8 +38,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 } // namespace
 
 OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
-    mEventHandlerRegistration(*this, endpointId), mOtaRequestor(otaRequestor)
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor)
 {}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
@@ -51,7 +50,7 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     if (mOtaRequestor)
     {
-        return mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration);
+        return mOtaRequestor->RegisterEventHandler(this);
     }
     return CHIP_NO_ERROR;
 }
@@ -60,7 +59,7 @@ void OTARequestorCluster::Shutdown()
 {
     if (mOtaRequestor)
     {
-        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId), SoftwareUpdate,
+        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(this), SoftwareUpdate,
                      "Unable to unregister event handling for endpoint %u during shutdown", mPath.mEndpointId);
     }
     DefaultServerCluster::Shutdown();
@@ -221,13 +220,13 @@ void OTARequestorCluster::SetOtaRequestor(OTARequestorInterface * otaRequestor)
 {
     if (mOtaRequestor)
     {
-        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId), SoftwareUpdate,
+        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(this), SoftwareUpdate,
                      "Unable to unregister event handling for endpoint %u before changing requestor", mPath.mEndpointId);
     }
     mOtaRequestor = otaRequestor;
     if (mOtaRequestor)
     {
-        SuccessOrLog(mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration), SoftwareUpdate,
+        SuccessOrLog(mOtaRequestor->RegisterEventHandler(this), SoftwareUpdate,
                      "Unable to register event handling for endpoint %u after changing requestor", mPath.mEndpointId);
     }
 }

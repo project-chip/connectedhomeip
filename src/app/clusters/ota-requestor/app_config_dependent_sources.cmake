@@ -39,8 +39,6 @@ TARGET_SOURCES(
   "${CLUSTER_DIR}/OTARequestorCluster.cpp"
   "${CLUSTER_DIR}/OTARequestorCluster.h"
   "${CLUSTER_DIR}/OTARequestorEventHandler.h"
-  "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.cpp"
-  "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.h"
 )
 
 # This is equivalent to BUILD.gn's interface source set.

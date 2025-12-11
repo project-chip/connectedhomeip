@@ -37,7 +37,12 @@ namespace chip {
 class DefaultOTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    DefaultOTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+    DefaultOTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {
+        for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
+        {
+            mEventHandlers[i] = nullptr;
+        }
+    }
 
     //////////// OTARequestorInterface Implementation ///////////////
     void Reset(void) override;
@@ -103,13 +108,10 @@ public:
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
 
     // Register a handler for generated cluster events
-    CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandlerRegistration & eventHandler) override
-    {
-        return mEventHandlers.Register(eventHandler);
-    }
+    CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandler * eventHandler) override;
 
     // Unregister a previously-registered event handler
-    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override { return mEventHandlers.Unregister(endpointId); }
+    CHIP_ERROR UnregisterEventHandler(app::OTARequestorEventHandler * eventHandler) override;
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -365,7 +367,7 @@ private:
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
-    app::OTARequestorEventHandlerRegistry mEventHandlers;
+    app::OTARequestorEventHandler * mEventHandlers[CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS];
 };
 
 } // namespace chip

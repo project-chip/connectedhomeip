@@ -90,11 +90,18 @@ public:
         return mProviderLocations.Add(providerLocation);
     }
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator() override { return mProviderLocations.Begin(); }
-    CHIP_ERROR RegisterEventHandler(OTARequestorEventHandlerRegistration & eventHandler) override
+    CHIP_ERROR RegisterEventHandler(OTARequestorEventHandlerRegistration * eventHandler) override
     {
-        return mEventHandlerRegistry.Register(eventHandler);
+        VerifyOrReturnError(mEventHandler == nullptr, CHIP_ERROR_NO_MEMORY);
+        mEventHandler = eventHandler;
+        return CHIP_NO_ERROR;
     }
-    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override { return mEventHandlerRegistry.Unregister(endpointId); }
+    CHIP_ERROR UnregisterEventHandler(OTARequestorEventHandlerRegistration * eventHandler) override
+    {
+        VerifyOrReturnError(mEventHandler == eventHandler, CHIP_ERROR_NOT_FOUND);
+        mEventHandler = nullptr;
+        return CHIP_NO_ERROR;
+    }
 
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
     {
@@ -109,7 +116,7 @@ private:
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
     ProviderLocationList mProviderLocations;
     DataModel::Nullable<uint8_t> mUpdateStateProgress;
-    OTARequestorEventHandlerRegistry mEventHandlerRegistry;
+    OTARequestorEventHandler * mEventHandler = nullptr;
 };
 
 struct TestOTARequestorCluster : public ::testing::Test

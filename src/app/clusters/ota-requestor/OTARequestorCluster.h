@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTARequestorEventHandler.h>
-#include <app/clusters/ota-requestor/OTARequestorEventHandlerRegistry.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
@@ -67,7 +66,6 @@ public:
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
-    OTARequestorEventHandlerRegistration mEventHandlerRegistration;
     OTARequestorInterface * mOtaRequestor = nullptr;
     bool mUpdatePossible                  = true;
 };

@@ -20,8 +20,6 @@ source_set("ota-requestor") {
     "OTARequestorCluster.cpp",
     "OTARequestorCluster.h",
     "OTARequestorEventHandler.h",
-    "OTARequestorEventHandlerRegistry.cpp",
-    "OTARequestorEventHandlerRegistry.h",
   ]
 
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
