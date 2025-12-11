@@ -46,7 +46,7 @@ Alchemy: v1.6.5
     <item fieldId="5" name="Confidence" type="percent"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>Measurement &amp; Sensing</domain>
     <name>Ambient Context Sensing</name>
     <code>0x0431</code>
