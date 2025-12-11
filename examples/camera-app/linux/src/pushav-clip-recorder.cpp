@@ -670,7 +670,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             ChipLogProgress(Camera, "Setting up audio-only stream, skipping input format initialization");
         }
 
-        if (SetupOutput(mUploadFileBasePath , initSegName, mediaSegName) < 0)
+        if (SetupOutput(mUploadFileBasePath, initSegName, mediaSegName) < 0)
         {
             ChipLogError(Camera, "Error: setting up output");
             return -1;
