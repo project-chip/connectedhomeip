@@ -464,8 +464,7 @@ class SubscriptionTransaction:
 
         if (self._readTransaction._cache.returnClusterObject):
             return eval(f'data[path.Path.EndpointId][path.ClusterType].{path.AttributeName}')
-        else:
-            return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
+        return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
 
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
@@ -678,7 +677,7 @@ def _BuildEventIndex():
     for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
         if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Events' == objName)):
+                if inspect.isclass(subclass) and objName == "Events":
                     for eventName, event in inspect.getmembers(subclass):
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)

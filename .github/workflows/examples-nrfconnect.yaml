@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:174
+            image: ghcr.io/project-chip/chip-build-nrf-platform:177
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -68,6 +68,8 @@ jobs:
                         - '**/tests/**'
                       shell:
                         - 'examples/shell/nrfconnect/**'
+                      crypto:
+                        - 'src/crypto/**'
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
@@ -162,7 +164,8 @@ jobs:
                 github.event_name == 'push' ||
                 steps.changed_paths.outputs.tests == 'true' ||
                 steps.changed_paths.outputs.nrfconnect == 'true' ||
-                steps.changed_paths.outputs.pigweed == 'true'
+                steps.changed_paths.outputs.pigweed == 'true' ||
+                steps.changed_paths.outputs.crypto == 'true'
               run: |
                   scripts/run_in_build_env.sh "source $ZEPHYR_BASE/zephyr-env.sh && pip3 install -r scripts/setup/requirements.build.txt && ./scripts/build/build_examples.py --target nrf-native-sim-tests build"
             - name: Uploading Failed Test Logs

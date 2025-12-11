@@ -438,8 +438,6 @@ typedef struct wfx_rsi_s
     uint16_t ap_chan; /* The chan our STA is using	*/
     chip::DeviceLayer::Silabs::WifiInterface::WifiCredentials credentials;
     ScanCallback scan_cb;
-    uint8_t * scan_ssid; /* Which one are we scanning for */
-    size_t scan_ssid_length;
 #ifdef SL_WFX_CONFIG_SOFTAP
     chip::DeviceLayer::Silabs::WifiInterface::MacAddress softap_mac;
 #endif

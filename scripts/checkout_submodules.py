@@ -22,6 +22,8 @@ import os
 import subprocess
 from collections import namedtuple
 
+log = logging.getLogger(__name__)
+
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 ALL_PLATFORMS = {
@@ -102,15 +104,14 @@ def make_chip_root_safe_directory() -> None:
         config.check_returncode()
         existing = config.stdout.split('\0')
     if CHIP_ROOT not in existing:
-        logging.info(
-            "Adding CHIP_ROOT to global git safe.directory configuration")
+        log.info("Adding CHIP_ROOT to global git safe.directory configuration")
         subprocess.check_call(
             ['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
 
 
 def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool, jobs: int) -> None:
     names = ', '.join([module.name for module in modules])
-    logging.info(f'Checking out: {names}')
+    log.info("Checking out '%s'", names)
 
     cmd = ['git', '-c', 'core.symlinks=true', '-C', CHIP_ROOT]
     cmd += ['submodule', '--quiet', 'update', '--init']
@@ -137,7 +138,7 @@ def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool,
 
 def deinit_modules(modules: list, force: bool) -> None:
     names = ', '.join([module.name for module in modules])
-    logging.info(f'Deinitializing: {names}')
+    log.info("Deinitializing: '%s'", names)
 
     cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'deinit']
     cmd += ['--force'] if force else []

@@ -66,7 +66,7 @@ uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
 
 TestPersistentStorageDelegate gStorageDelegate;
 
-class TestWriteChunking : public Test::AppContext
+class TestWriteChunking : public chip::Testing::AppContext
 {
 private:
     using PathStatus = std::pair<app::ConcreteAttributePath, bool>;

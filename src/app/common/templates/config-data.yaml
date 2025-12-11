@@ -29,6 +29,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Administrator Commissioning
     - Basic Information
     - Boolean State
+    - Boolean State Configuration
     - Camera AV Settings User Level Management
     - Camera AV Stream Management
     - Chime
@@ -64,6 +65,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
+    - Power Topology
     - Push AV Stream Transport
     - RVC Clean Mode
     - RVC Operational State
@@ -97,7 +99,6 @@ ClustersWithInitFunctions:
     - Groups
     - Level Control
     - Mode Select
-    - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
@@ -146,23 +147,31 @@ ClustersWithPreAttributeChangeFunctions:
 CodeDrivenClusters:
     # keep-sorted start
     - Access Control
+    - Activated Carbon Filter Monitoring
     - Administrator Commissioning
     - Basic Information
     - Binding
     - Boolean State
+    - Boolean State Configuration
+    - Chime
     - Descriptor
+    - Device Energy Management
     - Diagnostic Logs
+    - Electrical Power Measurement
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - HEPA Filter Monitoring
     - ICD Management
     - Identify
     - Localization Configuration
     - OTA Software Update Provider
+    - Occupancy Sensing
     - Operational Credentials
+    - Power Topology
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization

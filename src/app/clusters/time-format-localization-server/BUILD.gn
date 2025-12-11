@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("time-format-localization-server") {
   sources = [
-    "time-format-localization-cluster.cpp",
-    "time-format-localization-cluster.h",
+    "TimeFormatLocalizationCluster.cpp",
+    "TimeFormatLocalizationCluster.h",
   ]
 
   public_deps = [
