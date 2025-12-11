@@ -201,7 +201,7 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
     DeviceInfoProvider::DeviceInfoCapabilityMinimas capabilityMinimasFromDeviceInfo = deviceInfoProvider->GetSupportedCapabilityMinimaValues();
-    
+
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
     capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
     capabilityMinima.simultaneousInvocationsSupported =
