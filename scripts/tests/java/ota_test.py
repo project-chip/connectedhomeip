@@ -123,4 +123,4 @@ class OTATest:
                 raise RuntimeError("OTA content is not matching as the original file")
 
         else:
-            raise RuntimeError(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

@@ -112,8 +112,8 @@ def check_if_coverage_tools_detected():
             missing.append(tool)
 
     if missing:
-        raise FileNotFoundError("Following required coverage packages not found: " + ", ".join(missing) +
-                                "\nPlease either install them or source the correct environment")
+        raise RuntimeError("Following required coverage packages not found: " + ", ".join(missing) +
+                           "\nPlease either install them or source the correct environment")
 
 
 def run_fuzz_test(context):
