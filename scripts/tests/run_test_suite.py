@@ -61,6 +61,7 @@ class RunContext:
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
     runtime: TestRunTime
+    find_path: typing.List[str]
 
     # If not empty, include only the specified test tags
     include_tags: set(TestTag) = field(default_factory={})
@@ -120,13 +121,18 @@ class RunContext:
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--find-path',
+    default=[DEFAULT_CHIP_ROOT],
+    multiple=True,
+    help='Default directory path for finding compiled apps and tools.')
+@click.option(
     '--runner',
     type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.pass_context
 def main(context, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, runner):
+         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, find_path, runner):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -198,6 +204,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
                              runtime=runtime,
+                             find_path=find_path,
                              include_tags=include_tags,
                              exclude_tags=exclude_tags)
 
@@ -280,7 +287,7 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
-    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder())
+    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
     for p in app_path:
         try:

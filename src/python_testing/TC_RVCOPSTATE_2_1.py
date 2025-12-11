@@ -45,6 +45,8 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
@@ -60,7 +62,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         self.print_step(step, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
+        log.info("OperationalState: %s" % (operational_state))
         asserts.assert_equal(operational_state, expected_state,
                              "OperationalState(%s) should equal %s" % (operational_state, expected_state))
 
@@ -68,7 +70,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         self.print_step(step, "Read OperationalError attribute")
         operational_error = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalError)
-        logging.info("OperationalError: %s" % (operational_error))
+        log.info("OperationalError: %s" % (operational_error))
         asserts.assert_equal(operational_error.errorStateID, expected_error,
                              "errorStateID(%s) should equal %s" % (operational_error.errorStateID, expected_error))
 
@@ -104,9 +106,9 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             phase_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.PhaseList)
 
             if phase_list == NullValue:
-                logging.info("PhaseList is null")
+                log.info("PhaseList is null")
             else:
-                logging.info("PhaseList: %s" % (phase_list))
+                log.info("PhaseList: %s" % (phase_list))
 
                 phase_list_len = len(phase_list)
 
@@ -115,7 +117,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.CurrentPhase):
             self.print_step(3, "Read CurrentPhase attribute")
             current_phase = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentPhase)
-            logging.info("CurrentPhase: %s" % (current_phase))
+            log.info("CurrentPhase: %s" % (current_phase))
 
             if phase_list == NullValue:
                 asserts.assert_true(current_phase == NullValue, "CurrentPhase(%s) should be null" % current_phase)
@@ -128,7 +130,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                           attribute=attributes.CountdownTime)
 
-            logging.info("CountdownTime: %s" % (countdown_time))
+            log.info("CountdownTime: %s" % (countdown_time))
             if countdown_time is not NullValue:
                 asserts.assert_true(countdown_time >= 0 and countdown_time <= 259200,
                                     "CountdownTime(%s) must be between 0 and 259200" % countdown_time)
@@ -138,7 +140,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             operational_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.OperationalStateList)
 
-            logging.info("OperationalStateList: %s" % (operational_state_list))
+            log.info("OperationalStateList: %s" % (operational_state_list))
 
             defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                               if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
@@ -161,7 +163,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                              attribute=attributes.OperationalState)
 
-            logging.info("OperationalState: %s" % (operational_state))
+            log.info("OperationalState: %s" % (operational_state))
 
             in_range = 0x80 <= operational_state <= 0xBF
             asserts.assert_true(operational_state in defined_states or in_range, "OperationalState has an invalid ID value!")
@@ -270,7 +272,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             operational_error = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                              attribute=attributes.OperationalError)
 
-            logging.info("OperationalError: %s" % (operational_error))
+            log.info("OperationalError: %s" % (operational_error))
 
             # Defined Errors
             defined_errors = [error.value for error in Clusters.OperationalState.Enums.ErrorStateEnum

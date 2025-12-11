@@ -157,7 +157,7 @@ class App:
         """
         Wait for all provided pattern strings to appear in the process output pipe (capture log).
         """
-        logging.debug('Waiting for all patterns %r', patterns)
+        log.debug('Waiting for all patterns %r', patterns)
 
         start_time = time.monotonic()
 
@@ -175,7 +175,7 @@ class App:
         while lastLogIndex is None:
             if self.process.poll() is not None:
                 died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
-                logging.error(died_str)
+                log.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
                 raise Exception(f'Timeout while waiting for {patterns!r}')
@@ -184,7 +184,7 @@ class App:
             lastLogIndex = allPatternsFound()
 
         self.lastLogIndex = lastLogIndex + 1
-        logging.debug('Success waiting for: %r', patterns)
+        log.debug('Success waiting for: %r', patterns)
 
     def __updateSetUpCode(self):
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
