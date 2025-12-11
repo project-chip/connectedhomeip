@@ -31,7 +31,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
     }
 
-    for (const auto [attr, migrator] : attributes)
+    for (const auto & [attr, migrator] : attributes)
     {
         // We make a copy of the buffer so it can be resized
         // Still refers to same internal buffer though
