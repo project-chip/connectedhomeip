@@ -71,7 +71,7 @@ void MatterUserLabelClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
+void MatterUserLabelClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -82,7 +82,7 @@ void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kUserLabelFixedClusterCount,
             .maxClusterInstanceCount   = kUserLabelMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterUserLabelPluginServerInitCallback() {}

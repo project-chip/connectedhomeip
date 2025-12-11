@@ -42,7 +42,7 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(fixedLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { fixedLabel.Shutdown(); }
+    void TearDown() override { fixedLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
 

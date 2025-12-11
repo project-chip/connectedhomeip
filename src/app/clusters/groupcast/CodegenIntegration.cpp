@@ -83,7 +83,7 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrDie(endpointId == chip::kRootEndpointId);
 
@@ -96,7 +96,7 @@ void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId)
             .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGroupcastPluginServerInitCallback() {}

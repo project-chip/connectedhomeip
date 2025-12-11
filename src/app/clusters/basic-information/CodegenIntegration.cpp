@@ -88,7 +88,7 @@ void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId)
+void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -101,7 +101,7 @@ void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterBasicInformationPluginServerInitCallback() {}

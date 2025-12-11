@@ -88,7 +88,7 @@ struct TestResourceMonitoringCluster : public ::testing::Test
     void TearDown() override
     {
         app::SetSafeAttributePersistenceProvider(oldPersistence);
-        activatedCarbonFilterMonitoring.Shutdown();
+        activatedCarbonFilterMonitoring.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     chip::Testing::TestServerClusterContext testContext;

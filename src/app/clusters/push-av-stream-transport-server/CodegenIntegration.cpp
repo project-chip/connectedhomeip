@@ -87,7 +87,7 @@ void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -98,7 +98,7 @@ void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
             .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterPushAvStreamTransportPluginServerInitCallback() {}

@@ -27,6 +27,7 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
+#include <app/util/generic-callbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CommonIterator.h>
@@ -1157,7 +1158,7 @@ void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
     uint16_t endpointTableSize = 0;
     VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
 
-    // Get Scene Table Instance
+    // TODO: only do this in case of permanent shutdown
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
     TEMPORARY_RETURN_IGNORED sceneTable->RemoveEndpoint();
 }

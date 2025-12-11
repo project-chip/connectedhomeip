@@ -304,7 +304,8 @@ void CameraApp::ShutdownCameraDeviceClusters()
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
     mAVSettingsUserLevelMgmtServerPtr->Shutdown();
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster(),
+                                                                                ClusterShutdownType::kClusterShutdown);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "WebRTCTransportProvider unregister error: %" CHIP_ERROR_FORMAT, err.Format());

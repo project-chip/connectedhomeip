@@ -364,11 +364,11 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void TimeSynchronizationCluster::Shutdown()
+void TimeSynchronizationCluster::Shutdown(ClusterShutdownType type)
 {
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(type);
 }
 
 void TimeSynchronizationCluster::AttemptToGetFallbackNTPTimeFromDelegate()

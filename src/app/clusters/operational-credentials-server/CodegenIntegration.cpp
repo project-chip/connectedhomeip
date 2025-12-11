@@ -79,7 +79,7 @@ void MatterOperationalCredentialsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId)
+void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
@@ -89,7 +89,7 @@ void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterOperationalCredentialsPluginServerInitCallback() {}

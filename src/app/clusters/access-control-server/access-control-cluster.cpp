@@ -440,7 +440,7 @@ CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void AccessControlCluster::Shutdown()
+void AccessControlCluster::Shutdown(ClusterShutdownType type)
 {
     ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
 
@@ -453,7 +453,7 @@ void AccessControlCluster::Shutdown()
 #endif
 
     GetAccessControl().RemoveEntryListener(*this);
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(type);
 }
 
 DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

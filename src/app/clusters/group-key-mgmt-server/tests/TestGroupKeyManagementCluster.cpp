@@ -154,7 +154,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
     void TearDown() override
     {
         tester.SetFabricIndex(kUndefinedFabricIndex);
-        mCluster.Shutdown();
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         Credentials::SetGroupDataProvider(nullptr);
         mRealProvider.Finish();
     }

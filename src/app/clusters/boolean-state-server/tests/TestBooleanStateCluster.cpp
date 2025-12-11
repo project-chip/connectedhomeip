@@ -42,7 +42,7 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(booleanState.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { booleanState.Shutdown(); }
+    void TearDown() override { booleanState.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestBooleanStateCluster() : booleanState(kRootEndpointId) {}
 

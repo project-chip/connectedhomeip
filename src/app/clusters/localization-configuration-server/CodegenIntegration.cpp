@@ -80,7 +80,7 @@ void MatterLocalizationConfigurationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId)
+void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
@@ -91,5 +91,5 @@ void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointI
                 static_cast<uint16_t>(LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size()),
             .maxClusterInstanceCount = 1, // only root-node functionality supported by this implementation
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
