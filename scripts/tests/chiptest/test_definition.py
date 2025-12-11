@@ -87,7 +87,7 @@ class App:
             ok = self.__terminateProcess()
             if not ok:
                 # For now just raise an exception; no other way to get tests to fail in this situation.
-                raise Exception('Stopped subprocess terminated abnormally')
+                raise RuntimeError('Stopped subprocess terminated abnormally')
             return True
         return False
 
@@ -174,9 +174,9 @@ class App:
             if self.process.poll() is not None:
                 died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
                 log.error(died_str)
-                raise Exception(died_str)
+                raise RuntimeError(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception(f'Timeout while waiting for {patterns!r}')
+                raise TimeoutError(f'Timeout while waiting for {patterns!r}')
             time.sleep(0.1)
 
             lastLogIndex = allPatternsFound()
@@ -187,7 +187,7 @@ class App:
     def __updateSetUpCode(self):
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
         if not qrLine:
-            raise Exception("Unable to find QR code")
+            raise RuntimeError("Unable to find QR code")
         self.setupCode = qrLine.group(1)
 
     def __terminateProcess(self):
@@ -344,7 +344,7 @@ class TestTag(Enum):
         for (k, v) in TestTag.__members__.items():
             if self == v:
                 return k
-        raise Exception("Unknown tag: %r" % self)
+        raise KeyError(f"Unknown tag: {self!r}")
 
 
 class TestRunTime(Enum):
@@ -418,8 +418,7 @@ class TestDefinition:
             elif self.target == TestTarget.CLOSURE:
                 target_app = apps.closure_app
             else:
-                raise Exception("Unknown test target - "
-                                "don't know which application to run")
+                raise KeyError("Unknown test target - don't know which application to run")
 
             if not dry_run:
                 for command, key in apps.items_with_key():
@@ -518,7 +517,7 @@ class TestDefinition:
                         name='TEST', dependencies=[apps_register],
                         timeout_seconds=timeout_seconds)
 
-        except Exception:
+        except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
             loggedCapturedLogs = True
@@ -534,4 +533,4 @@ class TestDefinition:
             if not ok and not loggedCapturedLogs:
                 log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
                 runner.capture_delegate.LogContents()
-                raise Exception('Subprocess terminated abnormally')
+                raise RuntimeError('Subprocess terminated abnormally')

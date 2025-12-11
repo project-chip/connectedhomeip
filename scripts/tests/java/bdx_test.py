@@ -85,6 +85,6 @@ class BDXTest:
             code = self.TestCmdOnnetworkLongBDXDownloadLog(
                 self.nodeid, self.setup_pin_code, self.discriminator, self.timeout, self.logType, self.fileName)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-downloadLog failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-downloadLog failed with error {code}")
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise RuntimeError(f"Unsupported command {self.command_name}")
