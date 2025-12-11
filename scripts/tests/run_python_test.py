@@ -382,7 +382,7 @@ def monitor_app_restart_requests(
                 with app_manager_lock:
                     new_app_manager.start()
                     app_manager_ref[0] = new_app_manager
-                    logging.info("App restart completed")
+                    log.info("App restart completed")
             time.sleep(0.5)
         except Exception as e:
             log.error("Error in app restart monitor: %r", e)
