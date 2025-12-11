@@ -133,7 +133,7 @@ constexpr Nullable<T> MakeNullable(Args &&... args)
 /// Converts a DataModel::Nullable<T> to its storage representation.
 template <typename T>
 static constexpr void NullableToStorage(const DataModel::Nullable<T> & nullable,
-                                typename NumericAttributeTraits<T>::StorageType & storage)
+                                        typename NumericAttributeTraits<T>::StorageType & storage)
 {
     if (nullable.IsNull())
     {
