@@ -139,7 +139,7 @@ app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
-extern char baseServiceInstanceName[];
+extern const char sBaseServiceInstanceName[];
 #endif
 
 #ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
@@ -500,7 +500,7 @@ void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
                                                                                   Server::GetInstance().GetFailSafeContext());
 
         // Initialize TBR name
-        CharSpan brName(baseServiceInstanceName, strlen(baseServiceInstanceName));
+        CharSpan brName(sBaseServiceInstanceName, strlen(sBaseServiceInstanceName));
         sThreadBRDelegate.SetThreadBorderRouterName(brName);
         // Initialize TBR cluster
         TEMPORARY_RETURN_IGNORED sThreadBRMgmtInstance.Init();

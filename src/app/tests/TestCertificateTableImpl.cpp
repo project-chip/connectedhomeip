@@ -26,7 +26,7 @@
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app::DataModel;
 using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
