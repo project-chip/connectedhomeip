@@ -98,7 +98,7 @@ chip::PersistentStorageOperationalKeystore TestAdministratorCommissioningCluster
 chip::TestPersistentStorageDelegate TestAdministratorCommissioningCluster::sStorageDelegate;
 chip::Testing::EmptyProvider TestAdministratorCommissioningCluster::sEmptyProvider;
 
-const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
+const chip::FabricIndex kTestFabricIndex = chip::Testing::kTestFabrixIndex;
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
