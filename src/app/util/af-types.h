@@ -245,6 +245,12 @@ struct EmberAfDefinedEndpoint
 #endif
 };
 
+enum class MatterClusterShutdownType
+{
+    kClusterShutdown, // "normal" shutdown, e.g. application stop. Perform cleanups like: timer and delegate cleanup.
+    kPermanentRemove, // full "remove", generally for bridged devices.
+};
+
 /**
  * @brief Type for referring to the tick callback for cluster.
  *

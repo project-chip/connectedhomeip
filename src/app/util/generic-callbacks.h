@@ -149,12 +149,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
-enum class MatterClusterShutdownType
-{
-    kClusterShutdown, // "normal" shutdown, e.g. application stop. Perform cleanups like: timer and delegate cleanup.
-    kPermanentRemove, // full "remove", generally for bridged devices.
-};
-
 /**
  * Mark the given cluster as being shut down (i.e. not active anymore)
  *

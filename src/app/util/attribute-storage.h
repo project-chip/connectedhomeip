@@ -309,7 +309,19 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::Endpoin
                                                    chip::CharSpan endpointUniqueId                    = {},
                                                    chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 
-chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
+/// Free the given dynamic endpoint index.
+///
+/// The given endpoint index will be shut down and marked as not valid anymore.
+///
+/// `index` represents the 0-based index of the dynamic endpoints (i.e. the offset from
+/// FIXED_ENDPOINT_COUNT). Use `emberAfGetDynamicIndexFromEndpoint` to convert an endpoinid
+/// to an index.
+///
+/// Note that default shutdown type here is `assume endpoint removal` so clusters
+/// are free to clear any persistent data.
+chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index,
+                                             MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kPermanentRemove);
+
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
  * @brief Loads attribute defaults and any non-volatile attributes stored
