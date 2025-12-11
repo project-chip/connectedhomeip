@@ -33,6 +33,8 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     mConnectionID    = connectionID;
     mTransportStatus = TransportStatusEnum::kInactive;
     mActivationTimeSetByManualTrigger = false;
+    mRecordingTriggerByManual = false;
+    mIsZoneBasedTrigger = false;
 
     auto now               = std::chrono::system_clock::now();
     std::time_t time_t_now = std::chrono::system_clock::to_time_t(now);
@@ -309,7 +311,7 @@ bool PushAVTransport::HandleTriggerDetected()
     int64_t elapsed = 0;
     auto now        = std::chrono::steady_clock::now();
 
-    if (mTransportTriggerType != TransportTriggerTypeEnum::kCommand && InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS))
+    if (!mRecordingTriggerByManual && mIsZoneBasedTrigger && mTransportTriggerType != TransportTriggerTypeEnum::kCommand && InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS))
     {
         return false;
     }
@@ -333,6 +335,14 @@ bool PushAVTransport::HandleTriggerDetected()
 
         mRecorder->Start();
         mStreaming = true;
+        if (mIsZoneBasedTrigger)
+        {
+            mRecordingTriggerByManual = false;
+        }
+        else
+        {
+            mRecordingTriggerByManual = true;
+        }
     }
     else
     {
@@ -360,6 +370,7 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
 {
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneId: [%d], Sensitivity: [%d]",
                     (uint16_t) activationReason, zoneId, sensitivity);
+    mIsZoneBasedTrigger = isZoneBasedTrigger;
     if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
     {
         mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType, chip::MakeOptional(activationReason));
