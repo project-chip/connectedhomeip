@@ -120,11 +120,22 @@ CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode 
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(node);
+
     if (timeout == Milliseconds32(0))
     {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // In host unit tests with mock timers, use synchronous execution for backward
+        // compatibility since mock timers require manual clock advancement.
         node->TimerFired();
         return CHIP_NO_ERROR;
+#else
+        // On real platforms, use kMinScheduleDelay to ensure the report runs asynchronously.
+        // This prevents reports from being generated with incomplete state during multi-step
+        // operations (e.g., dynamic endpoint addition).
+        timeout = kMinScheduleDelay;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     }
+
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(node, timeout));
 
     return CHIP_NO_ERROR;

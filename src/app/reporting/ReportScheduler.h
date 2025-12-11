@@ -208,6 +208,10 @@ public:
 protected:
     friend class chip::app::reporting::TestReportScheduler;
 
+    /// Minimum delay to use when scheduling an "immediate" report asynchronously.
+    /// 1ms is the minimum practical delay that ensures proper async scheduling across platforms.
+    static constexpr System::Clock::Timeout kMinScheduleDelay = System::Clock::Milliseconds32(1);
+
     /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
     /// @param [in] aReadHandler ReadHandler pointer to look for in the ReadHandler nodes list
     /// @return Node Address if the node was found, nullptr otherwise
