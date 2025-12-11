@@ -133,8 +133,6 @@ public:
 
 private:
     OTARequestorEventHandlerRegistration * mRegistrations = nullptr;
-    OTARequestorEventHandler * mCachedEventHandler        = nullptr;
-    EndpointId mCachedEndpointId                          = kInvalidEndpointId;
 };
 
 } // namespace app

@@ -54,11 +54,6 @@ CHIP_ERROR OTARequestorEventHandlerRegistry::Unregister(EndpointId endpointId)
             }
             current->next = nullptr; // Clear the registration's next pointer
 
-            if (mCachedEndpointId == endpointId) // Invalidate cache if the unregistered endpoint was cached
-            {
-                mCachedEventHandler = nullptr;
-                mCachedEndpointId   = kInvalidEndpointId;
-            }
             return CHIP_NO_ERROR;
         }
         prev    = current;
@@ -69,11 +64,6 @@ CHIP_ERROR OTARequestorEventHandlerRegistry::Unregister(EndpointId endpointId)
 
 OTARequestorEventHandler * OTARequestorEventHandlerRegistry::Get(EndpointId endpointId)
 {
-    if (mCachedEndpointId == endpointId && mCachedEventHandler != nullptr)
-    {
-        return mCachedEventHandler;
-    }
-
     // The endpoint searched for is not cached, do a linear search for it
     OTARequestorEventHandlerRegistration * current = mRegistrations;
 
@@ -81,9 +71,7 @@ OTARequestorEventHandler * OTARequestorEventHandlerRegistry::Get(EndpointId endp
     {
         if (current->endpointId == endpointId)
         {
-            mCachedEventHandler = current->eventHandler;
-            mCachedEndpointId   = endpointId;
-            return mCachedEventHandler;
+            return current->eventHandler;
         }
         current = current->next;
     }
