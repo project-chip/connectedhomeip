@@ -295,6 +295,18 @@ tests:
                     minLength: 9238
                     maxLength: 9238
 
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+              - name: "timeoutInSeconds"
+                value: 60
+
     - label: "Read Crash log intent"
       command: "Download"
       arguments:
@@ -323,6 +335,18 @@ tests:
               - name: "error"
                 value: "FAILURE"
 
+    # Wait for the Status Report message
+    - label:
+          "BDX: Wait for 'Diagnostic logs transfer: StatusReport Error' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: StatusReport Error"
+
     - label:
           "Read End User Support log intent after a failure to make sure that
           everything still works"
@@ -340,21 +364,6 @@ tests:
                 constraints:
                     minLength: 28
                     maxLength: 28
-
-    #
-    # Validate that we handle Busy properly
-    #
-    - label:
-          "BDX: Wait for 'Diagnostic logs transfer: Success' message from the
-          previous steps"
-      cluster: "DelayCommands"
-      command: "WaitForMessage"
-      arguments:
-          values:
-              - name: "registerKey"
-                value: "default"
-              - name: "message"
-                value: "Diagnostic logs transfer: Success"
 
     - label: "Delete possible leftover from previous run"
       cluster: "SystemCommands"
