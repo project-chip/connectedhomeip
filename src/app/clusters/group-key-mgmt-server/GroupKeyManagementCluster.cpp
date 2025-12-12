@@ -134,16 +134,15 @@ struct KeySetReadAllIndicesResponse
         return CHIP_NO_ERROR;
     }
 };
-
-CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupKeyMap(FabricTable * fabricTable, AttributeValueEncoder & aEncoder)
 {
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-    return aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([&fabricTable, provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : Server::GetInstance().GetFabricTable())
+        for (auto & fabric : *fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
             auto iter         = provider->IterateGroupKeys(fabric_index);
@@ -232,15 +231,15 @@ CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadGroupTable(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupTable(FabricTable * fabricTable, AttributeValueEncoder & aEncoder)
 {
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-    CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([&fabricTable, provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : Server::GetInstance().GetFabricTable())
+        for (auto & fabric : *fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
             auto iter         = provider->IterateGroupInfo(fabric_index);
@@ -261,9 +260,9 @@ CHIP_ERROR ReadGroupTable(AttributeValueEncoder & aEncoder)
                 break;
             }
         }
+
         return encodeStatus;
     });
-    return err;
 }
 
 CHIP_ERROR ReadMaxGroupsPerFabric(AttributeValueEncoder & aEncoder)
@@ -281,15 +280,15 @@ CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder)
 }
 
 bool GetProviderAndFabric(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                          Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
+                          Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo,
+                          FabricTable * fabricTable)
 {
     VerifyOrDie(commandObj != nullptr);
     VerifyOrDie(outGroupDataProvider != nullptr);
     VerifyOrDie(outFabricInfo != nullptr);
 
-    // Internal failures on internal inconsistencies.
     auto provider = GetGroupDataProvider();
-    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
+    auto fabric   = fabricTable->FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
 
     if (nullptr == provider)
     {
@@ -635,7 +634,7 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCo
      * Fetch provider and fabric before command handling. Provider needed for many of the key set
      * functions and the fabric index is needed for the GroupKeyManagement Decode function.
      */
-    if (!GetProviderAndFabric(handler, request.path, &provider, &fabric))
+    if (!GetProviderAndFabric(handler, request.path, &provider, &fabric, mFabricTable))
     {
         // Command will already have status populated from validation.
         return std::nullopt;
@@ -685,9 +684,9 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         return encoder.Encode(features);
     }
     case GroupKeyManagement::Attributes::GroupKeyMap::Id:
-        return ReadGroupKeyMap(encoder);
+        return ReadGroupKeyMap(mFabricTable, encoder);
     case GroupKeyManagement::Attributes::GroupTable::Id:
-        return ReadGroupTable(encoder);
+        return ReadGroupTable(mFabricTable, encoder);
     case GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id:
         return ReadMaxGroupsPerFabric(encoder);
     case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
