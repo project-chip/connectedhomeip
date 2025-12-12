@@ -69,7 +69,7 @@ public:
      * @return CHIP_ERROR
      */
 
-    CHIP_ERROR SetUpFabric(FabricIndex fabricIndexOut)
+    CHIP_ERROR SetUpFabric(FabricIndex & fabricIndexOut)
     {
         ReturnErrorOnFailure(mOpCertStore.Init(mStorage));
         initParams.opCertStore         = &mOpCertStore;
@@ -86,8 +86,6 @@ public:
 
         ReturnErrorOnFailure(mfabricTable.CommitPendingFabricData());
 
-        // Record the actual assigned fabric index so tests can tear it down later.
-
         return CHIP_NO_ERROR;
     }
 
@@ -97,7 +95,7 @@ public:
      * @param fabricIndex The FabricIndex to tear down.
      * @return CHIP_ERROR
      */
-    CHIP_ERROR TearDownFabric(FabricIndex fabricIndex)
+    CHIP_ERROR TearDownFabric(FabricIndex & fabricIndex)
     {
         if (fabricIndex != chip::kUndefinedFabricIndex)
         {
