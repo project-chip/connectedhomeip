@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import logging
 import time
 
@@ -52,6 +53,8 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 '''
 Category:
 Functional
@@ -65,7 +68,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 '''
 
 
-class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
+class TC_IDM_4_3(BasicCompositionTests):
     @property
     def default_timeout(self) -> int:
         return 600
@@ -184,9 +187,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         changed_count = 0
         changed_attributes = []
 
-        reports_at_start = handler.get_all_reported_attributes()
-        logging.info(f"{test_step}: Handler has {len(reports_at_start)} attributes with reports at start")
-
         for endpoint_id, clusters in priming_data.items():
 
             for cluster_class, attributes in clusters.items():
@@ -201,7 +201,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                 cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
                 writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
-                logging.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
+                log.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
 
                 if not writable_attr_ids:
                     continue
@@ -226,7 +226,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
-                        logging.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
+                        log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
                         continue
 
                     try:
@@ -235,7 +235,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                         # Skip if value decode failed
                         if isinstance(cached_val, ValueDecodeFailure):
-                            logging.info(f"{test_step}: Skipping {attribute.__name__} - decode failure")
+                            log.info(f"{test_step}: Skipping {attribute.__name__} - decode failure")
                             continue
 
                         # Determine new value based on type
@@ -252,7 +252,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                             # List attribute - toggle between empty and non-empty to ensure actual change
                             if len(cached_val) == 0:
                                 # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
-                                logging.info(
+                                log.info(
                                     f"{test_step}: Skipping {attribute.__name__} - empty list")
                                 continue
                             # Non-empty list -> write empty list (safe change)
@@ -276,11 +276,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         else:
                             # For other types, skip to avoid writing same value
                             # Writing the same value should NOT trigger a report
-                            logging.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                            log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
                             continue
 
                         # Write the attribute
-                        logging.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
+                        log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
                         resp = await self.default_controller.WriteAttribute(
                             nodeId=self.dut_node_id,
                             attributes=[(endpoint_id, attribute(new_val))]
@@ -288,7 +288,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                         if resp[0].Status == Status.Success:
                             changed_count += 1
-                            logging.info(
+                            log.info(
                                 f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
 
                             # Track this change for verification
@@ -306,27 +306,27 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         else:
                             # Other errors are acceptable per TC_AccessChecker pattern
                             # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
-                            logging.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+                            log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
 
                     except Exception as e:
-                        logging.info(f"{test_step}: Exception writing {attribute.__name__}: {e}")
+                        log.info(f"{test_step}: Exception writing {attribute.__name__}: {e}")
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
         count = 0
         last_report_count = len(handler.get_all_reported_attributes())
-        while count < 30:
-            time.sleep(1)
+        max_wait_time = 30
+        while count < max_wait_time:
+            await asyncio.sleep(1)
             count += 1
             # Log progress every interval
             current_reports = len(handler.get_all_reported_attributes())
             if current_reports != last_report_count:
-                logging.info(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (was {last_report_count})")
                 last_report_count = current_reports
             elif current_reports == changed_count:
                 break
             else:
-                logging.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
+                log.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
 
         # Verify that we received reports for all the changed attributes we wrote to
         verified_count = 0
@@ -341,20 +341,15 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             if handler.was_attribute_reported(ep, cluster, attr):
                 verified_count += 1
                 report_count = handler.get_attribute_report_count(ep, cluster, attr)
-                logging.debug(
-                    f"{test_step}: Verified report for {attr.__name__} on EP{ep} "
-                    f"({report_count} report{'s' if report_count > 1 else ''} received)"
-                )
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
-                logging.warning(f"{test_step}: Missing report for {attr.__name__} on EP{ep}")
 
-        logging.info(
+        log.info(
             f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
 
         # Report summary of all attributes that received reports
         all_reported = handler.get_all_reported_attributes()
-        logging.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
+        log.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
 
         asserts.assert_less_equal(
             len(missing_reports), 0,
@@ -384,7 +379,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             nonlocal empty_report_received, empty_report_time
             empty_report_received = True
             empty_report_time = time.time()
-            logging.debug(f"Empty report callback triggered at {empty_report_time}")
+            log.debug(f"Empty report callback triggered at {empty_report_time}")
 
         # Use AttributeSubscriptionHandler for cleaner subscription management
         attr_handler_step1 = AttributeSubscriptionHandler(
@@ -417,13 +412,13 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         wait_start = time.time()
 
         while not empty_report_received and (time.time() - wait_start) < max_wait:
-            time.sleep(0.1)
+            await asyncio.sleep(0.1)
 
         asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
         sub_report_elapsed = empty_report_time - sub_time
 
-        logging.info(
+        log.info(
             F"Empty report received after {sub_report_elapsed}s (MinInterval: {self.min_interval_floor_sec}s, MaxInterval: {self.max_interval_ceiling_sec}s, Timeout: {sub_timeout_sec}s)")
 
         asserts.assert_greater_equal(
@@ -435,7 +430,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             f"Empty report elapsed time ({sub_report_elapsed}s) should be < subscription timeout ({sub_timeout_sec}s)"
         )
 
-        await attr_handler_step1.cancel()
+        attr_handler_step1.cancel()
+
+        
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
 
         # New Step 2: Basic attribute change and report timing
         # (This was originally test step 2 in the test plan)
@@ -480,7 +479,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 time_report = time.time()
                 report_received = True
                 break
-            time.sleep(0.1)
+            await asyncio.sleep(0.1)
 
         asserts.assert_true(report_received, "Failed to receive attribute change report")
 
@@ -495,7 +494,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             f"Report came too late ({report_delay}s > MaxInterval {self.max_interval_ceiling_sec}s)"
         )
 
-        await attr_handler_step2.cancel()
+        attr_handler_step2.cancel()
 
         # Step 3: Multiple subscriptions with KeepSubscriptions=False
         # (This was originally test step 11 in the test plan)
@@ -550,15 +549,22 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for report (should be on second subscription)
-        time.sleep(original_max_interval_sec + 1)
+        await asyncio.sleep(original_max_interval_sec + 1)
 
         # Verify we got a report on second subscription
         asserts.assert_greater(attr_handler_step3_second.attribute_queue.qsize(), 0,
                                "Should receive report on second subscription")
 
-        # First subscription should have been cancelled
-        # Note: The first handler may still have the priming report but no update
-        await attr_handler_step3_second.cancel()
+        # Clean up both subscriptions from step 3
+        attr_handler_step3_first.cancel()
+
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
+
+        attr_handler_step3_second.cancel()
+
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
 
         # Step 4: MinInterval/MaxInterval timing validation
         # (This was originally test steps 12 and 13 in the test plan, just appears to have been combined into one test step, which was a wise design decision)
@@ -588,9 +594,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         attr_handler_step4.flush_reports()
 
         # Wait for first empty report and capture its time
-        time.sleep(max_interval + 1)
         time_empty = time.time()
-
+        time.sleep(max_interval + 1)
+        
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
             self.dut_node_id,
@@ -615,10 +621,24 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Flush queue before waiting for next empty report
         attr_handler_step4.flush_reports()
 
+        # Wait for second empty report and capture its time
+        empty_report_2_received = False
+        empty_wait_2_start = time.time()
+        time_empty_2 = None
+        
+        while time.time() - empty_wait_2_start < (max_interval + 5):
+            if attr_handler_step4.attribute_queue.qsize() > 0:
+                # Second empty report arrived - capture the time
+                attr_handler_step4.attribute_queue.get()
+                time_empty_2 = time.time()
+                empty_report_2_received = True
+                break
+            time.sleep(0.1)
+        
         # Wait for second empty report
-        time.sleep(max_interval + 1)
         time_empty_2 = time.time()
-
+        time.sleep(max_interval + 1)
+       
         # Verify timing constraints
         #
         # MRP Retransmission Time Calculation:
@@ -674,15 +694,15 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             if session_params and session_params.sessionIdleInterval:
                 negotiated_idle_interval_ms = session_params.sessionIdleInterval
             else:
-                logging.info("Using default MRP Idle Interval (500ms for non-Thread)")
+                log.info("Using default MRP Idle Interval (500ms for non-Thread)")
         except Exception as e:
-            logging.info(f"Using default MRP Idle Interval (500ms for non-Thread) but experienced {e}")
+            log.info(f"Using default MRP Idle Interval (500ms for non-Thread) but experienced {e}")
 
         MRP_RETRANSMISSION_TIMEOUT = (negotiated_idle_interval_ms * 9.256 * 1.375 / 1000.0)
 
-        logging.info(f"Using MRP Idle Interval of {negotiated_idle_interval_ms}ms")
-        logging.info(f"Calculated MRP retransmission timeout: {MRP_RETRANSMISSION_TIMEOUT:.2f}s")
-        logging.info(f"This accounts for {4} retransmissions with BASE={1.6}, JITTER={0.25}, MARGIN={1.1}")
+        log.info(f"Using MRP Idle Interval of {negotiated_idle_interval_ms}ms")
+        log.info(f"Calculated MRP retransmission timeout: {MRP_RETRANSMISSION_TIMEOUT:.2f}s")
+        log.info(f"This accounts for {4} retransmissions with BASE={1.6}, JITTER={0.25}, MARGIN={1.1}")
 
         diff_1 = time_data - time_empty
         diff_2 = time_empty_2 - time_data
@@ -697,7 +717,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_less(diff_2, max_interval + MRP_RETRANSMISSION_TIMEOUT,
                             f"Second report interval ({diff_2}s) should be less than MaxInterval + MRP retransmission time ({max_interval + MRP_RETRANSMISSION_TIMEOUT}s)")
 
-        await attr_handler_step4.cancel()
+        attr_handler_step4.cancel()
+
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
 
         # Step 5: KeepSubscriptions=True preserves first subscription
         # (This was originally test step 14 in the test plan)
@@ -743,7 +766,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for reports
-        time.sleep(self.max_interval_ceiling_sec)
+        await asyncio.sleep(self.max_interval_ceiling_sec)
 
         # Verify both subscriptions received reports
         asserts.assert_greater(attr_handler_step5_first.attribute_queue.qsize(), 0,
@@ -751,8 +774,15 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(attr_handler_step5_second.attribute_queue.qsize(), 0,
                                "Second subscription should receive reports")
 
-        await attr_handler_step5_first.cancel()
-        await attr_handler_step5_second.cancel()
+        attr_handler_step5_first.cancel()
+
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
+
+        attr_handler_step5_second.cancel()
+
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
 
         # Step 6: KeepSubscriptions=False cancels first subscription
         # (This was originally test step 15 in the test plan)
@@ -795,7 +825,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for reports
-        time.sleep(self.max_interval_ceiling_sec)
+        await asyncio.sleep(self.max_interval_ceiling_sec)
 
         # Verify second subscription received reports
         asserts.assert_greater(attr_handler_step6_second.attribute_queue.qsize(), 0,
@@ -803,7 +833,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # First subscription should not receive reports (it was cancelled)
 
-        await attr_handler_step6_second.cancel()
+        attr_handler_step6_second.cancel()
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
 
         # Step 7: Subscription to attribute and events
         # (This was originally test step 16 in the test plan)
@@ -840,13 +872,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for attribute report
-        time.sleep(self.max_interval_ceiling_sec)
+        await asyncio.sleep(self.max_interval_ceiling_sec)
 
         # Verify attribute report received
         asserts.assert_greater(attr_handler_step7.attribute_queue.qsize(), 0,
                                "Should receive attribute report")
 
-        await attr_handler_step7.cancel()
+        attr_handler_step7.cancel()
+
+        #with contextlib.suppress(asyncio.CancelledError):
+        #    await asyncio.sleep(0.1)
 
         # Step 8: Attribute wildcard subscription
         # (This was originally test step 17 in the test plan)
@@ -878,14 +913,14 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(num_attributes, 5,
                                "Should receive multiple attributes in priming report for wildcard subscription")
 
-        # Flush priming reports from handler queue before making changes
-        handler_step8.flush_reports()
+        # Reset handler to clear priming report tracking before making changes
+        handler_step8.reset()
 
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step8, priming_data, "Step 8"
         )
-        logging.info(f"Changed and verified {changed_count} attribute(s)")
+        log.info(f"Changed and verified {changed_count} attribute(s)")
 
         # Shutdown subscription and wait for cleanup
         handler_step8.shutdown()
@@ -923,6 +958,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(found_attribute, "Should find NodeLabel attribute in priming report")
 
         sub_step9.Shutdown()
+        await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 10: All attributes from all clusters from all endpoints
         # (This was originally test step 19 in the test plan)
@@ -946,8 +982,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             attributes=subscription_paths,
-            min_interval_sec=0,
-            max_interval_sec=120,
+            min_interval_sec=self.min_interval_floor_sec,
+            max_interval_sec=self.max_interval_ceiling_sec,
             keepSubscriptions=False,
             fabric_filtered=False,
             autoResubscribe=False
@@ -969,14 +1005,19 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(total_clusters, 40, "Should receive reports from multiple clusters")
         asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
 
-        # Flush priming reports from handler queue before making changes
-        handler_step10.flush_reports()
+        log.info(f"Step 10: Priming data received from {num_endpoints} endpoints, {total_clusters} clusters, {total_attributes} attributes")
+        
+        # Reset handler to clear priming report tracking before making changes
+        handler_step10.reset()
+        
+        # Give subscription a moment to stabilize after reset
+        await asyncio.sleep(1)
 
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step10, priming_data, "Step 10"
         )
-        logging.info(f"Changed and verified {changed_count} attribute(s)")
+        log.info(f"Changed and verified {changed_count} attribute(s)")
 
         handler_step10.shutdown()
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
@@ -988,7 +1029,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Subscribe to all attributes from all clusters on endpoint 0
         subscription_paths_step11 = []
         if self.root_node_endpoint in self.endpoints_tlv:
-            for cluster_id in self.endpoints_tlv[self.root_node_endpoint].keys():
+            for cluster_id in self.endpoints_tlv[self.root_node_endpoint]:
                 if (not is_standard_cluster_id(cluster_id)):
                     continue
 
@@ -1022,14 +1063,14 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(num_clusters, 1, "Should receive reports from multiple clusters on the endpoint")
         asserts.assert_greater(total_attributes, 5, "Should receive reports for many attributes on the endpoint")
 
-        # Flush priming reports from handler queue before making changes
-        handler_step11.flush_reports()
+        # Reset handler to clear priming report tracking before making changes
+        handler_step11.reset()
 
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step11, priming_data, "Step 11"
         )
-        logging.info(f"Changed and verified {changed_count} attribute(s)")
+        log.info(f"Changed and verified {changed_count} attribute(s)")
 
         handler_step11.shutdown()
         await asyncio.sleep(1)  # Allow time for subscription teardown to complete
