@@ -29,8 +29,10 @@ namespace Clusters {
 class GroupKeyManagementCluster : public DefaultServerCluster
 {
 public:
+    GroupKeyManagementCluster() : DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }) {}
+
     GroupKeyManagementCluster(FabricTable & fabricTable) :
-        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mFabricTable(fabricTable)
+        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mFabricTable(&fabricTable)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
@@ -54,7 +56,7 @@ public:
     static constexpr bool IsMCSPSupported() { return false; }
 
 private:
-    FabricTable & mFabricTable;
+    FabricTable * mFabricTable = nullptr;
 };
 } // namespace Clusters
 } // namespace app

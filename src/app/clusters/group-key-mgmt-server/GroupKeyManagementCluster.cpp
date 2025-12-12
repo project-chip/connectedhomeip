@@ -134,7 +134,7 @@ struct KeySetReadAllIndicesResponse
         return CHIP_NO_ERROR;
     }
 };
-CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupKeyMap(FabricTable * fabricTable, AttributeValueEncoder & aEncoder)
 {
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
@@ -142,7 +142,7 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, AttributeValueEncoder & aE
     return aEncoder.EncodeList([&fabricTable, provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : fabricTable)
+        for (auto & fabric : *fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
             auto iter         = provider->IterateGroupKeys(fabric_index);
@@ -231,7 +231,7 @@ CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupTable(FabricTable * fabricTable, AttributeValueEncoder & aEncoder)
 {
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
@@ -239,7 +239,7 @@ CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, AttributeValueEncoder & aEn
     return aEncoder.EncodeList([&fabricTable, provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : fabricTable)
+        for (auto & fabric : *fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
             auto iter         = provider->IterateGroupInfo(fabric_index);
@@ -281,14 +281,14 @@ CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder)
 
 bool GetProviderAndFabric(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                           Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo,
-                          FabricTable & fabricTable)
+                          FabricTable * fabricTable)
 {
     VerifyOrDie(commandObj != nullptr);
     VerifyOrDie(outGroupDataProvider != nullptr);
     VerifyOrDie(outFabricInfo != nullptr);
 
     auto provider = GetGroupDataProvider();
-    auto fabric   = fabricTable.FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
+    auto fabric   = fabricTable->FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
 
     if (nullptr == provider)
     {
