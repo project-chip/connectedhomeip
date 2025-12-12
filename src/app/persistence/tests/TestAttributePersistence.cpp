@@ -781,7 +781,7 @@ TEST(TestAttributePersistence, TestNoOpOnSameValueNullableEnum)
     {
         DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kGregorian));
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kGregorian));
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_TRUE(status.IsNoOpSuccess());
@@ -800,7 +800,7 @@ TEST(TestAttributePersistence, TestNoOpOnSameValueNullableEnum)
     {
         DataModel::Nullable<CalendarTypeEnum> currentValue; // null
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_TRUE(status.IsNoOpSuccess());
@@ -834,7 +834,7 @@ TEST(TestAttributePersistence, TestWriteOnDifferentValueNullableEnum)
     {
         DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kGregorian);
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kBuddhist));
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kBuddhist));
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_FALSE(status.IsNoOpSuccess());
@@ -853,7 +853,7 @@ TEST(TestAttributePersistence, TestWriteOnDifferentValueNullableEnum)
     {
         DataModel::Nullable<CalendarTypeEnum> currentValue = DataModel::MakeNullable(CalendarTypeEnum::kBuddhist);
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::Nullable<CalendarTypeEnum>());
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_FALSE(status.IsNoOpSuccess());
@@ -871,7 +871,7 @@ TEST(TestAttributePersistence, TestWriteOnDifferentValueNullableEnum)
     {
         DataModel::Nullable<CalendarTypeEnum> currentValue; // null
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kCoptic));
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(DataModel::MakeNullable(CalendarTypeEnum::kCoptic));
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_FALSE(status.IsNoOpSuccess());

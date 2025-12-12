@@ -134,7 +134,8 @@ public:
     {
         DataModel::Nullable<T> decodedValue{};
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
-        VerifyOrReturnError(decodedValue.IsNull() || decodedValue.Value() != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(decodedValue.IsNull() || decodedValue.Value() != T::kUnknownEnumValue,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
 
