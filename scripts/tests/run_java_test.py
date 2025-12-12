@@ -54,7 +54,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip*", shell=True)
         if retcode != 0:
-            raise OSError("Failed to remove /tmp/chip* for factory reset.")
+            raise RuntimeError("Failed to remove /tmp/chip* for factory reset.")
 
         # Remove native app KVS if that was used
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
@@ -63,7 +63,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
             print("Trying to remove KVS path %s" % kvs_path_to_remove)
             if retcode != 0:
-                raise OSError(f"Failed to remove {kvs_path_to_remove} for factory reset.")
+                raise RuntimeError(f"Failed to remove {kvs_path_to_remove} for factory reset.")
 
     coloredlogs.install(level='INFO')
 
