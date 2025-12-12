@@ -19,6 +19,7 @@
 #include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -31,6 +32,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FixedLabel;
 using namespace chip::app::Clusters::FixedLabel::Attributes;
 using namespace chip::Testing;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -54,13 +56,10 @@ struct TestFixedLabelCluster : public ::testing::Test
 
 TEST_F(TestFixedLabelCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(fixedLabel.Attributes(ConcreteClusterPath(kRootEndpointId, FixedLabel::Id), attributes), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(FixedLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(fixedLabel,
+                                        {
+                                            FixedLabel::Attributes::LabelList::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestFixedLabelCluster, ReadAttributeTest)

@@ -17,6 +17,7 @@
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
@@ -34,6 +35,8 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestAdministratorCommissioningCluster : public ::testing::Test
@@ -47,38 +50,24 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
     {
         AdministratorCommissioningCluster cluster(kRootEndpointId, {});
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
-                      AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
-                      AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
+                                                AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
+                                                AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
+                                            }));
     }
 
     {
         AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
                                                                               BitFlags<Feature>{ Feature::kBasic });
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
-                      AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
-                      AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
+                                                AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
+                                                AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
+                                            }));
     }
 }
 
@@ -87,51 +76,34 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
     {
         AdministratorCommissioningCluster cluster(kRootEndpointId, {});
 
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
-                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
+                                                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
+                                                  }));
     }
 
     {
         AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{});
 
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
-                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
+                                                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
+                                                  }));
     }
 
     {
         AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
                                                                               BitFlags<Feature>{ Feature::kBasic });
 
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
-                      AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
-                      AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        EXPECT_TRUE(
+            IsAcceptedCommandsListEqualTo(cluster,
+                                          {
+                                              AdministratorCommissioning::Commands::OpenCommissioningWindow::kMetadataEntry,
+                                              AdministratorCommissioning::Commands::RevokeCommissioning::kMetadataEntry,
+                                              AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
+                                          }));
     }
 }
 

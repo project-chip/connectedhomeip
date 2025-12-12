@@ -38,6 +38,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::Testing;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
+using chip::Testing::IsGeneratedCommandsListEqualTo;
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
@@ -54,38 +57,22 @@ TEST_F(TestGroupKeyManagementCluster, CompileTest)
 TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 {
     GroupKeyManagementCluster cluster;
-    ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
 
     // Check required accepted commands are present
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
-    ASSERT_EQ(cluster.AcceptedCommands(groupKeyManagementPath, acceptedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = acceptedCommandsBuilder.TakeBuffer();
-    ASSERT_EQ(acceptedCommands.size(), GroupKeyManagement::Commands::kAcceptedCommandsCount);
-
-    ASSERT_EQ(acceptedCommands[0].commandId, GroupKeyManagement::Commands::KeySetWrite::Id);
-    ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry.GetInvokePrivilege());
-
-    ASSERT_EQ(acceptedCommands[1].commandId, GroupKeyManagement::Commands::KeySetRead::Id);
-    ASSERT_EQ(acceptedCommands[1].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetRead::kMetadataEntry.GetInvokePrivilege());
-
-    ASSERT_EQ(acceptedCommands[2].commandId, GroupKeyManagement::Commands::KeySetRemove::Id);
-    ASSERT_EQ(acceptedCommands[2].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry.GetInvokePrivilege());
-
-    ASSERT_EQ(acceptedCommands[3].commandId, GroupKeyManagement::Commands::KeySetReadAllIndices::Id);
-    ASSERT_EQ(acceptedCommands[3].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry,
+                                                  GroupKeyManagement::Commands::KeySetRead::kMetadataEntry,
+                                                  GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry,
+                                                  GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry,
+                                              }));
 
     // Check required generated commands are present
-    ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
-    ASSERT_EQ(cluster.GeneratedCommands(groupKeyManagementPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
-
-    ASSERT_EQ(generatedCommands.size(), GroupKeyManagement::Commands::kGeneratedCommandsCount);
-    ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
-    ASSERT_EQ(generatedCommands[1], GroupKeyManagement::Commands::KeySetReadResponse::Id);
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                               {
+                                                   GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id,
+                                                   GroupKeyManagement::Commands::KeySetReadResponse::Id,
+                                               }));
 }
 
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)

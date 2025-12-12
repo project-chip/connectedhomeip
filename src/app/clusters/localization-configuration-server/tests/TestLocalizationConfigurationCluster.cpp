@@ -18,6 +18,7 @@
 
 #include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
@@ -42,6 +43,7 @@ using namespace chip::Protocols::InteractionModel;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::IsAttributesListEqualTo;
 
 // Mock DeviceInfoProvider for testing
 class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
@@ -183,16 +185,10 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)
     CharSpan initialLocale = CharSpan::fromCharString("en-US");
     LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-    ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, LocalizationConfiguration::Id), attributesBuilder),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder.AppendElements({ LocalizationConfiguration::Attributes::ActiveLocale::kMetadataEntry,
-                                               LocalizationConfiguration::Attributes::SupportedLocales::kMetadataEntry }),
-              CHIP_NO_ERROR);
-
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            LocalizationConfiguration::Attributes::ActiveLocale::kMetadataEntry,
+                                            LocalizationConfiguration::Attributes::SupportedLocales::kMetadataEntry,
+                                        }));
 }
 } // namespace
