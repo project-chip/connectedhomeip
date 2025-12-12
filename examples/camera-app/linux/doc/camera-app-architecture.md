@@ -99,11 +99,27 @@ The manager classes in the camera-app are concrete implementations of the delega
 
 *   **`ZoneManager`:**
     *   **SDK Interface:** `chip::app::Clusters::ZoneManagement::Delegate`
-    *   **Responsibilities:** Implements the logic for the Zone Management cluster, which is used to define and manage zones for motion detection and other purposes.
+    *   **Responsibilities:**
+        *   Manages the creation, update, and removal of 2D Cartesian zones.
+        *   Handles the creation and management of triggers associated with zones (e.g., motion detection).
+        *   Receives zone event notifications from the `CameraDevice` HAL (e.g., `OnZoneTriggeredEvent`).
+        *   Emits `ZoneTriggered` and `ZoneStopped` Matter events to subscribers.
+        *   Manages trigger logic, including initial duration, augmentation duration, max duration, and blind duration using an internal timer.
+    *   **Key Interactions:**
+        *   `CreateTrigger`, `UpdateTrigger`, `RemoveTrigger` commands delegate to the `CameraHALInterface`.
+        *   `CameraDevice` calls `OnZoneTriggeredEvent` on this manager when the HAL detects activity in a zone.
+        *   `PushAvStreamTransportManager` is notified of zone triggers to start recordings.
 
 *   **`CameraAVSettingsUserLevelManager`:**
     *   **SDK Interface:** `chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate`
-    *   **Responsibilities:** Implements the logic for the Camera AV Settings User Level Management cluster, which allows for user-level configuration of camera settings.
+    *   **Responsibilities:** Handles user-level settings, including Pan, Tilt, Zoom.
+    *   **Mechanical PTZ (MPTZ):**
+        *   Commands like `MPTZSetPosition`, `MPTZRelativeMove`, and `MPTZMoveToPreset` are received from the SDK cluster.
+        *   These commands are delegated to the `CameraHALInterface` (`CameraDevice`) to interact with the physical hardware (simulated in this app).
+        *   The manager simulates the time taken for physical movement using a timer before responding to the command.
+    *   **Digital PTZ (DPTZ):**
+        *   `DPTZSetViewport`: Sets the digital viewport for a *specific allocated video stream ID*. It validates the requested viewport against the stream's resolution, aspect ratio, and the camera sensor's capabilities. The change is applied via `CameraHALInterface::SetViewport`.
+        *   `DPTZRelativeMove`: Adjusts the current viewport of a specific video stream by a delta. Calculations are done to keep the viewport within bounds and maintain the aspect ratio.
 
 ## Interaction Diagrams
 
@@ -186,6 +202,70 @@ sequenceDiagram
         Delegate -->> SDK Cluster: ResourceExhausted
     end
     SDK Cluster -->> Client: VideoStreamAllocate Response
+```
+
+### Push AV Transport Allocation Sequence
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant PushAVStreamTransportServer as SDK Cluster
+    participant PushAvStreamTransportManager as Delegate
+    participant MediaController
+    participant CameraAVStreamManager
+
+    Client ->> SDK Cluster: AllocatePushTransport Request
+    SDK Cluster ->> Delegate: AllocatePushTransport()
+    Delegate ->> CameraAVStreamManager: GetBandwidthForStreams()
+    CameraAVStreamManager -->> Delegate: Bandwidth
+    Delegate ->> Delegate: ValidateBandwidthLimit()
+    alt Bandwidth OK
+        Delegate ->> Delegate: Create PushAVTransport instance
+        Delegate ->> MediaController: RegisterTransport(PushAVTransport, videoID, audioID)
+        MediaController ->> MediaController: Add to transport list
+        Delegate ->> MediaController: SetPreRollLength()
+        Delegate -->> SDK Cluster: Success
+    else Bandwidth Exceeded
+        Delegate -->> SDK Cluster: ResourceExhausted
+    end
+    SDK Cluster -->> Client: AllocatePushTransport Response
+```
+
+### WebRTC Livestream Setup Sequence (Client Offer)
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant WebRTCTransportProviderServer as SDK Cluster
+    participant WebRTCProviderManager as Delegate
+    participant WebrtcTransport
+    participant MediaController
+    participant CameraAVStreamManager
+
+    Client ->> SDK Cluster: ProvideOffer Request (SDP Offer)
+    SDK Cluster ->> Delegate: HandleProvideOffer()
+    Delegate ->> Delegate: Create WebrtcTransport
+    Delegate ->> WebrtcTransport: SetRemoteDescription(Offer)
+    Delegate ->> CameraAVStreamManager: AcquireAudioVideoStreams()
+    CameraAVStreamManager -->> Delegate: Success
+    Delegate ->> WebrtcTransport: CreateAnswer()
+    WebrtcTransport -->> Delegate: OnLocalDescription(SDP Answer)
+    Delegate ->> Delegate: ScheduleAnswerSend()
+    Delegate -->> Client: Answer Command (SDP Answer)
+    SDK Cluster -->> Client: ProvideOffer Response
+
+    Client ->> SDK Cluster: ProvideICECandidates Request
+    SDK Cluster ->> Delegate: HandleProvideICECandidates()
+    Delegate ->> WebrtcTransport: AddRemoteCandidate()
+    Note right of Delegate: Meanwhile...
+    WebrtcTransport -->> Delegate: OnICECandidate (Local Candidates)
+    Delegate ->> Delegate: ScheduleICECandidatesSend()
+    Delegate -->> Client: ICECandidates Command
+
+    Note over Client, WebrtcTransport: ICE Connectivity Establishment
+    WebrtcTransport -->> Delegate: OnConnectionStateChanged(Connected)
+    Delegate ->> MediaController: RegisterTransport(WebrtcTransport, videoID, audioID)
+    Note over Client, MediaController: Live Stream Starts
 ```
 
 ### High-Level Data Flow
