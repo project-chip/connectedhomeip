@@ -79,23 +79,33 @@ The manager classes in the camera-app are concrete implementations of the delega
 
 *   **`WebRTCProviderManager`:**
     *   **SDK Interface:** `chip::app::Clusters::WebRTCTransportProvider::Delegate`
-    *   **Responsibilities:** Manages the lifecycle of WebRTC sessions for live streaming. This includes:
-        *   Handling `SolicitOffer` and `ProvideOffer` requests from clients.
-        *   Creating and managing `WebrtcTransport` instances for each session.
-        *   Handling the exchange of SDP offers/answers and ICE candidates.
-        *   Registering the `WebrtcTransport` instances with the `MediaController` so they can receive live media data.
+    *   **Responsibilities:** Manages the lifecycle of WebRTC sessions for live streaming.
+    *   **Session Initiation:**
+        *   `HandleSolicitOffer`: When a client wants the camera to initiate the WebRTC handshake, this method creates a `WebrtcTransport`, generates an SDP Offer, and sends it to the client.
+        *   `HandleProvideOffer`: When a client initiates the handshake, this method processes the received SDP Offer, creates a `WebrtcTransport`, generates an SDP Answer, and sends it back.
+    *   **Handshake:** Manages the exchange of SDP messages and ICE candidates between the camera and the WebRTC client. It uses callbacks like `OnLocalDescription` to send the locally generated SDP, and `HandleProvideICECandidates` to process candidates from the client.
+    *   **Media Flow:** Once the WebRTC connection is established (`OnConnectionStateChanged(Connected)`), it registers the `WebrtcTransport` with the `DefaultMediaController` to receive and send audio/video frames.
+    *   **Stream Management:** Acquires and releases audio/video stream resources from `CameraAVStreamManager` using `AcquireAudioVideoStreams` and `ReleaseAudioVideoStreams`.
+    *   **Privacy:** Handles `LiveStreamPrivacyModeChanged` to end sessions if live stream privacy is enabled.
 
 *   **`PushAvStreamTransportManager`:**
     *   **SDK Interface:** `chip::app::Clusters::PushAvStreamTransport::Delegate`
-    *   **Responsibilities:** Manages push-based AV streaming, which is typically used for event-based recording. This includes:
-        *   Allocating and deallocating `PushAVTransport` instances based on client requests.
-        *   Managing the bandwidth used by push transports.
-        *   Triggering transports based on events (e.g., motion detection).
-        *   Registering the `PushAVTransport` instances with the `MediaController` to receive media data from the pre-roll buffer.
+    *   **Responsibilities:** Manages push-based AV streaming for event-based recording (e.g., CMAF).
+    *   **Allocation:** `AllocatePushTransport` creates a `PushAVTransport` object for a given client request. This object is configured with details like container type (CMAF), segment duration, and target streams.
+    *   **Registration:** The created `PushAVTransport` is registered with the `DefaultMediaController` to access media data, including the pre-roll buffer.
+    *   **Triggering:**
+        *   `ManuallyTriggerTransport`: Allows a client to force a recording.
+        *   `HandleZoneTrigger`: Called by `CameraDevice` when a motion zone alarm is raised. This checks which `PushAVTransport` instances are configured for that zone and initiates the recording and upload process.
+    *   **Bandwidth Management:** Validates that new or modified transport configurations do not exceed the camera's maximum network bandwidth (`ValidateBandwidthLimit`).
+    *   **Session Management:** Monitors active recording sessions and can restart them to limit maximum session duration, generating new session IDs.
 
 *   **`ChimeManager`:**
     *   **SDK Interface:** `chip::app::Clusters::Chime::Delegate`
-    *   **Responsibilities:** Implements the logic for the Chime cluster, which is used to play sounds on the camera device.
+    *   **Responsibilities:** Implements the logic for the Chime cluster.
+    *   **Sound Management:** Provides a list of available chime sounds (`GetChimeSoundByIndex`).
+    *   **Playback:** The `PlayChimeSound` command handler checks if the chime is enabled and logs the intent to play the selected sound. The current Linux example does not include actual audio playback for chimes.
+    *   **Configuration:** Interacts with the `ChimeServer` to get the enabled state and selected chime ID.
+
 
 *   **`ZoneManager`:**
     *   **SDK Interface:** `chip::app::Clusters::ZoneManagement::Delegate`
@@ -140,11 +150,11 @@ graph TD
         CameraDevice -- owns --> CameraAVStreamManager
         CameraDevice -- owns --> WebRTCProviderManager
         CameraDevice -- owns --> PushAvStreamTransportManager
-    end
+        CameraDevice -- owns --> ChimeManager
+        CameraDevice -- owns --> ZoneManager
 
-    subgraph "Transport Managers"
-        WebRTCProviderManager
-        PushAvStreamTransportManager
+        WebRTCProviderManager --> DefaultMediaController
+        PushAvStreamTransportManager --> DefaultMediaController
     end
 
     subgraph "Matter Clusters (SDK)"
@@ -168,12 +178,11 @@ graph TD
     CameraAVStreamMgmtServer -- uses delegate --> CameraAVStreamManager
     WebRTCTransportProviderServer -- uses delegate --> WebRTCProviderManager
     PushAvStreamTransportServer -- uses delegate --> PushAvStreamTransportManager
-    ChimeServer -- uses delegate --> CameraDevice
-    ZoneMgmtServer -- uses delegate --> CameraDevice
+    ChimeServer -- uses delegate --> ChimeManager
+    ZoneMgmtServer -- uses delegate --> ZoneManager
 
     CameraAVStreamManager -- calls HAL --> CameraDevice
-    WebRTCProviderManager --> DefaultMediaController
-    PushAvStreamTransportManager --> DefaultMediaController
+    ZoneManager -- calls HAL --> CameraDevice
 ```
 
 ### Video Stream Allocation Sequence
@@ -251,8 +260,8 @@ sequenceDiagram
     Delegate ->> WebrtcTransport: CreateAnswer()
     WebrtcTransport -->> Delegate: OnLocalDescription(SDP Answer)
     Delegate ->> Delegate: ScheduleAnswerSend()
-    Delegate -->> Client: Answer Command (SDP Answer)
     SDK Cluster -->> Client: ProvideOffer Response
+    Delegate -->> Client: Answer Command (SDP Answer)
 
     Client ->> SDK Cluster: ProvideICECandidates Request
     SDK Cluster ->> Delegate: HandleProvideICECandidates()
@@ -336,11 +345,38 @@ graph TD
 
 ## GStreamer Integration
 
-GStreamer is used extensively in the `CameraDevice` to handle all media processing. Separate GStreamer pipelines are created for:
+GStreamer is used extensively in the `CameraDevice` to handle all media processing. The `CameraDevice` class contains helper methods (`CreateVideoPipeline`, `CreateAudioPipeline`, `CreateSnapshotPipeline`, `CreateAudioPlaybackPipeline`) that construct these GStreamer pipelines. Pipelines are dynamically created, started, and stopped based on requests from the Matter clusters, as orchestrated by the various managers (especially `CameraAVStreamManager`).
 
-*   **Video Streaming:** As described in the "Data Flow" section.
-*   **Audio Streaming:** A similar pipeline is created for audio, using `pulsesrc` (or `audiotestsrc`) to get raw audio, `opusenc` to encode it, and an `appsink` to send it to the `MediaController`.
-*   **Snapshots:** A pipeline is created to capture a single frame and save it as a JPEG.
-*   **Audio Playback:** A pipeline is created to receive audio from the network (via UDP) and play it out the speakers.
+*   **Video Streaming (`CreateVideoPipeline`):**
+    *   **Source:** `v4l2src` (or `videotestsrc` for testing) to capture from the camera device.
+    *   **Caps Negotiation:** `capsfilter` to set resolution and framerate.
+    *   **Format Conversion:** `videoconvert` to ensure the format is suitable for the encoder (e.g., I420).
+    *   **Encoding:** `x264enc` for H.264 encoding.
+    *   **Sink:** `appsink` with the `OnNewVideoSampleFromAppSink` callback. This callback receives the encoded H.264 buffers and passes them to `DefaultMediaController::DistributeVideo`.
+    *   **Lifecycle:** Started by `CameraDevice::StartVideoStream`, stopped by `CameraDevice::StopVideoStream`.
 
-The `CameraDevice` class contains helper methods (`CreateVideoPipeline`, `CreateAudioPipeline`, `CreateSnapshotPipeline`) that construct these GStreamer pipelines. The pipelines are started and stopped as needed based on requests from the Matter clusters, primarily orchestrated by the `CameraAVStreamManager`.
+*   **Audio Streaming (`CreateAudioPipeline`):**
+    *   **Source:** `pulsesrc` (or `audiotestsrc` for testing).
+    *   **Caps Negotiation:** `capsfilter` to set sample rate, channels.
+    *   **Format Conversion:** `audioconvert` and `audioresample`.
+    *   **Encoding:** `opusenc` for Opus encoding.
+    *   **Sink:** `appsink` with the `OnNewAudioSampleFromAppSink` callback, which passes encoded Opus buffers to `DefaultMediaController::DistributeAudio`.
+    *   **Lifecycle:** Started by `CameraDevice::StartAudioStream`, stopped by `CameraDevice::StopAudioStream`.
+
+*   **Snapshots (`CreateSnapshotPipeline`):**
+    *   **Source:** `v4l2src` or `libcamerasrc` depending on camera type.
+    *   **Caps Negotiation:** `capsfilter` for resolution/format.
+    *   **Encoding:** `jpegenc` to create a JPEG image.
+    *   **Sink:** `multifilesink` to save the JPEG to a temporary file (`SNAPSHOT_FILE_PATH`). The `CameraDevice::CaptureSnapshot` method then reads this file.
+    *   **Lifecycle:** Created on-demand when `CameraDevice::CaptureSnapshot` is called and a snapshot stream is active.
+
+*   **Audio Playback (`CreateAudioPlaybackPipeline`):**
+    *   **Source:** `udpsrc` to receive RTP Opus packets from the network (e.g., from a WebRTC session).
+    *   **Jitter Buffer:** `rtpjitterbuffer` to handle network jitter.
+    *   **Depacketization:** `rtpopusdepay` to extract Opus frames from RTP.
+    *   **Decoding:** `opusdec` to decode Opus audio.
+    *   **Output:** `audioconvert`, `audioresample`, and `autoaudiosink` to play the audio on the device speakers.
+    *   **Lifecycle:** Started by `CameraDevice::StartAudioPlaybackStream`, stopped by `CameraDevice::StopAudioPlaybackStream`.
+
+The state of these pipelines (e.g., NULL, READY, PLAYING) is managed using `gst_element_set_state`. Callbacks on `appsink` elements are crucial for linking GStreamer's data flow to the Matter application logic.
+
