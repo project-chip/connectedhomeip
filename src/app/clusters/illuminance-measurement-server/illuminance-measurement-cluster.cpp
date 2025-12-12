@@ -35,8 +35,8 @@ namespace chip::app::Clusters {
 IlluminanceMeasurementCluster::IlluminanceMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }),
-    mLightSensorType(config.lightSensorType), mTolerance(config.tolerance), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }), mLightSensorType(config.lightSensorType),
+    mTolerance(config.tolerance), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus IlluminanceMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
