@@ -59,8 +59,8 @@ As an example:
 ```shell
 scripts/tests/run_test_suite.py --runner chip_tool_python \
     run \
-    --tool-path chip-tool:objdir-clone/linux-x64-chip-tool/chip-tool \
-    --app-path all-clusters:objdir-clone/linux-x64-all-clusters/chip-all-clusters-app \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
     --custom-path app:new-app:out/new-app/chip-new-app
 ```
 
@@ -70,7 +70,7 @@ tools in separate network namespaces.
 
 In order to help with using the YAML tests for local usage the
 `--discover-paths` flag can be used to automatically discover paths to
-applications and tools. The the root directory of the Matter SDK is used as the
+applications and tools. The root directory of the Matter SDK is used as the
 starting path of the search.
 
 ## Connectivity mocking for local testing
@@ -102,7 +102,7 @@ scripts/tests/run_test_suite.py --runner chip_tool_python \
     --target TestOperationalState \
     --log-level=debug \
     run \
-    --app-path all-clusters:out/linux-x64-chip-tool/chip-tool \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool
 ```
 
@@ -172,7 +172,7 @@ scripts/tests/run_test_suite.py --runner chip_tool_python \
     --target TestOperationalState \
     --log-level=debug \
     run \
-    --app-path all-clusters:out/linux-x64-chip-tool/chip-tool \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
     --ble-wifi
 ```
