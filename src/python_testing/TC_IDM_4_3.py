@@ -431,8 +431,7 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step1.cancel()
 
-
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         # New Step 2: Basic attribute change and report timing
@@ -557,12 +556,12 @@ class TC_IDM_4_3(BasicCompositionTests):
         # Clean up both subscriptions from step 3
         attr_handler_step3_first.cancel()
 
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         attr_handler_step3_second.cancel()
 
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         # Step 4: MinInterval/MaxInterval timing validation
@@ -718,7 +717,7 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step4.cancel()
 
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         # Step 5: KeepSubscriptions=True preserves first subscription
@@ -775,12 +774,12 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step5_first.cancel()
 
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         attr_handler_step5_second.cancel()
 
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         # Step 6: KeepSubscriptions=False cancels first subscription
@@ -833,7 +832,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         # First subscription should not receive reports (it was cancelled)
 
         attr_handler_step6_second.cancel()
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         # Step 7: Subscription to attribute and events
@@ -879,7 +878,7 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step7.cancel()
 
-        #with contextlib.suppress(asyncio.CancelledError):
+        # with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
         # Step 8: Attribute wildcard subscription
@@ -1004,7 +1003,8 @@ class TC_IDM_4_3(BasicCompositionTests):
         asserts.assert_greater(total_clusters, 40, "Should receive reports from multiple clusters")
         asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
 
-        log.info(f"Step 10: Priming data received from {num_endpoints} endpoints, {total_clusters} clusters, {total_attributes} attributes")
+        log.info(
+            f"Step 10: Priming data received from {num_endpoints} endpoints, {total_clusters} clusters, {total_attributes} attributes")
 
         # Reset handler to clear priming report tracking before making changes
         handler_step10.reset()
