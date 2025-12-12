@@ -20,7 +20,7 @@
  * @brief Implementation for the TlsClientManagement Server Cluster
  ***************************************************************************/
 
-#include "tls-client-management-server.h"
+#include "TlsClientManagementCluster.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -44,28 +44,28 @@ using namespace Protocols::InteractionModel;
 
 static constexpr uint16_t kMaxTlsEndpointId = 65534;
 
-TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
-                                                     CertificateTable & certificateTable, uint8_t maxProvisioned) :
+TlsClientManagementCluster::TlsClientManagementCluster(EndpointId endpointId, TlsClientManagementDelegate & delegate,
+                                                       CertificateTable & certificateTable, uint8_t maxProvisioned) :
     AttributeAccessInterface(MakeOptional(endpointId), TlsClientManagement::Id),
     CommandHandlerInterface(MakeOptional(endpointId), TlsClientManagement::Id), mDelegate(delegate),
     mCertificateTable(certificateTable), mMaxProvisioned(maxProvisioned)
 {
     VerifyOrDieWithMsg(mMaxProvisioned >= 5, NotSpecified, "Spec requires MaxProvisioned be >= 5");
     VerifyOrDieWithMsg(mMaxProvisioned <= 254, NotSpecified, "Spec requires MaxProvisioned be <= 254");
-    mDelegate.SetTlsClientManagementServer(this);
+    mDelegate.SetTlsClientManagementCluster(this);
 }
 
-TlsClientManagementServer::~TlsClientManagementServer()
+TlsClientManagementCluster::~TlsClientManagementCluster()
 {
     // null out the ref to us on the delegate
-    mDelegate.SetTlsClientManagementServer(nullptr);
+    mDelegate.SetTlsClientManagementCluster(nullptr);
 
     // unregister
     TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR TlsClientManagementServer::Init()
+CHIP_ERROR TlsClientManagementCluster::Init()
 {
     ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
     ReturnErrorOnFailure(mDelegate.Init(Server::GetInstance().GetPersistentStorage()));
@@ -76,7 +76,7 @@ CHIP_ERROR TlsClientManagementServer::Init()
     return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
-CHIP_ERROR TlsClientManagementServer::Finish()
+CHIP_ERROR TlsClientManagementCluster::Finish()
 {
     TEMPORARY_RETURN_IGNORED mCertificateTable.Finish();
 
@@ -88,7 +88,7 @@ CHIP_ERROR TlsClientManagementServer::Finish()
 }
 
 // AttributeAccessInterface
-CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR TlsClientManagementCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == TlsClientManagement::Id);
 
@@ -97,9 +97,9 @@ CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPa
     case MaxProvisioned::Id:
         return aEncoder.Encode(mMaxProvisioned);
     case ProvisionedEndpoints::Id: {
-        TlsClientManagementServer * server = this;
-        auto matterEndpoint                = aPath.mEndpointId;
-        auto fabric                        = aEncoder.AccessingFabricIndex();
+        TlsClientManagementCluster * server = this;
+        auto matterEndpoint                 = aPath.mEndpointId;
+        auto fabric                         = aEncoder.AccessingFabricIndex();
         CHIP_ERROR err = aEncoder.EncodeList([server, matterEndpoint, fabric](const auto & encoder) -> CHIP_ERROR {
             return server->EncodeProvisionedEndpoints(matterEndpoint, fabric, encoder);
         });
@@ -112,21 +112,21 @@ CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPa
     return CHIP_NO_ERROR;
 }
 
-uint8_t TlsClientManagementServer::GetMaxProvisioned() const
+uint8_t TlsClientManagementCluster::GetMaxProvisioned() const
 {
     return mMaxProvisioned;
 }
 
 // helper method to get the TlsClientManagement provisioned endpoints encoded into a list
 CHIP_ERROR
-TlsClientManagementServer::EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
-                                                      const AttributeValueEncoder::ListEncodeHelper & encoder)
+TlsClientManagementCluster::EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
+                                                       const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     return mDelegate.ForEachEndpoint(matterEndpoint, fabric,
                                      [&](auto & endpoint) -> CHIP_ERROR { return encoder.Encode(endpoint); });
 }
 
-void TlsClientManagementServer::InvokeCommand(HandlerContext & ctx)
+void TlsClientManagementCluster::InvokeCommand(HandlerContext & ctx)
 {
     switch (ctx.mRequestPath.mCommandId)
     {
@@ -145,8 +145,8 @@ void TlsClientManagementServer::InvokeCommand(HandlerContext & ctx)
     }
 }
 
-void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
-                                                        const Commands::ProvisionEndpoint::DecodableType & req)
+void TlsClientManagementCluster::HandleProvisionEndpoint(HandlerContext & ctx,
+                                                         const Commands::ProvisionEndpoint::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsClientManagement: ProvisionEndpoint");
 
@@ -179,7 +179,7 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
     }
 }
 
-void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const Commands::FindEndpoint::DecodableType & req)
+void TlsClientManagementCluster::HandleFindEndpoint(HandlerContext & ctx, const Commands::FindEndpoint::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
 
@@ -204,7 +204,7 @@ void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const C
     }
 }
 
-void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const Commands::RemoveEndpoint::DecodableType & req)
+void TlsClientManagementCluster::HandleRemoveEndpoint(HandlerContext & ctx, const Commands::RemoveEndpoint::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsClientManagement: RemoveEndpoint");
 
@@ -222,7 +222,7 @@ void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void TlsClientManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+void TlsClientManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     TEMPORARY_RETURN_IGNORED mDelegate.RemoveFabric(fabricIndex);
 }
