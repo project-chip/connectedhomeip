@@ -411,8 +411,9 @@ class TC_IDM_4_3(BasicCompositionTests):
         max_wait = sub_timeout_sec + 1
         wait_start = time.time()
 
+        # ruff: noqa: ASYNC110
         while not empty_report_received and (time.time() - wait_start) < max_wait:
-            await asyncio.sleep(0.1)  # skip: ok
+            await asyncio.sleep(0.1) 
 
         asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
@@ -431,9 +432,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         )
 
         attr_handler_step1.cancel()
-
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
 
         # New Step 2: Basic attribute change and report timing
         # (This was originally test step 2 in the test plan)
@@ -556,16 +554,9 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         # Clean up both subscriptions from step 3
         attr_handler_step3_first.cancel()
-
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
-
         attr_handler_step3_second.cancel()
 
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
-
-        # Step 4: MinInterval/MaxInterval timing validation
+        # Step 4: MinInterval/MaxInterval timing 
         # (This was originally test steps 12 and 13 in the test plan, just appears to have been combined into one test step, which was a wise design decision)
         self.step(4)
 
@@ -716,9 +707,6 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step4.cancel()
 
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
-
         # Step 5: KeepSubscriptions=True preserves first subscription
         # (This was originally test step 14 in the test plan)
         self.step(5)
@@ -772,14 +760,7 @@ class TC_IDM_4_3(BasicCompositionTests):
                                "Second subscription should receive reports")
 
         attr_handler_step5_first.cancel()
-
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
-
         attr_handler_step5_second.cancel()
-
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
 
         # Step 6: KeepSubscriptions=False cancels first subscription
         # (This was originally test step 15 in the test plan)
@@ -831,8 +812,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         # First subscription should not receive reports (it was cancelled)
 
         attr_handler_step6_second.cancel()
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
 
         # Step 7: Subscription to attribute and events
         # (This was originally test step 16 in the test plan)
@@ -876,9 +855,6 @@ class TC_IDM_4_3(BasicCompositionTests):
                                "Should receive attribute report")
 
         attr_handler_step7.cancel()
-
-        # with contextlib.suppress(asyncio.CancelledError):
-        #    await asyncio.sleep(0.1)
 
         # Step 8: Attribute wildcard subscription
         # (This was originally test step 17 in the test plan)
