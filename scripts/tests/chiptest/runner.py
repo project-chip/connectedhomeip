@@ -18,7 +18,6 @@ import pathlib
 import pty
 import queue
 import re
-import signal
 import subprocess
 import threading
 import typing
