@@ -18,6 +18,7 @@ import pathlib
 import pty
 import queue
 import re
+import signal
 import subprocess
 import threading
 import typing
@@ -148,6 +149,8 @@ class SubprocessInfo:
 
 
 class Executor:
+    CLEANUP_TIMEOUT = 1
+
     def __init__(self) -> None:
         self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
 
@@ -156,24 +159,33 @@ class Executor:
         return process
 
     def terminate(self) -> None:
-        with suppress(queue.Empty):
-            while True:
-                if (process := self._processes.get_nowait()).poll() is not None:
-                    continue
-                cmd = str(process.args)
+        while True:
+            # Get process from the queue.
+            try:
+                process = self._processes.get_nowait()
+            except queue.Empty:
+                break
 
-                log.debug('Terminating leftover process "%s"', cmd)
-                process.terminate()
-                try:
-                    process.wait(1)
-                except subprocess.TimeoutExpired:
-                    log.warning('Failed to terminate the process "%s". Killing instead', cmd)
-                    process.kill()
+            # Check if process already exited.
+            if process.poll() is not None:
+                continue
+            cmd = str(process.args)
 
-                    try:
-                        process.wait(1)
-                    except subprocess.TimeoutExpired:
-                        log.error('Failed to kill process "%s". It may become a zombie.', cmd)
+            # SIGTERM
+            log.debug('Terminating leftover process "%s"', cmd)
+            process.terminate()
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT)
+                continue
+
+            # SIGKILL
+            log.warning('Failed to terminate the process "%s". Killing instead', cmd)
+            process.kill()
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT)
+                continue
+
+            log.error('Failed to kill process "%s". It may become a zombie', cmd)
 
 
 class Runner:
