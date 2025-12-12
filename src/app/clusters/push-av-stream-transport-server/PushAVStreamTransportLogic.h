@@ -7,7 +7,7 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>

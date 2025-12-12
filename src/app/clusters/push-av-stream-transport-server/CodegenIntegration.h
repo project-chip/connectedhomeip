@@ -20,7 +20,7 @@
 
 #include "push-av-stream-transport-delegate.h"
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 
 namespace chip {
 namespace app {
