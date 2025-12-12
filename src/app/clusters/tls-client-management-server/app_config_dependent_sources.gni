@@ -14,6 +14,6 @@
 import("//build_overrides/chip.gni")
 
 app_config_dependent_sources = [
-  "tls-client-management-server.cpp",
-  "tls-client-management-server.h",
+  "TlsClientManagementCluster.cpp",
+  "TlsClientManagementCluster.h",
 ]

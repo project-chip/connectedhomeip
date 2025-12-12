@@ -20,7 +20,7 @@
  * @brief Implementation for the TlsCertificateManagement Server Cluster
  ***************************************************************************/
 
-#include "tls-certificate-management-server.h"
+#include "TlsCertificateManagementCluster.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -49,10 +49,10 @@ static constexpr uint16_t kMaxIntermediateCertificates = 10;
 static constexpr uint16_t kNonceBytes                  = 32;
 static constexpr uint16_t kMaxSignatureBytes           = 128;
 
-TlsCertificateManagementServer::TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
-                                                               Tls::CertificateDependencyChecker & dependencyChecker,
-                                                               CertificateTable & certificateTable, uint8_t maxRootCertificates,
-                                                               uint8_t maxClientCertificates) :
+TlsCertificateManagementCluster::TlsCertificateManagementCluster(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
+                                                                 Tls::CertificateDependencyChecker & dependencyChecker,
+                                                                 CertificateTable & certificateTable, uint8_t maxRootCertificates,
+                                                                 uint8_t maxClientCertificates) :
     AttributeAccessInterface(MakeOptional(endpointId), TlsCertificateManagement::Id),
     CommandHandlerInterface(MakeOptional(endpointId), TlsCertificateManagement::Id), mDelegate(delegate),
     mDependencyChecker(dependencyChecker), mCertificateTable(certificateTable), mMaxRootCertificates(maxRootCertificates),
@@ -60,20 +60,20 @@ TlsCertificateManagementServer::TlsCertificateManagementServer(EndpointId endpoi
 {
     VerifyOrDieWithMsg(mMaxRootCertificates >= 5, NotSpecified, "Spec requires MaxRootCertificates be >= 5");
     VerifyOrDieWithMsg(mMaxClientCertificates >= 5, NotSpecified, "Spec requires MaxClientCertificates be >= 5");
-    mDelegate.SetTlsCertificateManagementServer(this);
+    mDelegate.SetTlsCertificateManagementCluster(this);
 }
 
-TlsCertificateManagementServer::~TlsCertificateManagementServer()
+TlsCertificateManagementCluster::~TlsCertificateManagementCluster()
 {
     // null out the ref to us on the delegate
-    mDelegate.SetTlsCertificateManagementServer(nullptr);
+    mDelegate.SetTlsCertificateManagementCluster(nullptr);
 
     // unregister
     TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR TlsCertificateManagementServer::Init()
+CHIP_ERROR TlsCertificateManagementCluster::Init()
 {
     ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
 
@@ -83,7 +83,7 @@ CHIP_ERROR TlsCertificateManagementServer::Init()
     return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
-CHIP_ERROR TlsCertificateManagementServer::Finish()
+CHIP_ERROR TlsCertificateManagementCluster::Finish()
 {
     mCertificateTable.Finish();
 
@@ -95,7 +95,7 @@ CHIP_ERROR TlsCertificateManagementServer::Finish()
 }
 
 // AttributeAccessInterface
-CHIP_ERROR TlsCertificateManagementServer::Read(const DataModel::ReadAttributeRequest & aRequest, AttributeValueEncoder & aEncoder)
+CHIP_ERROR TlsCertificateManagementCluster::Read(const DataModel::ReadAttributeRequest & aRequest, AttributeValueEncoder & aEncoder)
 {
     const auto & aPath = aRequest.path;
     bool largePayload  = aRequest.readFlags.Has(DataModel::ReadFlags::kAllowsLargePayload);
@@ -129,8 +129,8 @@ CHIP_ERROR TlsCertificateManagementServer::Read(const DataModel::ReadAttributeRe
 }
 
 CHIP_ERROR
-TlsCertificateManagementServer::EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
-                                                                  const AttributeValueEncoder::ListEncodeHelper & encoder)
+TlsCertificateManagementCluster::EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
+                                                                   const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     return mDelegate.LoadedRootCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
         if (largePayload)
@@ -147,9 +147,9 @@ TlsCertificateManagementServer::EncodeProvisionedRootCertificates(EndpointId mat
 }
 
 CHIP_ERROR
-TlsCertificateManagementServer::EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    bool largePayload,
-                                                                    const AttributeValueEncoder::ListEncodeHelper & encoder)
+TlsCertificateManagementCluster::EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                     bool largePayload,
+                                                                     const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     return mDelegate.LoadedClientCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
         if (largePayload)
@@ -165,7 +165,7 @@ TlsCertificateManagementServer::EncodeProvisionedClientCertificates(EndpointId m
     });
 }
 
-void TlsCertificateManagementServer::InvokeCommand(HandlerContext & ctx)
+void TlsCertificateManagementCluster::InvokeCommand(HandlerContext & ctx)
 {
     switch (ctx.mRequestPath.mCommandId)
     {
@@ -208,8 +208,8 @@ void TlsCertificateManagementServer::InvokeCommand(HandlerContext & ctx)
     }
 }
 
-void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerContext & ctx,
-                                                                    const ProvisionRootCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleProvisionRootCertificate(HandlerContext & ctx,
+                                                                     const ProvisionRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ProvisionRootCertificate");
 
@@ -264,7 +264,8 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
                                            TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id);
 }
 
-void TlsCertificateManagementServer::HandleFindRootCertificate(HandlerContext & ctx, const FindRootCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleFindRootCertificate(HandlerContext & ctx,
+                                                                const FindRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: FindRootCertificate");
     CHIP_ERROR result;
@@ -306,8 +307,8 @@ void TlsCertificateManagementServer::HandleFindRootCertificate(HandlerContext & 
     }
 }
 
-void TlsCertificateManagementServer::HandleLookupRootCertificate(HandlerContext & ctx,
-                                                                 const LookupRootCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleLookupRootCertificate(HandlerContext & ctx,
+                                                                  const LookupRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupRootCertificate");
     VerifyOrReturn(req.fingerprint.size() <= kSpecMaxFingerprintBytes,
@@ -330,8 +331,8 @@ void TlsCertificateManagementServer::HandleLookupRootCertificate(HandlerContext 
     }
 }
 
-void TlsCertificateManagementServer::HandleRemoveRootCertificate(HandlerContext & ctx,
-                                                                 const RemoveRootCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleRemoveRootCertificate(HandlerContext & ctx,
+                                                                  const RemoveRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveRootCertificate");
 
@@ -352,7 +353,7 @@ void TlsCertificateManagementServer::HandleRemoveRootCertificate(HandlerContext 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
 }
 
-void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ctx, const ClientCSR::DecodableType & req)
+void TlsCertificateManagementCluster::HandleGenerateClientCsr(HandlerContext & ctx, const ClientCSR::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ClientCSR");
 
@@ -385,8 +386,8 @@ void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ct
     }
 }
 
-void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerContext & ctx,
-                                                                      const ProvisionClientCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleProvisionClientCertificate(HandlerContext & ctx,
+                                                                       const ProvisionClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ProvisionClientCertificate");
 
@@ -438,8 +439,8 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-void TlsCertificateManagementServer::HandleFindClientCertificate(HandlerContext & ctx,
-                                                                 const FindClientCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleFindClientCertificate(HandlerContext & ctx,
+                                                                  const FindClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: FindClientCertificate");
     CHIP_ERROR result;
@@ -482,8 +483,8 @@ void TlsCertificateManagementServer::HandleFindClientCertificate(HandlerContext 
     }
 }
 
-void TlsCertificateManagementServer::HandleLookupClientCertificate(HandlerContext & ctx,
-                                                                   const LookupClientCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleLookupClientCertificate(HandlerContext & ctx,
+                                                                    const LookupClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupClientCertificate");
 
@@ -508,8 +509,8 @@ void TlsCertificateManagementServer::HandleLookupClientCertificate(HandlerContex
     }
 }
 
-void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContext & ctx,
-                                                                   const RemoveClientCertificate::DecodableType & req)
+void TlsCertificateManagementCluster::HandleRemoveClientCertificate(HandlerContext & ctx,
+                                                                    const RemoveClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveClientCertificate");
 
@@ -531,7 +532,7 @@ void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContex
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
 }
 
-void TlsCertificateManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+void TlsCertificateManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     ReturnAndLogOnFailure(mCertificateTable.RemoveFabric(fabricIndex), Zcl, "Failed to remove TLS certificate data for fabric 0x%x",
                           fabricIndex);

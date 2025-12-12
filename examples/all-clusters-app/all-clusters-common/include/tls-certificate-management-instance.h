@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
 
 namespace chip {
 namespace app {

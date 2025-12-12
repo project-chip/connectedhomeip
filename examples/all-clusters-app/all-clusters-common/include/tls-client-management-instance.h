@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.h>
 #include <app/util/config.h>
 #include <vector>

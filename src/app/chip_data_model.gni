@@ -255,7 +255,9 @@ template("chip_data_model") {
 
     _app_config_dependent_sources = []
     foreach(cluster, _cluster_sources) {
-      deps += [ "${_app_root}/clusters/${cluster}" ]
+      # Clusters are public deps to allow applications to depend on cluster APIs, (e.g. delegates / providers)
+      # without having to manually re-state the dependencies computed here from the zap file.
+      public_deps += [ "${_app_root}/clusters/${cluster}" ]
 
       # app_config_dependent_sources paths are relative to the target
       # accumulate them here so that we can "rebase_path" later on

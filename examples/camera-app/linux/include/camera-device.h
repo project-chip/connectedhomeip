@@ -98,8 +98,6 @@ public:
 
     MediaController & GetMediaController() override;
 
-    void HandlePushAvZoneTrigger(uint16_t zoneId) override;
-
     CameraDevice();
     ~CameraDevice();
 
@@ -300,7 +298,7 @@ public:
 
     CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
-    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+    CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
@@ -315,9 +313,9 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneId);
 
-    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
     // Audio playback pipeline methods
     CameraError StartAudioPlaybackStream();

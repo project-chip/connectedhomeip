@@ -34,9 +34,9 @@ namespace Clusters {
 
 class TlsCertificateManagementDelegate;
 
-class TlsCertificateManagementServer : private AttributeAccessInterface,
-                                       private CommandHandlerInterface,
-                                       private FabricTable::Delegate
+class TlsCertificateManagementCluster : private AttributeAccessInterface,
+                                        private CommandHandlerInterface,
+                                        private FabricTable::Delegate
 {
 public:
     /**
@@ -50,10 +50,10 @@ public:
      * @param maxClientCertificates The maximum number of client certificates which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
-                                   Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
-                                   uint8_t maxRootCertificates, uint8_t maxClientCertificates);
-    ~TlsCertificateManagementServer();
+    TlsCertificateManagementCluster(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
+                                    Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
+                                    uint8_t maxRootCertificates, uint8_t maxClientCertificates);
+    ~TlsCertificateManagementCluster();
 
     /**
      * Initializes the TLS Certificate Management server instance.
@@ -337,19 +337,19 @@ public:
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
                                                                  Tls::TLSCCDID id) = 0;
 
-    Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementServer->GetCertificateTable(); }
+    Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementCluster->GetCertificateTable(); }
 
 protected:
-    friend class TlsCertificateManagementServer;
+    friend class TlsCertificateManagementCluster;
 
-    TlsCertificateManagementServer * mTlsCertificateManagementServer = nullptr;
+    TlsCertificateManagementCluster * mTlsCertificateManagementCluster = nullptr;
 
-    // sets the TlsCertificateManagement Server pointer
-    void SetTlsCertificateManagementServer(TlsCertificateManagementServer * tlsCertificateManagementServer)
+    // sets the TlsCertificateManagement Cluster pointer
+    void SetTlsCertificateManagementCluster(TlsCertificateManagementCluster * tlsCertificateManagementServer)
     {
-        mTlsCertificateManagementServer = tlsCertificateManagementServer;
+        mTlsCertificateManagementCluster = tlsCertificateManagementServer;
     }
-    TlsCertificateManagementServer * GetTlsCertificateManagementServer() const { return mTlsCertificateManagementServer; }
+    TlsCertificateManagementCluster * GetTlsCertificateManagementCluster() const { return mTlsCertificateManagementCluster; }
 };
 
 } // namespace Clusters

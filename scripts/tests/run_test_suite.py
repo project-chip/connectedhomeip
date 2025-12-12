@@ -21,9 +21,8 @@ import os
 import sys
 import time
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
 
 import chiptest
 import click
@@ -67,12 +66,6 @@ class RunContext:
     dry_run: bool
     runtime: TestRunTime
     find_path: typing.List[str]
-
-    # If not empty, include only the specified test tags
-    include_tags: set[TestTag] = field(default_factory=set)
-
-    # If not empty, exclude tests tagged with these tags
-    exclude_tags: set[TestTag] = field(default_factory=set)
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
@@ -227,15 +220,25 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
-    tests.sort(key=lambda x: x.name)
+    tests_filtered: list[TestDefinition] = []
+    for test in tests:
+        if include_tags and not (test.tags & set(include_tags)):
+            log.debug("Test '%s' not included", test.name)
+            continue
 
-    context.obj = RunContext(root=root, tests=tests,
+        if exclude_tags and test.tags & set(exclude_tags):
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
+    tests_filtered.sort(key=lambda x: x.name)
+
+    context.obj = RunContext(root=root, tests=tests_filtered,
                              in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool_info, dry_run=dry_run,
                              runtime=runtime,
-                             find_path=find_path,
-                             include_tags=set(include_tags),
-                             exclude_tags=exclude_tags_set)
+                             find_path=find_path)
 
 
 @main.command(
@@ -368,7 +371,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     paths_finder = PathsFinder(context.obj.find_path)
 
-    def build_app(arg_value: Path | None, kind: Literal['app', 'tool'], key: str) -> SubprocessInfo | None:
+    def build_app(arg_value: Path | None, kind: SubprocessKind, key: str) -> SubprocessInfo | None:
         log.debug("Constructing app %s...", key)
         app_path = arg_value if arg_value is not None else paths_finder.get(key)
         return None if app_path is None else SubprocessInfo(kind=kind, path=Path(app_path))
@@ -425,18 +428,6 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         chip_tool_with_python_cmd=chip_tool_with_python_info,
     )
 
-    tests_filtered: list[TestDefinition] = []
-    for test in context.obj.tests:
-        if context.obj.include_tags and not (test.tags & context.obj.include_tags):
-            log.debug("Test '%s' not included", test.name)
-            continue
-
-        if context.obj.exclude_tags and test.tags & context.obj.exclude_tags:
-            log.debug("Test '%s' excluded", test.name)
-            continue
-
-        tests_filtered.append(test)
-
     ble_controller_app = None
     ble_controller_tool = None
     ns_rpc: str | None = None
@@ -490,7 +481,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         for i in range(iterations):
             log.info("Starting iteration %d", i+1)
             observed_failures = 0
-            for test in tests_filtered:
+            for test in context.obj.tests:
                 test_start = time.monotonic()
                 try:
                     if context.obj.dry_run:

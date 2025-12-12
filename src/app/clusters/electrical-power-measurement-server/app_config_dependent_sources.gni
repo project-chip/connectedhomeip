@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "ElectricalPowerMeasurementCluster.cpp",
-  "ElectricalPowerMeasurementCluster.h",
-  "ElectricalPowerMeasurementDelegate.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "electrical-power-measurement-server.h",
 ]
