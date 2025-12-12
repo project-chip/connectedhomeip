@@ -33,9 +33,9 @@ class PathsFinder:
     def __init__(self, roots: typing.List[str] = [DEFAULT_CHIP_ROOT]):
         self._roots = roots
 
-    def get(self, target_name: str) -> str:
+    def get(self, target_name: str) -> Path | None:
         path = _PATHS_CACHE.get(target_name)
-        if path and Path(path).is_file():
+        if path and path.is_file():
             return path
 
         if path:
@@ -52,8 +52,8 @@ class PathsFinder:
             if not path.is_file() or path.name != target_name:
                 continue
 
-            _PATHS_CACHE[target_name] = str(path)
-            return str(path)
+            _PATHS_CACHE[target_name] = path
+            return path
 
         return None
 

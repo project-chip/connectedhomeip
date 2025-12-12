@@ -22,9 +22,7 @@ import subprocess
 import threading
 import typing
 from dataclasses import dataclass
-from typing import Literal
-
-log = logging.getLogger(__name__)
+from enum import StrEnum
 
 log = logging.getLogger(__name__)
 
@@ -124,11 +122,16 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
+class SubprocessKind(StrEnum):
+    APP = 'app'
+    TOOL = 'tool'
+
+
 @dataclass
 class SubprocessInfo:
     # Restricted as this identifies the name of the network namespace in an executor implementing
     # test case isolation.
-    kind: Literal['app', 'tool']
+    kind: SubprocessKind
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
