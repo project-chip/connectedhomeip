@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/thermostat-server/thermostat-server.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
 
