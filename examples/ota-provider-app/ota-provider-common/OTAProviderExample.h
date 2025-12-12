@@ -91,6 +91,17 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
+    uint32_t GetVendorId() const { return mVendorId; }
+    uint32_t GetProductId() const { return mProductId; }
+    uint16_t GetHardwareVersion() const { return mHardwareVersion; }
+    uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    const std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> & GetProtocolsSupported() const
+    {
+        return mProtocolsSupported;
+    }
+    bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
+    const std::string & GetLocation() const { return mLocation; }
+
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
@@ -109,6 +120,8 @@ private:
     void
     SendQueryImageResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                            const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+    void
+    SaveCommandSnapshot(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
@@ -126,4 +139,11 @@ private:
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
     uint32_t mPollInterval;
     uint16_t mMaxBDXBlockSize;
+    uint32_t mVendorId;
+    uint32_t mProductId;
+    uint16_t mHardwareVersion;
+    uint32_t mRequestorSoftwareVersion;
+    std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
+    bool mRequestorCanConsent;
+    std::string mLocation;
 };

@@ -16,7 +16,9 @@
 # limitations under the License.
 #
 
+set -euo pipefail
 set -x
+
 CHIP_ROOT="$(dirname "$0")/../.."
 
 # Default values for optional arguments
@@ -67,7 +69,7 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     echo "Building for version $i"
 
     # Use a per-version GN output dir to avoid clobbering / to enable reuse
-    OUT_DIR="$BASE_OUT_PREFIX-v$i"
+    OUT_DIR="$BASE_OUT_PREFIX-v$i-${GITHUB_RUN_ID:-local}"
     mkdir -p "$OUT_DIR"
 
     # Pass version via GN args (target_cflags). Quotes must be escaped so the GN arg
@@ -78,13 +80,25 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     echo "Building the requestor app (out: $OUT_DIR)"
     ./"$CHIP_ROOT"/scripts/examples/gn_build_example.sh \
         "$CHIP_ROOT"/examples/ota-requestor-app/linux "$OUT_DIR" \
-        chip_config_network_layer_ble=false is_debug=false "$GN_VERSION_ARGS" >/dev/null
+        chip_config_network_layer_ble=false is_debug=false "$GN_VERSION_ARGS"
+
+    if [ ! -f "$OUT_DIR/chip-ota-requestor-app" ]; then
+        echo "ERROR: Could not find chip-ota-requetor-app in $OUT_DIR"
+        ls -l "$OUT_DIR"
+        exit 1
+    fi
 
     # Strip command (create .min binary in the same OUT_DIR)
     if [ "$(uname -s)" = "Darwin" ]; then
         strip "$OUT_DIR"/chip-ota-requestor-app -o "$OUT_DIR"/chip-ota-requestor-app.min >/dev/null 2>&1
     else
         strip --strip-all "$OUT_DIR"/chip-ota-requestor-app -o "$OUT_DIR"/chip-ota-requestor-app.min >/dev/null 2>&1
+    fi
+
+    if [ ! .s "$OUT_DIR/chip-ota-requestor-app.min" ]; then
+        echo "ERROR: Could not find .min file in $OUT_DIR"
+        ls -l "$OUT_DIR"
+        exit 1
     fi
 
     # Create ota image (store images under the shared OUT_PREFIX directory)
