@@ -119,13 +119,13 @@ void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId
 
 void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId);
 
-void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
-
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
