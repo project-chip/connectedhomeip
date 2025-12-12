@@ -1,3 +1,5 @@
+click
+colorama
 mobly
 pyasn1
 pyasn1_modules
