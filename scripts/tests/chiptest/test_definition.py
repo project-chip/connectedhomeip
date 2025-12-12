@@ -233,46 +233,46 @@ class TestTarget(StrEnum):
 
 
 @dataclass
-class KnowhowEntry:
+class KnownSubprocessEntry:
     kind: SubprocessKind
     target_name: str | None = None
 
 
-BUILTIN_SUBPROC_KNOWHOW = MappingProxyType({
+BUILTIN_SUBPROC_KNOWHOW_DATA = MappingProxyType({
     # Matter applications
-    'all-clusters': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
-    'all-devices': KnowhowEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
-    'air-purifier': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-air-purifier-app'),
-    'bridge': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-bridge-app'),
-    'camera': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-camera-app'),
-    'camera-controller': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-camera-controller'),
-    'closure': KnowhowEntry(kind=SubprocessKind.APP, target_name='closure-app'),
-    'energy-gateway': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-energy-gateway-app'),
-    'energy-management': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-energy-management-app'),
-    'fabric-bridge': KnowhowEntry(kind=SubprocessKind.APP, target_name='fabric-bridge-app'),
-    'fabric-admin': KnowhowEntry(kind=SubprocessKind.APP, target_name='fabric-admin'),
-    'fabric-sync': KnowhowEntry(kind=SubprocessKind.APP, target_name='fabric-sync'),
-    'jf-control': KnowhowEntry(kind=SubprocessKind.APP, target_name='jfc-app'),
-    'jf-admin': KnowhowEntry(kind=SubprocessKind.APP, target_name='jfa-app'),
-    'light': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-lighting-app'),
-    'lit-icd': KnowhowEntry(kind=SubprocessKind.APP, target_name='lit-icd-app'),
-    'lock': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-lock-app'),
-    'microwave-oven': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-microwave-oven-app'),
-    'network-manager': KnowhowEntry(kind=SubprocessKind.APP, target_name='matter-network-manager-app'),
-    'ota-provider': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-ota-provider-app'),
-    'ota-requestor': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-ota-requestor-app'),
-    'rvc': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
-    'terms-and-conditions': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-terms-and-conditions-app'),
-    'tv': KnowhowEntry(kind=SubprocessKind.APP, target_name='chip-tv-app'),
-    'water-leak-detector': KnowhowEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
+    'all-clusters': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
+    'all-devices': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
+    'air-purifier': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-air-purifier-app'),
+    'bridge': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-bridge-app'),
+    'camera': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-camera-app'),
+    'camera-controller': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-camera-controller'),
+    'closure': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='closure-app'),
+    'energy-gateway': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-energy-gateway-app'),
+    'energy-management': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-energy-management-app'),
+    'fabric-bridge': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-bridge-app'),
+    'fabric-admin': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-admin'),
+    'fabric-sync': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-sync'),
+    'jf-control': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='jfc-app'),
+    'jf-admin': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='jfa-app'),
+    'light': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-lighting-app'),
+    'lit-icd': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='lit-icd-app'),
+    'lock': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-lock-app'),
+    'microwave-oven': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-microwave-oven-app'),
+    'network-manager': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='matter-network-manager-app'),
+    'ota-provider': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-ota-provider-app'),
+    'ota-requestor': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-ota-requestor-app'),
+    'rvc': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
+    'terms-and-conditions': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-terms-and-conditions-app'),
+    'tv': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-tv-app'),
+    'water-leak-detector': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
 
     # Tools
-    'chip-tool': KnowhowEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
-    'darwin-framework-tool': KnowhowEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
-    'matter-repl-yaml-tester': KnowhowEntry(kind=SubprocessKind.TOOL, target_name='yamltest_with_matter_repl_tester.py'),
+    'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
+    'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
+    'matter-repl-yaml-tester': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='yamltest_with_matter_repl_tester.py'),
 
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
-    'chip-tool-with-python': KnowhowEntry(kind=SubprocessKind.TOOL)
+    'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.TOOL)
 })
 
 
@@ -286,7 +286,7 @@ class SubprocessInfoRepo(dict):
     # don't want to create a dependency on the diskcache module which PathsFinder imports.
     # Instead we just want a dict-like object
     def __init__(self, paths: PathsFinderProto,
-                 subproc_knowhow: dict[str, KnowhowEntry] = BUILTIN_SUBPROC_KNOWHOW,
+                 subproc_knowhow: dict[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_KNOWHOW_DATA,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.paths = paths

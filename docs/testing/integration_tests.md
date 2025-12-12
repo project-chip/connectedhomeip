@@ -47,6 +47,34 @@ way that is understandable, readable, and has the features you need
 
 ## Running integration tests locally
 
+### Application and tool binary path selection in the YAML test framework
+
+The `scripts/tests/run_test_suite.py` script is used to run the YAML tests
+locally. Apart from the YAML files describing particular test cases the script
+also needs information about the locations of the application (for example
+`chip-all-clusters`) and tool (for example `chip-tool`) binaries. This
+information is provided via `--app-path` and `--tool-path` commandline switches.
+As an example:
+
+```shell
+scripts/tests/run_test_suite.py --runner chip_tool_python \
+    run \
+    --tool-path chip-tool:objdir-clone/linux-x64-chip-tool/chip-tool \
+    --app-path all-clusters:objdir-clone/linux-x64-all-clusters/chip-all-clusters-app \
+    --custom-path app:new-app:out/new-app/chip-new-app
+```
+
+The distinction between applications and tools is not merely cosmetic. It is
+used when running tests in Linux network namespaces to place applications and
+tools in separate network namespaces.
+
+In order to help with using the YAML tests for local usage the
+`--discover-paths` flag can be used to automatically discover paths to
+applications and tools. The the root directory of the Matter SDK is used as the
+starting path of the search.
+
+## Connectivity mocking for local testing
+
 When integration tests are run locally, the test runner (YAML or python) needs
 to mock network connectivity between the controller and the device under test,
 so that all tests can be run without actual hardware. In case of a simple test
@@ -74,6 +102,7 @@ scripts/tests/run_test_suite.py --runner chip_tool_python \
     --target TestOperationalState \
     --log-level=debug \
     run \
+    --app-path all-clusters:out/linux-x64-chip-tool/chip-tool \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool
 ```
 
@@ -143,6 +172,7 @@ scripts/tests/run_test_suite.py --runner chip_tool_python \
     --target TestOperationalState \
     --log-level=debug \
     run \
+    --app-path all-clusters:out/linux-x64-chip-tool/chip-tool \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
     --ble-wifi
 ```

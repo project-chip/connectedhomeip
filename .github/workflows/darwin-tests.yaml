@@ -92,8 +92,8 @@ jobs:
         working-directory: src/darwin/Framework
       - name: Build Apps Using Unified Build
         run: |
-          scripts/run_in_build_env.sh \
-             "scripts/build/build_examples.py \
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
                 --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified \
                 --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified \
                 --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
@@ -106,8 +106,8 @@ jobs:
         run: rm -rf out/
       - name: Build Remaining Apps That Don't Support Unified Build
         run: |
-          scripts/run_in_build_env.sh \
-             "scripts/build/build_examples.py \
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
                 --target darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
                 --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
                 --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
@@ -121,34 +121,34 @@ jobs:
              "
       - name: Run Tests
         run: |
-          scripts/run_in_build_env.sh \
-          "scripts/tests/run_test_suite.py \
+          ./scripts/run_in_build_env.sh \
+          "./scripts/tests/run_test_suite.py \
              --runner darwin_framework_tool_python \
              --target-skip-glob '{TestAccessControlConstraints}' \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --tool-path darwin-framework-tool:out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
-             --app-path all-clusters:objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-             --app-path lock:objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-             --app-path ota-provider:objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-             --app-path ota-requestor:objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-             --app-path tv:objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
-             --app-path lit-icd:objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-             --app-path bridge:objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-             --app-path microwave-oven:objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-             --app-path rvc:objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-             --app-path network-manager:objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-             --app-path energy-gateway:objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-             --app-path energy-management:objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+             --tool-path darwin-framework-tool:./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+             --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+             --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+             --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --app-path tv:./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+             --app-path lit-icd:./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+             --app-path bridge:./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+             --app-path microwave-oven:./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+             --app-path rvc:./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+             --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+             --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+             --app-path energy-management:./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
           "
       - name: Run OTA Test
         run: |
-          scripts/run_in_build_env.sh \
-          "scripts/tests/run_darwin_framework_ota_test.py \
+          ./scripts/run_in_build_env.sh \
+          "./scripts/tests/run_darwin_framework_ota_test.py \
              run \
-             --darwin-framework-tool out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
-             --ota-requestor-app objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --darwin-framework-tool ./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
              --ota-data-file /tmp/rawImage \
              --ota-image-file /tmp/otaImage \
              --ota-destination-file /tmp/downloadedImage \
