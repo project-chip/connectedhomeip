@@ -274,14 +274,13 @@ assert(
         chip_device_platform == "realtek_bee" ||
         chip_device_platform == "realtek_zephyr" ||
         chip_device_platform == "nrfconnect" || chip_device_platform == "nxp" ||
-        chip_device_platform == "qpg" ||
-        chip_device_platform == "telink" || chip_device_platform == "psoc6" ||
-        chip_device_platform == "android" || chip_device_platform == "ameba" ||
-        chip_device_platform == "cyw30739" || chip_device_platform == "webos" ||
-        chip_device_platform == "zephyr" || chip_device_platform == "beken" ||
-        chip_device_platform == "bl602" || chip_device_platform == "bl616" ||
-        chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
-        chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
-        chip_device_platform == "asr" || chip_device_platform == "stm32" ||
-        chip_device_platform == "nuttx",
+        chip_device_platform == "qpg" || chip_device_platform == "telink" ||
+        chip_device_platform == "psoc6" || chip_device_platform == "android" ||
+        chip_device_platform == "ameba" || chip_device_platform == "cyw30739" ||
+        chip_device_platform == "webos" || chip_device_platform == "zephyr" ||
+        chip_device_platform == "beken" || chip_device_platform == "bl602" ||
+        chip_device_platform == "bl616" || chip_device_platform == "bl702" ||
+        chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
+        chip_device_platform == "SiWx917" || chip_device_platform == "asr" ||
+        chip_device_platform == "stm32" || chip_device_platform == "nuttx",
     "Please select a valid value for chip_device_platform")
