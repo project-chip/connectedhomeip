@@ -42,6 +42,7 @@
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
 #       --int-arg ota_image_download_timeout:300
+#       --timeout 0
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
