@@ -227,7 +227,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
         tests_filtered.append(test)
 
-    tests.sort(key=lambda x: x.name)
+    tests_filtered.sort(key=lambda x: x.name)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
                              in_unshare=internal_inside_unshare,
