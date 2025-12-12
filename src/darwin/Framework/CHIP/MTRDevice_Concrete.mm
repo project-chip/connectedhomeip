@@ -741,7 +741,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return YES;
     }
 
-    __block uint64_t cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
+    __block NSTimeInterval cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
 
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
@@ -2149,7 +2149,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 cumulativeIntervals += intervalSinceLastReport;
             }
         }
-        NSTimeInterval averageTimeBetweenReports = cumulativeIntervals / (_mostRecentReportTimes.count - 1);
+        NSTimeInterval averageTimeBetweenReports = cumulativeIntervals / static_cast<double>(_mostRecentReportTimes.count - 1);
 
         if (averageTimeBetweenReports < _storageBehaviorConfiguration.timeBetweenReportsTooShortThreshold) {
             // Multiplier goes from 1 to _reportToPersistenceDelayMaxMultiplier uniformly, as
@@ -4585,7 +4585,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // verify that the uptime is indeed the data type we want
                 if ([attributeDataValue[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
                     NSNumber * upTimeNumber = attributeDataValue[MTRValueKey];
-                    NSTimeInterval upTime = upTimeNumber.unsignedLongLongValue; // UpTime unit is defined as seconds in the spec
+                    NSTimeInterval upTime = static_cast<NSTimeInterval>(upTimeNumber.unsignedLongLongValue); // UpTime unit is defined as seconds in the spec
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
                     NSDate * oldSystemStartTime = _estimatedStartTime;
                     if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
