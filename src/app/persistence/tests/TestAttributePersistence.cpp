@@ -737,11 +737,11 @@ TEST(TestAttributePersistence, TestDecodeAndStoreNativeEndianValueNullableEnum)
         const ConcreteAttributePath path2(4, 5, 6);
         const uint8_t testUnknownValue = static_cast<uint8_t>(CalendarTypeEnum::kUnknownEnumValue) + 1;
         ASSERT_EQ(EnsureKnownEnumValue(static_cast<CalendarTypeEnum>(testUnknownValue)), CalendarTypeEnum::kUnknownEnumValue);
-        
+
         DataModel::Nullable<CalendarTypeEnum> currentValue;
         WriteOperation writeOp(path2);
         AttributeValueDecoder decoder = writeOp.DecoderFor(testUnknownValue);
-        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path2, decoder, currentValue), 
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path2, decoder, currentValue),
                   CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 
