@@ -28,7 +28,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]
 }

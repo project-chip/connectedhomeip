@@ -16,9 +16,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/descriptor/DescriptorCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Descriptor/Enums.h>
 #include <clusters/Descriptor/Metadata.h>

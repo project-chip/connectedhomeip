@@ -20,14 +20,14 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/power-topology-server/tests/MockPowerTopologyDelegate.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/PowerTopology/Attributes.h>
 #include <clusters/PowerTopology/Events.h>
 #include <clusters/PowerTopology/Metadata.h>

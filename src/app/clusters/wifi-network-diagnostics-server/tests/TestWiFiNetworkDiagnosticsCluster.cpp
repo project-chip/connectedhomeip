@@ -16,11 +16,11 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>

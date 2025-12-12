@@ -16,10 +16,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <lib/core/CHIPError.h>

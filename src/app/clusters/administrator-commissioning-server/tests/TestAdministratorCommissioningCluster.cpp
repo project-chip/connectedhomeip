@@ -16,9 +16,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AdministratorCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
