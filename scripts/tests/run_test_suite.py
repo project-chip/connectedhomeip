@@ -25,7 +25,6 @@ from dataclasses import dataclass, field
 import chiptest
 import click
 import coloredlogs
-from chiptest import linux
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessInfo
@@ -152,9 +151,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            linux.ensure_network_namespace_availability()
+            chiptest.linux.ensure_network_namespace_availability()
         else:
-            linux.ensure_private_state()
+            chiptest.linux.ensure_private_state()
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
