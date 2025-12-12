@@ -18,6 +18,7 @@ import enum
 import logging
 import multiprocessing
 import os
+import random
 import sys
 import time
 import typing
@@ -128,6 +129,16 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--no-randomize-tests',
+    is_flag=True,
+    default=False,
+    help='Don\'t randomize test order'
+)
+@click.option(
+    '--random-seed',
+    help='Seed for test order randomization'
+)
+@click.option(
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
@@ -145,7 +156,8 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, dry_run: bool, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
+         exclude_tags: tuple[TestTag, ...], no_randomize_tests: bool, random_seed: str | None, find_path: list[str], runner: str,
+         chip_tool: Path | None) -> None:
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -232,7 +244,15 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
 
         tests_filtered.append(test)
 
-    tests_filtered.sort(key=lambda x: x.name)
+    if no_randomize_tests:
+        if random_seed is not None:
+            log.warning("Setting a random seed when tests are not randomized has no effect on test order.")
+        tests_filtered.sort(key=lambda x: x.name)
+    else:
+        seed = str(time.time_ns()) if random_seed is None else random_seed
+        log.info('Using the following seed for test order randomization: %s', seed)
+        random.seed(seed)
+        random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
                              in_unshare=internal_inside_unshare,
