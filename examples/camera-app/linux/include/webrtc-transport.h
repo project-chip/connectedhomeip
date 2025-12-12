@@ -23,10 +23,12 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 
+#include <mutex>
 #include <string>
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
+using OnTransportICECandidateCallback     = std::function<void(const int16_t sessionId)>;
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
@@ -65,7 +67,8 @@ public:
 
     ~WebrtcTransport();
 
-    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState);
+    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState,
+                      OnTransportICECandidateCallback onICECandidate);
 
     void MoveToState(const State targetState);
     const char * GetStateStr() const;
@@ -105,9 +108,21 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    const std::vector<ICECandidateInfo> & GetCandidates() { return mLocalCandidates; }
+    bool HasCandidates()
+    {
+        std::lock_guard<std::mutex> lock(mCandidatesMutex);
+        return !mLocalCandidates.empty();
+    }
 
-    void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
+    // Drain candidates - returns all accumulated candidates and clears the internal list
+    // This prevents resending the same candidates multiple times during trickle ICE
+    std::vector<ICECandidateInfo> DrainCandidates()
+    {
+        std::lock_guard<std::mutex> lock(mCandidatesMutex);
+        auto candidates = std::move(mLocalCandidates);
+        mLocalCandidates.clear();
+        return candidates;
+    }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
 
@@ -126,9 +141,13 @@ public:
     void SetRequestArgs(const RequestArgs & args);
     RequestArgs & GetRequestArgs();
 
+    void SetInitializationInProgress(bool inProgress) { mInitializationInProgress = inProgress; }
+    bool IsInitializationInProgress() const { return mInitializationInProgress; }
+
 private:
-    CommandType mCommandType = CommandType::kUndefined;
-    State mState             = State::Idle;
+    CommandType mCommandType       = CommandType::kUndefined;
+    State mState                   = State::Idle;
+    bool mInitializationInProgress = false;
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
 
@@ -139,8 +158,10 @@ private:
     std::string mLocalSdp;
     SDPType mLocalSdpType;
     std::vector<ICECandidateInfo> mLocalCandidates;
+    std::mutex mCandidatesMutex;
 
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+    OnTransportICECandidateCallback mOnICECandidate         = nullptr;
 };

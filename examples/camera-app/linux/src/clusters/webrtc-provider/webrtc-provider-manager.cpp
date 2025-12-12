@@ -133,7 +133,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [this](const uint16_t sessionId) { this->OnTrickleICECandidate(sessionId); });
     }
 
     transport->SetRequestArgs(requestArgs);
@@ -169,6 +170,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // cluster and update the reference counts.
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
+    // Set initialization in progress - candidates will be batched until answer is received
+    transport->SetInitializationInProgress(true);
     transport->MoveToState(WebrtcTransport::State::SendingOffer);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
@@ -325,7 +328,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [this](const uint16_t sessionId) { this->OnTrickleICECandidate(sessionId); });
     }
 
     // Check resource availability before proceeding
@@ -363,6 +367,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // cluster and update the reference counts.
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
+    // Set initialization in progress - candidates will be batched until answer is sent
+    transport->SetInitializationInProgress(true);
     transport->MoveToState(WebrtcTransport::State::SendingAnswer);
 
     if (peerConnection != nullptr)
@@ -409,6 +415,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
+    // Initialization complete - enable trickle ICE for future candidates
+    transport->SetInitializationInProgress(false);
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
     ScheduleICECandidatesSend(sessionId);
 
@@ -448,9 +456,11 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         transport->AddRemoteCandidate(std::string(candidate.candidate.begin(), candidate.candidate.end()), mid);
     }
 
-    // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
-    transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-    ScheduleICECandidatesSend(sessionId);
+    if (transport->HasCandidates())
+    {
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -956,6 +966,8 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
         ScheduleOfferSend(sessionId);
         break;
     case WebrtcTransport::State::SendingAnswer:
+        // Initialization complete after answer is created - enable trickle ICE for future candidates
+        transport->SetInitializationInProgress(false);
         ScheduleAnswerSend(sessionId);
         break;
     default:
@@ -1017,6 +1029,30 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
     }
 }
 
+void WebRTCProviderManager::OnTrickleICECandidate(const uint16_t sessionId)
+{
+    ChipLogProgress(Camera, "Trickle ICE candidate received for session %u", sessionId);
+
+    // Check if the provided sessionId matches your current sessions
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport != nullptr)
+    {
+        if (transport->HasCandidates())
+        {
+            transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+            ScheduleICECandidatesSend(sessionId);
+        }
+        else
+        {
+            ChipLogProgress(Camera, "No ICE candidates to send for session %u; not changing state", sessionId);
+        }
+    }
+    else
+    {
+        ChipLogError(Camera, "Session ID %u does not match the current sessions", sessionId);
+    }
+}
+
 CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
                                                     uint16_t sessionId)
 {
@@ -1043,10 +1079,22 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
-                                            onFailure,
-                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
-                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
+    CHIP_ERROR err = Controller::InvokeCommandRequest(
+        &exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess, onFailure,
+        /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+        /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
+
+    // Initialization complete - enable trickle ICE for future candidates
+    transport->SetInitializationInProgress(false);
+
+    // Flush any queued up ICE candidates after the answer is sent
+    if (transport->HasCandidates())
+    {
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
+    }
+
+    return err;
 }
 
 CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeManager & exchangeMgr,
@@ -1067,7 +1115,9 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         return CHIP_ERROR_INTERNAL;
     }
 
-    const std::vector<ICECandidateInfo> & localCandidates = transport->GetCandidates();
+    // Drain candidates to get all accumulated candidates and clear the list
+    // This prevents resending the same candidates during trickle ICE
+    std::vector<ICECandidateInfo> localCandidates = transport->DrainCandidates();
 
     // Build the command
     WebRTCTransportRequestor::Commands::ICECandidates::Type command;

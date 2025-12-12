@@ -51,10 +51,12 @@ WebrtcTransport::~WebrtcTransport()
 }
 
 void WebrtcTransport::SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription,
-                                   OnTransportConnectionStateCallback onConnectionState)
+                                   OnTransportConnectionStateCallback onConnectionState,
+                                   OnTransportICECandidateCallback onICECandidate)
 {
     mOnLocalDescription = onLocalDescription;
     mOnConnectionState  = onConnectionState;
+    mOnICECandidate     = onICECandidate;
 }
 
 void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
@@ -261,10 +263,20 @@ bool WebrtcTransport::ClosePeerConnection()
 void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
 {
     ChipLogProgress(Camera, "ICE Candidate received for sessionID: %u", mRequestArgs.sessionId);
-    mLocalCandidates.push_back(candidateInfo);
+    {
+        std::lock_guard<std::mutex> lock(mCandidatesMutex);
+        mLocalCandidates.push_back(candidateInfo);
+    }
     ChipLogProgress(Camera, "Local Candidate:");
     ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
     ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
+
+    // If we're in Idle state (no pending commands), send this candidate immediately (trickle ICE)
+    if (!mInitializationInProgress && mState == State::Idle && mOnICECandidate)
+    {
+        ChipLogProgress(Camera, "Sending trickle ICE candidate immediately for sessionID: %u", mRequestArgs.sessionId);
+        mOnICECandidate(mRequestArgs.sessionId);
+    }
 }
 
 void WebrtcTransport::OnConnectionStateChanged(bool connected)
