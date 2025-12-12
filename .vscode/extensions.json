@@ -6,6 +6,7 @@
     "recommendations": [
         "aaron-bond.better-comments",
         "augustocdias.tasks-shell-input",
+        "charliermarsh.ruff",
         "christian-kohler.path-intellisense",
         "eamodio.gitlens",
         "editorconfig.editorconfig",
@@ -15,15 +16,17 @@
         "maelvalais.autoconf",
         "marus25.cortex-debug",
         "ms-azuretools.vscode-docker",
+        "ms-python.autopep8",
+        "ms-python.isort",
+        "ms-python.mypy-type-checker",
         "ms-vscode.cpptools",
         "msedge-dev.gnls",
         "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
         "vadimcn.vscode-lldb",
         "xaver.clang-format",
         "yuichinukiyama.vscode-preview-server",
-        "yzhang.markdown-all-in-one",
-        "ms-python.autopep8",
-        "ms-python.isort"
+        "yzhang.markdown-all-in-one"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []

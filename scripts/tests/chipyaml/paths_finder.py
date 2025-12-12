@@ -33,7 +33,7 @@ class PathsFinder:
     def __init__(self, roots: typing.List[str] = [DEFAULT_CHIP_ROOT]):
         self._roots = roots
 
-    def get(self, target_name: str) -> str:
+    def get(self, target_name: str) -> str | None:
         path = _PATHS_CACHE.get(target_name)
         if path and Path(path).is_file():
             return path
