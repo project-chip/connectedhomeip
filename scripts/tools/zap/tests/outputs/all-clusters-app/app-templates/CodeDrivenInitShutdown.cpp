@@ -48,6 +48,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::UnitLocalization::Id:
+        MatterUnitLocalizationClusterInitCallback(endpoint);
+        break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterInitCallback(endpoint);
         break;
@@ -138,6 +141,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::UnitLocalization::Id:
+        MatterUnitLocalizationClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterShutdownCallback(endpoint);

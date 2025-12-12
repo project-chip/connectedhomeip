@@ -3711,7 +3711,7 @@ endpoint 0 {
   server cluster UnitLocalization {
     callback attribute temperatureUnit;
     ram      attribute featureMap default = 0x1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralCommissioning {

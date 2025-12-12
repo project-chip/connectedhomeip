@@ -22,6 +22,12 @@ src/app/persistence/AttributePersistenceProvider.h
 # Server implementation
 src/app/server/Server.cpp
 
+
+# Attribute Migration
+
+src/app/persistence/AttributePersistenceMigration.cpp
+src/app/persistence/AttributePersistenceMigration.h
+
 # Cluster server implementations that currently use SafeAttributePersistenceProvider
 src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.cpp
 src/app/clusters/boolean-state-configuration-server/tests/TestBooleanStateConfigurationCluster.cpp
