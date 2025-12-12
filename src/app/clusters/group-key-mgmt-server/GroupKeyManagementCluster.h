@@ -29,7 +29,9 @@ namespace Clusters {
 class GroupKeyManagementCluster : public DefaultServerCluster
 {
 public:
-    GroupKeyManagementCluster() : DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }) {}
+    GroupKeyManagementCluster() :
+        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mFabricTable(&Server::GetInstance().GetFabricTable())
+    {}
 
     GroupKeyManagementCluster(FabricTable & fabricTable) :
         DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mFabricTable(&fabricTable)

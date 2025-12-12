@@ -39,9 +39,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::Testing;
 
-const chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
-const chip::GroupId kTestGroupId         = 0x1234;
-constexpr uint16_t kTestKeySetId         = 1;
+chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
+const chip::GroupId kTestGroupId   = 0x1234;
+constexpr uint16_t kTestKeySetId   = 1;
 
 namespace TestHelpers {
 
