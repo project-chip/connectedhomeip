@@ -339,7 +339,8 @@ class TC_IDM_4_3(BasicCompositionTests):
             # Check if handler received a report for this attribute
             if handler.was_attribute_reported(ep, cluster, attr):
                 verified_count += 1
-                report_count = handler.get_attribute_report_count(ep, cluster, attr)
+                reports_count = handler.get_attribute_report_count(ep, cluster, attr)
+                log.info(f"Reports count for {cluster.__name__} on endpoint {ep}: {reports_count}")
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
 
@@ -411,7 +412,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         wait_start = time.time()
 
         while not empty_report_received and (time.time() - wait_start) < max_wait:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1) # noqa: ASYNC110
 
         asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
@@ -592,8 +593,8 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step4.flush_reports()
 
         # Wait for first empty report and capture its time
-        time_empty = time.time()
-        time.sleep(max_interval + 1)
+        time_empty = time.time() # noqa: ASYNC251
+        time.sleep(max_interval + 1) # noqa: ASYNC251
 
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
@@ -620,7 +621,6 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step4.flush_reports()
 
         # Wait for second empty report and capture its time
-        empty_report_2_received = False
         empty_wait_2_start = time.time()
         time_empty_2 = None
 
@@ -629,13 +629,12 @@ class TC_IDM_4_3(BasicCompositionTests):
                 # Second empty report arrived - capture the time
                 attr_handler_step4.attribute_queue.get()
                 time_empty_2 = time.time()
-                empty_report_2_received = True
                 break
             time.sleep(0.1)
 
         # Wait for second empty report
-        time_empty_2 = time.time()
-        time.sleep(max_interval + 1)
+        time_empty_2 = time.time() # noqa: ASYNC251
+        time.sleep(max_interval + 1) # noqa: ASYNC251
 
         # Verify timing constraints
         #
