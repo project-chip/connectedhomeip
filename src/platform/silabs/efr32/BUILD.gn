@@ -151,5 +151,6 @@ static_library("efr32") {
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
       "OTAImageProcessorImpl.cpp",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 }

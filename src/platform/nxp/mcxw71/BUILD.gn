@@ -46,6 +46,7 @@ source_set("nxp_ota") {
 
   deps = [
     ":nxp_platform",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/platform:platform",
   ]
 }
@@ -134,6 +135,7 @@ static_library("nxp_platform") {
   # When the app is built using gn, the app selects the nxp_ota target through its build file.
   if (nxp_external_sdk && chip_enable_ota_requestor) {
     sources += ota_sources
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (nxp_use_plain_dac_key) {

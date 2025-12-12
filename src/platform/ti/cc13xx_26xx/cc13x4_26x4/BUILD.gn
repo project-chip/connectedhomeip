@@ -83,6 +83,7 @@ static_library("cc13x4_26x4") {
 
   if (chip_enable_ota_requestor) {
     sources += [ "OTAImageProcessorImpl.cpp" ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_enable_openthread) {

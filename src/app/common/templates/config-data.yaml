@@ -61,6 +61,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Network Commissioning
     - OTA Software Update Provider
+    - OTA Software Update Requestor
     - Operational Credentials
     - Operational State
     - Oven Cavity Operational State
@@ -169,6 +170,7 @@ CodeDrivenClusters:
     - Identify
     - Localization Configuration
     - OTA Software Update Provider
+    - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
     - Power Topology

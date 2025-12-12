@@ -39,6 +39,10 @@ void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterLocalizationConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterLocalizationConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
