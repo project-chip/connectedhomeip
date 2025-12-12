@@ -39,64 +39,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::Testing;
 
-struct TestGroupKeyManagementCluster : public ::testing::Test
-{
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
-
-TEST_F(TestGroupKeyManagementCluster, CompileTest)
-{
-    GroupKeyManagementCluster cluster;
-    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GroupKeyManagement::Id }), BitFlags<ClusterQualityFlags>());
-}
-
-TEST_F(TestGroupKeyManagementCluster, CommandsTest)
-{
-    GroupKeyManagementCluster cluster;
-    ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
-
-    // Check required accepted commands are present
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
-    ASSERT_EQ(cluster.AcceptedCommands(groupKeyManagementPath, acceptedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = acceptedCommandsBuilder.TakeBuffer();
-    ASSERT_EQ(acceptedCommands.size(), GroupKeyManagement::Commands::kAcceptedCommandsCount);
-
-    ASSERT_EQ(acceptedCommands[0].commandId, GroupKeyManagement::Commands::KeySetWrite::Id);
-    ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry.GetInvokePrivilege());
-
-    ASSERT_EQ(acceptedCommands[1].commandId, GroupKeyManagement::Commands::KeySetRead::Id);
-    ASSERT_EQ(acceptedCommands[1].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetRead::kMetadataEntry.GetInvokePrivilege());
-
-    ASSERT_EQ(acceptedCommands[2].commandId, GroupKeyManagement::Commands::KeySetRemove::Id);
-    ASSERT_EQ(acceptedCommands[2].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry.GetInvokePrivilege());
-
-    ASSERT_EQ(acceptedCommands[3].commandId, GroupKeyManagement::Commands::KeySetReadAllIndices::Id);
-    ASSERT_EQ(acceptedCommands[3].GetInvokePrivilege(),
-              GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
-
-    // Check required generated commands are present
-    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
-    ASSERT_EQ(cluster.GeneratedCommands(groupKeyManagementPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
-
-    ASSERT_EQ(generatedCommands.size(), GroupKeyManagement::Commands::kGeneratedCommandsCount);
-    ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
-    ASSERT_EQ(generatedCommands[1], GroupKeyManagement::Commands::KeySetReadResponse::Id);
-}
-TEST_F(TestGroupKeyManagementCluster, AttributesTest)
-{
-    GroupKeyManagementCluster cluster;
-    std::vector<app::DataModel::AttributeEntry> mandatoryAttributes(GroupKeyManagement::Attributes::kMandatoryMetadata.begin(),
-                                                                    GroupKeyManagement::Attributes::kMandatoryMetadata.end());
-
-    // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, std::move(mandatoryAttributes)));
-}
-
 const chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
 const chip::GroupId kTestGroupId         = 0x1234;
 constexpr uint16_t kTestKeySetId         = 1;
@@ -127,16 +69,22 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 } // namespace TestHelpers
 
-struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
+// TODO : Clean up redundancies with handlers fabric index logic and  figure out a better implementation Cluster testers and
+// FabricHelpers setup and teardown
+struct TestGroupKeyManagementCluster : public ::testing::Test
 {
+
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     Crypto::DefaultSessionKeystore mMockKeystore;
-    GroupKeyManagementCluster mCluster;
-    ClusterTester tester;
+    FabricTestHelper fabricHelper{ &mTestContext.StorageDelegate() };
 
-    TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
+    GroupKeyManagementCluster mCluster{ fabricHelper.GetFabricTable() };
+
+    ClusterTester tester{ mCluster };
 
     void SetUp() override
     {
@@ -146,7 +94,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         mRealProvider.SetSessionKeystore(&mMockKeystore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
         ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
-
+        CHIP_ERROR err = fabricHelper.SetUpFabric(kTestFabricIndex);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mRealProvider);
         tester.SetFabricIndex(kTestFabricIndex);
     }
@@ -156,6 +105,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         tester.SetFabricIndex(kUndefinedFabricIndex);
         mCluster.Shutdown();
         Credentials::SetGroupDataProvider(nullptr);
+        CHIP_ERROR err = fabricHelper.TearDownFabric(kTestFabricIndex);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         mRealProvider.Finish();
     }
     // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
@@ -194,8 +145,58 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         iterator->Release(); // ensure this frees memory or returns to pool
     }
 };
+
+TEST_F(TestGroupKeyManagementCluster, CompileTest)
+{
+    ASSERT_EQ(mCluster.GetClusterFlags({ kRootEndpointId, GroupKeyManagement::Id }), BitFlags<ClusterQualityFlags>());
+}
+
+TEST_F(TestGroupKeyManagementCluster, CommandsTest)
+{
+    ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
+
+    // Check required accepted commands are present
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
+    ASSERT_EQ(mCluster.AcceptedCommands(groupKeyManagementPath, acceptedCommandsBuilder), CHIP_NO_ERROR);
+    ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = acceptedCommandsBuilder.TakeBuffer();
+    ASSERT_EQ(acceptedCommands.size(), GroupKeyManagement::Commands::kAcceptedCommandsCount);
+
+    ASSERT_EQ(acceptedCommands[0].commandId, GroupKeyManagement::Commands::KeySetWrite::Id);
+    ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
+              GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry.GetInvokePrivilege());
+
+    ASSERT_EQ(acceptedCommands[1].commandId, GroupKeyManagement::Commands::KeySetRead::Id);
+    ASSERT_EQ(acceptedCommands[1].GetInvokePrivilege(),
+              GroupKeyManagement::Commands::KeySetRead::kMetadataEntry.GetInvokePrivilege());
+
+    ASSERT_EQ(acceptedCommands[2].commandId, GroupKeyManagement::Commands::KeySetRemove::Id);
+    ASSERT_EQ(acceptedCommands[2].GetInvokePrivilege(),
+              GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry.GetInvokePrivilege());
+
+    ASSERT_EQ(acceptedCommands[3].commandId, GroupKeyManagement::Commands::KeySetReadAllIndices::Id);
+    ASSERT_EQ(acceptedCommands[3].GetInvokePrivilege(),
+              GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
+
+    // Check required generated commands are present
+    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
+    ASSERT_EQ(mCluster.GeneratedCommands(groupKeyManagementPath, generatedCommandsBuilder), CHIP_NO_ERROR);
+    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+
+    ASSERT_EQ(generatedCommands.size(), GroupKeyManagement::Commands::kGeneratedCommandsCount);
+    ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
+    ASSERT_EQ(generatedCommands[1], GroupKeyManagement::Commands::KeySetReadResponse::Id);
+}
+TEST_F(TestGroupKeyManagementCluster, AttributesTest)
+{
+    std::vector<app::DataModel::AttributeEntry> mandatoryAttributes(GroupKeyManagement::Attributes::kMandatoryMetadata.begin(),
+                                                                    GroupKeyManagement::Attributes::kMandatoryMetadata.end());
+
+    // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
+    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(mCluster, std::move(mandatoryAttributes)));
+}
+
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
-TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
     auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 1, 0);
     PrepopulateGroupKeyMap(keys, kTestFabricIndex);
@@ -203,7 +204,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
 }
 
 // Cluster should reject a write containing duplicate keys for the same group/keyset combination.
-TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
     //  Intentionally creates two identical entries (duplicate group/keyset combination).
     // by setting increments  to 0 (groupIdIncrement = 0, keySetIdIncrement = 0)
@@ -223,7 +224,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
     VerifyGroupKeysMatch(kTestFabricIndex, expectedKeys);
 }
 
-TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
 {
     auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex);
 
@@ -236,7 +237,7 @@ const chip::EndpointId kTestEndpoint2 = 11;
 constexpr uint64_t kStartTimeOffset   = 100;
 
 // spec states - group should be deleted if the endpoint member list's last member is removed
-TEST_F(TestGroupKeyManagementClusterWithStorage, TestGroupEndpointLifecycle)
+TEST_F(TestGroupKeyManagementCluster, TestGroupEndpointLifecycle)
 {
     CHIP_ERROR err;
 
@@ -299,29 +300,6 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestGroupEndpointLifecycle)
     ASSERT_EQ(getEndpointCountForGroup(kTestGroupId), 0u);
 }
 
-struct TestGroupKeyManagementWithFabric : public TestGroupKeyManagementClusterWithStorage
-{
-    void SetUp() override
-    {
-        TestGroupKeyManagementClusterWithStorage::SetUp();
-
-        CHIP_ERROR err = tester.SetUpMockFabric();
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-
-        GroupKeyManagementCluster::SetFabricTableForTest(&tester.GetFabricHelper().GetFabricTable());
-    }
-
-    void TearDown() override
-    {
-        GroupKeyManagementCluster::SetFabricTableForTest(nullptr);
-
-        CHIP_ERROR err = tester.TearDownMockFabric();
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        TestGroupKeyManagementClusterWithStorage::TearDown();
-    }
-};
-
 const uint64_t kStartTime = 123456789;
 
 static const chip::Credentials::GroupDataProvider::EpochKey kKey = {
@@ -333,7 +311,7 @@ static const chip::Credentials::GroupDataProvider::EpochKey kNewKey = {
 };
 
 // writing a valid key set
-TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteCommand)
+TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteCommand)
 {
 
     GroupKeyManagement::Commands::KeySetWrite::Type requestData;
@@ -361,7 +339,7 @@ TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteCommand)
 }
 
 // Spec states that writing a KeySet with an existing KeySetID on the same fabric should overwrite the existing one
-TEST_F(TestGroupKeyManagementWithFabric, TestKeySetWriteSameId)
+TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
 {
     GroupKeyManagement::Commands::KeySetWrite::Type requestData1;
     requestData1.groupKeySet = {
