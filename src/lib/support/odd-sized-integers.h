@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <app/util/attribute-storage-null-handling.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/attribute-storage-null-handling.h>
 
 #include <cstdint>
 #include <limits>
