@@ -81,7 +81,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     async def teardown_test(self):
         await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
-        self.clear_kvs(kvs_prefix=self.provider_kvs_path)
+        self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()
 
     @async_test_body
@@ -96,6 +96,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
         logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
+
+        if not self.provider_kvs_path.startswith('/tmp'):
+            asserts.fail("Provider KVS path must be placed in the /tmp directory.")
 
         if self.ota_image_download_timeout <= 0:
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")

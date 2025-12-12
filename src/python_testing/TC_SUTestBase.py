@@ -382,8 +382,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         # Do not allow relative paths or paths outside of /tmp/
         real_kvs_path_prefix = path.realpath(kvs_path_prefix)
-        if not real_kvs_path_prefix.startswith('/tmp/'):
+        # on some darwin devices /tmp/ folder is an alias of /private/tmp/
+        if not (real_kvs_path_prefix.startswith('/tmp/') or real_kvs_path_prefix.startswith('/private/tmp/')):
             raise ValueError(
-                f"kvs_path_prefix must be an absolute path starting with /tmp/, but was: {kvs_path_prefix}")
+                f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
