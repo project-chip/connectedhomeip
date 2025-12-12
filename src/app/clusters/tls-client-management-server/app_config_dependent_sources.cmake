@@ -18,6 +18,7 @@ TARGET_SOURCES(
         PRIVATE
         "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.cpp"
         "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.h"
+        "${CLUSTER_DIR}/CodegenIntegration.cpp"
         "${CLUSTER_DIR}/TlsClientManagementCluster.cpp"
         "${CLUSTER_DIR}/TlsClientManagementCluster.h"
 )
