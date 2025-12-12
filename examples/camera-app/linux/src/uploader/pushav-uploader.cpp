@@ -33,29 +33,12 @@ PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
-    // Ensure final MPD upload during uploader thread termination to persist media data before shutdown.
-    if (!mMPDPath.first.empty() && !mMPDPath.second.empty())
-    {
-        ChipLogProgress(Camera, "Uploading final MPD to server before shutdown");
-        UploadData(mMPDPath);
-    }
-
     Stop();
 
     while (!mAvData.empty())
     {
         std::pair<std::string, std::string> uploadJob = std::move(mAvData.front());
         mAvData.pop();
-
-        std::error_code ec;
-        if (!std::filesystem::remove(uploadJob.first, ec))
-        {
-            ChipLogError(Camera, "Failed to delete file: %s, error: %s", uploadJob.first.c_str(), ec.message().c_str());
-        }
-        else
-        {
-            ChipLogDetail(Camera, "Successfully deleted file: %s", uploadJob.first.c_str());
-        }
     }
 }
 
