@@ -217,11 +217,11 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     tests_filtered: list[TestDefinition] = []
     for test in tests:
-        if include_tags and not (test.tags & set(include_tags)):
+        if include_tags and not (test.tags & include_tags):
             log.debug("Test '%s' not included", test.name)
             continue
 
-        if exclude_tags and test.tags & set(exclude_tags):
+        if exclude_tags and test.tags & exclude_tags:
             log.debug("Test '%s' excluded", test.name)
             continue
 
