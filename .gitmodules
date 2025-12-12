@@ -331,7 +331,7 @@
 [submodule "third_party/imx-secure-enclave/repo"]
 	path = third_party/imx-secure-enclave/repo
 	url = https://github.com/nxp-imx/imx-secure-enclave.git
-	branch = lf-6.12.34_2.1.0
+	branch = lf-6.12.49_2.2.0
 	platforms = linux
 [submodule "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"]
 	path = third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo
