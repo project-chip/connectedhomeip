@@ -98,6 +98,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*6)
         logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
 
+        if not self.provider_kvs_path.startswith('/tmp'):
+            asserts.fail("Provider KVS path must be placed in the /tmp directory.")
+
         if self.ota_image_download_timeout <= 0:
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
@@ -134,7 +137,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     async def teardown_test(self):
         await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
-        self.clear_kvs(kvs_prefix=self.provider_kvs_path)
+        self.clear_kvs(kvs_path_prefix=self.provider_kvs_path)
         super().teardown_test()
 
     def desc_TC_SU_2_7(self) -> str:
