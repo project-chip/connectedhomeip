@@ -413,7 +413,7 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         # ruff: noqa: ASYNC110
         while not empty_report_received and (time.time() - wait_start) < max_wait:
-            await asyncio.sleep(0.1) 
+            await asyncio.sleep(0.1)
 
         asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
@@ -556,7 +556,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step3_first.cancel()
         attr_handler_step3_second.cancel()
 
-        # Step 4: MinInterval/MaxInterval timing 
+        # Step 4: MinInterval/MaxInterval timing
         # (This was originally test steps 12 and 13 in the test plan, just appears to have been combined into one test step, which was a wise design decision)
         self.step(4)
 
