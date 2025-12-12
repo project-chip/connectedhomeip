@@ -569,16 +569,15 @@ CHIP_ERROR AccessControlCluster::GeneratedCommands(const ConcreteClusterPath & p
 }
 
 std::optional<DataModel::ActionReturnStatus> AccessControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                 TLV::TLVReader & input_arguments,
+                                                                                 TLV::TLVReader & inputArguments,
                                                                                  CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
-    case AccessControl::Commands::ReviewFabricRestrictions::Id: {
-        AccessControl::Commands::ReviewFabricRestrictions::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments, handler->GetAccessingFabricIndex()));
-        return HandleReviewFabricRestrictions(handler, request.path, data);
-    }
+    case ReviewFabricRestrictions::Id:
+        return HandleCommand<ReviewFabricRestrictions::DecodableType>(
+            inputArguments, handler->GetAccessingFabricIndex(),
+            [&](const auto & data) { return HandleReviewFabricRestrictions(handler, request.path, data); });
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
