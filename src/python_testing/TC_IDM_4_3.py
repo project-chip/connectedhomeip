@@ -412,7 +412,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         wait_start = time.time()
 
         while not empty_report_received and (time.time() - wait_start) < max_wait:
-            await asyncio.sleep(0.1)  # noqa: ASYNC110
+            await asyncio.sleep(0.1)  # skip: ok
 
         asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
@@ -613,7 +613,7 @@ class TC_IDM_4_3(BasicCompositionTests):
                 time_data = time.time()
                 report_received = True
                 break
-            time.sleep(0.1)
+            time.sleep(0.1) # noqa: ASYNC251
 
         asserts.assert_true(report_received, "Failed to receive attribute change report")
 
@@ -630,7 +630,7 @@ class TC_IDM_4_3(BasicCompositionTests):
                 attr_handler_step4.attribute_queue.get()
                 time_empty_2 = time.time()
                 break
-            time.sleep(0.1)
+            time.sleep(0.1) # noqa: ASYNC251
 
         # Wait for second empty report
         time_empty_2 = time.time()  # noqa: ASYNC251
