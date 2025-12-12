@@ -166,9 +166,18 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/g/%x/e/%x", fabric, group, endpoint);
     }
-    static StorageKeyName FabricKeyset(chip::FabricIndex fabric, uint16_t keyset)
+    static StorageKeyName FabricKeyset(chip::FabricIndex fabric, uint32_t keyset)
     {
-        return StorageKeyName::Formatted("f/%x/k/%x", fabric, keyset);
+        return StorageKeyName::Formatted("f/%x/k/%" PRIx32, fabric, keyset);
+    }
+    static StorageKeyName GroupcastEntryCountKey() { return StorageKeyName::Formatted("f/gcc"); }
+    static StorageKeyName GroupcastFabricEntryDataKey(chip::FabricIndex fabric)
+    {
+        return StorageKeyName::Formatted("f/%x/gcd", fabric);
+    }
+    static StorageKeyName GroupcastFabricEntryKey(chip::FabricIndex fabric, uint16_t index)
+    {
+        return StorageKeyName::Formatted("f/%x/gc/%x", fabric, index);
     }
 
     static StorageKeyName AttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)

@@ -1769,6 +1769,21 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
     return nullptr;
 }
 
+Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeysetContext(FabricIndex fabric_index, KeysetId keyset_id)
+{
+    FabricData fabric(fabric_index);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), nullptr);
+
+    KeySetData keyset;
+    VerifyOrReturnError(keyset.Find(mStorage, fabric, keyset_id), nullptr);
+    Crypto::GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
+    if (nullptr != creds)
+    {
+        return mGroupKeyContexPool.CreateObject(*this, creds->encryption_key, creds->hash, creds->privacy_key);
+    }
+    return nullptr;
+}
+
 CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet & out_keyset)
 {
     FabricData fabric(fabric_index);
