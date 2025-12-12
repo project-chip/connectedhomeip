@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>
@@ -296,7 +295,7 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPre
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
+CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams)
 {
     dptzStreams.clear();
     return CHIP_NO_ERROR;
