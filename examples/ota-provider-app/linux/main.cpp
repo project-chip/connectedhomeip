@@ -24,7 +24,7 @@
 #include <json/json.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
-#include <ota-provider-common/OtaProviderAppCommandDelegate.h>
+#include "OtaProviderAppCommandDelegate.h"
 
 #include "AppMain.h"
 

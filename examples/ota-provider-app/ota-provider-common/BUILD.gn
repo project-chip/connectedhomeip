@@ -17,10 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("config") {
-  include_dirs = [
-    "..",
-    "${chip_root}/examples/platform/linux",
-  ]
+  include_dirs = [ ".." ]
 }
 
 chip_data_model("ota-provider-common") {
@@ -31,12 +28,9 @@ chip_data_model("ota-provider-common") {
     "BdxOtaSender.h",
     "OTAProviderExample.cpp",
     "OTAProviderExample.h",
-    "OtaProviderAppCommandDelegate.cpp",
-    "OtaProviderAppCommandDelegate.h",
   ]
 
   deps = [
-    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app/clusters/ota-provider:user-consent",
     "${chip_root}/src/protocols/bdx",
   ]
