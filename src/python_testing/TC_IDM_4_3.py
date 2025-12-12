@@ -35,7 +35,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import contextlib
 import logging
 import time
 
@@ -50,7 +49,7 @@ from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import (AttributeSubscriptionHandler, EventSubscriptionHandler,
                                                       WildcardAttributeSubscriptionHandler)
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -432,7 +431,7 @@ class TC_IDM_4_3(BasicCompositionTests):
 
         attr_handler_step1.cancel()
 
-        
+
         #with contextlib.suppress(asyncio.CancelledError):
         #    await asyncio.sleep(0.1)
 
@@ -596,7 +595,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         # Wait for first empty report and capture its time
         time_empty = time.time()
         time.sleep(max_interval + 1)
-        
+
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
             self.dut_node_id,
@@ -625,7 +624,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         empty_report_2_received = False
         empty_wait_2_start = time.time()
         time_empty_2 = None
-        
+
         while time.time() - empty_wait_2_start < (max_interval + 5):
             if attr_handler_step4.attribute_queue.qsize() > 0:
                 # Second empty report arrived - capture the time
@@ -634,11 +633,11 @@ class TC_IDM_4_3(BasicCompositionTests):
                 empty_report_2_received = True
                 break
             time.sleep(0.1)
-        
+
         # Wait for second empty report
         time_empty_2 = time.time()
         time.sleep(max_interval + 1)
-       
+
         # Verify timing constraints
         #
         # MRP Retransmission Time Calculation:
@@ -1006,10 +1005,10 @@ class TC_IDM_4_3(BasicCompositionTests):
         asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
 
         log.info(f"Step 10: Priming data received from {num_endpoints} endpoints, {total_clusters} clusters, {total_attributes} attributes")
-        
+
         # Reset handler to clear priming report tracking before making changes
         handler_step10.reset()
-        
+
         # Give subscription a moment to stabilize after reset
         await asyncio.sleep(1)
 
