@@ -132,7 +132,7 @@ class RunContext:
     '--no-randomize-tests',
     is_flag=True,
     default=False,
-    help="Don't randomize test order"
+    help='Don\'t randomize test order'
 )
 @click.option(
     '--random-seed',
