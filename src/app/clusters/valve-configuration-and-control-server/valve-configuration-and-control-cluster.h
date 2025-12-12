@@ -76,7 +76,6 @@ private:
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
     CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
     void emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState);
-    void emitValveLevelEvent(chip::Percent currentLevel);
 
     template <typename T, typename U>
     inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, chip::AttributeId attributeId)
