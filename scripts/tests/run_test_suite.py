@@ -233,6 +233,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob, no_
             test.name.lower())]
 
     if no_randomize_tests:
+        if random_seed is not None:
+            log.warning("Setting a random seed when tests are not randomized has no effect on test order.")
         tests.sort(key=lambda x: x.name)
     else:
         seed = str(time.time_ns()) if random_seed is None else random_seed
