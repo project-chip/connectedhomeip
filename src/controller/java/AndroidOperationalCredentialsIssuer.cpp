@@ -63,7 +63,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     ReturnErrorOnFailure(ASN1ToChipEpochTime(effectiveTime, mNow));
 
     Crypto::P256SerializedKeypair serializedKey;
-    uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
+    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
     if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
     {
@@ -71,7 +71,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(sizeof(serializedKey));
+        keySize = static_cast<uint16_t>(serializedKey.Capacity());
         ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
     }
     else
