@@ -17,6 +17,7 @@
 import enum
 import logging
 import os
+import random
 import sys
 import time
 import typing
@@ -128,6 +129,16 @@ class RunContext:
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--no-randomize-tests',
+    is_flag=True,
+    default=False,
+    help="Don't randomize test order"
+)
+@click.option(
+    '--random-seed',
+    help='Seed for test order randomization'
+)
+@click.option(
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
@@ -141,8 +152,8 @@ class RunContext:
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, find_path, runner, chip_tool):
+def main(context, dry_run, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare,
+         include_tags, exclude_tags, no_randomize_tests: bool, random_seed: str | None, find_path, runner, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -221,7 +232,13 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
-    tests.sort(key=lambda x: x.name)
+    if no_randomize_tests:
+        tests.sort(key=lambda x: x.name)
+    else:
+        seed = str(time.time_ns()) if random_seed is None else random_seed
+        log.info('Using the following seed for test order randomization: %s', seed)
+        random.seed(seed)
+        random.shuffle(tests)
 
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
