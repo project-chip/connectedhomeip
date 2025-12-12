@@ -412,7 +412,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         wait_start = time.time()
 
         while not empty_report_received and (time.time() - wait_start) < max_wait:
-            await asyncio.sleep(0.1) # noqa: ASYNC110
+            await asyncio.sleep(0.1)  # noqa: ASYNC110
 
         asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
@@ -593,8 +593,8 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step4.flush_reports()
 
         # Wait for first empty report and capture its time
-        time_empty = time.time() # noqa: ASYNC251
-        time.sleep(max_interval + 1) # noqa: ASYNC251
+        time_empty = time.time()  # noqa: ASYNC251
+        time.sleep(max_interval + 1)  # noqa: ASYNC251
 
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
@@ -633,8 +633,8 @@ class TC_IDM_4_3(BasicCompositionTests):
             time.sleep(0.1)
 
         # Wait for second empty report
-        time_empty_2 = time.time() # noqa: ASYNC251
-        time.sleep(max_interval + 1) # noqa: ASYNC251
+        time_empty_2 = time.time()  # noqa: ASYNC251
+        time.sleep(max_interval + 1)  # noqa: ASYNC251
 
         # Verify timing constraints
         #
