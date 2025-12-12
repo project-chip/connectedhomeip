@@ -95,10 +95,6 @@ if (CONFIG_CHIP_FACTORY_DATA)
         ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
         ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
     )
-    target_include_directories(app PRIVATE
-        ${CHIP_ROOT}/src/platform/nxp/zephyr
-        ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy
-    )
 endif()
 
 chip_configure_data_model(app
