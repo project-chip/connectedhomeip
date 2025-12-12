@@ -44,6 +44,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 # These below variables are used to test the AccessControl cluster
 # Extension attribute and come from the test plan here:
 # https://github.com/CHIP-Specifications/chip-test-plans/blob/59e8c45b8e7c24d5ce130b166520ff4f7bd935b6/src/cluster/AccessControl.adoc#tc-acl-2-10-persistence
@@ -110,7 +112,7 @@ class TC_ACL_2_10(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info("CurrentFabricIndex F1: %s", str(f1))
+        log.info("CurrentFabricIndex F1: %s", str(f1))
 
         self.step(3)
         # TH1 puts DUT into commissioning mode, TH2 is created and commissions DUT using admin node ID
@@ -129,7 +131,7 @@ class TC_ACL_2_10(MatterBaseTest):
         self.step(4)
         # Read TH2's fabric index
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        logging.info("CurrentFabricIndex F2: %s", str(f2))
+        log.info("CurrentFabricIndex F2: %s", str(f2))
 
         self.step(5)
         # Saving initial ACL to use later during test step 17
@@ -160,7 +162,7 @@ class TC_ACL_2_10(MatterBaseTest):
             self.dut_node_id,
             [(0, acl_attribute(value=two_element_acl_th1))]
         )
-        logging.info("Write result: %s", str(result))
+        log.info("Write result: %s", str(result))
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -189,7 +191,7 @@ class TC_ACL_2_10(MatterBaseTest):
             self.dut_node_id,
             [(0, acl_attribute(value=two_element_acl_th2))]
         )
-        logging.info("Write result: %s", str(result))
+        log.info("Write result: %s", str(result))
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -198,13 +200,13 @@ class TC_ACL_2_10(MatterBaseTest):
             # TH1 writes Extension attribute with D_OK_EMPTY
             extension1 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
                 data=D_OK_EMPTY)
-            logging.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
+            log.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
             extensions_list1 = [extension1]
             result = await self.th1.WriteAttribute(
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list1))]
             )
-            logging.info("TH1 write result: %s", str(result))
+            log.info("TH1 write result: %s", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -213,14 +215,14 @@ class TC_ACL_2_10(MatterBaseTest):
             # TH2 writes Extension attribute with D_OK_SINGLE
             extension2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
                 data=D_OK_SINGLE)
-            logging.info(f"Writing extension with data {D_OK_SINGLE.hex()}")
+            log.info(f"Writing extension with data {D_OK_SINGLE.hex()}")
             extensions_list2 = [extension2]
 
             result = await self.th2.WriteAttribute(
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list2))]
             )
-            logging.info("TH2 write result: %s", str(result))
+            log.info("TH2 write result: %s", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
 
@@ -234,17 +236,17 @@ class TC_ACL_2_10(MatterBaseTest):
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
 
             # After manual reboot, expire previous sessions so that we can re-establish connections
-            logging.info("Expiring sessions after manual device reboot")
+            log.info("Expiring sessions after manual device reboot")
             self.th1.ExpireSessions(self.dut_node_id)
             self.th2.ExpireSessions(self.dut_node_id)
-            logging.info("Manual device reboot completed")
+            log.info("Manual device reboot completed")
 
         else:
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
-                logging.info("Created restart flag file to signal app restart")
+                log.info("Created restart flag file to signal app restart")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
                 # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
@@ -254,10 +256,10 @@ class TC_ACL_2_10(MatterBaseTest):
                 self.th1.ExpireSessions(self.dut_node_id)
                 self.th2.ExpireSessions(self.dut_node_id)
 
-                logging.info("App restart completed successfully")
+                log.info("App restart completed successfully")
 
             except Exception as e:
-                logging.error(f"Failed to restart app: {e}")
+                log.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
 
         self.step(10)
@@ -266,7 +268,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # containing 2 elements; must not contain an element with fabricIndex F2
         # acl_cluster = Clusters.AccessControl
         result1 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=acl_attribute)
-        logging.info("TH1 read result: %s", str(result1))
+        log.info("TH1 read result: %s", str(result1))
         asserts.assert_equal(len(result1), 2,
                              "Should have exactly two ACL entries")
         for entry in result1:
@@ -280,7 +282,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # or Data `D_OK_SINGLE`
         if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
             th1_extension_attr = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
-            logging.info("TH1 read extension result: %s", str(th1_extension_attr))
+            log.info("TH1 read extension result: %s", str(th1_extension_attr))
             asserts.assert_equal(len(th1_extension_attr), 1, "Expected exactly one extension attribute")
 
             # Verify the actual values
@@ -293,7 +295,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # Result is SUCCESS, value is list of AccessControlExtensionStruct
         # containing 2 elements; must not contain an element with fabricIndex F1
         result2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=acl_cluster, attribute=acl_attribute)
-        logging.info("TH2 read result: %s", str(result2))
+        log.info("TH2 read result: %s", str(result2))
         asserts.assert_equal(len(result2), 2,
                              "Should have exactly two ACL entries")
         for entry in result2:
@@ -307,7 +309,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # or Data `D_OK_EMPTY`
         if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
             th2_extension_attr = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
-            logging.info("TH2 read extension result: %s", str(th2_extension_attr))
+            log.info("TH2 read extension result: %s", str(th2_extension_attr))
             asserts.assert_equal(len(th2_extension_attr), 1, "Expected exactly one extension attribute")
 
             # Verify the actual values
@@ -325,7 +327,7 @@ class TC_ACL_2_10(MatterBaseTest):
         # Result is SUCCESS, value is list of AccessControlEntryStruct containing
         # 2 elements, and MUST NOT contain an element with FabricIndex `F2`
         result3 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=acl_attribute)
-        logging.info("TH1 read result: %s", str(result3))
+        log.info("TH1 read result: %s", str(result3))
         asserts.assert_equal(len(result3), 2,
                              "Should have exactly two ACL entries")
 
@@ -341,7 +343,7 @@ class TC_ACL_2_10(MatterBaseTest):
             # containing 1 element; MUST NOT contain an element with FabricIndex `F2`
             # or Data `D_OK_SINGLE`
             th1_extension_attr2 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
-            logging.info("TH1 read extension result: %s", str(th1_extension_attr2))
+            log.info("TH1 read extension result: %s", str(th1_extension_attr2))
             asserts.assert_equal(len(th1_extension_attr2), 1, "Expected exactly one extension attribute")
 
             # Verify the attribute, should not contain an entry with FabricIndex F2 or Data D_OK_SINGLE
@@ -357,7 +359,7 @@ class TC_ACL_2_10(MatterBaseTest):
         )
         asserts.assert_equal(result[0].Status, Status.Success,
                              "Write admin-only ACL should succeed")
-        logging.info("Successfully reset ACL to admin-only entry")
+        log.info("Successfully reset ACL to admin-only entry")
 
         # Final verification that ACL contains only admin entry
         final_acl = await self.read_single_attribute_check_success(

@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:175
+            image: ghcr.io/project-chip/chip-build-telink:177
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -99,15 +99,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) All Clusters Minimal App
+            - name: Build example Telink (B92) All Clusters Minimal App with NFC onboarding payload
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal-nfc-payload' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9528a all-clusters-minimal-app \
-                    out/telink-tlsr9528a-all-clusters-minimal/zephyr/zephyr.elf \
+                    out/telink-tlsr9528a-all-clusters-minimal-nfc-payload/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -386,7 +386,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:175
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:177
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

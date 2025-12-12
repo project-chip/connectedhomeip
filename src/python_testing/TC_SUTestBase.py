@@ -16,6 +16,7 @@
 
 
 import logging
+import subprocess
 import tempfile
 from os import path
 from typing import Optional
@@ -29,7 +30,7 @@ from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
@@ -47,8 +48,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        storage_dir='/tmp',
                        extra_args: list = [],
                        kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
-                       timeout: int = 10):
+                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
+                       timeout: int = 30):
         """Start the provider process using the provided configuration.
 
         Args:
@@ -57,14 +58,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             setup_pincode (int, optional): Setup pincode for the provider process. Defaults to 20202021.
             discriminator (int, optional): Discriminator for the provider process. Defaults to 1234.
             port (int, optional): Port for the provider process. Defaults to 5541.
-            storage_dir (str, optional): Storage dir for the provider proccess. Defaults to '/tmp'.
+            storage_dir (str, optional): Storage dir for the provider process. Defaults to '/tmp'.
             extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
-            expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
+            expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        logger.info(f"Launching provider app with with ota image {ota_image_path}")
+        log.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
+
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -81,9 +83,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # Assign the file descriptor to log_file
             log_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
                 dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
-            logger.info(f"Writing Provider logs at :{log_file.name}")
+            log.info(f"Writing Provider logs at :{log_file.name}")
         else:
-            logger.info(f"Writing Provider logs at : {log_file}")
+            log.info(f"Writing Provider logs at : {log_file}")
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
             provider_app_path,
@@ -101,7 +103,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        log.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+
+    def terminate_provider(self):
+        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
+            log.info("Terminating existing OTA Provider")
+            self.current_provider_app_proc.terminate()
+            self.current_provider_app_proc = None
+        else:
+            log.info("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -130,14 +140,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             metadataForNode=None,
             endpoint=endpoint
         )
-        logger.info("Sending AnnounceOTA Provider Command")
+        log.info("Sending AnnounceOTA Provider Command")
         cmd_resp = await self.send_single_cmd(
             cmd=cmd_announce_ota_provider,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        logger.info(f"Announce command sent {cmd_resp}")
+        log.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
 
     async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
@@ -145,9 +155,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Args:
             controller (ChipDeviceCtrl): Controller to write the providers.
-            provider_node_id (int): Node where the provider is localted.
+            provider_node_id (int): Node where the provider is located.
             requestor_node_id (int): Node of the requestor to write the providers.
-            endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
+            endpoint (int, optional): Endpoint to write the providers. Defaults to 0.
         """
 
         current_otap_info = await self.read_single_attribute_check_success(
@@ -155,7 +165,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers: {current_otap_info}")
+        log.info(f"OTA Providers: {current_otap_info}")
 
         # Create Provider Location into Requestor
         provider_location_struct = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
@@ -180,7 +190,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers List: {after_otap_info}")
+        log.info(f"OTA Providers List: {after_otap_info}")
 
     async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
@@ -217,7 +227,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ota_image_info['size'] = path.getsize(ota_path)
             ota_image_info['exists'] = True
         except OSError:
-            logger.info(f"OTA IMAGE at {ota_path} does not exists")
+            log.info(f"OTA IMAGE at {ota_path} does not exists")
             return ota_image_info
 
         return ota_image_info
@@ -237,7 +247,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             target_version (Optional[int], optional): Software version to verify if not provided ignore this check.. Defaults to None.
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
-        logger.info(f"Verifying the event {event_report}")
+        log.info(f"Verifying the event {event_report}")
         asserts.assert_equal(event_report.previousState, expected_previous_state,
                              f"Previous state was not {expected_previous_state}")
         asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")
@@ -300,3 +310,22 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
+        """
+        Remove all temporary KVS files created.
+
+        OTA Provider/Requestor use "/tmp/chip_kvs" as the default KVS location when no --KVS is provided.
+        Tests may also specify custom prefixes such as "/tmp/chip_kvs_provider".
+
+        Args:
+            kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
+            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files.
+        """
+        # Do not allow relative paths or paths outside of /tmp/
+        real_kvs_path_prefix = path.realpath(kvs_path_prefix)
+        if not real_kvs_path_prefix.startswith('/tmp/'):
+            raise ValueError(
+                f"kvs_path_prefix must be an absolute path starting with /tmp/, but was: {kvs_path_prefix}")
+        subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
+        log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
