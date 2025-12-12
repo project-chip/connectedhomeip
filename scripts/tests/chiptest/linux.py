@@ -29,7 +29,7 @@ import time
 
 import sdbus
 
-from .runner import Executor, SubprocessInfo
+from .runner import Executor, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
@@ -136,9 +136,8 @@ class IsolatedNetworkNamespace:
         "ip netns del app-{index}",
     ]
 
-    def __init__(self, index=0, setup_app_link_up=True, setup_tool_link_up=True,
-                 app_link_name='eth-app', tool_link_name='eth-tool',
-                 unshared=False):
+    def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
+                 wait_for_dad: bool = True, app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool', unshared: bool = False):
 
         if not unshared:
             # If not running in an unshared network namespace yet, try
@@ -151,17 +150,24 @@ class IsolatedNetworkNamespace:
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
 
-        self._setup()
-        if setup_app_link_up:
-            self._setup_app_link_up(wait_for_dad=False)
-        if setup_tool_link_up:
-            self._setup_tool_link_up(wait_for_dad=False)
-        self._wait_for_duplicate_address_detection()
+        try:
+            self._setup()
+            if setup_app_link_up:
+                self._setup_app_link_up(wait_for_dad=False)
+            if setup_tool_link_up:
+                self._setup_tool_link_up(wait_for_dad=False)
+        except BaseException:
+            # Ensure that we leave a clean state on any exception.
+            self.terminate()
+            raise
 
-    def netns_for_subprocess(self, subproc: SubprocessInfo):
-        return "{}-{}".format(subproc.kind, self.index)
+        if wait_for_dad:
+            self.wait_for_duplicate_address_detection()
 
-    def _wait_for_duplicate_address_detection(self):
+    def netns_for_subprocess_kind(self, kind: SubprocessKind):
+        return "{}-{}".format(kind.name.lower(), self.index)
+
+    def wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
@@ -182,27 +188,28 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_APP_LINK_UP:
             self._run(command)
         if wait_for_dad:
-            self._wait_for_duplicate_address_detection()
+            self.wait_for_duplicate_address_detection()
 
     def _setup_tool_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_TOOL_LINK_UP:
             self._run(command)
         if wait_for_dad:
-            self._wait_for_duplicate_address_detection()
+            self.wait_for_duplicate_address_detection()
 
-    def _run(self, command: str):
-        command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name,
-                                 index=self.index)
-        log.debug("Executing: '%s'", command)
-        if subprocess.run(command.split()).returncode != 0:
-            log.error("Failed to execute '%s'", command)
-            log.error("Are you using --privileged if running in docker?")
-            sys.exit(1)
+    def _run(self, *command: str):
+        for c in command:
+            c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
+            log.debug("Executing: '%s'", c)
+            if subprocess.run(c.split()).returncode != 0:
+                raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
-        for command in self.COMMANDS_TERMINATE:
-            self._run(command)
+        """Execute all down commands gracefully omitting errors."""
+        for cmd in self.COMMANDS_TERMINATE:
+            try:
+                self._run(cmd)
+            except Exception as e:
+                log.warning("Encountered error during namespace termination: %s", e)
 
 
 class LinuxNamespacedExecutor(Executor):
@@ -210,7 +217,7 @@ class LinuxNamespacedExecutor(Executor):
         self.ns = ns
 
     def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess(subproc))
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
         return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
 
 

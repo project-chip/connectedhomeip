@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import logging
 import os
 import pathlib
@@ -21,8 +22,7 @@ import re
 import subprocess
 import threading
 import typing
-from dataclasses import dataclass
-from typing import Literal
+from dataclasses import dataclass, replace
 
 log = logging.getLogger(__name__)
 
@@ -124,11 +124,15 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
+class SubprocessKind(enum.Enum):
+    APP = enum.auto()
+    TOOL = enum.auto()
+    RPC = enum.auto()
+
+
 @dataclass
 class SubprocessInfo:
-    # Restricted as this identifies the name of the network namespace in an executor implementing
-    # test case isolation.
-    kind: Literal['app', 'tool']
+    kind: SubprocessKind
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
@@ -137,10 +141,10 @@ class SubprocessInfo:
         self.path = pathlib.Path(self.path)
 
     def with_args(self, *args: str):
-        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
+        return replace(self, args=self.args + tuple(args))
 
     def wrap_with(self, *args: str):
-        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
+        return replace(self, wrapper=tuple(args) + self.wrapper)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
