@@ -122,6 +122,28 @@ public:
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 
+    // Nullable
+    // Specialization for enums
+    // - decode the given data
+    // - verifies that it is a valid enum value
+    // - validate that the decoded value is different from the current one
+    // - writes to storage
+    template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
+                                                                  AttributeValueDecoder & decoder, DataModel::Nullable<T> & value)
+    {
+        DataModel::Nullable<T> decodedValue{};
+        ReturnErrorOnFailure(decoder.Decode(decodedValue));
+        VerifyOrReturnError(decodedValue.IsNull() || decodedValue.Value() != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        value = decodedValue;
+
+        typename NumericAttributeTraits<T>::StorageType storageValue;
+        NullableToStorage(value, storageValue);
+
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+    }
+
     /// Load the given string from concrete storage.
     ///
     /// NOTE: `value` is take as an internal short string to avoid the templates that Storage::String
