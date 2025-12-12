@@ -485,7 +485,6 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent curre
     if (mFeatures.Has(Feature::kLevel))
     {
         SaveAndReportIfChanged(mCurrentLevel, currentLevel, Attributes::CurrentLevel::Id);
-        emitValveLevelEvent(currentLevel);
 
         if (!mTargetLevel.IsNull() && mCurrentLevel == mTargetLevel)
         {
@@ -538,17 +537,17 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
     return CHIP_NO_ERROR;
 }
 
-void ValveConfigurationAndControlCluster::emitValveLevelEvent(chip::Percent currentLevel)
-{
-    ValveConfigurationAndControl::Events::ValveStateChanged::Type event;
-    event.valveLevel = MakeOptional<Percent>(currentLevel);
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-}
-
 void ValveConfigurationAndControlCluster::emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState)
 {
     ValveConfigurationAndControl::Events::ValveStateChanged::Type event;
     event.valveState = currentState;
+    
+    // Check if Level feature and add current level if enabled
+    if(mFeatures.Has(Feature::kLevel) && !mCurrentLevel.IsNull())
+    {
+        event.valveLevel = MakeOptional<Percent>(mCurrentLevel.Value());
+    }
+
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
