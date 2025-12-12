@@ -19,6 +19,7 @@ import logging
 import subprocess
 import tempfile
 from os import path
+from time import sleep
 from typing import Optional
 
 from mobly import asserts
@@ -311,6 +312,63 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
+    def restart_requestor(self, restore: bool = False):
+        """This method Reboots or Restore the DUT."""
+        restart_flag_file = self.get_restart_flag_file()
+        log.info(f"RESTART FILE at {restart_flag_file}")
+        if not restart_flag_file:
+            action_str = "Reboot"
+            prompt_message = "Reboot the DUT. Press Enter when ready.\n"
+            if restore:
+                action_str = "Restore"
+                prompt_message = "Manually restore the DUT to it's original version. Please type Enter when its ready.\n"
+
+            log.info(f"Restart file not found. Entering Manual {action_str}.")
+            # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
+            # restore to the previous software version.
+            self.controller.ExpireSessions(self.requestor_node_id)
+            self.wait_for_user_input(prompt_msg=prompt_message)
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            log.info(f"Manual device {action_str} completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                log.info("Created restart flag file to signal app restart")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                sleep(1)
+
+                # Expire sessions and re-establish connections
+                log.info("Expiring sessions after manual device reboot")
+                self.controller.ExpireSessions(self.requestor_node_id)
+                log.info("App restart completed successfully")
+
+            except Exception as e:
+                asserts.fail(f"Requestor restart failed: {e}")
+
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+        Args:
+            controller (ChipDeviceCtrl): The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeId=requestor_node_id
+        )
+        log.info('Cleanup - DefaultOTAProviders cleared')
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+
     def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
         """
         Remove all temporary KVS files created.
@@ -324,8 +382,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         # Do not allow relative paths or paths outside of /tmp/
         real_kvs_path_prefix = path.realpath(kvs_path_prefix)
-        if not real_kvs_path_prefix.startswith('/tmp/'):
+        # on some darwin devices /tmp/ folder is an alias of /private/tmp/
+        if not (real_kvs_path_prefix.startswith('/tmp/') or real_kvs_path_prefix.startswith('/private/tmp/')):
             raise ValueError(
-                f"kvs_path_prefix must be an absolute path starting with /tmp/, but was: {kvs_path_prefix}")
+                f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
