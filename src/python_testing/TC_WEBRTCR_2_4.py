@@ -44,6 +44,8 @@ from TC_WEBRTCRTestBase import WEBRTCRTestBase
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_WebRTCR_2_4(WEBRTCRTestBase):
     def setup_class(self):
@@ -60,7 +62,7 @@ class TC_WebRTCR_2_4(WEBRTCRTestBase):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -95,21 +97,19 @@ class TC_WebRTCR_2_4(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from DUT"),
             TestStep(2, "Trigger {TH_Server} to send an Answer to DUT"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_4(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.C01.Rsp",   # Answer command
         ]
-        return pics
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.

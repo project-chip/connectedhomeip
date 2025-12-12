@@ -509,7 +509,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
 
     AdvancePendingResolverStates();
 
-    ScheduleRetries();
+    TEMPORARY_RETURN_IGNORED ScheduleRetries();
 }
 
 CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
@@ -785,7 +785,7 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 
 void MinMdnsResolver::RetryCallback(System::Layer *, void * self)
 {
-    reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
+    TEMPORARY_RETURN_IGNORED reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
 }
 
 MinMdnsResolver gResolver;

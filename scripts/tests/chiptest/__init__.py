@@ -17,6 +17,7 @@
 import json
 import logging
 import os
+import shlex
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,8 @@ from typing import Iterator, Set
 
 from . import runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+
+log = logging.getLogger(__name__)
 
 __all__ = [
     "TestTarget",
@@ -76,7 +79,7 @@ def _IsValidYamlTest(name: str) -> bool:
 
 
 def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
-    with open(json_file_path, 'rt') as f:
+    with open(json_file_path) as f:
         data = json.load(f)
         for c in data["collection"]:
             for name in data[c]:
@@ -322,9 +325,9 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     cmd = [chip_tool, "tests", cmd]
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
     if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
+        log.error("Failed to run %s:", shlex.join(cmd))
+        log.error("STDOUT: %s", result.stdout)
+        log.error("STDERR: %s", result.stderr)
         result.check_returncode()
 
     test_tags = set()

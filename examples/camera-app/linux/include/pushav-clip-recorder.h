@@ -18,7 +18,7 @@
 #pragma once
 
 #include "pushav-uploader.h"
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 
 #include <algorithm>
 #include <atomic>
@@ -90,7 +90,6 @@ public:
         uint16_t mElapsedTimeS;                               ///< Elapsed time since recording start in seconds
         std::string mOutputPath;                              ///< Base output directory path
         std::string mTrackName;                               ///< Track name for segmented files
-        AVRational mInputTimeBase;                            ///< Input time base
         std::string mUrl;                                     ///< URL for uploading clips;
         int mTriggerType;                                     ///< Recording trigger type
         std::chrono::steady_clock::time_point activationTime; ///< Time when the recording started
@@ -223,9 +222,6 @@ private:
 
     /// @name Internal Methods
     /// @{
-    bool FileExists(const std::string & path);
-
-    bool IsOutputDirectoryValid(const std::string & path);
 
     /**
      * @brief Ensures a directory exists, creating it if necessary.
@@ -233,12 +229,6 @@ private:
      * @return true if the directory exists or was created successfully, false otherwise.
      */
     bool EnsureDirectoryExists(const std::string & path);
-
-    /**
-     * @brief Removes files from previous recordings in the specified directory.
-     * @param path The directory path to clean.
-     */
-    void RemovePreviousRecordingFiles(const std::string & path);
 
     bool CheckAndUploadFile(std::string path);
 

@@ -112,7 +112,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     // Start timer to increment TotalOperationalHours every hour
-    SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 
 exit:
     return err;
@@ -124,14 +124,14 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
     if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
     }
     else
     {
         ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
     }
 
-    SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 }
 
 void PlatformManagerImpl::_Shutdown()

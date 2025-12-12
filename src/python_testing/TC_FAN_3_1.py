@@ -54,7 +54,7 @@ class OrderEnum(Enum):
     Descending = 2
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_3_1(MatterBaseTest):
@@ -140,20 +140,20 @@ class TC_FAN_3_1(MatterBaseTest):
 
     def log_scenario(self, attr_to_update, value_range, order) -> None:
         # Logging support info
-        logging.info("[FC] ====================================================================")
-        logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
-        logging.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
+        log.info("[FC] ====================================================================")
+        log.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
+        log.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
 
         # Logging initial FanMode state
         init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-        logging.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
+        log.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
 
         # Logging the scenario being tested
         attr_to_verify = "FanMode" if attr_to_update == Clusters.FanControl.Attributes.PercentSetting else "PercentSetting, PercentCurrent"
         speed_setting_scenario = ", SpeedSetting, and SpeedCurrent" if self.supports_multispeed else ""
-        logging.info(f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify}{speed_setting_scenario}")
-        logging.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
-        logging.info("[FC]")
+        log.info(f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify}{speed_setting_scenario}")
+        log.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
+        log.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
         cluster = Clusters.FanControl
@@ -176,10 +176,10 @@ class TC_FAN_3_1(MatterBaseTest):
 
     def log_results(self) -> None:
         for sub in self.subscriptions:
-            logging.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
+            log.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
             for q in sub.attribute_queue.queue:
-                logging.info(f"[FC] {q.attribute.__name__}: {q.value}")
-            logging.info("[FC]")
+                log.info(f"[FC] {q.attribute.__name__}: {q.value}")
+            log.info("[FC]")
 
     def verify_attribute_progression(self, order) -> None:
         # Setup
@@ -250,10 +250,14 @@ class TC_FAN_3_1(MatterBaseTest):
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_FAN_3_1(self):
         # Setup
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 

@@ -149,6 +149,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "HepaFilterMonitoring";
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return "ActivatedCarbonFilterMonitoring";
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id:
+        return "WaterTankLevelMonitoring";
     case chip::app::Clusters::BooleanStateConfiguration::Id:
         return "BooleanStateConfiguration";
     case chip::app::Clusters::ValveConfigurationAndControl::Id:
@@ -235,6 +237,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RadonConcentrationMeasurement";
     case chip::app::Clusters::SoilMeasurement::Id:
         return "SoilMeasurement";
+    case chip::app::Clusters::AmbientContextSensing::Id:
+        return "AmbientContextSensing";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -941,6 +945,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveNetworkFaults";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id:
             return "TestEventTriggersEnabled";
+        case chip::app::Clusters::GeneralDiagnostics::Attributes::DeviceLoadStatus::Id:
+            return "DeviceLoadStatus";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralDiagnostics::Attributes::AcceptedCommandList::Id:
@@ -2147,6 +2153,35 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::Condition::Id:
+            return "Condition";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::DegradationDirection::Id:
+            return "DegradationDirection";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ChangeIndication::Id:
+            return "ChangeIndication";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::InPlaceIndicator::Id:
+            return "InPlaceIndicator";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::LastChangedTime::Id:
+            return "LastChangedTime";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ReplacementProductList::Id:
+            return "ReplacementProductList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -3913,6 +3948,49 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::AmbientContextSensing::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HumanActivityDetected::Id:
+            return "HumanActivityDetected";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectIdentified::Id:
+            return "ObjectIdentified";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AudioContextDetected::Id:
+            return "AudioContextDetected";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextType::Id:
+            return "AmbientContextType";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
+            return "AmbientContextTypeSupported";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
+            return "SimultaneousDetectionLimit";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThresholdReached::Id:
+            return "CountThresholdReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThreshold::Id:
+            return "CountThreshold";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
+            return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
+            return "HoldTime";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:
+            return "HoldTimeLimits";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
+            return "PredictedActivity";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyModeEnabled::Id:
+            return "PrivacyModeEnabled";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -5605,6 +5683,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         switch (id)
         {
         case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id:
+            return "ResetCondition";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Id:
             return "ResetCondition";
         default:
             return "Unknown";

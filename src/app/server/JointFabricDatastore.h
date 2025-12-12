@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <credentials/CHIPCert.h>
+#include <functional>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
@@ -116,6 +117,44 @@ public:
         static JointFabricDatastore sInstance;
         return sInstance;
     }
+
+    class Delegate
+    {
+    public:
+        Delegate() {}
+        virtual ~Delegate() {}
+
+        virtual CHIP_ERROR
+        SyncNode(NodeId nodeId,
+                 const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & endpointGroupIDEntry,
+                 std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR
+        SyncNode(NodeId nodeId,
+                 const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & nodeKeySetEntry,
+                 std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR
+        SyncNode(NodeId nodeId,
+                 const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & bindingEntry,
+                 std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR SyncNode(NodeId nodeId,
+                                    const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
+                                    std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+    };
 
     ByteSpan GetAnchorRootCA() const { return ByteSpan(mAnchorRootCA, mAnchorRootCALength); }
 
@@ -256,6 +295,14 @@ public:
      */
     void RemoveListener(Listener & listener);
 
+    CHIP_ERROR SetDelegate(Delegate * delegate)
+    {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mDelegate = delegate;
+
+        return CHIP_NO_ERROR;
+    }
+
 private:
     static constexpr size_t kMaxNodes            = 256;
     static constexpr size_t kMaxAdminNodes       = 32;
@@ -304,6 +351,8 @@ private:
 
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
+
+    Delegate * mDelegate = nullptr;
 };
 
 } // namespace app

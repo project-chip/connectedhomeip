@@ -54,17 +54,21 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
+      "${chip_root}/src/app/clusters/chime-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
+      "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/operational-credentials-server/tests",
       "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
@@ -73,8 +77,15 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
       "${chip_root}/src/app/clusters/user-label-server/tests",
       "${chip_root}/src/app/clusters/identify-server/tests",
+      "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
+      "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
+      "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
+      "${chip_root}/src/app/clusters/power-topology-server/tests",
+      "${chip_root}/src/app/clusters/device-energy-management-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
+      "${chip_root}/src/app/clusters/time-synchronization-server/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
+      "${chip_root}/src/app/clusters/resource-monitoring-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -83,7 +94,6 @@ if (chip_build_tests) {
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/include/platform/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
       "${chip_root}/src/lib/asn1/tests",
@@ -199,7 +209,12 @@ if (chip_build_tests) {
     }
 
     if (chip_device_config_enable_joint_fabric) {
-      tests += [ "${chip_root}/src/app/server/tests" ]
+      tests += [
+        "${chip_root}/src/app/server/tests",
+        "${chip_root}/src/controller/tests/jcm",
+        "${chip_root}/src/credentials/tests/jcm",
+        "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      ]
     }
   }
 

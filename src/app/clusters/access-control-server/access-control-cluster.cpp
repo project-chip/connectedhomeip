@@ -639,19 +639,16 @@ std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewF
     CHIP_ERROR err = GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
         commandObj->GetAccessingFabricIndex(), entries, token);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
-        response.token = token;
-        commandObj->AddResponse(commandPath, response);
-    }
-    else
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
         return Protocols::InteractionModel::ClusterStatusCode(err);
     }
 
-    return Protocols::InteractionModel::Status::Success;
+    Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
+    response.token = token;
+    commandObj->AddResponse(commandPath, response);
+    return std::nullopt;
 }
 
 void AccessControlCluster::MarkCommissioningRestrictionListChanged()

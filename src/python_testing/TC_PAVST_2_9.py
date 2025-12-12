@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -49,7 +49,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
@@ -95,7 +95,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_9(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
@@ -125,10 +125,10 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormats})
-        logger.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+        log.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
 
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
-        logger.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
+        log.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
 
         self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
@@ -160,8 +160,8 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(transport_configs[0].transportStatus ==
                             pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
-        logger.info("Wait for 6 secs to PushAVTransport expiry")
-        time.sleep(6)
+        log.info("Wait for 6 secs to PushAVTransport expiry")
+        await asyncio.sleep(6)
 
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(

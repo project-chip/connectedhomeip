@@ -33,11 +33,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import random
 import tempfile
-from time import sleep
+import time
 
 from mobly import asserts
 from TC_WEBRTCRTestBase import WEBRTCRTestBase
@@ -45,6 +46,8 @@ from TC_WEBRTCRTestBase import WEBRTCRTestBase
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_WebRTCR_2_5(WEBRTCRTestBase):
@@ -62,7 +65,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -80,7 +83,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
             expected_output="Server initialization complete",
             timeout=30)
 
-        sleep(1)
+        time.sleep(1)
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -97,7 +100,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
@@ -107,18 +110,16 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
             TestStep(7, "End the WebRTC session"),
             TestStep(8, "Read CurrentSessions attribute from DUT"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_5(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.A0000",     # CurrentSessions attribute
             "WEBRTCR.S.C03.Rsp",   # End command
         ]
-        return pics
 
     # This test has multiple manual steps for attribute reads and session management.
     # Test typically runs under 2 mins, so 5 minutes is sufficient.
@@ -139,18 +140,18 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
 
         self.step(1)
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
         passcode = params.setupPinCode
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(3)
         # Prompt user with instructions
         prompt_msg = (
-            "\nPlease commission the server app from DUT:\n"
+            f"\nPlease commission the server app from DUT: manual code='{params.setupManualCode}' QR code='{params.setupQRCode}' :\n"
             f"  pairing onnetwork 1 {passcode}\n"
             "Input 'Y' if DUT successfully commissions without any warnings\n"
             "Input 'N' if commissioner warns about commissioning the non-genuine device, "

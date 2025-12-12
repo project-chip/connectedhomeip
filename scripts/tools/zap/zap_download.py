@@ -36,14 +36,11 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class DownloadType(enum.Enum):
@@ -54,19 +51,18 @@ class DownloadType(enum.Enum):
 def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
         return os.environ['PW_ENVIRONMENT_ROOT']
-    else:
-        return ".zap"
+    return ".zap"
 
 
 def _LogPipeLines(pipe, prefix):
-    log = logging.getLogger().getChild(prefix)
+    _log = log.getChild(prefix)
     for line in iter(pipe.readline, b''):
         line = line.strip().decode('utf-8', errors="ignore")
-        log.info('%s' % line)
+        _log.info(line)
 
 
 def _ExecuteProcess(cmd, cwd):
-    logging.info('Executing %r in %s' % (cmd, cwd))
+    log.info("Executing in '%s': %s", cwd, shlex.join(cmd))
 
     process = subprocess.Popen(
         cmd,
@@ -84,7 +80,7 @@ def _ExecuteProcess(cmd, cwd):
 
 def _SetupSourceZap(install_directory: str, zap_version: str):
     if os.path.exists(install_directory):
-        logging.warning("Completely re-creating %s", install_directory)
+        log.warning("Completely re-creating '%s'", install_directory)
         shutil.rmtree(install_directory)
 
     os.makedirs(install_directory, exist_ok=True)
@@ -136,7 +132,7 @@ def DownloadReleasedZap(install_directory: str, zap_version: str, zap_platform: 
 
     url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}-{zap_arch}.zip"
 
-    logging.info("Fetching: %s", url)
+    log.info("Fetching: '%s'", url)
 
     r = requests.get(url, stream=True)
     if zap_platform == 'mac':
@@ -150,12 +146,12 @@ def DownloadReleasedZap(install_directory: str, zap_version: str, zap_platform: 
             _ExecuteProcess(['/usr/bin/unzip', '-oq', tf.name], install_directory)
     else:
         z = zipfile.ZipFile(io.BytesIO(r.content))
-        logging.info("Data downloaded, extracting ...")
+        log.info("Data downloaded, extracting ...")
         # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
         for entry in z.filelist:
             path = z.extract(entry, install_directory)
             os.chmod(path, (entry.external_attr >> 16) & 0o777)
-    logging.info("Done extracting.")
+    log.info("Done extracting.")
 
 
 def _GetZapVersionToUse(project_root) -> str:
@@ -179,7 +175,8 @@ def _GetZapVersionToUse(project_root) -> str:
 
     zap_version = ""
     zap_path = os.path.join(project_root, "scripts/setup/zap.json")
-    zap_json = json.load(open(zap_path))
+    with open(zap_path) as f:
+        zap_json = json.load(f)
     for package in zap_json.get("packages", []):
         for tag in package.get("tags", []):
             if tag.startswith("version:"):
@@ -240,9 +237,9 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
 
     if not zap_version:
         zap_version = _GetZapVersionToUse(sdk_root)
-        logging.info('Found required zap version to be: %s' % zap_version)
+        log.info("Found required zap version to be: '%s'", zap_version)
 
-    logging.debug('User requested to download a %s zap version %s into %s', zap, zap_version, extract_root)
+    log.debug("User requested to download a '%s' zap version '%s' into '%s'", zap, zap_version, extract_root)
 
     install_directory = os.path.join(extract_root, f"zap-{zap_version}")
 

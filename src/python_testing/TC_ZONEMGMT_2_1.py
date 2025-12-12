@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_ZONEMGMT_2_1(MatterBaseTest):
@@ -76,7 +76,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.ZoneManagement) and
                              has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_ZONEMGMT_2_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.ZoneManagement
         attr = Clusters.ZoneManagement.Attributes
 
@@ -85,7 +85,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         self.twoDCartSupported = aFeatureMap & cluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         self.userDefinedSupported = aFeatureMap & cluster.Bitmaps.Feature.kUserDefined
         self.perZoneSenseSupported = aFeatureMap & cluster.Bitmaps.Feature.kPerZoneSensitivity
@@ -95,22 +95,22 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             maxUserDefinedZones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxUserDefinedZones
             )
-            logger.info(f"Rx'd MaxUserDefinedZones: {maxUserDefinedZones}")
+            log.info(f"Rx'd MaxUserDefinedZones: {maxUserDefinedZones}")
             asserts.assert_true(maxUserDefinedZones >= 5,
                                 "Expected Max value of UserDefinedZones to be least 5")
         else:
-            logging.info("UserDefinedZones Feature not supported. Test steps skipped")
+            log.info("UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step(2)
 
         self.step(3)
         maxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxZones
         )
-        logger.info(f"Rx'd MaxZones: {maxZones}")
+        log.info(f"Rx'd MaxZones: {maxZones}")
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        logger.info(f"Rx'd Zones: {zones}")
+        log.info(f"Rx'd Zones: {zones}")
         if self.userDefinedSupported:
             asserts.assert_true(maxZones >= maxUserDefinedZones,
                                 "Expected Max value of Zones should be >= UserDefinedZones")
@@ -131,14 +131,14 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
         triggers = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Triggers
         )
-        logger.info(f"Rx'd Triggers: {triggers}")
+        log.info(f"Rx'd Triggers: {triggers}")
         asserts.assert_true(len(triggers) <= maxZones, f"The number of triggers in the list should at most be {maxZones}")
 
         self.step(6)
         sensitivityMax = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SensitivityMax
         )
-        logger.info(f"Rx'd SensitivityMax: {sensitivityMax}")
+        log.info(f"Rx'd SensitivityMax: {sensitivityMax}")
         asserts.assert_true(sensitivityMax >= 2 and sensitivityMax <= 10, "SensitivityMax should be between 2 and 10")
 
         if not self.perZoneSenseSupported:
@@ -146,11 +146,11 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             sensitivity = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Sensitivity
             )
-            logger.info(f"Rx'd Sensitivity: {sensitivity}")
+            log.info(f"Rx'd Sensitivity: {sensitivity}")
             asserts.assert_true(sensitivity >= 1 and sensitivity <= sensitivityMax,
                                 f"Sensitivity should be between 1 and {sensitivityMax}")
         else:
-            logging.info("PerZoneSensitivity Feature supported. Test steps skipped")
+            log.info("PerZoneSensitivity Feature supported. Test steps skipped")
             self.skip_step(7)
 
         if self.twoDCartSupported:
@@ -158,16 +158,16 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             twoDCartesianMax = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoDCartesianMax
             )
-            logger.info(f"Rx'd TwoDCartesianMax: {twoDCartesianMax}")
+            log.info(f"Rx'd TwoDCartesianMax: {twoDCartesianMax}")
 
             videoSensorParams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.VideoSensorParams
             )
-            logger.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
+            log.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
             asserts.assert_true(twoDCartesianMax.x == videoSensorParams.sensorWidth - 1 and twoDCartesianMax.y ==
                                 videoSensorParams.sensorHeight - 1, "TwoDCartesianMax should be within the VideoSensorParams dimensions")
         else:
-            logging.info("TWoDCart Feature not supported. Test steps skipped")
+            log.info("TWoDCart Feature not supported. Test steps skipped")
             self.skip_step(8)
 
 

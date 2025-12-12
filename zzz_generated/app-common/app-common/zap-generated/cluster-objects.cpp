@@ -47,6 +47,10 @@
 #include <clusters/AirQuality/Commands.ipp>
 #include <clusters/AirQuality/Events.ipp>
 #include <clusters/AirQuality/Structs.ipp>
+#include <clusters/AmbientContextSensing/Attributes.ipp>
+#include <clusters/AmbientContextSensing/Commands.ipp>
+#include <clusters/AmbientContextSensing/Events.ipp>
+#include <clusters/AmbientContextSensing/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>
@@ -563,6 +567,10 @@
 #include <clusters/WaterHeaterMode/Commands.ipp>
 #include <clusters/WaterHeaterMode/Events.ipp>
 #include <clusters/WaterHeaterMode/Structs.ipp>
+#include <clusters/WaterTankLevelMonitoring/Attributes.ipp>
+#include <clusters/WaterTankLevelMonitoring/Commands.ipp>
+#include <clusters/WaterTankLevelMonitoring/Events.ipp>
+#include <clusters/WaterTankLevelMonitoring/Structs.ipp>
 #include <clusters/WebRTCTransportProvider/Attributes.ipp>
 #include <clusters/WebRTCTransportProvider/Commands.ipp>
 #include <clusters/WebRTCTransportProvider/Events.ipp>
@@ -1080,6 +1088,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
         switch (aCommand)
         {
         default:

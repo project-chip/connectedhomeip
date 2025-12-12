@@ -47,6 +47,10 @@
 #include <clusters/AirQuality/Commands.h>
 #include <clusters/AirQuality/Events.h>
 #include <clusters/AirQuality/Structs.h>
+#include <clusters/AmbientContextSensing/Attributes.h>
+#include <clusters/AmbientContextSensing/Commands.h>
+#include <clusters/AmbientContextSensing/Events.h>
+#include <clusters/AmbientContextSensing/Structs.h>
 #include <clusters/ApplicationBasic/Attributes.h>
 #include <clusters/ApplicationBasic/Commands.h>
 #include <clusters/ApplicationBasic/Events.h>
@@ -563,6 +567,10 @@
 #include <clusters/WaterHeaterMode/Commands.h>
 #include <clusters/WaterHeaterMode/Events.h>
 #include <clusters/WaterHeaterMode/Structs.h>
+#include <clusters/WaterTankLevelMonitoring/Attributes.h>
+#include <clusters/WaterTankLevelMonitoring/Commands.h>
+#include <clusters/WaterTankLevelMonitoring/Events.h>
+#include <clusters/WaterTankLevelMonitoring/Structs.h>
 #include <clusters/WebRTCTransportProvider/Attributes.h>
 #include <clusters/WebRTCTransportProvider/Commands.h>
 #include <clusters/WebRTCTransportProvider/Events.h>
