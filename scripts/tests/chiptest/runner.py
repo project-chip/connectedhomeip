@@ -21,6 +21,7 @@ import re
 import subprocess
 import threading
 import typing
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import Literal
 
@@ -147,8 +148,43 @@ class SubprocessInfo:
 
 
 class Executor:
+    CLEANUP_TIMEOUT = 1
+
+    def __init__(self) -> None:
+        self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
+
     def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
-        return subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+        self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr))
+        return process
+
+    def terminate(self) -> None:
+        while True:
+            # Get process from the queue.
+            try:
+                process = self._processes.get_nowait()
+            except queue.Empty:
+                break
+
+            # Check if process already exited.
+            if process.poll() is not None:
+                continue
+            cmd = str(process.args)
+
+            # SIGTERM
+            log.debug('Terminating leftover process "%s"', cmd)
+            process.terminate()
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT)
+                continue
+
+            # SIGKILL
+            log.warning('Failed to terminate the process "%s". Killing instead', cmd)
+            process.kill()
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT)
+                continue
+
+            log.error('Failed to kill process "%s". It may become a zombie', cmd)
 
 
 class Runner:
