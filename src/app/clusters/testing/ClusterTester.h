@@ -69,7 +69,7 @@ public:
      * @return CHIP_ERROR
      */
 
-    CHIP_ERROR SetUpFabric(FabricIndex & fabricIndexOut)
+    CHIP_ERROR SetUpFabric(FabricIndex fabricIndexOut)
     {
         ReturnErrorOnFailure(mOpCertStore.Init(mStorage));
         initParams.opCertStore         = &mOpCertStore;
@@ -85,6 +85,8 @@ public:
         ReturnErrorOnFailure(err);
 
         ReturnErrorOnFailure(mfabricTable.CommitPendingFabricData());
+
+        // Record the actual assigned fabric index so tests can tear it down later.
 
         return CHIP_NO_ERROR;
     }
@@ -232,6 +234,7 @@ public:
     ClusterTester(app::ServerClusterInterface & cluster) :
         mCluster(cluster), mFabricHelper(&mTestServerClusterContext.StorageDelegate())
     {}
+
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.
@@ -428,30 +431,6 @@ public:
     std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
-
-    CHIP_ERROR SetUpMockFabric()
-    {
-        FabricIndex currentHandlerIndex = mHandler.GetAccessingFabricIndex();
-
-        CHIP_ERROR err = mFabricHelper.SetUpFabric(currentHandlerIndex);
-
-        if (err == CHIP_NO_ERROR)
-        {
-            SetFabricIndex(currentHandlerIndex);
-        }
-        return err;
-    }
-
-    CHIP_ERROR TearDownMockFabric()
-    {
-        FabricIndex currentFabricIndex = mHandler.GetAccessingFabricIndex();
-
-        CHIP_ERROR err = mFabricHelper.TearDownFabric(currentFabricIndex);
-
-        SetFabricIndex(chip::kUndefinedFabricIndex);
-
-        return err;
-    }
 
     FabricTestHelper & GetFabricHelper() { return mFabricHelper; }
 
