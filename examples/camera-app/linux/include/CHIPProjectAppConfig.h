@@ -36,3 +36,7 @@
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Camera"
+
+// Override the CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
+// 256000 bytes chosen to accommodate large image frames for camera applications.
+#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (256000)
