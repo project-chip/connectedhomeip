@@ -194,12 +194,24 @@ inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager
 inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
+    DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
+    DeviceInfoProvider::DeviceInfoCapabilityMinimas capabilityMinimasFromDeviceInfo =
+        deviceInfoProvider->GetSupportedCapabilityMinimaValues();
+
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
     capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
+    capabilityMinima.simultaneousInvocationsSupported =
+        chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.simultaneousInvocationsSupported);
+    capabilityMinima.simultaneousWritesSupported =
+        chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.simultaneousWritesSupported);
+    capabilityMinima.readPathsSupported = chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.readPathsSupported);
+    capabilityMinima.subscribePathsSupported =
+        chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.subscribePathsSupported);
 
     return aEncoder.Encode(capabilityMinima);
 }
