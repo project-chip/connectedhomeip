@@ -71,8 +71,8 @@ struct AudioStream
     bool IsCompatible(const AudioStreamStruct & inputParams) const
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
-                audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
+                audioStreamParams.channelCount >= inputParams.channelCount &&
+                audioStreamParams.sampleRate >= inputParams.sampleRate && audioStreamParams.bitDepth >= inputParams.bitDepth);
     }
 };
 
@@ -147,8 +147,6 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
-
-    virtual void HandlePushAvZoneTrigger(uint16_t zoneId) = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -391,7 +389,7 @@ public:
         UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
 
         // Remove a zone trigger
-        virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
+        virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
 
         class ZoneEventCallback
         {
