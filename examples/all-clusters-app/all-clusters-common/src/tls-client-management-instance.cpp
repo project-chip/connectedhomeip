@@ -427,10 +427,6 @@ static TlsClientManagementCluster gTlsClientManagementClusterInstance = TlsClien
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
     TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Init();
 }
 
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Finish();
-}
+void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint) {}
