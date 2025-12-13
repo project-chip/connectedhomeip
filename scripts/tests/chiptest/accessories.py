@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from .mp_utils import LogConfig, WrappedMultiprocessingProcessContext, mp_wrapped_spawn_context
+from .mp_utils import LogConfig, WrappedProcessContext, mp_wrapped_spawn_context
 
 if TYPE_CHECKING:
     from .test_definition import App
@@ -250,7 +250,7 @@ APPS_RPC_FUNCS = tuple(func.__name__ for func in (
 ))
 
 
-class AppsXmlRpcServer(WrappedMultiprocessingProcessContext):
+class AppsXmlRpcServer(WrappedProcessContext):
     CommandQueue = queue.Queue[tuple[str, tuple[Any, ...]]]
     ResponseQueue = queue.Queue[bool | Exception]
 

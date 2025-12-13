@@ -3,37 +3,35 @@ from __future__ import annotations
 import itertools
 import logging
 import multiprocessing
-import os
 import queue
-import signal
 import subprocess
 import sys
 import tempfile
 import threading
 import time
 from abc import ABC, abstractmethod
-from contextlib import contextmanager, suppress
-from dataclasses import dataclass, field, replace
+from contextlib import suppress
+from dataclasses import dataclass, replace
+from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 from pathlib import Path
 from statistics import mean
-from types import TracebackType
-from typing import TYPE_CHECKING, Any, Iterator, Literal, Protocol, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Callable, Protocol, TypeAlias, TypeVar
 
 import chiptest
 import chiptest.darwin as darwin
 import chiptest.linux as linux
 
 from .accessories import AppsRegister
-from .mp_utils import LogConfig, mp_wrapped_spawn_context
+from .mp_utils import PROCESS_EXIT_STATES, LogConfig, WrappedProcess, WrappedProcessPoolContext, mp_wrapped_spawn_context
 from .runner import Executor
 from .test_definition import TestDefinition, TestRunTime
 
 log = logging.getLogger(__name__)
 worker_state: WorkerState | None = None
 
-WORKER_INIT_BARRIER_TIMEOUT = 30
-WORKER_TERMINATE_TIMEOUT = 5
+WORKER_START_TIMEOUT = 10
+WORKER_STOP_TIMEOUT = 5
 
 if sys.platform == "linux":
     # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
@@ -57,26 +55,6 @@ class WorkerError(RuntimeError):
     pass
 
 
-@contextmanager
-def defer_keyboard_interrupt() -> Iterator[None]:
-    """Defer KeyboardInterrupt in a context, and trigger the handler only once the context ends."""
-    original_handler = signal.getsignal(signal.SIGINT)
-    interrupted: list[tuple[int, Any]] = []
-
-    def handler(signum, frame):
-        log.warning("Caught a user interrupt. Waiting for the task to complete...")
-        interrupted.append((signum, frame))
-
-    signal.signal(signal.SIGINT, handler)
-    try:
-        yield
-    finally:
-        # Restore original handler and call it with captured signal.
-        signal.signal(signal.SIGINT, original_handler)
-        if interrupted and callable(original_handler):
-            original_handler(*interrupted[0])
-
-
 @dataclass
 class WorkerConfig:
     """Worker configuration which is a subset of command line options."""
@@ -85,7 +63,7 @@ class WorkerConfig:
     concurrency_status: float
     concurrency_fast: bool
     dry_run: bool
-    log_config: LogConfig
+    logconfig: LogConfig
     paths: chiptest.ApplicationPaths
     pics_file: Path
     runtime: TestRunTime
@@ -94,26 +72,6 @@ class WorkerConfig:
     def __post_init__(self):
         self.tmp_dir_default = Path(tempfile.gettempdir())
         self.tmp_dir_worker_base = self.tmp_dir_default / "matter_test_suite"
-
-
-class WorkerShared:
-    def __init__(self, manager: SyncManager, config: WorkerConfig):
-        # Barrier used to synchronize initialization event between workers and the main process.
-        # TODO: Remove init_barrier and base the general status on worker_working (which will be worker_status)
-        self.init_barrier = manager.Barrier(config.concurrency + 1)
-
-        # Event used to signal cancellation of all activity either because of error or no tasks left.
-        self.cancel_event = manager.Event()
-
-        # TODO: Replace with a proper runner status.
-        self.worker_working = manager.list([manager.Event() for _ in range(config.concurrency)])
-
-        # Indicate that one of the workers finished a job.
-        self.job_done_event = manager.Event()
-
-    @property
-    def worker_utilization(self) -> int:
-        return sum(status.is_set() for status in self.worker_working)
 
 
 @dataclass
@@ -150,18 +108,17 @@ class Terminatable(Protocol):
 
 
 class WorkerState(ABC):
-    def __init__(self, id: int, config: WorkerConfig, shared: WorkerShared) -> None:
+    def __init__(self, id: int, config: WorkerConfig) -> None:
         self.to_clean: queue.LifoQueue[Terminatable] = queue.LifoQueue()
 
         self.id = id
         self.config = config
-        self.shared = shared
         self.rpc_ns: str | None = None
         self.ble_controller_app: int | None = None
         self.ble_controller_tool: int | None = None
 
-        self.log_config = log_config = replace(self.config.log_config, process_name=f"W{id:0{len(str(config.concurrency))}}")
-        log_config.set_log_fmt()
+        self.logconfig = logconfig = replace(self.config.logconfig, process_name=f"W{id:0{len(str(config.concurrency))}}")
+        logconfig.set_log_fmt()
 
         try:
             # Initialize platform-specific executor.
@@ -169,7 +126,7 @@ class WorkerState(ABC):
 
             # Finalize common parts.
             self.runner = chiptest.runner.Runner(executor)
-            self.apps_register = self.add_to_clean(apps := AppsRegister(self.rpc_ns, log_config))
+            self.apps_register = self.add_to_clean(apps := AppsRegister(self.rpc_ns, logconfig))
             apps.init()
         except BaseException:
             self.terminate()
@@ -253,67 +210,61 @@ class GenericWorkerState(WorkerState):
         return Executor()
 
 
-class WorkerProcess(BaseProcess):
+class WorkerProcess(WrappedProcess):
     # TODO: Merge with WorkerState
     WorkQueueT: TypeAlias = queue.Queue[TestDefinition | None]
     ResultQueueT: TypeAlias = queue.Queue[WorkerResult]
 
-    def __init__(self, id: int, config: WorkerConfig, shared: WorkerShared, work_queue: WorkQueueT, resp_queue: ResultQueueT) -> None:
-        super().__init__(name=f"TestWorker{id}")
+    def __init__(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager,
+                 config: WorkerConfig, state_changed: threading.Condition, cancel_event: threading.Event,
+                 worker_ready_queue: queue.Queue[int], resp_queue: ResultQueueT) -> None:
+        super().__init__(mp_context, mp_manager, f"Worker {id}", f"W{id:0{len(str(config.concurrency))}}", config.logconfig,
+                         state_changed, cancel_event)
         self.id = id
         self.config = config
-        self.shared = shared
-        self.work_queue = work_queue
+        self.active = mp_manager.Event()
+        self.work_queue = mp_manager.Queue()
+        self.worker_ready_queue = worker_ready_queue
         self.resp_queue = resp_queue
 
         self.worker_state: WorkerState | None = None
 
-    def run(self) -> None:
-        # Initialize the worker.
-        try:
-            WorkerStateCls: type[WorkerState]
-            match sys.platform:
-                case "linux":
-                    WorkerStateCls = LinuxWorkerState
-                case "darwin":
-                    WorkerStateCls = DarwinWorkerState
-                case _:
-                    WorkerStateCls = GenericWorkerState
+    def _proc_init(self) -> None:
+        WorkerStateCls: type[WorkerState]
+        match sys.platform:
+            case "linux":
+                WorkerStateCls = LinuxWorkerState
+            case "darwin":
+                WorkerStateCls = DarwinWorkerState
+            case _:
+                WorkerStateCls = GenericWorkerState
 
-            # Don't interrupt during worker initialization.
-            with defer_keyboard_interrupt():
-                self.worker_state = WorkerStateCls(self.id, self.config, self.shared)
-                self.shared.init_barrier.wait()
+        # Don't interrupt during worker initialization.
+        self.worker_state = WorkerStateCls(self.id, self.config)
+        self.worker_ready_queue.put(self.id)
 
-            # Perform work. Will be stopped eventually with a KeyboardInterrupt.
-            while not self.shared.cancel_event.is_set():
-                try:
-                    if (work := self.work_queue.get(timeout=1)) is None:
-                        log.info("Cleaning up as there are no more jobs to process")
-                        break
-                    self.shared.worker_working[self.id].set()
-                    self.resp_queue.put(self.run_test(work))
-                    self.shared.worker_working[self.id].clear()
-                    self.shared.job_done_event.set()
-                except queue.Empty:
-                    continue
-        except BaseException as e:
-            if isinstance(e, KeyboardInterrupt):
-                log.warning("Interrupting work")
-            else:
-                self.shared.cancel_event.set()
-                log.critical("Cleaning up after error: %r", e, exc_info=True)
-        finally:
-            # 1. If for some reason the barrier is broken at this point, we don't really care.
-            # 2. We also don't care about KeyboardInterrupt anymore, but we also don't want KeyboardInterrupt to interrupt the
-            #    termination flow.
-            with suppress(KeyboardInterrupt), defer_keyboard_interrupt():
-                log.debug("Terminating worker")
-                if self.worker_state is not None:
-                    self.worker_state.terminate()
-                log.debug("Worker terminated")
+    def _proc_work(self, cancel_event: threading.Event):
+        while not cancel_event.is_set():
+            try:
+                work = self.work_queue.get(timeout=1)
+            except queue.Empty:
+                continue
+            if work is None:
+                log.info("Cleaning up as there are no more jobs to process")
+                break
 
-    def run_test(self, test: TestDefinition) -> WorkerResult:
+            self.active.set()
+            self.resp_queue.put(self._run_test(work))
+            self.worker_ready_queue.put(self.id)
+            self.active.clear()
+
+    def _proc_cleanup(self):
+        log.debug("Terminating worker")
+        if self.worker_state is not None:
+            self.worker_state.terminate()
+        log.debug("Worker terminated")
+
+    def _run_test(self, test: TestDefinition) -> WorkerResult:
         result = WorkerResult(test)
         test_start = time.monotonic()
         try:
@@ -322,13 +273,9 @@ class WorkerProcess(BaseProcess):
 
             result.worker_id = self.worker_state.id
             config = self.worker_state.config
-            self.worker_state.log_config.set_log_fmt(test.name)
+            self.worker_state.logconfig.set_log_fmt(test.name)
 
-            if config.dry_run:
-                log.info("Would run test")
-            else:
-                log.info("Starting test")
-
+            log.info("Would run test" if config.dry_run else "Starting test")
             # TODO: Potentially intercept stdout/stderr to output it in one block.
             test_start = time.monotonic()
             test.Run(self.worker_state.runner, self.worker_state.apps_register, config.paths, config.pics_file, config.test_timeout_seconds,
@@ -345,49 +292,225 @@ class WorkerProcess(BaseProcess):
             log.exception("❌ FAILED in %0.2f seconds", result.runtime, exc_info=True)
         finally:
             if self.worker_state is not None:
-                self.worker_state.log_config.set_log_fmt(None)
+                self.worker_state.logconfig.set_log_fmt(None)
             return result
 
 
+class WorkerPool(WrappedProcessPoolContext[WorkerProcess]):
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfig) -> None:
+        self.config = config
+        self.job_done_condition = mp_manager.Condition()
+        self.result_queue: WorkerProcess.ResultQueueT = mp_manager.Queue()
+        self.worker_ready_queue: queue.Queue[int] = mp_manager.Queue()
+
+        super().__init__(mp_context, mp_manager, config.concurrency, "Test Pool", WORKER_START_TIMEOUT, WORKER_STOP_TIMEOUT)
+
+    def _init_process(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+                      cancel_event: threading.Event) -> WorkerProcess:
+        return WorkerProcess(id, mp_context, mp_manager, self.config, state_changed, cancel_event, self.worker_ready_queue,
+                             self.result_queue)
+
+    @property
+    def worker_utilization(self) -> int:
+        return sum(worker.active.is_set() for worker in self._pool)
+
+    def get_first_free_worker(self) -> int | None:
+        return next((wid for wid, working in enumerate(worker.active for worker in self._pool) if not working.is_set()), None)
+
+    def put(self, id: int | None, item: TestDefinition | None, block: bool = True, timeout: float | None = None) -> None:
+        if id is None:
+            for id in range(len(self)):
+                self.put(id, item, block, timeout)
+            return
+
+        if id > self.config.concurrency:
+            raise ValueError(f"No worker with ID {id}")
+        self._pool[id].work_queue.put(item, block, timeout)
+
+    def finalize(self):
+        return self.put(None, None)
+
+# TODO: Test errors in tests
+# TODO: Test errors with keep-going
+
+
 @dataclass
-class PoolStatus:
+class TestPoolManager:
     config: WorkerConfig
-    iter_count: int
-    iter_cur: int = 0
-    test_results: dict[str, list[WorkerResult]] = field(default_factory=dict)
-    running: bool = False
+    iterations: int
+    keep_going: bool
+    expected_failures: int
 
-    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
+    def __post_init__(self) -> None:
+        self.test_results: dict[str, list[WorkerResult]] = {}
+        self.iteration_test_failures: list[int] = []
 
-    def __enter__(self) -> PoolStatus:
-        self._lock.acquire()
-        return self
+        # Calculate periodicity of status overview thread.
+        self.status_periodicity: float | None
+        match self.config.concurrency_status:
+            case num if num < 0:
+                # "Automatic" periodicity. Could be improved with checking activity of logger.
+                self.status_periodicity = (0.5 if self.config.logconfig.log_level_int <= logging.DEBUG else
+                                           2 if self.config.concurrency > 4 else
+                                           5 if self.config.concurrency > 1 else
+                                           10)
+            case 0:
+                self.status_periodicity = None
+            case num:
+                self.status_periodicity = num
 
-    def __exit__(self, exc_type: type[BaseException] | None, exc: BaseException | None, tb: TracebackType | None) -> Literal[False]:
-        self._lock.release()
-        # Returning False means exceptions are not suppressed.
-        return False
+    def run_tests(self, tests: list[TestDefinition]):
+        log.info("Will run the following tests (%i)", len(tests))
+        for test in tests:
+            log.info("  %s", test.name)
+        self.test_results = {test.name: [] for test in tests}
 
-    @property
-    def successful_tests(self) -> tuple[WorkerResult, ...]:
-        return tuple(result
-                     for _, results in self.test_results.items()
-                     for result in results
-                     if result.exception is None)
+        with (SyncManager(address=SYNC_MANAGER_PATH) as manager,
+              mp_wrapped_spawn_context("unshare --map-root-user -n -m") as ctx,
+              WorkerPool(ctx, manager, self.config) as pool):
+            # Set up the periodic status overview thread.
+            status_thread_cancel = threading.Event()
+            status_thread = threading.Thread(target=self._print_periodic_status,
+                                             args=(pool, status_thread_cancel, self.status_periodicity))
 
-    @property
-    def failed_tests(self) -> tuple[WorkerResult, ...]:
-        return tuple(result
-                     for _, results in self.test_results.items()
-                     for result in results
-                     if result.exception is not None)
+            # Set up result queue processor thread.
+            result_thread_cancel = threading.Event()
+            result_thread_exception: queue.Queue[Exception] = queue.Queue(1)
+            result_thread = threading.Thread(target=self._process_result_queue, args=(
+                result_thread_cancel, pool.result_queue, result_thread_exception))
 
-    @property
-    def total_tests(self) -> int:
-        return self.iter_count * len(self.test_results)
+            def check_if_error(block: bool = False, timeout: float | None = None):
+                pool.check_if_error(raise_error=True)
+                with suppress(queue.Empty):
+                    raise result_thread_exception.get(block, timeout)
+
+            try:
+                if self.status_periodicity is not None:
+                    log.debug("Launching periodic status overview thread.")
+                    status_thread.start()
+
+                result_thread.start()
+
+                # Perform the tests.
+                for i in range(self.iterations):
+                    log.info("Scheduling iteration %d", i+1)
+
+                    if self.config.concurrency_fast:
+                        self._scheduler_fast(pool, tests, check_if_error)
+                    else:
+                        self._scheduler_reproducible(pool, tests)
+
+                    # If this is the last iteration schedule finalization event.
+                    if i+1 == self.iterations:
+                        pool.finalize()
+
+                    check_if_error()
+
+                log.info("All jobs scheduled")
+
+                while not all(state in PROCESS_EXIT_STATES for state in pool.state):
+                    check_if_error(block=True, timeout=1)
+            except BaseException as e:
+                if isinstance(e, KeyboardInterrupt):
+                    log.warning("Interrupting execution per user request")
+                else:
+                    log.error("Interrupting execution: %r", e)
+                raise
+            finally:
+                log.debug("Stopping job status thread")
+                status_thread_cancel.set()
+                status_thread.join()
+
+                log.info("Stopping worker pool")
+                pool.stop()
+
+                log.debug("Stopping result processing thread")
+                result_thread_cancel.set()
+                result_thread.join()
+
+                log.debug("Finalized worker pool")
+                self.print_summary()
+
+    def _scheduler_fast(self, pool: WorkerPool, tests: list[TestDefinition], check_if_error: Callable[[], None]):
+        for test in tests:
+            while True:
+                check_if_error()
+                try:
+                    worker_id = pool.worker_ready_queue.get(timeout=1)
+                    break
+                except queue.Empty:
+                    continue
+            log.debug("Enqueuing test %s to worker %i", test.name, worker_id)
+            pool.put(worker_id, test)
+
+    def _scheduler_reproducible(self, pool: WorkerPool, tests: list[TestDefinition]):
+        for test, wid in zip(tests, itertools.cycle(range(len(pool)))):
+            log.debug("Enqueuing test %s to worker %i", test.name, wid)
+            pool.put(wid, test)
+
+    def _process_result_queue(self, cancel_event: threading.Event, result_queue: WorkerProcess.ResultQueueT,
+                              exception_queue: queue.Queue[Exception]) -> None:
+        while not cancel_event.is_set():
+            try:
+                result = result_queue.get(timeout=1)
+            except queue.Empty:
+                continue
+
+            if not isinstance(result, WorkerResult):
+                log.warning("Wrong work result: %r", result)
+                continue
+
+            self.test_results[result.test.name].append(result)
+
+            iteration = len(self.test_results[result.test.name])
+            if len(self.iteration_test_failures) < iteration:
+                self.iteration_test_failures.append(0)
+
+            if result.summarize():
+                continue
+
+            if not self.keep_going:
+                exception_queue.put(WorkerError("Task failed and --keep-going flag is not set."))
+                return
+
+            last_result_from_iteration = min(len(row) for row in self.test_results.values()) == iteration
+            observed_failures = self.iteration_test_failures[iteration-1] + 1
+            if last_result_from_iteration and observed_failures != self.expected_failures:
+                exception_queue.put(WorkerError(
+                    f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}"))
+                return
+
+            self.iteration_test_failures[iteration-1] = observed_failures
+
+    def _print_periodic_status(self, pool: WorkerPool, cancel_event: threading.Event, periodicity: float) -> None:
+        """Periodically print current status overview."""
+        while not cancel_event.is_set():
+            start = time.monotonic()
+            try:
+                if (utilization := pool.worker_utilization) == 0:
+                    continue
+
+                current_iteration = len(self.iteration_test_failures)
+
+                test_status: list[str] = []
+                if (successful_tests := len(self.successful_tests)) > 0:
+                    test_status.append(f"{successful_tests} successful")
+                if (failed_tests := len(self.failed_tests)) > 0:
+                    test_status.append(f"{failed_tests} failed")
+                if not test_status:
+                    test_status.append("no tests completed")
+
+                worker_utilization = (f", worker utilization: {utilization}/{self.config.concurrency}"
+                                      if self.config.concurrency > 1 else "")
+
+                # Style: bold, blue
+                log.info("\033[34;1mIteration %i/%i: %i/%i tests (%s)%s\033[0m", current_iteration, self.iterations,
+                         successful_tests + failed_tests, self.total_tests, ", ".join(test_status), worker_utilization)
+            finally:
+                cancel_event.wait(max(0, periodicity - (time.monotonic() - start)))
 
     def print_summary(self) -> None:
-        if self.iter_count == 0 or not self.test_results:
+        if self.iterations == 0 or not self.test_results:
             log.info("No test results available.")
 
         table: tuple[tuple[str, ...], ...] = (("Test", "Passed", "Time", "Worker ID", "Status"),) + tuple(
@@ -428,224 +551,20 @@ class PoolStatus:
         else:
             log.info("Note: You can find %s in %s/0", self.config.tmp_dir_default, self.config.tmp_dir_worker_base)
 
-# TODO: Test errors in tests
-# TODO: Test errors with keep-going
-
-
-class TestPoolManager:
-    def __init__(self, config: WorkerConfig, iterations: int, keep_going: bool, expected_failures: int) -> None:
-        self._config = config
-        self._status = PoolStatus(config, iterations)
-        self._shared: WorkerShared | None = None
-        self._work_queues: tuple[WorkerProcess.WorkQueueT, ...] = ()
-        self._pool: tuple[WorkerProcess, ...] = ()
-
-        self.iterations = iterations
-        self.keep_going = keep_going
-        self.expected_failures = expected_failures
-
-        periodicity: float | None = None
-        match self._config.concurrency_status:
-            case num if num < 0:
-                # "Automatic" periodicity. Could be improved with checking activity of logger.
-                periodicity = (0.5 if self._config.log_config.log_level_int <= logging.DEBUG else
-                               2 if self._config.concurrency > 4 else
-                               5 if self._config.concurrency > 1 else
-                               10)
-            case 0:
-                periodicity = None
-            case num:
-                periodicity = num
-
-        if periodicity is not None:
-            log.debug("Launching periodic status overview thread.")
-            self._status_thread = threading.Thread(target=self._print_periodic_status, args=(periodicity,), daemon=True)
-            self._status_thread.start()
+    @property
+    def successful_tests(self) -> tuple[WorkerResult, ...]:
+        return tuple(result
+                     for _, results in self.test_results.items()
+                     for result in results
+                     if result.exception is None)
 
     @property
-    def is_pool_alive(self) -> bool:
-        return all(worker.is_alive() for worker in self._pool)
+    def failed_tests(self) -> tuple[WorkerResult, ...]:
+        return tuple(result
+                     for _, results in self.test_results.items()
+                     for result in results
+                     if result.exception is not None)
 
-    def wait_for_pool_termination(self, timeout: float = WORKER_TERMINATE_TIMEOUT):
-        start_time = time.monotonic()
-        while (time.monotonic() - start_time) < timeout:
-            if not self.is_pool_alive:
-                return True
-            time.sleep(0.5)
-        return False
-
-    def _terminate_pool(self):
-        try:
-            if self.wait_for_pool_termination():
-                return
-            log.warning("Timeout when waiting for some workers. Finalizing the jobs forcefully")
-
-            # Sending SIGINT should trigger KeyboardInterrupt in case the test is still running, which should result in worker.
-            for worker in self._pool:
-                if worker.is_alive() and worker.pid is not None:
-                    # TODO Python 3.14: worker.interrupt()
-                    os.kill(worker.pid, signal.SIGINT)
-
-            if self.wait_for_pool_termination():
-                return
-            log.warning("Timeout when waiting for graceful job termination. Terminating the worker processes")
-
-            # Send SIGTERM
-            for worker in self._pool:
-                if worker.is_alive():
-                    worker.terminate()
-
-            if self.wait_for_pool_termination():
-                return
-            log.warning("Timeout when waiting for forced job termination. Killing the worker processes")
-
-            # Send SIGKILL
-            for worker in self._pool:
-                if worker.is_alive():
-                    worker.kill()
-        finally:
-            for worker in self._pool:
-                if worker.is_alive():
-                    worker.join(WORKER_TERMINATE_TIMEOUT)
-
-    def run_tests(self, selected_tests: list[TestDefinition]):
-        log.info("Initializing worker pool for concurrency of %i workers", self._config.concurrency)
-        with self._status as status:
-            status.test_results = {test.name: [] for test in selected_tests}
-
-        with SyncManager(address=SYNC_MANAGER_PATH) as manager, mp_wrapped_spawn_context("unshare --map-root-user -n -m", _ctx):
-            self._shared = shared = WorkerShared(manager, self._config)
-            self._work_queues = tuple(manager.Queue() for _ in range(self._config.concurrency))
-            results: WorkerProcess.ResultQueueT = manager.Queue()
-            self._pool = pool = tuple(WorkerProcess(id, self._config, shared, work_queue, results)
-                                      for id, work_queue in enumerate(self._work_queues))
-            try:
-                # Initialize the pool.
-                for worker in pool:
-                    worker.start()
-
-                # Wait for all workers to pass the initializer, while ensuring that user can't interrupt (same as in workers).
-                # Don't interrupt during worker initialization.
-                with defer_keyboard_interrupt():
-                    log.info("Waiting for all workers to initialize")
-                    shared.init_barrier.wait(WORKER_INIT_BARRIER_TIMEOUT)
-                    if shared.cancel_event.is_set():
-                        raise WorkerError("Error during worker initialization")
-
-                # All workers are in a valid state, so we can spawn tasks.
-                for i in range(self.iterations):
-                    log.info("Starting iteration %d", i+1)
-                    observed_failures = 0
-                    with self._status as status:
-                        status.running = True
-                        status.iter_cur = i
-
-                    # TODO: Move to concurrency mode function.
-                    if self._config.concurrency_fast:
-                        for test in selected_tests:
-                            # Get first free worker.
-                            while (free_worker := next((wid for wid, working in enumerate(shared.worker_working) if not working.is_set()), None)) is None:
-                                # When no workers are available process results and wait for any job.
-                                observed_failures += self._process_result_queue(results)
-                                shared.job_done_event.wait()
-                                shared.job_done_event.clear()
-
-                            log.debug("Enqueuing test %s to worker %i", test.name, free_worker)
-                            self._work_queues[free_worker].put(test)
-
-                            # We want to set it here as well, so that the next iteration doesn't double-book a worker because of
-                            # a slight delay between enqueuing a job and the flag being set.
-                            shared.worker_working[free_worker].set()
-
-                        # If this is the last iteration schedule finalization event.
-                        if i+1 == self.iterations:
-                            for work_queue in self._work_queues:
-                                work_queue.put(None)
-
-                        # Wait for all jobs to finish.
-                        while shared.worker_utilization > 0:
-                            observed_failures += self._process_result_queue(results)
-                            shared.job_done_event.wait()
-                            shared.job_done_event.clear()
-                    else:
-                        # Enqueue all jobs.
-                        for test, (wid, work_queue) in zip(selected_tests, itertools.cycle(enumerate(self._work_queues))):
-                            log.debug("Enqueuing test %s to worker %i", test.name, wid)
-                            work_queue.put(test)
-
-                        # Enqueue finalize events on the last iteration.
-                        if i+1 == self.iterations:
-                            for work_queue in self._work_queues:
-                                work_queue.put(None)
-                        observed_failures += self._process_result_queue(results, expected_results=len(selected_tests))
-
-                    if observed_failures != self.expected_failures:
-                        raise WorkerError(
-                            f"Iteration {i+1}: expected failure count {self.expected_failures}, but got {observed_failures}")
-            except (KeyboardInterrupt, Exception) as e:
-                if isinstance(e, KeyboardInterrupt):
-                    log.warning("Interrupting execution per user request")
-                else:
-                    log.error("Interrupting execution: %r", e)
-                raise
-            finally:
-                # Set cancel event so that all workers initialize termination.
-                shared.cancel_event.set()
-
-                # Wait until all workers finish cleanup.
-                log.info("Waiting until all workers terminate")
-                self._terminate_pool()
-
-                with self._status as status:
-                    status.running = False
-
-                # Process all remaining results.
-                self._process_result_queue(results, ignore_failures=True)
-
-                log.debug("Finalized worker pool")
-                with self._status as status:
-                    status.print_summary()
-
-    def _process_result_queue(self, queue: WorkerProcess.ResultQueueT, expected_results: int | None = None, ignore_failures: bool = False) -> int:
-        observed_failures = 0
-        result_count = 0
-        while not queue.empty() if expected_results is None else (result_count < expected_results):
-            if not isinstance(result := queue.get(), WorkerResult):
-                log.warning("Wrong work result: %s", str(result))
-                continue
-
-            with self._status as status:
-                status.test_results[result.test.name].append(result)
-            if not result.summarize():
-                observed_failures += 1
-                # TODO: Move keep_going to ignore_failures.
-                if not ignore_failures and not self.keep_going:
-                    raise WorkerError("Task failed and --keep-going flag is not set.")
-            result_count += 1
-        return observed_failures
-
-    def _print_periodic_status(self, periodicity: float) -> None:
-        """Periodically print current status overview."""
-        while True:
-            start = time.monotonic()
-            try:
-                with self._status as status:
-                    if not status.running:
-                        continue
-
-                    test_status: list[str] = []
-                    worker_utilization = ""
-                    if (successful_tests := len(status.successful_tests)) > 0:
-                        test_status.append(f"{successful_tests} successful")
-                    if (failed_tests := len(status.failed_tests)) > 0:
-                        test_status.append(f"{failed_tests} failed")
-                    if not test_status:
-                        test_status.append("no tests completed")
-                    if self._config.concurrency > 1 and self._shared is not None:
-                        worker_utilization = f", worker utilization: {self._shared.worker_utilization}/{len(self._work_queues)}"
-
-                    # Style: bold, blue
-                    log.info("\033[34;1mIteration %i/%i: %i/%i tests (%s)%s\033[0m", status.iter_cur + 1, status.iter_count,
-                             successful_tests + failed_tests, status.total_tests, ", ".join(test_status), worker_utilization)
-            finally:
-                time.sleep(max(0, periodicity - (time.monotonic() - start)))
+    @property
+    def total_tests(self) -> int:
+        return self.iterations * len(self.test_results)
