@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 """
 Handles linux-specific functionality for running test cases
 """
@@ -22,6 +21,7 @@ import asyncio
 import logging
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import threading
@@ -42,10 +42,9 @@ def EnsureNetworkNamespaceAvailability():
         log.warning("Running as root and this will change global namespaces.")
         return
 
-    os.execvpe(
-        "unshare", ["unshare", "--map-root-user", "-n", "-m", "python3",
-                    sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
-        test_environ)
+    os.execvpe("unshare",
+               ["unshare", "--map-root-user", "-n", "-m", "python3", sys.argv[0], '--internal-inside-unshare'] +
+               sys.argv[1:], test_environ)
 
 
 def EnsurePrivateState():
@@ -63,6 +62,13 @@ def EnsurePrivateState():
         log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
+    # TODO remove this mount once otbr-agent doesn't require it anymore
+    log.debug("Remounting /var/lib/thread")
+    if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/var/lib/thread"]).returncode != 0:
+        log.error("Failed to mount /var/lib/thread as a temporary filesystem")
+        log.error("Are you using --privileged if running in docker?")
+        sys.exit(1)
+
 
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
@@ -73,6 +79,8 @@ class IsolatedNetworkNamespace:
         # Create 2 virtual hosts: for app and for the tool
         "ip netns add app-{index}",
         "ip netns add tool-{index}",
+        'sysctl -w net.ipv6.conf.all.forwarding=1',
+        'sysctl -w net.ipv6.conf.default.forwarding=1',
 
         # Create links for switch to net connections
         "ip link add {app_link_name}-{index} type veth peer name {app_link_name}-sw-{index}",
@@ -90,7 +98,7 @@ class IsolatedNetworkNamespace:
         "ip link set {tool_link_name}-sw-{index} master br1-{index}",
         "ip link set eth-ci-sw-{index} master br1-{index}",
 
-        # Create link between virtual host 'tool' and the test runner
+        # Create link between virtual host self._tool_netns and the test runner
         "ip addr add 10.10.10.5/24 dev eth-ci-{index}",
         "ip link set dev eth-ci-{index} up",
         "ip link set dev eth-ci-sw-{index} up",
@@ -105,7 +113,10 @@ class IsolatedNetworkNamespace:
         # Force IPv6 to use ULAs that we control.
         "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
         "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
-
+        "ip netns exec app-{index} ip -6 a add fe80::1/64 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} sysctl -w net.ipv6.conf.{app_link_name}-{index}.accept_ra_rt_info_max_plen=64",
+        'ip netns exec app-{index} sysctl -w net.ipv6.conf.all.forwarding=1',
+        'ip netns exec app-{index} sysctl -w net.ipv6.conf.default.forwarding=1',
     ]
 
     # Bring up tool (controller) connection link.
@@ -117,6 +128,8 @@ class IsolatedNetworkNamespace:
         # Force IPv6 to use ULAs that we control.
         "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
         "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip -6 a add fe80::2/64 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} sysctl -w net.ipv6.conf.{tool_link_name}-{index}.accept_ra_rt_info_max_plen=64",
     ]
 
     # Commands for removing namespaces previously created.
@@ -124,20 +137,21 @@ class IsolatedNetworkNamespace:
         "ip link set dev eth-ci-{index} down",
         "ip link set dev eth-ci-sw-{index} down",
         "ip addr del 10.10.10.5/24 dev eth-ci-{index}",
-
         "ip link set br1-{index} down",
         "ip link delete br1-{index}",
-
         "ip link delete eth-ci-sw-{index}",
         "ip link delete {tool_link_name}-sw-{index}",
         "ip link delete {app_link_name}-sw-{index}",
-
         "ip netns del tool-{index}",
         "ip netns del app-{index}",
     ]
 
-    def __init__(self, index=0, setup_app_link_up=True, setup_tool_link_up=True,
-                 app_link_name='eth-app', tool_link_name='eth-tool',
+    def __init__(self,
+                 index=0,
+                 setup_app_link_up=True,
+                 setup_tool_link_up=True,
+                 app_link_name='eth-app',
+                 tool_link_name='eth-tool',
                  unshared=False):
 
         if not unshared:
@@ -191,9 +205,7 @@ class IsolatedNetworkNamespace:
             self._wait_for_duplicate_address_detection()
 
     def _run(self, command: str):
-        command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name,
-                                 index=self.index)
+        command = command.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
         log.debug("Executing: '%s'", command)
         if subprocess.run(command.split()).returncode != 0:
             log.error("Failed to execute '%s'", command)
@@ -206,6 +218,7 @@ class IsolatedNetworkNamespace:
 
 
 class LinuxNamespacedExecutor(Executor):
+
     def __init__(self, ns: IsolatedNetworkNamespace):
         self.ns = ns
 
@@ -222,7 +235,8 @@ class DBusTestSystemBus(subprocess.Popen):
 
     def __init__(self):
         super().__init__(["dbus-daemon", "--session", "--print-address", "--address", self.ADDRESS],
-                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.DEVNULL)
         os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
         # Wait for the bus to start (it will print the address to stdout).
         self.stdout.readline()
@@ -247,8 +261,7 @@ class BluetoothMock(subprocess.Popen):
 
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
-        super().__init__(["bluezoo", "--auto-enable"] + adapters,
-                         stderr=subprocess.PIPE, text=True)
+        super().__init__(["bluezoo", "--auto-enable"] + adapters, stderr=subprocess.PIPE, text=True)
         self.event = threading.Event()
         threading.Thread(target=self.__forward_stderr, daemon=True).start()
         # Wait for the adapters to be ready.
@@ -257,6 +270,75 @@ class BluetoothMock(subprocess.Popen):
     def terminate(self):
         super().terminate()
         self.wait()
+
+
+class ThreadBorderRouter:
+
+    def __init__(self, ns: IsolatedNetworkNamespace):
+        self._event = threading.Event()
+        self._pattern = None
+        self._event.set()
+        self._netns_app = f'app-{ns.index}'
+        self._netns_tool = f'tool-{ns.index}'
+        self._link_name_app = f'{ns.app_link_name}-{ns.index}'
+        self._link_name_tool = f'{ns.tool_link_name}-{ns.index}'
+
+        radio_url = 'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg=9'
+        args = [
+            'ip', 'netns', 'exec', self._netns_app, 'otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url
+        ]
+
+        self._otbr = subprocess.Popen(args,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT,
+                                      text=True,
+                                      encoding='UTF-8')
+
+        threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
+
+        self.expect(r'Co-processor version:', timeout=20)
+
+    def join_network(self, dataset):
+        status = os.system(
+            f'ot-ctl dataset init tlvs {dataset} &&'
+            'ot-ctl dataset commit active &&'
+            'ot-ctl ifconfig up &&'
+            'ot-ctl routerselectionjitter 1 &&'
+            'ot-ctl thread start &&'
+            'ot-ctl state leader &&'
+            'while !(ot-ctl state | grep leader); do sleep 1; done &&'
+            'ot-ctl netdata show &&'
+            'ot-ctl srp server enable &&'
+            'while !(ot-ctl br state | grep running); do sleep 1; done &&'
+            'echo TBR ready'
+        )
+        if status != 0:
+            raise RuntimeError("Failed to control Thread Border Router")
+
+        self.expect(r'Sent RA on infra netif', timeout=15)
+
+    def expect(self, pattern: str, timeout=10):
+        self._pattern = re.compile(pattern)
+        self._event.clear()
+        if not self._event.wait(timeout):
+            raise Exception(f'Failed to expect: {pattern}')
+
+    def _otbr_read_stdout(self):
+        assert self._otbr.stdout is not None
+        while (line := self._otbr.stdout.readline()):
+            log.info(line)
+            if self._event.is_set():
+                continue
+            if not self._pattern:
+                continue
+            if self._pattern.search(line):
+                self._event.set()
+
+    def terminate(self):
+        if self._sniffer:
+            self._sniffer.terminate()
+        if self._otbr:
+            self._otbr.terminate()
 
 
 class WpaSupplicantMock(threading.Thread):
@@ -274,8 +356,7 @@ class WpaSupplicantMock(threading.Thread):
     link to simulate network connectivity.
     """
 
-    class Wpa(sdbus.DbusInterfaceCommonAsync,
-              interface_name="fi.w1.wpa_supplicant1"):
+    class Wpa(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
 
         @sdbus.dbus_method_async("a{sv}", "o")
@@ -288,8 +369,7 @@ class WpaSupplicantMock(threading.Thread):
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
-    class WpaInterface(sdbus.DbusInterfaceCommonAsync,
-                       interface_name="fi.w1.wpa_supplicant1.Interface"):
+    class WpaInterface(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1.Interface"):
         path = "/fi/w1/wpa_supplicant1/Interfaces/1"
         state = "disconnected"
         current_network = "/"
@@ -313,12 +393,14 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("o")
         async def SelectNetwork(self, path):
+
             async def associate():
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 self.mock.networking._setup_app_link_up()
                 await self.State.set_async("completed")
+
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
 
@@ -358,8 +440,7 @@ class WpaSupplicantMock(threading.Thread):
         def CurrentAuthMode(self):
             return "WPA2-PSK"
 
-    class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
-                     interface_name="fi.w1.wpa_supplicant1.Network"):
+    class WpaNetwork(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1.Network"):
         path = "/fi/w1/wpa_supplicant1/Interfaces/1/Networks/1"
         enabled = False
 

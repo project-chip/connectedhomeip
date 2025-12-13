@@ -28,6 +28,10 @@
 #ifndef CHIP_PROJECT_CONFIG_H
 #define CHIP_PROJECT_CONFIG_H
 
+#ifndef BUILD_RELEASE
+#define BUILD_RELEASE 0
+#endif
+
 #if BUILD_RELEASE // release build
 
 // Security and Authentication enabled for release build.

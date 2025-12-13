@@ -49,7 +49,7 @@
 namespace chip {
 namespace System {
 
-class LayerImplSelect : public LayerSocketsLoop
+class LayerImplSelect : public LayerSelectLoop
 {
 public:
     LayerImplSelect() = default;
@@ -66,6 +66,7 @@ public:
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CriticalFailure ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // LayerSocket overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
     CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data) override;
@@ -75,6 +76,7 @@ public:
     CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token) override;
     CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut) override;
     SocketWatchToken InvalidSocketWatchToken() override { return reinterpret_cast<SocketWatchToken>(nullptr); }
+#endif
 
     // LayerSocketLoop overrides.
     void Signal() override;
@@ -97,7 +99,28 @@ public:
     // Expose the result of WaitForEvents() for non-blocking socket implementations.
     bool IsSelectResultValid() const { return mSelectResult >= 0; }
 
+    struct Source
+    {
+        virtual ~Source() = default;
+
+        virtual void PrepareEvents(int * aMaxFd, fd_set * aReadFdSet, fd_set * aWriteFdSet, fd_set * aErrorFdSet,
+                                   struct timeval * aTimeout)                                                         = 0;
+        virtual void ProcessEvents(const fd_set * aReadFdSet, const fd_set * aWriteFdSet, const fd_set * aErrorFdSet) = 0;
+
+        Source * mNext = nullptr;
+    };
+
+    void AddSource(Source * source)
+    {
+        source->mNext = mSources;
+        mSources      = source;
+    }
+
+    void RemoveSource(Source * source);
+
 protected:
+    Source * mSources = nullptr;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
@@ -118,6 +141,7 @@ protected:
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
+#endif
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;

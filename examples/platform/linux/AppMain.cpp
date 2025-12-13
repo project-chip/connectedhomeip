@@ -38,8 +38,12 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -145,6 +149,11 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <openthread-system.h>
+#include <openthread/instance.h>
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -165,7 +174,11 @@ Optional<EndpointId> sSecondaryNetworkCommissioningEndpoint;
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define CHIP_APP_MAIN_HAS_THREAD_DRIVER 1
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+DeviceLayer::NetworkCommissioning::GenericThreadDriver sThreadDriver;
+#else
 DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
+#endif
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -722,6 +735,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        char nodeId[sizeof("65535")]; // OpenThread simulation is based on UDP, 65535 is the maximum possible node id.
+
+        auto rval = snprintf(nodeId, sizeof(nodeId), "%u", LinuxDeviceOptions::GetInstance().mThread);
+        VerifyOrDieWithMsg(rval >= 0 && static_cast<size_t>(rval) < sizeof(nodeId), NotSpecified,
+                           "Failed to print OpenThread node id");
+
+        char * args[] = {
+            argv[0],
+            nodeId,
+        };
+
+        otSysInit(MATTER_ARRAY_SIZE(args), args);
+#endif
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         ChipLogProgress(NotSpecified, "Thread initialized.");
     }
@@ -933,6 +960,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
     if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
