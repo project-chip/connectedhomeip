@@ -202,7 +202,6 @@ sequenceDiagram
     Delegate ->> HAL: IsResourceAvailable()
     HAL -->> Delegate: Yes/No
     alt Resources Available
-        Delegate ->> HAL: SetViewport() / Other setup
         Delegate -->> SDK Cluster: Success, streamID
         SDK Cluster ->> Delegate: OnVideoStreamAllocated()
         Delegate ->> HAL: StartVideoStream(streamID)
