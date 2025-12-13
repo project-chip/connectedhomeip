@@ -82,7 +82,7 @@ public interface CastingPlayerDiscovery {
     static final String TAG = CastingPlayerChangeListener.class.getSimpleName();
 
     /**
-     * This handler is called when a Casting Player is added to the network.
+     * This handler is called when a Casting Player is added to the network during discovery.
      *
      * @param castingPlayer the Casting Player added.
      */
