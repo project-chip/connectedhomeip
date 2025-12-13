@@ -150,7 +150,7 @@
         "**/third_party/**": true
     },
     "files.eol": "\n",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.rulers": [132],
     "better-comments.tags": [
         {
@@ -199,7 +199,8 @@
     "search.followSymlinks": false,
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8",
-        "editor.rulers": [132]
+        "editor.rulers": [132],
+        "editor.formatOnSave": false
     },
     "autopep8.args": ["--max-line-length", "132"],
     "search.exclude": {
@@ -207,5 +208,6 @@
     },
     "files.exclude": {
         "**/examples/**/third_party/connectedhomeip/**": true
-    }
+    },
+    "git.autoRepositoryDetection": "openEditors"
 }

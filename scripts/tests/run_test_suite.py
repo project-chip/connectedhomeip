@@ -21,16 +21,16 @@ import os
 import random
 import sys
 import time
-import typing
 from dataclasses import dataclass
 from pathlib import Path
 
 import chiptest
 import click
 import coloredlogs
-from chiptest.accessories import AppsRegister
+from chiptest.concurrent import TestPoolManager, WorkerConfig, WorkerError
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import Executor, SubprocessInfo, SubprocessKind
+from chiptest.log_utils import LogConfig
+from chiptest.runner import SubprocessInfo, SubprocessKind
 from chiptest.test_definition import TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -53,19 +53,15 @@ class ManualHandling(enum.Enum):
     ONLY = enum.auto()
 
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = logging.getLevelNamesMapping()
-
-
 @dataclass
 class RunContext:
     root: str
-    tests: typing.List[chiptest.TestDefinition]
+    tests: list[chiptest.TestDefinition]
     chip_tool: SubprocessInfo | None
     dry_run: bool
     runtime: TestRunTime
-    find_path: typing.List[str]
+    find_path: list[str]
+    log_config: LogConfig
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
@@ -75,7 +71,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.option(
     '--log-level',
     default='info',
-    type=click.Choice(tuple(__LOG_LEVELS__.keys()), case_sensitive=False),
+    type=click.Choice(tuple(coloredlogs.find_defined_levels().keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
     '--dry-run',
@@ -157,11 +153,8 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
          exclude_tags: tuple[TestTag, ...], no_randomize_tests: bool, random_seed: str | None, find_path: list[str], runner: str,
          chip_tool: Path | None) -> None:
-    # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
-    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+    log_config = LogConfig(log_level, not no_log_timestamps)
+    log_config.set_log_fmt()
 
     if sys.platform == "linux":
         if not internal_inside_unshare:
@@ -263,7 +256,8 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
     context.obj = RunContext(root=root, tests=tests_filtered,
                              chip_tool=chip_tool_info, dry_run=dry_run,
                              runtime=runtime,
-                             find_path=find_path)
+                             find_path=find_path,
+                             log_config=log_config)
 
 
 @main.command(
@@ -277,10 +271,6 @@ def cmd_list(context: click.Context) -> None:
             tags = f" ({tags})"
 
         print("%s%s" % (test.name, tags))
-
-
-class Terminatable(typing.Protocol):
-    def terminate(self) -> None: ...
 
 
 @main.command(
@@ -382,17 +372,41 @@ class Terminatable(typing.Protocol):
     default=False,
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+@click.option(
+    '--concurrency',
+    default=1,
+    show_default=True,
+    type=click.IntRange(min=0),
+    help='Number of tests executed concurrently. Use the CPU count if set to 0.')
+@click.option(
+    '--concurrency-status',
+    default=-1,
+    type=float,
+    help='Periodically show the status of test execution. <0: automatic period, 0: turn off, other values: periodicity of report in seconds.'
+)
+@click.option(  # TODO: Refactor to --concurrency-mode
+    '--concurrency-fast',
+    is_flag=True,
+    default=False,
+    help='TODO'
+)
 @click.pass_context
 def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | None, lock_app: Path | None,
             ota_provider_app: Path | None, ota_requestor_app: Path | None, fabric_bridge_app: Path | None, tv_app: Path | None,
             bridge_app: Path | None, lit_icd_app: Path | None, microwave_oven_app: Path | None, rvc_app: Path | None,
             network_manager_app: Path | None, energy_gateway_app: Path | None, energy_management_app: Path | None,
             closure_app: Path | None, matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None, pics_file: Path,
-            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool) -> None:
+            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool, concurrency: int,
+            concurrency_status: float, concurrency_fast: bool) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
         raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
+
+    if concurrency == 0:
+        concurrency = multiprocessing.cpu_count()
+    if concurrency > 1 and sys.platform != "linux":
+        raise click.BadOptionUsage("--concurrency", "Concurrent execution is supported only on Linux")
 
     paths_finder = PathsFinder(context.obj.find_path)
 
@@ -453,91 +467,16 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         chip_tool_with_python_cmd=chip_tool_with_python_info,
     )
 
-    ble_controller_app = None
-    ble_controller_tool = None
-    ns_rpc: str | None = None
-    to_terminate: list[Terminatable] = []
+    log.info("Each test will be executed %d times", iterations)
 
-    def cleanup() -> None:
-        for item in reversed(to_terminate):
-            try:
-                log.info("Cleaning up %s", item.__class__.__name__)
-                item.terminate()
-            except Exception as e:
-                log.warning("Encountered exception during cleanup: %s", e)
-        to_terminate.clear()
-
+    config = WorkerConfig(ble_wifi, concurrency, concurrency_status, concurrency_fast, context.obj.dry_run, context.obj.log_config,
+                          paths, pics_file, context.obj.runtime, test_timeout_seconds)
+    pool = TestPoolManager(config, iterations, keep_going, expected_failures)
     try:
-        if sys.platform == 'linux':
-            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
-                index=0,
-                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                app_link_up=not ble_wifi,
-                # Change the app link name so the interface will be recognized as WiFi or Ethernet
-                # depending on the commissioning method used.
-                app_link_name='wlx-app' if ble_wifi else 'eth-app',
-                wait_for_dad=False))
-            ns.wait_for_duplicate_address_detection()
-            ns_rpc = ns.rpc_ns
-
-            if ble_wifi:
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-
-            executor = chiptest.linux.LinuxNamespacedExecutor(ns)
-        elif sys.platform == 'darwin':
-            executor = chiptest.darwin.DarwinExecutor()
-        else:
-            log.warning("No platform-specific executor for '%s'", sys.platform)
-            executor = Executor()
-        to_terminate.append(executor)
-
-        runner = chiptest.runner.Runner(executor=executor)
-
-        log.info("Each test will be executed %d times", iterations)
-
-        to_terminate.append(apps_register := AppsRegister(ns_rpc))
-        apps_register.init()
-
-        for i in range(iterations):
-            log.info("Starting iteration %d", i+1)
-            observed_failures = 0
-            for test in context.obj.tests:
-                test_start = time.monotonic()
-                try:
-                    if context.obj.dry_run:
-                        log.info("Would run test: '%s'", test.name)
-                    else:
-                        log.info("%-20s - Starting test", test.name)
-                    test.Run(
-                        runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                    )
-                    if not context.obj.dry_run:
-                        test_end = time.monotonic()
-                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-                except Exception:
-                    test_end = time.monotonic()
-                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                    observed_failures += 1
-                    if not keep_going:
-                        sys.exit(2)
-
-            if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
-                sys.exit(2)
-    except KeyboardInterrupt:
-        log.info("Interrupting execution on user request")
-    except Exception as e:
-        log.error("Caught exception during test execution: %s", e, exc_info=True)
-        raise
-    finally:
-        cleanup()
+        pool.run_tests(context.obj.tests)
+    except WorkerError as e:
+        log.error("%s", e)
+        sys.exit(1)
 
 
 # On Linux, allow an execution shell to be prepared

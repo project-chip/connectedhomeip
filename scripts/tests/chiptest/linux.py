@@ -47,8 +47,7 @@ def ensure_network_namespace_availability():
         return
 
     os.execvpe(
-        "unshare", ["unshare", "--map-root-user", "-n", "-m", "python3",
-                    sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
+        "unshare", ["unshare", "--map-root-user", "-m", "python3", sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
         test_environ)
 
 
@@ -57,16 +56,11 @@ def ensure_private_state():
 
     log.debug("Making / private")
     if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
-        log.error("Failed to make / private")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
+        raise RuntimeError("Failed to make / private. Are you using --privileged if running in docker?")
 
     log.debug("Remounting /run")
     if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
-        log.error("Failed to mount /run as a temporary filesystem")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
-
+        raise RuntimeError("Failed to mount /run as a temporary filesystem. Are you using --privileged if running in docker?")
 
 @dataclasses.dataclass
 class NetworkLinkCmd:
@@ -209,10 +203,10 @@ class IsolatedNetworkNamespace:
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
+        log.debug("Waiting for IPv6 DaD to complete (no tentative addresses)")
         for _ in range(100):  # wait at most 10 seconds
-            if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                log.info("No more tentative addresses")
+            if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True, stderr=subprocess.STDOUT):
+                log.debug("No more tentative addresses")
                 break
             time.sleep(0.1)
         else:
@@ -248,6 +242,7 @@ class IsolatedNetworkNamespace:
 
             log.debug("Executing: '%s'", command)
             if subprocess.run(command.split()).returncode != 0:
+                # TODO: Properly output stdout/err to log.
                 raise RuntimeError(f"Failed to execute '{command}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
