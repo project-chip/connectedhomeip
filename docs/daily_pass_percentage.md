@@ -1,13 +1,13 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
 | codeql                         |           0 |
-| chef-ci                        |          92 |
-| full-builds-android            |          92 |
-| cirque                         |          92 |
+| builds                         |         100 |
 | build-example-infineon         |         100 |
+| documentation-build            |         100 |
 | tv-casting-example-darwin      |         100 |
 | build-example-nxp              |         100 |
-| documentation-build            |         100 |
+| full-builds-android            |         100 |
+| chef-ci                        |         100 |
 | build-example-linux-arm        |         100 |
 | build-example-i-mx-linux       |         100 |
 | delete-old-artifacts           |         100 |
@@ -15,7 +15,7 @@
 | zap                            |         100 |
 | build-example-ameba            |         100 |
 | unit-integration-tests         |         100 |
-| builds                         |         100 |
+| cancel-workflows-on-failing-ci |         100 |
 | build-example-asr              |         100 |
 | darwin                         |         100 |
 | build-example-bouffalolab      |         100 |
@@ -30,15 +30,14 @@
 | build-example-esp32            |         100 |
 | build-example-telink           |         100 |
 | test-tv-casting-example        |         100 |
-| run-misspell                   |         100 |
-| cancel-workflows-on-failing-ci |         100 |
 | recent-fail-summary            |         100 |
 | build-example-realtek          |         100 |
-| build-example-ti-cc13xx-26xx   |         100 |
 | tests                          |         100 |
+| build-example-ti-cc13xx-26xx   |         100 |
 | darwin-tests                   |         100 |
 | build-example-tizen            |         100 |
 | bloat-check                    |         100 |
+| cirque                         |         100 |
 | validate-gradle-wrapper        |         100 |
 | build-example-efr32            |         100 |
 | build-example-ti-cc32xx        |         100 |
