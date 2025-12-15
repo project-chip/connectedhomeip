@@ -51,6 +51,10 @@
 #include <clusters/AmbientContextSensing/Commands.ipp>
 #include <clusters/AmbientContextSensing/Events.ipp>
 #include <clusters/AmbientContextSensing/Structs.ipp>
+#include <clusters/AmbientSensingUnion/Attributes.ipp>
+#include <clusters/AmbientSensingUnion/Commands.ipp>
+#include <clusters/AmbientSensingUnion/Events.ipp>
+#include <clusters/AmbientSensingUnion/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>

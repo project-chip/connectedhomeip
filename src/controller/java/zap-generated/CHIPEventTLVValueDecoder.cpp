@@ -8756,6 +8756,107 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::AmbientSensingUnion::Id: {
+        using namespace app::Clusters::AmbientSensingUnion;
+        switch (aPath.mEventId)
+        {
+        case Events::UnionContributorListChange::Id: {
+            Events::UnionContributorListChange::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_unionContributorList;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value_unionContributorList);
+
+            auto iter_value_unionContributorList_0 = cppValue.unionContributorList.begin();
+            while (iter_value_unionContributorList_0.Next())
+            {
+                auto & entry_0 = iter_value_unionContributorList_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_contributorNodeID;
+                std::string newElement_0_contributorNodeIDClassName     = "java/lang/Long";
+                std::string newElement_0_contributorNodeIDCtorSignature = "(J)V";
+                jlong jninewElement_0_contributorNodeID                 = static_cast<jlong>(entry_0.contributorNodeID);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0_contributorNodeIDClassName.c_str(), newElement_0_contributorNodeIDCtorSignature.c_str(),
+                    jninewElement_0_contributorNodeID, newElement_0_contributorNodeID);
+                jobject newElement_0_contributorEndpointID;
+                std::string newElement_0_contributorEndpointIDClassName     = "java/lang/Integer";
+                std::string newElement_0_contributorEndpointIDCtorSignature = "(I)V";
+                jint jninewElement_0_contributorEndpointID                  = static_cast<jint>(entry_0.contributorEndpointID);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_contributorEndpointIDClassName.c_str(), newElement_0_contributorEndpointIDCtorSignature.c_str(),
+                    jninewElement_0_contributorEndpointID, newElement_0_contributorEndpointID);
+                jobject newElement_0_contributorHealth;
+                std::string newElement_0_contributorHealthClassName     = "java/lang/Integer";
+                std::string newElement_0_contributorHealthCtorSignature = "(I)V";
+                jint jninewElement_0_contributorHealth                  = static_cast<jint>(entry_0.contributorHealth.Raw());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_contributorHealthClassName.c_str(), newElement_0_contributorHealthCtorSignature.c_str(),
+                    jninewElement_0_contributorHealth, newElement_0_contributorHealth);
+
+                {
+                    jclass unionMemberStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$AmbientSensingUnionClusterUnionMemberStruct",
+                        unionMemberStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$AmbientSensingUnionClusterUnionMemberStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID unionMemberStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, unionMemberStructStructClass_1, "<init>",
+                                                                        "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                        &unionMemberStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || unionMemberStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$AmbientSensingUnionClusterUnionMemberStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(unionMemberStructStructClass_1, unionMemberStructStructCtor_1,
+                                                  newElement_0_contributorNodeID, newElement_0_contributorEndpointID,
+                                                  newElement_0_contributorHealth);
+                }
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value_unionContributorList, newElement_0);
+            }
+
+            jclass unionContributorListChangeStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$AmbientSensingUnionClusterUnionContributorListChangeEvent",
+                unionContributorListChangeStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$AmbientSensingUnionClusterUnionContributorListChangeEvent");
+                return nullptr;
+            }
+
+            jmethodID unionContributorListChangeStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, unionContributorListChangeStructClass, "<init>",
+                                                                "(Ljava/util/ArrayList;)V", &unionContributorListChangeStructCtor);
+            if (err != CHIP_NO_ERROR || unionContributorListChangeStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$AmbientSensingUnionClusterUnionContributorListChangeEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(unionContributorListChangeStructClass, unionContributorListChangeStructCtor,
+                                           value_unionContributorList);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::WiFiNetworkManagement::Id: {
         using namespace app::Clusters::WiFiNetworkManagement;
         switch (aPath.mEventId)

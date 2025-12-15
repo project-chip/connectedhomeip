@@ -11748,6 +11748,82 @@ public static class AmbientContextSensingClusterPredictedActivityStruct {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterUnionMemberStruct {
+  public Long contributorNodeID;
+  public Integer contributorEndpointID;
+  public Integer contributorHealth;
+  private static final long CONTRIBUTOR_NODE_ID_ID = 0L;
+  private static final long CONTRIBUTOR_ENDPOINT_ID_ID = 1L;
+  private static final long CONTRIBUTOR_HEALTH_ID = 2L;
+
+  public AmbientSensingUnionClusterUnionMemberStruct(
+    Long contributorNodeID,
+    Integer contributorEndpointID,
+    Integer contributorHealth
+  ) {
+    this.contributorNodeID = contributorNodeID;
+    this.contributorEndpointID = contributorEndpointID;
+    this.contributorHealth = contributorHealth;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTRIBUTOR_NODE_ID_ID, new UIntType(contributorNodeID)));
+    values.add(new StructElement(CONTRIBUTOR_ENDPOINT_ID_ID, new UIntType(contributorEndpointID)));
+    values.add(new StructElement(CONTRIBUTOR_HEALTH_ID, new UIntType(contributorHealth)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionMemberStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long contributorNodeID = null;
+    Integer contributorEndpointID = null;
+    Integer contributorHealth = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTRIBUTOR_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorEndpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONTRIBUTOR_HEALTH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorHealth = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionMemberStruct(
+      contributorNodeID,
+      contributorEndpointID,
+      contributorHealth
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionMemberStruct {\n");
+    output.append("\tcontributorNodeID: ");
+    output.append(contributorNodeID);
+    output.append("\n");
+    output.append("\tcontributorEndpointID: ");
+    output.append(contributorEndpointID);
+    output.append("\n");
+    output.append("\tcontributorHealth: ");
+    output.append(contributorHealth);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
   public byte[] extendedPanID;
   public String networkName;

@@ -1031,6 +1031,15 @@ static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aA
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInAmbientSensingUnionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientSensingUnion;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -1703,6 +1712,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::AmbientContextSensing::Id: {
         return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
+    }
+    case Clusters::AmbientSensingUnion::Id: {
+        return CommandNeedsTimedInvokeInAmbientSensingUnionCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

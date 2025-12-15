@@ -8760,6 +8760,47 @@ provisional cluster AmbientContextSensing = 1073 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides data modeling and protocol implementation of multi-node ambient sensing system. */
+cluster AmbientSensingUnion = 1074 {
+  revision 1;
+
+  enum UnionHealthEnum : enum8 {
+    kFullyFunctional = 0;
+    kLimitedDegraded = 1;
+    kNonFunctional = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLeader = 0x1;
+  }
+
+  bitmap UnionContributorHealthBitmap : bitmap8 {
+    kMatterContributorOnline = 0x1;
+    kMatterContributorOffline = 0x2;
+    kNonMatterContributorOnline = 0x4;
+    kNonMatterContributorOffline = 0x8;
+  }
+
+  struct UnionMemberStruct {
+    int64u contributorNodeID = 0;
+    int16u contributorEndpointID = 1;
+    UnionContributorHealthBitmap contributorHealth = 2;
+  }
+
+  info event UnionContributorListChange = 0 {
+    UnionMemberStruct unionContributorList[] = 0;
+  }
+
+  attribute optional char_string<128> unionName = 1;
+  readonly attribute optional UnionHealthEnum unionHealth = 2;
+  readonly attribute optional UnionMemberStruct unionContributorList[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Functionality to retrieve operational information about a managed Wi-Fi network. */
 cluster WiFiNetworkManagement = 1105 {
   revision 1;
