@@ -19,7 +19,7 @@
 /*                                  Includes                                  */
 /* -------------------------------------------------------------------------- */
 
-#include <platform/nxp/zephyr/FactoryDataProviderImpl.h>
+#include "FactoryDataProviderImpl.h"
 
 /* mbedtls */
 #include "mbedtls/aes.h"
