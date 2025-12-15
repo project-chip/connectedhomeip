@@ -37,7 +37,6 @@ using namespace chip::Testing;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
-constexpr FabricIndex kTestFabric    = 1;
 constexpr uint8_t kMaxProvisioned    = 10;
 
 // Mock implementations
