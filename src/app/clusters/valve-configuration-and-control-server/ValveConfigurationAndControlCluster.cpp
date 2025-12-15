@@ -231,8 +231,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 
     // TargetState should be set to Closed and CurrentState to Transitioning
     SaveAndReportIfChanged(mTargetState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed), Attributes::TargetState::Id);
-    SaveAndReportIfChanged(mCurrentState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning),
-                           Attributes::CurrentState::Id);
+    SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
 
     // If TimeSync is enabled, AutoCloseTime should be set to Null
     if (mFeatures.Has(Feature::kTimeSync))
@@ -249,18 +248,6 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
     if (mDelegate != nullptr)
     {
         err = mDelegate->HandleCloseValve();
-    }
-
-    // If there was an error, we know nothing about the current state
-    if (err != CHIP_NO_ERROR)
-    {
-        SaveAndReportIfChanged(mCurrentLevel, DataModel::NullNullable, Attributes::CurrentLevel::Id);
-        SaveAndReportIfChanged(mCurrentState, DataModel::NullNullable, Attributes::CurrentState::Id);
-    }
-    else
-    {
-        // Emit the Transition state.
-        EmitValveChangeEvent(ValveStateEnum::kTransitioning);
     }
 
     return err;
@@ -376,6 +363,21 @@ void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::
     }
 }
 
+// Function to handle the StateChange that also allows to generate an event if needed.
+void ValveConfigurationAndControlCluster::SetCurrentState(const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState)
+{
+    VerifyOrReturn(mCurrentState != newState);
+    mCurrentState = newState;
+    NotifyAttributeChanged(Attributes::CurrentState::Id);
+
+    // It looks like the ValveStateChanged event expects a non-nullable value does this mean that
+    // changes to Null shouldn't be reported?
+    if(!mCurrentState.IsNull())
+    {
+        EmitValveChangeEvent(mCurrentState.Value());
+    }
+}
+
 // The rules to get the TargetLevel from the command data
 // - if no value is provided
 //   - Use the DefaultOpenLevel attribute if implemented.
@@ -424,14 +426,12 @@ void ValveConfigurationAndControlCluster::SetDelegate(Delegate * delegate)
 
 void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigurationAndControl::ValveStateEnum currentState)
 {
-    SaveAndReportIfChanged(mCurrentState, DataModel::Nullable<ValveStateEnum>(currentState), Attributes::CurrentState::Id);
+    SetCurrentState(DataModel::Nullable<ValveStateEnum>(currentState));
 
     if (mTargetState.ValueOr(ValveStateEnum::kUnknownEnumValue) == currentState)
     {
         SaveAndReportIfChanged(mTargetState, DataModel::NullNullable, Attributes::TargetState::Id);
     }
-
-    EmitValveChangeEvent(currentState);
 }
 
 void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent currentLevel)
@@ -451,8 +451,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
 {
     // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
     SaveAndReportIfChanged(mTargetState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen), Attributes::TargetState::Id);
-    SaveAndReportIfChanged(mCurrentState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning),
-                           Attributes::CurrentState::Id);
+    SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
 
     // Check for the AutoCloseTime feature
     if (mFeatures.Has(Feature::kTimeSync))
@@ -473,9 +472,6 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
         SaveAndReportIfChanged(mTargetLevel, level, Attributes::TargetLevel::Id);
     }
 
-    // start movement towards target
-    EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
-
     if (mDelegate != nullptr)
     {
         DataModel::Nullable<Percent> cLevel = mDelegate->HandleOpenValve(level);
@@ -492,10 +488,10 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
     return CHIP_NO_ERROR;
 }
 
-void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState)
+void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState)
 {
     ValveConfigurationAndControl::Events::ValveStateChanged::Type event;
-    event.valveState = currentState;
+    event.valveState = newState;
 
     // Check if Level feature and add current level if enabled
     if (mFeatures.Has(Feature::kLevel) && !mCurrentLevel.IsNull())

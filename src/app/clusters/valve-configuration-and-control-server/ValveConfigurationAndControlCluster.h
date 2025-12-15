@@ -78,8 +78,9 @@ private:
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
+    void SetCurrentState(const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState);
     CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
-    void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState);
+    void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState);
 
     template <typename T, typename U>
     inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, chip::AttributeId attributeId)
