@@ -80,7 +80,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestEmptyOptional)
 
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
                                                         DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry, 
+                                                        RemainingDuration::kMetadataEntry,
                                                         CurrentState::kMetadataEntry,
                                                         TargetState::kMetadataEntry
                                                     }));
@@ -95,7 +95,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestValveFault)
 
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
                                                         DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry, 
+                                                        RemainingDuration::kMetadataEntry,
                                                         CurrentState::kMetadataEntry,
                                                         TargetState::kMetadataEntry,
                                                         ValveFault::kMetadataEntry
@@ -112,7 +112,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestLevelStep)
 
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
                                                         DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry, 
+                                                        RemainingDuration::kMetadataEntry,
                                                         CurrentState::kMetadataEntry,
                                                         TargetState::kMetadataEntry,
                                                         CurrentLevel::kMetadataEntry,
@@ -131,7 +131,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestDefaultOpenLevel)
 
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
                                                         DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry, 
+                                                        RemainingDuration::kMetadataEntry,
                                                         CurrentState::kMetadataEntry,
                                                         TargetState::kMetadataEntry,
                                                         CurrentLevel::kMetadataEntry,
@@ -151,7 +151,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestTimeSync)
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
                                                         DefaultOpenDuration::kMetadataEntry,
                                                         AutoCloseTime::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry, 
+                                                        RemainingDuration::kMetadataEntry,
                                                         CurrentState::kMetadataEntry,
                                                         TargetState::kMetadataEntry,
                                                         CurrentLevel::kMetadataEntry,
@@ -171,7 +171,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
                                                         DefaultOpenDuration::kMetadataEntry,
                                                         AutoCloseTime::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry, 
+                                                        RemainingDuration::kMetadataEntry,
                                                         CurrentState::kMetadataEntry,
                                                         TargetState::kMetadataEntry,
                                                     }));
