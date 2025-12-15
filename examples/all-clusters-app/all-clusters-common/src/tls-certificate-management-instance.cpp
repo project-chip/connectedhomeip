@@ -21,6 +21,7 @@
 #include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <tls-certificate-management-instance.h>
 #include <tls-client-management-instance.h>
 
@@ -443,17 +444,30 @@ Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matt
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsCertificateManagementCommandDelegate TlsCertificateManagementCommandDelegate::instance(gCertificateTableInstance);
-static TlsCertificateManagementCluster gTlsCertificateManagementClusterInstance = TlsCertificateManagementCluster(
-    EndpointId(1), TlsCertificateManagementCommandDelegate::GetInstance(), TlsClientManagementCommandDelegate::GetInstance(),
-    gCertificateTableInstance, kMaxRootCerts, kMaxClientCerts);
+
+static LazyRegisteredServerCluster<TlsCertificateManagementCluster> sTlsCertificateManagementClusterServer;
 
 void emberAfTlsCertificateManagementClusterInitCallback(EndpointId matterEndpoint)
 {
     TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    TEMPORARY_RETURN_IGNORED gTlsCertificateManagementClusterInstance.Init();
+
+    sTlsCertificateManagementClusterServer.Create(EndpointId(1), TlsCertificateManagementCommandDelegate::GetInstance(),
+                                                  TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance,
+                                                  kMaxRootCerts, kMaxClientCerts);
+    CHIP_ERROR err =
+        CodegenDataModelProvider::Instance().Registry().Register(sTlsCertificateManagementClusterServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to register TLS Certificate Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     EndpointId(1), err.Format());
+    }
 }
 
 void emberAfTlsCertificateManagementClusterShutdownCallback(EndpointId matterEndpoint)
 {
-    TEMPORARY_RETURN_IGNORED gTlsCertificateManagementClusterInstance.Finish();
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsCertificateManagementClusterServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "TLS Certificate Management Cluster unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
