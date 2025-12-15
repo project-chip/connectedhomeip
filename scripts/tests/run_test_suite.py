@@ -78,7 +78,7 @@ class RunContext:
 # and drop this implementation.
 def deprecation_warning(context, param, value):
     # Hack: Try to reverse the conversion between flag and variable name which happens in click
-    warnings.warn(f"Use '{param.replacement}' instead of '--{str.replace(param.name,'_', '-')}'", category=DeprecationWarning)
+    warnings.warn(f"Use '{param.replacement}' instead of '--{str.replace(param.name, '_', '-')}'", category=DeprecationWarning)
     return value
 
 
@@ -263,10 +263,9 @@ def cmd_list(context):
     '--iterations',
     default=1,
     help='Number of iterations to run')
-
 # Deprecated flags:
 @click.option(
-  '--all-clusters-app', cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
+    '--all-clusters-app', cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
     help='what all clusters app to use')
 @click.option(
     '--lock-app', cls=DeprecatedOption, replacement='--app-path lock:<path>',
@@ -313,7 +312,6 @@ def cmd_list(context):
 @click.option(
     '--chip-tool-with-python', cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
-
 @click.option(
     '--app-path', multiple=True,
     help='Set path for an application (run in app network namespace), value should be <key>:<path>'
