@@ -12,38 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "impl/level-control-internals.h"
   "level-control.cpp",
   "level-control.h",
-  "impl/level-control-internals.h"
 ]
 
-if(defined(IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME))
-{
-  app_config_dependent_sources += [ "impl/level-control-ignore-remaining-time.cpp" ]
+if (defined(IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME)) {
+  app_config_dependent_sources +=
+      [ "impl/level-control-ignore-remaining-time.cpp" ]
 } else {
   app_config_dependent_sources += [ "impl/level-control-default.cpp" ]
 }
 
-if(defined(IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL))
-{
+if (defined(IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL)) {
   app_config_dependent_sources += [ "impl/level-control-startup-ignore.cpp" ]
 } else {
   app_config_dependent_sources += [ "impl/level-control-startup-default.cpp" ]
 }
 
-if(defined(IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE))
-{
+if (defined(IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE)) {
   app_config_dependent_sources += [ "impl/level-control-on-level-ignore.cpp" ]
 } else {
   app_config_dependent_sources += [ "impl/level-control-on-level-default.cpp" ]
 }
 
-if(defined(IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION))
-{
+if (defined(IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION)) {
   app_config_dependent_sources += [ "impl/level-control-transition-ignore.cpp" ]
-} else if(defined(IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME))
-{
-  app_config_dependent_sources += [ "impl/level-control-transition-no-onoff.cpp" ]
+} else if (defined(IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME)) {
+  app_config_dependent_sources +=
+      [ "impl/level-control-transition-no-onoff.cpp" ]
 } else {
-  app_config_dependent_sources += [ "impl/level-control-transition-default.cpp" ]
+  app_config_dependent_sources +=
+      [ "impl/level-control-transition-default.cpp" ]
 }
