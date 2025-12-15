@@ -43,7 +43,7 @@ OccupancySensorDeviceImpl::OccupancySensorDeviceImpl() :
             .WithDelegate(this))
 {
     // Kick off the timer loop to flip occupancy every few seconds
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)) == CHIP_NO_ERROR);
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)));
 }
 
 OccupancySensorDeviceImpl::~OccupancySensorDeviceImpl()
@@ -73,5 +73,5 @@ void OccupancySensorDeviceImpl::TimerFired()
         cluster.SetOccupancy(nextState);
     }
 
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)) == CHIP_NO_ERROR);
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)));
 }

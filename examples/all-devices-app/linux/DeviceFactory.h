@@ -78,7 +78,7 @@ private:
             return std::make_unique<BooleanStateSensorDevice>(
                 &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
-        mRegistry["occupancy-sensor"] = [this]() { return std::make_unique<OccupancySensorDeviceImpl>(); };
+        mRegistry["occupancy-sensor"] = []() { return std::make_unique<OccupancySensorDeviceImpl>(); };
     }
 };
 
