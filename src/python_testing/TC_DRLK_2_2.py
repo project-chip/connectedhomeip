@@ -62,6 +62,10 @@ class TC_DRLK_2_2(MatterBaseTest, DRLK_COMMON):
     def setup_class(self):
         return super().setup_class()
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     def pics_TC_DRLK_2_2(self) -> list[str]:
         return ["DRLK.S"]
 

@@ -88,7 +88,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -189,6 +189,7 @@ silabs_executable("energy-management-app") {
   deps = [
     ":sdk",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/electrical-energy-measurement-server:electrical-energy-measurement-server",
     app_data_model,
   ]
 

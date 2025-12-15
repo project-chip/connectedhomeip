@@ -25,6 +25,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 0
+#       --timeout 200
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -44,9 +45,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
-from time import sleep
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -56,6 +57,8 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from matter.tlv import TLVReader
+
+log = logging.getLogger(__name__)
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
@@ -107,13 +110,13 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
-            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         elif commission_type == "BCM":
             service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
-            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
@@ -221,7 +224,7 @@ class TC_CADMIN(CADMINBaseTest):
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-            sleep(1)
+            await asyncio.sleep(1)
 
         if commission_type == "ECM":
             self.step(13)

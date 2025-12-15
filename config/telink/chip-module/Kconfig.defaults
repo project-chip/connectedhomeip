@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023-2024 Project CHIP Authors
+#   Copyright (c) 2023-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 512 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 560 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config ISR_STACK_SIZE
     default 800 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
@@ -97,25 +97,33 @@ config NET_IPV6_MLD
     default n if PM
     default y
 
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
+
 config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 8 if PM
     default 15
 
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
+
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 16 if SOC_RISCV_TELINK_W91
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 16 if SOC_RISCV_TELINK_W91
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -163,7 +171,7 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 896 if BT_W91
+    default 1024 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 664 if BT_B9X || BT_TLX
@@ -243,6 +251,13 @@ config RISCV_MTVEC_VECTORED_MODE
 
 config CHIP_OTA_REQUESTOR
     default y
+
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
 
 config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1

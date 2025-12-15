@@ -28,7 +28,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// An action context that does not have a current exchange (just returns nullptr)
 class NullActionContext : public app::DataModel::ActionContext
@@ -66,17 +66,6 @@ public:
     /// Get a stable pointer to the underlying context
     app::ServerClusterContext & Get() { return mContext; }
 
-    /// Create a new context bound to this test context
-    app::ServerClusterContext Create()
-    {
-        return {
-            .provider           = mTestProvider,
-            .storage            = mTestStorage,
-            .attributeStorage   = mDefaultAttributePersistenceProvider,
-            .interactionContext = mTestContext,
-        };
-    };
-
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
@@ -96,5 +85,5 @@ private:
     app::ServerClusterContext mContext;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

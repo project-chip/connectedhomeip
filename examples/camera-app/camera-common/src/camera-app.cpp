@@ -44,10 +44,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
 
-    // Instantiate WebRTCTransport Provider
-    mWebRTCTransportProviderPtr =
-        std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
-
     Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
 
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
@@ -146,7 +142,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
+    mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamManagementCluster>(
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
@@ -172,7 +168,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     const uint8_t appMaxPresets = 5;
 
     // Instantiate the CameraAVSettingsUserLevelMgmt Server
-    mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+    mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelManagementCluster>(
         mEndpoint, mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), avsumFeatures, avsumAttrs, appMaxPresets);
 
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
@@ -283,8 +279,16 @@ void CameraApp::InitializeCameraAVStreamMgmt()
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    TEMPORARY_RETURN_IGNORED mWebRTCTransportProviderPtr->Init();
-    mCameraDevice->GetWebRTCProviderController().SetWebRTCTransportProvider(std::move(mWebRTCTransportProviderPtr));
+    mWebRTCTransportProviderServer.Create(mEndpoint, mCameraDevice->GetWebRTCProviderDelegate());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCTransportProviderServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register WebRTCTransportProvider on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
+
+    // Set the WebRTCTransportProvider server in the manager
+    mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
 
     TEMPORARY_RETURN_IGNORED mChimeServerPtr->Init();
 
@@ -299,7 +303,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
     mAVSettingsUserLevelMgmtServerPtr->Shutdown();
-    mWebRTCTransportProviderPtr->Shutdown();
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "WebRTCTransportProvider unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mWebRTCTransportProviderServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

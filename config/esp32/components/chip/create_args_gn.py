@@ -45,8 +45,7 @@ with open(compile_commands_path) as compile_commands_json:
 
     def get_compile_flags(src_file):
         compile_command = [
-            res["command"]
-            for res in filter(lambda cmd: cmd["file"] == src_file, compile_commands)
+            res["command"] for res in compile_commands if res["file"] == src_file
         ]
 
         if len(compile_command) != 1:
@@ -70,10 +69,9 @@ with open(compile_commands_path) as compile_commands_json:
     c_flags = get_compile_flags(args.c_file)
     cpp_flags = get_compile_flags(args.cpp_file)
 
-    with open(args.input) as args_input:
-        with open(args.output, "w") as args_output:
-            args_output.write(args_input.read())
+    with open(args.input) as args_input, open(args.output, "w") as args_output:
+        args_output.write(args_input.read())
 
-            args_output.write("target_cflags_c = [%s]" % ', '.join(c_flags))
-            args_output.write("\n")
-            args_output.write("target_cflags_cc = [%s]" % ', '.join(cpp_flags))
+        args_output.write("target_cflags_c = [%s]" % ', '.join(c_flags))
+        args_output.write("\n")
+        args_output.write("target_cflags_cc = [%s]" % ', '.join(cpp_flags))

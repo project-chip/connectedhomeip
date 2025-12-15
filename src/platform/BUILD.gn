@@ -86,7 +86,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Allows enabling dynamic setting of the local MRP configuration, for
     # devices with multiple radios that have different sleep behavior for
     # different radios.
-    chip_device_config_enable_dynamic_mrp_config = false
+    #
+    # Defaults to enabled on Linux since it's useful for tests and for
+    # performance evaluation in general. Default values are retained.
+    chip_device_config_enable_dynamic_mrp_config =
+        chip_device_platform == "linux"
 
     # Define the default endpoint id for the generic Thread network commissioning instance
     chip_device_config_thread_network_endpoint_id = 0
@@ -544,6 +548,8 @@ if (chip_device_platform != "none") {
       "Globals.cpp",
       "LockTracker.cpp",
       "PersistedStorage.cpp",
+      "PlatformError.cpp",
+      "PlatformError.h",
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
     ]
@@ -590,7 +596,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "efr32") {
       _platform_target = "silabs/efr32"
     } else if (chip_device_platform == "SiWx917") {
-      _platform_target = "silabs/SiWx917"
+      _platform_target = "silabs/SiWx"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
     } else if (chip_device_platform == "linux") {

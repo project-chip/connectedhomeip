@@ -18,7 +18,7 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
@@ -34,7 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 // Mock DeviceInfoProvider for testing
 class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
@@ -70,7 +70,7 @@ struct TestUserLabelCluster : public ::testing::Test
     void SetUp() override
     {
         DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
-        ASSERT_EQ(userLabel.Startup(context), CHIP_NO_ERROR);
+        ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
     }
 
     void TearDown() override
@@ -79,10 +79,9 @@ struct TestUserLabelCluster : public ::testing::Test
         DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 
-    TestUserLabelCluster() : context(testContext.Create()), userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() : userLabel(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
+    TestServerClusterContext testContext;
     UserLabelCluster userLabel;
     MockDeviceInfoProvider mDeviceInfoProvider;
 };

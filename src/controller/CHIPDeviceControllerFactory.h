@@ -269,7 +269,7 @@ public:
             (void) fabricTable;
             if (mGroupDataProvider != nullptr)
             {
-                mGroupDataProvider->RemoveFabric(fabricIndex);
+                TEMPORARY_RETURN_IGNORED mGroupDataProvider->RemoveFabric(fabricIndex);
             }
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
         };
@@ -313,6 +313,7 @@ private:
     Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    app::DataModel::Provider * mDataModelProvider                       = nullptr;
     bool mEnableServerInteractions                                      = false;
 };
 

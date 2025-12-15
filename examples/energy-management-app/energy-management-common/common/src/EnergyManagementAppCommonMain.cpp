@@ -25,7 +25,6 @@
 #include <PowerTopologyDelegate.h>
 #include <WhmMain.h>
 #include <WhmManufacturer.h>
-#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
@@ -83,8 +82,7 @@ CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId)
     }
 
     gPTInstance = std::make_unique<PowerTopologyInstance>(
-        EndpointId(endpointId), *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
-        BitMask<PowerTopology::OptionalAttributes, uint32_t>(0));
+        EndpointId(endpointId), *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology));
 
     if (!gPTInstance)
     {

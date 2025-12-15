@@ -44,14 +44,15 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_ACE_1_5(MatterBaseTest):
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def write_acl(self, acl: Clusters.AccessControl, th: ChipDeviceCtrl):
         result = await th.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
@@ -78,7 +79,7 @@ class TC_ACE_1_5(MatterBaseTest):
         await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
-        logging.info('Commissioning complete done. Successful.')
+        log.info('Commissioning complete done. Successful.')
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
 
         self.print_step(4, "TH2 reads its fabric index from the Operational Credentials cluster CurrentFabricIndex attribute")

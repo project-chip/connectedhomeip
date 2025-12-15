@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ namespace chip {
  * CHIP SDK errors inside Range::kSDK consist of a component identifier given by SdkPart and an arbitrary small
  * integer Code.
  */
-class ChipError
+class [[nodiscard]] ChipError
 {
 public:
     /// Internal representation of an error.

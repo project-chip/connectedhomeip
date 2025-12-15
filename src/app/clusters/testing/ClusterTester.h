@@ -26,6 +26,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -40,7 +41,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 // Helper class for testing clusters.
 //
@@ -91,18 +92,18 @@ public:
         // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
         // using std::unique_ptr because ReadOperation is non-copyable and non-movable
         // vector reallocation is not an issue since we store unique_ptrs
-        std::unique_ptr<app::Testing::ReadOperation> readOperation =
-            std::make_unique<app::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
+        std::unique_ptr<chip::Testing::ReadOperation> readOperation =
+            std::make_unique<chip::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
 
         mReadOperations.push_back(std::move(readOperation));
-        app::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
+        chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
         app::DataModel::ActionReturnStatus status           = mCluster.ReadAttribute(readOperationRef.GetRequest(), *encoder);
         VerifyOrReturnError(status.IsSuccess(), status);
         ReturnErrorOnFailure(readOperationRef.FinishEncoding());
 
-        std::vector<app::Testing::DecodedAttributeData> attributeData;
+        std::vector<chip::Testing::DecodedAttributeData> attributeData;
         ReturnErrorOnFailure(readOperationRef.GetEncodedIBs().Decode(attributeData));
         VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
@@ -116,15 +117,46 @@ public:
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename T>
-    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
+    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)
     {
-        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        auto path = mCluster.GetPaths()[0];
+        const auto & paths = mCluster.GetPaths();
 
-        app::Testing::WriteOperation writeOperation(path.mEndpointId, path.mClusterId, attr_id);
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
-        app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
-        return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder);
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        chip::Testing::WriteOperation writeOp(path);
+
+        // Create a stable object on the stack
+        Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
+
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+
+        // - DataModel::Encode(integral, enum, etc.) for simple types.
+        // - DataModel::Encode(List<X>) for lists (which iterates and calls Encode on elements).
+        // - DataModel::Encode(Struct) for non-fabric-scoped structs.
+        // - Note: For attribute writes, DataModel::EncodeForWrite is usually preferred for fabric-scoped types,
+        //         but the generic DataModel::Encode often works as a top-level function.
+        //         If you use EncodeForWrite, you ensure fabric-scoped list items are handled correctly:
+
+        if constexpr (app::DataModel::IsFabricScoped<T>::value)
+        {
+            ReturnErrorOnFailure(chip::app::DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), value));
+        }
+        else
+        {
+            ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
+        }
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
+
+        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
     }
 
     // Result structure for Invoke operations, containing both status and decoded response.
@@ -175,6 +207,31 @@ public:
 
         result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
 
+        // If InvokeCommand returned nullopt, it means the command implementation handled the response.
+        // We need to check the mock handler for a data response or a status response.
+        if (!result.status.has_value())
+        {
+            if (mHandler.HasResponse())
+            {
+                // A data response was added, so the command is successful.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+            }
+            else if (mHandler.HasStatus())
+            {
+                // A status response was added. Use the last one.
+                result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
+            }
+            else
+            {
+                // Neither response nor status was provided; this is unexpected.
+                // This would happen either in error (as mentioned here) or if the command is supposed
+                // to be handled asynchronously. ClusterTester does not support such asynchronous processing.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE);
+                ChipLogError(
+                    Test, "InvokeCommand returned nullopt, but neither HasResponse nor HasStatus is true. Setting error status.");
+            }
+        }
+
         // If command was successful and there's a response, decode it (skip for NullObjectType)
         if constexpr (!std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
         {
@@ -198,11 +255,22 @@ public:
         return result;
     }
 
+    // convenience method: most requests have a `GetCommandId` (and GetClusterId() as well).
+    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(const RequestType & request)
+    {
+        return Invoke(RequestType::GetCommandId(), request);
+    }
+
     // Returns the next generated event from the event generator in the test server cluster context
     std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
     {
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
+
+    std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+
+    void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
 
 private:
     bool VerifyClusterPathsValid()
@@ -225,10 +293,10 @@ private:
     // If protocol or test requirements change, this value may need to be increased.
     static constexpr size_t kTlvBufferSize = 256;
 
-    app::Testing::MockCommandHandler mHandler;
+    chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
-    std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
+    std::vector<std::unique_ptr<chip::Testing::ReadOperation>> mReadOperations;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

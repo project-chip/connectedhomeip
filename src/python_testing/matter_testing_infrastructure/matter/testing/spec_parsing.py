@@ -288,14 +288,13 @@ def get_location_from_element(element: ElementTree.Element, cluster_id: Optional
     try:
         if element.tag == 'feature':
             return FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
-        elif element.tag == 'command':
+        if element.tag == 'command':
             return CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
-        elif element.tag == 'attribute':
+        if element.tag == 'attribute':
             return AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
-        elif element.tag == 'event':
+        if element.tag == 'event':
             return EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
-        else:
-            return cluster_location
+        return cluster_location
     except (KeyError, ValueError):
         # If we can't find the id or can't parse it
         return cluster_location
@@ -1007,9 +1006,11 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
 
     descriptor_id = uint(Clusters.Descriptor.id)
     code = 'TAGLIST'
-    mask = clusters[descriptor_id].feature_map[code]
-    clusters[descriptor_id].features[mask].conformance = optional()
-    remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
+    # Data Model versions prior to 1.2 do not support TAGLIST.
+    if code in clusters[descriptor_id].feature_map:
+        mask = clusters[descriptor_id].feature_map[code]
+        clusters[descriptor_id].features[mask].conformance = optional()
+        remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
 
     action_id = uint(Clusters.Actions.id)
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
@@ -1093,8 +1094,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 
     def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
         ret = deepcopy(base)
-        extras = {k: v for k, v in derived.items() if k not in base.keys()}
-        overrides = {k: v for k, v in derived.items() if k in base.keys()}
+        extras = {k: v for k, v in derived.items() if k not in base}
+        overrides = {k: v for k, v in derived.items() if k in base}
         ret.update(extras)
         for id, override in overrides.items():
             if override.conformance is not None:
@@ -1145,9 +1146,9 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             bitmaps.update(c.bitmaps)
             unknown_commands = deepcopy(base.unknown_commands)
             for cmd in c.unknown_commands:
-                if cmd.id in accepted_commands.keys() and cmd.name == accepted_commands[uint(cmd.id)].name:
+                if cmd.id in accepted_commands and cmd.name == accepted_commands[uint(cmd.id)].name:
                     accepted_commands[uint(cmd.id)].conformance = cmd.conformance
-                elif cmd.id in generated_commands.keys() and cmd.name == generated_commands[uint(cmd.id)].name:
+                elif cmd.id in generated_commands and cmd.name == generated_commands[uint(cmd.id)].name:
                     generated_commands[uint(cmd.id)].conformance = cmd.conformance
                 else:
                     unknown_commands.append(cmd)
@@ -1426,7 +1427,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 continue
                             conformance_override = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
 
-                            map_id = [name_to_id_map[n] for n in name_to_id_map.keys() if _fuzzy_name(n) ==
+                            map_id = [name_to_id_map[n] for n in name_to_id_map if _fuzzy_name(n) ==
                                       _fuzzy_name(element_name)]
                             if len(map_id) == 0:
                                 # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
@@ -1488,7 +1489,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     if found_xmls < 1:
         LOGGER.warning("No XML files found in the specified device type directory: %r", top)
 
-    if -1 not in device_types.keys():
+    if -1 not in device_types:
         raise ConformanceException("Base device type not found in device type xml data")
 
     # Add in the base device type information and remove the base device type from the device_types
@@ -1628,7 +1629,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         0x01050000: PrebuiltDataModelDirectory.k1_5,
     }
 
-    if specification_version not in version_to_dm.keys():
+    if specification_version not in version_to_dm:
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
     return version_to_dm[specification_version]
