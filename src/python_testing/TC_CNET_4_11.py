@@ -657,23 +657,23 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             return  # Success!
         logger.error(f"change_networks: TH failed to connect to {ssid} after {MAX_ATTEMPTS} attempts")
 
-           # Try fallback to original network immediately
-           try:
-                fallback_result = await asyncio.wait_for(
-                    connect_host_wifi(ssid=original_ssid, password=original_password),
-                    timeout=NETWORK_CHANGE_TIMEOUT
-                )
-                if fallback_result and fallback_result.returncode == 0:
-                    pass
-                else:
-                    logger.error(f"change_networks: Fallback to {original_ssid} also failed!")
-            except Exception as fallback_e:
-                logger.error(f"change_networks: Fallback connection failed: {fallback_e}")
-
-            if attempt < MAX_ATTEMPTS:
+        # Try fallback to original network immediately
+        try:
+            fallback_result = await asyncio.wait_for(
+                connect_host_wifi(ssid=original_ssid, password=original_password),
+                timeout=NETWORK_CHANGE_TIMEOUT
+            )
+            if fallback_result and fallback_result.returncode == 0:
                 pass
             else:
-                logger.error("change_networks: All retry attempts exhausted")
+                logger.error(f"change_networks: Fallback to {original_ssid} also failed!")
+        except Exception as fallback_e:
+            logger.error(f"change_networks: Fallback connection failed: {fallback_e}")
+
+        if attempt < MAX_ATTEMPTS:
+            pass
+        else:
+            logger.error("change_networks: All retry attempts exhausted")
 
     # All attempts failed, ensure we have fallback connectivity
     logger.error(f"change_networks: Failed to switch networks after {MAX_ATTEMPTS} retries.")
