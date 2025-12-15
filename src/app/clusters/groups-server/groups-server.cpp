@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
 
-#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
@@ -304,7 +304,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::RemoveGroupResponse::Type response;
 
-#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     // If a group is removed the scenes associated with that group SHOULD be removed.
     ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
@@ -325,7 +325,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
 
     VerifyOrExit(nullptr != provider, status = Status::Failure);
 
-#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     {
         GroupDataProvider::EndpointIterator * iter = provider->IterateEndpoints(fabricIndex);
         GroupDataProvider::GroupEndpoint mapping;
