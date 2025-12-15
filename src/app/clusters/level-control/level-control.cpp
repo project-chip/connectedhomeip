@@ -17,6 +17,12 @@
 
 // clusters specific header
 #include "level-control.h"
+#include "impl/level-control-internals.h"
+// #if defined(IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME)
+// #include "impl/level-control-ignore-remaining-time.cpp"
+// #else
+// #include "impl/level-control-default.cpp"
+// #endif
 
 #include <algorithm>
 
@@ -57,10 +63,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LevelControl;
 using chip::Protocols::InteractionModel::Status;
 
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
-static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint);
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
-
 #if (MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE == 0)
 #define FASTEST_TRANSITION_TIME_MS 0
 #else
@@ -72,41 +74,13 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 
 #define INVALID_STORED_LEVEL 0xFFFF
 
-#define STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM 0x00
-#define STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL 0xFF
-
 static constexpr size_t kLevelControlStateTableSize =
     MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kLevelControlStateTableSize <= kEmberInvalidEndpointIndex, "LevelControl state table size error");
 
-struct CallbackScheduleState
-{
-    System::Clock::Timestamp idealTimestamp; // The ideal time-stamp for the next callback to be scheduled.
-    System::Clock::Milliseconds32 runTime;   // The duration of the previous scheduled callback function.
-                                             // e.g. running time of emberAfLevelControlClusterServerTickCallback
-                                             // when called consecutively
-};
-
-struct EmberAfLevelControlState
-{
-    CommandId commandId;
-    uint8_t moveToLevel;
-    bool increasing;
-    uint8_t onLevel;
-    uint8_t minLevel;
-    uint8_t maxLevel;
-    uint16_t storedLevel;
-    uint32_t eventDurationMs;
-    uint32_t transitionTimeMs;
-    uint32_t elapsedTimeMs;
-    CallbackScheduleState callbackSchedule;
-    QuieterReportingAttribute<uint8_t> quietCurrentLevel{ DataModel::NullNullable };
-    QuieterReportingAttribute<uint16_t> quietRemainingTime{ DataModel::MakeNullable<uint16_t>(0) };
-};
-
 static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
 
-static EmberAfLevelControlState * getState(EndpointId endpoint);
+EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
                                  DataModel::Nullable<uint16_t> transitionTimeDs, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
@@ -121,12 +95,8 @@ static void stopHandler(CommandHandler * commandObj, const ConcreteCommandPath &
                         chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
-static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition = false);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
-
-static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
-                                         DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
 
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -338,7 +308,7 @@ static void cancelEndpointTimerCallback(EndpointId endpoint)
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
-static EmberAfLevelControlState * getState(EndpointId endpoint)
+EmberAfLevelControlState * getState(EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, LevelControl::Id, MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -381,8 +351,8 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
  * @param isEndOfTransition: Boolean that indicate whether the update is occuring at the end of a level transition
  * @return Success in setting the attribute value or the IM error code for the failure.
  */
-static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
-                                         DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition)
+Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
+                                  DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition)
 {
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
@@ -508,65 +478,6 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs), isTransitionStart);
         scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     }
-}
-
-static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition)
-{
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id))
-    {
-        // Convert milliseconds to tenths of a second, rounding any fractional value
-        // up to the nearest whole value.  This means:
-        //
-        //   0 ms = 0.00 ds = 0 ds
-        //   1 ms = 0.01 ds = 1 ds
-        //   ...
-        //   100 ms = 1.00 ds = 1 ds
-        //   101 ms = 1.01 ds = 2 ds
-        //   ...
-        //   200 ms = 2.00 ds = 2 ds
-        //   201 ms = 2.01 ds = 3 ds
-        //   ...
-        //
-        // This is done to ensure that the attribute, in tenths of a second, only
-        // goes to zero when the remaining time in milliseconds is actually zero.
-        auto markDirty             = MarkAttributeDirty::kNo;
-        auto state                 = getState(endpoint);
-        auto now                   = System::SystemClock().GetMonotonicTimestamp();
-        uint16_t remainingTimeDs   = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
-        uint16_t lastRemainingTime = state->quietRemainingTime.value().ValueOr(0);
-
-        // RemainingTime Quiet report conditions:
-        // - When it changes to 0, or
-        // - When it changes from 0 to any value higher than 10, or
-        // - When it changes, with a delta larger than 10, caused by the invoke of a command.
-        auto predicate = [isNewTransition, lastRemainingTime](
-                             const decltype(state->quietRemainingTime)::SufficientChangePredicateCandidate & candidate) -> bool {
-            constexpr uint16_t reportDelta = 10;
-            bool isDirty                   = false;
-            if (candidate.newValue.Value() == 0 ||
-                (candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
-            {
-                isDirty = true;
-            }
-            else if (isNewTransition &&
-                     (candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
-                      static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
-                      candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
-            {
-                isDirty = true;
-            }
-            return isDirty;
-        };
-
-        if (state->quietRemainingTime.SetValue(remainingTimeDs, now, predicate) == AttributeDirtyState::kMustReport)
-        {
-            markDirty = MarkAttributeDirty::kYes;
-        }
-
-        Attributes::RemainingTime::Set(endpoint, state->quietRemainingTime.value().Value(), markDirty);
-    }
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
 }
 
 static void setOnOffValue(EndpointId endpoint, bool onOff)
@@ -947,52 +858,14 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
         actualStepSize    = static_cast<uint8_t>(currentLevel.Value() - state->moveToLevel);
     }
 
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
-    // If the Transition time field takes the value null, then the time taken
-    // to move to the new level shall instead be determined by the On/Off
-    // Transition Time attribute.  If On/Off Transition Time, which is an
-    // optional attribute, is not present, the device shall move to its new level
-    // as fast as it is able.
-    if (transitionTimeDs.IsNull())
+    uint32_t transitionTimeMs = 0;
+    status = ComputeTransitionTimeMsForMoveToLevel(endpoint, transitionTimeDs, actualStepSize, FASTEST_TRANSITION_TIME_MS,
+                                                   transitionTimeMs);
+    if (status != Status::Success)
     {
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
-        if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
-        {
-            uint16_t onOffTransitionTime = 0;
-            status                       = Attributes::OnOffTransitionTime::Get(endpoint, &onOffTransitionTime);
-            if (status != Status::Success)
-            {
-                ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", to_underlying(status));
-                return status;
-            }
-
-            // Transition time comes in (or is stored, in the case of On/Off Transition
-            // Time) as tenths of a second, but we work in milliseconds.
-            state->transitionTimeMs = (onOffTransitionTime * MILLISECOND_TICKS_PER_SECOND / 10);
-        }
-        else
-        {
-            state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
-        }
-#else
-        // If the Transition Time field is 0xFFFF and On/Off Transition Time,
-        // which is an optional attribute, is not present, the device shall move to
-        // its new level as fast as it is able.
-        state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
+        return status;
     }
-    else
-    {
-        // Transition time comes in (or is stored, in the case of On/Off Transition
-        // Time) as tenths of a second, but we work in milliseconds.
-        state->transitionTimeMs = (transitionTimeDs.Value() * MILLISECOND_TICKS_PER_SECOND / 10);
-    }
-#else
-    // Transition is not supported so always use fastest transition time and ignore
-    // both the provided transition time as well as OnOffTransitionTime.
-    ChipLogProgress(Zcl, "Device does not support transition, ignoring transition time");
-    state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
+    state->transitionTimeMs = transitionTimeMs;
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
@@ -1056,44 +929,11 @@ static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath &
     }
 
     uint8_t eventDuration; // use this local var so state->eventDurationMs is only set once the command is validated.
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
-    // If the Rate field is null, the device should move at the default move rate, if available,
-    // Otherwise, move as fast as possible
-    if (rate.IsNull())
+    status = ComputeEventDurationMsForMove(endpoint, rate, FASTEST_TRANSITION_TIME_MS, eventDuration);
+    if (status != Status::Success)
     {
-        DataModel::Nullable<uint8_t> defaultMoveRate;
-        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
-        if (status != Status::Success || defaultMoveRate.IsNull())
-        {
-            ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
-            eventDuration = FASTEST_TRANSITION_TIME_MS;
-        }
-        else
-        {
-            // This should never occur, but old devices could have this, now invalid, value stored.
-            if (defaultMoveRate.Value() == 0)
-            {
-                // The spec is not explicit about what should be done if this happens.
-                // For now Error out if DefaultMoveRate is equal to 0 as this is invalid
-                // until spec defines a behaviour.
-                status = Status::InvalidCommand;
-                goto send_default_response;
-            }
-            // Already checked that defaultMoveRate.Value() != 0.
-            eventDuration = static_cast<uint8_t>(MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value());
-        }
+        goto send_default_response;
     }
-    else
-    {
-        // Already confirmed rate.Value() != 0.
-        eventDuration = static_cast<uint8_t>(MILLISECOND_TICKS_PER_SECOND / rate.Value());
-    }
-#else
-    // Transition/rate is not supported so always use fastest transition time and ignore
-    // both the provided transition time as well as OnOffTransitionTime.
-    ChipLogProgress(Zcl, "Device does not support transition, ignoring rate");
-    eventDuration = FASTEST_TRANSITION_TIME_MS;
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
 
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
@@ -1270,32 +1110,8 @@ static void stepHandler(CommandHandler * commandObj, const ConcreteCommandPath &
         }
     }
 
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
-    // If the Transition Time field is null, the device should move as fast as
-    // it is able.
-    if (transitionTimeDs.IsNull())
-    {
-        state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
-    }
-    else
-    {
-        // Transition time comes in as tenths of a second, but we work in
-        // milliseconds.
-        state->transitionTimeMs = (transitionTimeDs.Value() * MILLISECOND_TICKS_PER_SECOND / 10);
-        // If the new level was pegged at the minimum level, the transition time
-        // shall be proportionally reduced.  This is done after the conversion to
-        // milliseconds to reduce rounding errors in integer division.
-        if (stepSize != actualStepSize)
-        {
-            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / std::max(static_cast<uint8_t>(1u), stepSize));
-        }
-    }
-#else
-    // Transition is not supported so always use fastest transition time and ignore
-    // both the provided transition time as well as OnOffTransitionTime.
-    ChipLogProgress(Zcl, "Device does not support transition, ignoring transition time");
-    state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
+    state->transitionTimeMs =
+        ComputeTransitionTimeMsForStep(endpoint, transitionTimeDs, stepSize, actualStepSize, FASTEST_TRANSITION_TIME_MS);
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
@@ -1377,53 +1193,17 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         return;
     }
 
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id))
-    {
-        status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
-        if (status != Status::Success)
-        {
-            ChipLogProgress(Zcl, "ERR: reading on level %x", to_underlying(status));
-            return;
-        }
-
-        if (resolvedLevel.IsNull())
-        {
-            // OnLevel has undefined value; fall back to CurrentLevel.
-            resolvedLevel.SetNonNull(temporaryCurrentLevelCache.Value());
-        }
-        else
-        {
-            useOnLevel = true;
-        }
-    }
-    else
-    {
-        resolvedLevel.SetNonNull(temporaryCurrentLevelCache.Value());
-    }
-#else
-    resolvedLevel.SetNonNull(temporaryCurrentLevelCache.Value());
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
+    ResolveOnLevel(endpoint, temporaryCurrentLevelCache, resolvedLevel, useOnLevel);
 
     // Read the OnOffTransitionTime attribute.
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
+    if (TryGetOnOffTransitionTimeDs(endpoint, currentOnOffTransitionTime))
     {
-        status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
-        if (status != Status::Success)
-        {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
-            return;
-        }
         transitionTime.SetNonNull(currentOnOffTransitionTime);
     }
     else
     {
         transitionTime.SetNull();
     }
-#else
-    transitionTime.SetNull();
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
 
     if (newValue)
     {
@@ -1497,57 +1277,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     Status status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status == Status::Success)
     {
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
-        // StartUp behavior relies StartUpCurrentLevel attributes being Non Volatile.
-        if (areStartUpLevelControlServerAttributesNonVolatile(endpoint))
-        {
-            // 1.5.14. StartUpCurrentLevel Attribute
-            // The StartUpCurrentLevel attribute SHALL define the desired startup level
-            // for a device when it is supplied with power and this level SHALL be
-            // reflected in the CurrentLevel attribute. The values of the StartUpCurrentLevel
-            // attribute are listed below:
-            // Table 4. Values of the StartUpCurrentLevel attribute
-            // Value      Action on power up
-            // 0x00       Set the CurrentLevel attribute to the minimum value permitted on the device.
-            // 0x01-0xfe  Set the CurrentLevel attribute to this value.
-            // NULL       Set the CurrentLevel attribute to its previous value.
-            // 0xFF       Work Around ZAP Can't set default value to NULL
-            // https://github.com/project-chip/zap/issues/354
-
-            DataModel::Nullable<uint8_t> startUpCurrentLevel;
-            status = Attributes::StartUpCurrentLevel::Get(endpoint, startUpCurrentLevel);
-            if (status == Status::Success)
-            {
-                if (!startUpCurrentLevel.IsNull())
-                {
-                    if (startUpCurrentLevel.Value() == STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM)
-                    {
-                        currentLevel.SetNonNull(state->minLevel);
-                    }
-                    else
-                    {
-                        // Otherwise set to specified value 0x01-0xFE.
-                        // But, need to enforce currentLevel's min/max, right?
-                        // Spec doesn't mention this.
-                        if (startUpCurrentLevel.Value() < state->minLevel)
-                        {
-                            currentLevel.SetNonNull(state->minLevel);
-                        }
-                        else if (startUpCurrentLevel.Value() > state->maxLevel)
-                        {
-                            currentLevel.SetNonNull(state->maxLevel);
-                        }
-                        else
-                        {
-                            currentLevel.SetNonNull(startUpCurrentLevel.Value());
-                        }
-                    }
-                }
-                // Otherwise Set the CurrentLevel attribute to its previous value which was already fetch above
-                SetCurrentLevelQuietReport(endpoint, state, currentLevel, false /*isEndOfTransition*/);
-            }
-        }
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
+        HandleStartUpCurrentLevel(endpoint, state, currentLevel);
        // In any case, we make sure that the respects min/max
         if (currentLevel.IsNull() || currentLevel.Value() < state->minLevel)
         {
@@ -1572,14 +1302,6 @@ void MatterLevelControlClusterServerShutdownCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "Shuting down level control server cluster on endpoint %d", endpoint);
     cancelEndpointTimerCallback(endpoint);
 }
-
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
-static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint)
-{
-    return !emberAfIsKnownVolatileAttribute(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id) &&
-        !emberAfIsKnownVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpCurrentLevel::Id);
-}
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
 
