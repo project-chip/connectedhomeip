@@ -364,7 +364,8 @@ void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::
 }
 
 // Function to handle the StateChange that also allows to generate an event if needed.
-void ValveConfigurationAndControlCluster::SetCurrentState(const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState)
+void ValveConfigurationAndControlCluster::SetCurrentState(
+    const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState)
 {
     VerifyOrReturn(mCurrentState != newState);
     mCurrentState = newState;
@@ -372,7 +373,7 @@ void ValveConfigurationAndControlCluster::SetCurrentState(const DataModel::Nulla
 
     // It looks like the ValveStateChanged event expects a non-nullable value does this mean that
     // changes to Null shouldn't be reported?
-    if(!mCurrentState.IsNull())
+    if (!mCurrentState.IsNull())
     {
         EmitValveChangeEvent(mCurrentState.Value());
     }
