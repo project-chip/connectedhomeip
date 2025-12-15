@@ -322,6 +322,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.restart_requestor()
 
         self.step(4)
+        # This pics_guard should be replaced when we can read this value directly from the DUT.
         if self.pics_guard('MCORE.OTA.RequestorConsent'):
             self.start_provider(
                 provider_app_path=self.provider_app_path,
