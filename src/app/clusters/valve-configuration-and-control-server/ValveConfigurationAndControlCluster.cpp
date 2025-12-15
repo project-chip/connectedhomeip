@@ -257,9 +257,11 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
         SaveAndReportIfChanged(mCurrentLevel, DataModel::NullNullable, Attributes::CurrentLevel::Id);
         SaveAndReportIfChanged(mCurrentState, DataModel::NullNullable, Attributes::CurrentState::Id);
     }
-
-    // Emit the Transition state.
-    EmitValveChangeEvent(ValveStateEnum::kTransitioning);
+    else
+    {
+        // Emit the Transition state.
+        EmitValveChangeEvent(ValveStateEnum::kTransitioning);
+    }
 
     return err;
 }
