@@ -24,6 +24,10 @@ if CHIP
 config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
 
+choice CHIP_ZEPHYR_POSIX_SELECTION
+	default CHIP_ZEPHYR_USE_POSIX_STRICT_SOURCE
+endchoice
+
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
 
@@ -425,7 +429,7 @@ config MBEDTLS_USER_CONFIG_ENABLE
     default y
 
 config MBEDTLS_USER_CONFIG_FILE
-    default "nxp-zephyr-mbedtls-config.h"
+    default "platform/nxp/zephyr/nxp-zephyr-mbedtls-config.h"
 
 config MBEDTLS_ENTROPY_C
 	default y
