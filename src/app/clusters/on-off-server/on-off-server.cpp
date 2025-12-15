@@ -476,7 +476,7 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         }
     }
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     //  the scene has been changed (the value of on/off has changed) so
     //  the current scene as described in the attribute table is invalid,
     //  so mark it as invalid (just writes the valid/invalid attribute)
@@ -520,7 +520,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
-#if defined(MATTER_DM_PLUGIN_MODE_SELECT)
+#ifdef MATTER_DM_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
         if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
             emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
@@ -540,7 +540,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
     // Registers Scene handlers for the On/Off cluster on the server
     app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint,
                                                                                    OnOffServer::Instance().GetSceneHandler());
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
@@ -655,7 +655,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 
     if (SupportsLightingApplications(endpoint))
     {
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
         FabricIndex fabric = commandObj->GetAccessingFabricIndex();
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
         bool globalSceneControl = false;
@@ -666,7 +666,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 
         if (globalSceneControl)
         {
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
             ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint,
                                                                          ScenesManagement::ScenesServer::kGlobalSceneGroupId,
                                                                          ScenesManagement::ScenesServer::kGlobalSceneId);
@@ -710,7 +710,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
         return true;
     }
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     FabricIndex fabric = commandObj->GetAccessingFabricIndex();
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
@@ -723,7 +723,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
         return true;
     }
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, ScenesManagement::ScenesServer::kGlobalSceneGroupId,
                                                            ScenesManagement::ScenesServer::kGlobalSceneId);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT

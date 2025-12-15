@@ -23,6 +23,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/PluginDependencyFlags.h>
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -33,13 +34,13 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
-#if defined(MATTER_DM_PLUGIN_ON_OFF)
+#if MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
-#endif // defined(MATTER_DM_PLUGIN_ON_OFF)
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
 using namespace chip;
 using namespace chip::app;
@@ -137,7 +138,7 @@ Status ChangeToMode(EndpointId endpointId, uint8_t newMode)
 
 } // anonymous namespace
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 static constexpr size_t kModeSelectMaxEnpointCount =
     MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
@@ -277,7 +278,7 @@ static void sceneModeSelectCallback(EndpointId endpoint)
     TEMPORARY_RETURN_IGNORED sModeSelectSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
 }
 
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
                                                   const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
@@ -286,14 +287,14 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
 
     uint8_t currentMode = 0;
     ModeSelect::Attributes::CurrentMode::Get(commandPath.mEndpointId, &currentMode);
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     if (currentMode != commandData.newMode)
     {
         //  the scene has been changed (the value of CurrentMode has changed) so
         //  the current scene as described in the scene table is invalid
         ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
     }
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     Status status = ChangeToMode(commandPath.mEndpointId, commandData.newMode);
 
@@ -315,9 +316,9 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
  */
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
 {
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpointId, &sModeSelectSceneHandler);
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
     if (areStartUpModeAndCurrentModeNonVolatile(endpointId))
@@ -333,7 +334,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         if (status == Status::Success && !startUpMode.IsNull())
         {
 
-#if defined(MATTER_DM_PLUGIN_ON_OFF)
+#if MATTER_DM_PLUGIN_ON_OFF
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute

@@ -146,8 +146,9 @@ config("config-controller-dynamic-server") {
 
 source_set("constants") {
   sources = [
-  "InteractionModelTimeout.h",
-  "SpecificationDefinedRevisions.h",
+    "InteractionModelTimeout.h",
+    "PluginDependencyFlags.h",
+    "SpecificationDefinedRevisions.h",
   ]
   public_deps = [
     "${chip_root}/src/lib/core",
