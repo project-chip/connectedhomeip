@@ -300,7 +300,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_basic_clear()
 
         self.step("21")
-        await sub_handler.cancel()
+        sub_handler.cancel()
 
 
 if __name__ == "__main__":
