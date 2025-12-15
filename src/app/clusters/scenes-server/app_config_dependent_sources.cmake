@@ -19,7 +19,8 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.cpp"
     "${CLUSTER_DIR}/CodegenAttributeValuePairValidator.h"
     "${CLUSTER_DIR}/CodegenEndpointToIndex.h"
-    "${CLUSTER_DIR}/scenes-server.cpp"
+    "${CLUSTER_DIR}/ScenesManagementCluster.cpp"
+    "${CLUSTER_DIR}/ScenesManagementCluster.h"
     "${CLUSTER_DIR}/scenes-server.h"
 
     # these below would be pulled by GN (.gni file) dependency. CMAKE needs these directly
