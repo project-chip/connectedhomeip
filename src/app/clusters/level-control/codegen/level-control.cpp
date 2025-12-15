@@ -38,9 +38,9 @@
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h> //nogncheck
-#include <app/clusters/scenes-server/scenes-server.h>                      //nogncheck
-#endif                                                                     // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h> // nogncheck
+#include <app/clusters/scenes-server/scenes-server.h>                      // nogncheck
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h> //nogncheck
