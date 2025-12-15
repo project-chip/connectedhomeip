@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::LevelControl;
 
 void writeRemainingTime(chip::EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition)
 {
-  bool containsAttribute = emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id);
+	bool containsAttribute = emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id);
 	if (!containsAttribute)
 	{
 		return;
@@ -59,18 +59,18 @@ void writeRemainingTime(chip::EndpointId endpoint, uint16_t remainingTimeMs, boo
 	// - When it changes from 0 to any value higher than 10, or
 	// - When it changes, with a delta larger than 10, caused by the invoke of a command.
 	auto predicate = [isNewTransition, lastRemainingTime](
-	                        const decltype(state->quietRemainingTime)::SufficientChangePredicateCandidate & candidate) -> bool {
+							const decltype(state->quietRemainingTime)::SufficientChangePredicateCandidate & candidate) -> bool {
 		constexpr uint16_t reportDelta = 10;
 		bool isDirty                   = false;
 		if (candidate.newValue.Value() == 0 ||
-		    (candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
+			(candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
 		{
 			isDirty = true;
 		}
 		else if (isNewTransition &&
-		            (candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
-		            static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
-		            candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
+					(candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
+					static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
+					candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
 		{
 			isDirty = true;
 		}
