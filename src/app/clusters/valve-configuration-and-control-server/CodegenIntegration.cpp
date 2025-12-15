@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 #include "CodegenIntegration.h"
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <app/static-cluster-config/ValveConfigurationAndControl.h>
 #include <app/util/attribute-storage.h>

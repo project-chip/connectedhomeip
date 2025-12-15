@@ -16,7 +16,7 @@
  *
  */
 
-#include "valve-configuration-and-control-cluster.h"
+#include "ValveConfigurationAndControlCluster.h"
 
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -51,7 +51,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
     }
 
     // The RemainingDuration attribute shall be reported when:
-    // - It changes from Null or  vice versa (default handling for QuieterReportingAttribute)
+    // - It changes from Null or vice versa (default handling for QuieterReportingAttribute)
     // - It changes to 0
     // - It increases.
     mRemainingDuration.policy()
@@ -176,7 +176,7 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
             request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenLevel), sizeof(mDefaultOpenLevel) });
     }
 
-    return Protocols::InteractionModel::Status::UnsupportedWrite;
+    return Status::UnsupportedWrite;
 }
 
 CHIP_ERROR ValveConfigurationAndControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -200,7 +200,7 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
     case ValveConfigurationAndControl::Commands::Open::Id:
         return HandleOpenCommand(request, input_arguments, handler);
     default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
+        return Status::UnsupportedCommand;
     }
 }
 
@@ -259,7 +259,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
     }
 
     // Emit the Transition state.
-    emitValveChangeEvent(ValveStateEnum::kTransitioning);
+    EmitValveChangeEvent(ValveStateEnum::kTransitioning);
 
     return err;
 }
@@ -286,6 +286,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // If no value is provided, use the DefaultOpenDuration attribute value.
     openDuration = commandData.openDuration.HasValue() ? commandData.openDuration.Value() : mDefaultOpenDuration;
 
+
     // Check rules for TargetLevel if enabled
     if (mFeatures.Has(Feature::kLevel))
     {
@@ -293,9 +294,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     }
 
     // Use the SetValveLevel function to handle the setting of internal values.
-    ReturnErrorOnFailure(SetValveLevel(openTargetLevel, openDuration));
-
-    return Status::Success;
+    return SetValveLevel(openTargetLevel, openDuration);
 }
 
 // Internal functions.
@@ -321,11 +320,11 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Null
     return CHIP_NO_ERROR;
 }
 
-void ValveConfigurationAndControlCluster::UpdateAutoCloseTime(uint64_t time)
+void ValveConfigurationAndControlCluster::UpdateAutoCloseTime(uint64_t epochTime)
 {
     if (!mRemainingDuration.value().IsNull() && mRemainingDuration.value().Value() != 0)
     {
-        uint64_t closingTime = mRemainingDuration.value().Value() * chip::kMicrosecondsPerSecond + time;
+        uint64_t closingTime = mRemainingDuration.value().Value() * chip::kMicrosecondsPerSecond + epochTime;
         SaveAndReportIfChanged(mAutoCloseTime, DataModel::Nullable<uint64_t>(closingTime), Attributes::AutoCloseTime::Id);
     }
 }
@@ -393,7 +392,7 @@ ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Perce
             adjustedTargetLevel = mDefaultOpenLevel;
             return CHIP_NO_ERROR;
         }
-        adjustedTargetLevel = 100u;
+        adjustedTargetLevel = kMaxLevelValue;
         return CHIP_NO_ERROR;
     }
 
@@ -409,7 +408,7 @@ bool ValveConfigurationAndControlCluster::ValueCompliesWithLevelStep(const uint8
 {
     if (mOptionalAttributeSet.IsSet(Attributes::LevelStep::Id))
     {
-        if ((value != 100u) && ((value % mLevelStep) != 0))
+        if ((value != kMaxLevelValue) && ((value % mLevelStep) != 0))
         {
             return false;
         }
@@ -431,20 +430,18 @@ void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigur
         SaveAndReportIfChanged(mTargetState, DataModel::NullNullable, Attributes::TargetState::Id);
     }
 
-    emitValveChangeEvent(currentState);
+    EmitValveChangeEvent(currentState);
 }
 
 void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent currentLevel)
 {
-    if (mFeatures.Has(Feature::kLevel))
-    {
-        SaveAndReportIfChanged(mCurrentLevel, currentLevel, Attributes::CurrentLevel::Id);
+    VerifyOrReturn(mFeatures.Has(Feature::kLevel));
+    SaveAndReportIfChanged(mCurrentLevel, currentLevel, Attributes::CurrentLevel::Id);
 
-        if (!mTargetLevel.IsNull() && mCurrentLevel == mTargetLevel)
-        {
-            SaveAndReportIfChanged(mTargetLevel, DataModel::NullNullable, Attributes::TargetLevel::Id);
-            UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
-        }
+    if (!mTargetLevel.IsNull() && mCurrentLevel == mTargetLevel)
+    {
+        SaveAndReportIfChanged(mTargetLevel, DataModel::NullNullable, Attributes::TargetLevel::Id);
+        UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
     }
 }
 
@@ -466,7 +463,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
     // Set OpenDuration to the provided value (can be Null).
     SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
 
-    // Set the RemainingDuration to the value of OpenDuration (eiter a value or Null)
+    // Set the RemainingDuration to the value of OpenDuration (either a value or Null)
     SetRemainingDuration(mOpenDuration);
 
     // Set target level
@@ -476,7 +473,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
     }
 
     // start movement towards target
-    emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
+    EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
 
     if (mDelegate != nullptr)
     {
@@ -494,13 +491,13 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
     return CHIP_NO_ERROR;
 }
 
-void ValveConfigurationAndControlCluster::emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState)
+void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState)
 {
     ValveConfigurationAndControl::Events::ValveStateChanged::Type event;
     event.valveState = currentState;
 
     // Check if Level feature and add current level if enabled
-    if (mFeatures.Has(Feature::kLevel) && !mCurrentLevel.IsNull())
+    if(mFeatures.Has(Feature::kLevel) && !mCurrentLevel.IsNull())
     {
         event.valveLevel = MakeOptional<Percent>(mCurrentLevel.Value());
     }

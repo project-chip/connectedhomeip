@@ -19,7 +19,8 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
+#include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -75,120 +76,105 @@ struct TestValveConfigurationAndControlCluster : public ::testing::Test
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestEmptyOptional)
 {
     // Base configuration with no features or optional attributes
-    const BitFlags<Feature> features;
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
-                                                     ValveConfigurationAndControlCluster::OptionalAttributeSet(), &timeSyncTracker);
-    valveCluster.SetDelegate(&delegate);
-    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, {}, &timeSyncTracker);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(valveCluster.Attributes(ConcreteClusterPath(kRootEndpointId, ValveConfigurationAndControl::Id), attributes),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-    valveCluster.Shutdown();
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
+                                                        DefaultOpenDuration::kMetadataEntry,
+                                                        RemainingDuration::kMetadataEntry, 
+                                                        CurrentState::kMetadataEntry,
+                                                        TargetState::kMetadataEntry
+                                                    }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestValveFault)
 {
     // With optional ValveFault attribute
-
-    const DataModel::AttributeEntry optionalAttributes[] = { ValveFault::kMetadataEntry };
     ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<ValveFault::Id>();
-    const BitFlags<Feature> features;
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, &timeSyncTracker);
-    valveCluster.SetDelegate(&delegate);
-    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, optionalAttributeSet, &timeSyncTracker);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(valveCluster.Attributes(ConcreteClusterPath(kRootEndpointId, ValveConfigurationAndControl::Id), attributes),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-    valveCluster.Shutdown();
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
+                                                        DefaultOpenDuration::kMetadataEntry,
+                                                        RemainingDuration::kMetadataEntry, 
+                                                        CurrentState::kMetadataEntry,
+                                                        TargetState::kMetadataEntry,
+                                                        ValveFault::kMetadataEntry
+                                                    }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestLevelStep)
 {
     // With Level feature (adds CurrentLevel, TargetLevel, and LevelStep attributes)
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, CurrentLevel::kMetadataEntry },
-                                                                                      { true, TargetLevel::kMetadataEntry },
-                                                                                      { true, LevelStep::kMetadataEntry } };
-
     ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<LevelStep::Id>();
     const BitFlags<Feature> features{ Feature::kLevel };
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, &timeSyncTracker);
-    valveCluster.SetDelegate(&delegate);
-    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(valveCluster.Attributes(ConcreteClusterPath(kRootEndpointId, ValveConfigurationAndControl::Id), attributes),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-    valveCluster.Shutdown();
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
+                                                        DefaultOpenDuration::kMetadataEntry,
+                                                        RemainingDuration::kMetadataEntry, 
+                                                        CurrentState::kMetadataEntry,
+                                                        TargetState::kMetadataEntry,
+                                                        CurrentLevel::kMetadataEntry,
+                                                        TargetLevel::kMetadataEntry,
+                                                        LevelStep::kMetadataEntry
+                                                    }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestDefaultOpenLevel)
 // With optional DefaultOpenLevel attribute enabled.
 {
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, CurrentLevel::kMetadataEntry },
-                                                                                      { true, TargetLevel::kMetadataEntry },
-                                                                                      { true, DefaultOpenLevel::kMetadataEntry } };
-
     ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<DefaultOpenLevel::Id>();
     const BitFlags<Feature> features{ Feature::kLevel };
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, &timeSyncTracker);
-    valveCluster.SetDelegate(&delegate);
-    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(valveCluster.Attributes(ConcreteClusterPath(kRootEndpointId, ValveConfigurationAndControl::Id), attributes),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-    valveCluster.Shutdown();
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
+                                                        DefaultOpenDuration::kMetadataEntry,
+                                                        RemainingDuration::kMetadataEntry, 
+                                                        CurrentState::kMetadataEntry,
+                                                        TargetState::kMetadataEntry,
+                                                        CurrentLevel::kMetadataEntry,
+                                                        TargetLevel::kMetadataEntry,
+                                                        DefaultOpenLevel::kMetadataEntry
+                                                    }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestTimeSync)
 // With TimeSync feature (adds AutoCloseTime attribute)
 {
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, AutoCloseTime::kMetadataEntry } };
+    ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
+    optionalAttributeSet.Set<ValveFault::Id>().Set<DefaultOpenLevel::Id>().Set<LevelStep::Id>();
+    const BitFlags<Feature> features{ Feature::kTimeSync, Feature::kLevel };
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
+                                                     optionalAttributeSet, &timeSyncTracker);
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
+                                                        DefaultOpenDuration::kMetadataEntry,
+                                                        AutoCloseTime::kMetadataEntry,
+                                                        RemainingDuration::kMetadataEntry, 
+                                                        CurrentState::kMetadataEntry,
+                                                        TargetState::kMetadataEntry,
+                                                        CurrentLevel::kMetadataEntry,
+                                                        TargetLevel::kMetadataEntry,
+                                                        DefaultOpenLevel::kMetadataEntry,
+                                                        ValveFault::kMetadataEntry,
+                                                        LevelStep::kMetadataEntry
+                                                    }));
+}
+
+TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
+// With all the optional and feature attributes enabled.
+{
     const BitFlags<Feature> features{ Feature::kTimeSync };
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
-                                                     ValveConfigurationAndControlCluster::OptionalAttributeSet(), &timeSyncTracker);
-    valveCluster.SetDelegate(&delegate);
-    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(valveCluster.Attributes(ConcreteClusterPath(kRootEndpointId, ValveConfigurationAndControl::Id), attributes),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-    valveCluster.Shutdown();
+                                                     {}, &timeSyncTracker);
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
+                                                        DefaultOpenDuration::kMetadataEntry,
+                                                        AutoCloseTime::kMetadataEntry,
+                                                        RemainingDuration::kMetadataEntry, 
+                                                        CurrentState::kMetadataEntry,
+                                                        TargetState::kMetadataEntry,
+                                                    }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)

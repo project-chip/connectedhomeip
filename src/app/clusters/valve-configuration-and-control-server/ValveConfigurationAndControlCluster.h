@@ -34,6 +34,10 @@ namespace chip::app::Clusters {
 class ValveConfigurationAndControlCluster : public DefaultServerCluster
 {
 public:
+    static constexpr uint8_t kDefaultOpenLevel = 100u;
+    static constexpr uint8_t kDefaultLevelStep = 1u;
+    static constexpr uint8_t kMaxLevelValue = 100u;
+
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
                                                                  ValveConfigurationAndControl::Attributes::ValveFault::Id,
                                                                  ValveConfigurationAndControl::Attributes::LevelStep::Id>;
@@ -61,7 +65,7 @@ public:
     void UpdateCurrentLevel(chip::Percent currentLevel);
     void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
     void EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
-    void UpdateAutoCloseTime(uint64_t time);
+    void UpdateAutoCloseTime(uint64_t epochTime);
 
 private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
@@ -75,7 +79,7 @@ private:
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
     CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
-    void emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState);
+    void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState);
 
     template <typename T, typename U>
     inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, chip::AttributeId attributeId)
@@ -96,9 +100,9 @@ private:
     DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState{ DataModel::NullNullable };
     DataModel::Nullable<Percent> mCurrentLevel{ DataModel::NullNullable };
     DataModel::Nullable<Percent> mTargetLevel{ DataModel::NullNullable };
-    Percent mDefaultOpenLevel{ 100u };
+    Percent mDefaultOpenLevel{ kDefaultOpenLevel };
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault{ 0u };
-    uint8_t mLevelStep{ 1u };
+    uint8_t mLevelStep{ kDefaultLevelStep };
     const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
     ValveConfigurationAndControl::Delegate * mDelegate;
