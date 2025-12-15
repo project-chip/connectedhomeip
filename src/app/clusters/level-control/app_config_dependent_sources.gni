@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "impl/level-control-internals.h"
+  "impl/level-control-internals.h",
   "level-control.cpp",
   "level-control.h",
 ]
