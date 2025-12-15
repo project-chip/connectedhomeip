@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::LevelControl;
 
 void writeRemainingTime(chip::EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition)
 {
-	bool containsAttribute = emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id);
+  bool containsAttribute = emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id);
 	if (!containsAttribute)
 	{
 		return;
