@@ -48,7 +48,6 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 
-// initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestAdministratorCommissioningCluster : public ::testing::Test
 {
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider sTestCommissionableDataProvider;
@@ -68,9 +67,6 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
 
         static chip::CommonCaseDeviceServerInitParams serverInitParams;
-        static chip::app::DefaultTimerDelegate sTimerDelegate;
-        static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
-        serverInitParams.reportScheduler           = &sReportScheduler;
         serverInitParams.opCertStore               = &sTestOpCertStore;
         serverInitParams.operationalKeystore       = &sTestOpKeystore;
         serverInitParams.persistentStorageDelegate = &sStorageDelegate;
@@ -82,13 +78,10 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     }
     static void TearDownTestSuite()
     {
-        chip::Server::GetInstance().GetCommissioningWindowManager().Shutdown();
-        chip::Server::GetInstance().GetFabricTable().Shutdown();
         Server::GetInstance().Shutdown();
         sTestOpCertStore.Finish();
         sTestOpKeystore.Finish();
         chip::DeviceLayer::PlatformMgr().Shutdown();
-        chip::Platform::MemoryShutdown();
     }
 };
 
@@ -250,7 +243,10 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     chip::Crypto::Spake2pVerifier verifier{};
     request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
     request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    request.salt = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20, 0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
+    static const uint8_t kSalt[] = {
+        0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20, 0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74
+    };
+    request.salt = chip::ByteSpan(kSalt);
 
     auto & fabricTable          = Server::GetInstance().GetFabricTable();
     FabricIndex testFabricIndex = kTestFabricIndex;
