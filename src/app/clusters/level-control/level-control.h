@@ -30,11 +30,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 
-namespace chip {
-namespace scenes {
-class SceneHandler;
-} // namespace scenes
-} // namespace chip
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/SceneTable.h>
+#endif
 
 /** @brief Level Control Cluster Server Post Init
  *
@@ -58,6 +56,8 @@ chip::Protocols::InteractionModel::Status
 MoveToLevel(chip::EndpointId endpointId,
             const chip::app::Clusters::LevelControl::Commands::MoveToLevel::DecodableType & commandData);
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 chip::scenes::SceneHandler * GetSceneHandler();
+#endif
 
 } // namespace LevelControlServer
