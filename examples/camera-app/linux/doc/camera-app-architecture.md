@@ -194,6 +194,7 @@ camera-app.
         IDs.
 
 -   **`ChimeManager`:**
+
     -   **SDK Interface:** `chip::app::Clusters::Chime::Delegate`
     -   **Responsibilities:** Implements the logic for the Chime cluster.
     -   **Sound Management:** Provides a list of available chime sounds
@@ -226,6 +227,7 @@ camera-app.
             recordings.
 
 -   **`CameraAVSettingsUserLevelManager`:**
+
     -   **SDK Interface:**
         `chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate`
     -   **Responsibilities:** Handles user-level settings, including Pan, Tilt,
