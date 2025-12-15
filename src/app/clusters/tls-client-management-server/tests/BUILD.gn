@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "TestTlsClientManagementCluster"
+  output_name = "libTestTlsClientManagementCluster"
 
   test_sources = [ "TestTlsClientManagementCluster.cpp" ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
-    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/tls-certificate-management-server",
     "${chip_root}/src/app/clusters/tls-client-management-server",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
