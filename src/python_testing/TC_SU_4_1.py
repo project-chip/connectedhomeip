@@ -294,39 +294,48 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             filter=long_discriminator)
         logger.info(f'Step #5 - TH4 Commissioning response: {resp}')
 
-        # Write the Access Control List (ACL) to the DUT device for TH4 controller,
-        # allowing TH4 to have the necessary permissions to perform operations.
-        admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],  # Optional [th4.nodeId]
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0, cluster=self.cluster_otar.id)]
-        )
-        view_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[]
-        )
-        acl = [admin_acl, view_acl]
+        # Write the Access Control List (ACL) to the DUT device for TH4 controller
+        # using the library function create_acl_entry, passing both Admin and View permissions
+        # so that TH4 can perform necessary operations.
+        acl_list = [
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[],
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                    endpoint=0,
+                    cluster=self.cluster_otar.id
+                )]
+            ),
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[],
+                targets=[]
+            )
+        ]
 
-        # Write ACL using TH1 since it has permission; this grants TH4 the needed access.
-        resp = await self.write_acl(th1, acl)
-        logger.info(f'Step #5 - TH4 have the necessary permissions to perform operation: {resp}')
+        resp = await self.create_acl_entry(
+            dev_ctrl=th1,
+            provider_node_id=self.dut_node_id,
+            acl_entries=acl_list
+        )
+        logger.info(f'Step #5 - TH4 has Admin + View permissions: {resp}')
 
         # TH4 is the OTA Provider (NodeID=4) for fabric 1
         provider_th4_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
-            providerNodeID=th4.nodeId,   # TH4 is the OTA Provider (NodeID=4)
+            providerNodeID=th4.nodeId,
             endpoint=0,
-            fabricIndex=th4.fabricId       # Fabric ID from TH4
+            fabricIndex=th4.fabricId
         )
 
         # NOTE:
-        # According to current observed behavior and discussion in Bug #40294,
-        # when writing a list with multiple providers from the same fabric,
-        # only the first valid entry is preserved if the write fails due to a ConstraintError.
-        # The rest of the list is ignored, and the original value remains unchanged.
+        # According to Bug #40294 and Matter specification sections 7.3.3 (Write Path Data Process)
+        # and 10.6.4.3.1 (Lists), when writing a list attribute with multiple providers from the same fabric:
+        # - The write may fail with a ConstraintError if any entry violates constraints.
+        # - Only the first valid entry in the list is guaranteed to be preserved.
+        # - The rest of the entries may be ignored, and the attribute value remains unchanged.
+        # This is expected behavior for list attributes and should be verified in the test.
 
         # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
         providers_list = [provider_th2_for_fabric1]
@@ -367,7 +376,6 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         # Confirm attribute value did not change
         asserts.assert_equal(pre_write_val, post_write_val,
                              "Attribute value changed unexpectedly after failed write")
-        # -----------------------------------------
 
         self.step(6)
 
