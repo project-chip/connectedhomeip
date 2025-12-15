@@ -32,6 +32,12 @@ config("sdk_private_config") {
     #   Based on comments from perfetto/repo/gn/standalone/BUILD.gn:
     #   Use return std::move(...) for compatibility with old GCC compilers.
     #
+    cflags += [
+      "-Wno-redundant-move",
+    ]
+  }
+
+  if (current_cpu == "arm" && current_os == "android") {
     # no-error=shorten-64-to-32:
     #
     #   Failure in android for android-arm-chip-tool:
@@ -42,10 +48,7 @@ config("sdk_private_config") {
     #     50363 |     const size_t key_hash = Hasher{}(key);
     #           |                  ~~~~~~~~   ^~~~~~~~~~~~~
     #
-    cflags += [
-      "-Wno-redundant-move",
-      "-Wno-error=shorten-64-to-32",
-    ]
+    cflags += [ "-Wno-error=shorten-64-to-32" ]
   }
 }
 
