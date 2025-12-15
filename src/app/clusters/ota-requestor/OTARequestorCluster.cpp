@@ -37,31 +37,24 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 } // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor) :
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor)
 {}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#if !CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     ChipLogError(SoftwareUpdate, "Initializing OTA requestor on endpoint %u with flag 'chip_enable_ota_requestor' disabled",
                  mPath.mEndpointId);
 #endif
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (mOtaRequestor)
-    {
-        return mOtaRequestor->RegisterEventHandler(this);
-    }
-    return CHIP_NO_ERROR;
+    return mOtaRequestor.RegisterEventHandler(this);
 }
 
 void OTARequestorCluster::Shutdown()
 {
-    if (mOtaRequestor)
-    {
-        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(this), SoftwareUpdate,
-                     "Unable to unregister event handling for endpoint %u during shutdown", mPath.mEndpointId);
-    }
+    SuccessOrLog(mOtaRequestor.UnregisterEventHandler(this), SoftwareUpdate,
+                 "Unable to unregister event handling for endpoint %u during shutdown", mPath.mEndpointId);
     DefaultServerCluster::Shutdown();
 }
 
@@ -71,19 +64,8 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
-        if (!mOtaRequestor)
-        {
-            // There are examples which enable the OTA requestor cluster in their zap configuration but don't
-            // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
-            // maintains backwards compatibility for those examples.
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            return CHIP_ERROR_INTERNAL;
-#else
-            return encoder.EncodeEmptyList();
-#endif
-        }
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            ProviderLocationList::Iterator providerIterator = mOtaRequestor->GetDefaultOTAProviderListIterator();
+            ProviderLocationList::Iterator providerIterator = mOtaRequestor.GetDefaultOTAProviderListIterator();
             CHIP_ERROR error                                = CHIP_NO_ERROR;
             while (error == CHIP_NO_ERROR && providerIterator.Next())
             {
@@ -95,33 +77,11 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
         return encoder.Encode(mUpdatePossible);
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-        if (!mOtaRequestor)
-        {
-            // There are examples which enable the OTA requestor cluster in their zap configuration but don't
-            // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
-            // maintains backwards compatibility for those examples.
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            return CHIP_ERROR_INTERNAL;
-#else
-            return encoder.Encode(OtaSoftwareUpdateRequestor::UpdateStateEnum::kUnknown);
-#endif
-        }
-        return encoder.Encode(mOtaRequestor->GetCurrentUpdateState());
+        return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
     {
-        if (!mOtaRequestor)
-        {
-            // There are examples which enable the OTA requestor cluster in their zap configuration but don't
-            // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
-            // maintains backwards compatibility for those examples.
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            return CHIP_ERROR_INTERNAL;
-#else
-            return encoder.EncodeNull();
-#endif
-        }
         DataModel::Nullable<uint8_t> progress;
-        ReturnErrorOnFailure(mOtaRequestor->GetUpdateStateProgressAttribute(mPath.mEndpointId, progress));
+        ReturnErrorOnFailure(mOtaRequestor.GetUpdateStateProgressAttribute(mPath.mEndpointId, progress));
         return encoder.Encode(progress);
     }
     case Globals::Attributes::FeatureMap::Id:
@@ -160,10 +120,6 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     switch (request.path.mCommandId)
     {
     case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
-        if (!mOtaRequestor)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
         OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
 
@@ -174,7 +130,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                          static_cast<unsigned>(kMaxMetadataLen));
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        mOtaRequestor->HandleAnnounceOTAProvider(handler, request.path, data);
+        mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
     default:
@@ -216,40 +172,19 @@ void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t byt
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void OTARequestorCluster::SetOtaRequestor(OTARequestorInterface * otaRequestor)
-{
-    if (mOtaRequestor)
-    {
-        SuccessOrLog(mOtaRequestor->UnregisterEventHandler(this), SoftwareUpdate,
-                     "Unable to unregister event handling for endpoint %u before changing requestor", mPath.mEndpointId);
-    }
-    mOtaRequestor = otaRequestor;
-    if (mOtaRequestor)
-    {
-        SuccessOrLog(mOtaRequestor->RegisterEventHandler(this), SoftwareUpdate,
-                     "Unable to register event handling for endpoint %u after changing requestor", mPath.mEndpointId);
-    }
-}
-
 CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    chip::OTARequestorInterface * requestor = mOtaRequestor;
-    if (requestor == nullptr)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
     if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
+        ReturnErrorOnFailure(mOtaRequestor.ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            ReturnErrorOnFailure(requestor->AddDefaultOtaProvider(iter.GetValue()));
+            ReturnErrorOnFailure(mOtaRequestor.AddDefaultOtaProvider(iter.GetValue()));
         }
 
         return iter.GetStatus();
@@ -264,7 +199,7 @@ CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttri
     case ConcreteDataAttributePath::ListOperation::AppendItem: {
         OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
-        return requestor->AddDefaultOtaProvider(item);
+        return mOtaRequestor.AddDefaultOtaProvider(item);
     }
     default:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

@@ -27,7 +27,7 @@ namespace chip::app::Clusters {
 class OTARequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
 {
 public:
-    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor);
+    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
 
     void SetUpdatePossible(bool updatePossible) { mUpdatePossible = updatePossible; }
     bool GetUpdatePossible() const { return mUpdatePossible; }
@@ -60,14 +60,11 @@ public:
     void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded, DataModel::Nullable<uint8_t> progressPercent,
                          DataModel::Nullable<int64_t> platformCode) override;
 
-    // This is intended to be used only for backwards compatibility with the codegen data model provider.
-    void SetOtaRequestor(OTARequestorInterface * otaRequestor);
-
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
-    OTARequestorInterface * mOtaRequestor = nullptr;
-    bool mUpdatePossible                  = true;
+    OTARequestorInterface & mOtaRequestor;
+    bool mUpdatePossible = true;
 };
 
 } // namespace chip::app::Clusters
