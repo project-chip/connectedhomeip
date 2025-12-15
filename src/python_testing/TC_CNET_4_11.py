@@ -125,9 +125,20 @@ class MatterServiceListener(ServiceListener):
         try:
             service_info = zc.get_service_info(type_, name)
             if service_info:
-                addresses = [
-                    socket.inet_ntoa(addr) for addr in service_info.addresses if len(addr) == 4
-                ]
+                # Support both IPv4 and IPv6 addresses
+                addresses = []
+                for addr in service_info.addresses:
+                    try:
+                        if len(addr) == 4:
+                            # IPv4 address
+                            addresses.append(socket.inet_ntoa(addr))
+                        elif len(addr) == 16:
+                            # IPv6 address
+                            addresses.append(socket.inet_ntop(socket.AF_INET6, addr))
+                    except Exception as addr_e:
+                        logger.debug(f"Failed to parse address: {addr_e}")
+                        continue
+
                 service_data = {
                     'name': name.replace(f'.{type_}', ''),
                     'type': type_,
