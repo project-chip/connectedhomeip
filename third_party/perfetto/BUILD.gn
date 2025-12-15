@@ -32,9 +32,7 @@ config("sdk_private_config") {
     #   Based on comments from perfetto/repo/gn/standalone/BUILD.gn:
     #   Use return std::move(...) for compatibility with old GCC compilers.
     #
-    cflags += [
-      "-Wno-redundant-move",
-    ]
+    cflags += [ "-Wno-redundant-move" ]
   }
 
   if (current_cpu == "arm" && current_os == "android") {
