@@ -16,6 +16,7 @@
 #
 
 import asyncio
+import contextlib
 import logging
 import os
 import platform
@@ -173,10 +174,9 @@ def detect_platform() -> str:
     system = platform.system()
     if system == 'Darwin':
         return 'macos'
-    elif system == 'Linux':
+    if system == 'Linux':
         return 'linux'
-    else:
-        return 'unknown'
+    return 'unknown'
 
 
 def get_target_device_id():
@@ -220,10 +220,8 @@ async def find_matter_devices_mdns():
 
         except Exception as e:
             logger.error(f"find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
-            try:
+            with contextlib.suppress(Exception):
                 zc.close()
-            except Exception:
-                pass
 
         if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(2)
@@ -249,8 +247,7 @@ async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBU
 
         if capture_output:
             return stdout.decode() if proc.returncode == 0 else ""
-        else:
-            return proc.returncode == 0
+        return proc.returncode == 0
 
     except asyncio.TimeoutError:
         logger.warning(f"run_subprocess: Command timed out after {timeout}s: {' '.join(cmd)}")
@@ -276,8 +273,7 @@ async def detect_wifi_interface():
         physical_interfaces = [c for c in candidates if not c.startswith('p2p-dev-')]
         if physical_interfaces:
             return physical_interfaces[0]
-        else:
-            return None
+        return None
     except Exception as e:
         logger.error(f"detect_wifi_interface: Error: {e}")
         return None
@@ -408,11 +404,11 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                 if "wpa_state=COMPLETED" in status:
                     connected = True
                     break
-                elif "wpa_state=4WAY_HANDSHAKE" in status:
+                if "wpa_state=4WAY_HANDSHAKE" in status:
                     # Authentication in progress, wait a bit more
                     last_state = "4WAY_HANDSHAKE"
                     await asyncio.sleep(2)
-                elif "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
+                if "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
                     disconnected_count += 1
                     last_state = "DISCONNECTED"
                     # Exit after more disconnected states
@@ -558,7 +554,7 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
 
             if conn and conn.returncode == 0:
                 break
-            elif conn:
+            if conn:
                 logger.warning(
                     f"connect_host_wifi: Attempt {attempt} failed. Return code: {conn.returncode}, stderr: {conn.stderr}")
             else:
@@ -645,9 +641,8 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     await asyncio.sleep(3)
                     th_success = True
                     break
-                else:
-                    logger.warning(
-                        f"change_networks: TH connection failed on attempt {th_attempt}: {result.stderr if result else 'Unknown error'}")
+                logger.warning(
+                    f"change_networks: TH connection failed on attempt {th_attempt}: {result.stderr if result else 'Unknown error'}")
 
             except asyncio.TimeoutError:
                 pass
@@ -660,11 +655,10 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
 
         if th_success:
             return  # Success!
-        else:
-            logger.error(f"change_networks: TH failed to connect to {ssid} after {MAX_ATTEMPTS} attempts")
+        logger.error(f"change_networks: TH failed to connect to {ssid} after {MAX_ATTEMPTS} attempts")
 
-            # Try fallback to original network immediately
-            try:
+           # Try fallback to original network immediately
+           try:
                 fallback_result = await asyncio.wait_for(
                     connect_host_wifi(ssid=original_ssid, password=original_password),
                     timeout=NETWORK_CHANGE_TIMEOUT
@@ -817,6 +811,7 @@ async def find_network_and_assert(test, networks, ssid, should_be_connected=True
             asserts.assert_equal(network.connected, should_be_connected, f"Wifi network {ssid} is {connection_state}.")
             return idx
     asserts.fail(f"Wifi network not found for SSID: {ssid}")
+    return None
 
 
 async def verify_operational_network(test, ssid):
@@ -1021,7 +1016,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
             logger.info(f" --- Connected networks count by endpoint: {connected_network_count}")
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")
