@@ -44,14 +44,18 @@ if(CONFIG_CHIP)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
 
     if(CONFIG_POSIX_API)
-        matter_add_flags(-D_DEFAULT_SOURCE)
-        matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
+        if(CONFIG_CHIP_ZEPHYR_USE_POSIX_DEFAULT_SOURCE)
+            matter_add_flags(-D_DEFAULT_SOURCE)
+            matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
+        endif()
     endif()
 
     if(CONFIG_MBEDTLS)
         zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
         zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
     endif()
+
+    zephyr_include_directories(${CHIP_ROOT}/src)
 
     zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
     matter_add_cflags("${ZEPHYR_CFLAGS_C}")
