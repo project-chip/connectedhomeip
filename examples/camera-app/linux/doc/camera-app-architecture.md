@@ -204,7 +204,7 @@ camera-app.
     -   **Configuration:** Interacts with the `ChimeServer` to get the enabled
         state and selected chime ID.
 
-*   **`ZoneManager`:**
+-   **`ZoneManager`:**
 
     -   **SDK Interface:** `chip::app::Clusters::ZoneManagement::Delegate`
     -   **Responsibilities:**
@@ -225,7 +225,7 @@ camera-app.
         -   `PushAvStreamTransportManager` is notified of zone triggers to start
             recordings.
 
-*   **`CameraAVSettingsUserLevelManager`:**
+-   **`CameraAVSettingsUserLevelManager`:**
     -   **SDK Interface:**
         `chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate`
     -   **Responsibilities:** Handles user-level settings, including Pan, Tilt,
