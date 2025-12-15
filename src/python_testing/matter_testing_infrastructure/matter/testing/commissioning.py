@@ -561,6 +561,8 @@ async def is_commissioned(
 
     Raises:
         ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
     try:
         # Fast DNS-SD check to determine if device is operational on this fabric
@@ -635,6 +637,8 @@ async def get_commissioned_fabric_count(
 
     Raises:
         ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
     try:
         # Import locally to avoid potential circular dependencies

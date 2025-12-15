@@ -396,6 +396,8 @@ async def assert_is_commissioned(
     Raises:
         AssertionError: If device has no commissioned fabrics (is factory fresh)
         ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
         # Verify device is commissioned before running multi-fabric test
@@ -405,7 +407,7 @@ async def assert_is_commissioned(
         await assert_is_commissioned(controller, node_id=1234, "Newly commissioned device")
 
         # Verify device is commissioned (establishes PASE if needed)
-        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        pase_params = {'discriminator': 1234, 'passcode': 20202021}
         await assert_is_commissioned(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import is_commissioned
@@ -445,13 +447,15 @@ async def assert_factory_fresh(
     Raises:
         AssertionError: If device has any commissioned fabrics
         ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
         # Verify device is factory reset before running test
         await assert_factory_fresh(controller, node_id=1234, "DUT")
 
         # Verify factory-fresh device (establishes PASE if needed)
-        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        pase_params = {'discriminator': 1234, 'passcode': 20202021}
         await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import is_commissioned
@@ -495,13 +499,15 @@ async def assert_fabric_count(
     Raises:
         AssertionError: If actual fabric count doesn't match expected count
         ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
 
     Example:
         # Verify device has exactly 1 fabric before adding second
         await assert_fabric_count(controller, node_id=1234, expected_count=1, "DUT")
 
         # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
-        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        pase_params = {'discriminator': 1234, 'passcode': 20202021}
         await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
