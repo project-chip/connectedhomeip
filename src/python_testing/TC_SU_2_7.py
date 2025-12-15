@@ -42,7 +42,8 @@
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_image_download_timeout:360
-#       --timeout 1600
+#       --timeout 0
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -211,6 +212,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report, self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
+        Clusters.OtaSoftwareUpdateRequestor.Attributes.FeatureMap
         # kIdle ( After update is Optional) in this case we only wait state to be Idle
         # Just wait the device to be kIdle to avoid unexpected states in following Steps.
         update_state_match = AttributeMatcher.from_callable(
@@ -276,7 +278,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider)
-        # state_transition_event_handler.reset()
         state_transition_event_handler.cancel()
         # Added this block because after EventSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
@@ -311,7 +312,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         logger.info(f"Event response : {event_report}")
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
-        # state_transition_event_handler.reset()
         state_transition_event_handler.cancel()
         # Added this block because after EventSubscriptionHandler
         # and calling an await method it was triggering an TimeoutError and CancelledError
@@ -322,35 +322,35 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.restart_requestor()
 
         self.step(4)
-        self.start_provider(
-            provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image,
-            setup_pincode=self.provider_setup_pincode,
-            discriminator=self.provider_discriminator,
-            port=self.provider_port, extra_args=['-u', 'deferred', '-c'],
-            kvs_path=self.provider_kvs_path,
-            log_file=self.provider_log,
-            timeout=10
-        )
-        state_transition_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=90)
-        await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
-        self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
-                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
-        self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
-                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
-        # state_transition_event_handler.reset()
-        state_transition_event_handler.cancel()
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
-        self.terminate_provider()
-        self.restart_requestor()
+        if self.pics_guard('MCORE.OTA.RequestorConsent'):
+            self.start_provider(
+                provider_app_path=self.provider_app_path,
+                ota_image_path=self.ota_image,
+                setup_pincode=self.provider_setup_pincode,
+                discriminator=self.provider_discriminator,
+                port=self.provider_port, extra_args=['-u', 'deferred', '-c'],
+                kvs_path=self.provider_kvs_path,
+                log_file=self.provider_log,
+                timeout=10
+            )
+            state_transition_event_handler = EventSubscriptionHandler(
+                expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
+            await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=90)
+            await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
+            event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+            self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
+                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
+            event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+            self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
+                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
+            state_transition_event_handler.cancel()
+            # Added this block because after AttributeSubscriptionHandler
+            # and calling an await method it was triggering an TimeoutError and CancelledError
+            # this is just to catch it and continue with the test
+            with contextlib.suppress(asyncio.CancelledError):
+                await asyncio.sleep(0.1)
+            self.terminate_provider()
+            self.restart_requestor()
 
         self.step(5)
         self.start_provider(
