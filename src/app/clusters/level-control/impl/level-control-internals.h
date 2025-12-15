@@ -24,12 +24,14 @@
 #include <app/util/util.h>
 #include <system/SystemClock.h>
 
-struct CallbackScheduleState {
+struct CallbackScheduleState
+{
     chip::System::Clock::Timestamp idealTimestamp;
     chip::System::Clock::Milliseconds32 runTime;
 };
 
-struct EmberAfLevelControlState {
+struct EmberAfLevelControlState
+{
     chip::CommandId commandId;
     uint8_t moveToLevel;
     bool increasing;
@@ -53,22 +55,22 @@ EmberAfLevelControlState * getState(chip::EndpointId endpoint);
 void writeRemainingTime(chip::EndpointId endpoint, uint16_t remainingTimeMs, bool isNewTransition = false);
 
 void HandleStartUpCurrentLevel(chip::EndpointId endpoint, EmberAfLevelControlState * state,
-    chip::app::DataModel::Nullable<uint8_t> & currentLevel);
+							   chip::app::DataModel::Nullable<uint8_t> & currentLevel);
 
 void ResolveOnLevel(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & currentLevelCache,
-    chip::app::DataModel::Nullable<uint8_t> & resolvedLevel, bool & useOnLevel);
+    				chip::app::DataModel::Nullable<uint8_t> & resolvedLevel, bool & useOnLevel);
 
 bool TryGetOnOffTransitionTimeDs(chip::EndpointId endpoint, uint16_t & transitionTimeDs);
 
 chip::Protocols::InteractionModel::Status
 ComputeTransitionTimeMsForMoveToLevel(chip::EndpointId endpoint, chip::app::DataModel::Nullable<uint16_t> transitionTimeDs,
-    uint8_t actualStepSize, uint32_t fastestTransitionTimeMs, uint32_t & transitionTimeMs);
+ 									  uint8_t actualStepSize, uint32_t fastestTransitionTimeMs, uint32_t & transitionTimeMs);
 
 chip::Protocols::InteractionModel::Status ComputeEventDurationMsForMove(chip::EndpointId endpoint, chip::app::DataModel::Nullable<uint8_t> rate,
-    uint32_t fastestTransitionTimeMs, uint8_t & eventDurationMs);
+    																	uint32_t fastestTransitionTimeMs, uint8_t & eventDurationMs);
 
 uint32_t ComputeTransitionTimeMsForStep(chip::EndpointId endpoint, chip::app::DataModel::Nullable<uint16_t> transitionTimeDs,
-    uint8_t stepSize, uint8_t actualStepSize, uint32_t fastestTransitionTimeMs);
+    									uint8_t stepSize, uint8_t actualStepSize, uint32_t fastestTransitionTimeMs);
 
 chip::Protocols::InteractionModel::Status SetCurrentLevelQuietReport(chip::EndpointId endpoint, EmberAfLevelControlState * state,
-    chip::app::DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
+    																 chip::app::DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
