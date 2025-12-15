@@ -17,9 +17,9 @@
 
 #include "level-control-internals.h"
 
+#include <algorithm>
 #include <app/util/config.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <algorithm>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,8 +33,7 @@ bool TryGetOnOffTransitionTimeDs(EndpointId, uint16_t &)
 }
 
 Status ComputeTransitionTimeMsForMoveToLevel(EndpointId endpoint, DataModel::Nullable<uint16_t> transitionTimeDs,
-                                             uint8_t actualStepSize, uint32_t fastestTransitionTimeMs,
-                                             uint32_t & transitionTimeMs)
+                                             uint8_t actualStepSize, uint32_t fastestTransitionTimeMs, uint32_t & transitionTimeMs)
 {
     if (transitionTimeDs.IsNull())
     {
@@ -48,8 +47,8 @@ Status ComputeTransitionTimeMsForMoveToLevel(EndpointId endpoint, DataModel::Nul
     return Status::Success;
 }
 
-Status ComputeEventDurationMsForMove(EndpointId endpoint, DataModel::Nullable<uint8_t> rate,
-                                     uint32_t fastestTransitionTimeMs, uint8_t & eventDurationMs)
+Status ComputeEventDurationMsForMove(EndpointId endpoint, DataModel::Nullable<uint8_t> rate, uint32_t fastestTransitionTimeMs,
+                                     uint8_t & eventDurationMs)
 {
     Status status = Status::Success;
 

@@ -17,8 +17,7 @@
 
 #include "level-control-internals.h"
 
-void HandleStartUpCurrentLevel(chip::EndpointId, EmberAfLevelControlState *,
-                               chip::DataModel::Nullable<uint8_t> &)
+void HandleStartUpCurrentLevel(chip::EndpointId, EmberAfLevelControlState *, chip::DataModel::Nullable<uint8_t> &)
 {
     // Start-up current level handling disabled by configuration.
 }
