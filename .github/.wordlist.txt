@@ -779,7 +779,6 @@ JDK
 jf
 jinja
 jitter
-Jitter
 JLink
 JLinkExe
 JLinkRTTClient
