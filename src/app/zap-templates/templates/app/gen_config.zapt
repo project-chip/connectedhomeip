@@ -17,50 +17,30 @@
 
 // Use this macro to check if the {{side}} side of the {{name}} cluster is included
 #define ZCL_USING_{{as_delimited_macro define}}_{{as_delimited_macro side}}
-#ifndef MATTER_DM_PLUGIN_{{as_delimited_macro name}}_{{as_delimited_macro side}}
-#define MATTER_DM_PLUGIN_{{as_delimited_macro name}}_{{as_delimited_macro side}} 1
-#endif
+#define MATTER_DM_PLUGIN_{{as_delimited_macro name}}_{{as_delimited_macro side}}
 {{#if (is_server side)}}
-#ifndef MATTER_DM_PLUGIN_{{as_delimited_macro name}}
-#define MATTER_DM_PLUGIN_{{as_delimited_macro name}} 1
-#endif
+#define MATTER_DM_PLUGIN_{{as_delimited_macro name}}
 {{/if}}
 {{#if (is_str_equal name "Color Control")}}
 {{#if (is_server side)}}
 // User options for {{side}} plugin {{name}}
-#ifndef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
-#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY 1
-#endif
-#ifndef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP 1
-#endif
-#ifndef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV 1
-#endif
+#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
+#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 {{/if}}
 {{else if (is_str_equal name "IAS Zone")}}
 // User options for {{side}} plugin {{name}}
 {{#if (is_server side)}}
-#ifndef MATTER_DM_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE
 #define MATTER_DM_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE 541
-#endif
 {{else}}
-#ifndef MATTER_DM_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES
 #define MATTER_DM_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES 10
-#endif
 {{/if}}
 {{else if (is_str_equal name "Level Control")}}
 {{#if (is_server side)}}
 // User options for {{side}} plugin {{name}}
-#ifndef MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL
 #define MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
-#endif
-#ifndef MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL
 #define MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
-#endif
-#ifndef MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE
 #define MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE 0
-#endif
 {{/if}}
 {{else if (is_str_equal name "Scenes Management")}}
 {{#if (is_server side)}}
