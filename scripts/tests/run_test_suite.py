@@ -21,6 +21,7 @@ import sys
 import time
 import typing
 from dataclasses import dataclass, field
+import warnings
 
 import chiptest
 import click
@@ -63,11 +64,29 @@ class RunContext:
     runtime: TestRunTime
     find_path: typing.List[str]
 
+    # Deprecated options passed to `cmd_run`
+    deprecated_chip_tool_path: str
+
     # If not empty, include only the specified test tags
     include_tags: set(TestTag) = field(default_factory={})
 
     # If not empty, exclude tests tagged with these tags
     exclude_tags: set(TestTag) = field(default_factory={})
+
+
+# TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
+# and drop this implementation.
+def deprecation_warning(context, param, value):
+    # Hack: Try to reverse the conversion between flag and variable name which happens in click
+    warnings.warn(f"Use '{param.replacement}' instead of '--{str.replace(param.name,'_', '-')}'", category=DeprecationWarning)
+    return value
+
+
+class DeprecatedOption(click.Option):
+    def __init__(self, *args, **kwargs):
+        self.replacement = kwargs.pop('replacement')
+        kwargs['help'] += f" (DEPRECATED: Use '{self.replacement}')"
+        super().__init__(*args, **kwargs, callback=deprecation_warning)
 
 
 @click.group(chain=True)
@@ -130,9 +149,13 @@ class RunContext:
     type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
+@click.option(
+    '--chip-tool', cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
+    help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, find_path, runner):
+         no_log_timestamps, root, internal_inside_unshare, include_tags,
+         exclude_tags, find_path, runner, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -205,6 +228,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
                              in_unshare=internal_inside_unshare,
                              runtime=runtime,
                              find_path=find_path,
+                             deprecated_chip_tool_path=chip_tool,
                              include_tags=include_tags,
                              exclude_tags=exclude_tags)
 
@@ -232,6 +256,57 @@ def cmd_list(context):
     '--iterations',
     default=1,
     help='Number of iterations to run')
+
+# Deprecated flags:
+@click.option(
+  '--all-clusters-app', cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
+    help='what all clusters app to use')
+@click.option(
+    '--lock-app', cls=DeprecatedOption, replacement='--app-path lock:<path>',
+    help='what lock app to use')
+@click.option(
+    '--fabric-bridge-app', cls=DeprecatedOption, replacement='--app-path fabric-bridge:<path>',
+    help='what fabric bridge app to use')
+@click.option(
+    '--ota-provider-app', cls=DeprecatedOption, replacement='--app-path ota-provider:<path>',
+    help='what ota provider app to use')
+@click.option(
+    '--ota-requestor-app', cls=DeprecatedOption, replacement='--app-path ota-requestor:<path>',
+    help='what ota requestor app to use')
+@click.option(
+    '--tv-app', cls=DeprecatedOption, replacement='--app-path tv:<path>',
+    help='what tv app to use')
+@click.option(
+    '--bridge-app', cls=DeprecatedOption, replacement='--app-path bridge:<path>',
+    help='what bridge app to use')
+@click.option(
+    '--lit-icd-app', cls=DeprecatedOption, replacement='--app-path lit-icd:<path>',
+    help='what lit-icd app to use')
+@click.option(
+    '--microwave-oven-app', cls=DeprecatedOption, replacement='--app-path microwave-oven:<path>',
+    help='what microwave oven app to use')
+@click.option(
+    '--rvc-app', cls=DeprecatedOption, replacement='--app-path rvc:<path>',
+    help='what rvc app to use')
+@click.option(
+    '--network-manager-app', cls=DeprecatedOption, replacement='--app-path network-manager:<path>',
+    help='what network-manager app to use')
+@click.option(
+    '--energy-gateway-app', cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
+    help='what energy-gateway app to use')
+@click.option(
+    '--energy-management-app', cls=DeprecatedOption, replacement='--app-path energy-management:<path>',
+    help='what energy-management app to use')
+@click.option(
+    '--closure-app', cls=DeprecatedOption, replacement='--app-path closure:<path>',
+    help='what closure app to use')
+@click.option(
+    '--matter-repl-yaml-tester', cls=DeprecatedOption, replacement='--tool-path matter-repl-yaml-tester:<path>',
+    help='what python script to use for running yaml tests using matter-repl as controller')
+@click.option(
+    '--chip-tool-with-python', cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
+    help='what python script to use for running yaml tests using chip-tool as controller')
+
 @click.option(
     '--app-path', multiple=True,
     help='Set path for an application (run in app network namespace), value should be <key>:<path>'
@@ -282,6 +357,9 @@ def cmd_list(context):
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, discover_paths,
+            all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, fabric_bridge_app, tv_app, bridge_app, lit_icd_app,
+            microwave_oven_app, rvc_app, network_manager_app, energy_gateway_app, energy_management_app, closure_app,
+            matter_repl_yaml_tester, chip_tool_with_python,
             pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
@@ -289,6 +367,30 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
+    def handle_deprecated_pathopt(key, path, kind):
+        if path is not None:
+            subproc_info_repo.addSpec(f"{key}:{path}", kind)
+
+    handle_deprecated_pathopt('all-clusters', all_clusters_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('lock', lock_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('fabric-bridge', fabric_bridge_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('ota-provider', ota_provider_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('ota-requestor', ota_requestor_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('tv', tv_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('bridge', bridge_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('lit-icd', lit_icd_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('microwave-oven', microwave_oven_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('rvc', rvc_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('network-manager', network_manager_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('energy-gateway', energy_gateway_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('energy-management', energy_management_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
+
+    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)
+
+    # New-style options override the deprecated ones
     for p in app_path:
         try:
             subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
