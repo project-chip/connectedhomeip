@@ -77,6 +77,8 @@ not_automated:
       reason: Shared code for TC_SETRF, not a standalone test
     - name: TC_SUTestBase.py
       reason: Shared code for TC_SU, not a standalone test
+    - name: TC_SU_2_2.py
+      reason: Test takes around 10 minutes, skipped in CI. Works on CI if added.
     - name: TC_SU_2_5.py
       reason:
           Test is skipped as it takes around 15 minutes to complete. Works on CI

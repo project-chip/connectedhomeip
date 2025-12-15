@@ -115,6 +115,10 @@ void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoin
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId);
