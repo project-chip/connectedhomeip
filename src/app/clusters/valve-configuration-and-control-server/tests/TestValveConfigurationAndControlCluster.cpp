@@ -78,12 +78,10 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestEmptyOptional)
     // Base configuration with no features or optional attributes
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, {}, &timeSyncTracker);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
-                                                        DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry,
-                                                        CurrentState::kMetadataEntry,
-                                                        TargetState::kMetadataEntry
-                                                    }));
+    ASSERT_TRUE(
+        IsAttributesListEqualTo(valveCluster,
+                                { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry,
+                                  RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry, TargetState::kMetadataEntry }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestValveFault)
@@ -93,13 +91,10 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestValveFault)
     optionalAttributeSet.Set<ValveFault::Id>();
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, optionalAttributeSet, &timeSyncTracker);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
-                                                        DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry,
-                                                        CurrentState::kMetadataEntry,
-                                                        TargetState::kMetadataEntry,
-                                                        ValveFault::kMetadataEntry
-                                                    }));
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster,
+                                        { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry,
+                                          RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry,
+                                          TargetState::kMetadataEntry, ValveFault::kMetadataEntry }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestLevelStep)
@@ -110,15 +105,11 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestLevelStep)
     const BitFlags<Feature> features{ Feature::kLevel };
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, &timeSyncTracker);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
-                                                        DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry,
-                                                        CurrentState::kMetadataEntry,
-                                                        TargetState::kMetadataEntry,
-                                                        CurrentLevel::kMetadataEntry,
-                                                        TargetLevel::kMetadataEntry,
-                                                        LevelStep::kMetadataEntry
-                                                    }));
+    ASSERT_TRUE(
+        IsAttributesListEqualTo(valveCluster,
+                                { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry,
+                                  RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
+                                  CurrentLevel::kMetadataEntry, TargetLevel::kMetadataEntry, LevelStep::kMetadataEntry }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestDefaultOpenLevel)
@@ -129,15 +120,11 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestDefaultOpenLevel)
     const BitFlags<Feature> features{ Feature::kLevel };
     ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, &timeSyncTracker);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
-                                                        DefaultOpenDuration::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry,
-                                                        CurrentState::kMetadataEntry,
-                                                        TargetState::kMetadataEntry,
-                                                        CurrentLevel::kMetadataEntry,
-                                                        TargetLevel::kMetadataEntry,
-                                                        DefaultOpenLevel::kMetadataEntry
-                                                    }));
+    ASSERT_TRUE(
+        IsAttributesListEqualTo(valveCluster,
+                                { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry,
+                                  RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
+                                  CurrentLevel::kMetadataEntry, TargetLevel::kMetadataEntry, DefaultOpenLevel::kMetadataEntry }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestTimeSync)
@@ -146,35 +133,29 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestTimeSync)
     ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<ValveFault::Id>().Set<DefaultOpenLevel::Id>().Set<LevelStep::Id>();
     const BitFlags<Feature> features{ Feature::kTimeSync, Feature::kLevel };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
-                                                     optionalAttributeSet, &timeSyncTracker);
-    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
-                                                        DefaultOpenDuration::kMetadataEntry,
-                                                        AutoCloseTime::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry,
-                                                        CurrentState::kMetadataEntry,
-                                                        TargetState::kMetadataEntry,
-                                                        CurrentLevel::kMetadataEntry,
-                                                        TargetLevel::kMetadataEntry,
-                                                        DefaultOpenLevel::kMetadataEntry,
-                                                        ValveFault::kMetadataEntry,
-                                                        LevelStep::kMetadataEntry
-                                                    }));
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, &timeSyncTracker);
+    ASSERT_TRUE(
+        IsAttributesListEqualTo(valveCluster,
+                                { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, AutoCloseTime::kMetadataEntry,
+                                  RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
+                                  CurrentLevel::kMetadataEntry, TargetLevel::kMetadataEntry, DefaultOpenLevel::kMetadataEntry,
+                                  ValveFault::kMetadataEntry, LevelStep::kMetadataEntry }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
 // With all the optional and feature attributes enabled.
 {
     const BitFlags<Feature> features{ Feature::kTimeSync };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
-                                                     {}, &timeSyncTracker);
-    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster, { OpenDuration::kMetadataEntry,
-                                                        DefaultOpenDuration::kMetadataEntry,
-                                                        AutoCloseTime::kMetadataEntry,
-                                                        RemainingDuration::kMetadataEntry,
-                                                        CurrentState::kMetadataEntry,
-                                                        TargetState::kMetadataEntry,
-                                                    }));
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, {}, &timeSyncTracker);
+    ASSERT_TRUE(IsAttributesListEqualTo(valveCluster,
+                                        {
+                                            OpenDuration::kMetadataEntry,
+                                            DefaultOpenDuration::kMetadataEntry,
+                                            AutoCloseTime::kMetadataEntry,
+                                            RemainingDuration::kMetadataEntry,
+                                            CurrentState::kMetadataEntry,
+                                            TargetState::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)

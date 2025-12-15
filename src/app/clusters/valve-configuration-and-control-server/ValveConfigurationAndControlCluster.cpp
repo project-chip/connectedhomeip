@@ -286,7 +286,6 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // If no value is provided, use the DefaultOpenDuration attribute value.
     openDuration = commandData.openDuration.HasValue() ? commandData.openDuration.Value() : mDefaultOpenDuration;
 
-
     // Check rules for TargetLevel if enabled
     if (mFeatures.Has(Feature::kLevel))
     {
@@ -497,7 +496,7 @@ void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfiguratio
     event.valveState = currentState;
 
     // Check if Level feature and add current level if enabled
-    if(mFeatures.Has(Feature::kLevel) && !mCurrentLevel.IsNull())
+    if (mFeatures.Has(Feature::kLevel) && !mCurrentLevel.IsNull())
     {
         event.valveLevel = MakeOptional<Percent>(mCurrentLevel.Value());
     }
