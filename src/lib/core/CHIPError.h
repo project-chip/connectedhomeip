@@ -428,7 +428,7 @@ private:
         // Mask value for every range except kPlatformExtended range. The kPlatformExtended
         // range is special, because we are using only the highest bit to determine whether
         // the range is kPlatformExtended and the rest is used to store the value itself.
-        // No masking is needed for kPlatform because MakeInteger will set the MSB.
+        // No masking is needed for kPlatformExtended because MakeInteger will set the MSB.
         return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStart, kValueLength))
                                                    : static_cast<StorageType>(value);
     }
