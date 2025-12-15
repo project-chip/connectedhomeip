@@ -41,7 +41,7 @@ public:
      * Creates a TLSClientManagement server instance.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
-     * @param certificateTable A reference to the certificate table for looking up certiciates
+     * @param certificateTable A reference to the certificate table for looking up certificates
      * @param maxProvisioned The maximum number of endpoints which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
