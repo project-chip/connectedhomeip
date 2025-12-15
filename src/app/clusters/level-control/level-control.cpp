@@ -351,8 +351,8 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
  * @param isEndOfTransition: Boolean that indicate whether the update is occuring at the end of a level transition
  * @return Success in setting the attribute value or the IM error code for the failure.
  */
-Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
-                                  DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition)
+Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state, DataModel::Nullable<uint8_t> newValue,
+                                  bool isEndOfTransition)
 {
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
@@ -1278,7 +1278,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     if (status == Status::Success)
     {
         HandleStartUpCurrentLevel(endpoint, state, currentLevel);
-       // In any case, we make sure that the respects min/max
+        // In any case, we make sure that the respects min/max
         if (currentLevel.IsNull() || currentLevel.Value() < state->minLevel)
         {
             SetCurrentLevelQuietReport(endpoint, state, state->minLevel, false /*isEndOfTransition*/);
