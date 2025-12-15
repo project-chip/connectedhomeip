@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <camera-av-stream-delegate-impl.h>
 #include <fstream>
 #include <iostream>
@@ -41,7 +41,7 @@ using chip::Protocols::InteractionModel::Status;
 std::unique_ptr<CameraAVStreamManager> sCameraAVStreamMgrInstance;
 
 // Global pointer to Camera AVStream Mgmt Server SDK cluster;
-std::unique_ptr<CameraAVStreamMgmtServer> sCameraAVStreamMgmtClusterServerInstance;
+std::unique_ptr<CameraAVStreamManagementCluster> sCameraAVStreamMgmtClusterServerInstance;
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
@@ -257,30 +257,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams)
-{
-    allocatedVideoStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams)
-{
-    allocatedAudioStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams)
-{
-    allocatedSnapshotStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
     ChipLogDetail(Zcl, "Persistent attributes loaded");
@@ -312,6 +288,13 @@ const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoS
 const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
 {
     return audioStreamStructs;
+}
+
+void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                   uint32_t & outBandwidthbps)
+{
+    ChipLogDetail(Zcl, "Get bandwidth for streams called");
 }
 
 void CameraAVStreamManager::InitializeAvailableVideoStreams()
@@ -398,16 +381,16 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport                  = TwoWayTalkSupportTypeEnum::kNotSupported;
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
-    uint32_t maxNetworkBandwidth                                 = 64;
+    uint32_t maxNetworkBandwidth                                 = 64 * 1000 * 1000; // 64 Mbps
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
     std::vector<StreamUsageEnum> streamUsagePriorities           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
-    sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
+    sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamManagementCluster>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
         spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
         streamUsagePriorities);
-    sCameraAVStreamMgmtClusterServerInstance->Init();
+    TEMPORARY_RETURN_IGNORED sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 
 void emberAfCameraAvStreamManagementClusterShutdownCallback(EndpointId endpoint)

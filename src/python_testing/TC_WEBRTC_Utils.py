@@ -18,6 +18,8 @@ import logging
 
 from matter.clusters import CameraAvStreamManagement
 
+log = logging.getLogger(__name__)
+
 
 class WebRTCTestHelper:
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):
@@ -45,7 +47,7 @@ class WebRTCTestHelper:
 
                 case _:
                     aBitRate = 30000
-                    logging.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
+                    log.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
 
             adoStreamAllocateCmd = CameraAvStreamManagement.Commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -59,10 +61,10 @@ class WebRTCTestHelper:
             return audioStreamAllocateResponse.audioStreamID
 
         except Exception as e:
-            logging.error(f"Failed to allocate audio stream. {e}")
+            log.error(f"Failed to allocate audio stream. {e}")
             return None
 
-    async def allocate_video_stream(self, endpoint):
+    async def allocate_video_stream(self, endpoint, devCtrl=None, node_id=None):
         """Try to allocate a video stream from the camera device. Returns the stream ID if successful, otherwise None."""
         attrs = CameraAvStreamManagement.Attributes
         try:
@@ -78,6 +80,12 @@ class WebRTCTestHelper:
             )
             aMinViewportRes = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewportResolution)
             aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
+            dev_ctrl = self.default_controller
+
+            if (node_id is None):
+                node_id = self.dut_node_id
+            if (devCtrl is not None):
+                dev_ctrl = devCtrl
 
             response = await self.send_single_cmd(
                 cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
@@ -96,9 +104,11 @@ class WebRTCTestHelper:
                     OSDEnabled=osd,
                 ),
                 endpoint=endpoint,
+                dev_ctrl=dev_ctrl,
+                node_id=node_id
             )
             return response.videoStreamID
 
         except Exception as e:
-            logging.error(f"Failed to allocate video stream. {e}")
+            log.error(f"Failed to allocate video stream. {e}")
             return None

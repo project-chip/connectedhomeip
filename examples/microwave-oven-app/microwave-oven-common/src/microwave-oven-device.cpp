@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "microwave-oven-device.h"
+#include "Identify.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -30,10 +31,10 @@ using Status            = Protocols::InteractionModel::Status;
 
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {
-    mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    mOperationalStateInstance.Init();
-    mMicrowaveOvenModeInstance.Init();
-    mMicrowaveOvenControlInstance.Init();
+    TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    TEMPORARY_RETURN_IGNORED mOperationalStateInstance.Init();
+    TEMPORARY_RETURN_IGNORED mMicrowaveOvenModeInstance.Init();
+    TEMPORARY_RETURN_IGNORED mMicrowaveOvenControlInstance.Init();
 
     // set default value for attribute SelectedWattIndex and WattRating
     if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
@@ -85,7 +86,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
 
     if (startAfterSetting)
     {
-        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     }
     return Status::Success;
 }
@@ -251,6 +252,7 @@ void MatterMicrowaveOvenServerInit()
 {
     gMicrowaveOvenDevice = Platform::MakeUnique<ExampleMicrowaveOvenDevice>(kDemoEndpointId);
     gMicrowaveOvenDevice.get()->MicrowaveOvenInit();
+    TEMPORARY_RETURN_IGNORED IdentifyInit();
 }
 
 void MatterMicrowaveOvenServerShutdown()

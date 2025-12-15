@@ -32,9 +32,9 @@ using namespace chip::Shell;
 
 int main()
 {
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().InitChipStack();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
 #endif

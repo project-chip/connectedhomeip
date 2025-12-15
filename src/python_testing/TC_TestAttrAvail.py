@@ -59,61 +59,14 @@
 # Run 2: Tests CASE connection using manual discriminator and passcode
 # Run 3: Tests without factory reset
 
-import asyncio
-
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_TestAttrAvail(MatterBaseTest):
-    # Using get_code and a modified version of setup_class_helper functions from matter.testing.basic_composition module
-    def get_code(self, dev_ctrl):
-        created_codes = []
-        for idx, discriminator in enumerate(self.matter_test_config.discriminators):
-            created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
-
-        setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
-        if not setup_codes:
-            return None
-        asserts.assert_equal(len(setup_codes), 1,
-                             "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
-        return setup_codes[0]
-
-    async def setup_class_helper(self, allow_pase: bool = True):
-        dev_ctrl = self.default_controller
-        self.problems = []
-
-        node_id = self.dut_node_id
-
-        task_list = []
-        if allow_pase and self.get_code(dev_ctrl):
-            setup_code = self.get_code(dev_ctrl)
-            pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
-            task_list.append(asyncio.create_task(pase_future))
-
-        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
-        task_list.append(asyncio.create_task(case_future))
-
-        for task in task_list:
-            asyncio.ensure_future(task)
-
-        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
-
-        for task in pending:
-            try:
-                task.cancel()
-                await task
-            except asyncio.CancelledError:
-                pass
-
-        wildcard_read = (await dev_ctrl.Read(node_id, [()]))
-
-        # ======= State kept for use by all tests =======
-        # All endpoints in "full object" indexing format
-        self.endpoints = wildcard_read.attributes
-
+class TC_TestAttrAvail(BasicCompositionTests):
     def steps_TC_TestAttrAvail(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),

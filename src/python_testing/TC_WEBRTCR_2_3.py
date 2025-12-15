@@ -38,16 +38,16 @@ import logging
 import os
 import tempfile
 
-import websockets
 from mobly import asserts
+from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
-SERVER_URI = "ws://localhost:9002"
+log = logging.getLogger(__name__)
 
 
-class TC_WebRTCRequestor_2_3(MatterBaseTest):
+class TC_WebRTCR_2_3(WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 
@@ -62,7 +62,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -89,19 +89,27 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_3(self) -> str:
+    def desc_TC_WebRTCR_2_3(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.3] Validate Offer command with valid session id"
 
-    def steps_TC_WebRTCRequestor_2_3(self) -> list[TestStep]:
+    def steps_TC_WebRTCR_2_3(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from DUT"),
             TestStep(2, "Trigger {TH_Server} to send an Offer to DUT with valid session ID and SDP offer"),
         ]
-        return steps
+
+    def pics_TC_WebRTCR_2_3(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        return [
+            "WEBRTCR.S",           # WebRTC Transport Requestor Server
+            "WEBRTCR.S.C00.Rsp",   # Offer command
+        ]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -109,20 +117,8 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3 * 60
 
-    async def send_command(self, command):
-        async with websockets.connect(SERVER_URI) as websocket:
-            logging.info(f"Connected to {SERVER_URI}")
-
-            # Send command
-            logging.info(f"Sending command: {command}")
-            await websocket.send(command)
-
-            # Receive response
-            await websocket.recv()
-            logging.info("Received command response")
-
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_3(self):
+    async def test_TC_WebRTCR_2_3(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """

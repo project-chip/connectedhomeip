@@ -1,10 +1,18 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
+    - name: TC_DD_3_23.py
+      reason:
+          NFC-Thread hardware setup needed for running this test-case and CI
+          does not support it
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
+    - name: TC_BRBINFO_3_1.py
+      reason:
+          Attribute is not implemented in the bridge app. Same code as
+          BINFO-3.1, which is run in the CI
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
@@ -69,6 +77,8 @@ not_automated:
       reason: Shared code for TC_SEPR, not a standalone test
     - name: TC_SETRF_TestBase.py
       reason: Shared code for TC_SETRF, not a standalone test
+    - name: TC_SUTestBase.py
+      reason: Shared code for TC_SU, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -80,6 +90,8 @@ not_automated:
     - name: TestDefaultWarnings.py
       reason: Unit test - does not run against an app
     - name: TestIdChecks.py
+      reason: Unit test - does not run against an app
+    - name: TestSpecParsingDataType.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
       reason: Unit test - does not run against an app
@@ -130,6 +142,9 @@ not_automated:
       reason: Depends on a browser peer for webrtc. CI is not supported.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_WEBRTCRTestBase.py
+      reason:
+          Shared code for the WebRTC Requestor Cluster, not a standalone test.
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.
@@ -149,10 +164,12 @@ slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
     - { name: TC_AccessChecker.py, duration: 1.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
+    - { name: TC_CADMIN_1_3_4.py, duration: 4 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
     - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
     - { name: TC_CC_2_2.py, duration: 1.5 minutes }
+    - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }
     - { name: TC_DEM_2_10.py, duration: 40 seconds }
     - { name: TC_DeviceBasicComposition.py, duration: 25 seconds }
     - { name: TC_DRLK_2_12.py, duration: 30 seconds }
@@ -171,4 +188,3 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
-    - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }

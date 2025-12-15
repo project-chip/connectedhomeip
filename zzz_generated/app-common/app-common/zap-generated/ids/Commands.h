@@ -26,6 +26,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/CommandIds.h>
 #include <clusters/AdministratorCommissioning/CommandIds.h>
 #include <clusters/AirQuality/CommandIds.h>
+#include <clusters/AmbientContextSensing/CommandIds.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>
@@ -155,6 +156,7 @@
 #include <clusters/WakeOnLan/CommandIds.h>
 #include <clusters/WaterHeaterManagement/CommandIds.h>
 #include <clusters/WaterHeaterMode/CommandIds.h>
+#include <clusters/WaterTankLevelMonitoring/CommandIds.h>
 #include <clusters/WebRTCTransportProvider/CommandIds.h>
 #include <clusters/WebRTCTransportRequestor/CommandIds.h>
 #include <clusters/WiFiNetworkDiagnostics/CommandIds.h>

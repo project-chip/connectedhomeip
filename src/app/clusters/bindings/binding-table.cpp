@@ -22,15 +22,18 @@
 #include <app/clusters/bindings/binding-table.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
 
-BindingTable BindingTable::sInstance;
+Table Table::sInstance;
 
-BindingTable::BindingTable()
+Table::Table()
 {
     memset(mNextIndex, kNextNullIndex, sizeof(mNextIndex));
 }
 
-CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
+CHIP_ERROR Table::Add(const TableEntry & entry)
 {
     if (entry.type == MATTER_UNUSED_BINDING)
     {
@@ -55,7 +58,8 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
         }
         if (error != CHIP_NO_ERROR)
         {
-            mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(newIndex).KeyName());
+            TEMPORARY_RETURN_IGNORED mStorage->SyncDeleteKeyValue(
+                DefaultStorageKeyAllocator::BindingTableEntry(newIndex).KeyName());
         }
     }
     if (error != CHIP_NO_ERROR)
@@ -81,14 +85,14 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
     return CHIP_NO_ERROR;
 }
 
-const EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
+const TableEntry & Table::GetAt(uint8_t index)
 {
     return mBindingTable[index];
 }
 
-CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
+CHIP_ERROR Table::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
 {
-    EmberBindingTableEntry & entry    = mBindingTable[index];
+    TableEntry & entry                = mBindingTable[index];
     uint8_t buffer[kEntryStorageSize] = { 0 };
     TLV::TLVWriter writer;
     writer.Init(buffer);
@@ -116,7 +120,7 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
                                      static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR BindingTable::SaveListInfo(uint8_t head)
+CHIP_ERROR Table::SaveListInfo(uint8_t head)
 {
     uint8_t buffer[kListInfoStorageSize] = { 0 };
     TLV::TLVWriter writer;
@@ -131,7 +135,7 @@ CHIP_ERROR BindingTable::SaveListInfo(uint8_t head)
                                      static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR BindingTable::LoadFromStorage()
+CHIP_ERROR Table::LoadFromStorage()
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     uint8_t buffer[kListInfoStorageSize] = { 0 };
@@ -178,11 +182,11 @@ CHIP_ERROR BindingTable::LoadFromStorage()
     return error;
 }
 
-CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex)
+CHIP_ERROR Table::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex)
 {
     uint8_t buffer[kEntryStorageSize] = { 0 };
     uint16_t size                     = sizeof(buffer);
-    EmberBindingTableEntry entry;
+    TableEntry entry;
 
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(index).KeyName(), buffer, size));
     TLV::TLVReader reader;
@@ -229,7 +233,7 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
+CHIP_ERROR Table::RemoveAt(Iterator & iter)
 {
     CHIP_ERROR error;
     if (iter.mTable != this || iter.mIndex == kNextNullIndex)
@@ -272,7 +276,7 @@ CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
     return error;
 }
 
-BindingTable::Iterator BindingTable::begin()
+Table::Iterator Table::begin()
 {
     Iterator iter;
     iter.mTable     = this;
@@ -281,7 +285,7 @@ BindingTable::Iterator BindingTable::begin()
     return iter;
 }
 
-BindingTable::Iterator BindingTable::end()
+Table::Iterator Table::end()
 {
     Iterator iter;
     iter.mTable = this;
@@ -289,7 +293,7 @@ BindingTable::Iterator BindingTable::end()
     return iter;
 }
 
-uint8_t BindingTable::GetNextAvaiableIndex()
+uint8_t Table::GetNextAvaiableIndex()
 {
     for (uint8_t i = 0; i < kMaxBindingEntries; i++)
     {
@@ -301,7 +305,7 @@ uint8_t BindingTable::GetNextAvaiableIndex()
     return kMaxBindingEntries;
 }
 
-BindingTable::Iterator BindingTable::Iterator::operator++()
+Table::Iterator Table::Iterator::operator++()
 {
     if (mIndex != kNextNullIndex)
     {
@@ -311,4 +315,7 @@ BindingTable::Iterator BindingTable::Iterator::operator++()
     return *this;
 }
 
+} // namespace Binding
+} // namespace Clusters
+} // namespace app
 } // namespace chip

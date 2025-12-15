@@ -28,6 +28,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/Enums.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AirQuality/Enums.h>
+#include <clusters/AmbientContextSensing/Enums.h>
 #include <clusters/ApplicationBasic/Enums.h>
 #include <clusters/ApplicationLauncher/Enums.h>
 #include <clusters/AudioOutput/Enums.h>
@@ -157,6 +158,7 @@
 #include <clusters/WakeOnLan/Enums.h>
 #include <clusters/WaterHeaterManagement/Enums.h>
 #include <clusters/WaterHeaterMode/Enums.h>
+#include <clusters/WaterTankLevelMonitoring/Enums.h>
 #include <clusters/WebRTCTransportProvider/Enums.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
@@ -165,4 +167,6 @@
 #include <clusters/ZoneManagement/Enums.h>
 
 // Included at the end, so all our definitions above are available.
+#define CHIP_INCLUDING_FROM_CLUSTER_ENUMS
 #include <app/common/CompatEnumNames.h>
+#undef CHIP_INCLUDING_FROM_CLUSTER_ENUMS

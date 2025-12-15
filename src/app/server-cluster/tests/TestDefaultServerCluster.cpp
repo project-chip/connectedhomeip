@@ -33,14 +33,13 @@
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdlib>
-#include <optional>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
@@ -48,7 +47,7 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ConcreteClusterPath path) : DefaultServerCluster(path) {}
+    constexpr FakeDefaultServerCluster(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -93,8 +92,8 @@ TEST(TestDefaultServerCluster, ListWriteNotification)
     FakeDefaultServerCluster cluster({ 1, 2 });
 
     // this does not test anything really, except we get 100% coverage and we see that we do not crash
-    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin);
-    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin, 1);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure, 1);
 }
 
 TEST(TestDefaultServerCluster, AttributesDefault)
@@ -110,11 +109,11 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     // 5 global attributes are currently supported. Ensure they are returned.
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_EQ(data[0].attributeId, Globals::Attributes::ClusterRevision::Id);
-    ASSERT_EQ(data[1].attributeId, Globals::Attributes::FeatureMap::Id);
-    ASSERT_EQ(data[2].attributeId, Globals::Attributes::AttributeList::Id);
+    ASSERT_EQ(data[0].attributeId, Globals::Attributes::FeatureMap::Id);
+    ASSERT_EQ(data[1].attributeId, Globals::Attributes::ClusterRevision::Id);
+    ASSERT_EQ(data[2].attributeId, Globals::Attributes::GeneratedCommandList::Id);
     ASSERT_EQ(data[3].attributeId, Globals::Attributes::AcceptedCommandList::Id);
-    ASSERT_EQ(data[4].attributeId, Globals::Attributes::GeneratedCommandList::Id);
+    ASSERT_EQ(data[4].attributeId, Globals::Attributes::AttributeList::Id);
 
     // first 2 are normal, the rest are list
     for (size_t i = 0; i < 5; i++)
@@ -131,9 +130,9 @@ TEST(TestDefaultServerCluster, ListWriteIsANoop)
 
     // this is really for coverage, we are not calling anything useful
     cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
-                                           DataModel::ListWriteOperation::kListWriteBegin);
+                                           DataModel::ListWriteOperation::kListWriteBegin, 1);
     cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
-                                           DataModel::ListWriteOperation::kListWriteSuccess);
+                                           DataModel::ListWriteOperation::kListWriteSuccess, 1);
 }
 
 TEST(TestDefaultServerCluster, CommandsDefault)

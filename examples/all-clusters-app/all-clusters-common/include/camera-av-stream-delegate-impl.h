@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -57,7 +57,7 @@ struct SnapshotStream
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
+class CameraAVStreamManager : public CameraAVStreamManagementDelegate
 {
 public:
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
@@ -91,15 +91,6 @@ public:
                                                         const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override;
 
-    CHIP_ERROR
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
-
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
@@ -110,6 +101,8 @@ public:
 
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
 
+    void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps);
     void Init();
 
     CameraAVStreamManager()  = default;

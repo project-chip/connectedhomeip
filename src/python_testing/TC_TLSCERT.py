@@ -50,6 +50,8 @@ from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.utils import CommissioningBuildingBlocks
 
+log = logging.getLogger(__name__)
+
 
 class TC_TLSCERT(MatterBaseTest):
     def __init__(self, *args, **kwargs):
@@ -76,7 +78,7 @@ class TC_TLSCERT(MatterBaseTest):
     async def common_setup(self, step_prefix: string = "1") -> TLSUtils:
         self.step(f'{step_prefix}.1')
         attributes = Clusters.TlsCertificateManagement.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Establishing CR1 controller
         cr1_cmd = TLSUtils(self, endpoint=endpoint)
@@ -107,7 +109,7 @@ class TC_TLSCERT(MatterBaseTest):
     async def common_two_fabric_setup(self, step_prefix: string = "1") -> TwoFabricData:
         cr1_cmd = await self.common_setup(f'{step_prefix}.1')
         cr1 = self.default_controller
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(f'{step_prefix}.2')
         # Establishing CR2 controller
@@ -404,9 +406,9 @@ class TC_TLSCERT(MatterBaseTest):
             my_caid[i] = response.caid
 
         self.step(5)
-        logging.warning(f"maximum cert {my_max_root_certs}")
+        log.warning(f"maximum cert {my_max_root_certs}")
         for i in range(2, my_max_root_certs + 2):
-            logging.warning(f"Root cert {i}")
+            log.warning(f"Root cert {i}")
             response = await cr2_cmd.send_provision_root_command(certificate=my_root_cert[i])
             cr2_cmd.assert_valid_caid(response.caid)
             my_caid[i] = response.caid
@@ -752,7 +754,7 @@ class TC_TLSCERT(MatterBaseTest):
         return ["TLSCERT.S"]
 
     def desc_TC_TLSCERT_2_8(self) -> str:
-        return "[TC-TLSCERT-2.8] TLSClientCSR command verification"
+        return "[TC-TLSCERT-2.8] ClientCSR command verification"
 
     def steps_TC_TLSCERT_2_8(self) -> list[TestStep]:
         return [
@@ -760,21 +762,21 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(2, "CR2 reads MaxClientCertificates attribute into myMaxClientCerts."),
             TestStep(3, "Populate myNonce[] with myMaxClientCerts+1 distinct, random 32-octet values."),
             TestStep(4, "Set myBigNonce to a value exceeding 32 octets."),
-            TestStep(5, "CR1 sends TLSClientCSR command with Nonce set to myBigNonce.",
+            TestStep(5, "CR1 sends ClientCSR command with Nonce set to myBigNonce.",
                      test_plan_support.verify_status(Status.ConstraintError)),
-            TestStep(6, "CR1 sends TLSClientCSR command with Nonce set to myNonce[0].",
+            TestStep(6, "CR1 sends ClientCSR command with Nonce set to myNonce[0].",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[0]."),
-            TestStep(7, "CR2 sends TLSClientCSR command with Nonce set to myNonce[i], for each i in [1..myMaxClientCerts].",
+            TestStep(7, "CR2 sends ClientCSR command with Nonce set to myNonce[i], for each i in [1..myMaxClientCerts].",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[i]."),
             TestStep(8, "CR1 reads ProvisionedClientCertificates attribute using a fabric-filtered read.",
                      "DUT replies with a list of TLSClientCertificateDetailStruct with one entry for myCcdid[0]."),
             TestStep(9, "CR2 reads ProvisionedClientCertificates attribute using a fabric-filtered read.",
                      "DUT replies with a list of TLSClientCertificateDetailStruct with myMaxClientCerts entries."),
-            TestStep(10, "CR2 sends TLSClientCSR command with Nonce set to myNonce[myMaxClientCerts].",
+            TestStep(10, "CR2 sends ClientCSR command with Nonce set to myNonce[myMaxClientCerts].",
                      test_plan_support.verify_status(Status.ResourceExhausted)),
             TestStep(11, "CR2 sends RemoveClientCertificate command with CCDID set to myCcdid[1].",
                      test_plan_support.verify_success()),
-            TestStep(12, "CR2 sends TLSClientCSR command with Nonce set to myNonce[myMaxClientCerts].",
+            TestStep(12, "CR2 sends ClientCSR command with Nonce set to myNonce[myMaxClientCerts].",
                      "DUT replies with CCDID, CSR and Nonce."),
             TestStep(13, "CR2 reads ProvisionedClientCertificates attribute.",
                      "DUT replies with a list of TLSClientCertificateDetailStruct with myMaxClientCerts entries."),
@@ -873,12 +875,12 @@ class TC_TLSCERT(MatterBaseTest):
         return ["TLSCERT.S"]
 
     def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             *self.get_two_fabric_substeps(),
             TestStep(2, "Populate my_nonce[] with 4 distinct, random 32-octet values"),
-            TestStep(3, "CR1 sends TLSClientCSR command with Nonce set to my_nonce[i], for each i in [0..1]",
+            TestStep(3, "CR1 sends ClientCSR command with Nonce set to my_nonce[i], for each i in [0..1]",
                      "Verify the fields CCDID, CSR and Nonce with types TLSCCDID, octstr and octstr respectively. Store TLSCCDID in my_ccdid[i] and CSR in my_csr[i]."),
-            TestStep(4, "CR2 sends sends TLSClientCSR command with Nonce set to my_nonce[2]",
+            TestStep(4, "CR2 sends sends ClientCSR command with Nonce set to my_nonce[2]",
                      "Verify the fields CCDID, CSR and Nonce with types TLSCCDID, octstr and octstr respectively. Store TLSCCDID in my_ccdid[2] and CSR in my_csr[2]."),
             TestStep(5, "Populate my_intermediate_certs_1 with 10 DER-encoded x509 certificates that form a certificate chain up to (but not including) a root"),
             TestStep(6, "Populate my_intermediate_certs_2 with 1 DER-encoded x509 certificates that form a certificate chain up to (but not including) a root"),
@@ -899,7 +901,7 @@ class TC_TLSCERT(MatterBaseTest):
                      "Verify a list of TLSClientCertificateDetailStruct with two entries. The entries should correspond to my_client_cert[0..1]"),
             TestStep(15, "CR2 sends FindClientCertificate command with null CCDID",
                      "Verify a  list of TLSClientCertificateDetailStruct with one entry. The entry should correspond to my_client_cert[2]"),
-            TestStep(16, "CR1 sends TLSClientCSR command with CCDID set to my_ccdid[0] and Nonce set to my_nonce[3]",
+            TestStep(16, "CR1 sends ClientCSR command with CCDID set to my_ccdid[0] and Nonce set to my_nonce[3]",
                      "the fields CCDID, CSR and Nonce with types TLSCCDID, octstr and octstr respectively. CCDID should equal my_ccdid[0]. The public key of the resulting CSR should be equal to the public key in my_csr[0]. NonceSignature should be a signature of my_nonce[3] using public key in CSR"),
             TestStep(
                 17, "CR1 sends ProvisionClientCertificate command with CCDID set to my_ccdid[0] and ClientCertificateDetails set to my_client_cert[3]", test_plan_support.verify_success()),
@@ -915,7 +917,6 @@ class TC_TLSCERT(MatterBaseTest):
                      test_plan_support.verify_success()),
             TestStep(23, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
     async def test_TC_TLSCERT_2_9(self):
@@ -976,12 +977,16 @@ class TC_TLSCERT(MatterBaseTest):
             asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
             asserts.assert_equal(found_certs[my_ccdid[i]].clientCertificate,
                                  my_client_cert[i], "Expected matching certificate detail")
+        asserts.assert_equal(found_certs[my_ccdid[1]].intermediateCertificates,
+                             my_intermediate_certs_1, "Expected matching certificate detail")
 
         self.step(12)
         found_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
         asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
+        asserts.assert_equal(found_certs[my_ccdid[2]].intermediateCertificates,
+                             my_intermediate_certs_2, "Expected matching certificate detail")
 
         self.step(13)
         # Must close session so we don't re-use large payload session
@@ -1014,8 +1019,8 @@ class TC_TLSCERT(MatterBaseTest):
         response = await cr1_cmd.send_csr_command(ccdid=my_ccdid[0], nonce=my_nonce[3])
         cr1_cmd.assert_valid_ccdid(response.ccdid)
         asserts.assert_equal(response.ccdid, my_ccdid[0], "Expected same ID")
-        my_csr[3] = cr1_cmd.assert_valid_csr(response, my_nonce[3])
-        my_client_cert[3] = cr1_cmd.gen_cert_with_key(root, public_key=my_csr[3].public_key(), subject=my_csr[3].subject)
+        cr1_cmd.assert_valid_csr(response, my_nonce[3])
+        my_client_cert[3] = cr1_cmd.gen_cert_with_key(root, public_key=my_csr[0].public_key(), subject=my_csr[0].subject)
 
         self.step(17)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])
@@ -1066,7 +1071,7 @@ class TC_TLSCERT(MatterBaseTest):
         return [
             *self.get_two_fabric_substeps(),
             TestStep(2, "Populate myNonce with a random 32-octet values"),
-            TestStep(3, "CR1 sends sends TLSClientCSR command with Nonce set to myNonce.",
+            TestStep(3, "CR1 sends sends ClientCSR command with Nonce set to myNonce.",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid and CSR in myCsr."),
             TestStep(4,
                      "Set myBigCert to a valid DER encoding of a valid, self-signed x509 certificate using the public key from csr. The certificate should be large enough that the DER encoding is larger than 3000 octets."),
@@ -1171,7 +1176,7 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(2, "Set myNonce to a random 32-octet value"),
             TestStep(3, "CR1 sends FindClientCertificate command with null CCDID.",
                      test_plan_support.verify_status(Status.NotFound)),
-            TestStep(4, "CR1 sends TLSClientCSR command with Nonce set to myNonce.",
+            TestStep(4, "CR1 sends ClientCSR command with Nonce set to myNonce.",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid."),
             TestStep(5, "CR1 sends FindClientCertificate command with CCDID set to myCcdid.",
                      "DUT replies with a list of TLSClientCertificateDetailsStruct with one entry. The entry should have CCDID with value myCcdid with ClientCertificate and IntermediateCertificates unset."),
@@ -1240,9 +1245,9 @@ class TC_TLSCERT(MatterBaseTest):
                      test_plan_support.verify_status(Status.NotFound)),
             TestStep(4, "CR1 sends LookupClientCertificate command with Fingerprint set to and arbitrary octstr.",
                      test_plan_support.verify_status(Status.NotFound)),
-            TestStep(5, "CR1 sends TLSClientCSR command with Nonce set to myNonce[i], for each i in [0..1].",
+            TestStep(5, "CR1 sends ClientCSR command with Nonce set to myNonce[i], for each i in [0..1].",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[i] and CSR in myCsr[i]."),
-            TestStep(6, "CR2 sends TLSClientCSR command with Nonce set to myNonce[2].",
+            TestStep(6, "CR2 sends ClientCSR command with Nonce set to myNonce[2].",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[2] and CSR in myCsr[2]."),
             TestStep(7,
                      "Populate myClientCert[] with 3 distinct, valid, self-signed, DER-encoded x509 certificates using each respective public key from myCsr[i]."),
@@ -1374,7 +1379,7 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(3, "Set myRootCert to a valid, self-signed, DER-encoded x509 certificate"),
             TestStep(4, "CR1 sends RemoveClientCertificate command with CCDID set to 1.",
                      test_plan_support.verify_status(Status.NotFound)),
-            TestStep(5, "CR1 sends TLSClientCSR command with Nonce set to myNonce.",
+            TestStep(5, "CR1 sends ClientCSR command with Nonce set to myNonce.",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid."),
             TestStep(6, "Populate myClientCert with a valid, self-signed, DER-encoded x509 certificate using the public key from the CSR."),
             TestStep(7, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificateDetails set to myClientCert.",

@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
@@ -32,7 +32,6 @@ namespace app {
 namespace Clusters {
 
 // Forward declarations
-class PushAvStreamTransportServerLogic;
 class PushAvStreamTransportServer;
 
 /**
@@ -52,6 +51,7 @@ public:
      *
      * @param transportOptions The configuration options of the transport to be allocated
      * @param connectionID The connectionID to allocate
+     * @param AccessingFabricIndex The FabricIndex of the associated Fabric
      * @return Success if allocation is successful and a PushTransportConnectionID was produced;
      *         otherwise, the command is rejected with Failure
      *
@@ -64,7 +64,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     AllocatePushTransport(const PushAvStreamTransport::Structs::TransportOptionsStruct::Type & transportOptions,
-                          const uint16_t connectionID) = 0;
+                          const uint16_t connectionID, FabricIndex accessingFabricIndex) = 0;
 
     /**
      * @brief Handles stream transport deallocation for the provided connectionID.
@@ -84,7 +84,7 @@ public:
      *         Failure if modification fails
      *
      * @note The buffers storing URL, Trigger Options, Motion Zones, Container Options are owned by
-     * the PushAVStreamTransport Server. The allocated buffers are cleared and reassigned to modified
+     * the Push AV Stream Transport server. The allocated buffers are cleared and reassigned to modified
      * transportOptions on success of ModifyPushTransport and deallocated on success of DeallocatePushTransport.
      */
     virtual Protocols::InteractionModel::Status
@@ -131,14 +131,6 @@ public:
         const Optional<PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type> & timeControl) = 0;
 
     /**
-     * @brief Validates the provided URL.
-     *
-     * @param url The URL to validate
-     * @return true if URL is valid, false otherwise
-     */
-    virtual bool ValidateUrl(const std::string & url) = 0;
-
-    /**
      * @brief Validates the provided StreamUsage.
      *
      * @param streamUsage The StreamUsage to validate
@@ -150,9 +142,11 @@ public:
      * @brief Validates the provided Segment Duration.
      *
      * @param segmentDuration The Segment Duration to validate
-     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     * @param videoStreamId   The video stream to be validated against
+     * @return true if Segment Duration is multiple of KeyFrameInterval for the provided videoStreamId, false otherwise
      */
-    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
+                                         const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -194,22 +188,24 @@ public:
                                                                   uint16_t & audioStreamId) = 0;
 
     /**
-     * @brief Validates that the video stream corresponding to videoStreamID is allocated.
+     * @brief Sets the video stream for Push AV usage corresponding to videoStreamID,
+     * if it is valid and is allocated.
      *
      * @param videoStreamId Identifier for the requested video stream
-     * @return Status::Success if allocated video stream exists;
+     * @return Status::Success if allocated video stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated video stream with videoStreamID exists
      */
-    virtual Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) = 0;
 
     /**
-     * @brief Validates that the audio stream corresponding to audioStreamID is allocated.
+     * @brief Sets the audio stream for Push AV usage corresponding to audioStreamID,
+     * if it is valid and is allocated.
      *
      * @param audioStreamId Identifier for the requested audio stream
-     * @return Status::Success if allocated audio stream exists;
+     * @return Status::Success if allocated audio stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated audio stream with audioStreamID exists
      */
-    virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) = 0;
 
     /**
      * @brief Validates that the zone corresponding to zoneId exists.
@@ -267,11 +263,41 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
+    /**
+     * @brief Sets TLS certificates for secure push transport connections.
+     *
+     * @param clientCertEntry Reference to buffered client certificate entry
+     * @param rootCertEntry Reference to buffered root certificate entry
+     */
     virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                              Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
 
     /**
-     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     * @brief Verifies whether Hard privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delegate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Verifies whether Soft Recording privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delegate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Verifies whether Soft Livestream privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delegate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide
      * the delegate with a pointer to the server instance. This allows the

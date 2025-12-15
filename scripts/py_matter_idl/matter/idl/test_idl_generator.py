@@ -50,7 +50,7 @@ class TestCaseStorage(GeneratorStorage):
 
 def ReadMatterIdl(repo_path: str) -> str:
     path = os.path.join(os.path.dirname(__file__), "../../../..", repo_path)
-    with open(path, "rt") as stream:
+    with open(path) as stream:
         return stream.read()
 
 
@@ -64,7 +64,7 @@ def RenderAsIdlTxt(idl: Idl) -> str:
     return storage.content or ""
 
 
-def SkipLeadingComments(txt: str, also_strip: List[str] = list()) -> str:
+def SkipLeadingComments(txt: str, also_strip: List[str] = []) -> str:
     """Skips leading lines starting with // in a file. """
     lines = txt.split("\n")
     idx = 0

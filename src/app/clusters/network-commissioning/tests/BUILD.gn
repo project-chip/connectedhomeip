@@ -23,17 +23,16 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestNetworkCommissioningCluster.cpp",
-    "TestNetworkCommissioningLogic.cpp",
+    "TestNetworkCommissioningClusterEthernet.cpp",
     "TestThreadResponse.cpp",
     "TestWifiResponse.cpp",
   ]
 
-  sources = [ "FakeWifiDriver.h" ]
+  sources = [ "FakeDrivers.h" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/general-commissioning-server:test-only-temporary-coupling",
     "${chip_root}/src/app/clusters/network-commissioning",
     "${chip_root}/src/app/clusters/network-commissioning:thread-response-encoding",
     "${chip_root}/src/app/clusters/network-commissioning:wifi-response-encoding",

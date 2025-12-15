@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avsm_2_17_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avsm_2_17_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -47,7 +48,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
@@ -79,8 +80,9 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH writes attribute `SoftLivestreamPrivacyModeEnabled` to false in the CameraAVStreamManagement Cluster on DUT.",
+                "TH writes attribute `SoftLivestreamPrivacyModeEnabled` and `SoftRecordingPrivacyModeEnabled` to false in the CameraAVStreamManagement Cluster on DUT.",
                 "DUT responds with Success",
+                "TH ensures HardPrivacyModeOn is false"
             ),
             TestStep(
                 5,
@@ -171,7 +173,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         and has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy)
     )
     async def test_TC_AVSM_2_17(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -188,7 +190,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         adoSupport = aFeatureMap & cluster.Bitmaps.Feature.kAudio
         privacySupport = aFeatureMap & cluster.Bitmaps.Feature.kPrivacy
@@ -200,7 +202,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
         aVideoStreamID = aAllocatedVideoStreams[0].videoStreamID
         aVideoRefCount = aAllocatedVideoStreams[0].referenceCount
@@ -209,7 +211,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1")
         aAudioStreamID = aAllocatedAudioStreams[0].audioStreamID
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
@@ -217,7 +219,38 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         self.step(4)
         result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-        logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+        log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+
+        softLivestreamPrivMode = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
+        )
+        asserts.assert_false(softLivestreamPrivMode, "SoftLivestreamPrivacyModeEnabled should be False")
+
+        result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
+        asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
+        log.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+
+        softRecordingPrivMode = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
+        )
+        asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeEnabled should be False")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+            # For CI: Use app pipe to simulate physical privacy switch being turned on
+            # For manual testing: User should physically turn on the privacy switch
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+            else:
+                self.wait_for_user_input(
+                    "Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
+
+            # Verify the attribute reflects the privacy switch state
+            hard_privacy_mode = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
+            )
+            asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
 
         self.step(5)
         current_sessions = await self.read_single_attribute_check_success(
@@ -272,7 +305,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(aAllocatedVideoStreams[0].referenceCount, aVideoRefCount+1,
                              "The reference count for allocated video streams is not as expected")
 
@@ -280,14 +313,14 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(aAllocatedAudioStreams[0].referenceCount, aAudioRefCount+1,
                              "The reference count for allocated audio streams is not as expected")
 
         self.step(11)
         result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-        logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
+        log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
 
         self.step(12)
         kPrivacyReasonCode = 11
@@ -308,14 +341,14 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(aAllocatedVideoStreams[0].referenceCount, aVideoRefCount, "The reference count should be unchanged")
 
         self.step(15)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(aAllocatedAudioStreams[0].referenceCount, aAudioRefCount, "The reference count should be unchanged")
 
         self.step(16)
@@ -336,20 +369,20 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(19)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
         self.step(20)
         result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-        logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+        log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
 
         await webrtc_manager.close_all()
 

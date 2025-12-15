@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
+#include <app/clusters/time-format-localization-server/TimeFormatLocalizationCluster.h>
 #include <app/static-cluster-config/TimeFormatLocalization.h>
 #include <app/util/attribute-metadata.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -94,7 +94,6 @@ void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // register a singleton server (root endpoint only)
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
         {
@@ -113,7 +112,6 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // register a singleton server (root endpoint only)
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {

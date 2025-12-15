@@ -21,6 +21,8 @@ import sys
 import threading
 from xmlrpc.server import SimpleXMLRPCServer
 
+log = logging.getLogger(__name__)
+
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
@@ -64,8 +66,11 @@ class AppsRegister:
             accessory.kill()
 
     def killAll(self):
+        ok = True
         for accessory in self.__accessories.values():
-            accessory.kill()
+            # make sure to do kill() on all of our apps, even if some of them returned False
+            ok = accessory.kill() and ok
+        return ok
 
     def start(self, name, args):
         accessory = self.__accessories[name]
@@ -161,9 +166,8 @@ class AppsRegister:
 
         # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
         if (len(args) % 2) != 0:
-            logging.warning("Unexpected command line options %r - not key/value pairs (odd length)" % (args,))
+            log.warning("Unexpected command line options %r - not key/value pairs (odd length)", args)
             return {}
 
         # Create a dictionary from the key-value pair list
-        options = {args[i]: args[i+1] for i in range(0, len(args), 2)}
-        return options
+        return {args[i]: args[i+1] for i in range(0, len(args), 2)}

@@ -7,195 +7,212 @@ general overview of the code-driven cluster architecture.
 
 ---
 
-## Step 1: Evaluate the Existing Ember Implementation
+## Migration Checklist
 
-Before writing new code, it's crucial to understand how the current Ember
-cluster is implemented. Ember clusters typically use a mix of the following
-patterns:
+This checklist provides a granular, step-by-step process for migrating an Ember
+cluster to a code-driven implementation.
 
-### Pure Ember Implementation (Simple Attributes)
+### Part 0: Optimizing for an Easier Review
 
-For simple attributes, the Ember framework in `src/app/util` handles data
-storage and access. The application interacts with these attributes via the
-type-safe accessors in
-`zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.h`.
+Before you begin the migration, consider structuring your changes into multiple,
+smaller pull requests. This approach significantly simplifies the review
+process, allowing reviewers to approve preliminary changes quickly. We recommend
+the following sequence of PRs:
 
-In a code-driven implementation, this data must be moved into member variables
-within your new cluster class.
+-   [ ] **PR 1: File Renames Only.**
 
-In some cases the cluster directory may not exist. In that case, create a new
-directory and add the mapping in
-[src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
-under the `ServerDirectories` key.
+    -   If your migration involves renaming files, submit a PR containing _only_
+        the renames. A typical rename is from `<name>-server.cpp` to
+        `<Name>Cluster.cpp`.
+    -   **Note:** For backward compatibility with code generation, it is often
+        best to **not** rename the header file.
+    -   **Why:** This prevents `git diff` from becoming confused and showing the
+        entire file as deleted and recreated, making the actual code changes
+        impossible to review.
+    -   _This type of PR can be reviewed and merged very quickly._
 
-### `AttributeAccessInterface` (`AAI`) and `CommandHandlerInterface` (`CHI`)
+-   [ ] **PR 2: Code Movement Only.**
 
-When more complex logic is needed, Ember clusters use these interfaces.
+    -   If you plan to reorder functions or move code blocks (e.g., moving
+        helper functions to an anonymous namespace), submit a PR with _only_
+        these movements. Do not change any logic.
+    -   **Why:** Reviewers can use tools like `git diff --color-moved` to verify
+        that code has only been moved, not altered. This allows for a rapid
+        review of structural changes.
+    -   _This type of PR can also be fast-tracked._
 
--   `AAI` can be directly translated to the `ReadAttribute` and `WriteAttribute`
-    methods in your new cluster class.
--   `CHI` can be translated to the `InvokeCommand` method.
+-   [ ] **PR 3: The Core Logic Changes.**
+    -   This PR should contain the actual migration logic: implementing the new
+        cluster class, moving attribute storage, and converting command
+        handlers.
+    -   **Why:** With renames and code movements already handled, this PR will
+        be much smaller and focused, allowing the reviewer to concentrate solely
+        on the correctness of the migration logic.
 
-### Determine ember/zap storage
+This structure respects the reviewer's time and helps get your changes merged
+faster. You can ask for an expedited review of the preliminary PRs in the
+project's Slack channel.
 
-Ember storage should be moved from `persist/ram/callback` into `ram/callback`:
+### Part 1: Analysis and Design
 
--   if the value loaded from ZAP UI needs to be loaded, use `RAM` and have
-    `CodegenIntegration.cpp` load the value from ZAP via `Accessors.h`. A common
-    example here is `FeatureMap`
+-   [ ] **1.1: Understand the Existing Implementation:**
 
--   if the value is internal to the cluster or does not need loading, set it as
-    `External` by including it in the `attributeAccessInterfaceAttributes` in
-    `zcl.json` and `zcl-with-test-extensions.json`. A common example here is
-    `ClusterRevision`
+    -   [ ] Identify if the cluster uses a pure Ember implementation,
+            `AttributeAccessInterface` (`AAI`), or `CommandHandlerInterface`
+            (`CHI`).
+        -   **Pure Ember Implementation:** For simple attributes, the Ember
+            framework in `src/app/util` handles data storage and access. In a
+            code-driven implementation, this data **must be moved into member
+            variables** within your new cluster class.
+        -   **AAI and CHI:** For more complex logic, `AAI` translates to the
+            `ReadAttribute` and `WriteAttribute` methods, while `CHI` translates
+            to the `InvokeCommand` method.
+    -   [ ] Determine how attributes are stored (e.g., `persist`, `ram`,
+            `callback`). This will inform how you handle data in the new
+            implementation.
+        -   If the value was `persist`, the new cluster should handle
+            persistence (load in `Startup` and store during writes).
+        -   If the value was `ram` and loaded from the ZAP UI,
+            `CodegenIntegration.cpp` should load the value from ZAP via the
+            generated `Accessors.h`. A common example is the `FeatureMap`.
+        -   If the value is internal to the cluster (e.g., `ClusterRevision`),
+            it should be marked as `External` by adding it to
+            `attributeAccessInterfaceAttributes` in `zcl.json`.
 
--   if the value used to be `persist` it is an indication that the cluster
-    should handle persistence (load in `Startup` and store during writes).
+-   [ ] **1.2: Choose an Implementation Pattern:**
 
-## Step 2: Design the Code-Driven Implementation
+    -   [ ] Decide between a combined or modular implementation based on the
+            cluster's complexity and resource constraints. See the
+            [Writing Clusters](./writing_clusters.md#choosing-the-right-implementation-pattern)
+            guide for more details.
 
-### Class Layout and File Structure
+-   [ ] **1.3: Create the File Structure:**
+    -   [ ] Use an existing directory for the cluster or create a new one if
+            missing at `src/app/clusters/<name>/`.
+        -   **Note:** If the cluster was a pure Ember implementation, this
+            directory may not exist. After creating it, you must add a mapping
+            to `src/app/zap_cluster_list.json` under the `ServerDirectories`
+            key.
+    -   [ ] Add the following files:
+        -   `<Name>Cluster.h`
+        -   `<Name>Cluster.cpp`
+        -   `CodegenIntegration.cpp`
+        -   `tests/Test<Name>Cluster.cpp`
+        -   `BUILD.gn`
+        -   `tests/BUILD.gn`
+        -   `app_config_dependent_sources.gni`
+        -   `app_config_dependent_sources.cmake`
 
-When converting clusters, optimizing for flash usage is often a priority. For
-this reason, it's common to implement the cluster without separating the logic
-from the implementation class.
+### Part 2: Implementation
 
--   **Recommendation:** Combine logic and data storage into a single
-    `<Name>Cluster` class that implements the `ServerClusterInterface`.
--   **Trade-off:** This approach prioritizes a smaller flash footprint over the
-    modular, more testable layout described in the
-    [Writing Clusters](./writing_clusters.md) guide. The combined approach is
-    often suitable for simpler clusters or when resource constraints are tight.
+-   [ ] **2.1: Implement the Cluster Class:**
 
-You will need to create the following files:
+    -   [ ] Define the `<Name>Cluster` class, inheriting from
+            `DefaultServerCluster`.
+    -   [ ] Add member variables for all attributes previously handled by Ember.
+    -   [ ] Implement the `Startup` and `Shutdown` methods for resource
+            management.
 
--   `src/app/clusters/<name>/<Name>Cluster.h`
--   `src/app/clusters/<name>/<Name>Cluster.cpp`
--   `src/app/clusters/<name>/CodegenIntegration.cpp`
--   `src/app/clusters/<name>/tests/Test<Name>Cluster.cpp`
--   Build files (`BUILD.gn`, `tests/BUILD.gn`,
-    `app_config_dependent_sources.gni`, `app_config_dependent_sources.cmake`)
+-   [ ] **2.2: Implement Attribute Logic:**
 
-### Attribute and Command Availability
+    -   [ ] Implement the `ReadAttribute` and `WriteAttribute` methods,
+            translating any existing `AAI` logic.
+    -   [ ] For persisted attributes, use the `AttributePersistence` helper to
+            load in `Startup` and save on writes.
+    -   [ ] **Crucially,** after a successful write, call a notification
+            function (e.g., `NotifyAttributeChangedIfSuccess`) to ensure
+            subscriptions work correctly.
 
-Your new class must accurately report which attributes and commands are
-available based on the feature map and other configuration.
+-   [ ] **2.3: Implement Command Logic:**
 
--   Store the feature map in your cluster instance.
--   For optional attributes, use a `BitFlags` variable, an
-    `OptionalAttributeSet`, or a `struct` of booleans to track which are
-    enabled.
+    -   [ ] Implement the `InvokeCommand` method, translating any existing `CHI`
+            or `emberAf...Callback` logic.
 
----
+        -   **Example:** An `emberAf<CLUSTER>Cluster<COMMAND>Callback` function
+            becomes a `case` in the `InvokeCommand`'s `switch` statement:
 
-## Step 3: Implement the Cluster Logic
+            ```cpp
+            // This:
+            emberAfAccessControlClusterReviewFabricRestrictionsCallback(...);
 
-This step involves translating the logic from the old Ember patterns into the
-new code-driven class structure.
+            // Becomes this in the `InvokeCommand` implementation:
+            switch (request.path.mCommandId) {
+              // ...
+              case AccessControl::Commands::ReviewFabricRestrictions::Id:
+                 // ...
+            }
+            ```
 
-#### Attribute Storage and Persistence
+    -   [ ] Use a `switch` statement on the command ID to handle different
+            commands.
 
--   Attributes are now member variables of your cluster class.
--   If attributes were configured as `RAM` in `zap` to load defaults, ensure
-    your `CodegenIntegration.cpp` reads these defaults and passes them to your
-    cluster's constructor.
--   For persisted attributes, use the `AttributePersistence` helper, which is
-    available via the `ServerClusterContext`. Load values in `Startup` and save
-    them on writes.
+-   [ ] **2.4: Implement Event Logic:**
 
-#### Command Handling
+    -   [ ] Replace any calls to `LogEvent` with
+            `mContext->interactionContext.eventsGenerator.GenerateEvent` to make
+            events unit-testable.
+    -   [ ] Check if any events have non-default access permissions (e.g.,
+            require Administrator access) and implement the `EventInfo` method
+            if necessary.
 
--   Translate `CommandHandlerInterface` calls or `emberAf...Callback` functions
-    into logic inside your `InvokeCommand` method:
+### Part 3: Configuration and Integration
 
-    -   ember calls of the form `emberAf<CLUSTER>Cluster<COMMAND>Callback` will
-        be converted to a switch `case <CLUSTER>::Commands::<COMMAND>::Id: ...`
-        implementation
+-   [ ] **3.1: Update Build Files:**
 
-        Example:
+    -   [ ] Configure `BUILD.gn` and `tests/BUILD.gn` to include the new source
+            files.
+    -   [ ] Configure `app_config_dependent_sources.gni` and
+            `app_config_dependent_sources.cmake` to integrate the cluster into
+            the build system.
 
-        ```cpp
-        // This
-        emberAfAccessControlClusterReviewFabricRestrictionsCallback(...);
+-   [ ] **3.2: Implement Codegen Integration:**
 
-        // Becomes this in the `InvokeCommand` implementation:
-        switch (request.path.mCommandId) {
-          // ...
-          case AccessControl::Commands::ReviewFabricRestrictions::Id:
-             // ...
-        }
+    -   [ ] In `CodegenIntegration.cpp`, use the `CodegenClusterIntegration`
+            helper to read configuration values from the generated code.
+    -   > **Note:** The `CodegenClusterIntegration` helper for optional
+        > attributes only supports attribute IDs up to 31. For clusters with
+        > higher attribute IDs, you will need a custom implementation.
+
+-   [ ] **3.3: Update ZAP Configuration:**
+    -   [ ] In `src/app/common/templates/config-data.yaml`, add the cluster to
+            the `CommandHandlerInterfaceOnlyClusters` and `CodeDrivenClusters`
+            arrays.
+    -   [ ] In `src/app/zap-templates/zcl/zcl.json` and
+            `zcl-with-test-extensions.json`, add all non-list attributes to the
+            `attributeAccessInterfaceAttributes` list.
+    -   [ ] Run the ZAP regeneration script:
+        ```bash
+        ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
         ```
 
-    -   Command Handler Interface logic translates directly: `CHI` has a switch
-        on command ID inside its `InvokeCommand` call. You should have the same
-        logic inside the `ServerClusterInterface` processing logic.
+### Part 4: Testing
 
--   The `InvokeCommand` method can return an `ActionReturnStatus` optional. For
-    better readability, prefer returning a status code directly (e.g.,
-    `return Status::Success;`) rather than using the command handler to set the
-    status, unless you need to return a response with a value or handle the
-    command asynchronously.
+-   [ ] **4.1: Write Unit Tests:**
 
-#### Attribute Access
+    -   [ ] In `tests/Test<Name>Cluster.cpp`, add unit tests for the new
+            implementation.
+    -   [ ] Ensure all attributes, commands, and feature combinations are
+            tested.
 
--   Translate `AAI` logic into your `ReadAttribute` and `WriteAttribute`
-    methods.
--   **Important:** After successfully writing a new attribute value, you
-    **must** explicitly call a notification function (e.g., via
-    `interactionContext->dataModelChangeListener`) to inform the SDK of the
-    change. This is required for subscriptions to work correctly.
+-   [ ] **4.2: Perform Integration Testing:**
+    -   [ ] Integrate the cluster into an example application (e.g.,
+            `all-clusters-app`).
+    -   [ ] Manually validate the cluster's functionality using `chip-tool` or
+            `matter-repl`.
 
-#### Event Generation
+## Improvements to Consider
 
--   Replace any calls to `LogEvent` with
-    `mContext->interactionContext.eventsGenerator.GenerateEvent`. This makes
-    events unit-testable.
+Cluster migrations are often not a full re-write of the code but rather the
+minimum necessary to make the code testable and decoupled from Ember/ZAP.
+Therefore, the suggestions in this section are optional.
 
----
+### Remove Build Time Switches
 
-## Step 4: Update Build and Codegen Configuration
+Some legacy cluster implementations contain build time switches (`#ifdef`)
+throughout the code. This is undesirable because it makes it difficult to change
+the behavior of an application in runtime.
 
-#### Build Files
-
-Create the necessary build files (`BUILD.gn`, `tests/BUILD.gn`,
-`app_config_dependent_sources.gni`, `app_config_dependent_sources.cmake`) to
-integrate your new cluster files into the build system.
-
-#### Codegen Integration
-
-In `CodegenIntegration.cpp`, use the `CodegenClusterIntegration` helper class to
-minimize the boilerplate needed to read configuration values (like feature maps
-and optional attribute lists) from the generated code.
-
-> **Note:** The `CodegenClusterIntegration` helper for optional attributes only
-> supports attribute IDs up to 31. For clusters with higher attribute IDs (e.g.,
-> `On/Off`, `Color Control`), you will need a custom implementation.
-
-#### ZAP Configuration
-
-You must update the ZAP configuration to inform the code generator that your
-cluster is now code-driven. This prevents the Ember framework from managing its
-data.
-
-1. **Update `config-data.yaml`:** In
-   `src/app/common/templates/config-data.yaml`, add your cluster to the
-   `CommandHandlerInterfaceOnlyClusters` array. This disables Ember's command
-   dispatch for this cluster.
-2. **Update `zcl.json`:** In `src/app/zap-templates/zcl/zcl.json` and
-   `zcl-with-test-extensions.json`, add all of your cluster's non-list
-   attributes to the `attributeAccessInterfaceAttributes` list. This tells ZAP
-   not to allocate RAM for these attributes, as your class now manages them.
-3. Re-run ZAP regeneration, like
-
-    ```bash
-    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
-    ```
-
----
-
-## Step 5: Add Unit Tests
-
--   Create `tests/Test<Name>Cluster.cpp` and add unit tests for your new
-    implementation.
--   Ensure you test the cluster's logic with various feature combinations and
-    for all supported attributes and commands.
+When possible, avoid copying this pattern and think of new ways the same thing
+could be achieved. For example, use configuration injected via constructor or
+implement separate sub classes if code size increase is a concern and the build
+time options cause a significant difference in the cluster behavior.

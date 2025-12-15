@@ -52,7 +52,7 @@ namespace System {
 
 constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 24 * 30); // Month [sec]
 
-CHIP_ERROR LayerImplSelect::Init()
+CriticalFailure LayerImplSelect::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -69,7 +69,7 @@ CHIP_ERROR LayerImplSelect::Init()
 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    ReturnErrorOnFailure(mWakeEvent.Open(*this));
+    ReturnErrorOnFailure(mWakeEvent.Open());
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -98,11 +98,8 @@ void LayerImplSelect::Shutdown()
 #else
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
+    mWakeEvent.Close();
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
-
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    mWakeEvent.Close(*this);
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
 }
@@ -138,7 +135,7 @@ void LayerImplSelect::Signal()
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
-CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -247,7 +244,7 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 #endif
 }
 
-CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -441,6 +438,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 
 CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
+    VerifyOrReturnError(tokenInOut != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
     *tokenInOut         = InvalidSocketWatchToken();
 
@@ -556,6 +555,11 @@ void LayerImplSelect::PrepareEvents()
     FD_ZERO(&mSelected.mErrorSet);
     // NOLINTEND(clang-analyzer-security.insecureAPI.bzero)
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    FD_SET(mWakeEvent.GetReadFD(), &mSelected.mReadSet);
+    mMaxFd = mWakeEvent.GetReadFD();
+#endif
+
     for (auto & w : mSocketWatchPool)
     {
         if (w.mFD != kInvalidFd)
@@ -587,9 +591,17 @@ void LayerImplSelect::HandleEvents()
 
     if (!IsSelectResultValid())
     {
+        VerifyOrReturn(errno != EINTR); // EINTR is not really an error (and we don't use it for signal handling)
         ChipLogError(DeviceLayer, "Select failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
         return;
     }
+
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    if (mSelectResult > 0 && FD_ISSET(mWakeEvent.GetReadFD(), &mSelected.mReadSet))
+    {
+        mWakeEvent.Confirm();
+    }
+#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = pthread_self();

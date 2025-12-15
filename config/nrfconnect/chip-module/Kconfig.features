@@ -21,7 +21,7 @@ if CHIP
 
 config CHIP_WIFI
 	bool "Enable nrfconnect Wi-Fi support"
-	default y if SHIELD_NRF7002EK || BOARD_NRF7002DK_NRF5340_CPUAPP || SHIELD_NRF7002EB || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
+	default y if SHIELD_NRF7002EK || BOARD_NRF7002DK_NRF5340_CPUAPP || SHIELD_NRF7002EB || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001
 	select WIFI_NRF70
 	select WIFI
 	select WIFI_NM_WPA_SUPPLICANT
@@ -82,9 +82,9 @@ config CHIP_MEMORY_PROFILING
 	# Crypto
 	select MBEDTLS_MEMORY_DEBUG if !CHIP_CRYPTO_PSA
 	# Network
-	select NET_STATISTICS
-	select NET_SHELL
-	select NET_BUF_POOL_USAGE
+	select NET_STATISTICS if NETWORKING
+	select NET_SHELL if NETWORKING
+	select NET_BUF_POOL_USAGE if NETWORKING
 	select OPENTHREAD_SHELL if !CHIP_WIFI
 	# Settings
 	select SETTINGS_SHELL
@@ -152,7 +152,7 @@ endif
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
 	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15DK
+	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
 	imply BOOTLOADER_MCUBOOT
 	select MCUMGR
 	select MCUMGR_TRANSPORT_BT
@@ -192,12 +192,12 @@ config MCUMGR_SMP_COMMAND_STATUS_HOOKS
 	bool
 	default y
 
-# Increase BT MTU and RX buffer for big size DFU messages
+# Increase BT MTU and RX buffer sizes to improve DFU throughput on non-RAM-constrained devices
 config BT_L2CAP_TX_MTU
-	default 498
+	default 498 if !SOC_NRF54L10
 
 config BT_BUF_ACL_RX_SIZE
-	default 502
+	default 502 if !SOC_NRF54L10
 
 # Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
 config MCUMGR_TRANSPORT_NETBUF_SIZE
@@ -298,5 +298,4 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  After removing the last fabric the device will wait for the defined time and then perform
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
-
 endif # CHIP

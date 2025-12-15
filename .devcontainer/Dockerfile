@@ -22,6 +22,8 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
+ARG WORKSPACE_ROOT=/workspaces/connectedhomeip
+ARG LOCAL_WORKSPACE_ROOT
 ENV LANG=en_US.utf8
 
 
@@ -38,6 +40,9 @@ RUN apt-get update \
     docker.io \
     iputils-ping \
     icecc \
+    # emacs pulls in libgccjit0 -> libgcc-14-dev without libstdc++-14-dev which causes clang++ to fail \
+    # See-Also: https://bugs.launchpad.net/ubuntu/+source/llvm-defaults/+bug/2077130 \
+    libstdc++-14-dev \
     && :
 
 RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -f1) || true) \
@@ -58,6 +63,7 @@ RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
+    $ZEPHYR_BASE/.. `# Assume $ZEPHYR_BASE is inside the west workspace` \
     && find $AMEBA_PATH \
     -name "inc_lp" -print0      -or \
     -name "inc_hp" -print0      -or \
@@ -75,6 +81,12 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
+
+RUN if [ -n "${LOCAL_WORKSPACE_ROOT}" ]; then \
+    true \
+    && mkdir -p "$(dirname "${LOCAL_WORKSPACE_ROOT}")" \
+    && ln -sf "${WORKSPACE_ROOT}" "${LOCAL_WORKSPACE_ROOT}" \
+    ; fi
 
 ENV TIZEN_ROOTFS=/tizen_rootfs
 

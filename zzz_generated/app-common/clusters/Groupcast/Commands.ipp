@@ -36,8 +36,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
-    encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kKeyID), keyID);
+    encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kGracePeriod), gracePeriod);
     encoder.Encode(to_underlying(Fields::kUseAuxiliaryACL), useAuxiliaryACL);
     return encoder.Finalize();
@@ -61,13 +61,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, endpoints);
         }
-        else if (__context_tag == to_underlying(Fields::kKey))
-        {
-            err = DataModel::Decode(reader, key);
-        }
         else if (__context_tag == to_underlying(Fields::kKeyID))
         {
             err = DataModel::Decode(reader, keyID);
+        }
+        else if (__context_tag == to_underlying(Fields::kKey))
+        {
+            err = DataModel::Decode(reader, key);
         }
         else if (__context_tag == to_underlying(Fields::kGracePeriod))
         {
@@ -159,8 +159,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kKeyID), keyID);
+    encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kGracePeriod), gracePeriod);
     return encoder.Finalize();
 }
@@ -179,13 +179,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else if (__context_tag == to_underlying(Fields::kKey))
-        {
-            err = DataModel::Decode(reader, key);
-        }
         else if (__context_tag == to_underlying(Fields::kKeyID))
         {
             err = DataModel::Decode(reader, keyID);
+        }
+        else if (__context_tag == to_underlying(Fields::kKey))
+        {
+            err = DataModel::Decode(reader, key);
         }
         else if (__context_tag == to_underlying(Fields::kGracePeriod))
         {

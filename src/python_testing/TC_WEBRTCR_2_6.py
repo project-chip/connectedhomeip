@@ -21,6 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
+#     app: ${CAMERA_CONTROLLER_APP}
+#     app-args: interactive server
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -31,21 +33,25 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import random
 import tempfile
-from time import sleep
+import time
 
 from mobly import asserts
+from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
-class TC_WebRTCRequestor_2_6(MatterBaseTest):
+class TC_WebRTCR_2_6(WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 
@@ -60,7 +66,7 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -78,7 +84,7 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        sleep(1)
+        time.sleep(1)
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -87,22 +93,30 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_6(self) -> str:
+    def desc_TC_WebRTCR_2_6(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.6] Validate ICECandidates command with invalid session id"
 
-    def steps_TC_WebRTCRequestor_2_6(self) -> list[TestStep]:
+    def steps_TC_WebRTCR_2_6(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
             TestStep(4, "Activate fault injection on TH_SERVER to modify the session ID of the WebRTC ICECandidates command"),
             TestStep(5, "Trigger TH_SERVER to send ICECandidates command to DUT with invalid session ID"),
         ]
-        return steps
+
+    def pics_TC_WebRTCR_2_6(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        return [
+            "WEBRTCR.S",           # WebRTC Transport Requestor Server
+            "WEBRTCR.S.C02.Rsp",   # ICECandidates command
+        ]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -111,7 +125,7 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
         return 3 * 60
 
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_6(self):
+    async def test_TC_WebRTCR_2_6(self):
         """
         Executes the test steps for the WebRTC ICECandidates with invalid session ID scenario.
         """
@@ -123,18 +137,18 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
 
         self.step(1)
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
         passcode = params.setupPinCode
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(3)
         # Prompt user with instructions
         prompt_msg = (
-            "\nPlease commission the server app from DUT:\n"
+            f"\nPlease commission the server app from DUT: manual code='{params.setupManualCode}' QR code='{params.setupQRCode}' :\n"
             f"  pairing onnetwork 1 {passcode}\n"
             "Input 'Y' if DUT successfully commissions without any warnings\n"
             "Input 'N' if commissioner warns about commissioning the non-genuine device, "
@@ -142,7 +156,7 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
+            await self.send_command(f"pairing onnetwork 1 {passcode}")
             resp = 'Y'
         else:
             resp = self.wait_for_user_input(prompt_msg)
@@ -157,7 +171,7 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
         )
 
         self.step(4)
-        logging.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
+        log.info("Injecting kFault_ModifyWebRTCICECandidatesSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
         # Use FailAtFault to activate the chip‑layer fault exactly once
@@ -175,11 +189,11 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.th_server_local_nodeid,
+            nodeId=self.th_server_local_nodeid,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(5)
         # Prompt user with instructions
@@ -192,8 +206,17 @@ class TC_WebRTCRequestor_2_6(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
-            resp = 'Y'
+            self.th_server.set_output_match("NOT_FOUND")
+            self.th_server.event.clear()
+
+            try:
+                await self.send_command("webrtc establish-session 1")
+                # Wait up to 90s until the provider logs that the data‑channel opened
+                if not self.th_server.event.wait(90):
+                    raise TimeoutError("PeerConnection is not connected within 90s")
+                resp = 'Y'
+            except TimeoutError:
+                resp = 'N'
         else:
             resp = self.wait_for_user_input(prompt_msg)
 

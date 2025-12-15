@@ -50,6 +50,14 @@ config CHIP_APP_LOG_LEVEL
 	  option only within the application. To set the logging level for the
 	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
 
+config CHIP_LOG_SIZE_OPTIMIZATION
+	bool "Disable some detailed logs to decrease flash usage"
+	help
+	  Disables some log levels for specific Matter log modules that provide
+	  information that is too detailed to be used in most cases. You can find
+	  full configuration enabled by this option in the
+	  platform CHIPPlatformConfig.h file.
+
 # Device and firmware identifers
 
 config CHIP_DEVICE_VENDOR_ID
@@ -244,6 +252,44 @@ config CHIP_OTA_REQUESTOR
 	  Enables over-the-air (OTA) Requestor role that allows the node to perform
 	  Device Firmware Upgrade by quering and downloading a new firmware image
 	  from a peer OTA Provider node.
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 1024
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures the size of the buffer used by OTA Requestor when downloading
+	  and writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  Reboots the device automatically after downloading a new firmware update
+	  to swap the old and the new firmware images. The reboot happens only when
+	  a user consents to apply the firmware update.
+
+choice CHIP_OTA_REQUEST_UPGRADE_TYPE
+	prompt "Type of the upgrade to apply on new images"
+	default CHIP_OTA_REQUEST_UPGRADE_TEST
+	depends on CHIP_OTA_REQUESTOR
+
+	config CHIP_OTA_REQUEST_UPGRADE_PERMANENT
+		bool "Mark the image as permanent"
+		help
+		  The upgrade will be permanent on the next reboot.
+		  No coming back to the old image.
+
+	config CHIP_OTA_REQUEST_UPGRADE_TEST
+		bool "Mark the image as a test"
+		help
+		  The upgrade will be marked as a test.
+		  Image will be run on the next reboot, if confirmed it
+		  becomes permanent, otherwise the new image is reverted.
+
+endchoice
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
@@ -460,6 +506,22 @@ config CHIP_OPENTHREAD_CONFIG
 	  is specified, it replaces the OpenThread configuration file supplied by
 	  Zephyr.
 
+# Wi-Fi network features
+
+config CHIP_ENABLE_WIFI_STATION
+    bool "Enable Wi-Fi Station mode"
+	depends on WIFI
+    help
+      Enable Wi-Fi station (client) mode for Matter-over-Wi-Fi devices.
+      This allows the device to connect to an existing Wi-Fi network.
+
+config CHIP_ENABLE_WIFI_AP
+    bool "Enable Wi-Fi Access Point mode"
+	depends on WIFI
+    help
+      Enable Wi-Fi Access Point mode for SoftAP commissioning.
+      This allows the device to create its own Wi-Fi network for onboarding.
+
 # Platform additions and configuration
 
 config CHIP_CERTIFICATION_DECLARATION_STORAGE
@@ -526,6 +588,52 @@ config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
 	  watermarks. 
 
 endif
+
+config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
+	bool "Enable thread-local storage for Matter System Layer"
+    default y
+    help
+      Enable use of thread-local storage (TLS) in the Matter System Layer.
+
+config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
+	bool "Use Zephyr socket extensions in Matter System Layer"
+	default y
+	help
+	  Enables the use of Zephyr socket extensions in the Matter System Layer
+	  socket implementation.
+
+config CHIP_TASK_PRIORITY
+	int "Matter task priority"
+	default 1
+	help
+	  Set the Zephyr thread priority for the Matter main task (CHIP event loop).
+	  This value is passed to K_PRIO_PREEMPT(). Lower values mean higher priority.
+
+config CHIP_TASK_STACK_SIZE
+	int "Matter task stack size"
+	default 8192
+	help
+	  Set the stack size (in bytes) for the Matter main task (CHIP event loop).
+
+config MAX_EVENT_QUEUE_SIZE
+	int "Maximum Matter event queue size"
+	default 100
+	help
+	  Set the maximum number of events that can be queued in the Matter event loop.
+
+config CHIP_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+	int "MRP Local Active Retry Interval (ms)"
+	default 2000 if NET_L2_OPENTHREAD
+	default 300
+	help
+	  Sets the local active retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
+
+config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
+	int "MRP Local Idle Retry Interval (ms)"
+	default 2000 if NET_L2_OPENTHREAD
+	default 500
+	help
+	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
 
 module = MATTER
 module-str = Matter

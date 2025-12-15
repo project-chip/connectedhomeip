@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import asyncio
 import logging
 import re
 import select
@@ -92,7 +93,7 @@ class WebSocketRunner(TestRunner):
                 duration = round((time.time() - start) * 1000, 0)
                 self._hooks.failure(duration)
                 self._hooks.retry(interval_between_retries)
-                time.sleep(interval_between_retries)
+                await asyncio.sleep(interval_between_retries)
                 return await self._start_client(url, max_retries - 1, interval_between_retries + 1)
 
         self._hooks.abort(url)
@@ -107,16 +108,20 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            command = ['stdbuf', '-o0', '-e0'] + command  # disable buffering
-            instance = subprocess.Popen(
-                command, text=False, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            instance = subprocess.Popen(    # noqa: ASYNC220
+                command,
+                bufsize=0,                  # unbuffered
+                text=False,                 # keep output as bytes
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
 
             # Loop to read the subprocess output with a timeout
             lines = []
             while True:
                 if time.time() - start_time > _WEBSOCKET_SERVER_MESSAGE_TIMEOUT:
                     for line in lines:
-                        print(line.decode('utf-8'), end='')
+                        print(line.decode('utf-8', errors='replace'), end='')
                     self._hooks.abort(url)
                     await self._stop_server(instance)
                     raise Exception(
@@ -125,9 +130,9 @@ class WebSocketRunner(TestRunner):
                 ready, _, _ = select.select([instance.stdout], [], [], 1)
                 if ready:
                     line = instance.stdout.readline()
-                    if len(line):
+                    if line:
                         lines.append(line)
-                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8')):
+                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8', errors='replace')):
                             break  # Exit the loop if the pattern is found
                 else:
                     continue
@@ -141,7 +146,8 @@ class WebSocketRunner(TestRunner):
             try:
                 instance.wait(_WEBSOCKET_SERVER_TERMINATE_TIMEOUT)
             except subprocess.TimeoutExpired:
-                LOGGER.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                LOGGER.debug(
+                    'Subprocess did not terminate on SIGTERM, killing it now')
                 instance.kill()
 
     def _make_server_connection_url(self, address: str, port: int):
@@ -150,7 +156,6 @@ class WebSocketRunner(TestRunner):
     def _make_server_startup_command(self, path: str, arguments: str, port: int):
         if path is None:
             return None
-        elif arguments is None:
+        if arguments is None:
             return [path] + ['--port', str(port)]
-        else:
-            return [path] + [arg.strip() for arg in arguments.split(' ')] + ['--port', str(port)]
+        return [path] + [arg.strip() for arg in arguments.split(' ')] + ['--port', str(port)]

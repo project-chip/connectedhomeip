@@ -12,23 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
-import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/system/system.gni")
 
 import("device.gni")
-
-if (chip_enable_openthread) {
-  import("//build_overrides/openthread.gni")
-
-  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
-    import("//build_overrides/ot_br_posix.gni")
-  }
-}
 
 if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
@@ -97,7 +86,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Allows enabling dynamic setting of the local MRP configuration, for
     # devices with multiple radios that have different sleep behavior for
     # different radios.
-    chip_device_config_enable_dynamic_mrp_config = false
+    #
+    # Defaults to enabled on Linux since it's useful for tests and for
+    # performance evaluation in general. Default values are retained.
+    chip_device_config_enable_dynamic_mrp_config =
+        chip_device_platform == "linux"
 
     # Define the default endpoint id for the generic Thread network commissioning instance
     chip_device_config_thread_network_endpoint_id = 0
@@ -255,13 +248,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "telink") {
       device_layer_target_define = "TELINK"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=telink" ]
-    } else if (chip_device_platform == "mbed") {
-      device_layer_target_define = "MBED"
-      defines += [
-        "CHIP_DEVICE_LAYER_TARGET=mbed",
-        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
-        "CHIP_DEVICE_ENABLE_DATA_MODEL=${chip_enable_data_model}",
-      ]
     } else if (chip_device_platform == "bl602") {
       device_layer_target_define = "BL602"
       defines += [
@@ -303,7 +289,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
     } else if (chip_device_platform == "realtek_bee") {
       device_layer_target_define = "REALTEK_BEE"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=realtek/BEE" ]
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=realtek/freertos" ]
     } else if (chip_device_platform == "realtek_zephyr") {
       device_layer_target_define = "REALTEK_ZEPHYR"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=realtek/zephyr" ]
@@ -367,7 +353,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "NXP",
       "NXP_ZEPHYR",
       "TELINK",
-      "MBED",
       "BL602",
       "BL616",
       "BL702",
@@ -508,6 +493,7 @@ if (chip_device_platform != "none") {
       "../include/platform/CommissionableDataProvider.h",
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
+      "../include/platform/DefaultTimerDelegate.h",
       "../include/platform/DeviceControlServer.h",
       "../include/platform/DeviceInstanceInfoProvider.h",
       "../include/platform/GeneralFaults.h",
@@ -552,6 +538,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "CommissionableDataProvider.cpp",
+      "DefaultTimerDelegate.cpp",
       "DeviceControlServer.cpp",
       "DeviceInfoProvider.cpp",
       "DeviceInstanceInfoProvider.cpp",
@@ -561,6 +548,8 @@ if (chip_device_platform != "none") {
       "Globals.cpp",
       "LockTracker.cpp",
       "PersistedStorage.cpp",
+      "PlatformError.cpp",
+      "PlatformError.h",
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
     ]
@@ -595,6 +584,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:timer-delegate",
     ]
 
     if (chip_device_platform == "cc13x4_26x4") {
@@ -606,7 +596,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "efr32") {
       _platform_target = "silabs/efr32"
     } else if (chip_device_platform == "SiWx917") {
-      _platform_target = "silabs/SiWx917"
+      _platform_target = "silabs/SiWx"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
     } else if (chip_device_platform == "linux") {
@@ -621,8 +611,6 @@ if (chip_device_platform != "none") {
       _platform_target = "nxp/zephyr:nxp_zephyr"
     } else if (chip_device_platform == "telink") {
       _platform_target = "telink"
-    } else if (chip_device_platform == "mbed") {
-      _platform_target = "mbed"
     } else if (chip_device_platform == "tizen") {
       _platform_target = "Tizen"
     } else if (chip_device_platform == "android") {
@@ -634,7 +622,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "realtek_bee") {
-      _platform_target = "realtek/BEE"
+      _platform_target = "realtek/freertos"
     } else if (chip_device_platform == "realtek_zephyr") {
       _platform_target = "realtek/zephyr:realtek_zephyr"
     } else if (chip_device_platform == "webos") {

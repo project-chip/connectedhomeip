@@ -52,12 +52,11 @@ public:
 
     using IterateRootCertFnType   = std::function<CHIP_ERROR(CommonIterator<RootCertStruct> & iterator)>;
     using IterateClientCertFnType = std::function<CHIP_ERROR(CommonIterator<ClientCertWithKey> & iterator)>;
-    using RootBuffer              = PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>;
-    using ClientBuffer            = PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>;
+    using RootBuffer              = PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>;
+    using ClientBuffer            = PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>;
 
     /// @brief a root cert along with an associated buffer for the cert payload. RootCertStruct has a ByteSpan,
     /// and this wrapper ensures that the underlying buffer for the ByteSpan has a long-enough lifetime.
-    /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedRootCert
     {
         BufferedRootCert(RootBuffer & buffer) : mBuffer(buffer) {}
@@ -74,7 +73,6 @@ public:
     /// @brief a client cert along with an associated buffer for the cert payload.  ClientCertStruct contains various
     /// lists and bytespans, and this wrapper ensures that the underlying buffers for those data structures
     /// have long-enough lifetimes.
-    /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedClientCert
     {
         BufferedClientCert(ClientBuffer & buffer) : mBuffer(buffer) {}
@@ -180,12 +178,19 @@ public:
     virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)          = 0;
     virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) = 0;
 
+    /**
+     * @brief Removes all data and certificates associated with the specified fabric.
+     *
+     * @param[in] fabric The fabric to remove.
+     */
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric) = 0;
+
 protected:
-    static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
+    static inline PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
     {
         return bufferedCert.mBuffer;
     }
-    static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & GetBuffer(BufferedClientCert & bufferedCert)
+    static inline PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & GetBuffer(BufferedClientCert & bufferedCert)
     {
         return bufferedCert.mBuffer;
     }

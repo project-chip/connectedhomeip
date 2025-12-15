@@ -24,7 +24,6 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -108,6 +107,7 @@ def BuildHostTarget():
                    app=HostApp.RPC_CONSOLE).OnlyIfRe(f'{native_board_name}-'),
         TargetPart('all-clusters', app=HostApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('all-devices-app', app=HostApp.ALL_DEVICES_APP),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
@@ -205,6 +205,22 @@ def BuildHostTarget():
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
+    target.AppendModifier('unified', unified=True).OnlyIfRe(
+        "-(" + "|".join([
+            # keep-sorted start
+            'air-purifier',
+            'bridge',
+            'closure',
+            'light',
+            'lock',
+            'microwave-oven',
+            'ota-provider',
+            'rvc',
+            'thermostat',
+            'tv-app',
+            'water-leak-detector',
+            # keep-sorted end
+        ]) + ")-")
 
     return target
 
@@ -295,7 +311,6 @@ def BuildEfr32Target():
     target.AppendModifier(
         'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('rs9116', enable_rs9116=True).OnlyIfRe('-wifi')
     target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
     target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
     target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
@@ -401,36 +416,6 @@ def BuildAndroidTarget():
 
     # Modifiers
     target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
-
-    return target
-
-
-def BuildMbedTarget():
-    target = BuildTarget('mbed', MbedBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('CY8CPROTO_062_4343W', board=MbedBoard.CY8CPROTO_062_4343W),
-    ])
-
-    # apps
-    target.AppendFixedTargets([
-        TargetPart('lock', app=MbedApp.LOCK),
-        TargetPart('light', app=MbedApp.LIGHT),
-        TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL),
-        TargetPart('pigweed', app=MbedApp.PIGWEED),
-        TargetPart('ota-requestor', app=MbedApp.OTA_REQUESTOR),
-        TargetPart('shell', app=MbedApp.SHELL),
-    ])
-
-    # Modifiers
-    target.AppendModifier('release', profile=MbedProfile.RELEASE).ExceptIfRe(
-        '-(develop|debug)')
-    target.AppendModifier('develop', profile=MbedProfile.DEVELOP).ExceptIfRe(
-        '-(release|debug)')
-    target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
-        '-(release|develop)')
 
     return target
 
@@ -559,8 +544,8 @@ def BuildNxpTarget():
     target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71|mcxw72')
-    target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(
-        'laundry-washer').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71|mcxw72')
+    target.AppendModifier(name="gn", build_system=NxpBuildSystem.GN).OnlyIfRe(
+        'thermostat|contact-sensor').OnlyIfRe('rw61x|mcxw72').OnlyIfRe('freertos')
     target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
     target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
     target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
@@ -768,6 +753,7 @@ def BuildIMXTarget():
 
     target.AppendModifier('release', release=True)
     target.AppendModifier('trusty', trusty=True)
+    target.AppendModifier('ele', ele=True)
 
     return target
 
@@ -816,7 +802,7 @@ def BuildTelinkTarget():
     ])
 
     target.AppendModifier('ota', enable_ota=True)
-    target.AppendModifier('dfu', enable_dfu=True)
+    target.AppendModifier('dfu-smp', enable_dfu_smp=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('factory-data', enable_factory_data=True)
@@ -827,6 +813,7 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
+    target.AppendModifier('nfc-payload', chip_enable_nfc_onboarding_payload=True)
 
     return target
 
@@ -871,7 +858,6 @@ BUILD_TARGETS = [
     BuildIMXTarget(),
     BuildInfineonTarget(),
     BuildNxpTarget(),
-    BuildMbedTarget(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),

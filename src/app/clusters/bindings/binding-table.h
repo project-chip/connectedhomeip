@@ -26,11 +26,15 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <optional>
 
-// TODO: Remove the Ember Prefix and place the class and structure to chip::app::Clusters::Binding namespace.
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
+
 /**
- * @brief Defines binding types.
+ * @brief Defines binding entry types.
  */
-enum EmberBindingType : uint8_t
+enum EntryType : uint8_t
 {
     /** A binding that is currently not in use. */
     MATTER_UNUSED_BINDING = 0,
@@ -48,38 +52,34 @@ enum EmberBindingType : uint8_t
  * cluster ID and either the destination EUI64 (for unicast bindings) or the
  * 64-bit group address (for multicast bindings).
  */
-struct EmberBindingTableEntry
+struct TableEntry
 {
-    static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
-                                          chip::EndpointId remoteEndpoint, std::optional<chip::ClusterId> cluster)
+    TableEntry(FabricIndex fabric, NodeId node, EndpointId localEndpoint, EndpointId remoteEndpoint,
+               std::optional<ClusterId> cluster) :
+        type(MATTER_UNICAST_BINDING),
+        fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(remoteEndpoint), nodeId(node)
+    {}
+
+    TableEntry(FabricIndex fabric, GroupId group, EndpointId localEndpoint, std::optional<ClusterId> cluster) :
+        type(MATTER_MULTICAST_BINDING), fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(kInvalidEndpointId),
+        groupId(group)
+    {}
+
+    TableEntry() = default;
+
+    static TableEntry ForNode(FabricIndex fabric, NodeId node, EndpointId localEndpoint, EndpointId remoteEndpoint,
+                              std::optional<ClusterId> cluster)
     {
-        EmberBindingTableEntry entry = {
-            .type        = MATTER_UNICAST_BINDING,
-            .fabricIndex = fabric,
-            .local       = localEndpoint,
-            .clusterId   = cluster,
-            .remote      = remoteEndpoint,
-            .nodeId      = node,
-        };
-        return entry;
+        return TableEntry(fabric, node, localEndpoint, remoteEndpoint, cluster);
     }
 
-    static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
-                                           std::optional<chip::ClusterId> cluster)
+    static TableEntry ForGroup(FabricIndex fabric, GroupId group, EndpointId localEndpoint, std::optional<ClusterId> cluster)
     {
-        EmberBindingTableEntry entry = {
-            .type        = MATTER_MULTICAST_BINDING,
-            .fabricIndex = fabric,
-            .local       = localEndpoint,
-            .clusterId   = cluster,
-            .remote      = 0,
-            .groupId     = group,
-        };
-        return entry;
+        return TableEntry(fabric, group, localEndpoint, cluster);
     }
 
     /** The type of binding. */
-    EmberBindingType type = MATTER_UNUSED_BINDING;
+    EntryType type = MATTER_UNUSED_BINDING;
 
     chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
@@ -105,7 +105,7 @@ struct EmberBindingTableEntry
         chip::GroupId groupId;
     };
 
-    bool operator==(EmberBindingTableEntry const & other) const
+    bool operator==(TableEntry const & other) const
     {
         if (type != other.type)
         {
@@ -126,28 +126,26 @@ struct EmberBindingTableEntry
     }
 };
 
-namespace chip {
-
-class BindingTable
+class Table
 {
     friend class Iterator;
 
 public:
     static constexpr size_t kMaxBindingEntries = CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
-    BindingTable();
+    Table();
 
     class Iterator
     {
-        friend class BindingTable;
+        friend class Table;
 
     public:
-        EmberBindingTableEntry & operator*() { return mTable->mBindingTable[mIndex]; }
+        TableEntry & operator*() { return mTable->mBindingTable[mIndex]; }
 
-        const EmberBindingTableEntry & operator*() const { return mTable->mBindingTable[mIndex]; }
+        const TableEntry & operator*() const { return mTable->mBindingTable[mIndex]; }
 
-        EmberBindingTableEntry * operator->() { return &(mTable->mBindingTable[mIndex]); }
+        TableEntry * operator->() { return &(mTable->mBindingTable[mIndex]); }
 
-        const EmberBindingTableEntry * operator->() const { return &(mTable->mBindingTable[mIndex]); }
+        const TableEntry * operator->() const { return &(mTable->mBindingTable[mIndex]); }
 
         Iterator operator++();
 
@@ -158,14 +156,14 @@ public:
         uint8_t GetIndex() const { return mIndex; }
 
     private:
-        BindingTable * mTable;
+        Table * mTable;
         uint8_t mPrevIndex;
         uint8_t mIndex;
     };
 
-    CHIP_ERROR Add(const EmberBindingTableEntry & entry);
+    CHIP_ERROR Add(const TableEntry & entry);
 
-    const EmberBindingTableEntry & GetAt(uint8_t index);
+    const TableEntry & GetAt(uint8_t index);
 
     // The iter will be moved to the next item in the table after calling RemoveAt.
     CHIP_ERROR RemoveAt(Iterator & iter);
@@ -182,10 +180,10 @@ public:
 
     CHIP_ERROR LoadFromStorage();
 
-    static BindingTable & GetInstance() { return sInstance; }
+    static Table & GetInstance() { return sInstance; }
 
 private:
-    static BindingTable sInstance;
+    static Table sInstance;
 
     static constexpr uint32_t kStorageVersion  = 1;
     static constexpr uint8_t kEntryStorageSize = TLV::EstimateStructOverhead(
@@ -210,7 +208,7 @@ private:
 
     CHIP_ERROR LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex);
 
-    EmberBindingTableEntry mBindingTable[kMaxBindingEntries];
+    TableEntry mBindingTable[kMaxBindingEntries];
     uint8_t mNextIndex[kMaxBindingEntries];
 
     uint8_t mHead = kNextNullIndex;
@@ -220,4 +218,7 @@ private:
     PersistentStorageDelegate * mStorage;
 };
 
+} // namespace Binding
+} // namespace Clusters
+} // namespace app
 } // namespace chip

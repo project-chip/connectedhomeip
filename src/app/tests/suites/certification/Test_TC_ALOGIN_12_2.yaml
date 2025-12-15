@@ -108,37 +108,47 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
-          ./chip-tv-casting-app accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tool accountlogin login <TempAccountIdentifier> <SetupPIN> <destination-id> <endpoint-id-ignored-for-group-commands> [optional flags]
+          Argument Descriptions
+          TempAccountIdentifier: Replace it with the appropriate identifier for your DUT.
+          SetupPIN : Replace it with the PIN specific to your DUT.
+          destination-id : Replace it with the actual node ID of the DUT.
+
+          Example Command
+          ./chip-tool accountlogin login 11111 20202021 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin login 11111 20202021 1 4 --timedInteractionTimeoutMs 1000
 
           On TH (tv-app), Verify the  login command is received successfully.
 
-          [1658531831563] [21924:325733] CHIP: [DMG] InvokeRequestMessage =
-          [1658531831563] [21924:325733] CHIP: [DMG] {
-          [1658531831563] [21924:325733] CHIP: [DMG]         suppressResponse = false,
-          [1658531831563] [21924:325733] CHIP: [DMG]         timedRequest = true,
-          [1658531831563] [21924:325733] CHIP: [DMG]         InvokeRequests =
-          [1658531831563] [21924:325733] CHIP: [DMG]         [
-          [1658531831563] [21924:325733] CHIP: [DMG]                 CommandDataIB =
-          [1658531831563] [21924:325733] CHIP: [DMG]                 {
-          [1658531831563] [21924:325733] CHIP: [DMG]                         CommandPathIB =
-          [1658531831563] [21924:325733] CHIP: [DMG]                         {
-          [1658531831563] [21924:325733] CHIP: [DMG]                                 EndpointId = 0x6,
-          [1658531831563] [21924:325733] CHIP: [DMG]                                 ClusterId = 0x50e,
-          [1658531831563] [21924:325733] CHIP: [DMG]                                 CommandId = 0x2,
-          [1658531831563] [21924:325733] CHIP: [DMG]                         },
-          [1658531831563] [21924:325733] CHIP: [DMG]
-          [1658531831563] [21924:325733] CHIP: [DMG]                         CommandFields =
-          [1658531831563] [21924:325733] CHIP: [DMG]                         {
-          [1658531831563] [21924:325733] CHIP: [DMG]                                 0x0 = "11111",
-          [1658531831563] [21924:325733] CHIP: [DMG]                                 0x1 = "34567890",
-          [1658531831563] [21924:325733] CHIP: [DMG]                         },
-          [1658531831563] [21924:325733] CHIP: [DMG]                 },
-          [1658531831563] [21924:325733] CHIP: [DMG]
-          [1658531831563] [21924:325733] CHIP: [DMG]         ],
-          [1658531831563] [21924:325733] CHIP: [DMG]
-          [1658531831563] [21924:325733] CHIP: [DMG]         InteractionModelRevision = 1
-          [1658531831563] [21924:325733] CHIP: [DMG] },
+          58661f0 exchange 16770r
+          [1726125071.027072][4610:4610] CHIP:DMG: InvokeRequestMessage =
+          [1726125071.027101][4610:4610] CHIP:DMG: {
+          [1726125071.027126][4610:4610] CHIP:DMG:         suppressResponse = false,
+          [1726125071.027156][4610:4610] CHIP:DMG:         timedRequest = true,
+          [1726125071.027183][4610:4610] CHIP:DMG:         InvokeRequests =
+          [1726125071.027221][4610:4610] CHIP:DMG:         [
+          [1726125071.027248][4610:4610] CHIP:DMG:                 CommandDataIB =
+          [1726125071.027280][4610:4610] CHIP:DMG:                 {
+          [1726125071.027309][4610:4610] CHIP:DMG:                         CommandPathIB =
+          [1726125071.027342][4610:4610] CHIP:DMG:                         {
+          [1726125071.027376][4610:4610] CHIP:DMG:                                 EndpointId = 0x4,
+          [1726125071.027416][4610:4610] CHIP:DMG:                                 ClusterId = 0x50e,
+          [1726125071.027452][4610:4610] CHIP:DMG:                                 CommandId = 0x2,
+          [1726125071.027485][4610:4610] CHIP:DMG:                         },
+          [1726125071.027520][4610:4610] CHIP:DMG:
+          [1726125071.027552][4610:4610] CHIP:DMG:                         CommandFields =
+          [1726125071.027587][4610:4610] CHIP:DMG:                         {
+          [1726125071.027623][4610:4610] CHIP:DMG:                                 0x0 = "11111" (5 chars),
+          [1726125071.027660][4610:4610] CHIP:DMG:                                 0x1 = "20202021" (8 chars),
+          [1726125071.027696][4610:4610] CHIP:DMG:                         },
+          [1726125071.027728][4610:4610] CHIP:DMG:                 },
+          [1726125071.027763][4610:4610] CHIP:DMG:
+          [1726125071.027790][4610:4610] CHIP:DMG:         ],
+          [1726125071.027855][4610:4610] CHIP:DMG:
+          [1726125071.027888][4610:4610] CHIP:DMG:         InteractionModelRevision = 11
+          [1726125071.027915][4610:4610] CHIP:DMG: },
+          [1726125071.028055][4610:4610] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_050E e=4 p=a r=i
+          [1726125071.028097][4610:4610] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label: "Step 3: DUT sends Logout command to TH"

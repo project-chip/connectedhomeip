@@ -50,6 +50,42 @@ config CHIP_NFC_ONBOARDING_PAYLOAD
 	help
 	  Enables sharing the onboarding payload in the NFC tag.
 
+choice CHIP_BOOTLOADER
+	prompt "Bootloader implementation for Matter purposes"
+	default CHIP_BOOTLOADER_MCUBOOT if !BOARD_NRF21540DK && !BOARD_NRF52840DONGLE
+	default CHIP_BOOTLOADER_NONE
+
+config CHIP_BOOTLOADER_MCUBOOT
+	bool "MCUBOOT for Matter Bootloader purpose"
+	imply BOOTLOADER_MCUBOOT
+	select IMG_MANAGER
+
+config CHIP_BOOTLOADER_NONE
+	bool "No bootloader selected for Matter purposes"
+
+endchoice
+
+config CHIP_DFU_LIBRARY_MCUMGR
+	bool "Use mcumgr library for Matter DFU purposes"
+	# MCUBOOT
+	select MCUMGR_GRP_IMG if CHIP_BOOTLOADER_MCUBOOT
+	select MCUMGR_GRP_OS if CHIP_BOOTLOADER_MCUBOOT
+	select MCUMGR_GRP_IMG_STATUS_HOOKS if CHIP_BOOTLOADER_MCUBOOT
+	# COMMON
+	select MCUMGR
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
+
+config CHIP_DFU_LIBRARY_DFU_TARGET
+	bool "Use dfu target library for Matter DFU purposes"
+	imply DFU_MULTI_IMAGE
+	# COMMON
+	imply DFU_TARGET
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
+	select ZCBOR
+	select ZCBOR_CANONICAL
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
 	bool
@@ -59,24 +95,6 @@ config CHIP_OTA_REQUESTOR
 	imply IMG_MANAGER
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
-
-config CHIP_OTA_REQUESTOR_BUFFER_SIZE
-	int "OTA Requestor image buffer size"
-	default 1024
-	depends on CHIP_OTA_REQUESTOR
-	help
-	  Configures the size of the buffer used by OTA Requestor when downloading
-	  and writing a new firmware image to flash.
-
-config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-	bool "Auto-reboot when firmware update is applied"
-	default y
-	depends on CHIP_OTA_REQUESTOR
-	imply REBOOT
-	help
-	  Reboots the device automatically after downloading a new firmware update
-	  to swap the old and the new firmware images. The reboot happens only when
-	  a user consents to apply the firmware update.
 
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
@@ -264,14 +282,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/nrfconnect/CHIPPlatformConfig.h file.
-
 config CHIP_IPV4
 	bool "IPv4 support for Matter"
 	default n
@@ -280,15 +290,6 @@ config CHIP_IPV4
 	  If disabled, it allows to build nRF Connect SDK application
 	  with IPv4 support independently of the Matter stack still
 	  running over IPv6.
-
-config CHIP_OPENTHREAD_JOINER_ENABLED
-	bool "Specify whether the Thread Joiner functionality is used when it is enabled"
-	default n
-	depends on NET_L2_OPENTHREAD
-	depends on OPENTHREAD_JOINER
-	help
-	  If disabled, it allows to optimize memory usage even if Thread Joiner
-	  support is enabled.
 
 config CHIP_ENABLE_READ_CLIENT
 	bool "Enable Read Client in the Interaction Model"
@@ -313,10 +314,39 @@ config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
 	  Perform factory reset of the device if the operational key for Fabric has not been migrated
 	  properly to PSA ITS storage.
 
-config CHIP_PERSISTENT_SUBSCRIPTIONS
-	default n
-	# selecting experimental for this feature since there is an issue with multiple controllers.
+config CHIP_STORE_KEYS_IN_KMU
+	bool "Use KMU to store crypto keys"
+	depends on CRACEN_LIB_KMU
 	select EXPERIMENTAL
+	help
+	  Stores cryptographic materials like keys in the KMU if available on the device.
+	  This option utilizes a custom nRF Connect implementation of PSAKeyAllocator for key
+	  storage. All non-volatile cryptographic materials used by the Matter stack will be
+	  stored in KMU slots.
+
+if CHIP_STORE_KEYS_IN_KMU
+
+config CHIP_KMU_SLOT_RANGE_START
+	int "Starting KMU slot number for Matter crypto materials"
+	default 100
+	help
+	  Defines the starting KMU slot number reserved for storing Matter-related keys.
+	  This configuration does not include the DAC private key. To change DAC private key
+	  location see the CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID Kconfig.
+
+config CHIP_KMU_SLOT_RANGE_END
+	int "Last available KMU slot for Matter crypto materials"
+	default 175 if CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+	default 180
+	help
+	  Defines the last available KMU slot for storing Matter-related keys.
+	  This configuration does not include the DAC private key. To change DAC private key
+	  location see the CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID Kconfig.
+
+endif # CHIP_STORE_KEYS_IN_KMU
+
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default y
 
 config CHIP_MAX_FABRICS
 	int "Maximum number of Matter fabrics"
@@ -341,15 +371,15 @@ config CHIP_MAX_ACTIVE_DEVICES
 
 config CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL
 	int "Minimum subscription resumption interval in seconds"
-	default 20
-	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 20 if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 300
 	help
 	  The minimum interval in seconds before resuming a subscription that timed out.
 
 config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
 	int "The multiplier for subscription resumption retry in seconds"
-	default 40
-	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 40 if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 300
 	help
 	  The multiplier per subscription resumption retry attempt that is multiplied by the index of Fibonacci sequence
 	  and added to CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL to obtain final wait time for next retry.
@@ -361,14 +391,14 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 
 config CHIP_USE_OPENTHREAD_ENDPOINT
 	bool "Use OpenThread TCP/UDP stack directly"
-	depends on OPENTHREAD && !CHIP_WIFI
+	depends on OPENTHREAD && !WIFI
 	help
 	  Use OpenThread TCP/UDP stack directly instead of using Zephyr's networking layer.
 	  This option is not supported when using WiFi.
 
 config CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
 	int "Packet buffer pool size"
-	default 11
+	default 15
 	help
 	  Total number of packet buffers allocated by the stack for internal pool.
 

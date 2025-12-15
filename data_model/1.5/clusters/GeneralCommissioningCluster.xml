@@ -70,6 +70,12 @@ Davis, CA 95616, USA
     <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
       <optionalConform/>
     </feature>
+    <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
   </features>
   <dataTypes>
     <enum name="CommissioningErrorEnum">
@@ -102,6 +108,17 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="NetworkRecoveryReasonEnum">
+      <item value="0" name="Unspecified" summary="Unspecified / unknown reason of network failure">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Auth" summary="Credentials for the configured operational network are not valid">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Visibility" summary="Configured network cannot be found (e.g. the device cannot see the configured Wi-Fi SSID, Thread end-node is unable to find a parent router on the PAN)">
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="RegulatoryLocationTypeEnum">
@@ -194,6 +211,29 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
+    </attribute>
+    <attribute id="0x000A" name="RecoveryIdentifier" type="octstr" default="0">
+      <access read="true" readPrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="NR"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint>
+        <allowed value="8"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="NetworkRecoveryReason" type="NetworkRecoveryReasonEnum" default="null">
+      <access read="true" readPrivilege="manage"/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="NR"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
     <attribute id="0x000C" name="IsCommissioningWithoutPower" type="bool" default="false">
       <access read="true" readPrivilege="view"/>

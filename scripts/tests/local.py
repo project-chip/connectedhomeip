@@ -38,6 +38,39 @@ import coloredlogs
 import tabulate
 import yaml
 
+try:
+    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
+except ImportError:
+    # Fallback to manual import from source tree
+    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
+        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
+    if _MATTER_TESTING_PATH not in sys.path:
+        sys.path.insert(0, _MATTER_TESTING_PATH)
+    try:
+        from matter.testing.metadata import extract_runs_args
+    except ImportError:
+        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+
+log = logging.getLogger(__name__)
+
+
+def _get_apps_from_script(path: str) -> List[str]:
+    """
+    Parses a python script and returns the apps it is for.
+    """
+    try:
+        runs_args = extract_runs_args(path)
+        apps = set()
+        for run_config in runs_args.values():
+            if run_config and 'app' in run_config:
+                # app is like "${ALL_CLUSTERS_APP}"
+                app_name = run_config['app'].strip('${}')
+                apps.add(app_name)
+        return list(apps)
+    except Exception as e:
+        log.warning("Failed to parse metadata from '%s': %r", path, e)
+        return []
+
 
 def _get_native_machine_target():
     """
@@ -79,7 +112,7 @@ def _get_variants(coverage: Optional[bool]):
     config["OPTIONS"] = {}
     try:
         config.read(_CONFIG_PATH)
-        logging.info("Defaults read from '%s'", _CONFIG_PATH)
+        log.info("Defaults read from '%s'", _CONFIG_PATH)
     except Exception:
         config["OPTIONS"]["coverage"] = "true"
 
@@ -87,9 +120,7 @@ def _get_variants(coverage: Optional[bool]):
         # Coverage is NOT passed in as an explicit flag, so try to
         # resume it from whatever last `build` flag was used
         coverage = config["OPTIONS"].getboolean("coverage")
-        logging.info(
-            "Coverage setting not provided via command line. Will use: %s", coverage
-        )
+        log.info("Coverage setting not provided via command line. Will use: %s", coverage)
 
     if coverage:
         variants.append("coverage")
@@ -299,17 +330,18 @@ class BinaryRunner(enum.Enum):
     def execute_str(self, path: str):
         if self == BinaryRunner.NONE:
             return path
-        elif self == BinaryRunner.RR:
+        if self == BinaryRunner.RR:
             return f"exec rr record {path}"
-        elif self == BinaryRunner.VALGRIND:
+        if self == BinaryRunner.VALGRIND:
             return f"exec valgrind {path}"
-        elif self == BinaryRunner.COVERAGE:
+        if self == BinaryRunner.COVERAGE:
             # Expected path is like "out/<target>/<binary>"
             #
             # We output up to 10K of separate profiles that will be merged as a
             # final step.
             rawname = os.path.basename(path[: path.rindex("/")] + "-run-%10000m.profraw")
             return f'export LLVM_PROFILE_FILE="out/profiling/{rawname}"; exec {path}'
+        return None
 
 
 __RUNNERS__ = {
@@ -318,12 +350,7 @@ __RUNNERS__ = {
     "valgrind": BinaryRunner.VALGRIND,
 }
 
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARN,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @dataclass
@@ -390,7 +417,7 @@ def _do_build_python():
     """
     Builds a python virtual environment into `out/venv`
     """
-    logging.info("Building python packages in out/venv ...")
+    log.info("Building python packages in out/venv ...")
     subprocess.run(
         ["./scripts/build_python.sh", "--install_virtual_env", "out/venv"], check=True
     )
@@ -402,7 +429,7 @@ def _do_build_apps(coverage: Optional[bool], ccache: bool):
 
     This builds a LOT of apps (significant storage usage).
     """
-    logging.info("Building example apps...")
+    log.info("Building example apps...")
 
     targets = [t.target for t in _get_targets(coverage)]
 
@@ -424,9 +451,9 @@ def _do_build_basic_apps(coverage: Optional[bool]):
     Builds a minimal subset of test applications, specifically
     all-clusters and chip-tool only, for basic tests.
     """
-    logging.info("Building example apps...")
+    log.info("Building example apps...")
 
-    all_targets = dict([(t.key, t) for t in _get_targets(coverage)])
+    all_targets = {t.key: t for t in _get_targets(coverage)}
     targets = [
         all_targets["CHIP_TOOL"].target,
         all_targets["ALL_CLUSTERS_APP"].target,
@@ -543,7 +570,7 @@ class FilterList:
     filters: list[GlobFilter]
 
     def any_matches(self, txt: str) -> bool:
-        return any([f.matches(txt) for f in self.filters])
+        return any(f.matches(txt) for f in self.filters)
 
 
 def _parse_filters(entry: str) -> FilterList:
@@ -618,7 +645,7 @@ def _raw_profile_to_info(profile: RawProfile):
 
     info_path = path.replace(".profraw", ".info")
     subprocess.run(_with_activate(cmd, output_path=info_path), check=True)
-    logging.info("Generated %s", info_path)
+    log.info("Generated '%s'", info_path)
 
     # !!!!! HACK ALERT !!!!!
     #
@@ -630,7 +657,7 @@ def _raw_profile_to_info(profile: RawProfile):
     #
     # We assume that the info lines fit in RAM
     lines = []
-    with open(info_path, 'rt') as f:
+    with open(info_path) as f:
         for line in f.readlines():
             line = line.rstrip()
             if line.startswith("SF:"):
@@ -676,15 +703,13 @@ def gen_coverage(flat):
                 binary_path=os.path.join("./out", t.target, t.binary)
             ))
         else:
-            logging.warning("No profiles for %s", t.target)
+            log.warning("No profiles for '%s'", t.target)
 
     with multiprocessing.Pool() as p:
         trace_files = p.map(_raw_profile_to_info, raw_profiles)
 
     if not trace_files:
-        logging.error(
-            "Could not find any trace files. Did you run tests with coverage enabled?"
-        )
+        log.error("Could not find any trace files. Did you run tests with coverage enabled?")
         return
 
     cmd = ["lcov"]
@@ -707,7 +732,7 @@ def gen_coverage(flat):
 
     subprocess.run(cmd, check=True)
 
-    logging.info("Generating HTML...")
+    log.info("Generating HTML...")
     cmd = ["genhtml"]
     for e in errors_to_ignore:
         cmd.append("--ignore-errors")
@@ -719,7 +744,7 @@ def gen_coverage(flat):
     cmd.append("out/profiling/merged.info")
 
     subprocess.run(cmd, check=True)
-    logging.info("Coverage HTML should be available in out/coverage/index.html")
+    log.info("Coverage HTML should be available in out/coverage/index.html")
 
 
 @cli.command()
@@ -778,6 +803,19 @@ def gen_coverage(flat):
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
+@click.option(
+    "--override-binary-path",
+    default=None,
+    nargs=2,
+    multiple=True,
+    help="Defines an override binary path for a given app. Can be used multiple times. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
+)
+@click.option(
+    "--app-filter",
+    default=None,
+    type=str,
+    help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
+)
 def python_tests(
     test_filter,
     skip,
@@ -789,6 +827,8 @@ def python_tests(
     keep_going,
     coverage,
     fail_log_dir,
+    override_binary_path,
+    app_filter,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -802,7 +842,7 @@ def python_tests(
     coverage = get_coverage_default(coverage)
     if coverage:
         if runner != BinaryRunner.NONE:
-            logging.error("Runner for coverage is implict")
+            log.error("Runner for coverage is implict")
             sys.exit(1)
 
         # wrap around so we get a good LLVM_PROFILE_FILE
@@ -812,9 +852,14 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
+    override_binaries = dict(override_binary_path or [])
+
     with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
-            run_path = as_runner(f"out/{target.target}/{target.binary}")
+            if target.key in override_binaries:
+                run_path = as_runner(override_binaries[target.key])
+            else:
+                run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
@@ -823,6 +868,12 @@ def python_tests(
     if not test_filter:
         test_filter = "*"
     test_filter = _parse_filters(test_filter)
+
+    app_filter_list = None
+    if app_filter:
+        if not extract_runs_args:
+            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
+        app_filter_list = _parse_filters(app_filter)
 
     if skip:
         print("SKIP IS %r" % skip)
@@ -847,13 +898,14 @@ def python_tests(
     if fail_log_dir and not os.path.exists(fail_log_dir):
         os.mkdir(fail_log_dir)
 
-    metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
-    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
+    with open("src/python_testing/test_metadata.yaml") as f:
+        metadata = yaml.full_load(f)
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = dict(
-        [(item["name"], item["duration"]) for item in metadata["slow_tests"]]
-    )
+    slow_test_duration = {
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
+    }
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -873,20 +925,26 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            if app_filter_list:
+                required_apps = _get_apps_from_script(script)
+                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                    log.info("Skipping '%s' due to app filter (requires %r)", script, required_apps)
+                    continue
+
             if from_filter:
                 if not fnmatch.fnmatch(script, from_filter):
-                    logging.info("From-filter SKIP %s", script)
+                    log.info("From-filter SKIP '%s'", script)
                     continue
                 from_filter = None
 
             if from_skip_filter:
                 if fnmatch.fnmatch(script, from_skip_filter):
                     from_skip_filter = None
-                logging.info("From-skip-filter SKIP %s", script)
+                log.info("From-skip-filter SKIP '%s'", script)
                 continue
             if skip:
                 if skip.any_matches(script):
-                    logging.info("EXPLICIT SKIP %s", script)
+                    log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
             to_run.append(script)
@@ -900,13 +958,16 @@ def python_tests(
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
 
+                if app_filter_list:
+                    cmd.extend(('--app-filter', app_filter))
+
                 if dry_run:
                     print(shlex.join(cmd))
                     continue
 
                 base_name = os.path.basename(script)
                 if base_name in slow_test_duration:
-                    logging.warning(
+                    log.warning(
                         "SLOW test '%s' is executing (expect to take around %s). Be patient...",
                         base_name,
                         slow_test_duration[base_name],
@@ -917,13 +978,13 @@ def python_tests(
                 tend = time.time()
 
                 if result.returncode != 0:
-                    logging.error("Test failed: %s (error code %d when running %r)", script, result.returncode, cmd)
+                    log.error("Test failed: '%s' (error code %d when running %r)", script, result.returncode, cmd)
                     if fail_log_dir:
                         out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
                         err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
 
-                        logging.error("STDOUT IN %s", out_name)
-                        logging.error("STDERR IN %s", err_name)
+                        log.error("STDOUT IN '%s'", out_name)
+                        log.error("STDERR IN '%s'", err_name)
 
                         with open(out_name, "wb") as f:
                             f.write(result.stdout)
@@ -931,8 +992,8 @@ def python_tests(
                             f.write(result.stderr)
 
                     else:
-                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
+                        log.info("STDOUT:\n%s", result.stdout.decode("utf8", errors='replace'))
+                        log.warning("STDERR:\n%s", result.stderr.decode("utf8", errors='replace'))
                     if not keep_going:
                         sys.exit(1)
                     failed_tests.append(script)
@@ -949,17 +1010,13 @@ def python_tests(
                 execution_times.append(time_info)
 
                 if time_info.duration_sec > 20 and base_name not in slow_test_duration:
-                    logging.warning(
-                        "%s finished in %0.2f seconds",
-                        time_info.script,
-                        time_info.duration_sec,
-                    )
+                    log.warning("'%s' finished in %0.2f seconds", time_info.script, time_info.duration_sec)
                 bar()
     finally:
         if failed_tests and keep_going:
-            logging.error("FAILED TESTS:")
+            log.error("FAILED TESTS:")
             for name in failed_tests:
-                logging.error("  %s", name)
+                log.error("  '%s'", name)
 
         if execution_times and not no_show_timings:
             execution_times.sort(
@@ -1142,14 +1199,14 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:167
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:177
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
     coverage = get_coverage_default(coverage)
     if coverage:
         if runner != BinaryRunner.NONE:
-            logging.error("Runner for coverage is implict")
+            log.error("Runner for coverage is implict")
             sys.exit(1)
 
         # wrap around so we get a good LLVM_PROFILE_FILE
@@ -1167,9 +1224,9 @@ def chip_tool_tests(
     cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
     cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
 
-    paths = dict(
-        [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
-    )
+    paths = {
+        t.key: f"./out/{t.target}/{t.binary}" for t in _get_targets(coverage)
+    }
 
     if runner == BinaryRunner.COVERAGE:
         # when running with coveage, chip-tool also is covered
