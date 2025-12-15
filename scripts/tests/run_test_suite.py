@@ -20,8 +20,8 @@ import os
 import sys
 import time
 import typing
-from dataclasses import dataclass, field
 import warnings
+from dataclasses import dataclass, field
 
 import chiptest
 import click
