@@ -24,9 +24,9 @@ The core components are:
 -   **Transport Managers (`WebRTCProviderManager`,
     `PushAvStreamTransportManager`):** These classes manage the specific
     transport protocols for streaming media to clients.
--   **Matter Clusters:** The various Matter clusters that expose the camera's
-    functionality to the Matter network (e.g., `CameraAVStreamManagement`,
-    `WebRTCTransportProvider`).
+-   **Matter Cluster Managers:** The various Matter cluster managers that expose
+    the camera's functionality to the Matter network (e.g.,
+    `CameraAVStreamManagement`, `WebRTCTransportProvider`).
 
 This layered architecture allows for easy porting of the camera application to
 other platforms by simply providing a new implementation of the
