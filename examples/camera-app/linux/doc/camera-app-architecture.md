@@ -309,26 +309,26 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant Client
-    participant CameraAVStreamManagementCluster as SDK Cluster
+    participant CameraAVStreamManagementCluster
     participant CameraAVStreamManager as Delegate
     participant CameraDevice as HAL
 
-    Client ->> SDK Cluster: VideoStreamAllocate Request
-    SDK Cluster ->> Delegate: VideoStreamAllocate()
+    Client ->> CameraAVStreamManagementCluster: VideoStreamAllocate Request
+    CameraAVStreamManagementCluster ->> Delegate: VideoStreamAllocate()
     Delegate ->> HAL: GetAvailableVideoStreams()
     HAL -->> Delegate: List of streams
     Delegate ->> Delegate: Find compatible stream
     Delegate ->> HAL: IsResourceAvailable()
     HAL -->> Delegate: Yes/No
     alt Resources Available
-        Delegate -->> SDK Cluster: Success, streamID
-        SDK Cluster ->> Delegate: OnVideoStreamAllocated()
+        Delegate -->> CameraAVStreamManagementCluster: Success, streamID
+        CameraAVStreamManagementCluster ->> Delegate: OnVideoStreamAllocated()
         Delegate ->> HAL: StartVideoStream(streamID)
         HAL ->> HAL: Configure & Start GStreamer Pipeline
     else Resources NOT Available
-        Delegate -->> SDK Cluster: ResourceExhausted
+        Delegate -->> CameraAVStreamManagementCluster: ResourceExhausted
     end
-    SDK Cluster -->> Client: VideoStreamAllocate Response
+    CameraAVStreamManagementCluster -->> Client: VideoStreamAllocate Response
 ```
 
 ### Push AV Transport Allocation Sequence
