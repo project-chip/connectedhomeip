@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "OccupancySensorDeviceImpl.h"
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <functional>
@@ -77,6 +78,7 @@ private:
             return std::make_unique<BooleanStateSensorDevice>(
                 &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
+        mRegistry["occupancy-sensor"] = [this]() { return std::make_unique<OccupancySensorDeviceImpl>(); };
     }
 };
 

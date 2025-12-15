@@ -23,10 +23,14 @@ config("includes") {
 }
 
 executable("all-devices-app") {
-  sources = [ "main.cpp" ]
+  sources = [
+    "OccupancySensorDeviceImpl.cpp",
+    "main.cpp",
+  ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
@@ -37,6 +41,7 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
+    "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
   include_dirs = [
