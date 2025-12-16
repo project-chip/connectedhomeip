@@ -246,7 +246,7 @@ TlsClientManagementCluster::HandleFindEndpoint(CommandHandler & commandHandler, 
         return DataModel::ActionReturnStatus(Status::Failure);
     }
 
-    return DataModel::ActionReturnStatus(Status::Success);
+    return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus>
