@@ -244,6 +244,7 @@ class Bitmap:
     is_shared: bool = False  # shared across multiple clusters (shared by name)
     description: Optional[str] = None
 
+    # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
