@@ -148,7 +148,7 @@ class SubprocessInfo:
 
 
 class Executor:
-    CLEANUP_TIMEOUT_S = 1
+    CLEANUP_TIMEOUT_S = 5
 
     def __init__(self) -> None:
         self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
