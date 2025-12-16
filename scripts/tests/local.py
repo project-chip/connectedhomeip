@@ -876,7 +876,7 @@ def python_tests(
         # refuse OTA requestor v2 for now
         # This would be built by a shell script like this:
         #
-        #    ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+        #    ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2"
         #
         # Which is not currently integrated in our build logic (we always use build_examples.py)
         f.write("SU_OTA_REQUESTOR_V2: /usr/bin/false\n")
