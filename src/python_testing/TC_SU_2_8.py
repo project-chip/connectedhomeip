@@ -57,6 +57,8 @@ from matter import ChipDeviceCtrl
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+logger = logging.getLogger(__name__)
+
 
 class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
     """
@@ -131,16 +133,16 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.fabric_id_th2 = self.th1.fabricId + 1
         self.vendor_id = self.matter_test_config.admin_vendor_id
 
-        logging.info(f"Endpoint: {self.endpoint}.")
-        logging.info(f"DUT Node ID: {self.dut_node_id}.")
-        logging.info(f"Requestor Node ID: {self.requestor_node_id}.")
-        logging.info(f"Vendor ID: {self.vendor_id}.")
+        logger.info(f"Endpoint: {self.endpoint}.")
+        logger.info(f"DUT Node ID: {self.dut_node_id}.")
+        logger.info(f"Requestor Node ID: {self.requestor_node_id}.")
+        logger.info(f"Vendor ID: {self.vendor_id}.")
 
-        logging.info(f"TH1 fabric id: {self.th1.fabricId}.")
-        logging.info(f"TH2 fabric id: {self.fabric_id_th2}.")
+        logger.info(f"TH1 fabric id: {self.th1.fabricId}.")
+        logger.info(f"TH2 fabric id: {self.fabric_id_th2}.")
 
         # Start OTA Provider
-        logging.info("Starting OTA Provider 1")
+        logger.info("Starting OTA Provider 1")
 
         extra_arguments = ['--app-pipe', self.fifo_in, '--app-pipe-out', self.fifo_out]
         self.start_provider(
@@ -156,7 +158,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         )
 
         # Commissioning Provider-TH1
-        logging.info("Commissioning OTA Provider to TH1")
+        logger.info("Commissioning OTA Provider to TH1")
 
         resp = await self.th1.CommissionOnNetwork(
             nodeId=self.p1_node,
@@ -165,7 +167,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             filter=self.p1_disc
         )
 
-        logging.info(f"Commissioning response: {resp}.")
+        logger.info(f"Commissioning response: {resp}.")
         super().setup_test()
 
     @async_test_body
@@ -197,7 +199,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.write_to_app_pipe(command, self.fifo_in, is_subprocess=True)
         response_data = self.read_from_app_pipe(self.fifo_out, is_subprocess=True)
 
-        logging.info(f"Out of band command response: {response_data}")
+        logger.info(f"Out of band command response: {response_data}")
 
         # Check VendorID
         vendor_id_basic_information = await self.read_single_attribute_check_success(
@@ -279,7 +281,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
         self.step(2)
 
-        logging.info("Starting OTA Provider 2")
+        logger.info("Starting OTA Provider 2")
         self.start_provider(
             provider_app_path=self.app_path,
             ota_image_path=self.image,
@@ -292,12 +294,12 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         )
 
         # Create TH2
-        logging.info("Setting up TH2.")
+        logger.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=self.vendor_id, fabricId=self.fabric_id_th2)
         th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-        logging.info("Opening commissioning window on DUT.")
+        logger.info("Opening commissioning window on DUT.")
         params = await self.open_commissioning_window(self.th1, self.dut_node_id)
 
         # Commission TH2/DUT (requestor)
@@ -308,10 +310,10 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             filter=params.randomDiscriminator
         )
 
-        logging.info(f"TH2 commissioned: {resp}.")
+        logger.info(f"TH2 commissioned: {resp}.")
 
         # Commissioning Provider-TH2
-        logging.info("Commissioning OTA Provider to TH2")
+        logger.info("Commissioning OTA Provider to TH2")
 
         resp = await th2.CommissionOnNetwork(
             nodeId=self.p2_node,
@@ -320,7 +322,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             filter=self.p2_disc
         )
 
-        logging.info(f"Commissioning response: {resp}.")
+        logger.info(f"Commissioning response: {resp}.")
 
         # ACL permissions are not required
 
@@ -347,7 +349,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         download_error = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.DownloadError, 50)
 
-        logging.info(f"Download Error: {download_error}")
+        logger.info(f"Download Error: {download_error}")
 
         idle_event = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)

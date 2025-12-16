@@ -190,16 +190,6 @@ class EventSubscriptionHandler:
     def get_event_from_queue(self, block: bool, timeout: int):
         return self._q.get(block, timeout)
 
-    async def cancel(self):
-        """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
-        try:
-            self._subscription.Shutdown()
-            await asyncio.sleep(5)
-        except asyncio.CancelledError:
-            pass
-
-
 class AttributeSubscriptionHandler:
     """
     Callback class to handle attribute subscription reports. This class manages the reception. filtering and queuing of attribute update reports.
