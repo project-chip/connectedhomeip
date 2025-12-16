@@ -26,7 +26,7 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 # This must be called before find_package(Zephyr)
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional

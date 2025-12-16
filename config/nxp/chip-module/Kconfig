@@ -14,7 +14,8 @@
 #   limitations under the License.
 #
 
-rsource "../../zephyr/Kconfig"
+if SOC_FAMILY_NXP_RW
+
 rsource "../cmake/Kconfig.matter.nxp"
 
 if CHIP
@@ -38,3 +39,5 @@ config BOOTLOADER_MCUBOOT
 	select IMG_MANAGER
 	select STREAM_FLASH
 	select STREAM_FLASH_ERASE
+
+endif # SOC_FAMILY_NXP_RW

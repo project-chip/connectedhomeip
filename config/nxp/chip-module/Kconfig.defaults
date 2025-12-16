@@ -18,7 +18,11 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
+if SOC_FAMILY_NXP_RW
+
 if CHIP
+
+rsource "Kconfig.features"
 
 # See config/common/cmake/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
@@ -72,6 +76,9 @@ config CHIP_DEVICE_PRODUCT_ID
 	default 41510 if SOC_SERIES_RW6XX
 
 endif # CHIP_FACTORY_DATA
+
+config NET_L2_OPENTHREAD
+	default n
 
 config LOG
 	default y
@@ -545,4 +552,6 @@ choice POSIX_AEP_CHOICE
 	default POSIX_AEP_CHOICE_NONE
 endchoice
 
-endif
+endif # CHIP
+
+endif # SOC_FAMILY_NXP_RW
