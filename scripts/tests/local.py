@@ -313,6 +313,14 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
         )
     )
 
+    targets.append(ApplicationTarget(key="ALL_DEVICES_APP", target=f"{target_prefix}-all-devices-app", binary="all-devices-app"))
+
+    targets.append(ApplicationTarget(key="CAMERA_CONTROLLER_APP",
+                   target=f"{target_prefix}-camera-controller", binary="chip-camera-controller"))
+
+    targets.append(ApplicationTarget(key="WATER_LEAK_DETECTOR_APP",
+                   target=f"{target_prefix}-water-leak-detector-{suffix}", binary="water-leak-detector-app"))
+
     return targets
 
 
@@ -861,6 +869,18 @@ def python_tests(
             else:
                 run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
+
+        # PushAV is special
+        f.write("PUSH_AV_SERVER: src/tools/push_av_server/server.py\n")
+
+        # refuse OTA requestor v2 for now
+        # This would be built by a shell script like this:
+        #
+        #    ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+        #
+        # Which is not currently integrated in our build logic (we always use build_examples.py)
+        f.write("SU_OTA_REQUESTOR_V2: /usr/bin/false\n")
+
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
