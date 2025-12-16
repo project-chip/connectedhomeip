@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
 import logging
 import os
 import pathlib
@@ -23,6 +22,7 @@ import subprocess
 import threading
 import typing
 from dataclasses import dataclass, replace
+from enum import StrEnum
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class SubprocessKind(enum.StrEnum):
+class SubprocessKind(StrEnum):
     APP = 'app'
     TOOL = 'tool'
     RPC = 'rpc'
