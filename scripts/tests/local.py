@@ -873,7 +873,7 @@ def python_tests(
         # PushAV is special
         f.write("PUSH_AV_SERVER: src/tools/push_av_server/server.py\n")
 
-        # refuse OTA requestor v2 for now
+        # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:
         #
         #    ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2"
