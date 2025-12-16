@@ -149,7 +149,7 @@ std::optional<DataModel::ActionReturnStatus> TlsClientManagementCluster::InvokeC
                                                                                        chip::TLV::TLVReader & input_arguments,
                                                                                        CommandHandler * handler)
 {
-    FabricIndex accessingFabricIndex = handler->GetAccessingFabricIndex();
+    FabricIndex accessingFabricIndex = request.GetAccessingFabricIndex();
 
     switch (request.path.mCommandId)
     {
