@@ -208,7 +208,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
         ConcreteCommandPath responsePath(mPath.mEndpointId, TlsClientManagement::Id, Commands::ProvisionEndpoint::Id);
         commandHandler.AddResponse(responsePath, response);
         NotifyAttributeChanged(TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
-        return DataModel::ActionReturnStatus(Status::Success);
+        return std::nullopt;
     }
 
     return DataModel::ActionReturnStatus(status);
