@@ -92,8 +92,8 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
-    uint32_t GetVendorId() const { return mVendorId; }
-    uint32_t GetProductId() const { return mProductId; }
+    uint16_t GetVendorId() const { return mVendorId; }
+    uint16_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
     const std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> & GetProtocolsSupported() const
@@ -140,8 +140,8 @@ private:
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
     uint32_t mPollInterval;
     uint16_t mMaxBDXBlockSize;
-    uint32_t mVendorId;
-    uint32_t mProductId;
+    uint16_t mVendorId;
+    uint16_t mProductId;
     uint16_t mHardwareVersion;
     uint32_t mRequestorSoftwareVersion;
     std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
