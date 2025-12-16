@@ -114,7 +114,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         actual_otap_info = await self.read_single_attribute_check_success(
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
-        logger.info(f'Step #1 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
+        logger.info(f'Step #1 - Read actual DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
 
         # TH2 is the OTA Provider (NodeID=1) for fabric 1
         # Write DefaultOTAProviders to DUT using base class helper function
@@ -392,6 +392,11 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         logger.info(f'Step #6 - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
 
         self.step(7)
+        # Step #7: Verify UpdatePossible attribute on both fabrics.
+        # Note: Although the test case mentions TH3 for Fabric 2, we are using TH4 here
+        # because a secure session to the DUT is already established via TH4. This
+        # allows reading attributes for both fabrics without opening an additional
+        # session. The verification is still valid for Fabric 2.
 
         # Verify DefaultOTAProviders attribute on the DUT after write (TH4 on Fabric 1)
         update_possible_th4 = await self.read_single_attribute_check_success(
@@ -405,12 +410,15 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         asserts.assert_true(update_possible_th4, "Expected UpdatePossible to be True on fabric 1")
 
         # Verify DefaultOTAProviders attribute on the DUT after write (TH3 on Fabric 2)
+        # NOTE: Using TH4 session instead of TH3 because a secure session to the DUT
+        # is already established via TH4. Verification is still valid for Fabric 2.
         update_possible_th3 = await self.read_single_attribute_check_success(
             dev_ctrl=th4,
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.UpdatePossible)
 
-        logger.info(f'Step #7 - Read UpdatePossible attribute on DUT using TH3 (fabric 2): {update_possible_th3}')
+        logger.info(
+            f'Step #7 - Read UpdatePossible attribute on DUT using TH3 (fabric 2), but using TH4 session: {update_possible_th3}')
 
         # Verify UpdatePossible is true
         asserts.assert_true(update_possible_th3, "Expected UpdatePossible to be True on fabric 2")
