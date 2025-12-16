@@ -73,6 +73,7 @@ def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
 
     return checkable_attrs
 
+
 class TC_IDM_9_1(BasicCompositionTests):
     def _get_xml_path(self, cluster_id: int) -> Optional[str]:
         """Get the XML file path for a cluster."""
@@ -362,7 +363,7 @@ class TC_IDM_9_1(BasicCompositionTests):
             log.info("Step 1a: Testing uint16 constraint (ColorTemperatureMireds out of range)")
             try:
                 cmd = Clusters.ColorControl.Commands.MoveToColorTemperature(
-                    colorTemperatureMireds=65280, # Max value is 65279 for this uint16 attribute according to XML spec
+                    colorTemperatureMireds=65280,  # Max value is 65279 for this uint16 attribute according to XML spec
                     transitionTime=0,
                     optionsMask=0,
                     optionsOverride=0
@@ -371,7 +372,7 @@ class TC_IDM_9_1(BasicCompositionTests):
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
-                                    f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                     f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1b: Test octstr max length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
         self.step("1b")
@@ -386,7 +387,7 @@ class TC_IDM_9_1(BasicCompositionTests):
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                 f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1c: Test octstr min length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
         self.step("1c")
@@ -401,7 +402,7 @@ class TC_IDM_9_1(BasicCompositionTests):
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                 f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1d: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
         self.step("1d")
@@ -417,7 +418,7 @@ class TC_IDM_9_1(BasicCompositionTests):
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR, got {e.status}")
+                                 f"Expected CONSTRAINT_ERROR, got {e.status}")
 
         # Step 1e: Test string min length constraint violation
         self.step("1e")
@@ -433,8 +434,7 @@ class TC_IDM_9_1(BasicCompositionTests):
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                f"Expected CONSTRAINT_ERROR, got {e.status}")
-
+                                 f"Expected CONSTRAINT_ERROR, got {e.status}")
 
         # Step 2: Test all writable attributes with constraints
         self.step(2)
@@ -499,6 +499,7 @@ class TC_IDM_9_1(BasicCompositionTests):
         if failed_attributes:
             log.error(f"Failed attributes constraints not enforced: {', '.join(failed_attributes)}")
             asserts.fail("Failed attributes constraints not enforced")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
