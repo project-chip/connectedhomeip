@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${OTA_REQUESTOR}
+#     app: ${OTA_REQUESTOR_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --passcode 20202021
@@ -53,16 +53,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_4_1(SoftwareUpdateBaseTest):
-    """
-        Validate OTA Requestor (DUT) attribute behavior across fabrics:
-        - DefaultOTAProviders
-        - UpdatePossible
-        - UpdateState
-
-        Raises:
-            AssertionError: If any attribute read/write response does not match the expected outcome.
-
-    """
 
     # Reference variable for the OTA Software Update Provider cluster.
     # cluster_otap = Clusters.OtaSoftwareUpdateProvider
@@ -102,11 +92,14 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
                      "Idle, Querying, DelayedOnQuery, Downloading, Applying, DelayedOnApply, RollingBack, DelayedOnUserConsent."),
         ]
 
+    async def teardown_test(self):
+        # Clear provider KVS after test to avoid interference with subsequent tests
+        self.clear_kvs()
+        await super().teardown_test()
+
     @async_test_body
     async def test_TC_SU_4_1(self):
         self.step(0)
-
-        # Read the Steps
 
         self.step(1)
 
@@ -124,26 +117,22 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         logger.info(f'Step #1 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
 
         # TH2 is the OTA Provider (NodeID=1) for fabric 1
-        provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
-            providerNodeID=1,   # TH2 is the OTA Provider (NodeID=1)
-            endpoint=0,
-            fabricIndex=1       # Fabric ID from TH1 (controller writing to DUT)
+        # Write DefaultOTAProviders to DUT using base class helper function
+        await self.set_default_ota_providers_list(
+            controller=th1,
+            provider_node_id=1,   # TH2 is the OTA Provider (NodeID=1)
+            requestor_node_id=th1_node_id
         )
-
-        # DefaultOTAProviders attribute with the provider list
-        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
-
-        # Write the DefaultOTAProviders attribute to the DUT (TH1)
-        resp = await self.write_single_attribute(
-            attribute_value=attr,
-            endpoint_id=0
-        )
-        logger.info(f'Step #1 - Write DefaultOTAProviders response: {resp}')
-
-        # Verify write succeeded (response code 0)
-        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders attribute")
+        logger.info("Step #1 - DefaultOTAProviders attribute written successfully to DUT (TH1)")
 
         self.step(2)
+        # Reference object for verifying DefaultOTAProviders (TH2, NodeId 2, Fabric 2)
+        provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
+            providerNodeID=1,
+            endpoint=0,
+            fabricIndex=th1_fabric_id
+        )
+
         # Verify DefaultOTAProviders attribute on the DUT (TH1) after write (using TH1 on Fabric 1)
         actual_otap_info = await self.read_single_attribute_check_success(
             cluster=self.cluster_otar,
@@ -192,25 +181,21 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
 
         # Use TH3 controller (already commissioned) to write DefaultOTAProviders on fabric 2
         # TH3 is the OTA Provider (NodeID=3) for fabric 2
-        provider_th3_for_fabric2 = self.cluster_otar.Structs.ProviderLocation(
-            providerNodeID=th3.nodeId,  # TH3 is the OTA Provider (NodeID=3)
-            endpoint=0,
-            fabricIndex=th3.fabricId    # Fabric ID from TH3
+        await self.set_default_ota_providers_list(
+            controller=th3,            # TH3 controller → Fabric 2
+            provider_node_id=th3.nodeId,
+            requestor_node_id=self.dut_node_id
         )
-
-        # Update attribute with new providers list  (TH3 for fabric 2)
-        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th3_for_fabric2])
-
-        # Write updated DefaultOTAProviders attribute to DUT (TH1)
-        resp = await th3.WriteAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[(0, attr)]
-        )
-        logger.info(f'Step #3 - Write DefaultOTAProviders response: {resp}')
-        # Status=<Status.Success: 0
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
+        logger.info("Step #3 - DefaultOTAProviders attribute written successfully to DUT (TH3)")
 
         self.step(4)
+
+        # Reference object for verifying DefaultOTAProviders (TH3, NodeId 3,  Fabric 2)
+        provider_th3_for_fabric2 = self.cluster_otar.Structs.ProviderLocation(
+            providerNodeID=th3.nodeId,
+            endpoint=0,
+            fabricIndex=th3.fabricId
+        )
 
         # Read the actual value of DefaultOTAProviders attribute on the TH3
         th3_actual_otap_info = await self.read_single_attribute_check_success(
@@ -271,7 +256,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         logger.info(f'Step #5 - TH4 Commissioning response: {resp}')
 
         # Write the Access Control List (ACL) to the DUT device for TH4 controller
-        # using the library function create_acl_entry, passing both Admin and View permissions
+        # using the SUTestBase function create_acl_entry, passing both Admin and View permissions
         # so that TH4 can perform necessary operations.
         acl_list = [
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -311,7 +296,11 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         # - The write may fail with a ConstraintError if any entry violates constraints.
         # - Only the first valid entry in the list is guaranteed to be preserved.
         # - The rest of the entries may be ignored, and the attribute value remains unchanged.
+        # - The SUTestBase set_default_ota_providers_list() only supports one provider.
+        #   Using it here would bypass the test purpose (we need to trigger ConstraintError),
+        #   so we use WriteAttribute() directly instead of the helper.
         # This is expected behavior for list attributes and should be verified in the test.
+        # --------------------------------------------------------------
 
         # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
         providers_list = [provider_th2_for_fabric1]
@@ -387,10 +376,11 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         logger.info("Step #6 - DefaultOTAProviders attribute matches expected values.")
 
         # NOTE:
-        # According to current observed behavior and discussion in Bug #40294,
-        # when writing a list with multiple providers from the same fabric,
-        # only the first valid entry is preserved if the write fails due to a ConstraintError.
-        # The rest of the list is ignored, and the original value remains unchanged.
+        # According to Bug #40294 and current Matter specification behavior:
+        # - Writing a list attribute with multiple providers in the same fabric may fail with ConstraintError.
+        # - When writing an empty list, the write succeeds and clears the providers for that fabric.
+        # - Other fabrics are not affected; their DefaultOTAProviders remain intact.
+        # This explains why we verify Fabric 2 is empty and Fabric 1 still has the original provider.
 
         # Verify DefaultOTAProviders attribute on the DUT after write (TH4 on Fabric 1) in this case should be the original from TH2 fabric 1
         # Read fabric 1 with TH4 and verify that the provider is TH1 (providerNodeID=1 , fabricIndex=1 )
