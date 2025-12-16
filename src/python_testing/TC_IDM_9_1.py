@@ -381,7 +381,7 @@ class TC_IDM_9_1(BasicCompositionTests):
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
-                                    f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                     f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1c: Test octstr min length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
         self.step("1c")
@@ -396,7 +396,7 @@ class TC_IDM_9_1(BasicCompositionTests):
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
-                                    f"Expected CONSTRAINT_ERROR, but got {e.status}")
+                                     f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1d: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
         self.step("1d")
