@@ -41,6 +41,7 @@ public:
     static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
     static constexpr size_t kFilepathBufLen      = 256;
     static constexpr size_t kUriMaxLen           = 256;
+    static constexpr size_t kMaxLocation         = 3;
 
     typedef struct DeviceSoftwareVersionModel
     {
@@ -100,7 +101,7 @@ public:
         return mProtocolsSupported;
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
-    const std::string & GetLocation() const { return mLocation; }
+    const char * GetLocation() const { return mLocation; }
 
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
@@ -145,5 +146,5 @@ private:
     uint32_t mRequestorSoftwareVersion;
     std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
     bool mRequestorCanConsent;
-    std::string mLocation;
+    char mLocation[kMaxLocation] = {0, 0, 0};
 };

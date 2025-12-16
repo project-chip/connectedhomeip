@@ -330,10 +330,15 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
-    mLocation.clear();
     if (commandData.location.HasValue())
     {
-        mLocation = NullTerminated(commandData.location.Value()).c_str();
+        chip::CharSpan loc = commandData.location.Value();
+        const size_t n = (loc.size() < 2) ? loc.size() : 2;
+        for (size_t i = 0; i < n; ++i)
+        {
+            mLocation[i] = loc.data()[i];
+        }
+        mLocation[2] = '\0';
     }
 
     mProtocolsSupported.clear();
