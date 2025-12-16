@@ -487,6 +487,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")
+        raise
     except Exception as e:
         log.error("Caught exception during test execution: %s", e, exc_info=True)
         raise
