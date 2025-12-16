@@ -21,6 +21,7 @@ source_set("testing") {
     "AttributeTesting.cpp",
     "AttributeTesting.h",
     "ClusterTester.h",
+    "FabricTestFixture.h",
     "EmptyProvider.cpp",
     "EmptyProvider.h",
     "MockCommandHandler.cpp",
