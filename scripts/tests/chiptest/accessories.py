@@ -126,12 +126,12 @@ class AppsRegister:
         s = subprocess.Popen(cmd)
         s.wait()
         if s.returncode != 0:
-            raise Exception('Cannot create OTA image file')
+            raise RuntimeError('Cannot create OTA image file')
         return True
 
     def compareFiles(self, file1, file2):
         if filecmp.cmp(file1, file2, shallow=False) is False:
-            raise Exception('Files %s and %s do not match' % (file1, file2))
+            raise RuntimeError(f'Files {file1} and {file2} do not match')
         return True
 
     def createFile(self, filePath, fileContent):
