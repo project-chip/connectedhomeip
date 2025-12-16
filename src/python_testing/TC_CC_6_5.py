@@ -40,8 +40,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_command,
+                                           run_if_endpoint_matches)
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class TC_CC_6_5(MatterBaseTest):
         return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH writes 0x00 to the Options attribute"),
-            TestStep("0b", "TH sends MoveToColorTemperature command to DUT",
+            TestStep("0b", "TH sends On command to DUT",
                      "Verify DUT responds with a successful (value 0x00) status response."),
             TestStep("0c", "TH reads ColorTemperatureMireds attribute from DUT.",
                      "Verify that the DUT response contains with ColorTemperatureMireds attribute value."),
@@ -87,7 +87,7 @@ class TC_CC_6_5(MatterBaseTest):
                      "Value has to be between a range of 0x00 to 0x03; Verify that the DUT response indicates that the EnhancedColorMode attribute has the expected value 2 (ColorTemperatureMireds)."),
         ]
 
-    @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds))
+    @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds) and has_command(Clusters.OnOff.Commands.On))
     async def test_TC_CC_6_5(self):
         cc_cluster = Clusters.Objects.ColorControl
         cc_attributes = cc_cluster.Attributes
@@ -103,21 +103,13 @@ class TC_CC_6_5(MatterBaseTest):
         await self.write_single_attribute(cc_attributes.Options(0x00), self.endpoint, expect_success=True)
 
         self.step("0b")
-        log.info(f"Sending MoveToColorTemperature command to endpoint {self.endpoint}")
-        try:
-            await self.send_single_cmd(
-                endpoint=self.endpoint,
-                cmd=Clusters.ColorControl.Commands.MoveToColorTemperature(
-                    colorTemperatureMireds=0x7FFF,
-                    transitionTime=0,
-                    optionsMask=0,
-                    optionsOverride=0
-                ),
-                node_id=self.dut_node_id)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned {e.Status}")
+        log.info(f"Sending On command to endpoint {self.endpoint}")
 
-        log.info("MoveToColorTemperature command sent successfully {ret}")
+        await self.send_single_cmd(
+            endpoint=self.endpoint,
+            cmd=Clusters.OnOff.Commands.On(),
+            node_id=self.dut_node_id)
+        log.info("Lights On!")
 
         self.step("0c")
         color_temp_mireds = await self.read_single_attribute_check_success(
@@ -163,7 +155,6 @@ class TC_CC_6_5(MatterBaseTest):
                                                   colortemp_physical_min_mireds)/2 + colortemp_physical_min_mireds
 
         log.info(f"Defined new value for StartUpColorTemperatureMireds with value {startup_color_temperature_mireds2a}")
-
         # First attempt: Write with minimal parameters
         await self.write_single_attribute(cc_attributes.StartUpColorTemperatureMireds(startup_color_temperature_mireds2a), self.endpoint, expect_success=True)
 
@@ -178,7 +169,7 @@ class TC_CC_6_5(MatterBaseTest):
         if self.is_pics_sdk_ci_only and restart_flag_file is not None:
             with open(restart_flag_file, "w") as f:
                 f.write("restart")
-            logging.info("Created restart flag file to signal app restart")
+            log.info("Created restart flag file to signal app restart")
             await asyncio.sleep(1)
             self.TH1.ExpireSessions(self.dut_node_id)
         else:
@@ -212,13 +203,13 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("5a")
         color_mode = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.ColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
         log.info(f"Color mode response: {color_mode}")
-        asserts.assert_in(color_mode, range(0, 3), "Value ColorMode in range of 1-2")
+        asserts.assert_in(color_mode, range(0, 3), "Value ColorMode in range of [0,2]")
         asserts.assert_equal(color_mode, 2, "Value ColorMode is not 2")
 
         self.step("5b")
         enhanced_color_mode = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.EnhancedColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
         log.info(f"Enhanced mode response: {enhanced_color_mode}")
-        asserts.assert_in(color_mode, range(0, 4), "Value EnhancedColorMode in range of 1-3")
+        asserts.assert_in(enhanced_color_mode, range(0, 4), "Value EnhancedColorMode in range of [0,3]")
         asserts.assert_equal(enhanced_color_mode, 2, "Value EnhancedColorMode is not 2")
 
 
