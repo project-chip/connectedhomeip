@@ -190,6 +190,7 @@ class EventSubscriptionHandler:
     def get_event_from_queue(self, block: bool, timeout: int):
         return self._q.get(block, timeout)
 
+
 class AttributeSubscriptionHandler:
     """
     Callback class to handle attribute subscription reports. This class manages the reception. filtering and queuing of attribute update reports.
