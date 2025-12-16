@@ -419,9 +419,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if ble_wifi else 'eth-app',
-                unshared=context.obj.in_unshare,
-                wait_for_dad=False))
-            ns.wait_for_duplicate_address_detection()
+                unshared=context.obj.in_unshare))
 
             if ble_wifi:
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())

@@ -156,18 +156,17 @@ class IsolatedNetworkNamespace:
                 self._setup_app_link_up(wait_for_dad=False)
             if setup_tool_link_up:
                 self._setup_tool_link_up(wait_for_dad=False)
+            if wait_for_dad:
+                self._wait_for_duplicate_address_detection()
         except BaseException:
             # Ensure that we leave a clean state on any exception.
             self.terminate()
             raise
 
-        if wait_for_dad:
-            self.wait_for_duplicate_address_detection()
-
     def netns_for_subprocess_kind(self, kind: SubprocessKind):
         return "{}-{}".format(kind.name.lower(), self.index)
 
-    def wait_for_duplicate_address_detection(self):
+    def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
@@ -188,13 +187,13 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_APP_LINK_UP:
             self._run(command)
         if wait_for_dad:
-            self.wait_for_duplicate_address_detection()
+            self._wait_for_duplicate_address_detection()
 
     def _setup_tool_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_TOOL_LINK_UP:
             self._run(command)
         if wait_for_dad:
-            self.wait_for_duplicate_address_detection()
+            self._wait_for_duplicate_address_detection()
 
     def _run(self, *command: str):
         for c in command:
