@@ -35,9 +35,9 @@ static constexpr uint16_t kSpecMaxHostname = 253;
 
 class TlsClientManagementDelegate;
 
-class TlsClientManagementServer : private AttributeAccessInterface,
-                                  private CommandHandlerInterface,
-                                  private chip::FabricTable::Delegate
+class TlsClientManagementCluster : private AttributeAccessInterface,
+                                   private CommandHandlerInterface,
+                                   private chip::FabricTable::Delegate
 {
 public:
     /**
@@ -49,9 +49,9 @@ public:
      * @param maxProvisioned The maximum number of endpoints which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
-                              Tls::CertificateTable & certificateTable, uint8_t maxProvisioned);
-    ~TlsClientManagementServer();
+    TlsClientManagementCluster(EndpointId endpointId, TlsClientManagementDelegate & delegate,
+                               Tls::CertificateTable & certificateTable, uint8_t maxProvisioned);
+    ~TlsClientManagementCluster();
 
     /**
      * Initialise the TLS Client Management server instance.
@@ -184,16 +184,16 @@ public:
                                                     int8_t delta) = 0;
 
 protected:
-    friend class TlsClientManagementServer;
+    friend class TlsClientManagementCluster;
 
-    TlsClientManagementServer * mTlsClientManagementServer = nullptr;
+    TlsClientManagementCluster * mTlsClientManagementCluster = nullptr;
 
-    // sets the TlsClientManagement Server pointer
-    void SetTlsClientManagementServer(TlsClientManagementServer * tlsClientManagementServer)
+    // sets the TlsClientManagement Cluster pointer
+    void SetTlsClientManagementCluster(TlsClientManagementCluster * tlsClientManagementServer)
     {
-        mTlsClientManagementServer = tlsClientManagementServer;
+        mTlsClientManagementCluster = tlsClientManagementServer;
     }
-    TlsClientManagementServer * GetTlsClientManagementServer() const { return mTlsClientManagementServer; }
+    TlsClientManagementCluster * GetTlsClientManagementCluster() const { return mTlsClientManagementCluster; }
 };
 
 } // namespace Clusters
