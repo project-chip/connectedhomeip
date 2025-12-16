@@ -111,7 +111,7 @@ class TC_IDM_9_1(BasicCompositionTests):
 
         # Find XML file dynamically from script location
         script_dir = Path(__file__).parent
-        repo_root = script_dir.parent.parent 
+        repo_root = script_dir.parent.parent
         xml_dir = repo_root / 'data_model' / spec_version / 'clusters'
 
         for possible_name in possible_names:
