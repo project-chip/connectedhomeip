@@ -19,7 +19,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-
+#include <lib/support/logging/CHIPLogging.h>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -83,11 +83,11 @@ public:
 
         if ((err = mOpCertStore.RemoveOpCertsForFabric(fabricIndex)) != CHIP_NO_ERROR)
         {
-            ChipLogError(Test, "TearDownFabric: RemoveOpCertsForFabric failed: %s", err.Format());
+            ChipLogError(Test, "TearDownFabric: RemoveOpCertsForFabric failed: %" CHIP_ERROR_FORMAT, err.Format());
         }
         if ((err = mfabricTable.Delete(fabricIndex)) != CHIP_NO_ERROR)
         {
-            ChipLogError(Test, "TearDownFabric: Delete fabric failed: %s", err.Format());
+            ChipLogError(Test, "TearDownFabric: Delete fabric failed: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
         mfabricTable.Shutdown();
