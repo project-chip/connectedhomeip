@@ -72,9 +72,9 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
     const auto & protos = gOtaProvider.GetProtocolsSupported();
 
     Json::Value arr(Json::arrayValue);
-    for (OtaSoftwareUpdateProvider::DownloadProtocolEnum p : protos)
+    for (size_t i = 0; i < gOtaProvider.kProtocolsSupportedCount; ++i)
     {
-        arr.append(Json::UInt(p));
+        arr.append(Json::UInt(protos[i]));
     }
     payload["ProtocolsSupported"] = arr;
 
