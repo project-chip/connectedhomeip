@@ -46,15 +46,14 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                            default_matter_test_main)
 
+log = logging.getLogger(__name__)
+
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.latch == latch:
-            return True
-        else:
-            return False
+        return report.value.latch == latch
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -62,10 +61,7 @@ def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.position == position:
-            return True
-        else:
-            return False
+        return report.value.position == position
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
@@ -78,7 +74,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         return "[TC-CLDIM-3.3] SetTarget Command Field Sanity Check with DUT as Server"
 
     def steps_TC_CLDIM_3_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
@@ -121,13 +117,11 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep(10, "Send SetTarget command with invalid Speed when Speed is unsupported"),
             TestStep(11, "Send SetTarget command with invalid Speed"),
         ]
-        return steps
 
     def pics_TC_CLDIM_3_3(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -180,7 +174,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         # STEP 2f: If Latching feature is not supported or state is unlatched, skip steps 2g to 2l
         self.step("2f")
         if (not is_latching_supported) or (not current_state.latch):
-            logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
+            log.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
             self.mark_step_range_skipped("2g", "2l")
         else:
             # STEP 2g: Read LatchControlModes attribute
@@ -191,7 +185,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             self.step("2h")
             sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes is manual unlatching. Skipping step 2i.")
+                log.info("LatchControlModes is manual unlatching. Skipping step 2i.")
                 self.skip_step("2i")
             else:
                 # STEP 2i: Send SetTarget command with Latch=False
@@ -207,7 +201,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             # STEP 2j: If LatchControlModes is remote unlatching, skip step 2k
             self.step("2j")
             if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes is remote unlatching. Skipping step 2k.")
+                log.info("LatchControlModes is remote unlatching. Skipping step 2k.")
                 self.skip_step("2k")
             else:
                 # STEP 2k: Manually unlatch the device
@@ -235,7 +229,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         # STEP 4a: If Positioning feature is supported, skip step 4b to 4e
         self.step("4a")
         if is_positioning_supported:
-            logging.info("Positioning feature is supported. Skipping steps 4b to 4e.")
+            log.info("Positioning feature is supported. Skipping steps 4b to 4e.")
             self.mark_step_range_skipped("4b", "4e")
         else:
             # STEP 4b: Send SetTarget command with Position MaxPosition
@@ -260,7 +254,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             else:
-                logging.info("MinPosition not > 0. Skipping step 4c.")
+                log.info("MinPosition not > 0. Skipping step 4c.")
                 self.mark_current_step_skipped()
 
             # STEP 4d: Send SetTarget command with Position above MaxPosition
@@ -274,7 +268,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             else:
-                logging.info("MaxPosition not < 10000. Skipping step 4d.")
+                log.info("MaxPosition not < 10000. Skipping step 4d.")
                 self.mark_current_step_skipped()
 
             # STEP 4e: Send SetTarget command with Position exceeding 100%
@@ -290,7 +284,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         # STEP 5a: If LimitRange is unsupported, skip step 5b to 5g
         self.step("5a")
         if (not is_positioning_supported) or (not is_limitation_supported):
-            logging.info("Positioning feature or Limitation feature is not supported. Skipping steps 5b to 5g.")
+            log.info("Positioning feature or Limitation feature is not supported. Skipping steps 5b to 5g.")
             self.mark_step_range_skipped("5b", "5g")
         else:
             # STEP 5b: Send SetTarget command with Position 0%
@@ -315,7 +309,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
             else:
-                logging.info("Initial Position not > 0. Skipping step 5d.")
+                log.info("Initial Position not > 0. Skipping step 5d.")
                 self.mark_current_step_skipped()
 
             # STEP 5e: Send SetTarget command with Position 100%
@@ -340,7 +334,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
             else:
-                logging.info("MaxPosition not < 10000. Skipping step 5g.")
+                log.info("MaxPosition not < 10000. Skipping step 5g.")
                 self.mark_current_step_skipped()
 
         # STEP 6: Send SetTarget command with invalid Position
@@ -356,13 +350,13 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
-            logging.info("Positioning feature is not supported. Skipping step 6.")
+            log.info("Positioning feature is not supported. Skipping step 6.")
             self.mark_current_step_skipped()
 
         # STEP 7a: If Resolution is unsupported, skip step 7b to 7j
         self.step("7a")
         if (not is_positioning_supported):
-            logging.info("Positioning feature is not supported. Skipping steps 7b to 7j.")
+            log.info("Positioning feature is not supported. Skipping steps 7b to 7j.")
             self.mark_step_range_skipped("7b", "7j")
         else:
             # STEP 7b: Read CurrentState attribute
@@ -456,7 +450,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
-            logging.info("Latching feature is supported. Skipping step 8.")
+            log.info("Latching feature is supported. Skipping step 8.")
             self.mark_current_step_skipped()
 
         # STEP 9: Send SetTarget command with Speed field when Speed is unsupported
@@ -471,7 +465,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
-            logging.info("Speed feature is supported. Skipping step 9.")
+            log.info("Speed feature is supported. Skipping step 9.")
             self.mark_current_step_skipped()
 
         # STEP 10: Send SetTarget command with invalid Speed when Speed is unsupported
@@ -485,7 +479,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
         else:
-            logging.info("Speed feature is supported. Skipping step 10.")
+            log.info("Speed feature is supported. Skipping step 10.")
             self.mark_current_step_skipped()
 
         # STEP 11: Send SetTarget command with invalid Speed
@@ -502,7 +496,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
         else:
-            logging.info("Speed feature is not supported. Skipping step 11.")
+            log.info("Speed feature is not supported. Skipping step 11.")
             self.mark_current_step_skipped()
 
 

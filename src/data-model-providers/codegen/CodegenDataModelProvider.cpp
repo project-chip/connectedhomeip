@@ -45,7 +45,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
 #include <optional>
@@ -188,7 +187,8 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         }
     }
 
-    // Ember always sets the return in the handler
+    // Ember always returns responses via the handler, so std::nullopt must be returned here to follow the InvokeCommand API
+    // contract
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
 }
@@ -453,11 +453,10 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     if (interface != nullptr)
     {
         CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
         // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
-
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;

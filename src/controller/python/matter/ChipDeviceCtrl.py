@@ -340,7 +340,7 @@ class CommissionableNode(discovery.CommissionableNode):
     def __rich_repr__(self):
         yield "(To Be Commissioned By)", self._devCtrl.name
 
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 
@@ -874,6 +874,35 @@ class ChipDeviceControllerBase():
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DeleteAllSessionResumption(
                 self.devCtrl)).raise_on_error()
+
+    def SetLocalMRPConfig(self, idle_ms: int, active_ms: int, active_threshold_ms: int):
+        '''
+        Set the local MRP config. This will be advertised to peers and used by them for message retransmissions.
+
+        Args:
+            idle_ms (int): The idle retransmission interval in milliseconds.
+            active_ms (int): The active retransmission interval in milliseconds.
+            active_threshold_ms (int): The active threshold time in milliseconds.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetLocalMRPConfig(idle_ms, active_ms, active_threshold_ms)
+        ).raise_on_error()
+
+    def ResetLocalMRPConfig(self):
+        '''
+        Resets the local MRP config to the default values.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_ResetLocalMRPConfig()
+        ).raise_on_error()
 
     async def _establishPASESession(self, callFunct):
         self.CheckIsActive()
@@ -1492,9 +1521,15 @@ class ChipDeviceControllerBase():
 
         closure = DeviceAvailableClosure(eventLoop, future)
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
-        await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeId, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
-            timeoutMs)
+        try:
+            await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+                self.devCtrl, nodeId, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
+                timeoutMs)
+        except:
+            # Ensure we clean up the future if CallAsync fails (e.g. timeout).
+            # This signals the callback (which might fire later) that we are no longer interested.
+            future.cancel()
+            raise
 
         # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
         # In that case the Future has already been set it will return immediately
@@ -1519,9 +1554,8 @@ class ChipDeviceControllerBase():
             int: The computed timeout value in milliseconds, representing the round-trip time.
         '''
         device = self.GetConnectedDeviceSync(nodeId)
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
+        return self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
             device.deviceProxy, upperLayerProcessingTimeoutMs))
-        return res
 
     def GetRemoteSessionParameters(self, nodeId: int) -> typing.Optional[SessionParameters]:
         '''
@@ -1774,7 +1808,7 @@ class ChipDeviceControllerBase():
             groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
 
         # None is the expected return for sending group commands.
-        return None
+        return
 
     async def WriteAttribute(self, nodeId: int,
                              attributes: typing.List[typing.Union[
@@ -1968,29 +2002,26 @@ class ChipDeviceControllerBase():
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
             return ClusterAttribute.AttributePath()
-        elif not isinstance(pathTuple, tuple):
+        if not isinstance(pathTuple, tuple):
             if isinstance(pathTuple, int):
                 return ClusterAttribute.AttributePath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[misc, arg-type]
+            if issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[misc, arg-type]
                 return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
-            elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):  # type: ignore[arg-type]
+            if issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):  # type: ignore[arg-type]
                 return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)  # type: ignore[arg-type]
-            else:
-                raise ValueError("Unsupported Attribute Path")
-        else:
-            # endpoint + (cluster) attribute / endpoint + cluster
-            if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[misc]
-                return ClusterAttribute.AttributePath.from_cluster(
-                    EndpointId=pathTuple[0],  # type: ignore[arg-type]
-                    Cluster=pathTuple[1]  # type: ignore[arg-type, misc]
-                )
-            elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):  # type: ignore[arg-type, misc]
-                return ClusterAttribute.AttributePath.from_attribute(
-                    EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                    Attribute=pathTuple[1]  # type: ignore[arg-type, misc]
-                )
-            else:
-                raise ValueError("Unsupported Attribute Path")
+            raise ValueError("Unsupported Attribute Path")
+        # endpoint + (cluster) attribute / endpoint + cluster
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[misc]
+            return ClusterAttribute.AttributePath.from_cluster(
+                EndpointId=pathTuple[0],  # type: ignore[arg-type]
+                Cluster=pathTuple[1]  # type: ignore[arg-type, misc]
+            )
+        if issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):  # type: ignore[arg-type, misc]
+            return ClusterAttribute.AttributePath.from_attribute(
+                EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                Attribute=pathTuple[1]  # type: ignore[arg-type, misc]
+            )
+        raise ValueError("Unsupported Attribute Path")
 
     def _parseDataVersionFilterTuple(self, pathTuple: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]):
         endpoint = None
@@ -2027,40 +2058,36 @@ class ChipDeviceControllerBase():
         if pathTuple in [('*'), ()]:
             # Wildcard
             return ClusterAttribute.EventPath()
-        elif not isinstance(pathTuple, tuple):
+        if not isinstance(pathTuple, tuple):
             # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
             # instantiate class types before passing to from_cluster/from_event
             # because these expect instances, not classes.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
+            if isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
                 return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
-            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
+            if isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
                 return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
-            else:
-                raise ValueError("Unsupported Event Path")
-        else:
-            if pathTuple[0] == '*':
-                return ClusterAttribute.EventPath(Urgent=pathTuple[-1])
-            else:
-                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
-                # endpoint + (cluster) event / endpoint + cluster
-                # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-                # Fixing these typing errors is a high risk to affect existing functionality.
-                # These mismatches are intentional and safe within the current logic.
-                if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
-                    return ClusterAttribute.EventPath.from_cluster(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
-                    )
-                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
-                    return ClusterAttribute.EventPath.from_event(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Event=pathTuple[1],  # type: ignore[arg-type]
-                        Urgent=urgent
-                    )
-                else:
-                    raise ValueError("Unsupported Attribute Path")
+            raise ValueError("Unsupported Event Path")
+        if pathTuple[0] == '*':
+            return ClusterAttribute.EventPath(Urgent=pathTuple[-1])
+        urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
+        # endpoint + (cluster) event / endpoint + cluster
+        # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+        # Fixing these typing errors is a high risk to affect existing functionality.
+        # These mismatches are intentional and safe within the current logic.
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+            return ClusterAttribute.EventPath.from_cluster(
+                EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
+            )
+        if issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
+            return ClusterAttribute.EventPath.from_event(
+                EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                Event=pathTuple[1],  # type: ignore[arg-type]
+                Urgent=urgent
+            )
+        raise ValueError("Unsupported Attribute Path")
 
     async def Read(
         self,
@@ -2275,8 +2302,7 @@ class ChipDeviceControllerBase():
                               payloadCapability=payloadCapability)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
-        else:
-            return res.attributes
+        return res.attributes
 
     async def ReadEvent(
         self,
@@ -2349,8 +2375,7 @@ class ChipDeviceControllerBase():
                               autoResubscribe=autoResubscribe, payloadCapability=payloadCapability)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
-        else:
-            return res.events
+        return res.events
 
     def SetIpk(self, ipk: bytes):
         '''
@@ -2512,6 +2537,19 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.restype = PyChipError
+
+            try:
+                self._dmLib.pychip_DeviceController_SetLocalMRPConfig.restype = PyChipError
+                self._dmLib.pychip_DeviceController_SetLocalMRPConfig.argtypes = [c_uint32, c_uint32, c_uint16]
+
+                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig.restype = PyChipError
+                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig.argtypes = []
+            except AttributeError:
+                # This can happen if the SDK is not built with CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+                def _unsupported_dynamic_mrp(*args, **kwargs):
+                    raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build.")
+                self._dmLib.pychip_DeviceController_SetLocalMRPConfig = _unsupported_dynamic_mrp
+                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig = _unsupported_dynamic_mrp
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]

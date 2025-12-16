@@ -41,6 +41,8 @@ from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_ACL_2_6(MatterBaseTest):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
@@ -73,8 +75,7 @@ class TC_ACL_2_6(MatterBaseTest):
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"
@@ -112,7 +113,7 @@ class TC_ACL_2_6(MatterBaseTest):
         # we are expecting as it adds the admin entry for our controller for
         # access control.
         events_response = [events_response[0]]
-        logging.info(f"Events response: {events_response}")
+        log.info(f"Events response: {events_response}")
 
         # If we found events via read, verify them
         expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
@@ -174,7 +175,7 @@ class TC_ACL_2_6(MatterBaseTest):
         expected_event_count = 3 if force_legacy_encoding else 2
         for _ in range(expected_event_count):
             event_data = self.events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-            logging.info(f"Received subscription event: {event_data}")
+            log.info(f"Received subscription event: {event_data}")
             received_subscription_events.append(event_data)
 
         # Read events
@@ -184,7 +185,7 @@ class TC_ACL_2_6(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_number + 1
         )
-        logging.info(f"Read events response: {events_response}")
+        log.info(f"Read events response: {events_response}")
 
         asserts.assert_true(events_response, "Did not receive a response when calling ReadEvents")
         read_events = sorted([e.Data for e in events_response],
@@ -214,9 +215,9 @@ class TC_ACL_2_6(MatterBaseTest):
             sub_only = subscription_event_set - read_event_set
             read_only = read_event_set - subscription_event_set
             if sub_only:
-                logging.error(f"Events only in subscription: {sub_only}")
+                log.error(f"Events only in subscription: {sub_only}")
             if read_only:
-                logging.error(f"Events only in read: {read_only}")
+                log.error(f"Events only in read: {read_only}")
         asserts.assert_equal(subscription_event_set, read_event_set, "Subscription and read events should match")
 
         self.step(6)
@@ -261,7 +262,7 @@ class TC_ACL_2_6(MatterBaseTest):
                     event.Data.latestValue.subjects == invalid_entry.subjects):
                 asserts.fail(f"Found event for invalid entry in read response: {event.Data}")
 
-        logging.info("No events found for invalid entry, as expected")
+        log.info("No events found for invalid entry, as expected")
 
         # Re-running test using the legacy list writing mechanism
         if force_legacy_encoding:
@@ -269,7 +270,7 @@ class TC_ACL_2_6(MatterBaseTest):
 
         else:
             self.step(8)
-            logging.info("Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism")
+            log.info("Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism")
 
             # Before rerunning with legacy encoding, reset ACL to only admin/case
             single_admin_acl = [
@@ -289,7 +290,7 @@ class TC_ACL_2_6(MatterBaseTest):
             )
 
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
@@ -324,7 +325,6 @@ class TC_ACL_2_6(MatterBaseTest):
                 "Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                 "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_6(self):
@@ -333,7 +333,7 @@ class TC_ACL_2_6(MatterBaseTest):
 
         # Reset step counter and re-run the test using the legacy list encoding mechanism
         self.current_step_index = 0
-        logging.info("Starting second test run using legacy list encoding mechanism")
+        log.info("Starting second test run using legacy list encoding mechanism")
         await self.internal_test_TC_ACL_2_6(force_legacy_encoding=True)
 
 

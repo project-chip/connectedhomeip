@@ -148,7 +148,8 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 
     log.info("Uploading report to '%s', PR #%d", gh_repo, gh_pr_number)
 
-    rawText = open(filename, 'rt').read()
+    with open(filename) as f:
+        rawText = f.read()
 
     # a consistent title to help identify obsolete comments
     titleHeading = 'Size increase report for "{jobName}"'.format(

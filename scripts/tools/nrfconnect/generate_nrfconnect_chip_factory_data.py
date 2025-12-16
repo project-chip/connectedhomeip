@@ -89,9 +89,7 @@ def get_raw_private_key_der(der_file: str, password: str):
             if password is None:
                 log.warning("KEY password has not been provided. It means that DAC key is not encrypted.")
             keys = load_der_private_key(key_data, password, backend=default_backend())
-            private_key = keys.private_numbers().private_value.to_bytes(32, byteorder='big')
-
-            return private_key
+            return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
 
     except IOError or ValueError:
         return None
@@ -315,7 +313,7 @@ class FactoryDataGenerator:
             sys.exit(-1)
 
         try:
-            json_file = open(self._args.output+".json", "w+")
+            json_file = open(self._args.output+".json", "w+")  # noqa: SIM115
         except FileNotFoundError:
             print("Cannot create JSON file in this location: {}".format(self._args.output+".json"))
             sys.exit(-1)
@@ -373,7 +371,7 @@ class FactoryDataGenerator:
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
-        if (isinstance(value, bytes) or isinstance(value, bytearray)):
+        if (isinstance(value, (bytes, bytearray))):
             value = HEX_PREFIX + value.hex()
         if value or (isinstance(value, int) and value == 0):
             log.debug("Adding entry '%s' with size %d and type '%s'", name, sys.getsizeof(value), type(value))
@@ -414,8 +412,7 @@ class FactoryDataGenerator:
         log.debug("Processing der file...")
         try:
             with open(path, 'rb') as f:
-                data = f.read()
-                return data
+                return f.read()
         except IOError as e:
             log.exception(e)
             raise e
