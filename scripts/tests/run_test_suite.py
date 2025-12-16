@@ -20,7 +20,7 @@ import os
 import sys
 import time
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import chiptest
 import click
@@ -28,7 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessInfo
-from chiptest.test_definition import TestRunTime, TestTag
+from chiptest.test_definition import TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -63,12 +63,6 @@ class RunContext:
     dry_run: bool
     runtime: TestRunTime
     find_path: typing.List[str]
-
-    # If not empty, include only the specified test tags
-    include_tags: set(TestTag) = field(default_factory={})
-
-    # If not empty, exclude tests tagged with these tags
-    exclude_tags: set(TestTag) = field(default_factory={})
 
 
 @click.group(chain=True)
@@ -227,14 +221,24 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
-    tests.sort(key=lambda x: x.name)
+    tests_filtered: list[TestDefinition] = []
+    for test in tests:
+        if include_tags and not (test.tags & include_tags):
+            log.debug("Test '%s' not included", test.name)
+            continue
 
-    context.obj = RunContext(root=root, tests=tests,
+        if exclude_tags and test.tags & exclude_tags:
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
+    tests_filtered.sort(key=lambda x: x.name)
+
+    context.obj = RunContext(root=root, tests=tests_filtered,
                              chip_tool=chip_tool, dry_run=dry_run,
                              runtime=runtime,
-                             find_path=find_path,
-                             include_tags=include_tags,
-                             exclude_tags=exclude_tags)
+                             find_path=find_path)
 
 
 @main.command(
@@ -445,16 +449,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
-            if context.obj.include_tags:
-                if not (test.tags & context.obj.include_tags):
-                    log.debug("Test '%s' not included", test.name)
-                    continue
-
-            if context.obj.exclude_tags:
-                if test.tags & context.obj.exclude_tags:
-                    log.debug("Test '%s' excluded", test.name)
-                    continue
-
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
