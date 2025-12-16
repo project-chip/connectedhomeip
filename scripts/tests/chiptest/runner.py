@@ -124,10 +124,10 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class SubprocessKind(enum.Enum):
-    APP = enum.auto()
-    TOOL = enum.auto()
-    RPC = enum.auto()
+class SubprocessKind(enum.StrEnum):
+    APP = 'app'
+    TOOL = 'tool'
+    RPC = 'rpc'
 
 
 @dataclass
