@@ -148,7 +148,7 @@ class SubprocessInfo:
 
 
 class Executor:
-    CLEANUP_TIMEOUT = 1
+    CLEANUP_TIMEOUT_S = 1
 
     def __init__(self) -> None:
         self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
@@ -174,14 +174,14 @@ class Executor:
             log.debug('Terminating leftover process "%s"', cmd)
             process.terminate()
             with suppress(subprocess.TimeoutExpired):
-                process.wait(self.CLEANUP_TIMEOUT)
+                process.wait(self.CLEANUP_TIMEOUT_S)
                 continue
 
             # SIGKILL
             log.warning('Failed to terminate the process "%s". Killing instead', cmd)
             process.kill()
             with suppress(subprocess.TimeoutExpired):
-                process.wait(self.CLEANUP_TIMEOUT)
+                process.wait(self.CLEANUP_TIMEOUT_S)
                 continue
 
             log.error('Failed to kill process "%s". It may become a zombie', cmd)
