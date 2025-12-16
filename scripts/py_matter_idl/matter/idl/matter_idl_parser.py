@@ -367,7 +367,6 @@ class MatterIdlTransformer(Transformer):
         meta = None if self.skip_meta else ParseMetaData(meta)
         return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **args[2])
 
-
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
 
@@ -452,7 +451,7 @@ class MatterIdlTransformer(Transformer):
 
         return Attribute(definition=definition, qualities=qualities, **acl)
 
-    @v_args(meta=True,inline=True)
+    @v_args(meta=True, inline=True)
     def struct(self, meta, shared, qualities, id, *fields):
         if shared is None:
             shared = False

@@ -180,15 +180,24 @@ class TestParser(unittest.TestCase):
         self.assertIdlEqual(
             actual.clusters[1].commands[1].description, "Some command doc comment")
 
-        self.assertIdlEqual(actual.clusters[1].attributes[0].definition.description, "Attribute comment")
-        self.assertIdlEqual(actual.clusters[1].enums[0].description, "Multi line\n                Enum comment")
-        self.assertIdlEqual(actual.clusters[1].enums[0].entries[0].description, "Enum field comment")
-        self.assertIdlEqual(actual.clusters[1].structs[0].description, "Multi line\n                Struct comment")
-        self.assertIdlEqual(actual.clusters[1].structs[0].fields[0].description, "Struct field comment")
-        self.assertIdlEqual(actual.clusters[1].bitmaps[0].description, "Multi line\n                Bitmap comment")
-        self.assertIdlEqual(actual.clusters[1].bitmaps[0].entries[0].description, "Multi line\n                    Bitmap field comment")
-        self.assertIdlEqual(actual.clusters[1].events[0].description, "Multi line\n                Event comment")
-        self.assertIdlEqual(actual.clusters[1].events[0].fields[0].description, "Event field comment")
+        self.assertIdlEqual(
+            actual.clusters[1].attributes[0].definition.description, "Attribute comment")
+        self.assertIdlEqual(
+            actual.clusters[1].enums[0].description, "Multi line\n                Enum comment")
+        self.assertIdlEqual(
+            actual.clusters[1].enums[0].entries[0].description, "Enum field comment")
+        self.assertIdlEqual(
+            actual.clusters[1].structs[0].description, "Multi line\n                Struct comment")
+        self.assertIdlEqual(
+            actual.clusters[1].structs[0].fields[0].description, "Struct field comment")
+        self.assertIdlEqual(
+            actual.clusters[1].bitmaps[0].description, "Multi line\n                Bitmap comment")
+        self.assertIdlEqual(actual.clusters[1].bitmaps[0].entries[0].description,
+                            "Multi line\n                    Bitmap field comment")
+        self.assertIdlEqual(
+            actual.clusters[1].events[0].description, "Multi line\n                Event comment")
+        self.assertIdlEqual(
+            actual.clusters[1].events[0].fields[0].description, "Event field comment")
 
     def test_sized_attribute(self):
         actual = parseText("""
