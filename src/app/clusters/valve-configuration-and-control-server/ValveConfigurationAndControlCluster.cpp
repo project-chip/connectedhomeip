@@ -59,19 +59,15 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement);
 
     // Try to get the stored value for the DefaultOpenDuration attribute.
-    MutableByteSpan defaultOpenDurationBytes(reinterpret_cast<uint8_t *>(&mDefaultOpenDuration), sizeof(mDefaultOpenDuration));
+    AttributePersistence attrPersistence{ context.attributeStorage };
     const DataModel::Nullable<uint32_t> defaultOpenDuration = mDefaultOpenDuration;
-    if (context.attributeStorage.ReadValue({ mPath.mEndpointId, ValveConfigurationAndControl::Id,
-                                             ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id },
-                                           defaultOpenDurationBytes) != CHIP_NO_ERROR)
-    {
-        mDefaultOpenDuration = defaultOpenDuration;
-    }
+    attrPersistence.LoadNativeEndianValue(
+        { mPath.mEndpointId, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id },
+        mDefaultOpenDuration, defaultOpenDuration);
 
     // If Level feature is enabled, try to get the DefaultOpenLevel value.
     if (mFeatures.Has(Feature::kLevel))
     {
-        AttributePersistence attrPersistence{ context.attributeStorage };
         Percent defaultOpenLevel = mDefaultOpenLevel;
         attrPersistence.LoadNativeEndianValue(
             { mPath.mEndpointId, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id },
@@ -150,13 +146,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id)
     {
-        DataModel::Nullable<uint32_t> defaultOpenDuration;
-        ReturnErrorOnFailure(decoder.Decode(defaultOpenDuration));
-        VerifyOrReturnValue(defaultOpenDuration != mDefaultOpenDuration,
-                            DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-        mDefaultOpenDuration = defaultOpenDuration;
-        return mContext->attributeStorage.WriteValue(
-            request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenDuration), sizeof(mDefaultOpenDuration) });
+        AttributePersistence persistence{ mContext->attributeStorage };
+        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mDefaultOpenDuration);
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
