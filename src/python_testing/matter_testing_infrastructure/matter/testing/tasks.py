@@ -117,7 +117,7 @@ class Subprocess(threading.Thread):
             if not self.event_started.is_set():
                 self.event_started.set()
 
-            LOGGER.exception("Failed to execute suprocess `%s`", self.program, exc_info=sys.exc_info())
+            LOGGER.exception("Failed to execute subprocess `%s`", self.program, exc_info=sys.exc_info())
         finally:
             # Wait for the process to finish.
             if self.p is not None:
