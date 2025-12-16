@@ -22,6 +22,7 @@ import asyncio
 import logging
 import os
 import pathlib
+import shlex
 import subprocess
 import sys
 import threading
@@ -191,7 +192,7 @@ class IsolatedNetworkNamespace:
         for c in command:
             c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
             log.debug("Executing: '%s'", c)
-            if subprocess.run(c, shell=True).returncode != 0:
+            if subprocess.run(shlex.split(c)).returncode != 0:
                 raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
