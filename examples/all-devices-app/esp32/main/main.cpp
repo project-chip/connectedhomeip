@@ -183,7 +183,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     gDataModelProvider = &dataModelProvider;
 
     gRootNodeDevice = chip::Platform::New<WifiRootNodeDevice>(&sWiFiDriver);
-    err  = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+    err             = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
