@@ -262,7 +262,7 @@ public:
     {
         if (range == Range::kPlatformExtended)
             return mError & (1u << kPlatformBit);
-        return range == static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
+        return range == static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
     }
 
     /**
@@ -272,7 +272,7 @@ public:
     {
         if (mError & (1u << kPlatformBit))
             return Range::kPlatformExtended;
-        return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
+        return static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
     }
 
     /**
@@ -282,7 +282,7 @@ public:
     {
         if (mError & (1u << kPlatformBit))
             return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError);
-        return GetField<ValueType>(kValueStart, kValueLength, mError);
+        return GetField<ValueType>(kValueStartBit, kValueLength, mError);
     }
 
     /**
@@ -308,15 +308,15 @@ public:
      */
     constexpr bool IsPart(SdkPart part) const
     {
-        return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
-            (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
-             MakeField(kSdkPartStart, static_cast<StorageType>(part)));
+        return (mError & (MakeMask(kRangeStartBit, kRangeLength) | MakeMask(kSdkPartStartBit, kSdkPartLength))) ==
+            (MakeField(kRangeStartBit, static_cast<StorageType>(Range::kSDK)) |
+             MakeField(kSdkPartStartBit, static_cast<StorageType>(part)));
     }
 
     /**
      * Get the SDK code for an SDK error.
      */
-    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError)); }
+    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStartBit, kSdkCodeLength, mError)); }
 
     /**
      * Test whether @a error is an SDK error representing an Interaction Model
@@ -387,19 +387,19 @@ private:
      *  |    01 - 7F    |          encapsulated error code              |   Encapsulated error
      *  |1|                   encapsulated platform error code          |   Encapsulated platform error
      */
-    static constexpr int kRangeStart  = 24;
-    static constexpr int kRangeLength = 8;
-    static constexpr int kValueStart  = 0;
-    static constexpr int kValueLength = 24;
+    static constexpr int kRangeStartBit = 24;
+    static constexpr int kRangeLength   = 8;
+    static constexpr int kValueStartBit = 0;
+    static constexpr int kValueLength   = 24;
 
     static constexpr int kPlatformBit         = 31;
     static constexpr int kPlatformValueStart  = 0;
     static constexpr int kPlatformValueLength = 31;
 
-    static constexpr int kSdkPartStart  = 8;
-    static constexpr int kSdkPartLength = 3;
-    static constexpr int kSdkCodeStart  = 0;
-    static constexpr int kSdkCodeLength = 8;
+    static constexpr int kSdkPartStartBit = 8;
+    static constexpr int kSdkPartLength   = 3;
+    static constexpr int kSdkCodeStartBit = 0;
+    static constexpr int kSdkCodeLength   = 8;
 
     template <typename T = StorageType>
     static constexpr T GetField(unsigned int start, unsigned int length, StorageType value)
@@ -416,11 +416,11 @@ private:
 
     static constexpr StorageType MakeInteger(Range range, StorageType value)
     {
-        return MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, value);
+        return MakeField(kRangeStartBit, to_underlying(range)) | MakeField(kValueStartBit, value);
     }
     static constexpr StorageType MakeInteger(SdkPart part, uint8_t code)
     {
-        return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
+        return MakeInteger(Range::kSDK, MakeField(kSdkPartStartBit, to_underlying(part)) | MakeField(kSdkCodeStartBit, code));
     }
 
     static constexpr StorageType MaskValue(Range range, ValueType value)
@@ -429,7 +429,7 @@ private:
         // range is special, because we are using only the highest bit to determine whether
         // the range is kPlatformExtended and the rest is used to store the value itself.
         // No masking is needed for kPlatformExtended because MakeInteger will set the MSB.
-        return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStart, kValueLength))
+        return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStartBit, kValueLength))
                                                    : static_cast<StorageType>(value);
     }
 
@@ -440,19 +440,20 @@ private:
     };
 
     // Assert that Range and Value fields fit in StorageType and don't overlap.
-    static_assert(kRangeStart + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
-    static_assert(kValueStart + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
-    static_assert((MaskConstant<kRangeStart, kRangeLength>::value & MaskConstant<kValueStart, kValueLength>::value) == 0,
+    static_assert(kRangeStartBit + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
+    static_assert(kValueStartBit + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
+    static_assert((MaskConstant<kRangeStartBit, kRangeLength>::value & MaskConstant<kValueStartBit, kValueLength>::value) == 0,
                   "Range and Value overlap");
 
     // Assert that SDK Part and Code fields fit in SdkCode field and don't overlap.
-    static_assert(kSdkPartStart + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
-    static_assert(kSdkCodeStart + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
-    static_assert((MaskConstant<kSdkPartStart, kSdkPartLength>::value & MaskConstant<kSdkCodeStart, kSdkCodeLength>::value) == 0,
+    static_assert(kSdkPartStartBit + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
+    static_assert(kSdkCodeStartBit + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
+    static_assert((MaskConstant<kSdkPartStartBit, kSdkPartLength>::value & MaskConstant<kSdkCodeStartBit, kSdkCodeLength>::value) ==
+                      0,
                   "SdkPart and SdkCode overlap");
 
     // Assert that value fits in ValueType.
-    static_assert(kValueStart + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
+    static_assert(kValueStartBit + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
     static_assert(kPlatformValueStart + kPlatformValueLength <= std::numeric_limits<ValueType>::digits,
                   "Platform value does not fit in ValueType");
 
