@@ -19,7 +19,6 @@ from multiprocessing.managers import SyncManager, ValueProxy
 from pathlib import Path
 from types import TracebackType
 from typing import Generic, Iterator, TypeVar, Literal
-import time
 from contextlib import suppress
 import queue
 
@@ -75,7 +74,8 @@ class WrappedProcess(ABC):
 
     def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, process_name_long: str,
                  process_name_short: str | None = None, log_config: LogConfig = LogConfig(),
-                 state_changed: threading.Condition | None = None, cancel_event: threading.Event | None = None) -> None:
+                 state_changed: threading.Condition | None = None, work_cancel_error: threading.Condition | None = None,
+                 cancel_event: threading.Event | None = None) -> None:
         # Neither mp_context or mp_manager should be saved in the instance, as they are not picklable between processes but they can
         # be used to initialize some shared resources.
 
@@ -83,6 +83,7 @@ class WrappedProcess(ABC):
         self.state_changed = mp_manager.Condition() if state_changed is None else state_changed
         self.state = mp_manager.Value(object, ProcessState.NOT_STARTED)
         self.state_exception: ValueProxy[BaseException | None] = mp_manager.Value(object, None)
+        self.work_cancel_error = mp_manager.Condition() if work_cancel_error is None else work_cancel_error
         self.cancel_event = mp_manager.Event() if cancel_event is None else cancel_event
 
         # Create multiprocessing.Process in a given context.
@@ -130,7 +131,9 @@ class WrappedProcess(ABC):
             match method:
                 case 0:
                     log.debug("Cancelling work in process %s", self.process_name_long)
-                    self.cancel_event.set()
+                    with self.work_cancel_error:
+                        self.cancel_event.set()
+                        self.work_cancel_error.notify_all()
                 case 1:
                     if self._process.pid is not None and os.name == "posix":
                         log.debug("%s process is not responding. Sending interrupt signal", self.process_name_long)
@@ -158,6 +161,7 @@ class WrappedProcess(ABC):
             # Logger needs to be initialized per-task.
             self.log_config.set_log_fmt()
 
+            # Initialize.
             log.debug("Initializing %s", self.process_name_long)
             self._proc_init()
             with self.state_changed:
@@ -165,15 +169,17 @@ class WrappedProcess(ABC):
                 self.state_changed.notify_all()
             log.debug("Initialized %s successfully", self.process_name_long)
 
-            self._proc_work(self.cancel_event)
+            # Perform work.
+            self._proc_work(self.work_cancel_error, self.cancel_event)
             log.debug("Received a cancel event for %s", self.process_name_long)
         except BaseException as e:
             if isinstance(e, KeyboardInterrupt):
                 log.debug("Caught an interrupt for %s", self.process_name_long)
-            with self.state_changed:
+            with self.state_changed, self.work_cancel_error:
                 self.state_exception.set(e)
                 self.state.set(ProcessState.ERROR)
                 self.state_changed.notify_all()
+                self.work_cancel_error.notify_all()
         finally:
             log.debug("Cleaning up %s", self.process_name_long)
             self._proc_cleanup()
@@ -182,7 +188,6 @@ class WrappedProcess(ABC):
                     self.state.set(ProcessState.CLOSED)
                     self.state_changed.notify_all()
             log.debug("Process %s finished cleanly", self.process_name_long)
-            time.sleep(1)
 
     @abstractmethod
     def _proc_init(self):
@@ -191,12 +196,13 @@ class WrappedProcess(ABC):
         If there are some structures which are created, they should be stored as instance fields and cleaned up in _proc_cleanup().
         """
 
-    def _proc_work(self, cancel_event: threading.Event):
+    def _proc_work(self, work_cancel_error: threading.Condition, cancel_event: threading.Event):
         """Perform the work.
 
         Needs to somehow wait for the provided cancel_event.
         """
-        cancel_event.wait()
+        with work_cancel_error:
+            work_cancel_error.wait_for(lambda: cancel_event.is_set())
 
     @abstractmethod
     def _proc_cleanup(self):
@@ -208,8 +214,9 @@ class WrappedProcessContext(WrappedProcess):
                  process_name_short: str | None = None, log_config: LogConfig = LogConfig(),
                  start_timeout: float | None = WrappedProcess.DEFAULT_START_TIMEOUT,
                  stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT, state_changed: threading.Condition | None = None,
-                 cancel_event: threading.Event | None = None) -> None:
-        super().__init__(mp_context, mp_manager, process_name_long, process_name_short, log_config, state_changed, cancel_event)
+                 work_cancel_error: threading.Condition | None = None, cancel_event: threading.Event | None = None) -> None:
+        super().__init__(mp_context, mp_manager, process_name_long, process_name_short, log_config, state_changed, work_cancel_error,
+                         cancel_event)
         self._start_timeout = start_timeout
         self._stop_timeout = stop_timeout
 
@@ -234,14 +241,16 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT]):
                  stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT) -> None:
         self.name = name
         self.state_changed = mp_manager.Condition()
+        self.work_cancel_error = mp_manager.Condition()
         self.cancel_event = mp_manager.Event()
-        self._pool = tuple(self._init_process(process_cls, id, mp_context, mp_manager, self.state_changed, self.cancel_event)
-                           for id in range(concurrency))
+        self._pool = tuple(self._init_process(process_cls, id, mp_context, mp_manager, self.state_changed, self.work_cancel_error,
+                                              self.cancel_event) for id in range(concurrency))
         self._active = False
         self._stop_timeout = stop_timeout
 
     @abstractmethod
-    def _init_process(self, process_cls: type[WrappedProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+    def _init_process(self, process_cls: type[WrappedProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager,
+                      state_changed: threading.Condition, work_cancel_error: threading.Condition,
                       cancel_event: threading.Event) -> WrappedProcessT:
         """Initialize a process with index `id`."""
 
@@ -293,8 +302,10 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT]):
             return True
 
         # queue.Empty might happen on KeyboardInterrupt race.
-        with suppress(queue.Empty):
+        with suppress(queue.Empty), self.work_cancel_error:
             self.cancel_event.set()
+            self.work_cancel_error.notify_all()
+
 
         ret = True
         with ThreadPoolExecutor(max_workers=len(self)) as pool:
@@ -310,7 +321,7 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT]):
 
 
 class WrappedProcessPoolContext(Generic[WrappedProcessT], WrappedProcessPool[WrappedProcessT]):
-    def __init__(self,process_cls: type[WrappedProcessT],  mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int, name: str,
+    def __init__(self, process_cls: type[WrappedProcessT],  mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int, name: str,
                  start_timeout: float | None = WrappedProcess.DEFAULT_START_TIMEOUT,
                  stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT) -> None:
         super().__init__(process_cls, mp_context, mp_manager, concurrency, name, stop_timeout)
