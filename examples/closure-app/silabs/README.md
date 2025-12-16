@@ -177,7 +177,7 @@ passed to the build scripts.
 
 show_qr_code
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A "show_qr_code=false"
 
 ### KVS maximum entry count
 
