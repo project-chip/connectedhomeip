@@ -173,14 +173,21 @@ class Executor:
 
             # SIGTERM
             log.debug('Terminating leftover process "%s"', cmd)
-            process.terminate()
+            try:
+                process.terminate()
+            except OSError:
+                # Can occur in case of race condition when process exits between poll and terminate.
+                continue
             with suppress(subprocess.TimeoutExpired):
                 process.wait(self.CLEANUP_TIMEOUT_S)
                 continue
 
             # SIGKILL
             log.warning('Failed to terminate the process "%s". Killing instead', cmd)
-            process.kill()
+            try:
+                process.kill()
+            except OSError:
+                continue
             with suppress(subprocess.TimeoutExpired):
                 process.wait(self.CLEANUP_TIMEOUT_S)
                 continue
