@@ -240,7 +240,8 @@ TlsClientManagementCluster::HandleFindEndpoint(CommandHandler & commandHandler, 
     {
         return DataModel::ActionReturnStatus(Status::NotFound);
     }
-    else if (result != CHIP_NO_ERROR)
+
+    if (result != CHIP_NO_ERROR)
     {
         return DataModel::ActionReturnStatus(Status::Failure);
     }

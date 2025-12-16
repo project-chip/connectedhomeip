@@ -451,6 +451,7 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointSuccess)
 
     auto provisionResult = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(provisionReq);
     EXPECT_TRUE(provisionResult.IsSuccess());
+    ASSERT_TRUE(provisionResult.response.has_value());
 
     uint16_t provisionedID = provisionResult.response.value().endpointID;
 
@@ -507,6 +508,7 @@ TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointSuccess)
 
     auto provisionResult = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(provisionReq);
     EXPECT_TRUE(provisionResult.IsSuccess());
+    ASSERT_TRUE(provisionResult.response.has_value());
 
     uint16_t provisionedID = provisionResult.response.value().endpointID;
 
