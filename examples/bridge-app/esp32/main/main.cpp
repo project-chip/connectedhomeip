@@ -90,17 +90,11 @@ static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
 
-// 4 Bridged devices
-static Device gLight1("Light 1", "Office");
-static Device gLight2("Light 2", "Office");
-static Device gLight3("Light 3", "Kitchen");
-static Device gLight4("Light 4", "Den");
-
-// Track which lights are currently added
-static bool gLight1Added = false;
-static bool gLight2Added = false;
-static bool gLight3Added = false;
-static bool gLight4Added = false;
+// Dynamic device storage - all bridged devices are created at runtime
+static constexpr size_t kMaxBridgedDevices = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static Device * gBridgedDevices[kMaxBridgedDevices];
+static DataVersion * gBridgedDataVersions[kMaxBridgedDevices];
+static size_t gBridgedDeviceCount = 0;
 
 // (taken from chip-devices.xml)
 #define DEVICE_TYPE_BRIDGED_NODE 0x0013
@@ -161,11 +155,6 @@ DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIn
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
-
-DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
-DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
-DataVersion gLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
-DataVersion gLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 /* REVISION definitions:
  */
@@ -378,33 +367,17 @@ using chip::Shell::shell_command_t;
 
 Engine sShellBridgeSubCommands;
 
-static bool GetLightByNumber(int num, Device ** dev, bool ** added, DataVersion ** dataVersions)
+// Find device index by endpoint ID
+static int FindDeviceByEndpoint(EndpointId endpointId)
 {
-    switch (num)
+    for (size_t i = 0; i < kMaxBridgedDevices; i++)
     {
-    case 1:
-        *dev          = &gLight1;
-        *added        = &gLight1Added;
-        *dataVersions = gLight1DataVersions;
-        return true;
-    case 2:
-        *dev          = &gLight2;
-        *added        = &gLight2Added;
-        *dataVersions = gLight2DataVersions;
-        return true;
-    case 3:
-        *dev          = &gLight3;
-        *added        = &gLight3Added;
-        *dataVersions = gLight3DataVersions;
-        return true;
-    case 4:
-        *dev          = &gLight4;
-        *added        = &gLight4Added;
-        *dataVersions = gLight4DataVersions;
-        return true;
-    default:
-        return false;
+        if (gBridgedDevices[i] != nullptr && gBridgedDevices[i]->GetEndpointId() == endpointId)
+        {
+            return static_cast<int>(i);
+        }
     }
+    return -1;
 }
 
 static CHIP_ERROR BridgeHelpHandler(int argc, char ** argv)
@@ -415,49 +388,82 @@ static CHIP_ERROR BridgeHelpHandler(int argc, char ** argv)
 
 static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
 {
-    if (argc != 1)
+    if (argc > 2)
     {
-        ESP_LOGE(TAG, "Usage: bridge add <1-4>");
+        ESP_LOGE(TAG, "Usage: bridge add [name] [location]");
+        ESP_LOGE(TAG, "  name: optional device name (default: 'Light <N>')");
+        ESP_LOGE(TAG, "  location: optional location (default: 'Room')");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    char * end;
-    long lightNumLong = strtol(argv[0], &end, 10);
-    if (end == argv[0] || *end != '\0')
+    // Check if we have room for more devices
+    if (gBridgedDeviceCount >= kMaxBridgedDevices)
     {
-        ESP_LOGE(TAG, "Invalid light number: %s", argv[0]);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    int lightNum = static_cast<int>(lightNumLong);
-
-    Device * dev;
-    bool * added;
-    DataVersion * dataVersions;
-
-    if (!GetLightByNumber(lightNum, &dev, &added, &dataVersions))
-    {
-        ESP_LOGE(TAG, "Invalid light number: %d (must be 1-4)", lightNum);
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        ESP_LOGE(TAG, "Max bridged devices reached (%zu). Cannot add more.", kMaxBridgedDevices);
+        return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (*added)
+    // Create device name - use device count + 1 for default naming
+    char defaultName[32];
+    const char * name;
+    if (argc >= 1)
     {
-        ESP_LOGI(TAG, "Light %d is already added", lightNum);
-        return CHIP_NO_ERROR;
-    }
-
-    int result = AddDeviceEndpoint(dev, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                   Span<DataVersion>(dataVersions, MATTER_ARRAY_SIZE(bridgedLightClusters)), 1);
-    if (result >= 0)
-    {
-        *added = true;
-        ESP_LOGI(TAG, "Added Light %d to endpoint %d", lightNum, dev->GetEndpointId());
+        name = argv[0];
     }
     else
     {
-        ESP_LOGE(TAG, "Failed to add Light %d", lightNum);
-        return CHIP_ERROR_INTERNAL;
+        snprintf(defaultName, sizeof(defaultName), "Light %zu", gBridgedDeviceCount + 1);
+        name = defaultName;
     }
+
+    const char * location = (argc >= 2) ? argv[1] : "Room";
+
+    // Allocate new device and data versions
+    Device * newDevice = new Device(name, location);
+    if (newDevice == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to allocate memory for new device");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    DataVersion * newDataVersions = new DataVersion[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+    if (newDataVersions == nullptr)
+    {
+        delete newDevice;
+        ESP_LOGE(TAG, "Failed to allocate memory for data versions");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    memset(newDataVersions, 0, sizeof(DataVersion) * MATTER_ARRAY_SIZE(bridgedLightClusters));
+
+    // Set device as reachable and configure callback
+    newDevice->SetReachable(true);
+    newDevice->SetChangeCallback(&HandleDeviceStatusChanged);
+
+    // Try to add the device endpoint
+    int result = AddDeviceEndpoint(newDevice, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                   Span<DataVersion>(newDataVersions, MATTER_ARRAY_SIZE(bridgedLightClusters)), 1);
+    if (result < 0)
+    {
+        delete newDevice;
+        delete[] newDataVersions;
+        ESP_LOGE(TAG, "Failed to add device endpoint - no available endpoints");
+        return CHIP_ERROR_ENDPOINT_POOL_FULL;
+    }
+
+    // Find first empty slot in our tracking array
+    for (size_t i = 0; i < kMaxBridgedDevices; i++)
+    {
+        if (gBridgedDevices[i] == nullptr)
+        {
+            gBridgedDevices[i]      = newDevice;
+            gBridgedDataVersions[i] = newDataVersions;
+            gBridgedDeviceCount++;
+            break;
+        }
+    }
+
+    ESP_LOGI(TAG, "Added '%s' @ %s (endpoint %d) [%zu/%zu]", name, location, newDevice->GetEndpointId(), gBridgedDeviceCount,
+             kMaxBridgedDevices);
 
     return CHIP_NO_ERROR;
 }
@@ -466,44 +472,39 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
 {
     if (argc != 1)
     {
-        ESP_LOGE(TAG, "Usage: bridge remove <1-4>");
+        ESP_LOGE(TAG, "Usage: bridge remove <endpoint>");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     char * end;
-    long lightNumLong = strtol(argv[0], &end, 10);
-    if (end == argv[0] || *end != '\0')
+    long endpointId = strtol(argv[0], &end, 10);
+    if (end == argv[0] || *end != '\0' || endpointId < 0)
     {
-        ESP_LOGE(TAG, "Invalid light number: %s", argv[0]);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    int lightNum = static_cast<int>(lightNumLong);
-
-    Device * dev;
-    bool * added;
-    DataVersion * dataVersions;
-
-    if (!GetLightByNumber(lightNum, &dev, &added, &dataVersions))
-    {
-        ESP_LOGE(TAG, "Invalid light number: %d (must be 1-4)", lightNum);
+        ESP_LOGE(TAG, "Invalid endpoint ID: %s", argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (!*added)
+    int idx = FindDeviceByEndpoint(static_cast<EndpointId>(endpointId));
+    if (idx < 0)
     {
-        ESP_LOGI(TAG, "Light %d is not currently added", lightNum);
-        return CHIP_NO_ERROR;
+        ESP_LOGE(TAG, "No device at endpoint %ld", endpointId);
+        return CHIP_ERROR_NOT_FOUND;
     }
 
-    CHIP_ERROR err = RemoveDeviceEndpoint(dev);
+    const char * name = gBridgedDevices[idx]->GetName();
+    CHIP_ERROR err    = RemoveDeviceEndpoint(gBridgedDevices[idx]);
     if (err == CHIP_NO_ERROR)
     {
-        *added = false;
-        ESP_LOGI(TAG, "Removed Light %d", lightNum);
+        ESP_LOGI(TAG, "Removed '%s' from endpoint %ld", name, endpointId);
+        delete gBridgedDevices[idx];
+        delete[] gBridgedDataVersions[idx];
+        gBridgedDevices[idx]      = nullptr;
+        gBridgedDataVersions[idx] = nullptr;
+        gBridgedDeviceCount--;
     }
     else
     {
-        ESP_LOGE(TAG, "Failed to remove Light %d", lightNum);
+        ESP_LOGE(TAG, "Failed to remove '%s'", name);
         return err;
     }
 
@@ -512,59 +513,21 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
 
 static CHIP_ERROR BridgeListHandler(int argc, char ** argv)
 {
-    ESP_LOGI(TAG, "Bridged devices:");
+    ESP_LOGI(TAG, "Bridged devices (%zu/%zu):", gBridgedDeviceCount, kMaxBridgedDevices);
 
-    struct
+    if (gBridgedDeviceCount == 0)
     {
-        int num;
-        Device * dev;
-        bool added;
-    } lights[] = {
-        { 1, &gLight1, gLight1Added },
-        { 2, &gLight2, gLight2Added },
-        { 3, &gLight3, gLight3Added },
-        { 4, &gLight4, gLight4Added },
-    };
-
-    for (const auto & light : lights)
-    {
-        if (light.added)
-        {
-            ESP_LOGI(TAG, "  Light %d: \"%s\" (endpoint %d, %s)", light.num, light.dev->GetName(), light.dev->GetEndpointId(),
-                     light.dev->IsOn() ? "ON" : "OFF");
-        }
-        else
-        {
-            ESP_LOGI(TAG, "  Light %d: not added", light.num);
-        }
+        ESP_LOGI(TAG, "  (none)");
     }
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR BridgeRenameHandler(int argc, char ** argv)
-{
-    // Rename all added lights to "Light Xb" (TC-BR-3)
-    struct
+    else
     {
-        int num;
-        Device * dev;
-        bool added;
-    } lights[] = {
-        { 1, &gLight1, gLight1Added },
-        { 2, &gLight2, gLight2Added },
-        { 3, &gLight3, gLight3Added },
-        { 4, &gLight4, gLight4Added },
-    };
-
-    for (const auto & light : lights)
-    {
-        if (light.added)
+        for (size_t i = 0; i < kMaxBridgedDevices; i++)
         {
-            char newName[16];
-            snprintf(newName, sizeof(newName), "Light %db", light.num);
-            light.dev->SetName(newName);
-            ESP_LOGI(TAG, "Renamed Light %d to '%s'", light.num, newName);
+            if (gBridgedDevices[i] != nullptr)
+            {
+                ESP_LOGI(TAG, "  \"%s\" @ %s (endpoint %d, %s)", gBridgedDevices[i]->GetName(), gBridgedDevices[i]->GetLocation(),
+                         gBridgedDevices[i]->GetEndpointId(), gBridgedDevices[i]->IsOn() ? "ON" : "OFF");
+            }
         }
     }
 
@@ -573,28 +536,84 @@ static CHIP_ERROR BridgeRenameHandler(int argc, char ** argv)
 
 static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
 {
-    // Toggle all added lights
-    struct
+    if (argc == 1)
     {
-        int num;
-        Device * dev;
-        bool added;
-    } lights[] = {
-        { 1, &gLight1, gLight1Added },
-        { 2, &gLight2, gLight2Added },
-        { 3, &gLight3, gLight3Added },
-        { 4, &gLight4, gLight4Added },
-    };
-
-    for (const auto & light : lights)
-    {
-        if (light.added)
+        // Toggle specific device by endpoint: bridge toggle <endpoint>
+        char * end;
+        long endpointId = strtol(argv[0], &end, 10);
+        if (end == argv[0] || *end != '\0' || endpointId < 0)
         {
-            light.dev->SetOnOff(!light.dev->IsOn());
-            ESP_LOGI(TAG, "Toggled Light %d: now %s", light.num, light.dev->IsOn() ? "ON" : "OFF");
+            ESP_LOGE(TAG, "Invalid endpoint ID: %s", argv[0]);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        int idx = FindDeviceByEndpoint(static_cast<EndpointId>(endpointId));
+        if (idx < 0)
+        {
+            ESP_LOGE(TAG, "No device at endpoint %ld", endpointId);
+            return CHIP_ERROR_NOT_FOUND;
+        }
+
+        gBridgedDevices[idx]->SetOnOff(!gBridgedDevices[idx]->IsOn());
+        ESP_LOGI(TAG, "Toggled '%s' (endpoint %ld): now %s", gBridgedDevices[idx]->GetName(), endpointId,
+                 gBridgedDevices[idx]->IsOn() ? "ON" : "OFF");
+    }
+    else
+    {
+        // Toggle all devices
+        ESP_LOGI(TAG, "Toggling all devices:");
+        for (size_t i = 0; i < kMaxBridgedDevices; i++)
+        {
+            if (gBridgedDevices[i] != nullptr)
+            {
+                gBridgedDevices[i]->SetOnOff(!gBridgedDevices[i]->IsOn());
+                ESP_LOGI(TAG, "  '%s': now %s", gBridgedDevices[i]->GetName(), gBridgedDevices[i]->IsOn() ? "ON" : "OFF");
+            }
         }
     }
 
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR BridgeMaxHandler(int argc, char ** argv)
+{
+    ESP_LOGI(TAG, "Bridge endpoint limits:");
+    ESP_LOGI(TAG, "  Max bridged devices: %zu", kMaxBridgedDevices);
+    ESP_LOGI(TAG, "  Current devices: %zu", gBridgedDeviceCount);
+    ESP_LOGI(TAG, "  Available slots: %zu", kMaxBridgedDevices - gBridgedDeviceCount);
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR BridgeRemoveAllHandler(int argc, char ** argv)
+{
+    ESP_LOGI(TAG, "Removing all bridged devices...");
+    int removedCount = 0;
+
+    for (size_t i = 0; i < kMaxBridgedDevices; i++)
+    {
+        if (gBridgedDevices[i] != nullptr)
+        {
+            const char * name = gBridgedDevices[i]->GetName();
+            CHIP_ERROR err    = RemoveDeviceEndpoint(gBridgedDevices[i]);
+            if (err == CHIP_NO_ERROR)
+            {
+                ESP_LOGI(TAG, "  Removed '%s'", name);
+                delete gBridgedDevices[i];
+                delete[] gBridgedDataVersions[i];
+                gBridgedDevices[i]      = nullptr;
+                gBridgedDataVersions[i] = nullptr;
+                removedCount++;
+            }
+            else
+            {
+                ESP_LOGE(TAG, "  Failed to remove '%s'", name);
+            }
+        }
+    }
+    gBridgedDeviceCount = 0;
+
+    ESP_LOGI(TAG, "Removed %d devices total", removedCount);
     return CHIP_NO_ERROR;
 }
 
@@ -611,11 +630,12 @@ static void RegisterBridgeCommands()
 {
     static const shell_command_t sBridgeSubCommands[] = {
         { &BridgeHelpHandler, "help", "Usage: bridge <subcommand>" },
-        { &BridgeAddHandler, "add", "Add a light: bridge add <1-4>" },
-        { &BridgeRemoveHandler, "remove", "Remove a light: bridge remove <1-4>" },
+        { &BridgeAddHandler, "add", "Add device: bridge add [name] [location]" },
+        { &BridgeRemoveHandler, "remove", "Remove device: bridge remove <endpoint>" },
+        { &BridgeRemoveAllHandler, "remove_all", "Remove all bridged devices" },
+        { &BridgeMaxHandler, "max", "Show max endpoint limits" },
         { &BridgeListHandler, "list", "List all bridged devices" },
-        { &BridgeRenameHandler, "rename", "Rename all lights to 'Light Xb'" },
-        { &BridgeToggleHandler, "toggle", "Toggle all lights on/off" },
+        { &BridgeToggleHandler, "toggle", "Toggle: bridge toggle [endpoint] or all" },
     };
 
     static const shell_command_t sBridgeCommand = { &BridgeCommandHandler, "bridge",
@@ -646,44 +666,12 @@ static void InitServer(intptr_t context)
     emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gRootDeviceTypes));
     emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
 
-    // Add lights 1..3 --> will be mapped to ZCL endpoints 3, 4, 5
-    if (AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                          Span<DataVersion>(gLight1DataVersions), 1) >= 0)
-    {
-        gLight1Added = true;
-    }
-
-    if (AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                          Span<DataVersion>(gLight2DataVersions), 1) >= 0)
-    {
-        gLight2Added = true;
-    }
-
-    if (AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                          Span<DataVersion>(gLight3DataVersions), 1) >= 0)
-    {
-        gLight3Added = true;
-    }
-
-    // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 3 & 5
-    if (RemoveDeviceEndpoint(&gLight2) == CHIP_NO_ERROR)
-    {
-        gLight2Added = false;
-    }
-
-    // Add Light 4 -- > will be mapped to ZCL endpoint 6
-    if (AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                          Span<DataVersion>(gLight4DataVersions), 1) >= 0)
-    {
-        gLight4Added = true;
-    }
-
-    // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
-    if (AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                          Span<DataVersion>(gLight2DataVersions), 1) >= 0)
-    {
-        gLight2Added = true;
-    }
+    // Bridge starts with no bridged devices - use shell commands to add them:
+    //   bridge add <id> [name] [location]
+    //   bridge remove <id>
+    //   bridge list
+    //   bridge max
+    ESP_LOGI(TAG, "Bridge ready. Use 'bridge add <id>' to add devices. Max devices: %zu", kMaxBridgedDevices);
 }
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
@@ -729,6 +717,9 @@ extern "C" void app_main()
     // bridge will have own database named gDevices.
     // Clear database
     memset(gDevices, 0, sizeof(gDevices));
+    memset(gBridgedDevices, 0, sizeof(gBridgedDevices));
+    memset(gBridgedDataVersions, 0, sizeof(gBridgedDataVersions));
+    gBridgedDeviceCount = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
@@ -737,17 +728,6 @@ extern "C" void app_main()
         return;
     }
 #endif
-
-    gLight1.SetReachable(true);
-    gLight2.SetReachable(true);
-    gLight3.SetReachable(true);
-    gLight4.SetReachable(true);
-
-    // Whenever bridged device changes its state
-    gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
-    gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
-    gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
-    gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
 
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
