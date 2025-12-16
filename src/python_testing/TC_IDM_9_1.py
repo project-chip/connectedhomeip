@@ -58,15 +58,12 @@ def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
 
     checkable_attrs = []
     for attr_id in all_attrs:
-        # Filter 1: Must be a standard (non-manufacturer) attribute
         if not is_standard_attribute_id(attr_id):
             continue
 
-        # Filter 2: Must have XML spec definition
         if attr_id not in xml_cluster.attributes:
             continue
 
-        # Filter 3: Must have Python codegen data
         if attr_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
             continue
 
@@ -113,9 +110,8 @@ class TC_IDM_9_1(BasicCompositionTests):
             ]
 
         # Find XML file dynamically from script location
-        # Navigate from src/python_testing/ to data_model/<version>/clusters/
         script_dir = Path(__file__).parent
-        repo_root = script_dir.parent.parent  # Go up from src/python_testing to repo root
+        repo_root = script_dir.parent.parent 
         xml_dir = repo_root / 'data_model' / spec_version / 'clusters'
 
         for possible_name in possible_names:
@@ -133,13 +129,11 @@ class TC_IDM_9_1(BasicCompositionTests):
             field_ref = attr_ref.find('./field')
 
             if field_ref is not None and 'name' in field_ref.attrib:
-                # Reference to a field within a struct
                 constraint_dict[f'{prefix}AttributeRef'] = {
                     'attribute': ref_attr_name,
                     'field': field_ref.attrib['name']
                 }
             else:
-                # Reference to an attribute directly
                 constraint_dict[f'{prefix}AttributeRef'] = {'attribute': ref_attr_name}
 
     def _parse_attribute_constraints(self, cluster_id: int, attribute_id: int) -> dict:
@@ -360,8 +354,7 @@ class TC_IDM_9_1(BasicCompositionTests):
 
         # Step 1a: Test uint16 constraint validation using ColorControl clusters MoveToColorTemperature command
         self.step("1a")
-        if MatterBaseTest.attribute_guard(self, endpoint=self.endpoint, attribute=Clusters.ColorControl.Attributes.ColorTemperatureMireds):
-            log.info("Step 1a: Testing uint16 constraint (ColorTemperatureMireds out of range)")
+        if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.ColorControl.Commands.MoveToColorTemperature):
             try:
                 cmd = Clusters.ColorControl.Commands.MoveToColorTemperature(
                     colorTemperatureMireds=65280,  # Max value is 65279 for this uint16 attribute according to XML spec
@@ -369,7 +362,7 @@ class TC_IDM_9_1(BasicCompositionTests):
                     optionsMask=0,
                     optionsOverride=0
                 )
-                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=1, payload=cmd)
+                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
@@ -377,37 +370,36 @@ class TC_IDM_9_1(BasicCompositionTests):
 
         # Step 1b: Test octstr max length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
         self.step("1b")
-        log.info("Step 1b: Testing octstr max length constraint (ClientChallenge > 32 bytes)")
-        # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
-        try:
-            cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
-                fabricIndex=1,
-                clientChallenge=b'x' * 33
-            )
-            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
-            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError,
-                                 f"Expected CONSTRAINT_ERROR, but got {e.status}")
+        if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest):
+            # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
+            try:
+                cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
+                    fabricIndex=1,
+                    clientChallenge=b'x' * 33
+                )
+                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+                asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.ConstraintError,
+                                    f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1c: Test octstr min length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
         self.step("1c")
-        log.info("Step 1c: Testing octstr min length constraint (ClientChallenge < 32 bytes)")
-        # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
-        try:
-            cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
-                fabricIndex=1,
-                clientChallenge=b'x' * 31
-            )
-            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
-            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError,
-                                 f"Expected CONSTRAINT_ERROR, but got {e.status}")
+        if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest):
+            # ClientChallenge is octstr with constraint = 32 (must be 32 bytes)
+            try:
+                cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
+                    fabricIndex=1,
+                    clientChallenge=b'x' * 31
+                )
+                await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+                asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.ConstraintError,
+                                    f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1d: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
         self.step("1d")
-        log.info("Step 1d: Testing string max length constraint (CountryCode > 2 chars)")
         try:
             # CountryCode field is string with constraint length=2
             cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
@@ -423,7 +415,6 @@ class TC_IDM_9_1(BasicCompositionTests):
 
         # Step 1e: Test string min length constraint violation
         self.step("1e")
-        log.info("Step 1e: Testing string min length constraint (CountryCode < 2 chars)")
         try:
             # CountryCode field is string with constraint length=2
             cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
