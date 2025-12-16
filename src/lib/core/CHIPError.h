@@ -286,21 +286,14 @@ public:
     }
 
     /**
-     * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
-     */
-    template <typename T>
-    static constexpr bool CanEncapsulate()
-    {
-        return std::numeric_limits<typename std::make_unsigned_t<T>>::digits <= kValueLength;
-    }
-
-    /**
      * Test whether if @a value can be losslessly encapsulated in a CHIP_ERROR.
      */
     template <typename T>
-    static constexpr bool CanEncapsulate(T value)
+    static constexpr bool CanEncapsulate(Range range, T value)
     {
-        return CanEncapsulate<T>() || FitsInField(kValueLength, static_cast<ValueType>(value));
+        if (range == Range::kPlatformExtended)
+            return std::numeric_limits<T>::min() >= kPlatformValueMin && std::numeric_limits<T>::max() <= kPlatformValueMax;
+        return std::numeric_limits<T>::min() >= kValueMin && std::numeric_limits<T>::max() <= kValueMax;
     }
 
     /**
@@ -391,10 +384,14 @@ private:
     static constexpr int kRangeLength   = 8;
     static constexpr int kValueStartBit = 0;
     static constexpr int kValueLength   = 24;
+    static constexpr int kValueMax      = (1u << kValueLength) - 1;
+    static constexpr int kValueMin      = -kValueMax - 1;
 
     static constexpr int kPlatformBit         = 31;
     static constexpr int kPlatformValueStart  = 0;
     static constexpr int kPlatformValueLength = 31;
+    static constexpr int kPlatformValueMax    = (1u << kPlatformValueLength) - 1;
+    static constexpr int kPlatformValueMin    = -kPlatformValueMax - 1;
 
     static constexpr int kSdkPartStartBit = 8;
     static constexpr int kSdkPartLength   = 3;

@@ -191,7 +191,7 @@ DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
  */
 DLL_EXPORT CHIP_ERROR MapErrorLwIP(err_t aError)
 {
-    static_assert(ChipError::CanEncapsulate(-std::numeric_limits<err_t>::min()), "Can't represent all LWIP errors");
+    static_assert(ChipError::CanEncapsulate<err_t>(ChipError::Range::kLwIP, 0), "Can't represent all LWIP errors");
     return (aError == ERR_OK ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kLwIP, static_cast<int>(-aError)));
 }
 
