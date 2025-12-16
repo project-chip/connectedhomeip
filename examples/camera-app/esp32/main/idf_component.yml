@@ -1,0 +1,22 @@
+dependencies:
+    network_coprocessor:
+        version: "*"
+        path: ${KVS_SDK_PATH}/esp_port/components/network_coprocessor
+        rules:
+        - if: "target in [esp32c6]"
+
+    esp_webrtc_utils:
+        path: ${KVS_SDK_PATH}/esp_port/components/esp_webrtc_utils
+        version: "*"
+
+    kvs_webrtc:
+        path: ${KVS_SDK_PATH}/esp_port/components/kvs_webrtc
+        version: "*"
+
+    signaling_serializer:
+        path: ${KVS_SDK_PATH}/esp_port/components/signaling_serializer
+        version: "*"
+
+    webrtc_bridge:
+        path: ${KVS_SDK_PATH}/esp_port/components/webrtc_bridge
+        version: "*"
