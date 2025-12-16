@@ -355,7 +355,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                              f"New state is {idle_event.newState} and it should be {self.idle}")
 
         event_cb.reset()
-        await event_cb.cancel()
+        event_cb.cancel()
         await asyncio.sleep(2)
 
         # Subscribe to events
@@ -385,9 +385,9 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                                            expected_previous_state=self.querying, expected_new_state=self.downloading, expected_target_version=self.target_version)
 
         event_cb.reset()
-        await event_cb.cancel()
+        event_cb.cancel()
 
-        await self.clear_ota_providers(controller=th2, requestor_node_id=self.requestor_node_id)
+        # await self.clear_ota_providers(controller=th2, requestor_node_id=self.requestor_node_id)
 
         th2.ExpireSessions(nodeId=self.p2_node)
 
