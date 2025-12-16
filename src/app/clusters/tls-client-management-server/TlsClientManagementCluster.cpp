@@ -185,7 +185,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
     }
     if (req.caid > kMaxRootCertId)
     {
-        return DataModel::ActionReturnStatus(Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     auto fabric     = commandHandler.GetAccessingFabricIndex();
@@ -221,7 +221,7 @@ TlsClientManagementCluster::HandleFindEndpoint(CommandHandler & commandHandler, 
 
     if (req.endpointID > kMaxTlsEndpointId)
     {
-        return DataModel::ActionReturnStatus(Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     auto fabric     = commandHandler.GetAccessingFabricIndex();
@@ -238,12 +238,12 @@ TlsClientManagementCluster::HandleFindEndpoint(CommandHandler & commandHandler, 
 
     if (result == CHIP_ERROR_NOT_FOUND)
     {
-        return DataModel::ActionReturnStatus(Status::NotFound);
+        return Status::NotFound;
     }
 
     if (result != CHIP_NO_ERROR)
     {
-        return DataModel::ActionReturnStatus(Status::Failure);
+        return Status::Failure;
     }
 
     return std::nullopt;
@@ -257,7 +257,7 @@ TlsClientManagementCluster::HandleRemoveEndpoint(CommandHandler & commandHandler
 
     if (req.endpointID > kMaxTlsEndpointId)
     {
-        return DataModel::ActionReturnStatus(Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     auto fabric     = commandHandler.GetAccessingFabricIndex();
