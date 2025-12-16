@@ -99,7 +99,7 @@ DataModel::ActionReturnStatus TlsClientManagementCluster::ReadAttribute(const Da
     case ProvisionedEndpoints::Id: {
         TlsClientManagementCluster * server = this;
         auto matterEndpoint                 = request.path.mEndpointId;
-        auto fabric                         = request.AccessingFabricIndex();
+        auto fabric                         = request.GetAccessingFabricIndex();
         return encoder.EncodeList([server, matterEndpoint, fabric](const auto & listEncoder) -> CHIP_ERROR {
             return server->EncodeProvisionedEndpoints(matterEndpoint, fabric, listEncoder);
         });
