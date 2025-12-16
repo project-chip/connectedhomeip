@@ -254,7 +254,12 @@ def cmd_list(context):
         print("%s%s" % (test.name, tags))
 
 
-class Terminatable(typing.Protocol):
+class Terminable(typing.Protocol):
+    """Protocol for resources that can be explicitly terminated or cleaned up.
+
+    Implement this protocol for any class that manages external resources (such as subprocesses, network connections, or files) that
+    require explicit cleanup. The `terminate` method should perform any necessary actions to release or clean up the resource.
+    """
     def terminate(self) -> None: ...
 
 
@@ -408,7 +413,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     ble_controller_app = None
     ble_controller_tool = None
-    to_terminate: list[Terminatable] = []
+    to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
         for item in reversed(to_terminate):
