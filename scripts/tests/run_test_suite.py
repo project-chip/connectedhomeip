@@ -61,7 +61,6 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 class RunContext:
     root: str
     tests: typing.List[chiptest.TestDefinition]
-    in_unshare: bool
     chip_tool: SubprocessInfo | None
     dry_run: bool
     runtime: TestRunTime
@@ -158,6 +157,13 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
+    if sys.platform == "linux":
+        if not internal_inside_unshare:
+            # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
+            chiptest.linux.ensure_network_namespace_availability()
+        else:
+            chiptest.linux.ensure_private_state()
+
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
         runtime = TestRunTime.MATTER_REPL_PYTHON
@@ -229,7 +235,6 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
     tests.sort(key=lambda x: x.name)
 
     context.obj = RunContext(root=root, tests=tests,
-                             in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool_info, dry_run=dry_run,
                              runtime=runtime,
                              find_path=find_path,
@@ -431,8 +436,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
             setup_app_link_up=not ble_wifi,
             # Change the app link name so the interface will be recognized as WiFi or Ethernet
             # depending on the commissioning method used.
-            app_link_name='wlx-app' if ble_wifi else 'eth-app',
-            unshared=context.obj.in_unshare)
+            app_link_name='wlx-app' if ble_wifi else 'eth-app')
 
         if ble_wifi:
             bus = chiptest.linux.DBusTestSystemBus()
@@ -515,10 +519,8 @@ if sys.platform == 'linux':
         'shell',
         help=('Execute a bash shell in the environment (useful to test '
               'network namespaces)'))
-    @click.pass_context
-    def cmd_shell(context: click.Context) -> None:
-        assert isinstance(context.obj, RunContext)
-        chiptest.linux.IsolatedNetworkNamespace(unshared=context.obj.in_unshare)
+    def cmd_shell() -> None:
+        chiptest.linux.IsolatedNetworkNamespace()
         os.execvpe("bash", ["bash"], os.environ.copy())
 
 

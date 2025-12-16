@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 test_environ = os.environ.copy()
 
 
-def EnsureNetworkNamespaceAvailability():
+def ensure_network_namespace_availability():
     if os.getuid() == 0:
         log.debug("Current user is root")
         log.warning("Running as root and this will change global namespaces.")
@@ -51,7 +51,7 @@ def EnsureNetworkNamespaceAvailability():
         test_environ)
 
 
-def EnsurePrivateState():
+def ensure_private_state():
     log.info("Ensuring /run is privately accessible")
 
     log.debug("Making / private")
@@ -139,17 +139,8 @@ class IsolatedNetworkNamespace:
         "ip netns del app-{index}",
     ]
 
-    def __init__(self, index: int = 0, setup_app_link_up: bool = True,
-                 setup_tool_link_up: bool = True, app_link_name: str = 'eth-app',
-                 tool_link_name: str = 'eth-tool', unshared: bool = False):
-
-        if not unshared:
-            # If not running in an unshared network namespace yet, try
-            # to rerun the script with the 'unshare' command.
-            EnsureNetworkNamespaceAvailability()
-        else:
-            EnsurePrivateState()
-
+    def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
+                 app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool'):
         self.index = index
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
