@@ -370,7 +370,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointSuccess)
 {
     Commands::ProvisionEndpoint::Type request;
     const char * hostnameStr = "example.com";
-    request.hostname         = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameStr), 11);
+    request.hostname         = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameStr), strlen(hostnameStr));
     request.caid             = 1;
     request.ccdid.SetNull();
 
@@ -405,7 +405,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointConstraintErrors)
 
     // Test invalid CAID
     const char * validHostname = "example.com";
-    request.hostname           = ByteSpan(reinterpret_cast<const uint8_t *>(validHostname), 11);
+    request.hostname           = ByteSpan(reinterpret_cast<const uint8_t *>(validHostname), strlen(validHostname));
     request.caid               = 256; // exceeds kMaxRootCertId
     result                     = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
     EXPECT_FALSE(result.IsSuccess());
@@ -415,7 +415,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointRootCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
     const char * exampleHostname = "example.com";
-    request.hostname             = ByteSpan(reinterpret_cast<const uint8_t *>(exampleHostname), 11);
+    request.hostname             = ByteSpan(reinterpret_cast<const uint8_t *>(exampleHostname), strlen(exampleHostname));
     request.caid                 = 99; // Not in mock cert table
     request.ccdid.SetNull();
 
@@ -432,8 +432,8 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointClientCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
     const char * hostnameForClientTest = "example.com";
-    request.hostname                   = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameForClientTest), 11);
-    request.caid                       = 1;
+    request.hostname = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameForClientTest), strlen(hostnameForClientTest));
+    request.caid     = 1;
     request.ccdid.SetNonNull(99); // Not in mock cert table
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -445,7 +445,7 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointSuccess)
     // First provision an endpoint
     Commands::ProvisionEndpoint::Type provisionReq;
     const char * hostnameForFind = "example.com";
-    provisionReq.hostname        = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameForFind), 11);
+    provisionReq.hostname        = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameForFind), strlen(hostnameForFind));
     provisionReq.caid            = 1;
     provisionReq.ccdid.SetNull();
 
@@ -468,7 +468,7 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointSuccess)
         EXPECT_EQ(findResult.response.value().endpoint.endpointID, provisionedID);
         const char * expectedHostname = "example.com";
         EXPECT_TRUE(findResult.response.value().endpoint.hostname.data_equal(
-            ByteSpan(reinterpret_cast<const uint8_t *>(expectedHostname), 11)));
+            ByteSpan(reinterpret_cast<const uint8_t *>(expectedHostname), strlen(expectedHostname))));
     }
 }
 
@@ -503,7 +503,7 @@ TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointSuccess)
     // First provision an endpoint
     Commands::ProvisionEndpoint::Type provisionReq;
     const char * hostnameForRemove = "example.com";
-    provisionReq.hostname          = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameForRemove), 11);
+    provisionReq.hostname          = ByteSpan(reinterpret_cast<const uint8_t *>(hostnameForRemove), strlen(hostnameForRemove));
     provisionReq.caid              = 1;
     provisionReq.ccdid.SetNull();
 
