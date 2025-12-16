@@ -34,7 +34,14 @@ include(${CHIP_ROOT}/third_party/nxp/nxp_matter_support/cmake/build_helpers.cmak
 # Include SDK hooks required to build Matter libs
 include(${CHIP_ROOT}/third_party/nxp/nxp_matter_support/cmake/sdk_hook.cmake)
 
-include(${CHIP_ROOT}/config/nxp/cmake/common.cmake)
+include(${CHIP_ROOT}/config/nxp/chip-module/generate_factory_data.cmake)
+
+get_filename_component(COMMON_CMAKE_SOURCE_DIR ${CHIP_ROOT}/config/common/cmake REALPATH)
+
+# Get common Cmake sources
+include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
+include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
+include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 # Prepare compiler flags
@@ -59,12 +66,11 @@ matter_add_gn_arg_bool("nxp_use_plain_dac_key" CONFIG_NXP_USE_PLAIN_DAC_KEY)
 matter_add_gn_arg_bool("nxp_use_smu2_dynamic" CONFIG_NXP_USE_SMU2_DYNAMIC)
 matter_add_gn_arg_bool("nxp_use_smu2_static" CONFIG_NXP_USE_SMU2_STATIC)
 
+matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_CHIP_OPENTHREAD_FTD)
+matter_add_gn_arg_bool("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OT_ENDPOINT)
+
 # Remove default spec config from the build
 matter_add_gn_arg_list("default_configs_specs" " ")
-
-# Allows to set chip_stack_lock_tracking level
-# Required for freeRTOS build in case default value needs to be set to "none" for optimization
-matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
 
 # Adding nxp crypto implementation
 matter_add_gn_arg_string("nxp_crypto_impl" "${CONFIG_CHIP_NXP_CRYPTO_IMPL}")
@@ -99,6 +105,14 @@ endif()
 if(CONFIG_CHIP_OTA_ENCRYPTION)
     matter_add_gn_arg_bool("chip_with_ota_encryption" CONFIG_CHIP_OTA_ENCRYPTION)
     matter_add_gn_arg_string("chip_with_ota_key" ${CONFIG_CHIP_OTA_ENCRYPTION_KEY})
+endif()
+
+if(CONFIG_DEBUG)
+    if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
+        matter_add_gn_arg_string("optimize_debug_level" "g")
+    else()
+        matter_add_gn_arg_string("optimize_debug_level" "0")
+    endif()
 endif()
 
 # Enable map file generation by default
