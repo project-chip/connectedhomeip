@@ -30,6 +30,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <em_device.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -235,6 +237,23 @@ int __attribute__((weak)) _write(int file, const char * ptr, int len)
     return len;
 }
 #endif // SILABS_LOG_OUT_UART
+
+/**************************************************************************
+ * @brief
+ *  Override exit to prevent hard fault
+ *
+ * @param[in] status
+ *  Exit status (not used).
+ **************************************************************************/
+void __attribute__((weak)) exit(int status)
+{
+    (void) status;
+    _write(0, "exit not supported, resetting system...\r\n", 42);
+    NVIC_SystemReset();
+    while (1)
+    {
+    } // Unreachable, satisfies noreturn attribute
+}
 
 #ifdef __cplusplus
 }
