@@ -18,6 +18,7 @@ import pathlib
 import pty
 import queue
 import re
+import shlex
 import subprocess
 import threading
 import typing
@@ -225,13 +226,12 @@ class Runner:
                 break
             # dependencies MUST NOT be done
             s.kill()
-            raise Exception("Unexpected return %d for %r/%r" %
-                            (process.returncode, process, userdata))
+            raise RuntimeError(f"Unexpected return {process.returncode} for {process!r}/{userdata!r}")
 
         if s.returncode != 0:
             if wait.timed_out:
-                raise Exception("Command %r exceeded test timeout (%d seconds)" % (cmd, wait.timeout_seconds))
-            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+                raise TimeoutError(f'Command "{shlex.join(cmd)}" exceeded test timeout ({wait.timeout_seconds} seconds)')
+            raise RuntimeError(f'Command "{shlex.join(cmd)}" failed: {s.returncode}')
 
         log.debug("Command %r completed with error code 0", cmd)
         return None
