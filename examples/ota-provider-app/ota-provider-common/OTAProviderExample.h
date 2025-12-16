@@ -146,5 +146,5 @@ private:
     uint32_t mRequestorSoftwareVersion;
     std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
     bool mRequestorCanConsent;
-    char mLocation[kMaxLocation] = {0, 0, 0};
+    char mLocation[kMaxLocation] = { 0, 0, 0 };
 };
