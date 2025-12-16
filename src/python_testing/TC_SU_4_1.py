@@ -25,7 +25,6 @@
 #     app-args: >
 #       --discriminator 1234
 #       --passcode 20202021
-#       --secured-device-port 5541
 #       --KVS /tmp/chip_kvs_requestor
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -33,9 +32,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --vendor-id 65521
-#       --product-id 32769
-#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -43,8 +39,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import os
-import time
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
@@ -52,7 +46,6 @@ from TC_SUTestBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 # Create a logger
@@ -74,23 +67,6 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
     # Reference variable for the OTA Software Update Provider cluster.
     # cluster_otap = Clusters.OtaSoftwareUpdateProvider
     cluster_otar = Clusters.OtaSoftwareUpdateRequestor
-
-    async def write_acl(self, controller, acl):
-        """
-        Writes the Access Control List (ACL) to the DUT device using the specified controller.
-
-        Args:
-            controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
-            acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
-
-        Raises:
-            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
-        """
-        result = await controller.WriteAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
-        )
-        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
     def desc_TC_SU_4_1(self) -> str:
         return "[TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)"
