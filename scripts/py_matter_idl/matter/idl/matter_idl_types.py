@@ -132,6 +132,10 @@ class Field:
     is_list: bool = False
     qualities: FieldQuality = FieldQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
     @property
     def is_optional(self) -> bool:
@@ -178,6 +182,10 @@ class Struct:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -191,6 +199,9 @@ class Event:
     description: Optional[str] = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+
     @property
     def is_fabric_sensitive(self) -> bool:
         return EventQuality.FABRIC_SENSITIVE in self.qualities
@@ -203,6 +214,10 @@ class ConstantEntry:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     # If set, shows the specification name including spaces and special characters.
     specification_name: Optional[str] = None
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -213,6 +228,10 @@ class Enum:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -223,6 +242,9 @@ class Bitmap:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
+    description: Optional[str] = None
+
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
