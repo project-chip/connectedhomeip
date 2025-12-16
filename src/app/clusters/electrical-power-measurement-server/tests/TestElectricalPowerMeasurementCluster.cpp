@@ -20,14 +20,14 @@
 #include <app/clusters/electrical-power-measurement-server/tests/MockElectricalPowerMeasurementDelegate.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ElectricalPowerMeasurement/Attributes.h>
 #include <clusters/ElectricalPowerMeasurement/Events.h>
 #include <clusters/ElectricalPowerMeasurement/Metadata.h>
