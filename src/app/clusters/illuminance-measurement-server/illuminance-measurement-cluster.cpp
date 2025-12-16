@@ -35,8 +35,8 @@ namespace chip::app::Clusters {
 IlluminanceMeasurementCluster::IlluminanceMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }),
-    mLightSensorType(config.lightSensorType), mTolerance(config.tolerance), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }), mLightSensorType(config.lightSensorType),
+    mTolerance(config.tolerance), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus IlluminanceMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -75,11 +75,8 @@ CHIP_ERROR IlluminanceMeasurementCluster::Attributes(const ConcreteClusterPath &
 
     // Full attribute set, to combine real "optional" attributes but also
     // attributes controlled by feature flags.
-    app::OptionalAttributeSet<LightSensorType::Id,  //
-                              MaxMeasuredValue::Id, //
-                              MeasuredValue::Id,    //
-                              MinMeasuredValue::Id, //
-                              Tolerance::Id         //
+    app::OptionalAttributeSet<LightSensorType::Id, //
+                              Tolerance::Id        //
                               >
         optionalAttributeSet(mOptionalAttributeSet);
 
