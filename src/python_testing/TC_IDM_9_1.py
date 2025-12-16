@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -43,7 +42,6 @@ from typing import Optional
 import xml.etree.ElementTree as ET
 
 import matter.clusters as Clusters
-from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.tlv import uint
 from matter.testing.basic_composition import BasicCompositionTests
@@ -56,23 +54,23 @@ log = logging.getLogger(__name__)
 def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
     """Get list of attributes that exist on the DUT and have spec/codegen data available."""
     all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
-    
+
     checkable_attrs = []
     for attr_id in all_attrs:
         # Filter 1: Must be a standard (non-manufacturer) attribute
         if not is_standard_attribute_id(attr_id):
             continue
-        
+
         # Filter 2: Must have XML spec definition
         if attr_id not in xml_cluster.attributes:
             continue
-        
+
         # Filter 3: Must have Python codegen data
         if attr_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
             continue
-        
+
         checkable_attrs.append(attr_id)
-    
+
     return checkable_attrs
 
 class TC_IDM_9_1(BasicCompositionTests):
@@ -155,7 +153,7 @@ class TC_IDM_9_1(BasicCompositionTests):
             # Find the attribute element - try different hex formats
             attr_elem = None
             search_ids = [
-                f"0x{attribute_id:04X}",  
+                f"0x{attribute_id:04X}",
                 f"0x{attribute_id:X}",
             ]
 
@@ -258,14 +256,14 @@ class TC_IDM_9_1(BasicCompositionTests):
         if 'string' in datatype or 'octstr' in datatype:
             if 'maxLength' in constraints:
                 return 'x' * (constraints['maxLength'] + 1)
-            elif 'minLength' in constraints:
+            if 'minLength' in constraints:
                 return 'x' * max(0, constraints['minLength'] - 1)
 
         # List constraints
-        elif 'list' in datatype:
+        if 'list' in datatype:
             if 'maxCount' in constraints:
                 return [{}] * (constraints['maxCount'] + 1)
-            elif 'minCount' in constraints:
+            if 'minCount' in constraints:
                 count = max(0, constraints['minCount'] - 1)
                 return [{}] * count if count > 0 else []
 
@@ -327,12 +325,12 @@ class TC_IDM_9_1(BasicCompositionTests):
                 return False
 
             log.info(f"PASS: {attr_info['cluster_name']}.{attr_info['attribute_name']} "
-                     f"constraint properly enforced")
+                     f"constraint properly enforced (original={original_value}, rejected={test_value})")
             return True
-        else:
-            log.error(f"FAIL: {attr_info['cluster_name']}.{attr_info['attribute_name']} "
-                      f"got {result_status} instead of CONSTRAINT_ERROR for value {test_value}")
-            return False
+
+        log.error(f"FAIL: {attr_info['cluster_name']}.{attr_info['attribute_name']} "
+                  f"got {result_status} instead of CONSTRAINT_ERROR for value {test_value}")
+        return False
 
     def steps_TC_IDM_9_1(self) -> list[TestStep]:
         return [
@@ -382,14 +380,14 @@ class TC_IDM_9_1(BasicCompositionTests):
         try:
             cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
                 fabricIndex=1,
-                clientChallenge=b'x' * 33  
+                clientChallenge=b'x' * 33
             )
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                 f"Expected CONSTRAINT_ERROR, but got {e.status}")
-        
+
         # Step 1c: Test octstr min length constraint violation using OperationalCredentials clusters SignVIDVerificationRequest command
         self.step("1c")
         log.info("Step 1c: Testing octstr min length constraint (ClientChallenge < 32 bytes)")
@@ -397,7 +395,7 @@ class TC_IDM_9_1(BasicCompositionTests):
         try:
             cmd = Clusters.OperationalCredentials.Commands.SignVIDVerificationRequest(
                 fabricIndex=1,
-                clientChallenge=b'x' * 31  
+                clientChallenge=b'x' * 31
             )
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
@@ -406,7 +404,7 @@ class TC_IDM_9_1(BasicCompositionTests):
                                 f"Expected CONSTRAINT_ERROR, but got {e.status}")
 
         # Step 1d: Test string max length constraint violation using GeneralCommissioning clusters SetRegulatoryConfig command
-        self.step("1d")  
+        self.step("1d")
         log.info("Step 1d: Testing string max length constraint (CountryCode > 2 chars)")
         try:
             # CountryCode field is string with constraint length=2
