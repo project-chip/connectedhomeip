@@ -407,7 +407,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 log.info("Cleaning up %s", item.__class__.__name__)
                 item.terminate()
             except Exception as e:
-                log.warning("Encountered exception during cleanup: %s", e)
+                log.warning("Encountered exception during cleanup: %r", e)
         to_terminate.clear()
 
     try:
