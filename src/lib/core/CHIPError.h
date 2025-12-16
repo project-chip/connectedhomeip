@@ -261,7 +261,7 @@ public:
     constexpr bool IsRange(Range range) const
     {
         if (range == Range::kPlatformExtended)
-            return mError & (1u << (kPlatformBit - 1));
+            return mError & (1u << kPlatformBit);
         return range == static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
     }
 
@@ -270,7 +270,7 @@ public:
      */
     constexpr Range GetRange() const
     {
-        if (mError & (1u << (kPlatformBit - 1)))
+        if (mError & (1u << kPlatformBit))
             return Range::kPlatformExtended;
         return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
     }
@@ -280,7 +280,7 @@ public:
      */
     constexpr ValueType GetValue() const
     {
-        if (mError & (1u << (kPlatformBit - 1)))
+        if (mError & (1u << kPlatformBit))
             return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError);
         return GetField<ValueType>(kValueStart, kValueLength, mError);
     }
@@ -392,7 +392,7 @@ private:
     static constexpr int kValueStart  = 0;
     static constexpr int kValueLength = 24;
 
-    static constexpr int kPlatformBit         = 32;
+    static constexpr int kPlatformBit         = 31;
     static constexpr int kPlatformValueStart  = 0;
     static constexpr int kPlatformValueLength = 31;
 
