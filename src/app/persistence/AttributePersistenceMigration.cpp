@@ -31,13 +31,15 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
     }
 
+    ConcreteAttributePath attrPath;
+
     for (const auto & [attr, migrator] : attributes)
     {
         // We make a copy of the buffer so it can be resized
         // Still refers to same internal buffer though
         MutableByteSpan copyOfBuffer = buffer;
+        attrPath                     = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, attr);
 
-        auto attrPath = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, attr);
         // Read Value, will resize copyOfBuffer to read size
         err = migrator(attrPath, safeProvider, copyOfBuffer);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
