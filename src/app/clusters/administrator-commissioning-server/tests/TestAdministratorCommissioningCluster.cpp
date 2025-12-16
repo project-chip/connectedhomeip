@@ -16,27 +16,22 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
-#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AdministratorCommissioning/Metadata.h>
-#include <credentials/tests/CHIPCert_unit_test_vectors.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
-#include <platform/CommissionableDataProvider.h>
-#include <platform/NetworkCommissioning.h>
-
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
-#include <app/server-cluster/testing/EmptyProvider.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 namespace {
@@ -186,8 +181,6 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
     }
 }
 
-} // namespace
-
 TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
 {
     AdministratorCommissioningCluster cluster(kRootEndpointId, {});
@@ -274,3 +267,4 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     ASSERT_TRUE(status.IsSuccess());
     ASSERT_FALSE(adminVendor.IsNull());
 }
+} // namespace
