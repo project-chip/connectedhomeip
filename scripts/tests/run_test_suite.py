@@ -260,6 +260,7 @@ class Terminable(typing.Protocol):
     Implement this protocol for any class that manages external resources (such as subprocesses, network connections, or files) that
     require explicit cleanup. The `terminate` method should perform any necessary actions to release or clean up the resource.
     """
+
     def terminate(self) -> None: ...
 
 
