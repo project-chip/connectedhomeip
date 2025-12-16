@@ -182,6 +182,7 @@ class TC_CC_6_5(MatterBaseTest):
             await asyncio.sleep(1)
             self.TH1.ExpireSessions(self.dut_node_id)
         else:
+            self.TH1.ExpireSessions(self.dut_node_id)
             self.wait_for_user_input("Power Off the device under test.")
 
         self.step("3b")
