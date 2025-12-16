@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
- #include "OtaProviderAppCommandDelegate.h"
+#include "OtaProviderAppCommandDelegate.h"
 #include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <app/clusters/ota-provider/DefaultOTAProviderUserConsent.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>

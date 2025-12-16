@@ -17,9 +17,9 @@ import("//build_overrides/chip.gni")
 
 executable("chip-ota-provider-app") {
   sources = [
-      "main.cpp",
-      "OtaProviderAppCommandDelegate.cpp",
-      "OtaProviderAppCommandDelegate.h",
+    "main.cpp",
+    "OtaProviderAppCommandDelegate.cpp",
+    "OtaProviderAppCommandDelegate.h",
   ]
 
   deps = [

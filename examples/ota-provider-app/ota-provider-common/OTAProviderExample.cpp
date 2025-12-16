@@ -341,14 +341,13 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
         mLocation[2] = '\0';
     }
 
-    size_t i = 0;
+    size_t i  = 0;
     auto iter = commandData.protocolsSupported.begin();
     while (iter.Next())
     {
         mProtocolsSupported[i++] = iter.GetValue();
     }
     kProtocolsSupportedCount = i;
-
 }
 
 void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
