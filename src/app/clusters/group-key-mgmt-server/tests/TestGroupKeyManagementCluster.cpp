@@ -16,9 +16,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -69,8 +66,6 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 } // namespace TestHelpers
 
-// TODO : Clean up redundancies with handlers fabric index logic and  figure out a better implementation Cluster testers and
-// FabricHelpers setup and teardown
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
 
@@ -80,7 +75,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
     TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     Crypto::DefaultSessionKeystore mMockKeystore;
-    FabricTestHelper fabricHelper{ &mTestContext.StorageDelegate() };
+    FabricTestFixture fabricHelper{ &mTestContext.StorageDelegate() };
 
     GroupKeyManagementCluster mCluster{ fabricHelper.GetFabricTable() };
 
@@ -94,7 +89,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         mRealProvider.SetSessionKeystore(&mMockKeystore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
         ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
-        CHIP_ERROR err = fabricHelper.SetUpFabric(kTestFabricIndex);
+        CHIP_ERROR err = fabricHelper.SetUpTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mRealProvider);
         tester.SetFabricIndex(kTestFabricIndex);
@@ -105,7 +100,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         tester.SetFabricIndex(kUndefinedFabricIndex);
         mCluster.Shutdown();
         Credentials::SetGroupDataProvider(nullptr);
-        CHIP_ERROR err = fabricHelper.TearDownFabric(kTestFabricIndex);
+        CHIP_ERROR err = fabricHelper.TearDownTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         mRealProvider.Finish();
     }
