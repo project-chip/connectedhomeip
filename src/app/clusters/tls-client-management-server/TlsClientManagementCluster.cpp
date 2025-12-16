@@ -181,7 +181,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
 
     if (req.hostname.size() < 4 || req.hostname.size() > kSpecMaxHostname)
     {
-        return DataModel::ActionReturnStatus(Status::ConstraintError);
+        return Status::ConstraintError;
     }
     if (req.caid > kMaxRootCertId)
     {
