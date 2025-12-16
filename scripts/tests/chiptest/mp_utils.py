@@ -230,18 +230,18 @@ WrappedProcessT = TypeVar("WrappedProcessT", bound=WrappedProcess)
 
 
 class WrappedProcessPool(ABC, Generic[WrappedProcessT]):
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int, name: str,
+    def __init__(self, process_cls: type[WrappedProcessT], mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int, name: str,
                  stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT) -> None:
         self.name = name
         self.state_changed = mp_manager.Condition()
         self.cancel_event = mp_manager.Event()
-        self._pool = tuple(self._init_process(id, mp_context, mp_manager, self.state_changed, self.cancel_event)
+        self._pool = tuple(self._init_process(process_cls, id, mp_context, mp_manager, self.state_changed, self.cancel_event)
                            for id in range(concurrency))
         self._active = False
         self._stop_timeout = stop_timeout
 
     @abstractmethod
-    def _init_process(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+    def _init_process(self, process_cls: type[WrappedProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
                       cancel_event: threading.Event) -> WrappedProcessT:
         """Initialize a process with index `id`."""
 
@@ -310,10 +310,10 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT]):
 
 
 class WrappedProcessPoolContext(Generic[WrappedProcessT], WrappedProcessPool[WrappedProcessT]):
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int, name: str,
+    def __init__(self,process_cls: type[WrappedProcessT],  mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int, name: str,
                  start_timeout: float | None = WrappedProcess.DEFAULT_START_TIMEOUT,
                  stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT) -> None:
-        super().__init__(mp_context, mp_manager, concurrency, name, stop_timeout)
+        super().__init__(process_cls, mp_context, mp_manager, concurrency, name, stop_timeout)
         self._start_timeout = start_timeout
 
     def __enter__(self):

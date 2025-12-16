@@ -195,7 +195,8 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
     # If just defaults specified, do not run manual and in development
     # Specific target basically includes everything
     exclude_tags_set = set(exclude_tags)
-    if 'all' in target and not include_tags and not exclude_tags_set:
+    include_tags_set = set(include_tags)
+    if 'all' in target and not include_tags_set and not exclude_tags_set:
         exclude_tags_set = {
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
@@ -233,11 +234,11 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
 
     tests_filtered: list[TestDefinition] = []
     for test in tests:
-        if include_tags and not (test.tags & set(include_tags)):
+        if include_tags_set and not (test.tags & include_tags_set):
             log.debug("Test '%s' not included", test.name)
             continue
 
-        if exclude_tags and test.tags & set(exclude_tags):
+        if exclude_tags_set and test.tags & exclude_tags_set:
             log.debug("Test '%s' excluded", test.name)
             continue
 

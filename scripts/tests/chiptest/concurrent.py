@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import itertools
 import logging
-import multiprocessing
 import queue
 import subprocess
 import sys
@@ -11,16 +10,18 @@ import threading
 import time
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 from pathlib import Path
 from statistics import mean
-from typing import TYPE_CHECKING, Callable, Protocol, TypeAlias, TypeVar
+from typing import Callable, Protocol, TypeAlias, TypeVar
 
 import chiptest
-import chiptest.darwin as darwin
-import chiptest.linux as linux
+if sys.platform == "linux":
+    import chiptest.linux as linux
+elif sys.platform == "darwin":
+    import chiptest.darwin as darwin
 
 from .accessories import AppsRegister
 from .mp_utils import PROCESS_EXIT_STATES, LogConfig, WrappedProcess, WrappedProcessPoolContext, mp_wrapped_spawn_context
@@ -28,10 +29,9 @@ from .runner import Executor
 from .test_definition import TestDefinition, TestRunTime
 
 log = logging.getLogger(__name__)
-worker_state: WorkerState | None = None
 
-WORKER_START_TIMEOUT = 10
-WORKER_STOP_TIMEOUT = 5
+WORKER_START_TIMEOUT = 15
+WORKER_STOP_TIMEOUT = 10
 
 if sys.platform == "linux":
     # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
@@ -40,15 +40,6 @@ if sys.platform == "linux":
 else:
     # Other platforms will fall back to their default.
     SYNC_MANAGER_PATH = None
-
-# Create worker multiprocessing context so that we can drop RPC server into a network namespace with a custom wrapper.
-_ctx = multiprocessing.get_context("spawn")
-
-if TYPE_CHECKING:
-    # Mypy doesn't seem to like custom contexts.
-    BaseProcess = multiprocessing.Process
-else:
-    BaseProcess = _ctx.Process
 
 
 class WorkerError(RuntimeError):
@@ -83,7 +74,7 @@ class WorkerResult:
 
     def summarize(self) -> bool:
         if self.exception is None:
-            # The test result was already printed by the worker.
+            # The test result was already printed by the worker so we don't need to print anything.
             return True
 
         if isinstance(self.exception, KeyboardInterrupt):
@@ -95,123 +86,12 @@ class WorkerResult:
             log.error("Encountered exception while executing the task '%s': %r", self.test.name, self.exception)
         return False
 
-    @staticmethod
-    def summarize_all(result: WorkerResult | list[WorkerResult]) -> bool:
-        if isinstance(result, list):
-            results = [r.summarize() for r in result]
-            return all(results)
-        return result.summarize()
 
-
-class Terminatable(Protocol):
+class Terminable(Protocol):
     def terminate(self) -> None: ...
 
 
-class WorkerState(ABC):
-    def __init__(self, id: int, config: WorkerConfig) -> None:
-        self.to_clean: queue.LifoQueue[Terminatable] = queue.LifoQueue()
-
-        self.id = id
-        self.config = config
-        self.rpc_ns: str | None = None
-        self.ble_controller_app: int | None = None
-        self.ble_controller_tool: int | None = None
-
-        self.logconfig = logconfig = replace(self.config.logconfig, process_name=f"W{id:0{len(str(config.concurrency))}}")
-        logconfig.set_log_fmt()
-
-        try:
-            # Initialize platform-specific executor.
-            self.executor = self.add_to_clean(executor := self._platform_init())
-
-            # Finalize common parts.
-            self.runner = chiptest.runner.Runner(executor)
-            self.apps_register = self.add_to_clean(apps := AppsRegister(self.rpc_ns, logconfig))
-            apps.init()
-        except BaseException:
-            self.terminate()
-            raise
-
-    ToCleanT = TypeVar("ToCleanT", bound=Terminatable)
-
-    def add_to_clean(self, component: ToCleanT) -> ToCleanT | None:
-        self.to_clean.put(component)
-        return component
-
-    @abstractmethod
-    def _platform_init(self) -> Executor:
-        """Initialize platform-specific executor."""
-
-    def terminate(self) -> None:
-        """Cleanup worker state."""
-        log.debug("Cleaning up state of the worker")
-
-        while not self.to_clean.empty():
-            # During termination treat exceptions as warnings to ensure that all items get a chance to terminate.
-            try:
-                item = self.to_clean.get_nowait()
-
-                # Get member name if exists.
-                name = next((attr for attr, val in vars(self).items() if val == item), None)
-
-                if name is not None:
-                    log.debug("Cleaning up %s (%s)", name, item.__class__.__name__)
-                    setattr(self, name, None)
-                else:
-                    log.debug("Cleaning up %s", item.__class__.__name__)
-                item.terminate()
-            except Exception as e:
-                log.warning("Exception during cleanup: %s", e)
-
-
-class LinuxWorkerState(WorkerState):
-    def _platform_init(self) -> Executor:
-        log.debug("Initializing Linux test executor.")
-
-        # Create a virtual /tmp.
-        tmp_dir_default = self.config.tmp_dir_default
-        tmp_dir = self.config.tmp_dir_worker_base / str(self.id)
-        tmp_dir.mkdir(parents=True, exist_ok=True)
-
-        log.info("Remounting %s as %s for the worker", tmp_dir, tmp_dir_default)
-        if subprocess.run(["mount", "-o", "bind", str(tmp_dir), str(tmp_dir_default)]).returncode != 0:
-            raise RuntimeError(f"Failed to mount a virtual {tmp_dir_default}")
-
-        self.net_ns = self.add_to_clean(net_ns := linux.IsolatedNetworkNamespace(
-            index=self.id,
-            # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-            app_link_up=not self.config.ble_wifi_enable,
-            # Change the app link name so the interface will be recognized as WiFi or Ethernet
-            # depending on the commissioning method used.
-            app_link_name='wlx-app' if self.config.ble_wifi_enable else 'eth-app',
-            wait_for_dad=False))
-        net_ns.wait_for_duplicate_address_detection()
-        self.rpc_ns = net_ns.rpc_ns
-
-        if self.config.ble_wifi_enable:
-            self.dbus = self.add_to_clean(linux.DBusTestSystemBus())
-            self.bluetooth = self.add_to_clean(linux.BluetoothMock())
-            self.wifi = self.add_to_clean(linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", net_ns))
-            self.ble_controller_app = 0  # Bind app to the first BLE controller
-            self.ble_controller_tool = 1  # Bind tool to the second BLE controller
-
-        return linux.LinuxNamespacedExecutor(net_ns)
-
-
-class DarwinWorkerState(WorkerState):
-    def _platform_init(self) -> Executor:
-        log.debug("Initializing Darwin test executor.")
-        return darwin.DarwinExecutor()
-
-
-class GenericWorkerState(WorkerState):
-    def _platform_init(self) -> Executor:
-        log.warning("No platform-specific executor for '%s'", sys.platform)
-        return Executor()
-
-
-class WorkerProcess(WrappedProcess):
-    # TODO: Merge with WorkerState
+class WorkerProcess(WrappedProcess, ABC):
     WorkQueueT: TypeAlias = queue.Queue[TestDefinition | None]
     ResultQueueT: TypeAlias = queue.Queue[WorkerResult]
 
@@ -222,26 +102,36 @@ class WorkerProcess(WrappedProcess):
                          state_changed, cancel_event)
         self.id = id
         self.config = config
+
         self.active = mp_manager.Event()
         self.work_queue = mp_manager.Queue()
         self.worker_ready_queue = worker_ready_queue
         self.resp_queue = resp_queue
 
-        self.worker_state: WorkerState | None = None
-
     def _proc_init(self) -> None:
-        WorkerStateCls: type[WorkerState]
-        match sys.platform:
-            case "linux":
-                WorkerStateCls = LinuxWorkerState
-            case "darwin":
-                WorkerStateCls = DarwinWorkerState
-            case _:
-                WorkerStateCls = GenericWorkerState
+        self._to_clean: queue.LifoQueue[Terminable] = queue.LifoQueue()
+        self.rpc_ns: str | None = None
+        self.ble_controller_app: int | None = None
+        self.ble_controller_tool: int | None = None
 
-        # Don't interrupt during worker initialization.
-        self.worker_state = WorkerStateCls(self.id, self.config)
+        # Initialize platform-specific executor.
+        self.executor = self._add_to_clean(executor := self._platform_init())
+
+        # Finalize common parts.
+        self.runner = chiptest.runner.Runner(executor)
+        self.apps_register = self._add_to_clean(apps := AppsRegister(self.rpc_ns, self.log_config))
+        apps.init()
         self.worker_ready_queue.put(self.id)
+
+    @abstractmethod
+    def _platform_init(self) -> Executor:
+        """Initialize platform-specific executor."""
+
+    ToCleanT = TypeVar("ToCleanT", bound=Terminable)
+
+    def _add_to_clean(self, component: ToCleanT) -> ToCleanT | None:
+        self._to_clean.put(component)
+        return component
 
     def _proc_work(self, cancel_event: threading.Event):
         while not cancel_event.is_set():
@@ -259,30 +149,43 @@ class WorkerProcess(WrappedProcess):
             self.active.clear()
 
     def _proc_cleanup(self):
-        log.debug("Terminating worker")
-        if self.worker_state is not None:
-            self.worker_state.terminate()
+        log.debug("Cleaning up state of the worker")
+
+        while not self._to_clean.empty():
+            # During termination treat exceptions as warnings to ensure that all items get a chance to terminate.
+            try:
+                item = self._to_clean.get_nowait()
+
+                # Get member name if exists.
+                name = next((attr for attr, val in vars(self).items() if val == item), None)
+
+                if name is not None:
+                    log.debug("Cleaning up %s (%s)", name, item.__class__.__name__)
+                    setattr(self, name, None)
+                else:
+                    log.debug("Cleaning up %s", item.__class__.__name__)
+                item.terminate()
+            except Exception as e:
+                log.warning("Exception during cleanup: %s", e)
         log.debug("Worker terminated")
 
     def _run_test(self, test: TestDefinition) -> WorkerResult:
-        result = WorkerResult(test)
+        result = WorkerResult(test, self.id)
         test_start = time.monotonic()
         try:
-            if self.worker_state is None or self.worker_state.apps_register is None:
+            if self.apps_register is None:
                 raise RuntimeError("Invalid state of the worker")
 
-            result.worker_id = self.worker_state.id
-            config = self.worker_state.config
-            self.worker_state.logconfig.set_log_fmt(test.name)
+            self.log_config.set_log_fmt(test.name)
 
-            log.info("Would run test" if config.dry_run else "Starting test")
+            log.info("Would run test" if self.config.dry_run else "Starting test")
             # TODO: Potentially intercept stdout/stderr to output it in one block.
             test_start = time.monotonic()
-            test.Run(self.worker_state.runner, self.worker_state.apps_register, config.paths, config.pics_file, config.test_timeout_seconds,
-                     config.dry_run, config.runtime, self.worker_state.ble_controller_app, self.worker_state.ble_controller_tool)
+            test.Run(self.runner, self.apps_register, self.config.paths, self.config.pics_file, self.config.test_timeout_seconds,
+                     self.config.dry_run, self.config.runtime, self.ble_controller_app, self.ble_controller_tool)
             result.runtime = time.monotonic() - test_start
 
-            if not config.dry_run:
+            if not self.config.dry_run:
                 log.info("✅ Completed in %0.2f seconds", result.runtime)
         except BaseException as e:
             result.runtime = time.monotonic() - test_start
@@ -291,24 +194,81 @@ class WorkerProcess(WrappedProcess):
                 raise
             log.exception("❌ FAILED in %0.2f seconds", result.runtime, exc_info=True)
         finally:
-            if self.worker_state is not None:
-                self.worker_state.logconfig.set_log_fmt(None)
+            self.log_config.set_log_fmt(None)
             return result
 
+if sys.platform == "linux":
 
-class WorkerPool(WrappedProcessPoolContext[WorkerProcess]):
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfig) -> None:
+    class LinuxWorkerProcess(WorkerProcess):
+        def _platform_init(self) -> Executor:
+            log.debug("Initializing Linux test executor.")
+
+            # Create a virtual /tmp.
+            tmp_dir_default = self.config.tmp_dir_default
+            tmp_dir = self.config.tmp_dir_worker_base / str(self.id)
+            tmp_dir.mkdir(parents=True, exist_ok=True)
+
+            log.info("Remounting %s as %s for the worker", tmp_dir, tmp_dir_default)
+            if subprocess.run(["mount", "-o", "bind", str(tmp_dir), str(tmp_dir_default)]).returncode != 0:
+                raise RuntimeError(f"Failed to mount a virtual {tmp_dir_default}")
+
+            self.net_ns = self._add_to_clean(net_ns := linux.IsolatedNetworkNamespace(
+                index=self.id,
+                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+                app_link_up=not self.config.ble_wifi_enable,
+                # Change the app link name so the interface will be recognized as WiFi or Ethernet
+                # depending on the commissioning method used.
+                app_link_name='wlx-app' if self.config.ble_wifi_enable else 'eth-app',
+                wait_for_dad=False))
+            net_ns.wait_for_duplicate_address_detection()
+            self.rpc_ns = net_ns.rpc_ns
+
+            if self.config.ble_wifi_enable:
+                self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
+                self.bluetooth = self._add_to_clean(linux.BluetoothMock())
+                self.wifi = self._add_to_clean(linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", net_ns))
+                self.ble_controller_app = 0  # Bind app to the first BLE controller
+                self.ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+            return linux.LinuxNamespacedExecutor(net_ns)
+
+    WorkerProcessCls = LinuxWorkerProcess
+
+elif sys.platform == "darwin":
+
+    class DarwinWorkerProcess(WorkerProcess):
+        def _platform_init(self) -> Executor:
+            log.debug("Initializing Darwin test executor.")
+            return darwin.DarwinExecutor()
+
+    WorkerProcessCls = DarwinWorkerProcess
+
+else:
+
+    class GenericWorkerProcess(WorkerProcess):
+        def _platform_init(self) -> Executor:
+            log.warning("No platform-specific executor for '%s'", sys.platform)
+            return Executor()
+
+    WorkerProcessCls = GenericWorkerProcess
+
+
+WorkerPoolProcessT = TypeVar("WorkerPoolProcessT", bound=WorkerProcess)
+
+
+class WorkerPool(WrappedProcessPoolContext[WorkerPoolProcessT]):
+    def __init__(self, process_cls: type[WorkerPoolProcessT], mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfig) -> None:
         self.config = config
         self.job_done_condition = mp_manager.Condition()
         self.result_queue: WorkerProcess.ResultQueueT = mp_manager.Queue()
         self.worker_ready_queue: queue.Queue[int] = mp_manager.Queue()
 
-        super().__init__(mp_context, mp_manager, config.concurrency, "Test Pool", WORKER_START_TIMEOUT, WORKER_STOP_TIMEOUT)
+        super().__init__(process_cls, mp_context, mp_manager, config.concurrency, "Test Pool", WORKER_START_TIMEOUT, WORKER_STOP_TIMEOUT)
 
-    def _init_process(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
-                      cancel_event: threading.Event) -> WorkerProcess:
-        return WorkerProcess(id, mp_context, mp_manager, self.config, state_changed, cancel_event, self.worker_ready_queue,
-                             self.result_queue)
+    def _init_process(self, process_cls: type[WorkerPoolProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+                      cancel_event: threading.Event) -> WorkerPoolProcessT:
+        return process_cls(id, mp_context, mp_manager, self.config, state_changed, cancel_event, self.worker_ready_queue,
+                           self.result_queue)
 
     @property
     def worker_utilization(self) -> int:
@@ -329,9 +289,6 @@ class WorkerPool(WrappedProcessPoolContext[WorkerProcess]):
 
     def finalize(self):
         return self.put(None, None)
-
-# TODO: Test errors in tests
-# TODO: Test errors with keep-going
 
 
 @dataclass
@@ -360,14 +317,11 @@ class TestPoolManager:
                 self.status_periodicity = num
 
     def run_tests(self, tests: list[TestDefinition]):
-        log.info("Will run the following tests (%i)", len(tests))
-        for test in tests:
-            log.info("  %s", test.name)
         self.test_results = {test.name: [] for test in tests}
 
         with (SyncManager(address=SYNC_MANAGER_PATH) as manager,
               mp_wrapped_spawn_context("unshare --map-root-user -n -m") as ctx,
-              WorkerPool(ctx, manager, self.config) as pool):
+              WorkerPool(WorkerProcessCls, ctx, manager, self.config) as pool):
             # Set up the periodic status overview thread.
             status_thread_cancel = threading.Event()
             status_thread = threading.Thread(target=self._print_periodic_status,
