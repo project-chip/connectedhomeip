@@ -91,12 +91,12 @@ void DeviceInfoProvider::SetStorageDelegate(PersistentStorageDelegate * storage)
 
 DeviceInfoProvider::DeviceInfoCapabilityMinimas DeviceInfoProvider::GetSupportedCapabilityMinimaValues()
 {
-    static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000, "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be under 10000");
-    static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000, "CHIP_IM_MAX_NUM_WRITE_HANDLER must be under 10000");
+    static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000, "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be <= 10000");
+    static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000, "CHIP_IM_MAX_NUM_WRITE_HANDLER must be <= 10000");
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= 10000,
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be under 10000");
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be <= 10000");
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= 10000,
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be under 10000");
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be <= 10000");
 
     return DeviceInfoCapabilityMinimas{ .simultaneousInvocationsSupported = CHIP_IM_MAX_NUM_COMMAND_HANDLER,
                                         .simultaneousWritesSupported      = CHIP_IM_MAX_NUM_WRITE_HANDLER,

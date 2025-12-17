@@ -43,7 +43,7 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
                    BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Basic Information cluster MUST be on endpoint 0");
 
-ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
+LazyRegisteredServerCluster<BasicInformationCluster<true>> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -52,19 +52,19 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
-        BasicInformationCluster::Instance().OptionalAttributes() =
-            BasicInformationCluster::OptionalAttributesSet(optionalAttributeBits);
+        BasicInformationCluster<true>::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
-        return gRegistration;
+        gServer.Create(optionalAttributeSet);
+        return gServer.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return &BasicInformationCluster::Instance();
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
     }
 
-    // Nothing to destroy: separate singleton class without constructor/destructor is used
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace

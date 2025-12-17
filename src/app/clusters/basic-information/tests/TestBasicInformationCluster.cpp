@@ -74,23 +74,13 @@ struct TestBasicInformationCluster : public ::testing::Test
 TEST_F(TestBasicInformationCluster, TestAttributes)
 {
 
-    // save and restore the flags at the end of the test
-    struct SaveFlags
-    {
-        SaveFlags() { mFlags = BasicInformationCluster::Instance().OptionalAttributes(); }
-        ~SaveFlags() { BasicInformationCluster::Instance().OptionalAttributes() = mFlags; }
-
-    private:
-        BasicInformationCluster::OptionalAttributesSet mFlags;
-    } scopedFlagsSave;
-
     // check without optional attributes
     {
-        BasicInformationCluster::Instance().OptionalAttributes() =
-            BasicInformationCluster::OptionalAttributesSet().Set<UniqueID::Id>();
+        const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+        BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(
-            BasicInformationCluster::Instance(),
+            cluster,
             {
 
                 DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry,
@@ -104,10 +94,13 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
     // Check that disabling unique id works
     {
-        // UniqueID is EXPLICITLY NOT SET
-        BasicInformationCluster::Instance().OptionalAttributes() = BasicInformationCluster::OptionalAttributesSet();
+        const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+        BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
 
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(BasicInformationCluster::Instance(),
+        // UniqueID is EXPLICITLY NOT SET
+        cluster.OptionalAttributes() = BasicInformationCluster<false>::OptionalAttributesSet();
+
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
                                                      {
                                                          DataModelRevision::kMetadataEntry,
                                                          VendorName::kMetadataEntry,
@@ -129,8 +122,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
     // All attributes
     {
-        BasicInformationCluster::Instance().OptionalAttributes() = //
-            BasicInformationCluster::OptionalAttributesSet()
+        const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet = BasicInformationCluster<false>::OptionalAttributesSet()
                 .Set<ManufacturingDate::Id>()
                 .Set<PartNumber::Id>()
                 .Set<ProductURL::Id>()
@@ -141,7 +133,9 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                 .Set<ProductAppearance::Id>()
                 .Set<UniqueID::Id>();
 
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(BasicInformationCluster::Instance(),
+        BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
 
                                                      {
                                                          DataModelRevision::kMetadataEntry,

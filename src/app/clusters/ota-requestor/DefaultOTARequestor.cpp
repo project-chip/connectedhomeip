@@ -731,21 +731,25 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
 
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
-
     uint16_t vendorId;
-    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
+    bool localConfigDisabled;
+    DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider = DeviceLayer::GetDeviceInstanceInfoProvider();
+
+    ReturnErrorOnFailure(deviceInstanceInfoProvider->GetVendorId(vendorId));
     args.vendorID = static_cast<VendorId>(vendorId);
 
-    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(args.productID));
+    ReturnErrorOnFailure(deviceInstanceInfoProvider->GetProductId(args.productID));
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(!BasicInformationCluster::Instance().GetLocalConfigDisabled() &&
+
+    ReturnErrorOnFailure(deviceInstanceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
+    args.requestorCanConsent.SetValue(!localConfigDisabled &&
                                       mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
+    if (deviceInstanceInfoProvider->GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }

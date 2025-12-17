@@ -65,6 +65,12 @@ public:
         Iterator() = default;
     };
 
+    /**
+     * This struct contains some of the values that are a part of the 
+     * CapabilityMinimaStruct from the basic information cluster. These are 
+     * only the values that are retrieved from the device info provider, other 
+     * values of the CapabilityMinimaStruct are populated elsewhere. 
+     */
     struct DeviceInfoCapabilityMinimas
     {
         uint16_t simultaneousInvocationsSupported;

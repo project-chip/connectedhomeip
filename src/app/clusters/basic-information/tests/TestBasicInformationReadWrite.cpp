@@ -198,25 +198,17 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override
-    {
-        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
-        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
-    }
-
-    void TearDown() override { basicInformationClusterInstance.Shutdown(); }
-
     MockDeviceInfoProvider mDeviceInfoProvider;
     chip::Testing::TestServerClusterContext testContext;
-    static BasicInformationCluster & basicInformationClusterInstance;
-    static chip::Testing::ClusterTester tester;
 };
-
-BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
-chip::Testing::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
+    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster<false> cluster(optionalAttributeSet , &mDeviceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // 1. GIVEN: A mock storage with a pre-existing "Old Label".
     CharSpan oldLabelSpan = "Old Label"_span;
 
@@ -230,8 +222,8 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    basicInformationClusterInstance.Shutdown();
-    ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
+    cluster.Shutdown();
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
     char readBuffer[32];
@@ -258,11 +250,17 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     Storage::String<32> persistedLabel;
     persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, persistedLabel);
     EXPECT_TRUE(persistedLabel.Content().data_equal(newLabelSpan));
+
+    cluster.Shutdown();
 }
 
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
+
+    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
     {
@@ -359,11 +357,28 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         ASSERT_EQ(tester.ReadAttribute(Attributes::CapabilityMinima::Id, val), CHIP_NO_ERROR);
         EXPECT_GE(val.caseSessionsPerFabric, 3);
         EXPECT_GE(val.subscriptionsPerFabric, 3);
+
+        ASSERT_TRUE(val.simultaneousInvocationsSupported.HasValue());
+        EXPECT_GE(val.simultaneousInvocationsSupported.Value(), 4);
+
+        ASSERT_TRUE(val.simultaneousWritesSupported.HasValue());
+        EXPECT_GE(val.simultaneousWritesSupported.Value(), 4);
+
+        ASSERT_TRUE(val.readPathsSupported.HasValue());
+        EXPECT_GE(val.readPathsSupported.Value(), 144);
+
+        ASSERT_TRUE(val.subscribePathsSupported.HasValue());
+        EXPECT_GE(val.subscribePathsSupported.Value(), 3);
     }
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
+    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // 1. ARRANGE: Define a new valid label
     CharSpan newLabel = "My Awesome Hub"_span;
     char readBuffer[32];
@@ -375,10 +390,17 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
     // 3. ASSERT: Read the attribute back and verify it matches the new label
     ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(newLabel));
+
+    cluster.Shutdown();
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
+    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // --- Test Case 1: Write a valid 2-character location ---
     {
         CharSpan validLocation = "US"_span;
@@ -399,11 +421,18 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
+
+    cluster.Shutdown();
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
     bool readValue{};
+
+    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
 
     // --- Test Case 1: Write 'true' ---
     {
@@ -426,6 +455,8 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
         ASSERT_EQ(tester.ReadAttribute(Attributes::LocalConfigDisabled::Id, readValue), CHIP_NO_ERROR);
         EXPECT_EQ(readValue, finalValue);
     }
+
+    cluster.Shutdown();
 }
 
 } // namespace

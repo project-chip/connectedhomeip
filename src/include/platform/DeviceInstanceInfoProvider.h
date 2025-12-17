@@ -207,6 +207,38 @@ public:
      * Administrator.
      */
     virtual CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Obtain the current value of LocalConfigDisabled flag
+     * 
+     * This method provides the value of the LocalConfigDisabled flag, whether it is implemented by the device or not. 
+     * This is so other system delegates can access this value without needing to access it from a global cluster instance
+     * (which in this case would mean getting it from the basic information cluster). 
+     * 
+     * @returns CHIP_NO_ERROR on success (which is returned here by default).
+     */
+    virtual CHIP_ERROR GetLocalConfigDisabled(bool & localConfigDisabled)
+    {
+        localConfigDisabled = mLocalConfigDisabled;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * @brief Set the current value of LocalConfigDisabled flag
+     * 
+     * This method returns CHIP_NO_ERROR by default.
+     * 
+     * @param[in] localConfigDisabled the new value of to set mLocalConfigDisabled to.
+     * @returns CHIP_NO_ERROR on success (which is returned here by default).
+     */
+    virtual CHIP_ERROR SetLocalConfigDisabled(bool localConfigDisabled)
+    {
+        mLocalConfigDisabled = localConfigDisabled;
+        return CHIP_NO_ERROR;
+    }
+
+protected:
+    volatile bool mLocalConfigDisabled = false;
 };
 
 /**

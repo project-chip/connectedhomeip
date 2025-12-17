@@ -35,12 +35,9 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpointId, provider, parentId));
 
-    mBasicInformationCluster.Create();
-
     // TODO: This needs to be refactored so the optional attributes being set for
     //  the cluster are configurable to allow different settings
-    mBasicInformationCluster.Cluster()
-        .OptionalAttributes()
+    const BasicInformationCluster<true>::OptionalAttributesSet optionalAttributeSet = BasicInformationCluster<true>::OptionalAttributesSet()
         .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
         .Set<BasicInformation::Attributes::PartNumber::Id>()
         .Set<BasicInformation::Attributes::ProductURL::Id>()
@@ -48,6 +45,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         .Set<BasicInformation::Attributes::SerialNumber::Id>()
         .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
         .Set<BasicInformation::Attributes::Reachable::Id>();
+    
+    mBasicInformationCluster.Create(optionalAttributeSet);
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
