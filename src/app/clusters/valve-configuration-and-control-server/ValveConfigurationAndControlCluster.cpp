@@ -34,10 +34,11 @@ using chip::Protocols::InteractionModel::Status;
 
 ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(EndpointId endpoint,
                                                                          BitFlags<ValveConfigurationAndControl::Feature> features,
-                                                                         OptionalAttributeSet optionalAttributeSet,
+                                                                         OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
                                                                          TimeSyncTracker * tsTracker) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDelegate(nullptr), mTsTracker(tsTracker)
+    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
+    mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker) 
 {}
 
 CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & context)

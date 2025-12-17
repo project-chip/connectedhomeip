@@ -42,8 +42,15 @@ public:
                                                                  ValveConfigurationAndControl::Attributes::ValveFault::Id,
                                                                  ValveConfigurationAndControl::Attributes::LevelStep::Id>;
 
+    struct StartupConfiguration
+    {
+        const DataModel::Nullable<uint32_t> defaultOpenDuration;
+        Percent defaultOpenLevel;
+        uint8_t levelStep;
+    };
+
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
-                                        OptionalAttributeSet optionalAttributeSet, TimeSyncTracker * tsTracker);
+                                        OptionalAttributeSet optionalAttributeSet,  const StartupConfiguration & config, TimeSyncTracker * tsTracker);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -93,6 +100,8 @@ private:
     }
 
     // Attributes
+    const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
+    const OptionalAttributeSet mOptionalAttributeSet;
     DataModel::Nullable<uint32_t> mOpenDuration{ DataModel::NullNullable };
     DataModel::Nullable<uint32_t> mDefaultOpenDuration{ DataModel::NullNullable };
     DataModel::Nullable<uint64_t> mAutoCloseTime{ DataModel::NullNullable };
@@ -104,8 +113,6 @@ private:
     Percent mDefaultOpenLevel{ kDefaultOpenLevel };
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault{ 0u };
     uint8_t mLevelStep{ kDefaultLevelStep };
-    const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
-    const OptionalAttributeSet mOptionalAttributeSet;
     ValveConfigurationAndControl::Delegate * mDelegate;
     TimeSyncTracker * mTsTracker;
 };

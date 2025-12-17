@@ -72,11 +72,14 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        // Create OptionalAttributeSet from optionalAttributeBits
-        ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-
         gServers[clusterInstanceIndex].Create(endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
-                                              optionalAttributeSet, &codegenTracker);
+                                                          ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
+                                                          ValveConfigurationAndControlCluster::StartupConfiguration{
+                                                            .defaultOpenDuration = DataModel::NullNullable,
+                                                            .defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                            .levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep
+                                                          }, 
+                                                          &codegenTracker);
         return gServers[clusterInstanceIndex].Registration();
     }
 
