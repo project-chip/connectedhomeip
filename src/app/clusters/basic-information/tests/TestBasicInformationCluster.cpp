@@ -66,8 +66,6 @@ struct TestBasicInformationCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider); }
-
     MockDeviceInfoProvider mDeviceInfoProvider;
 };
 
