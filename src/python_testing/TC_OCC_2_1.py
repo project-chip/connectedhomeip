@@ -43,10 +43,13 @@
 #     app-args: --device occupancy-sensor --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --manual-code 10054912339
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
