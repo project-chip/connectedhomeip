@@ -25,3 +25,7 @@ void MatterTlsClientManagementPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
 }
+
+void MatterTlsClientManagementClusterInitCallback(unsigned short) {}
+
+void MatterTlsClientManagementClusterShutdownCallback(unsigned short) {}
