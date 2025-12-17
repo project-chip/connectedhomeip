@@ -22,9 +22,9 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -46,6 +46,7 @@ using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
 
 using chip::app::AttributeValueDecoder;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::IsAttributesListEqualTo;
 using chip::Testing::kAdminSubjectDescriptor;
 using chip::Testing::WriteOperation;
 
@@ -69,34 +70,33 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 
         NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      MaxNetworks::kMetadataEntry,
-                      Networks::kMetadataEntry,
-                      InterfaceEnabled::kMetadataEntry,
-                      LastNetworkingStatus::kMetadataEntry,
-                      LastNetworkID::kMetadataEntry,
-                      LastConnectErrorValue::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
         //       For now keep the logic as inherited from previous implementation.
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      ScanMaxTimeSeconds::kMetadataEntry,
-                      ConnectMaxTimeSeconds::kMetadataEntry,
-                      SupportedWiFiBands::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                MaxNetworks::kMetadataEntry,
+                                                Networks::kMetadataEntry,
+                                                InterfaceEnabled::kMetadataEntry,
+                                                LastNetworkingStatus::kMetadataEntry,
+                                                LastNetworkID::kMetadataEntry,
+                                                LastConnectErrorValue::kMetadataEntry,
+                                                ScanMaxTimeSeconds::kMetadataEntry,
+                                                ConnectMaxTimeSeconds::kMetadataEntry,
+                                                SupportedWiFiBands::kMetadataEntry,
+                                            }));
+#else
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                MaxNetworks::kMetadataEntry,
+                                                Networks::kMetadataEntry,
+                                                InterfaceEnabled::kMetadataEntry,
+                                                LastNetworkingStatus::kMetadataEntry,
+                                                LastNetworkID::kMetadataEntry,
+                                                LastConnectErrorValue::kMetadataEntry,
+                                            }));
 #endif
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
     // TODO: more tests for ethernet and thread should be added

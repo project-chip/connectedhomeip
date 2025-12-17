@@ -17,15 +17,17 @@
 
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/AccessControl/Enums.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 
 namespace {
 
@@ -33,6 +35,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+
+using chip::Testing::IsAttributesListEqualTo;
 
 struct TestAccessControlCluster : public ::testing::Test
 {
@@ -78,26 +82,20 @@ TEST_F(TestAccessControlCluster, CommandsTest)
 TEST_F(TestAccessControlCluster, AttributesTest)
 {
     AccessControlCluster cluster;
-    ConcreteClusterPath accessControlPath = ConcreteClusterPath(kRootEndpointId, AccessControl::Id);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-    ASSERT_EQ(cluster.Attributes(accessControlPath, attributesBuilder), CHIP_NO_ERROR);
+    std::vector<DataModel::AttributeEntry> expectedAttributes(AccessControl::Attributes::kMandatoryMetadata.begin(),
+                                                              AccessControl::Attributes::kMandatoryMetadata.end());
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+    expectedAttributes.push_back(AccessControl::Attributes::Extension::kMetadataEntry);
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+    expectedAttributes.push_back(AccessControl::Attributes::CommissioningARL::kMetadataEntry);
+    expectedAttributes.push_back(AccessControl::Attributes::Arl::kMetadataEntry);
 #endif
-    }),
-              CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
 }
 
 } // namespace
