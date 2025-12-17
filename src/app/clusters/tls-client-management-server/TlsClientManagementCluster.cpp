@@ -219,10 +219,7 @@ TlsClientManagementCluster::HandleFindEndpoint(CommandHandler & commandHandler, 
 {
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
 
-    if (req.endpointID > kMaxTlsEndpointId)
-    {
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError(req.endpointID <= kMaxTlsEndpointId, Status::ConstraintError);
 
     auto fabric     = commandHandler.GetAccessingFabricIndex();
     auto endpointId = mPath.mEndpointId;
