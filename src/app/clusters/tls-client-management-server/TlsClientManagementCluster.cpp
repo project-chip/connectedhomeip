@@ -270,7 +270,7 @@ TlsClientManagementCluster::HandleRemoveEndpoint(CommandHandler & commandHandler
         NotifyAttributeChanged(TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
     }
 
-    return DataModel::ActionReturnStatus(status);
+    return status;
 }
 
 void TlsClientManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
