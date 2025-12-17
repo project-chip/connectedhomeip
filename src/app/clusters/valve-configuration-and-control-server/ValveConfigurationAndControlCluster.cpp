@@ -387,7 +387,7 @@ ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Perce
             adjustedTargetLevel = mDefaultOpenLevel;
             return CHIP_NO_ERROR;
         }
-        adjustedTargetLevel = kMaxLevelValue;
+        adjustedTargetLevel = kMaxLevelValuePercent;
         return CHIP_NO_ERROR;
     }
 
@@ -403,7 +403,7 @@ bool ValveConfigurationAndControlCluster::ValueCompliesWithLevelStep(const uint8
 {
     if (mOptionalAttributeSet.IsSet(Attributes::LevelStep::Id))
     {
-        if ((value != kMaxLevelValue) && ((value % mLevelStep) != 0))
+        if ((value != kMaxLevelValuePercent) && ((value % mLevelStep) != 0))
         {
             return false;
         }

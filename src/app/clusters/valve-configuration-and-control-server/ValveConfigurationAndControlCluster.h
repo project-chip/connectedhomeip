@@ -36,7 +36,7 @@ class ValveConfigurationAndControlCluster : public DefaultServerCluster
 public:
     static constexpr uint8_t kDefaultOpenLevel = 100u;
     static constexpr uint8_t kDefaultLevelStep = 1u;
-    static constexpr uint8_t kMaxLevelValue    = 100u;
+    static constexpr uint8_t kMaxLevelValuePercent    = 100u;
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
                                                                  ValveConfigurationAndControl::Attributes::ValveFault::Id,
