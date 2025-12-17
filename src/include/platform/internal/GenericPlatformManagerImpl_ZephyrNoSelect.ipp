@@ -49,6 +49,33 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+namespace {
+
+// Semaphore used to wake up the event loop thread.
+K_SEM_DEFINE(sEventSignal, 0, 1);
+
+// Work item used to signal the event loop from ISR context, since giving a semaphore
+// directly from ISR may not wake up the thread immediately in all cases.
+K_WORK_DEFINE(sSignalWork, [](k_work *) { k_sem_give(&sEventSignal); });
+
+// Timer handler to wake up the event loop after a small delay.
+// This runs in ISR context, so we use the work queue to signal safely.
+void WakeupTimerHandler(k_timer * timer)
+{
+    k_work_submit(&sSignalWork);
+}
+
+// Timer used to schedule a delayed wake-up of the event loop when _StartChipTimer is called.
+// The delay allows the calling thread to complete its operation before the event loop
+// processes the timer, avoiding race conditions where timers fire too early.
+K_TIMER_DEFINE(sWakeupTimer, WakeupTimerHandler, nullptr);
+
+// Delay before waking up the event loop after a timer is scheduled from another thread.
+// 1ms is enough to let the calling thread finish its current operation.
+constexpr uint32_t kWakeupDelayMs = 1;
+
+} // anonymous namespace
+
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 {
@@ -99,15 +126,14 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
-    // If the platform timer is being updated by a thread other than the event loop thread,
-    // trigger the event loop thread to recalculate its wait time by posting a no-op event
-    // to the event queue.
+    // The timer is already recorded in the system layer's timer list.
+    // If called from a different thread, schedule a delayed wake-up to let the event loop
+    // process the timer. The delay allows the calling thread to complete its operation
+    // before the event loop processes the timer, avoiding race conditions.
     if (k_current_get() != &mChipThread)
     {
-        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
-        ReturnErrorOnFailure(Impl()->PostEvent(&noop));
+        k_timer_start(&sWakeupTimer, K_MSEC(kWakeupDelayMs), K_NO_WAIT);
     }
-
     return CHIP_NO_ERROR;
 }
 
@@ -147,6 +173,13 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
 
     SYSTEM_STATS_INCREMENT(System::Stats::kPlatformMgr_NumEvents);
 
+    // The k_poll in the event loop is configured with K_POLL_TYPE_MSGQ_DATA_AVAILABLE,
+    // so it will automatically wake up when k_msgq_put adds data to the queue.
+    if (k_is_in_isr())
+    {
+        (void) k_work_submit(&sSignalWork);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -164,10 +197,13 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 
     System::LayerImplZephyr & systemLayer = static_cast<System::LayerImplZephyr &>(DeviceLayer::SystemLayer());
 
+    // Define poll events for message queue and signal semaphore.
+    // This allows waking up when either an event is posted or a signal arrives.
+    struct k_poll_event pollEvents[2];
+
     while (mShouldRunEventLoop)
     {
         k_timeout_t timeout = K_FOREVER;
-        bool eventReceived  = false;
         ChipDeviceEvent event;
 
         // Get the awaken time for the next timer
@@ -177,19 +213,32 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
             System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
             if (nextAwakenTime.value() > now)
             {
-                // Calculate the timeout
+                // Calculate the timeout based on the next timer
                 System::Clock::Timestamp delay = nextAwakenTime.value() - now;
                 timeout                        = K_MSEC(delay.count());
             }
             else
             {
-                // Some timer already expired, do not wait if event queue is empty
+                // Some timer already expired, do not wait
                 timeout = K_NO_WAIT;
             }
         }
 
+        // Initialize poll events before each wait
+        k_poll_event_init(&pollEvents[0], K_POLL_TYPE_MSGQ_DATA_AVAILABLE, K_POLL_MODE_NOTIFY_ONLY, &mChipEventQueue);
+        k_poll_event_init(&pollEvents[1], K_POLL_TYPE_SEM_AVAILABLE, K_POLL_MODE_NOTIFY_ONLY, &sEventSignal);
+
         Impl()->UnlockChipStack();
-        eventReceived = k_msgq_get(&mChipEventQueue, &event, timeout) == 0;
+
+        // Wait for either:
+        // 1. An event in the message queue
+        // 2. A signal from ISR
+        // 3. Timeout for the next timer
+        k_poll(pollEvents, 2, timeout);
+
+        // Reset the signal semaphore if it was given (consume the signal)
+        k_sem_reset(&sEventSignal);
+
         Impl()->LockChipStack();
 
         // Call into the system layer to dispatch the callback functions for all timers
@@ -200,11 +249,11 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
             ChipLogError(DeviceLayer, "Error handling CHIP timers: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
-        while (eventReceived)
+        // Process all pending events from the queue
+        while (k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0)
         {
             SYSTEM_STATS_DECREMENT(System::Stats::kPlatformMgr_NumEvents);
             Impl()->DispatchEvent(&event);
-            eventReceived = k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0;
         }
     }
 
