@@ -210,6 +210,34 @@ exit:
 
 } // namespace Binding
 
+CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
+{
+    CHIP_ERROR err = Binding::Table::GetInstance().Add(entry);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    if (entry.type == Binding::MATTER_UNICAST_BINDING)
+    {
+        err = Binding::Manager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogError(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.nodeId), err.Format());
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
