@@ -22,6 +22,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>

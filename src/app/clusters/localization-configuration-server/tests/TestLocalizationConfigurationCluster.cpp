@@ -21,6 +21,7 @@
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
 #include <clusters/LocalizationConfiguration/Ids.h>
 #include <clusters/LocalizationConfiguration/Metadata.h>

@@ -22,6 +22,7 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>

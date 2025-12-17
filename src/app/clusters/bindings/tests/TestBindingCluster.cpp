@@ -20,6 +20,7 @@
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/Binding/Enums.h>
 #include <clusters/Binding/Metadata.h>
 #include <lib/core/CHIPError.h>
