@@ -33,11 +33,6 @@ set(APP_SRCS
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     # Providers
     "${CHIP_ROOT}/examples/providers/DeviceInfoProviderImpl.cpp"
-    # ESP32 common
-    "${CHIP_ROOT}/examples/platform/esp32/common/CHIPDeviceManager.cpp"
-    "${CHIP_ROOT}/examples/platform/esp32/common/CommonDeviceCallbacks.cpp"
-    "${CHIP_ROOT}/examples/platform/esp32/common/Esp32AppServer.cpp"
-    "${CHIP_ROOT}/examples/platform/esp32/common/Esp32ThreadInit.cpp"
 )
 
 # Code-driven data model provider sources

@@ -24,9 +24,13 @@ set(PROJECT_VER_NUMBER 1)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 
+# ESP-IDF scans EXTRA_COMPONENT_DIRS for valid components (subdirectories with
+# CMakeLists.txt containing idf_component_register). Components are discovered
+# but only linked if required by the dependency graph.
+#
+# - config/esp32/components: Provides the 'chip' component (GN build wrapper)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common"
 )
 
 project(chip-all-devices-app)
@@ -48,4 +52,3 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
 
 flashing_script()
-

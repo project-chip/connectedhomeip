@@ -80,7 +80,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-WifiRootNodeDevice * gRootNodeDevice                        = nullptr;
+std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 
 void DeInitBLEIfCommissioned()
@@ -182,7 +182,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
-    gRootNodeDevice = chip::Platform::New<WifiRootNodeDevice>(&sWiFiDriver);
+    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(&sWiFiDriver);
     err             = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
