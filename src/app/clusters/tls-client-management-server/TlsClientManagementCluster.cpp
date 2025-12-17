@@ -211,7 +211,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
         return std::nullopt;
     }
 
-    return DataModel::ActionReturnStatus(status);
+    return status;
 }
 
 std::optional<DataModel::ActionReturnStatus>
