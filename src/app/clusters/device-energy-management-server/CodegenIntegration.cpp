@@ -44,8 +44,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CHIP_ERROR err =
-        CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster(), ClusterShutdownType::kClusterShutdown);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
 
     if (err != CHIP_NO_ERROR)
     {

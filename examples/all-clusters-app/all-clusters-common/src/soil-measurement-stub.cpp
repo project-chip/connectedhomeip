@@ -71,8 +71,7 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 {
     VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
-    LogErrorOnFailure(
-        CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster(), ClusterShutdownType::kClusterShutdown));
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
 
     gServer.Destroy();
 }
