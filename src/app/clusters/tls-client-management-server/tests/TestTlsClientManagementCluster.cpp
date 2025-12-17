@@ -453,8 +453,11 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointSuccess)
     EXPECT_TRUE(provisionResult.IsSuccess());
     ASSERT_TRUE(provisionResult.response.has_value());
 
-    auto & response        = provisionResult.response.value();
-    uint16_t provisionedID = response.endpointID;
+    uint16_t provisionedID = 0;
+    if (provisionResult.response.has_value())
+    {
+        provisionedID = provisionResult.response.value().endpointID;
+    }
 
     // Now find it
     Commands::FindEndpoint::Type findReq;
@@ -511,8 +514,11 @@ TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointSuccess)
     EXPECT_TRUE(provisionResult.IsSuccess());
     ASSERT_TRUE(provisionResult.response.has_value());
 
-    auto & response        = provisionResult.response.value();
-    uint16_t provisionedID = response.endpointID;
+    uint16_t provisionedID = 0;
+    if (provisionResult.response.has_value())
+    {
+        provisionedID = provisionResult.response.value().endpointID;
+    }
 
     EXPECT_EQ(mMockDelegate.endpoints.size(), 1u);
 

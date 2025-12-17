@@ -15,7 +15,6 @@ import("//build_overrides/chip.gni")
 
 source_set("tls-client-management-server") {
   sources = [
-    "CodegenIntegration.cpp",
     "TlsClientManagementCluster.cpp",
     "TlsClientManagementCluster.h",
   ]

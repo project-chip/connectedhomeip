@@ -43,6 +43,8 @@ using namespace chip::app::Clusters::TlsClientManagement::Attributes;
 using namespace Protocols::InteractionModel;
 
 static constexpr uint16_t kMaxTlsEndpointId = 65534;
+// Minimum hostname length of 4 allows for shortest valid format: single char + dot + 2-letter TLD (e.g., "a.bc")
+static constexpr size_t kMinHostnameLength = 4;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::ProvisionEndpoint::kMetadataEntry,
@@ -81,8 +83,8 @@ void TlsClientManagementCluster::Shutdown()
 {
     ChipLogProgress(DataManagement, "TlsClientManagementCluster: shutdown");
 
-    TEMPORARY_RETURN_IGNORED mCertificateTable.Finish();
-    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mCertificateTable.Finish();
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 
     DefaultServerCluster::Shutdown();
 }
@@ -179,18 +181,17 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
 {
     ChipLogDetail(Zcl, "TlsClientManagement: ProvisionEndpoint");
 
-    if (req.hostname.size() < 4 || req.hostname.size() > kSpecMaxHostname)
+    if (req.hostname.size() < kMinHostnameLength || req.hostname.size() > kSpecMaxHostname)
     {
         return Status::ConstraintError;
     }
+
     if (req.caid > kMaxRootCertId)
     {
         return Status::ConstraintError;
     }
 
-    auto fabric     = commandHandler.GetAccessingFabricIndex();
-    auto endpointId = mPath.mEndpointId;
-
+    auto fabric = commandHandler.GetAccessingFabricIndex();
     if (mCertificateTable.HasRootCertificateEntry(fabric, req.caid) != CHIP_NO_ERROR)
     {
         return DataModel::ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound));
@@ -201,7 +202,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
     }
 
     Commands::ProvisionEndpointResponse::Type response;
-    auto status = mDelegate.ProvisionEndpoint(endpointId, fabric, req, response.endpointID);
+    auto status = mDelegate.ProvisionEndpoint(mPath.mEndpointId, fabric, req, response.endpointID);
 
     if (status.IsSuccess())
     {
