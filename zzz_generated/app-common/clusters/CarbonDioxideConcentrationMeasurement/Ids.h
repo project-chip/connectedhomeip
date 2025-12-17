@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster CarbonDioxideConcentrationMeasurement (cluster code: 1037/0x0440D)
+// Identifier constant values for cluster CarbonDioxideConcentrationMeasurement (cluster code: 1037/0x040D)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

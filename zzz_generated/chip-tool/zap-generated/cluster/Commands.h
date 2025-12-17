@@ -97,6 +97,7 @@
 | Groupcast                                                           | 0x0065 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
+| WaterTankLevelMonitoring                                            | 0x0079 |
 | BooleanStateConfiguration                                           | 0x0080 |
 | ValveConfigurationAndControl                                        | 0x0081 |
 | ElectricalPowerMeasurement                                          | 0x0090 |
@@ -140,6 +141,7 @@
 | TotalVolatileOrganicCompoundsConcentrationMeasurement               | 0x042E |
 | RadonConcentrationMeasurement                                       | 0x042F |
 | SoilMeasurement                                                     | 0x0430 |
+| AmbientContextSensing                                               | 0x0431 |
 | WiFiNetworkManagement                                               | 0x0451 |
 | ThreadBorderRouterManagement                                        | 0x0452 |
 | ThreadNetworkDirectory                                              | 0x0453 |
@@ -2761,6 +2763,7 @@ private:
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
 | * TestEventTriggersEnabled                                          | 0x0008 |
+| * DeviceLoadStatus                                                  | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6585,6 +6588,65 @@ public:
 
 private:
     chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster WaterTankLevelMonitoring                                    | 0x0079 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCondition                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Condition                                                         | 0x0000 |
+| * DegradationDirection                                              | 0x0001 |
+| * ChangeIndication                                                  | 0x0002 |
+| * InPlaceIndicator                                                  | 0x0003 |
+| * LastChangedTime                                                   | 0x0004 |
+| * ReplacementProductList                                            | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCondition
+ */
+class WaterTankLevelMonitoringResetCondition : public ClusterCommand
+{
+public:
+    WaterTankLevelMonitoringResetCondition(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("reset-condition", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WaterTankLevelMonitoring::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WaterTankLevelMonitoring::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11497,6 +11559,34 @@ private:
 | Attributes:                                                         |        |
 | * SoilMoistureMeasurementLimits                                     | 0x0000 |
 | * SoilMoistureMeasuredValue                                         | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster AmbientContextSensing                                       | 0x0431 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * HumanActivityDetected                                             | 0x0000 |
+| * ObjectIdentified                                                  | 0x0001 |
+| * AudioContextDetected                                              | 0x0002 |
+| * AmbientContextType                                                | 0x0003 |
+| * AmbientContextTypeSupported                                       | 0x0004 |
+| * SimultaneousDetectionLimit                                        | 0x0005 |
+| * CountThresholdReached                                             | 0x0006 |
+| * CountThreshold                                                    | 0x0007 |
+| * ObjectCount                                                       | 0x0008 |
+| * HoldTime                                                          | 0x0009 |
+| * HoldTimeLimits                                                    | 0x000A |
+| * PredictedActivity                                                 | 0x000B |
+| * PrivacyModeEnabled                                                | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -21027,6 +21117,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "device-load-status", Attributes::DeviceLoadStatus::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -21056,6 +21147,8 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
             Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "test-event-triggers-enabled", 0, 1, Attributes::TestEventTriggersEnabled::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type>>(
+            Id, "device-load-status", Attributes::DeviceLoadStatus::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -21078,6 +21171,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "device-load-status", Attributes::DeviceLoadStatus::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -24283,6 +24377,84 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type>>>(
+            Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterWaterTankLevelMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::WaterTankLevelMonitoring;
+
+    const char * clusterName = "WaterTankLevelMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<WaterTankLevelMonitoringResetCondition>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "condition", Attributes::Condition::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "degradation-direction", Attributes::DegradationDirection::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "change-indication", Attributes::ChangeIndication::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "in-place-indicator", Attributes::InPlaceIndicator::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "last-changed-time", Attributes::LastChangedTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "replacement-product-list", Attributes::ReplacementProductList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "condition", 0, UINT8_MAX, Attributes::Condition::Id,
+                                                   WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum>>(
+            Id, "degradation-direction", 0, UINT8_MAX, Attributes::DegradationDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum>>(
+            Id, "change-indication", 0, UINT8_MAX, Attributes::ChangeIndication::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "in-place-indicator", 0, 1, Attributes::InPlaceIndicator::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "last-changed-time", 0, UINT32_MAX,
+                                                                              Attributes::LastChangedTime::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::WaterTankLevelMonitoring::Structs::ReplacementProductStruct::Type>>>(
             Id, "replacement-product-list", Attributes::ReplacementProductList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -29175,6 +29347,114 @@ void registerClusterSoilMeasurement(Commands & commands, CredentialIssuerCommand
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::AmbientContextSensing;
+
+    const char * clusterName = "AmbientContextSensing";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "human-activity-detected", Attributes::HumanActivityDetected::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "object-identified", Attributes::ObjectIdentified::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "audio-context-detected", Attributes::AudioContextDetected::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "ambient-context-type", Attributes::AmbientContextType::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "ambient-context-type-supported", Attributes::AmbientContextTypeSupported::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "simultaneous-detection-limit", Attributes::SimultaneousDetectionLimit::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "count-threshold-reached", Attributes::CountThresholdReached::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "count-threshold", Attributes::CountThreshold::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "object-count", Attributes::ObjectCount::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "privacy-mode-enabled", Attributes::PrivacyModeEnabled::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAttribute<bool>>(Id, "human-activity-detected", 0, 1, Attributes::HumanActivityDetected::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "object-identified", 0, 1, Attributes::ObjectIdentified::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "audio-context-detected", 0, 1, Attributes::AudioContextDetected::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type>>>(
+            Id, "ambient-context-type", Attributes::AmbientContextType::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type>>>(
+            Id, "ambient-context-type-supported", Attributes::AmbientContextTypeSupported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "simultaneous-detection-limit", 0, UINT8_MAX,
+                                             Attributes::SimultaneousDetectionLimit::Id, WriteCommandType::kWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "count-threshold-reached", 0, 1, Attributes::CountThresholdReached::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "count-threshold", 0, UINT16_MAX, Attributes::CountThreshold::Id,
+                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "object-count", 0, UINT16_MAX, Attributes::ObjectCount::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "hold-time", 0, UINT16_MAX, Attributes::HoldTime::Id, WriteCommandType::kWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type>>(
+            Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type>>>(
+            Id, "predicted-activity", Attributes::PredictedActivity::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "privacy-mode-enabled", 0, 1, Attributes::PrivacyModeEnabled::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "human-activity-detected", Attributes::HumanActivityDetected::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "object-identified", Attributes::ObjectIdentified::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "audio-context-detected", Attributes::AudioContextDetected::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "ambient-context-type", Attributes::AmbientContextType::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "ambient-context-type-supported", Attributes::AmbientContextTypeSupported::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "simultaneous-detection-limit", Attributes::SimultaneousDetectionLimit::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "count-threshold-reached", Attributes::CountThresholdReached::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "count-threshold", Attributes::CountThreshold::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "object-count", Attributes::ObjectCount::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "privacy-mode-enabled", Attributes::PrivacyModeEnabled::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WiFiNetworkManagement;
@@ -32406,6 +32686,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterGroupcast(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterWaterTankLevelMonitoring(commands, credsIssuerConfig);
     registerClusterBooleanStateConfiguration(commands, credsIssuerConfig);
     registerClusterValveConfigurationAndControl(commands, credsIssuerConfig);
     registerClusterElectricalPowerMeasurement(commands, credsIssuerConfig);
@@ -32449,6 +32730,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterRadonConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterSoilMeasurement(commands, credsIssuerConfig);
+    registerClusterAmbientContextSensing(commands, credsIssuerConfig);
     registerClusterWiFiNetworkManagement(commands, credsIssuerConfig);
     registerClusterThreadBorderRouterManagement(commands, credsIssuerConfig);
     registerClusterThreadNetworkDirectory(commands, credsIssuerConfig);

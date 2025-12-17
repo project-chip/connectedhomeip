@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/storage/TableEntry.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/IntrusiveList.h>
@@ -36,7 +37,6 @@ typedef uint32_t SceneTransitionTime;
 inline constexpr GroupId kGlobalGroupSceneId = 0x0000;
 inline constexpr SceneId kUndefinedSceneId   = 0xff;
 
-static constexpr size_t kIteratorsMax            = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength      = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
 static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 
@@ -56,16 +56,8 @@ static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 class SceneHandler : public IntrusiveListNodeBase<>
 {
 public:
-    SceneHandler(){};
+    SceneHandler()          = default;
     virtual ~SceneHandler() = default;
-
-    /// @brief Copies the list of supported clusters for an endpoint in a Span and resizes the span to fit the actual number of
-    /// supported clusters
-    /// @param endpoint target endpoint
-    /// @param clusterBuffer Buffer to hold the supported cluster IDs, cannot hold more than
-    /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE. The function shall use the reduce_size() method in the event it is supporting
-    /// less than CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE clusters.
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
 
     /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
     ///
@@ -232,8 +224,8 @@ public:
 
     SceneTable & operator=(const SceneTable &) = delete;
 
-    virtual CHIP_ERROR Init(PersistentStorageDelegate & storage) = 0;
-    virtual void Finish()                                        = 0;
+    virtual CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) = 0;
+    virtual void Finish()                                                                              = 0;
 
     // Global scene count
     virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;

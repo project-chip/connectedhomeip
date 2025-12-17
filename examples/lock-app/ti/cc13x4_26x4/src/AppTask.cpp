@@ -125,7 +125,7 @@ void InitializeOTARequestor(void)
     SetRequestorInstance(&sRequestorCore);
 
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    TEMPORARY_RETURN_IGNORED sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
@@ -235,7 +235,7 @@ int AppTask::Init()
     cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
-    Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
 
     PLAT_LOG("Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     PLAT_LOG("Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -289,7 +289,7 @@ int AppTask::Init()
             ;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -330,7 +330,7 @@ int AppTask::Init()
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().Init(initParams);
 
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -342,7 +342,7 @@ int AppTask::Init()
 
     uiInit();
 
-    PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
     PlatformMgr().LockChipStack();
     {
@@ -607,7 +607,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             else
             {
                 // Disable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+                TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(false);
                 PLAT_LOG("Disabled BLE Advertisements");
             }
         }

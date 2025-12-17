@@ -35,14 +35,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-
-logger = logging.getLogger(__name__)
 
 
 class TC_PAVST_2_1(MatterBaseTest):
@@ -63,7 +59,7 @@ class TC_PAVST_2_1(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.PushAvStreamTransport
         attr = Clusters.PushAvStreamTransport.Attributes
 

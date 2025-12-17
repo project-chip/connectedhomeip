@@ -25,6 +25,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
+log = logging.getLogger(__name__)
+
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
@@ -59,7 +61,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
 
     async def commission_and_base_checks(self):
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
         await self.commissioner.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
@@ -112,7 +114,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
     async def commission_stages(self, time_zone: bool, dst: bool, default_ntp: bool, trusted_time_source: bool):
         await self.create_commissioner()
 
-        logging.info(
+        log.info(
             f'Running Commissioning test - time_zone: {time_zone}, dst: {dst}, default_ntp: {default_ntp}, trusted_time_source: {trusted_time_source}')
 
         if time_zone:

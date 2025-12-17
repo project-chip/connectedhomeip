@@ -57,33 +57,15 @@ class TC_CC_10_1(MatterBaseTest):
     def _prepare_cc_extension_field_set(self, attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct:
         efs_attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct] = []
         for attribute_id in kCCAttributeValueIDs:
-            # Attempt to find the attribute in the input list
-            found = False
             for pair in attribute_value_list:
                 if pair.attributeID == attribute_id:
                     efs_attribute_value_list.append(pair)
-                    found = True
                     break
 
-            if not found:
-                if attribute_id == 0x0001 or attribute_id == 0x4001 or attribute_id == 0x4002 or attribute_id == 0x4003:
-                    empty_attribute_value = Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                        attributeID=attribute_id,
-                        valueUnsigned8=0x00,
-                    )
-                elif attribute_id == 0x0003 or attribute_id == 0x0004 or attribute_id == 0x0007 or attribute_id == 0x4004:
-                    empty_attribute_value = Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                        attributeID=attribute_id,
-                        valueUnsigned16=0x0000,
-                    )
-                efs_attribute_value_list.append(empty_attribute_value)
-
-        extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
+        return Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
             clusterID=Clusters.Objects.ColorControl.id,
             attributeValueList=efs_attribute_value_list
         )
-
-        return extension_field_set
 
     def desc_TC_CC_10_1(self) -> str:
         """Returns a description of this test"""
@@ -94,7 +76,7 @@ class TC_CC_10_1(MatterBaseTest):
         return ["CC.S", "S.S"]
 
     def steps_TC_CC_10_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. GroupKeySet fields are as follows: GroupKeySetID: 0x01a1, GroupKeySecurityPolicy: TrustFirst (0), EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf, EpochStartTime0: 1110000, EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf, EpochStartTime1: 1110001, EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf, EpochStartTime2: 1110002"),
             TestStep("0b", "TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster by writing the GroupKeyMap attribute with two entries as follows: * List item 1: - FabricIndex: 1 - GroupId: 0x0001 - GroupKeySetId: 0x01a1"),
@@ -106,38 +88,43 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("1e", "TH reads ColorTempPhysicalMaxMireds attribute from DUT."),
             TestStep("2a", "TH sends _MoveToHueAndSaturation command_ to DUT with _Hue_=200, _Saturation_=50 and _TransitionTime_=0 (immediately)."),
             TestStep("2b", "TH reads _CurrentHue and CurrentSaturation attributes_ from DUT."),
-            TestStep("2c", "TH sends _MoveToColor command_ to DUT, with: ColorX = 32768/0x8000 (x=0.5) (purple), ColorY = 19660/0x4CCC (y=0.3), TransitionTime = 0 (immediate)"),
-            TestStep("2d", "TH reads _CurrentX and CurrentY attributes_ from DUT."),
-            TestStep("2e", "TH sends _MoveToColorTemperature command_ to DUT with _ColorTemperatureMireds_=(_ColorTempPhysicalMinMireds_ + _ColorTempPhysicalMaxMireds_)/2"),
-            TestStep("2f", "TH reads _ColorTemperatureMireds attribute_ from DUT."),
-            TestStep("2g", "TH sends _EnhancedMoveToHueAndSaturation command_ to DUT with _EnhancedHue_=20000, _Saturation_=50 and _TransitionTime_=0 (immediately)."),
-            TestStep("2h", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
-            TestStep("3", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
-            TestStep("4", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("2c", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("2d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("3a", "TH sends _MoveToColor command_ to DUT, with: ColorX = 32768/0x8000 (x=0.5) (purple), ColorY = 19660/0x4CCC (y=0.3), TransitionTime = 0 (immediate)"),
+            TestStep("3b", "TH reads _CurrentX and CurrentY attributes_ from DUT."),
+            TestStep("3c", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("3d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("4a", "TH sends _MoveToColorTemperature command_ to DUT with _ColorTemperatureMireds_=(_ColorTempPhysicalMinMireds_ + _ColorTempPhysicalMaxMireds_)/2"),
+            TestStep("4b", "TH reads _ColorTemperatureMireds attribute_ from DUT."),
+            TestStep("4c", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("4d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("5a", "TH sends _EnhancedMoveToHueAndSaturation command_ to DUT with _EnhancedHue_=20000, _Saturation_=50 and _TransitionTime_=0 (immediately)."),
+            TestStep("5b", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
+            TestStep("5c", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("5d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep(
-                "5a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xFE }]}]'"),
-            TestStep("5b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
-            TestStep("5c", "TH reads the _CurrentSaturation attribute_ from DUT."),
+                "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xE0 }]}]'"),
+            TestStep("6b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
+            TestStep("6c", "TH reads the _CurrentSaturation attribute_ from DUT."),
             TestStep(
-                "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x01 }, { AttributeID: 0x0003, ValueUnsigned16: 16334 },{ AttributeID: 0x0004, ValueUnsigned16: 13067 }]}]'"),
-            TestStep("6b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03 and the _TransitionTime_ omitted."),
-            TestStep("6c", "TH reads _CurrentX and CurrentY attributes_ from DUT."),
+                "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x01 }, { AttributeID: 0x0003, ValueUnsigned16: 16334 },{ AttributeID: 0x0004, ValueUnsigned16: 13067 }]}]'"),
+            TestStep("7b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03 and the _TransitionTime_ omitted."),
+            TestStep("7c", "TH reads _CurrentX and CurrentY attributes_ from DUT."),
             TestStep(
-                "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x02 }, { AttributeID: 0x0007, ValueUnsigned16: 175 }]}]'"),
-            TestStep("7b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04 and the _TransitionTime_ omitted."),
-            TestStep("7c", "TH reads _ColorTemperatureMireds attribute_ from DUT."),
+                "8a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x02 }, { AttributeID: 0x0007, ValueUnsigned16: 250 }]}]'"),
+            TestStep("8b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04 and the _TransitionTime_ omitted."),
+            TestStep("8c", "TH reads _ColorTemperatureMireds attribute_ from DUT."),
             TestStep(
-                "8a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x03 }, { AttributeID: 0x4000, ValueUnsigned16: 12000 }, { AttributeID: 0x0001, ValueUnsigned16: 70 }]}]'"),
-            TestStep("8b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05 and the _TransitionTime_ omitted."),
-            TestStep("8c", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
-            TestStep(
-                "9a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
+                "9a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x03 }, { AttributeID: 0x4000, ValueUnsigned16: 12000 }, { AttributeID: 0x0001, ValueUnsigned16: 70 }]}]'"),
             TestStep("9b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05 and the _TransitionTime_ omitted."),
-            TestStep("9c", "TH read _ColorLoopActive attribute_ from DUT."),
-            TestStep("9d", "TH read _ColorLoopDirection attribute_ from DUT."),
-            TestStep("9e", "TH read _ColorLoopTime attribute_ from DUT."),
+            TestStep("9c", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
+            TestStep(
+                "10a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned8: 1 }, { AttributeID: 0x4003, ValueUnsigned8: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
+            TestStep("10b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06 and the _TransitionTime_ omitted."),
+            TestStep("10c", "TH read _ColorLoopActive attribute_ from DUT."),
+            TestStep("10d", "TH read _ColorLoopDirection attribute_ from DUT."),
+            TestStep("10e", "TH read _ColorLoopTime attribute_ from DUT."),
         ]
-        return steps
 
     @async_test_body
     async def setup_test(self):
@@ -229,11 +216,34 @@ class TC_CC_10_1(MatterBaseTest):
                                          [attributes.CurrentSaturation], 42, "CurrentSaturation is not greater than or equal 42")
 
         self.step("2c")
+        if self.pics_guard(self.check_pics("CC.S.F00")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "Store Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "Store Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "Store Scene failed on sceneID")
+
+        self.step("2d")
+        if self.pics_guard(self.check_pics("CC.S.F00")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.ViewScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "View Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "View Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
+            asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
+            for EFS in result.extensionFieldSetStructs:
+                if EFS.clusterID != 0x0300:
+                    continue
+
+                for AV in EFS.attributeValueList:
+                    if AV.attributeID == 0x0001:
+                        asserts.assert_less_equal(AV.valueUnsigned8, 58, "View Scene failed on Saturation above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned8, 42, "View Scene failed on Saturation below limit")
+
+        self.step("3a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.MoveToColor(32768, 19660, 0, 1, 1))
             await asyncio.sleep(1)
 
-        self.step("2d")
+        self.step("3b")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.CurrentX), (self.matter_test_config.endpoint, attributes.CurrentY)])
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
@@ -245,13 +255,40 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.CurrentY], 17000,
                                          "CurrentY is not greater than or equal to 17000")
 
-        self.step("2e")
+        self.step("3c")
+        if self.pics_guard(self.check_pics("CC.S.F03")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "Store Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "Store Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "Store Scene failed on sceneID")
+
+        self.step("3d")
+        if self.pics_guard(self.check_pics("CC.S.F03")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.ViewScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "View Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "View Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
+            asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
+            for EFS in result.extensionFieldSetStructs:
+                if EFS.clusterID != 0x0300:
+                    continue
+
+                for AV in EFS.attributeValueList:
+                    if AV.attributeID == 0x0003:
+                        asserts.assert_less_equal(AV.valueUnsigned16, 35000, "View Scene failed on CurrentX above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned16, 31000, "View Scene failed on CurrentX below limit")
+
+                    if AV.attributeID == 0x0004:
+                        asserts.assert_less_equal(AV.valueUnsigned16, 21000, "View Scene failed on CurrentY above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned16, 17000, "View Scene failed on CurrentY below limit")
+
+        self.step("4a")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             CTtarget = round((ColorTempPhysicalMinMiredsValue + ColorTempPhysicalMaxMiredsValue) / 2)
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.MoveToColorTemperature(CTtarget, 0, 1, 1))
             await asyncio.sleep(1)
 
-        self.step("2f")
+        self.step("4b")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             CTmax = round(CTtarget * (1 + kTempTolerance))
             CTmin = round(CTtarget * (1 - kTempTolerance))
@@ -260,13 +297,37 @@ class TC_CC_10_1(MatterBaseTest):
                                       "ColorTemperatureMireds is not less than or equal to %d" % CTmax)
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmin,
                                          "ColorTemperatureMireds is not greater than or equal to %d" % CTmin)
+        self.step("4c")
+        if self.pics_guard(self.check_pics("CC.S.F04")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "Store Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "Store Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "Store Scene failed on sceneID")
 
-        self.step("2g")
+        self.step("4d")
+        if self.pics_guard(self.check_pics("CC.S.F04")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.ViewScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "View Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "View Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
+            asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
+            for EFS in result.extensionFieldSetStructs:
+                if EFS.clusterID != 0x0300:
+                    continue
+
+                for AV in EFS.attributeValueList:
+                    if AV.attributeID == 0x0007:
+                        asserts.assert_less_equal(AV.valueUnsigned16, ColorTempPhysicalMaxMiredsValue,
+                                                  "View Scene failed on ColorTemperatureMireds above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned16, ColorTempPhysicalMinMiredsValue,
+                                                     "View Scene failed on ColorTemperatureMireds below limit")
+
+        self.step("5a")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.EnhancedMoveToHueAndSaturation(20000, 50, 0, 1, 1))
             await asyncio.sleep(1)
 
-        self.step("2h")
+        self.step("5b")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.EnhancedCurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster][attributes.EnhancedCurrentHue], 21800,
@@ -278,47 +339,30 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
                                          [attributes.CurrentSaturation], 42, "CurrentSaturation is not 42")
 
-        self.step("3")
-        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
-        asserts.assert_equal(result.status, Status.Success, "Store Scene failed on status")
-        asserts.assert_equal(result.groupID, self.kGroup1, "Store Scene failed on groupID")
-        asserts.assert_equal(result.sceneID, 0x01, "Store Scene failed on sceneID")
+        self.step("5c")
+        if self.pics_guard(self.check_pics("CC.S.F01")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "Store Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "Store Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "Store Scene failed on sceneID")
 
-        self.step("4")
-        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.ViewScene(self.kGroup1, 0x01))
-        asserts.assert_equal(result.status, Status.Success, "View Scene failed on status")
-        asserts.assert_equal(result.groupID, self.kGroup1, "View Scene failed on groupID")
-        asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
-        asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
+        self.step("5d")
+        if self.pics_guard(self.check_pics("CC.S.F01")):
+            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.ViewScene(self.kGroup1, 0x01))
+            asserts.assert_equal(result.status, Status.Success, "View Scene failed on status")
+            asserts.assert_equal(result.groupID, self.kGroup1, "View Scene failed on groupID")
+            asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
+            asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
+            for EFS in result.extensionFieldSetStructs:
+                if EFS.clusterID != 0x0300:
+                    continue
 
-        for EFS in result.extensionFieldSetStructs:
-            if EFS.clusterID != 0x0300:
-                continue
+                for AV in EFS.attributeValueList:
+                    if AV.attributeID == 0x4000:
+                        asserts.assert_less_equal(AV.valueUnsigned16, 21800, "View Scene failed on EnhancedHue above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned16, 18200, "View Scene failed on EnhancedHue below limit")
 
-            for AV in EFS.attributeValueList:
-                if AV.attributeID == 0x0001 and self.pics_guard(self.check_pics("CC.S.F00")):
-                    asserts.assert_less_equal(AV.valueUnsigned8, 58, "View Scene failed on Satuation above limit")
-                    asserts.assert_greater_equal(AV.valueUnsigned8, 42, "View Scene failed on Satuation below limit")
-
-                if AV.attributeID == 0x0003 and self.pics_guard(self.check_pics("CC.S.F03")):
-                    asserts.assert_less_equal(AV.valueUnsigned16, 35000, "View Scene failed on CurrentX above limit")
-                    asserts.assert_greater_equal(AV.valueUnsigned16, 31000, "View Scene failed on CurrentX below limit")
-
-                if AV.attributeID == 0x0004 and self.pics_guard(self.check_pics("CC.S.F03")):
-                    asserts.assert_less_equal(AV.valueUnsigned16, 21000, "View Scene failed on CurrentY above limit")
-                    asserts.assert_greater_equal(AV.valueUnsigned16, 17000, "View Scene failed on CurrentY below limit")
-
-                if AV.attributeID == 0x0007 and self.pics_guard(self.check_pics("CC.S.F04")):
-                    asserts.assert_less_equal(AV.valueUnsigned16, ColorTempPhysicalMaxMiredsValue,
-                                              "View Scene failed on ColorTemperatureMireds above limit")
-                    asserts.assert_greater_equal(AV.valueUnsigned16, ColorTempPhysicalMinMiredsValue,
-                                                 "View Scene failed on ColorTemperatureMireds below limit")
-
-                if AV.attributeID == 0x4000 and self.pics_guard(self.check_pics("CC.S.F01")):
-                    asserts.assert_less_equal(AV.valueUnsigned16, 21800, "View Scene failed on EnhancedHue above limit")
-                    asserts.assert_greater_equal(AV.valueUnsigned16, 18200, "View Scene failed on EnhancedHue below limit")
-
-        self.step("5a")
+        self.step("6a")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             result = await self.TH1.SendCommand(
                 self.dut_node_id, self.matter_test_config.endpoint,
@@ -331,7 +375,7 @@ class TC_CC_10_1(MatterBaseTest):
                         self._prepare_cc_extension_field_set(
                             [
                                 Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x4001, valueUnsigned8=0x00),
-                                Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x0001, valueUnsigned8=0xFE)
+                                Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x0001, valueUnsigned8=0xE0)
                             ]
                         )
                     ]
@@ -342,17 +386,17 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
             asserts.assert_equal(result.sceneID, 0x02, "Add Scene failed on sceneID")
 
-        self.step("5b")
+        self.step("6b")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
 
-        self.step("5c")
+        self.step("6c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             CurrentSaturation = await self.read_single_attribute_check_success(cluster, attributes.CurrentSaturation)
-            asserts.assert_less_equal(CurrentSaturation, 0xFE, "CurrentSaturation is above limit")
-            asserts.assert_greater_equal(CurrentSaturation, 0xF6, "CurrentSaturation is below limit")
+            asserts.assert_less_equal(CurrentSaturation, 0xE8, "CurrentSaturation is above limit")
+            asserts.assert_greater_equal(CurrentSaturation, 0xD8, "CurrentSaturation is below limit")
 
-        self.step("6a")
+        self.step("7a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             result = await self.TH1.SendCommand(
                 self.dut_node_id, self.matter_test_config.endpoint,
@@ -379,11 +423,11 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
             asserts.assert_equal(result.sceneID, 0x03, "Add Scene failed on sceneID")
 
-        self.step("6b")
+        self.step("7b")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x03))
 
-        self.step("6c")
+        self.step("7c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.CurrentX), (self.matter_test_config.endpoint, attributes.CurrentY)])
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
@@ -395,7 +439,7 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
                                          [attributes.CurrentY], 11000, "CurrentY is below limit")
 
-        self.step("7a")
+        self.step("8a")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             result = await self.TH1.SendCommand(
                 self.dut_node_id, self.matter_test_config.endpoint,
@@ -408,7 +452,7 @@ class TC_CC_10_1(MatterBaseTest):
                         self._prepare_cc_extension_field_set(
                             [
                                 Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x4001, valueUnsigned8=0x02),
-                                Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x0007, valueUnsigned16=175)
+                                Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x0007, valueUnsigned16=250)
                             ]
                         )
                     ]
@@ -419,11 +463,11 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
             asserts.assert_equal(result.sceneID, 0x04, "Add Scene failed on sceneID")
 
-        self.step("7b")
+        self.step("8b")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x04))
 
-        self.step("7c")
+        self.step("8c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
             ColorTemperatureMireds = await self.read_single_attribute_check_success(cluster, attributes.ColorTemperatureMireds)
             asserts.assert_less_equal(ColorTemperatureMireds,
@@ -431,7 +475,7 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(ColorTemperatureMireds,
                                          ColorTempPhysicalMinMiredsValue, "ColorTemperatureMireds is below limit")
 
-        self.step("8a")
+        self.step("9a")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             result = await self.TH1.SendCommand(
                 self.dut_node_id, self.matter_test_config.endpoint,
@@ -457,11 +501,11 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
             asserts.assert_equal(result.sceneID, 0x05, "Add Scene failed on sceneID")
 
-        self.step("8b")
+        self.step("9b")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x05))
 
-        self.step("8c")
+        self.step("9c")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.EnhancedCurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
@@ -473,7 +517,7 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
                                          [attributes.CurrentSaturation], 62, "CurrentSaturation is below limit")
 
-        self.step("9a")
+        self.step("10a")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             result = await self.TH1.SendCommand(
                 self.dut_node_id, self.matter_test_config.endpoint,
@@ -498,21 +542,21 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
             asserts.assert_equal(result.sceneID, 0x06, "Add Scene failed on sceneID")
 
-        self.step("9b")
+        self.step("10b")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x06))
 
-        self.step("9c")
+        self.step("10c")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             ColorLoopActive = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopActive)
             asserts.assert_equal(ColorLoopActive, 1, "ColorLoopActive is not 1")
 
-        self.step("9d")
+        self.step("10d")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             ColorLoopDirection = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopDirection)
             asserts.assert_equal(ColorLoopDirection, 1, "ColorLoopDirection is not 1")
 
-        self.step("9e")
+        self.step("10e")
         if self.pics_guard(self.check_pics("CC.S.F02")):
             ColorLoopTime = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopTime)
             asserts.assert_equal(ColorLoopTime, 5, "ColorLoopTime is not 5")

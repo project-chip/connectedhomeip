@@ -15,10 +15,10 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/bindings/binding-cluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/bindings/BindingCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/Binding/Enums.h>
 #include <clusters/Binding/Metadata.h>
 #include <lib/core/CHIPError.h>

@@ -214,6 +214,9 @@ public class ClusterIDMapping {
         if (clusterId == ActivatedCarbonFilterMonitoring.ID) {
             return new ActivatedCarbonFilterMonitoring();
         }
+        if (clusterId == WaterTankLevelMonitoring.ID) {
+            return new WaterTankLevelMonitoring();
+        }
         if (clusterId == BooleanStateConfiguration.ID) {
             return new BooleanStateConfiguration();
         }
@@ -342,6 +345,9 @@ public class ClusterIDMapping {
         }
         if (clusterId == SoilMeasurement.ID) {
             return new SoilMeasurement();
+        }
+        if (clusterId == AmbientContextSensing.ID) {
+            return new AmbientContextSensing();
         }
         if (clusterId == WiFiNetworkManagement.ID) {
             return new WiFiNetworkManagement();
@@ -3431,6 +3437,7 @@ public class ClusterIDMapping {
             ActiveRadioFaults(6L),
             ActiveNetworkFaults(7L),
             TestEventTriggersEnabled(8L),
+            DeviceLoadStatus(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -8767,6 +8774,112 @@ public class ClusterIDMapping {
     }
     public static class ActivatedCarbonFilterMonitoring implements BaseCluster {
         public static final long ID = 114L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Condition(0L),
+            DegradationDirection(1L),
+            ChangeIndication(2L),
+            InPlaceIndicator(3L),
+            LastChangedTime(4L),
+            ReplacementProductList(5L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ResetCondition(0L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class WaterTankLevelMonitoring implements BaseCluster {
+        public static final long ID = 121L;
         public long getID() {
             return ID;
         }
@@ -14994,6 +15107,118 @@ public class ClusterIDMapping {
         public enum Attribute {
             SoilMoistureMeasurementLimits(0L),
             SoilMoistureMeasuredValue(1L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class AmbientContextSensing implements BaseCluster {
+        public static final long ID = 1073L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            HumanActivityDetected(0L),
+            ObjectIdentified(1L),
+            AudioContextDetected(2L),
+            AmbientContextType(3L),
+            AmbientContextTypeSupported(4L),
+            SimultaneousDetectionLimit(5L),
+            CountThresholdReached(6L),
+            CountThreshold(7L),
+            ObjectCount(8L),
+            HoldTime(9L),
+            HoldTimeLimits(10L),
+            PredictedActivity(11L),
+            PrivacyModeEnabled(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

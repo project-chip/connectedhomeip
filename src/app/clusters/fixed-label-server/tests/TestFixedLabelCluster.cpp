@@ -16,11 +16,11 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/FixedLabel/Attributes.h>
 #include <clusters/FixedLabel/Metadata.h>
@@ -30,7 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FixedLabel;
 using namespace chip::app::Clusters::FixedLabel::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -40,14 +40,13 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(fixedLabel.Startup(context), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(fixedLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { fixedLabel.Shutdown(); }
 
-    TestFixedLabelCluster() : context(testContext.Create()), fixedLabel(kRootEndpointId) {}
+    TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
+    TestServerClusterContext testContext;
     FixedLabelCluster fixedLabel;
 };
 

@@ -17,12 +17,13 @@
 
 #include <app/AttributePathParams.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -35,7 +36,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
-#include "FakeWifiDriver.h"
+#include "FakeDrivers.h"
 
 namespace {
 
@@ -45,9 +46,14 @@ using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
 
 using chip::app::AttributeValueDecoder;
 using chip::app::DataModel::AttributeEntry;
-using chip::app::Testing::kAdminSubjectDescriptor;
-using chip::app::Testing::WriteOperation;
+using chip::Testing::kAdminSubjectDescriptor;
+using chip::Testing::WriteOperation;
 
+class NoopBreadcrumbTracker : public BreadCrumbTracker
+{
+public:
+    void SetBreadCrumb(uint64_t v) override {}
+};
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
@@ -57,9 +63,11 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
+    NoopBreadcrumbTracker tracker;
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
+
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -97,15 +105,16 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
+    NoopBreadcrumbTracker tracker;
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     {
         WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
         writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(true);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(false);
 
         // no notification if enable fails
         context.ChangeListener().DirtyList().clear();

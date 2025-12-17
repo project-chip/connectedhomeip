@@ -118,20 +118,20 @@ void OnTriggerIdentifyEffect(Identify * identify)
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        SystemLayer().ScheduleLambda([identify] {
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([identify] {
             (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
                                                                identify);
         });
         break;
     case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
-        SystemLayer().ScheduleLambda([identify] {
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([identify] {
             (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
             (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
                                                                identify);
         });
         break;
     case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
-        SystemLayer().ScheduleLambda(
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
             [identify] { (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify); });
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
         break;
@@ -200,7 +200,7 @@ CHIP_ERROR BaseAppTask::Init()
 
     StatusLed_Init(StatusLedGpios, Q_ARRAY_SIZE(StatusLedGpios), true);
 
-    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 #if BASE_APP_BUILD
@@ -268,7 +268,7 @@ void BaseAppTask::InitServer(intptr_t arg)
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
@@ -279,7 +279,7 @@ void BaseAppTask::OpenCommissioning(intptr_t arg)
 {
     // Enable BLE advertisements
 
-    SystemLayer().ScheduleLambda([] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([] {
         CHIP_ERROR err;
         err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
         if (err == CHIP_NO_ERROR)
@@ -345,14 +345,14 @@ void BaseAppTask::TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aA
 
     if (err == CHIP_NO_ERROR)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
-                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SEC / ONE_HOUR_SEC));
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(
+            totalOperationalHours + (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SEC / ONE_HOUR_SEC));
     }
     else if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         totalOperationalHours = 0; // set this explicitly to 0 for safety
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
-                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SEC / ONE_HOUR_SEC));
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(
+            totalOperationalHours + (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SEC / ONE_HOUR_SEC));
     }
     else
     {
@@ -496,7 +496,7 @@ void BaseAppTask::FunctionHandler(AppEvent * aEvent)
             // Trigger Factory Reset
             ChipLogProgress(NotSpecified, "[BTN] Trigger Factory Reset");
             sAppTask.mFunction = kFunction_NoneSelected;
-            SystemLayer().ScheduleLambda([] { chip::Server::GetInstance().ScheduleFactoryReset(); });
+            TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([] { chip::Server::GetInstance().ScheduleFactoryReset(); });
         }
         else if (sAppTask.mFunction == kFunction_PreStackSwitch)
         {
@@ -509,7 +509,7 @@ void BaseAppTask::FunctionHandler(AppEvent * aEvent)
 
 void BaseAppTask::StartTimer(uint32_t aTimeoutInMs)
 {
-    SystemLayer().ScheduleLambda([aTimeoutInMs, this] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aTimeoutInMs, this] {
         CHIP_ERROR err;
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
         err =
@@ -527,7 +527,7 @@ void BaseAppTask::StartTimer(uint32_t aTimeoutInMs)
 
 void BaseAppTask::CancelTimer()
 {
-    SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([this] {
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
         this->mFunctionTimerActive = false;
     });

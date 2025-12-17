@@ -44,48 +44,46 @@ from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_CADMIN_1_15(MatterBaseTest):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:
-            params = await th.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
+            return await th.OpenCommissioningWindow(
+                nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
 
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            errcode = ctx.exception.chip_error
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            await th.OpenCommissioningWindow(
+                nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
+        errcode = ctx.exception.chip_error
+        log.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+        asserts.assert_true(errcode.sdk_code == expectedErrCode,
+                            'Unexpected error code returned from CommissioningComplete')
+        return None
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabrics
+        return await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
 
     async def CommissionAttempt(
             self, setupPinCode: int, thnum: int, th):
 
-        logging.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
+        log.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
         await th.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
 
     def get_instance_name(self, compressed_fabric_id) -> str:
         node_id = self.dut_node_id
-        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
-        return instance_name
+        return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
     def steps_TC_CADMIN_1_15(self) -> list[TestStep]:
         return [
@@ -205,7 +203,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2)
-        await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th2.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(12)
         # Verifies TH_CR2 is unable to read the Basic Information Cluster’s NodeLabel attribute of DUT_CE as no longer on network
@@ -253,11 +251,11 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         self.step(19)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
 
         self.step(20)
         removeFabricCmd3 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr3)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd3)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd3)
 
         self.step(21)
         fabrics4 = await self.get_fabrics(th=self.th1)

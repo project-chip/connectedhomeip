@@ -29,6 +29,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/diagnostic-logs-server",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/bdx",
   ]

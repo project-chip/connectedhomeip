@@ -32,12 +32,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
 import random
 import tempfile
-import time
 from configparser import ConfigParser
 
 from mobly import asserts
@@ -48,6 +48,8 @@ from matter.interaction_model import InteractionModelError
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_JFADMIN_2_2(MatterBaseTest):
@@ -76,7 +78,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
         #####################################################################################################################################
         #
@@ -208,12 +210,12 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         self.step("5")
         # Wait for ArmFailSafe timer to expire
-        time.sleep(11)
+        await asyncio.sleep(11)
 
         self.step("6")
         # Get the ICAC from JF-Admin
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         _icac = response[0][Clusters.OperationalCredentials].NOCs[0].icac
         cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(_icac)

@@ -47,10 +47,12 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm there is an active WebRTC sessions exist in DUT"),
             TestStep(
@@ -71,27 +73,20 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
             TestStep(4, "TH sends the SUCCESS status code to the DUT."),
             TestStep(
                 5,
-                description="TH sends the ProvideICECandidates command with a its ICE candidates to the DUT.",
+                description="TH sends the ProvideICECandidates command with its ICE candidates to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 6,
-                description="TH waits up to 30 seconds for ICECandidates command from the DUT.",
-                expectation="Verify that ICECandidates command contains the same WebRTCSessionID saved in step 1 and contain a non-empty ICE candidates.",
-            ),
-            TestStep(
-                7,
                 description="TH waits for 10 seconds.",
                 expectation="Verify the WebRTC session has been successfully established.",
             ),
             TestStep(
-                8,
+                7,
                 description="TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-
-        return steps
 
     def desc_TC_WEBRTC_1_2(self) -> str:
         return "[TC-WEBRTC-1.2] Validate that providing an existing WebRTC session ID with an SDP Offer successfully triggers the re-offer flow"
@@ -103,11 +98,15 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
     def default_timeout(self) -> int:
         return 4 * 60  # 4 minutes
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTC_1_2(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
@@ -169,20 +168,14 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         )
 
         self.step(6)
-        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-        asserts.assert_equal(prev_sessionid, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
-        asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
-
-        self.step(7)
-        if not webrtc_peer.is_session_connected():
-            logging.error("Failed to establish webrtc session")
+        if not await webrtc_peer.check_for_session_establishment():
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only:
             self.user_verify_video_stream("Verify WebRTC session by validating if video is received")
 
-        self.step(8)
+        self.step(7)
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=prev_sessionid, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
@@ -225,9 +218,6 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl, 
         endpoint=endpoint,
         payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
     )
-
-    ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-    webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
     return await webrtc_peer.check_for_session_establishment()
 
