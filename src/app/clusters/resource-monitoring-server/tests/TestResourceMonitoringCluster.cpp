@@ -113,11 +113,6 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(activatedCarbonFilterMonitoring.Attributes(ConcreteClusterPath(kRootEndpointId, ActivatedCarbonFilterMonitoring::Id),
-                                                         attributes),
-              CHIP_NO_ERROR);
-
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(
         activatedCarbonFilterMonitoring,
         { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,

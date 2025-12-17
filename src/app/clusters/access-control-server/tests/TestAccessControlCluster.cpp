@@ -24,9 +24,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
-#include <platform/NetworkCommissioning.h>
 #include <vector>
 
 namespace {
@@ -36,7 +34,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
+using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
+using chip::Testing::IsGeneratedCommandsListEqualTo;
 
 struct TestAccessControlCluster : public ::testing::Test
 {
@@ -53,29 +53,22 @@ TEST_F(TestAccessControlCluster, CompileTest)
 TEST_F(TestAccessControlCluster, CommandsTest)
 {
     AccessControlCluster cluster;
-    ConcreteClusterPath accessControlPath = ConcreteClusterPath(kRootEndpointId, AccessControl::Id);
-
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
-    ASSERT_EQ(cluster.AcceptedCommands(accessControlPath, acceptedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = acceptedCommandsBuilder.TakeBuffer();
-
-    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
-    ASSERT_EQ(cluster.GeneratedCommands(accessControlPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Check accepted commands
-    ASSERT_EQ(acceptedCommands.size(), AccessControl::Commands::kAcceptedCommandsCount);
-    ASSERT_EQ(acceptedCommands[0].commandId, AccessControl::Commands::ReviewFabricRestrictions::Id);
-    ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
-              AccessControl::Commands::ReviewFabricRestrictions::kMetadataEntry.GetInvokePrivilege());
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  AccessControl::Commands::ReviewFabricRestrictions::kMetadataEntry,
+                                              }));
 
     // Check generated commands
-    ASSERT_EQ(generatedCommands.size(), AccessControl::Commands::kGeneratedCommandsCount);
-    ASSERT_EQ(generatedCommands[0], AccessControl::Commands::ReviewFabricRestrictionsResponse::Id);
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                               {
+                                                   AccessControl::Commands::ReviewFabricRestrictionsResponse::Id,
+                                               }));
 #else
-    ASSERT_EQ(acceptedCommands.size(), (size_t) (0));
-    ASSERT_EQ(generatedCommands.size(), (size_t) (0));
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, {}));
 #endif
 }
 

@@ -29,8 +29,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <vector>
 
@@ -44,7 +42,9 @@ using namespace chip::app::Clusters::IcdManagement::Attributes;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
+using chip::Testing::IsGeneratedCommandsListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestIcdManagementCluster : public ::testing::Test
@@ -115,42 +115,73 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
     ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
 
     // Test accepted commands list
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
-    ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), acceptedCommandsBuilder),
-              CHIP_NO_ERROR);
-
-    // Calculate expected accepted commands based on feature map and configuration
     bool hasStayActive = optionalCommands.Has(IcdManagement::OptionalCommands::kStayActive);
 
-    size_t expectedAcceptedCommands = 0;
-    if (hasCIP)
+    // Build expected accepted commands list dynamically
+    if (hasCIP && (hasLIT || hasStayActive))
     {
-        expectedAcceptedCommands += 2; // RegisterClient, UnregisterClient
+        // Both CIP and StayActive
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      IcdManagement::Commands::RegisterClient::kMetadataEntry,
+                                                      IcdManagement::Commands::UnregisterClient::kMetadataEntry,
+                                                      IcdManagement::Commands::StayActiveRequest::kMetadataEntry,
+                                                  }));
     }
-    if (hasLIT || hasStayActive)
+    else if (hasCIP)
     {
-        expectedAcceptedCommands += 1; // StayActiveRequest
+        // Only CIP
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      IcdManagement::Commands::RegisterClient::kMetadataEntry,
+                                                      IcdManagement::Commands::UnregisterClient::kMetadataEntry,
+                                                  }));
     }
-
-    ASSERT_TRUE(acceptedCommandsBuilder.Size() == expectedAcceptedCommands);
+    else if (hasLIT || hasStayActive)
+    {
+        // Only StayActive
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      IcdManagement::Commands::StayActiveRequest::kMetadataEntry,
+                                                  }));
+    }
+    else
+    {
+        // No commands
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
+    }
 
     // Test generated commands list
-    ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
-    ASSERT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), generatedCommandsBuilder),
-              CHIP_NO_ERROR);
-
-    // Calculate expected generated commands based on feature map and configuration
-    size_t expectedGeneratedCommands = 0;
-    if (hasCIP)
+    if (hasCIP && (hasLIT || hasStayActive))
     {
-        expectedGeneratedCommands += 1; // RegisterClientResponse
+        // Both CIP and StayActive
+        ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                                   {
+                                                       IcdManagement::Commands::RegisterClientResponse::Id,
+                                                       IcdManagement::Commands::StayActiveResponse::Id,
+                                                   }));
     }
-    if (hasLIT || hasStayActive)
+    else if (hasCIP)
     {
-        expectedGeneratedCommands += 1; // StayActiveResponse
+        // Only CIP
+        ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                                   {
+                                                       IcdManagement::Commands::RegisterClientResponse::Id,
+                                                   }));
     }
-
-    ASSERT_TRUE(generatedCommandsBuilder.Size() == expectedGeneratedCommands);
+    else if (hasLIT || hasStayActive)
+    {
+        // Only StayActive
+        ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                                   {
+                                                       IcdManagement::Commands::StayActiveResponse::Id,
+                                                   }));
+    }
+    else
+    {
+        // No commands
+        ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, {}));
+    }
 }
 
 } // namespace
