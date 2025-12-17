@@ -85,6 +85,20 @@ source_set("safeint") {
   sources = [ "SafeInt.h" ]
 }
 
+source_set("numeric-primitives") {
+  sources = [
+    "attribute-storage-null-handling.h",
+    "odd-sized-integers.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 source_set("memory") {
   sources = [
     "CHIPMem.cpp",
