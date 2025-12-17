@@ -53,6 +53,10 @@ class TC_DD_1_5(MatterBaseTest):
                      "NFC tag is detected and read, it contains a Record of type URI whose data starts with \"MT:\""
                      ),
             TestStep("3",
+                     "Compare QR Code and NFCTag onboarding data",
+                     "Onboarding data are identical."
+                     ),
+            TestStep("4",
                      "Try to write a new NDEF in the tag",
                      "Writing NFC tag fails, the content of the tag is unmodified."
                      )
@@ -60,6 +64,11 @@ class TC_DD_1_5(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DD_1_5(self):
+
+        asserts.assert_true(self.matter_test_config.qr_code_content,
+                            "This test needs to be run with the qr setup code.")
+        qr_code_content = self.matter_test_config.qr_code_content[0]
+        log.info(f"qr_code_content: {qr_code_content}")
 
         reader = matter.testing.nfc.NFCReader()
 
@@ -93,6 +102,15 @@ class TC_DD_1_5(MatterBaseTest):
 
         ###########
         self.step("3")
+        asserts.assert_equal(
+            qr_code_content,
+            nfc_tag_content,
+            f"Error! QR Code and NFC Tag onboarding data differ! "
+            f"qr_code_content='{qr_code_content}', nfc_tag_content='{nfc_tag_content}'"
+        )
+
+        ###########
+        self.step("4")
 
         with asserts.assert_raises(signals.TestFailure):
             reader.write_ndef_uri("MT:-24J029Q00OC0000000")
