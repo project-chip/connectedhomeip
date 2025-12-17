@@ -16,11 +16,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ethernet-network-diagnostics-server/EthernetDiagnosticsCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/EthernetNetworkDiagnostics/Enums.h>
 #include <clusters/EthernetNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>

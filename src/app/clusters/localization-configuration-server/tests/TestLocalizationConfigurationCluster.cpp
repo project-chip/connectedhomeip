@@ -17,11 +17,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
 #include <clusters/LocalizationConfiguration/Ids.h>
 #include <clusters/LocalizationConfiguration/Metadata.h>

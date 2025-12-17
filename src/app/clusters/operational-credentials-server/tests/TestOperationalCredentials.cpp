@@ -16,11 +16,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
 #include <lib/core/CHIPError.h>
