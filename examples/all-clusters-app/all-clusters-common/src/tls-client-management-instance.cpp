@@ -22,6 +22,7 @@
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <tls-client-management-instance.h>
 
@@ -421,12 +422,28 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
-static TlsClientManagementCluster gTlsClientManagementClusterInstance = TlsClientManagementCluster(
-    EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisionedEndpoints);
+
+static LazyRegisteredServerCluster<TlsClientManagementCluster> sTlsClientManagementClusterServer;
 
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
     TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
+
+    sTlsClientManagementClusterServer.Create(EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(),
+                                             gCertificateTableInstance, kMaxProvisionedEndpoints);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(sTlsClientManagementClusterServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to register TLS Client Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT, EndpointId(1),
+                     err.Format());
+    }
 }
 
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint) {}
+void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
+{
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsClientManagementClusterServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "TLS Client Management Cluster unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
