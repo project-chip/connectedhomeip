@@ -52,6 +52,7 @@ public:
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
+    static const char kConfigNamespace_ChipKVS[];
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;

@@ -57,3 +57,11 @@ code will have parallels in any new adaptation.
 -   Implements low-level read/write of persistent configuration values
 -   Class API specifically designed to work in conjunction with the
     GenericConfigurationManagerImpl<> class.
+
+`platform/Linux/StorageBackend.cpp`
+
+-   Provides services to PosixConfig
+-   Controls datastore used to store KV pairs (filesystem, database, etc.)
+-   Controls locations within a particular data store (for example file system
+    paths)
+-   Controls the data format (.ini, .json, etc.)
