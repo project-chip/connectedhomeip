@@ -16,11 +16,11 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/CommandHandler.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/WebRTCTransportProvider/Attributes.h>
 #include <clusters/WebRTCTransportProvider/Commands.h>
 #include <clusters/WebRTCTransportProvider/Enums.h>
