@@ -35,15 +35,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import re
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 kRootEndpointId = 0
 kMaxUserActiveModeBitmap = 0x1FFFF
@@ -104,7 +101,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         return "[TC_ICDM_2_1]  attributes with DUT as Server"
 
     def steps_TC_ICDM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1a", "Commissioning, already done", is_commissioning=True),
             TestStep("1b", "CTH reads from the DUT the FeatureMap attribute."),
             TestStep(2, "TH reads from the DUT the ActiveModeThreshold attribute."),
@@ -121,14 +118,12 @@ class TC_ICDM_2_1(MatterBaseTest):
             TestStep(10, "TH reads from the DUT the OperatingMode attribute."),
             TestStep(11, "TH reads from the DUT the MaximumCheckInBackoff attribute."),
         ]
-        return steps
 
     def pics_TC_ICDM_2_1(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
         ]
-        return pics
 
     #
     # ICDM 2.1 Test Body

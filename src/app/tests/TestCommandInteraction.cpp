@@ -34,6 +34,7 @@
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/Optional.h>
@@ -41,6 +42,7 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
@@ -55,7 +57,7 @@ using namespace chip::Protocols;
 
 namespace {
 
-void CheckForInvalidAction(chip::Test::MessageCapturer & messageLog)
+void CheckForInvalidAction(chip::Testing::MessageCapturer & messageLog)
 {
     EXPECT_EQ(messageLog.MessageCount(), 1u);
     EXPECT_TRUE(messageLog.IsMessageType(0, chip::Protocols::InteractionModel::MsgType::StatusResponse));
@@ -98,10 +100,10 @@ public:
     }
 };
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const chip::Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
-    using namespace chip::Test;
+    using namespace chip::Testing;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
@@ -459,19 +461,47 @@ public:
     }
 };
 
-class TestCommandInteraction : public chip::Test::AppContext
+namespace {
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+chip::TestPersistentStorageDelegate gTestStorage;
+chip::Crypto::DefaultSessionKeystore gSessionKeystore;
+chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+} // namespace
+
+class TestCommandInteraction : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
         AppContext::SetUp();
+
+        gTestStorage.ClearStorage();
+        gGroupsProvider.SetStorageDelegate(&gTestStorage);
+        gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
+        ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
+        chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        uint8_t buf[sizeof(chip::CompressedFabricId)];
+        chip::MutableByteSpan span(buf);
+        ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
+
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(TestCommandInteractionModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
+        if (provider != nullptr)
+        {
+            provider->Finish();
+        }
+        chip::Credentials::SetGroupDataProvider(nullptr);
+
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }
@@ -515,7 +545,7 @@ public:
                                              const ConcreteCommandPath & aRequestCommandPath, const Optional<uint16_t> & aRef) :
             CommandHandlerImpl(apCallback)
         {
-            GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
+            EXPECT_SUCCESS(GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional()));
             SetExchangeInterface(&mMockCommandResponder);
         }
         MockCommandResponder mMockCommandResponder;
@@ -583,7 +613,7 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
     CommandPathIB::Builder & commandPathBuilder = commandDataIBBuilder.CreatePath();
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB();
+    EXPECT_SUCCESS(commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB());
     EXPECT_EQ(commandPathBuilder.GetError(), CHIP_NO_ERROR);
 
     if (aCommandId == kTestCommandIdWithData)
@@ -599,13 +629,13 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
         EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
-    commandDataIBBuilder.EndOfCommandDataIB();
+    EXPECT_SUCCESS(commandDataIBBuilder.EndOfCommandDataIB());
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeRequests.EndOfInvokeRequests();
+    EXPECT_SUCCESS(invokeRequests.EndOfInvokeRequests());
     EXPECT_EQ(invokeRequests.GetError(), CHIP_NO_ERROR);
 
-    invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
+    EXPECT_SUCCESS(invokeRequestMessageBuilder.EndOfInvokeRequestMessage());
     ASSERT_EQ(invokeRequestMessageBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -635,7 +665,7 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
     CommandPathIB::Builder & commandPathBuilder = commandDataIBBuilder.CreatePath();
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB();
+    EXPECT_SUCCESS(commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB());
     EXPECT_EQ(commandPathBuilder.GetError(), CHIP_NO_ERROR);
 
     if (aCommandId == kTestCommandIdWithData)
@@ -657,16 +687,16 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
         EXPECT_EQ(commandDataIBBuilder.Ref(*aCommandRef), CHIP_NO_ERROR);
     }
 
-    commandDataIBBuilder.EndOfCommandDataIB();
+    EXPECT_SUCCESS(commandDataIBBuilder.EndOfCommandDataIB());
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeResponseIBBuilder.EndOfInvokeResponseIB();
+    EXPECT_SUCCESS(invokeResponseIBBuilder.EndOfInvokeResponseIB());
     EXPECT_EQ(invokeResponseIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeResponses.EndOfInvokeResponses();
+    EXPECT_SUCCESS(invokeResponses.EndOfInvokeResponses());
     EXPECT_EQ(invokeResponses.GetError(), CHIP_NO_ERROR);
 
-    invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
+    EXPECT_SUCCESS(invokeResponseMessageBuilder.EndOfInvokeResponseMessage());
     EXPECT_EQ(invokeResponseMessageBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -813,14 +843,14 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     response.Status(Protocols::InteractionModel::Status::Busy);
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -850,8 +880,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects unknown message to client,
@@ -884,13 +914,13 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     ReportDataMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -919,8 +949,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects malformed invoke response
@@ -953,13 +983,13 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     InvokeResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandResponse);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -987,8 +1017,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects malformed status response to
@@ -1020,13 +1050,13 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*this);
+    chip::Testing::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
@@ -1054,8 +1084,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F(TestCommandInteraction, TestCommandSender_WithWrongState)
@@ -1146,7 +1176,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
                                      &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
-    pendingResponseTracker.Add(mockCommandRef);
+    EXPECT_SUCCESS(pendingResponseTracker.Add(mockCommandRef));
     commandSender.mFinishedCommandCount = 1;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1173,7 +1203,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
                                      &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
-    pendingResponseTracker.Add(mockCommandRef);
+    EXPECT_SUCCESS(pendingResponseTracker.Add(mockCommandRef));
 
     commandSender.mFinishedCommandCount = 1;
 
@@ -1620,6 +1650,29 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
 
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 1u);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
+{
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    SessionHandle groupSession = GetSessionBobToFriends();
+    EXPECT_TRUE(groupSession->IsGroupSession());
+    EXPECT_EQ(commandSender.SendGroupCommandRequest(groupSession), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    // No response is expected for a group command, so OnResponse and OnError should not be called.
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    // There should be no invoke response messages.
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

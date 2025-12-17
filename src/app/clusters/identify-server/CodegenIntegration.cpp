@@ -30,6 +30,8 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TimerDelegate.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <tracing/macros.h>
 
 namespace {
@@ -144,7 +146,7 @@ IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
 
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
-                   EffectVariantEnum effectVariant, reporting::ReportScheduler::TimerDelegate * timerDelegate) :
+                   EffectVariantEnum effectVariant, chip::TimerDelegate * timerDelegate) :
 
     mOnIdentifyStart(onIdentifyStart),
     mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
@@ -156,52 +158,32 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                  .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
+
+    // CodegenDataModelProvider::Instance() is a Meyer’s singleton so it's safe to call this here without worrying about
+    // intialization order. It's also OK to Register() the cluster in the provider even if the endpoint is not yet started up. It
+    // will be started up when the endpoint is started and a context is set.
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 };
 
 Identify::~Identify()
 {
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
     UnregisterLegacyIdentify(this);
 }
 
 void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 {
-    Identify * identify = GetLegacyIdentifyInstance(endpointId);
-    if (identify != nullptr)
-    {
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(identify->mCluster.Registration());
-
-        if (err != CHIP_NO_ERROR)
-        {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-            ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, endpointId,
-                         ChipLogValueMEI(Clusters::Identify::Id), err.Format());
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        }
-    }
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-    else
+    if (GetLegacyIdentifyInstance(endpointId) != nullptr &&
+        CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id }) == nullptr)
     {
-        ChipLogError(AppServer, "Failed to find Instance of Identify cluster for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Warning: unexpected state. Failed to find Identify cluster registration for endpoint %u",
+                     endpointId);
     }
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
-void MatterIdentifyClusterShutdownCallback(EndpointId endpointId)
-{
-    Identify * identify = GetLegacyIdentifyInstance(endpointId);
-    if (identify != nullptr)
-    {
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(identify->mCluster.Cluster()));
-
-        if (err != CHIP_NO_ERROR)
-        {
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-            ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, endpointId,
-                         ChipLogValueMEI(Clusters::Identify::Id), err.Format());
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        }
-    }
-}
+void MatterIdentifyClusterShutdownCallback(EndpointId endpointId) {}
 
 // Legacy PluginServer callback stubs
 void MatterIdentifyPluginServerInitCallback() {}

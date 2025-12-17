@@ -22,7 +22,7 @@
 #include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <media-controller.h>
 #include <webrtc-transport.h>
 
@@ -39,7 +39,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public Delegate, public WebRTCTransportProviderController
+class WebRTCProviderManager : public Delegate
 {
 public:
     WebRTCProviderManager() :
@@ -54,7 +54,7 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
-    void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) override;
+    void SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -80,6 +80,8 @@ public:
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
+    CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
+
     CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
 
     CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
@@ -89,6 +91,10 @@ public:
     bool HasAllocatedVideoStreams() override;
 
     bool HasAllocatedAudioStreams() override;
+
+    CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) override;
+
+    CHIP_ERROR IsUTCTimeNull(bool & isNull) override;
 
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
@@ -104,6 +110,8 @@ private:
     void ScheduleEndSend(uint16_t sessionId);
 
     void RegisterWebrtcTransport(uint16_t sessionId);
+
+    void UnregisterWebrtcTransport(uint16_t sessionId);
 
     CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                 uint16_t sessionId);
@@ -141,7 +149,7 @@ private:
 
     MediaController * mMediaController = nullptr;
 
-    std::unique_ptr<WebRTCTransportProviderServer> mWebRTCTransportProvider = nullptr;
+    WebRTCTransportProviderCluster * mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.

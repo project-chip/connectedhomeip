@@ -400,7 +400,7 @@ public:
     }
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
     Get the freq_list from args.
     Format:
@@ -586,7 +586,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
         ChipLogProgress(WiFiPAF, "WiFi-PAF: initialzing");
@@ -653,7 +653,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
         uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
         Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
-        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+        app::TermsAndConditionsManager::GetInstance().Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 

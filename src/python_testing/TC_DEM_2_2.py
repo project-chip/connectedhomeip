@@ -44,11 +44,10 @@
 
 """Define Matter test case TC_DEM_2_2."""
 
-
+import asyncio
 import datetime
 import logging
 import sys
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -58,7 +57,7 @@ from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
@@ -70,14 +69,13 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F00",  # Depends on Feature 00 (PowerAdjustment)
         ]
-        return pics
 
     def steps_TC_DEM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -163,7 +161,9 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_DEM_2_2(self):
@@ -183,7 +183,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         events_callback = EventSubscriptionHandler(expected_cluster=Clusters.DeviceEnergyManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.get_endpoint(default=1))
+                                    self.get_endpoint())
 
         self.step("4")
         await self.check_test_event_triggers_enabled()
@@ -197,7 +197,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         self.step("5b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        logging.info(powerAdjustCapabilityStruct)
+        log.info(powerAdjustCapabilityStruct)
         asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
@@ -214,7 +214,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             max_duration = max(max_duration, entry.maxDuration)
 
         result = f"min_power {min_power} max_power {max_power} min_duration {min_duration} max_duration {max_duration}"
-        logging.info(result)
+        log.info(result)
 
         self.step("5c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
@@ -365,7 +365,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("20")
-        time.sleep(10)
+        await asyncio.sleep(10)
 
         # Allow a little tolerance checking the duration returned in the event as CI tests can run "slower"
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerAdjustEnd)

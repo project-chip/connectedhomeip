@@ -42,8 +42,15 @@ enum class MediaType : uint8_t
     Video,
 };
 
+struct ICECandidateInfo
+{
+    std::string candidate;
+    std::string mid;
+    int mlineIndex;
+};
+
 using OnLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type)>;
-using OnICECandidateCallback     = std::function<void(const std::string & candidate)>;
+using OnICECandidateCallback     = std::function<void(const ICECandidateInfo & candidateInfo)>;
 using OnConnectionStateCallback  = std::function<void(bool connected)>;
 using OnTrackCallback            = std::function<void(std::shared_ptr<WebRTCTrack> track)>;
 

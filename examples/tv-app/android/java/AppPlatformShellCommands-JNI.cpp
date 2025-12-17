@@ -82,8 +82,8 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         }
 
         char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
-                                            sizeof(rotatingIdString));
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(),
+                                                                     rotatingIdString, sizeof(rotatingIdString));
 
         CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
 
@@ -282,7 +282,7 @@ char * AppPlatformHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "remove-app-access") == 0)
     {
-        Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
+        TEMPORARY_RETURN_IGNORED Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
         strcpy(response, "removed app access");
 
         return response;

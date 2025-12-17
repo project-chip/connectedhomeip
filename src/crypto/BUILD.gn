@@ -74,6 +74,7 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
+    "CHIP_OP_KEYSTORE_ELE=${chip_with_imx_ele}",
   ]
 }
 
@@ -93,6 +94,15 @@ source_set("public_headers") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
+
+  if (chip_with_imx_ele) {
+    public_deps +=
+        [ "${chip_root}/third_party/imx-secure-enclave:libelematter" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
@@ -103,7 +113,17 @@ if (chip_crypto == "openssl") {
   }
 
   source_set("cryptopal_openssl") {
-    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    sources = [
+      "CHIPCryptoPALOpenSSL.cpp",
+      "CHIPCryptoPALOpenSSL.h",
+    ]
+
+    if (chip_with_trusty_os) {
+      sources += [ "P256KeyPairTrustyImpl.cpp" ]
+    } else {
+      sources += [ "P256KeyPairOpenSSL.cpp" ]
+    }
+
     public_configs = [ ":openssl_config" ]
     public_deps = [ ":public_headers" ]
   }
@@ -112,7 +132,17 @@ if (chip_crypto == "openssl") {
 
   source_set("cryptopal_boringssl") {
     # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
-    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    sources = [
+      "CHIPCryptoPALOpenSSL.cpp",
+      "CHIPCryptoPALOpenSSL.h",
+    ]
+
+    if (chip_with_trusty_os) {
+      sources += [ "P256KeyPairTrustyImpl.cpp" ]
+    } else {
+      sources += [ "P256KeyPairOpenSSL.cpp" ]
+    }
+
     public_deps = [
       ":public_headers",
       "${boringssl_root}:boringssl",
@@ -158,7 +188,6 @@ static_library("crypto") {
   sources = [
     "CHIPCryptoPAL.cpp",
     "DefaultSessionKeystore.h",
-    "PersistentStorageOperationalKeystore.cpp",
     "PersistentStorageOperationalKeystore.h",
     "RandUtils.cpp",
     "RandUtils.h",
@@ -185,6 +214,18 @@ static_library("crypto") {
       "PSASpake2p.cpp",
       "PSASpake2p.h",
     ]
+  }
+
+  if (chip_with_trusty_os) {
+    sources += [ "PersistentStorageOperationalKeystoreTrusty.cpp" ]
+  } else if (chip_with_imx_ele) {
+    sources += [
+      "EleManagerImpl.cpp",
+      "EleManagerImpl.h",
+      "PersistentStorageOperationalKeystoreEle.cpp",
+    ]
+  } else {
+    sources += [ "PersistentStorageOperationalKeystore.cpp" ]
   }
 
   public_configs = []

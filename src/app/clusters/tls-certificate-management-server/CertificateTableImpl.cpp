@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
+#include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <app/storage/TableEntry.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -63,12 +64,6 @@ enum class CertificateType : uint8_t
     kRoot
 };
 
-struct StoredCertificate
-{
-    CertificateId id;
-    FabricIndex fabric = kUndefinedFabricIndex;
-};
-
 static constexpr size_t kPersistentBufferNextIdBytes =
     EstimateStructOverhead(sizeof(uint16_t), // mNextClientId
                            sizeof(uint16_t), // mNextRootId,
@@ -77,34 +72,20 @@ static constexpr size_t kPersistentBufferNextIdBytes =
                            EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
                                (kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
 
-struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdBytes>
+class GlobalCertificateData : public PersistableData<kPersistentBufferNextIdBytes>
 {
-    uint16_t mNextClientId = 0;
-    uint16_t mNextRootId   = 0;
+    IncrementingIdHelper<CertificateId, kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mRoot;
+    IncrementingIdHelper<CertificateId, kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mClient;
     EndpointId mEndpointId = kInvalidEndpointId;
-    std::array<StoredCertificate, kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mRootCertMapping;
-    size_t mRootCertMappingCount = 0;
-    std::array<StoredCertificate, kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mClientCertMapping;
-    size_t mClientCertMappingCount = 0;
 
+public:
     GlobalCertificateData(EndpointId endpoint) : mEndpointId(endpoint) {}
     ~GlobalCertificateData() {}
 
     void Clear() override
     {
-        mNextClientId = 0;
-        mNextRootId   = 0;
-
-        for (auto & cert : mRootCertMapping)
-        {
-            cert.fabric = kUndefinedFabricIndex;
-            cert.id.Clear();
-        }
-        for (auto & cert : mClientCertMapping)
-        {
-            cert.fabric = kUndefinedFabricIndex;
-            cert.id.Clear();
-        }
+        mRoot.Clear();
+        mClient.Clear();
     }
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) const override
@@ -118,40 +99,29 @@ struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdByte
     {
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kClientCertificateNextId), mNextClientId));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kRootCertificateNextId), mNextRootId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kClientCertificateNextId), mClient.mNextId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kRootCertificateNextId), mRoot.mNextId));
 
         // Storing the cert map
         TLV::TLVType entryMapContainer;
         ReturnErrorOnFailure(
             writer.StartContainer(TLV::ContextTag(TagCertificate::kRootCertMapping), TLV::kTLVType_Array, entryMapContainer));
-        ReturnErrorOnFailure(SerializeMapping(writer, mRootCertMappingCount, mRootCertMapping.data()));
+        ReturnErrorOnFailure(SerializeMapping(writer, mRoot));
         ReturnErrorOnFailure(writer.EndContainer(entryMapContainer));
 
         ReturnErrorOnFailure(
             writer.StartContainer(TLV::ContextTag(TagCertificate::kClientCertMapping), TLV::kTLVType_Array, entryMapContainer));
-        ReturnErrorOnFailure(SerializeMapping(writer, mClientCertMappingCount, mClientCertMapping.data()));
+        ReturnErrorOnFailure(SerializeMapping(writer, mClient));
         ReturnErrorOnFailure(writer.EndContainer(entryMapContainer));
 
         return writer.EndContainer(container);
     }
 
-    CHIP_ERROR SerializeMapping(TLV::TLVWriter & writer, const size_t & count, const StoredCertificate * source) const
+    template <size_t NumEntries>
+    CHIP_ERROR SerializeMapping(TLV::TLVWriter & writer, const IncrementingIdHelper<CertificateId, NumEntries> & source) const
     {
-        for (size_t i = 0; i < count; i++)
-        {
-            const auto & stored = source[i];
-            if (stored.fabric == kUndefinedFabricIndex)
-            {
-                continue;
-            }
-            TLV::TLVType entryIdContainer;
-            ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, entryIdContainer));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kCertificateId), stored.id.mCertificateId));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagCertificate::kStoredFabricIndex), stored.fabric));
-            ReturnErrorOnFailure(writer.EndContainer(entryIdContainer));
-        }
-        return CHIP_NO_ERROR;
+        return source.SerializeMapping(writer, TLV::ContextTag(TagCertificate::kCertificateId),
+                                       TLV::ContextTag(TagCertificate::kStoredFabricIndex));
     }
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
@@ -161,205 +131,69 @@ struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdByte
         TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kClientCertificateNextId)));
-        ReturnErrorOnFailure(reader.Get(mNextClientId));
+        ReturnErrorOnFailure(reader.Get(mClient.mNextId));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kRootCertificateNextId)));
-        ReturnErrorOnFailure(reader.Get(mNextRootId));
+        ReturnErrorOnFailure(reader.Get(mRoot.mNextId));
 
         TLV::TLVType entryMapContainer;
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagCertificate::kRootCertMapping)));
         ReturnErrorOnFailure(reader.EnterContainer(entryMapContainer));
-        ReturnErrorOnFailure(DeserializeMapping(reader, mRootCertMapping.size(), mRootCertMappingCount, mRootCertMapping.data()));
+        ReturnErrorOnFailure(DeserializeMapping(reader, mRoot));
         ReturnErrorOnFailure(reader.ExitContainer(entryMapContainer));
 
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagCertificate::kClientCertMapping)));
         ReturnErrorOnFailure(reader.EnterContainer(entryMapContainer));
-        ReturnErrorOnFailure(
-            DeserializeMapping(reader, mClientCertMapping.size(), mClientCertMappingCount, mClientCertMapping.data()));
+        ReturnErrorOnFailure(DeserializeMapping(reader, mClient));
         ReturnErrorOnFailure(reader.ExitContainer(entryMapContainer));
 
         return reader.ExitContainer(container);
     }
 
-    CHIP_ERROR DeserializeMapping(TLV::TLVReader & reader, const size_t max, size_t & count, StoredCertificate * target)
+    template <size_t NumEntries>
+    CHIP_ERROR DeserializeMapping(TLV::TLVReader & reader, IncrementingIdHelper<CertificateId, NumEntries> & source)
     {
-        size_t i = 0;
-        CHIP_ERROR err;
-        while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR)
-        {
-            TLV::TLVType entryIdContainer;
-            if (i >= max)
-            {
-                // In-memory is not allowed to be smaller than what we've stored in persistence,
-                // due to bindings to FabricTableImpl
-                return CHIP_ERROR_INTERNAL;
-            }
-            auto & stored = target[i];
-            ReturnErrorOnFailure(reader.EnterContainer(entryIdContainer));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kCertificateId)));
-            ReturnErrorOnFailure(reader.Get(stored.id.mCertificateId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kStoredFabricIndex)));
-            ReturnErrorOnFailure(reader.Get(stored.fabric));
-            ReturnErrorOnFailure(reader.ExitContainer(entryIdContainer));
-
-            if (stored.fabric != kUndefinedFabricIndex)
-            {
-                ++i;
-            }
-        }
-        count = i;
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        return CHIP_NO_ERROR;
+        return source.DeserializeMapping(reader, TLV::ContextTag(TagCertificate::kCertificateId),
+                                         TLV::ContextTag(TagCertificate::kStoredFabricIndex));
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
-        CHIP_ERROR err = PersistentData::Load(storage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            Clear();
-        }
-
-        return CHIP_NO_ERROR;
+        CHIP_ERROR err = PersistableData::Load(storage);
+        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND); // NOT_FOUND is OK; DataAccessor::Load already called Clear()
     }
 
     CHIP_ERROR GetNextClientCertificateId(FabricIndex fabric, TLSCCDID & id)
     {
-        VerifyOrReturnError(mClientCertMappingCount < mClientCertMapping.size(), CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(
-            GetNextCertificateId(mNextClientId, kMaxClientCertId, mClientCertMappingCount, mClientCertMapping.data()));
-        return ConsumeId(fabric, id, mNextClientId, mClientCertMappingCount, mClientCertMapping.data());
+        ReturnErrorOnFailure(mClient.GetNextId(kMaxClientCertId));
+        return mClient.ConsumeId(fabric, id);
     }
 
     CHIP_ERROR GetNextRootCertificateId(FabricIndex fabric, TLSCAID & id)
     {
-        VerifyOrReturnError(mRootCertMappingCount < mRootCertMapping.size(), CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(GetNextCertificateId(mNextRootId, kMaxRootCertId, mRootCertMappingCount, mRootCertMapping.data()));
-        return ConsumeId(fabric, id, mNextRootId, mRootCertMappingCount, mRootCertMapping.data());
+        ReturnErrorOnFailure(mRoot.GetNextId(kMaxRootCertId));
+        return mRoot.ConsumeId(fabric, id);
     }
 
     CHIP_ERROR RemoveClientCertificate(PersistentStorageDelegate & storage, ClientCertificateTable & table, FabricIndex fabric,
                                        TLSCCDID id)
     {
-        return DoRemoval(storage, table, fabric, id, mClientCertMappingCount, mClientCertMapping.data());
+        return mClient.Remove(table, fabric, CertificateId(id), [&, this]() { return Save(&storage); });
     }
 
     CHIP_ERROR RemoveRootCertificate(PersistentStorageDelegate & storage, RootCertificateTable & table, FabricIndex fabric,
                                      TLSCAID id)
     {
-        return DoRemoval(storage, table, fabric, id, mRootCertMappingCount, mRootCertMapping.data());
+        return mRoot.Remove(table, fabric, CertificateId(id), [&, this]() { return Save(&storage); });
     }
 
     CHIP_ERROR RemoveAllClientCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
     {
-        return DoRemovalAll(storage, fabric, mClientCertMappingCount, mClientCertMapping.data());
+        return mClient.RemoveAll(fabric, [&, this]() { return Save(&storage); });
     }
 
     CHIP_ERROR RemoveAllRootCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
     {
-        return DoRemovalAll(storage, fabric, mRootCertMappingCount, mRootCertMapping.data());
-    }
-
-private:
-    template <class CertificateTable>
-    CHIP_ERROR DoRemoval(PersistentStorageDelegate & storage, CertificateTable & table, FabricIndex fabric, uint16_t id,
-                         size_t count, StoredCertificate * source)
-    {
-        // Find the entry in the global mapping
-        StoredCertificate * foundEntry = nullptr;
-        for (size_t i = 0; i < count; ++i)
-        {
-            auto & entry = source[i];
-            if (entry.fabric == fabric && entry.id == id)
-            {
-                foundEntry = &entry;
-                break;
-            }
-        }
-        if (foundEntry == nullptr)
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-        foundEntry->fabric = kUndefinedFabricIndex;
-        foundEntry->id.Clear();
-        ReturnErrorOnFailure(this->Save(&storage));
-
-        CertificateId localId(id);
-        auto removeResult = table.RemoveTableEntry(fabric, localId);
-        if (removeResult == CHIP_ERROR_NOT_FOUND)
-        {
-            // Index is out of sync; keep it updated & return NOT_FOUND
-            return CHIP_ERROR_NOT_FOUND;
-        }
-
-        if (removeResult != CHIP_NO_ERROR)
-        {
-            // Failed to remove, re-add
-            foundEntry->fabric = fabric;
-            foundEntry->id     = localId;
-            ReturnErrorOnFailure(this->Save(&storage));
-        }
-        return removeResult;
-    }
-
-    CHIP_ERROR DoRemovalAll(PersistentStorageDelegate & storage, FabricIndex fabric, size_t count, StoredCertificate * source)
-    {
-        // Find the entry in the global mapping
-        uint16_t foundCount = 0;
-        for (size_t i = 0; i < count; ++i)
-        {
-            auto & entry = source[i];
-            if (entry.fabric == fabric)
-            {
-                entry.fabric = kUndefinedFabricIndex;
-                entry.id.Clear();
-                ++foundCount;
-            }
-        }
-        if (foundCount == 0)
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-        return this->Save(&storage);
-    }
-
-    CHIP_ERROR GetNextCertificateId(uint16_t & nextId, uint16_t maxId, size_t count, const StoredCertificate * source)
-    {
-        bool looped = false;
-        bool taken;
-        uint16_t outOfIdCheck = nextId;
-        do
-        {
-            if (nextId == outOfIdCheck)
-            {
-                VerifyOrReturnError(!looped, CHIP_ERROR_ENDPOINT_POOL_FULL);
-                looped = true;
-            }
-            if (nextId == maxId)
-            {
-                nextId = 0;
-            }
-            taken = false;
-            for (size_t i = 0; i < count; i++)
-            {
-                if (source[i].id == nextId)
-                {
-                    taken = true;
-                    ++nextId;
-                    break;
-                }
-            }
-        } while (taken);
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR ConsumeId(FabricIndex fabric, uint16_t & id, uint16_t & nextId, size_t & count, StoredCertificate * stored)
-    {
-        id          = nextId++;
-        auto & used = stored[count++];
-        used.id     = id;
-        used.fabric = fabric;
-        return CHIP_NO_ERROR;
+        return mRoot.RemoveAll(fabric, [&, this]() { return Save(&storage); });
     }
 };
 } // namespace
@@ -404,14 +238,6 @@ constexpr uint16_t RootSerializer::kMaxPerEndpoint()
     return kMaxCertificatesPerEndpoint;
 }
 
-// Serialized TLV length is 88 bytes, 128 bytes gives some slack.  Calculated using
-// writer.GetLengthWritten after calling Serialize method of RootCertFabricData
-template <>
-constexpr size_t RootSerializer::kFabricMaxBytes()
-{
-    return 128;
-}
-
 template <>
 CHIP_ERROR RootSerializer::SerializeId(TLV::TLVWriter & writer, const CertificateId & id)
 {
@@ -447,8 +273,6 @@ void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>;
-using RootCertFabricData = FabricEntryData<CertificateId, CertificateTable::RootCertStruct, RootSerializer::kEntryMaxBytes(),
-                                           RootSerializer::kFabricMaxBytes(), kMaxRootCertificatesPerFabric>;
 
 //
 // CertificateTable::ClientCertStruct storage template specialization
@@ -488,14 +312,6 @@ template <>
 constexpr uint16_t ClientSerializer::kMaxPerEndpoint()
 {
     return kMaxCertificatesPerEndpoint;
-}
-
-// Serialized TLV length is 88 bytes, 128 bytes gives some slack.  Calculated using
-// writer.GetLengthWritten after calling Serialize method of ClientCertFabricData
-template <>
-constexpr size_t ClientSerializer::kFabricMaxBytes()
-{
-    return 128;
 }
 
 template <>
@@ -539,7 +355,7 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
     ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kCertificatePayload)));
     ByteSpan key;
     ReturnErrorOnFailure(reader.Get(key));
-    data.key.SetLength(key.size());
+    ReturnErrorOnFailure(data.key.SetLength(key.size()));
     MutableByteSpan keyAsSpan(data.key.Bytes(), data.key.Length());
     return CopySpanToMutableSpan(key, keyAsSpan);
 }
@@ -551,8 +367,6 @@ void ClientSerializer::Clear(CertificateTable::ClientCertWithKey & data)
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>;
-using ClientCertFabricData = FabricEntryData<CertificateId, CertificateTable::ClientCertWithKey, ClientSerializer::kEntryMaxBytes(),
-                                             ClientSerializer::kFabricMaxBytes(), kMaxClientCertificatesPerFabric>;
 
 //
 // CertificateTableImpl implementation
@@ -754,17 +568,12 @@ CHIP_ERROR CertificateTableImpl::GetClientCertificateCount(FabricIndex fabric, u
     return mClientCertificates.GetFabricEntryCount(fabric, outCount);
 }
 
-inline CHIP_ERROR SwallowNotFound(CHIP_ERROR err)
-{
-    return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err;
-}
-
 CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 {
     // We want to release as many resources as possible; if anything fails,
     // hold on to the error until we've had a chance to try to free other resources
-    CHIP_ERROR clientResult = SwallowNotFound(mClientCertificates.RemoveFabric(fabric));
-    CHIP_ERROR rootResult   = SwallowNotFound(mRootCertificates.RemoveFabric(fabric));
+    CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
+    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
 
     GlobalCertificateData globalData(mEndpointId);
     CHIP_ERROR globalDataResult = globalData.Load(mStorage);
@@ -777,10 +586,10 @@ CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 
     if (rootResult == CHIP_NO_ERROR)
     {
-        rootResult = SwallowNotFound(globalData.RemoveAllRootCertificates(*mStorage, fabric));
+        rootResult = globalData.RemoveAllRootCertificates(*mStorage, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
     }
 
-    ReturnErrorOnFailure(SwallowNotFound(globalData.RemoveAllClientCertificates(*mStorage, fabric)));
+    ReturnErrorOnFailure(globalData.RemoveAllClientCertificates(*mStorage, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND));
     ReturnErrorOnFailure(clientResult);
     return rootResult;
 }

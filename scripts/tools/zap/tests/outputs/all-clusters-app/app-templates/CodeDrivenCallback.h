@@ -27,6 +27,10 @@ void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBindingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBindingClusterShutdownCallback(chip::EndpointId endpointId);
@@ -71,6 +75,10 @@ void MatterEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoi
 
 void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterTimeSynchronizationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTimeSynchronizationClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
@@ -87,6 +95,42 @@ void MatterFixedLabelClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterUserLabelClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterChimeClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterChimeClusterShutdownCallback(chip::EndpointId endpointId);

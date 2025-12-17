@@ -7,6 +7,7 @@
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [],
         "AIR_QUALITY_CLUSTER": [],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": [],
         "APPLICATION_LAUNCHER_CLUSTER": [],
         "AUDIO_OUTPUT_CLUSTER": [],
@@ -66,10 +67,8 @@
         "ICD_MANAGEMENT_CLUSTER": [],
         "IDENTIFY_CLUSTER": [],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
-        "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
-        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
-            "joint-fabric-administrator-server"
-        ],
+        "JOINT_FABRIC_DATASTORE_CLUSTER": [],
+        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": [],
         "LAUNDRY_WASHER_MODE_CLUSTER": [],
         "LEVEL_CONTROL_CLUSTER": [],
@@ -108,9 +107,7 @@
         "PROXY_CONFIGURATION_CLUSTER": [],
         "PROXY_DISCOVERY_CLUSTER": [],
         "PROXY_VALID_CLUSTER": [],
-        "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER": [
-            "pump-configuration-and-control-client"
-        ],
+        "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER": [],
         "PWM_CLUSTER": [],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [],
         "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [],
@@ -127,7 +124,7 @@
         "TARGET_NAVIGATOR_CLUSTER": [],
         "TEMPERATURE_CONTROL_CLUSTER": [],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
-        "THERMOSTAT_CLUSTER": ["thermostat-client"],
+        "THERMOSTAT_CLUSTER": [],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -168,6 +165,7 @@
         ],
         "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
