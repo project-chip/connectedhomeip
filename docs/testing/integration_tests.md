@@ -67,7 +67,7 @@ be disabled by default. To enable it, ensure the following lines are present in
 kernel.unprivileged_userns_clone = 1
 ```
 
-On systems with AppArmor, you also need:
+On systems with AppArmor (like Ubuntu), you also need:
 
 ```
 kernel.apparmor_restrict_unprivileged_userns = 0
