@@ -47,7 +47,6 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
-from test_plan_support import remove_fabric
 
 # Create a logger
 logger = logging.getLogger(__name__)
