@@ -575,7 +575,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterFailsIfEndpointExists)
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(localProvider.RemoveCluster(&testCluster, ClusterShutdownType::kClusterShutdown), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(testCluster.shutdownCallCount, 0);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
@@ -597,7 +597,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterSucceedsIfEndpointRemoved)
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
-    EXPECT_EQ(localProvider.RemoveCluster(&testCluster, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
+    EXPECT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.shutdownCallCount, 1);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
@@ -620,7 +620,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFrom
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
-    ASSERT_EQ(localProvider.RemoveCluster(&testCluster, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
+    ASSERT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.shutdownCallCount, 0);
 }
 
@@ -1064,7 +1064,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointThenRemoveClusterCallsShut
     ASSERT_EQ(testCluster.startupCallCount, 1);
 
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
-    ASSERT_EQ(localProvider.RemoveCluster(&testCluster, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
+    ASSERT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.shutdownCallCount, 1);
 
     EXPECT_SUCCESS(localProvider.Shutdown());

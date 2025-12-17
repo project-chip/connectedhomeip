@@ -100,44 +100,42 @@ void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     SingleEndpointUnregistration(provider);
     if (mBasicInformationCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mBasicInformationCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mBasicInformationCluster.Cluster()));
         mBasicInformationCluster.Destroy();
     }
     if (mGeneralCommissioningCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster()));
         mGeneralCommissioningCluster.Destroy();
     }
     if (mAdministratorCommissioningCluster.IsConstructed())
     {
-        LogErrorOnFailure(
-            provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster()));
         mAdministratorCommissioningCluster.Destroy();
     }
     if (mGeneralDiagnosticsCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster()));
         mGeneralDiagnosticsCluster.Destroy();
     }
     if (mGroupKeyManagementCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));
         mGroupKeyManagementCluster.Destroy();
     }
     if (mSoftwareDiagnosticsServerCluster.IsConstructed())
     {
-        LogErrorOnFailure(
-            provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster()));
         mSoftwareDiagnosticsServerCluster.Destroy();
     }
     if (mAccessControlCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mAccessControlCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mAccessControlCluster.Cluster()));
         mAccessControlCluster.Destroy();
     }
     if (mOperationalCredentialsCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
         mOperationalCredentialsCluster.Destroy();
     }
 }
@@ -163,12 +161,12 @@ void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     RootNodeDevice::UnRegister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));
         mNetworkCommissioningCluster.Destroy();
     }
     if (mWifiDiagnosticsCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster());
         mWifiDiagnosticsCluster.Destroy();
     }
 }

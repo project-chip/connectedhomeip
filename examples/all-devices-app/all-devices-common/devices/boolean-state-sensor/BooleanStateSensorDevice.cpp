@@ -39,12 +39,12 @@ void BooleanStateSensorDevice::UnRegister(CodeDrivenDataModelProvider & provider
     SingleEndpointUnregistration(provider);
     if (mBooleanStateCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mBooleanStateCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mBooleanStateCluster.Cluster()));
         mBooleanStateCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
 }

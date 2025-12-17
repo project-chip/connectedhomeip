@@ -45,7 +45,7 @@ void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvi
     LogErrorOnFailure(provider.RemoveEndpoint(mEndpointId, ClusterShutdownType::kClusterShutdown));
     if (mDescriptorCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mDescriptorCluster.Cluster(), ClusterShutdownType::kClusterShutdown));
+        LogErrorOnFailure(provider.RemoveCluster(&mDescriptorCluster.Cluster()));
         mDescriptorCluster.Destroy();
     }
 }
