@@ -198,7 +198,7 @@ class TC_GCAST_2_2(MatterBaseTest):
             groupID=groupID2,
             endpoints=endpoint1,
             keyID=keyID2,
-            gracePeriod=gracePeriodSeconds
+            gracePeriod=gracePeriodSeconds,
             key=inputKey2,
             useAuxiliaryACL="true")
         )
@@ -223,38 +223,41 @@ class TC_GCAST_2_2(MatterBaseTest):
         groupID3 = 3
         inputKey3 = secrets.token_bytes(16)
 
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID3,
-            endpoints=endpoint1,
-            keyID=keyID2,
-            key=inputKey3)
-        )
-
-        asserts.fail("JoinGroup command should have failed because Group with keyID already exists and does not match key")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID3,
+                endpoints=endpoint1,
+                keyID=keyID2,
+                key=inputKey3)
+            )
+            asserts.fail(
+                "JoinGroup command should have failed because Group with keyID already exists and does not match key, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists,
                                  f"Send JoinGroup command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(8)
         keyID3 = 3
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID3,
-            endpoints=endpoint1,
-            keyID=keyID3)
-        )
-        asserts.fail("JoinGroup command should have failed because no Key found")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID3,
+                endpoints=endpoint1,
+                keyID=keyID3)
+            )
+            asserts.fail("JoinGroup command should have failed because no Key found, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Send JoinGroup command error should be {Status.NotFound} instead of {e.status}")
 
         self.step(9)
         endpoint_invalid = -1
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID3,
-            endpoints=endpoint_invalid,
-            keyID=keyID1)
-        )
-        asserts.fail("JoinGroup command should have failed because endpoint is invalid (not in uint16 format)")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID3,
+                endpoints=endpoint_invalid,
+                keyID=keyID1)
+            )
+            asserts.fail("JoinGroup command should have failed because endpoint is invalid (not in uint16 format), but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedEndpoint,
                                  f"Send JoinGroup command error should be {Status.UnsupportedEndpoint} instead of {e.status}")
@@ -264,12 +267,13 @@ class TC_GCAST_2_2(MatterBaseTest):
             self.mark_step_range_skipped(10, 10)  # How to just skip to 11?
 
         endpoints_list_empty = []
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID3,
-            endpoints=endpoints_list_empty,
-            keyID=keyID1)
-        )
-        asserts.fail("JoinGroup command should have failed because endpoints list is empty")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID3,
+                endpoints=endpoints_list_empty,
+                keyID=keyID1)
+            )
+            asserts.fail("JoinGroup command should have failed because endpoints list is empty, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
@@ -279,12 +283,14 @@ class TC_GCAST_2_2(MatterBaseTest):
             endpoint21 = 21
             # length of this list is now one more than the length of the list of endpoints in DUT
             endpoints_list_exceeds_DUT_endpoints = endpoints_list.append(endpoint21)
-            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID3,
-                endpoints=endpoints_list_exceeds_DUT_endpoints,
-                keyID=keyID2)
-            )
-            asserts.fail("JoinGroup command should have failed because endpoints list has more endpoints than DUT provides")
+            try:
+                await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                    groupID=groupID3,
+                    endpoints=endpoints_list_exceeds_DUT_endpoints,
+                    keyID=keyID2)
+                )
+                asserts.fail(
+                    "JoinGroup command should have failed because endpoints list has more endpoints than DUT provides, but it still succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
@@ -322,25 +328,28 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         self.step("15a")
         inputKey6 = secrets.token_bytes(16)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID5,
-            endpoints=endpoints_list_empty,
-            keyID=keyID4,
-            key=inputKey6)
-        )
-        asserts.fail("JoinGroup command should have failed because Group with keyID already exists and does not match key")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID5,
+                endpoints=endpoints_list_empty,
+                keyID=keyID4,
+                key=inputKey6)
+            )
+            asserts.fail(
+                "JoinGroup command should have failed because Group with keyID already exists and does not match key, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists,
                                  f"Send JoinGroup command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step("15b")
         keyID5 = 5
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID5,
-            endpoints=endpoints_list_empty,
-            keyID=keyID5)
-        )
-        asserts.fail("JoinGroup command should have failed because no Key found")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID5,
+                endpoints=endpoints_list_empty,
+                keyID=keyID5)
+            )
+            asserts.fail("JoinGroup command should have failed because no Key found, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Send JoinGroup command error should be {Status.NotFound} instead of {e.status}")
@@ -352,7 +361,7 @@ class TC_GCAST_2_2(MatterBaseTest):
             groupID=groupID5,
             endpoints=[],
             keyID=keyID5,
-            gracePeriod=gracePeriodSeconds
+            gracePeriod=gracePeriodSeconds,
             key=inputKey5)
         )
 
@@ -374,60 +383,65 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step(17)
         if ln_enabled:
             self.mark_step_range_skipped(18, 18)  # priyamal confirm This should skip to 19 right?
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID5,
-            endpoints=endpoint1,
-            keyID=keyID5,
-            key=inputKey5)
-        )
-        asserts.fail("JoinGroup command should have failed because listener cannot do JoinGroup commands")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID5,
+                endpoints=endpoint1,
+                keyID=keyID5,
+                key=inputKey5)
+            )
+            asserts.fail("JoinGroup command should have failed because listener cannot do JoinGroup commands, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(18)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID5,
-            endpoints=endpoints_list_empty,  # priyamal check if preference to use [] or the empty_list
-            keyID=keyID5,
-            useAuxiliaryACL="true")
-        )
-        asserts.fail("JoinGroup command should have failed because listener cannot do JoinGroup commands")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID5,
+                endpoints=endpoints_list_empty,  # priyamal check if preference to use [] or the empty_list
+                keyID=keyID5,
+                useAuxiliaryACL="true")
+            )
+            asserts.fail("JoinGroup command should have failed because listener cannot do JoinGroup commands, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(19)
         groupID0 = 0
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID0)
-        )
-        asserts.fail("JoinGroup command should have failed because GroupID cannot be 0")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID0)
+            )
+            asserts.fail("JoinGroup command should have failed because GroupID cannot be 0, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(20)
         inputKeyLong = secrets.token_bytes(17)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID5,
-            key=inputKeyLong)
-        )
-        asserts.fail("JoinGroup command should have failed because Key length is not 16 bytes")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID5,
+                key=inputKeyLong)
+            )
+            asserts.fail("JoinGroup command should have failed because Key length is not 16 bytes, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(21)
         gracePeriodSeconds = 86401
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID2,
-            endpoints=endpoint1,
-            keyID=keyID2,
-            gracePeriod=gracePeriodSeconds
-            key=inputKey2)
-        )
-        asserts.fail("JoinGroup command should have failed because GracePeriod is too long")
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID2,
+                endpoints=endpoint1,
+                keyID=keyID2,
+                gracePeriod=gracePeriodSeconds,
+                key=inputKey2)
+            )
+            asserts.fail("JoinGroup command should have failed because GracePeriod is too long, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
