@@ -166,7 +166,6 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         params = await self.open_commissioning_window(th1, th1_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
-        # setup_qr_code = params.commissioningParameters.setupQRCode
         logger.info(f'Step #3: Commissioning window opened: {vars(params)}')
 
         logger.info('Step #3 - Commissioning DUT with TH3...')
@@ -300,8 +299,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         # --------------------------------------------------------------
 
         # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
-        providers_list = [provider_th2_for_fabric1]
-        providers_list.append(provider_th4_for_fabric1)
+        providers_list = [provider_th2_for_fabric1, provider_th4_for_fabric1]
         logger.info(f'Step #5 - Providers list updated with provider "TH4 and TH2 for fabric 1": {providers_list}')
 
         # Update attribute with providers list  (TH2 and TH4 for fabric 1)
