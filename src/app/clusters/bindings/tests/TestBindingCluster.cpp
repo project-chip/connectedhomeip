@@ -24,7 +24,6 @@
 #include <clusters/Binding/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 
 namespace {
 

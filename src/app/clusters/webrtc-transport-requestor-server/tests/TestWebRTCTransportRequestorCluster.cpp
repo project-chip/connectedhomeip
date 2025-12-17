@@ -28,7 +28,6 @@
 #include <clusters/WebRTCTransportRequestor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace {

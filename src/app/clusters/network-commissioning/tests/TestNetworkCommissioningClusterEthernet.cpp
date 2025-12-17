@@ -35,7 +35,6 @@
 #include <clusters/NetworkCommissioning/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
 #include "FakeDrivers.h"
