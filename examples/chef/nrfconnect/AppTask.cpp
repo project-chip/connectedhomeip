@@ -314,14 +314,15 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
     if (sIsSitModeRequested)
     {
         ChipLogProgress(AppServer, "IcdDslsEventHandler: NotifySITModeRequestWithdrawal");
-        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
         sIsSitModeRequested = false;
     }
     else
     {
         ChipLogProgress(AppServer, "IcdDslsEventHandler: NotifySITModeRequestNotification");
-        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
-                                   0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
         sIsSitModeRequested = true;
     }
 }
@@ -331,7 +332,8 @@ void AppTask::IcdUatEventHandler(const AppEvent &)
 {
 #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
     // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
-    PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+        [](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #endif
 }
 

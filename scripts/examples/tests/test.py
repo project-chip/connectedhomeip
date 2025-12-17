@@ -29,7 +29,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 
 
 def build_expected_output(root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt'), 'rt') as file:
+    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt')) as file:
         for line in file.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
@@ -44,7 +44,7 @@ def build_actual_output(root: str, out: str) -> List[str]:
         project,
     ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
 
-    with open(cmake, 'rt') as f:
+    with open(cmake) as f:
         for line in f.readlines():
             yield line
 

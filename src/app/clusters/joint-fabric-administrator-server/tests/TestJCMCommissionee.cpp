@@ -345,13 +345,13 @@ protected:
     }
 };
 
-class TestJCMCommissionee : public chip::Test::AppContext
+class TestJCMCommissionee : public chip::Testing::AppContext
 {
 public:
     static void SetUpTestSuite()
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        chip::Test::AppContext::SetUpTestSuite();
+        chip::Testing::AppContext::SetUpTestSuite();
     }
 
     static void TearDownTestSuite()

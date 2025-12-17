@@ -48,8 +48,8 @@ def convert_ini_to_json(ini_dir: str, json_path: str):
                                          json_dict=python_json_store, replace_suffix=str(counter))
         counter = counter + 1
 
-    json_file = open(json_path, 'w')
-    json.dump(python_json_store, json_file, ensure_ascii=True, indent=4)
+    with open(json_path, 'w') as f:
+        json.dump(python_json_store, f, ensure_ascii=True, indent=4)
 
 
 def create_repl_config_from_init(ini_file: str, json_dict: typing.Dict, replace_suffix: str):
