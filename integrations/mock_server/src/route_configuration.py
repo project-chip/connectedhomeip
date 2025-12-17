@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 class RouteResponse:
     status: int
     headers: Dict[str, str]
-    body: Dict[str, Any]
+    body: Any  # Dict for inline JSON, or bytes for $ref content (raw file bytes)
 
 
 @dataclass
@@ -108,6 +108,43 @@ def load_routing_configuration_dir(directory: Path) -> List[Route]:
     return all_routes
 
 
+def resolve_ref(body: Dict[str, Any], base_path: Path) -> bytes:
+    """
+    Resolve $ref reference and return raw file content.
+
+    Args:
+        body (Dict[str, Any]): The body object containing a $ref key.
+        base_path (Path): The directory path to resolve relative references from.
+
+    Returns:
+        bytes: The raw file content as bytes.
+
+    Example:
+        body = {"$ref": "../static/tc-65521-32769-v1.json"}
+        content = resolve_ref(body, Path("configurations/fake_product_server"))
+        # Returns raw contents of configurations/static/tc-65521-32769-v1.json
+    """
+    ref_path_str = body["$ref"]
+    ref_path = (base_path / ref_path_str).resolve()
+
+    # To prevent path traversal, ensure the resolved path is within the parent directory of the config file.
+    config_root = base_path.parent.resolve()
+    try:
+        ref_path.relative_to(config_root)
+    except ValueError:
+        log.error("Path traversal attempt in $ref: '%s' resolves to a path outside of '%s'", ref_path_str, config_root)
+        raise ValueError("Invalid $ref path: path traversal is not allowed.")
+
+    log.debug("Resolving $ref: %s -> %s", ref_path_str, ref_path)
+
+    try:
+        with open(ref_path, "rb") as ref_file:
+            return ref_file.read()
+    except FileNotFoundError:
+        log.error("Referenced file not found: %s", ref_path)
+        raise
+
+
 def load_routing_configuration_file(file_path: Path) -> List[Route]:
     """
     Load and parse a single routing configuration JSON file.
@@ -133,13 +170,19 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
                     "response": {
                         "status": int,
                         "headers": dict[str, str],
-                        "body": dict[str, Any]
+                        "body": dict[str, Any] | {"$ref": "path/to/file.json"}
                     },
                     "body": Any,  # Optional
                     "query": dict[str, Any]  # Optional
                 }
             ]
         }
+
+    Note:
+        The "body" field in "response" can contain a "$ref" key pointing to an
+        external JSON file. The reference is resolved relative to the config file's
+        directory. This allows response bodies to be stored as separate static files
+        that can be hosted independently (e.g., on GitHub for DCL references).
     """
     try:
         with open(file_path, "r") as file:
@@ -150,12 +193,23 @@ def load_routing_configuration_file(file_path: Path) -> List[Route]:
 
         log.debug("Routes configuration loaded successfully from %s", file_path)
         routes = []
+        base_path = file_path.parent
+
         for route_config in config["routes"]:
+            # Get the body, resolving $ref if present
+            body = route_config["response"].get("body", {})
+            if isinstance(body, dict) and "$ref" in body:
+                # $ref: load raw file content as bytes (preserves exact bytes for hash verification)
+                resolved_body = resolve_ref(body, base_path)
+            else:
+                # Inline body: keep as-is (dict or other)
+                resolved_body = body
+
             # Create RouteResponse object
             response = RouteResponse(
                 status=route_config["response"]["status"],
                 headers=route_config["response"].get("headers", {}),
-                body=route_config["response"].get("body", {}),
+                body=resolved_body,
             )
 
             # Create QueryConfig if query params exist
