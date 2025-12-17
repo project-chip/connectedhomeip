@@ -33,8 +33,8 @@
 #include <clusters/NetworkCommissioning/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 
 #include "FakeDrivers.h"
 
@@ -73,30 +73,21 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
         //       For now keep the logic as inherited from previous implementation.
+        std::vector<AttributeEntry> expectedAttributes = {
+            MaxNetworks::kMetadataEntry,          Networks::kMetadataEntry,      InterfaceEnabled::kMetadataEntry,
+            LastNetworkingStatus::kMetadataEntry, LastNetworkID::kMetadataEntry, LastConnectErrorValue::kMetadataEntry,
+        };
+
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                MaxNetworks::kMetadataEntry,
-                                                Networks::kMetadataEntry,
-                                                InterfaceEnabled::kMetadataEntry,
-                                                LastNetworkingStatus::kMetadataEntry,
-                                                LastNetworkID::kMetadataEntry,
-                                                LastConnectErrorValue::kMetadataEntry,
-                                                ScanMaxTimeSeconds::kMetadataEntry,
-                                                ConnectMaxTimeSeconds::kMetadataEntry,
-                                                SupportedWiFiBands::kMetadataEntry,
-                                            }));
-#else
-        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                MaxNetworks::kMetadataEntry,
-                                                Networks::kMetadataEntry,
-                                                InterfaceEnabled::kMetadataEntry,
-                                                LastNetworkingStatus::kMetadataEntry,
-                                                LastNetworkID::kMetadataEntry,
-                                                LastConnectErrorValue::kMetadataEntry,
-                                            }));
+        expectedAttributes.insert(expectedAttributes.end(),
+                                  {
+                                      ScanMaxTimeSeconds::kMetadataEntry,
+                                      ConnectMaxTimeSeconds::kMetadataEntry,
+                                      SupportedWiFiBands::kMetadataEntry,
+                                  });
 #endif
+
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
     }
 
     // TODO: more tests for ethernet and thread should be added

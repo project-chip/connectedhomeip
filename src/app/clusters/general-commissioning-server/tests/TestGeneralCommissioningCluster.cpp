@@ -25,10 +25,10 @@
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 
 namespace {
 
@@ -51,16 +51,15 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 
 GeneralCommissioningCluster::Context CreateStandardContext()
 {
-    return
-    {
+    return {
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager        = DeviceLayer::PlatformMgr(),                            //
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+        .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+        .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+        .platformManager            = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 }
@@ -71,32 +70,25 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
     {
         GeneralCommissioningCluster cluster(CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes(0));
 
+        std::vector<AttributeEntry> expectedAttributes = {
+            Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
+            LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
+        };
+
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // This is both define AND feature map dependent. The feature map is hardcoded
         // based on compile-time defines, so we check the define directly.
-        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                Breadcrumb::kMetadataEntry,
-                                                BasicCommissioningInfo::kMetadataEntry,
-                                                RegulatoryConfig::kMetadataEntry,
-                                                LocationCapability::kMetadataEntry,
-                                                SupportsConcurrentConnection::kMetadataEntry,
-                                                TCAcceptedVersion::kMetadataEntry,
-                                                TCMinRequiredVersion::kMetadataEntry,
-                                                TCAcknowledgements::kMetadataEntry,
-                                                TCAcknowledgementsRequired::kMetadataEntry,
-                                                TCUpdateDeadline::kMetadataEntry,
-                                            }));
-#else
-        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                Breadcrumb::kMetadataEntry,
-                                                BasicCommissioningInfo::kMetadataEntry,
-                                                RegulatoryConfig::kMetadataEntry,
-                                                LocationCapability::kMetadataEntry,
-                                                SupportsConcurrentConnection::kMetadataEntry,
-                                            }));
+        expectedAttributes.insert(expectedAttributes.end(),
+                                  {
+                                      TCAcceptedVersion::kMetadataEntry,
+                                      TCMinRequiredVersion::kMetadataEntry,
+                                      TCAcknowledgements::kMetadataEntry,
+                                      TCAcknowledgementsRequired::kMetadataEntry,
+                                      TCUpdateDeadline::kMetadataEntry,
+                                  });
 #endif
+
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
     }
 
     // test with optional attributes
@@ -104,34 +96,27 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
         GeneralCommissioningCluster cluster(
             CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes().Set<IsCommissioningWithoutPower::Id>());
 
+        std::vector<AttributeEntry> expectedAttributes = {
+            Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
+            LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
+        };
+
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // This is both define AND feature map dependent. The feature map is hardcoded
         // based on compile-time defines, so we check the define directly.
-        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                Breadcrumb::kMetadataEntry,
-                                                BasicCommissioningInfo::kMetadataEntry,
-                                                RegulatoryConfig::kMetadataEntry,
-                                                LocationCapability::kMetadataEntry,
-                                                SupportsConcurrentConnection::kMetadataEntry,
-                                                TCAcceptedVersion::kMetadataEntry,
-                                                TCMinRequiredVersion::kMetadataEntry,
-                                                TCAcknowledgements::kMetadataEntry,
-                                                TCAcknowledgementsRequired::kMetadataEntry,
-                                                TCUpdateDeadline::kMetadataEntry,
-                                                IsCommissioningWithoutPower::kMetadataEntry,
-                                            }));
-#else
-        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                Breadcrumb::kMetadataEntry,
-                                                BasicCommissioningInfo::kMetadataEntry,
-                                                RegulatoryConfig::kMetadataEntry,
-                                                LocationCapability::kMetadataEntry,
-                                                SupportsConcurrentConnection::kMetadataEntry,
-                                                IsCommissioningWithoutPower::kMetadataEntry,
-                                            }));
+        expectedAttributes.insert(expectedAttributes.end(),
+                                  {
+                                      TCAcceptedVersion::kMetadataEntry,
+                                      TCMinRequiredVersion::kMetadataEntry,
+                                      TCAcknowledgements::kMetadataEntry,
+                                      TCAcknowledgementsRequired::kMetadataEntry,
+                                      TCUpdateDeadline::kMetadataEntry,
+                                  });
 #endif
+
+        expectedAttributes.push_back(IsCommissioningWithoutPower::kMetadataEntry);
+
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
     }
 }
 
