@@ -444,6 +444,6 @@ void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsClientManagementClusterServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "TLS Client Management Cluster unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "TLS Client Management Cluster unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
