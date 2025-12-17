@@ -30,11 +30,11 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     mVideoStreamParams(videoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
-    mConnectionID    = connectionID;
-    mTransportStatus = TransportStatusEnum::kInactive;
+    mConnectionID                     = connectionID;
+    mTransportStatus                  = TransportStatusEnum::kInactive;
     mActivationTimeSetByManualTrigger = false;
-    mRecordingTriggerByManual = false;
-    mIsZoneBasedTrigger = false;
+    mRecordingTriggerByManual         = false;
+    mIsZoneBasedTrigger               = false;
 
     auto now               = std::chrono::system_clock::now();
     std::time_t time_t_now = std::chrono::system_clock::to_time_t(now);
@@ -311,7 +311,8 @@ bool PushAVTransport::HandleTriggerDetected()
     int64_t elapsed = 0;
     auto now        = std::chrono::steady_clock::now();
 
-    if (!mRecordingTriggerByManual && mIsZoneBasedTrigger && mTransportTriggerType != TransportTriggerTypeEnum::kCommand && InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS))
+    if (!mRecordingTriggerByManual && mIsZoneBasedTrigger && mTransportTriggerType != TransportTriggerTypeEnum::kCommand &&
+        InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS))
     {
         return false;
     }
@@ -327,9 +328,9 @@ bool PushAVTransport::HandleTriggerDetected()
     {
         // Start new recording
         ChipLogError(Camera, "PushAVTransport starting new recording");
-        mHasAugmented                       = false;
-        mClipInfo.activationTimeS           = std::chrono::steady_clock::now();
-        mRecorder->mClipInfo.activationTimeS= mClipInfo.activationTimeS;
+        mHasAugmented                        = false;
+        mClipInfo.activationTimeS            = std::chrono::steady_clock::now();
+        mRecorder->mClipInfo.activationTimeS = mClipInfo.activationTimeS;
         mRecorder->mClipInfo.mSessionNumber =
             mPushAvStreamTransportManager->OnTriggerActivated(mFabricIndex, mClipInfo.mSessionGroup, mConnectionID);
 
@@ -362,11 +363,13 @@ bool PushAVTransport::HandleTriggerDetected()
             mStreaming                             = true;
         }
     }
-    mBlindStartTime = mRecorder->mClipInfo.activationTimeS + std::chrono::seconds(mRecorder->mClipInfo.mInitialDurationS) + std::chrono::seconds((mRecorder->mClipInfo.mPreRollLengthMs / 1000));
+    mBlindStartTime = mRecorder->mClipInfo.activationTimeS + std::chrono::seconds(mRecorder->mClipInfo.mInitialDurationS) +
+        std::chrono::seconds((mRecorder->mClipInfo.mPreRollLengthMs / 1000));
     return true;
 }
 
-void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, int zoneId, int sensitivity, bool isZoneBasedTrigger)
+void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, int zoneId, int sensitivity,
+                                       bool isZoneBasedTrigger)
 {
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneId: [%d], Sensitivity: [%d]",
                     (uint16_t) activationReason, zoneId, sensitivity);
@@ -390,7 +393,8 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
-        if (mTransportStatus == TransportStatusEnum::kInactive) {
+        if (mTransportStatus == TransportStatusEnum::kInactive)
+        {
             ChipLogProgress(Camera, "PushAVTransport Inactive transport status received. No action needed");
             mUploader = std::make_unique<PushAVUploader>();
             mUploader->Start();
@@ -546,7 +550,8 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
                     mRecorder->mClipInfo.mElapsedTimeS = static_cast<uint16_t>(elapsedSeconds);
                     ChipLogProgress(Camera, "Active trigger is present. Recording will start for [%d seconds]",
                                     mRecorder->mClipInfo.mInitialDurationS);
-                    if (HandleTriggerDetected()) {
+                    if (HandleTriggerDetected())
+                    {
                         if (mPushAvStreamTransportServer != nullptr)
                         {
                             mPushAvStreamTransportServer->NotifyTransportStarted(
@@ -558,10 +563,13 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
                             ChipLogError(Camera, "PushAvStreamTransportServer is null for connection %u", mConnectionID);
                         }
                     }
-                    else {
-                         ChipLogError(Camera,
-                         "PushAVTransport command/motion transport trigger received but ignored due to blind period. Clip duration "
-                         "[%d seconds]",mRecorder->mClipInfo.mInitialDurationS);
+                    else
+                    {
+                        ChipLogError(Camera,
+                                     "PushAVTransport command/motion transport trigger received but ignored due to blind period. "
+                                     "Clip duration "
+                                     "[%d seconds]",
+                                     mRecorder->mClipInfo.mInitialDurationS);
                     }
                 }
             }
@@ -576,7 +584,7 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         // Clear activationTime for manual triggers when setting status to inactive
         if (mActivationTimeSetByManualTrigger)
         {
-            mClipInfo.activationTimeS = std::chrono::steady_clock::time_point();
+            mClipInfo.activationTimeS         = std::chrono::steady_clock::time_point();
             mActivationTimeSetByManualTrigger = false;
             ChipLogProgress(Camera, "PushAVTransport, cleared activationTimeS for manual trigger");
         }

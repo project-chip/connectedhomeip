@@ -168,8 +168,8 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    uint32_t mCurrentlyUsedBandwidthbps = 0;
+    uint32_t mCurrentlyUsedBandwidthbps    = 0;
     bool mActivationTimeSetByManualTrigger = false;
-    bool mRecordingTriggerByManual = false;
-    bool mIsZoneBasedTrigger = false;
+    bool mRecordingTriggerByManual         = false;
+    bool mIsZoneBasedTrigger               = false;
 };
