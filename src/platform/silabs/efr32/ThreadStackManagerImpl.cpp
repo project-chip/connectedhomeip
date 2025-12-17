@@ -36,6 +36,8 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
+#include <openthread-core-config.h>
+
 #include <lib/support/CodeUtils.h>
 #include <mbedtls/platform.h>
 
@@ -114,6 +116,12 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::ConfigureThreadStack(otInst);
+    if (err == CHIP_NO_ERROR)
+    {
+        // To make sure that timeout is set with OT libraries
+        otThreadSetChildTimeout(otInst, OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT);
+    }
+
     return err;
 }
 
