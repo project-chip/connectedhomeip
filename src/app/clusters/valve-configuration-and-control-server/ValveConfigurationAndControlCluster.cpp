@@ -34,7 +34,8 @@ using chip::Protocols::InteractionModel::Status;
 
 ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(EndpointId endpoint,
                                                                          BitFlags<ValveConfigurationAndControl::Feature> features,
-                                                                         OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
+                                                                         OptionalAttributeSet optionalAttributeSet,
+                                                                         const StartupConfiguration & config,
                                                                          TimeSyncTracker * tsTracker) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),

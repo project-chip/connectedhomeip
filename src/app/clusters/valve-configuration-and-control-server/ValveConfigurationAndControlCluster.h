@@ -34,9 +34,9 @@ namespace chip::app::Clusters {
 class ValveConfigurationAndControlCluster : public DefaultServerCluster
 {
 public:
-    static constexpr uint8_t kDefaultOpenLevel = 100u;
-    static constexpr uint8_t kDefaultLevelStep = 1u;
-    static constexpr uint8_t kMaxLevelValuePercent    = 100u;
+    static constexpr uint8_t kDefaultOpenLevel     = 100u;
+    static constexpr uint8_t kDefaultLevelStep     = 1u;
+    static constexpr uint8_t kMaxLevelValuePercent = 100u;
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
                                                                  ValveConfigurationAndControl::Attributes::ValveFault::Id,
@@ -50,7 +50,8 @@ public:
     };
 
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
-                                        OptionalAttributeSet optionalAttributeSet,  const StartupConfiguration & config, TimeSyncTracker * tsTracker);
+                                        OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
+                                        TimeSyncTracker * tsTracker);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;

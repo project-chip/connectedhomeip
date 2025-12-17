@@ -75,34 +75,32 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         // Get DefaultOpenDuration
-        DataModel::Nullable<uint32_t> defaultOpenDuration {};
+        DataModel::Nullable<uint32_t> defaultOpenDuration{};
         if (DefaultOpenDuration::Get(endpointId, defaultOpenDuration) != Status::Success)
         {
             defaultOpenDuration = DataModel::NullNullable;
         }
 
         // Get the DefaultOpenLevel
-        Percent defaultOpenLevel {};
+        Percent defaultOpenLevel{};
         if (DefaultOpenLevel::Get(endpointId, &defaultOpenLevel) != Status::Success)
         {
             defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel;
         }
 
         // Get the LevelStep
-        uint8_t levelStep {};
+        uint8_t levelStep{};
         if (LevelStep::Get(endpointId, &levelStep) != Status::Success)
         {
             levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
         }
 
-        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
-                                                          ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
-                                                          ValveConfigurationAndControlCluster::StartupConfiguration{
-                                                            .defaultOpenDuration = defaultOpenDuration,
-                                                            .defaultOpenLevel = defaultOpenLevel,
-                                                            .levelStep = levelStep
-                                                          },
-                                                          &codegenTracker);
+        gServers[clusterInstanceIndex].Create(
+            endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
+            ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
+            ValveConfigurationAndControlCluster::StartupConfiguration{
+                .defaultOpenDuration = defaultOpenDuration, .defaultOpenLevel = defaultOpenLevel, .levelStep = levelStep },
+            &codegenTracker);
         return gServers[clusterInstanceIndex].Registration();
     }
 
