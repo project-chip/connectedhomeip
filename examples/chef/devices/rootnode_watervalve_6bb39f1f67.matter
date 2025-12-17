@@ -1950,7 +1950,7 @@ endpoint 1 {
 
   server cluster ValveConfigurationAndControl {
     callback attribute openDuration;
-    callback attribute defaultOpenDuration;
+    ram      attribute defaultOpenDuration;
     callback attribute remainingDuration;
     callback attribute currentState;
     callback attribute targetState;

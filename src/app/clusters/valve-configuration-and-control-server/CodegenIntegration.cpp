@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "CodegenIntegration.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <app/static-cluster-config/ValveConfigurationAndControl.h>
 #include <app/util/attribute-storage.h>
@@ -30,6 +31,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using namespace chip::app::Clusters::ValveConfigurationAndControl::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
@@ -72,12 +74,33 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        // Get DefaultOpenDuration
+        DataModel::Nullable<uint32_t> defaultOpenDuration {};
+        if (DefaultOpenDuration::Get(endpointId, defaultOpenDuration) != Status::Success)
+        {
+            defaultOpenDuration = DataModel::NullNullable;
+        }
+
+        // Get the DefaultOpenLevel
+        Percent defaultOpenLevel {};
+        if (DefaultOpenLevel::Get(endpointId, &defaultOpenLevel) != Status::Success)
+        {
+            defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel;
+        }
+
+        // Get the LevelStep
+        uint8_t levelStep {};
+        if (LevelStep::Get(endpointId, &levelStep) != Status::Success)
+        {
+            levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
+        }
+
         gServers[clusterInstanceIndex].Create(endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
                                                           ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
                                                           ValveConfigurationAndControlCluster::StartupConfiguration{
-                                                            .defaultOpenDuration = DataModel::NullNullable,
-                                                            .defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                                                            .levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep
+                                                            .defaultOpenDuration = defaultOpenDuration,
+                                                            .defaultOpenLevel = defaultOpenLevel,
+                                                            .levelStep = levelStep
                                                           }, 
                                                           &codegenTracker);
         return gServers[clusterInstanceIndex].Registration();
