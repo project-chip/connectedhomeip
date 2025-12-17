@@ -25,66 +25,15 @@
 #include <app/clusters/bindings/BindingCluster.h>
 #include <app/clusters/bindings/binding-table.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/Binding/Attributes.h>
 #include <clusters/Binding/Metadata.h>
-#include <clusters/Binding/Structs.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using TargetStructType         = Binding::Structs::TargetStruct::Type;
-using DecodableBindingListType = Binding::Attributes::Binding::TypeInfo::DecodableType;
 
 // TODO: add binding table to the persistent storage
 namespace {
-
-bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry)
-{
-    // Entry has endpoint, node id and no group id
-    if (!entry.group.HasValue() && entry.endpoint.HasValue() && entry.node.HasValue())
-    {
-        VerifyOrReturnValue(entry.cluster.HasValue(), true); // valid node/endopint binding without a clusterid
-        // Valid node/endpoint/cluster binding
-        ReadOnlyBufferBuilder<ClusterId> clientClusters;
-        // TODO: is this a correct validation?
-        VerifyOrReturnValue(InteractionModelEngine::GetInstance()->GetDataModelProvider()->ClientClusters(
-                                localEndpoint, clientClusters) == CHIP_NO_ERROR,
-                            false);
-        for (auto & client : clientClusters.TakeBuffer())
-        {
-            VerifyOrReturnValue(client != entry.cluster.Value(), true);
-        }
-    }
-    // Entry has group id and no endpoint and node id
-    return (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue());
-}
-
-CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
-                                 FabricIndex accessingFabricIndex)
-{
-    size_t listSize = 0;
-    auto iter       = bindingList.begin();
-    while (iter.Next())
-    {
-        VerifyOrReturnError(IsValidBinding(localEndpoint, iter.GetValue()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        listSize++;
-    }
-    ReturnErrorOnFailure(iter.GetStatus());
-
-    // Check binding table size
-    uint8_t oldListSize = 0;
-    for (const auto & entry : Binding::Table::GetInstance())
-    {
-        if (entry.local == localEndpoint && entry.fabricIndex == accessingFabricIndex)
-        {
-            oldListSize++;
-        }
-    }
-    VerifyOrReturnError(Binding::Table::GetInstance().Size() - oldListSize + listSize <= Binding::Table::kMaxBindingEntries,
-                        CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
@@ -109,6 +58,51 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+bool BindingCluster::IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry)
+{
+    // Entry has endpoint, node id and no group id
+    if (!entry.group.HasValue() && entry.endpoint.HasValue() && entry.node.HasValue())
+    {
+        VerifyOrReturnValue(entry.cluster.HasValue(), true); // valid node/endopint binding without a clusterid
+        // Valid node/endpoint/cluster binding
+        ReadOnlyBufferBuilder<ClusterId> clientClusters;
+        // TODO: is this a correct validation?
+        VerifyOrReturnValue(mContext->provider.ClientClusters(localEndpoint, clientClusters) == CHIP_NO_ERROR, false);
+        for (auto & client : clientClusters.TakeBuffer())
+        {
+            VerifyOrReturnValue(client != entry.cluster.Value(), true);
+        }
+    }
+    // Entry has group id and no endpoint and node id
+    return (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue());
+}
+
+CHIP_ERROR BindingCluster::CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
+                                                 FabricIndex accessingFabricIndex)
+{
+    size_t listSize = 0;
+    auto iter       = bindingList.begin();
+    while (iter.Next())
+    {
+        VerifyOrReturnError(IsValidBinding(localEndpoint, iter.GetValue()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        listSize++;
+    }
+    ReturnErrorOnFailure(iter.GetStatus());
+
+    // Check binding table size
+    uint8_t oldListSize = 0;
+    for (const auto & entry : mClusterContext.bindingTable)
+    {
+        if (entry.local == localEndpoint && entry.fabricIndex == accessingFabricIndex)
+        {
+            oldListSize++;
+        }
+    }
+    VerifyOrReturnError(mClusterContext.bindingTable.Size() - oldListSize + listSize <= Binding::Table::kMaxBindingEntries,
+                        CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                             AttributeValueEncoder & encoder)
 {
@@ -116,7 +110,7 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
     {
     case Binding::Attributes::Binding::Id: {
         return encoder.EncodeList([&](const auto & subEncoder) {
-            for (auto & entry : Binding::Table::GetInstance())
+            for (auto & entry : mClusterContext.bindingTable)
             {
                 if (entry.local != request.path.mEndpointId)
                 {
@@ -173,17 +167,17 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
                 CheckValidBindingList(request.path.mEndpointId, newBindingList, request.GetAccessingFabricIndex()));
 
             // Clear all entries for the current accessing fabric and endpoint
-            auto bindingTableIter = Binding::Table::GetInstance().begin();
-            while (bindingTableIter != Binding::Table::GetInstance().end())
+            auto bindingTableIter = mClusterContext.bindingTable.begin();
+            while (bindingTableIter != mClusterContext.bindingTable.end())
             {
                 if (bindingTableIter->local == request.path.mEndpointId &&
                     bindingTableIter->fabricIndex == request.GetAccessingFabricIndex())
                 {
                     if (bindingTableIter->type == Binding::MATTER_UNICAST_BINDING)
                     {
-                        TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
+                        TEMPORARY_RETURN_IGNORED mClusterContext.bindingManager.UnicastBindingRemoved(bindingTableIter.GetIndex());
                     }
-                    ReturnErrorOnFailure(Binding::Table::GetInstance().RemoveAt(bindingTableIter));
+                    ReturnErrorOnFailure(mClusterContext.bindingTable.RemoveAt(bindingTableIter));
                 }
                 else
                 {
@@ -246,7 +240,7 @@ CHIP_ERROR BindingCluster::NotifyBindingsChanged(FabricIndex accessingFabricInde
 {
     DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
                                         .BindingsChanged = { .fabricIndex = accessingFabricIndex } };
-    return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+    return mClusterContext.platformManager.PostEvent(&event);
 }
 
 } // namespace Clusters
