@@ -166,7 +166,7 @@ void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     }
     if (mWifiDiagnosticsCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster()));
         mWifiDiagnosticsCluster.Destroy();
     }
 }
