@@ -36,8 +36,9 @@ ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endp
                                                                  const BitFlags<ThreadNetworkDiagnostics::Feature> features,
                                                                  const OptionalAttributeSet & optionalAttributeSet,
                                                                  const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features),
-    mOptionalAttributeSet(optionalAttributeSet), mActiveTs(config.activeTs), mPendingTs(config.pendingTs), mDelay(config.delay)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
+    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mActiveTs(config.activeTs), mPendingTs(config.pendingTs),
+    mDelay(config.delay)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
