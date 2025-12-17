@@ -229,15 +229,23 @@ def main(context, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
-    tests.sort(key=lambda x: x.name)
+    tests_filtered: list[TestDefinition] = []
+    for test in tests:
+        if include_tags and not (test.tags & include_tags):
+            log.debug("Test '%s' not included", test.name)
+            continue
 
-    context.obj = RunContext(root=root, tests=tests,
-                             in_unshare=internal_inside_unshare,
-                             runtime=runtime,
-                             find_path=find_path,
-                             deprecated_chip_tool_path=chip_tool,
-                             include_tags=include_tags,
-                             exclude_tags=exclude_tags)
+        if exclude_tags and test.tags & exclude_tags:
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
+    tests_filtered.sort(key=lambda x: x.name)
+
+    context.obj = RunContext(root=root, tests=tests_filtered,
+                             runtime=runtime, find_path=find_path,
+                             deprecated_chip_tool_path=chip_tool)
 
 
 @main.command(
@@ -479,16 +487,6 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
         log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
-            if context.obj.include_tags:
-                if not (test.tags & context.obj.include_tags):
-                    log.debug("Test '%s' not included", test.name)
-                    continue
-
-            if context.obj.exclude_tags:
-                if test.tags & context.obj.exclude_tags:
-                    log.debug("Test '%s' excluded", test.name)
-                    continue
-
             test_start = time.monotonic()
             try:
                 if dry_run:
