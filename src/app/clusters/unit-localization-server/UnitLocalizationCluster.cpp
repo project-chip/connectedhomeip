@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "unit-localization-server.h"
+#include "UnitLocalizationCluster.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>

@@ -32,5 +32,5 @@ src/app/clusters/resource-monitoring-server/resource-monitoring-server.cpp
 src/app/clusters/thread-network-directory-server/thread-network-directory-server.cpp
 src/app/clusters/tls-certificate-management-server/tls-certificate-management-server.cpp
 src/app/clusters/tls-client-management-server/tls-client-management-server.cpp
-src/app/clusters/unit-localization-server/unit-localization-server.cpp
+src/app/clusters/UnitLocalizationCluster/UnitLocalizationCluster.cpp
 src/app/clusters/zone-management-server/zone-management-server.h

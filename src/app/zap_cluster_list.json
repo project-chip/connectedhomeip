@@ -345,7 +345,7 @@
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "UNIT_LOCALIZATION_CLUSTER": ["unit-localization-server"],
+        "UNIT_LOCALIZATION_CLUSTER": ["UnitLocalizationCluster"],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
         "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [
