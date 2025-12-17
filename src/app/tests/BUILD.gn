@@ -54,6 +54,7 @@ source_set("ota-requestor-test-srcs") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]

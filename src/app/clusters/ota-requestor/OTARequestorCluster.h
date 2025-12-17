@@ -1,0 +1,75 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/clusters/ota-requestor/OTARequestorEventHandler.h>
+#include <app/clusters/ota-requestor/OTARequestorEventHandlerRegistry.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+
+namespace chip::app::Clusters {
+
+class OTARequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
+{
+public:
+    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor);
+
+    void SetUpdatePossible(bool updatePossible) { mUpdatePossible = updatePossible; }
+    bool GetUpdatePossible() const { return mUpdatePossible; }
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    void Shutdown() override;
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    void OnStateTransition(OTARequestorEventHandler::UpdateStateEnum previousState,
+                           OTARequestorEventHandler::UpdateStateEnum newState, OTARequestorEventHandler::ChangeReasonEnum reason,
+                           DataModel::Nullable<uint32_t> const & targetSoftwareVersion) override;
+
+    void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) override;
+
+    void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded, DataModel::Nullable<uint8_t> progressPercent,
+                         DataModel::Nullable<int64_t> platformCode) override;
+
+    // This is intended to be used only for backwards compatibility with the codegen data model provider.
+    void SetOtaRequestor(OTARequestorInterface * otaRequestor);
+
+private:
+    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+
+    OTARequestorEventHandlerRegistration mEventHandlerRegistration;
+    OTARequestorInterface * mOtaRequestor = nullptr;
+    bool mUpdatePossible                  = true;
+};
+
+} // namespace chip::app::Clusters

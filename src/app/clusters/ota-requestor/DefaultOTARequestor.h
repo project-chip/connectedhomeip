@@ -75,6 +75,9 @@ public:
     // Get the current state of the OTA update
     OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
+    // Get the progress of the current OTA update state
+    app::DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override { return mCurrentUpdateStateProgress; }
+
     // Get the target version of the OTA update
     uint32_t GetTargetVersion() override { return mTargetVersion; }
 
@@ -101,6 +104,15 @@ public:
 
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
+
+    // Register a handler for generated cluster events
+    CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandlerRegistration & eventHandler) override
+    {
+        return mEventHandlers.Register(eventHandler);
+    }
+
+    // Unregister a previously-registered event handler
+    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override { return mEventHandlers.Unregister(endpointId); }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -206,11 +218,6 @@ private:
     };
 
     /**
-     * Callback to initialize states and server attributes in the CHIP context
-     */
-    static void InitState(intptr_t context);
-
-    /**
      * Map a CHIP_ERROR to an IdleStateReason enum type
      */
     IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
@@ -292,6 +299,23 @@ private:
     void LoadCurrentUpdateInfo();
 
     /**
+     * Send a StateTransition event to all registered event handlers
+     */
+    void SendStateTransitionEvent(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
+                                  app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion);
+
+    /**
+     * Send a VersionApplied event to all registered event handlers
+     */
+    void SendVersionAppliedEvent(uint32_t softwareVersion, uint16_t productId);
+
+    /**
+     * Send a StateTransition event to all registered event handlers
+     */
+    void SendDownloadErrorEvent(uint32_t softwareVersion, uint64_t bytesDownloaded,
+                                app::DataModel::Nullable<uint8_t> progressPercent, app::DataModel::Nullable<int64_t> platformCode);
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -336,13 +360,15 @@ private:
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
-    Server * mServer                       = nullptr;
+    app::DataModel::Nullable<uint8_t> mCurrentUpdateStateProgress;
+    Server * mServer = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
     // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
+    app::OTARequestorEventHandlerRegistry mEventHandlers;
 };
 
 } // namespace chip

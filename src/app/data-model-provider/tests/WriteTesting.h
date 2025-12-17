@@ -97,7 +97,14 @@ public:
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
         SuccessOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value));
+        if constexpr (chip::app::DataModel::IsFabricScoped<T>::value)
+        {
+            SuccessOrDie(chip::app::DataModel::EncodeForWrite(writer, TLV::ContextTag(1), value));
+        }
+        else
+        {
+            SuccessOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value));
+        }
         SuccessOrDie(writer.EndContainer(outerContainerType));
         SuccessOrDie(writer.Finalize());
 
