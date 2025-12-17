@@ -132,7 +132,7 @@ if (chip_build_tests) {
 
       tests += [
         "${chip_root}/src/setup_payload/tests",
-        #        "${chip_root}/src/transport/raw/tests",
+        "${chip_root}/src/transport/raw/tests",
       ]
     }
 
@@ -172,7 +172,7 @@ if (chip_build_tests) {
     }
 
     if (chip_device_platform != "ameba") {
-      #      tests += [ "${chip_root}/src/platform/tests" ]
+      tests += [ "${chip_root}/src/platform/tests" ]
     }
 
     if (chip_config_network_layer_ble) {
