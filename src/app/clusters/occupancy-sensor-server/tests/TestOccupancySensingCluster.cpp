@@ -26,7 +26,6 @@
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
 #include <lib/support/TimerDelegateMock.h>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -525,12 +524,6 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptional
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
 
-    const DataModel::AttributeEntry expectedMandatoryAttributes[] = {
-        Attributes::Occupancy::kMetadataEntry,
-        Attributes::OccupancySensorType::kMetadataEntry,
-        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
-    };
-
     // Test case 1: Only PassiveInfrared feature enabled
     {
         OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
@@ -953,12 +946,6 @@ TEST_F(TestOccupancySensingCluster, TestDeprecatedAttributesVisibility)
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
 
-    const DataModel::AttributeEntry expectedMandatoryAttributes[] = {
-        Attributes::Occupancy::kMetadataEntry,
-        Attributes::OccupancySensorType::kMetadataEntry,
-        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
-    };
-
     // Test Case 1: Deprecated attributes enabled (default)
     {
         OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
@@ -968,21 +955,17 @@ TEST_F(TestOccupancySensingCluster, TestDeprecatedAttributesVisibility)
                                              .WithDeprecatedAttributes(true) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-            { true, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-            { true, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-            { true, Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                                Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry,
+                                                Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                                Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                            }));
     }
 
     // Test Case 2: Deprecated attributes disabled
