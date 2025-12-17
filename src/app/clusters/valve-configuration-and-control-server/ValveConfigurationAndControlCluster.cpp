@@ -38,7 +38,7 @@ ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(Endpoin
                                                                          TimeSyncTracker * tsTracker) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
-    mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker) 
+    mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker)
 {}
 
 CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & context)

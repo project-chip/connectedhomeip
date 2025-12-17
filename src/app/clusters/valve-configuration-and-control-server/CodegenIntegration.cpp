@@ -101,7 +101,7 @@ public:
                                                             .defaultOpenDuration = defaultOpenDuration,
                                                             .defaultOpenLevel = defaultOpenLevel,
                                                             .levelStep = levelStep
-                                                          }, 
+                                                          },
                                                           &codegenTracker);
         return gServers[clusterInstanceIndex].Registration();
     }
