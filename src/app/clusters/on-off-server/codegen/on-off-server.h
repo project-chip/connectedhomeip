@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/scenes-server/SceneTable.h>
+#include <app/clusters/scenes-server/SceneTable.h> //nogncheck
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>

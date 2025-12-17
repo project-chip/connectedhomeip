@@ -17,7 +17,7 @@
 
 #include <app/ConcreteClusterPath.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <gtest/gtest.h>
 #include <lib/support/TimerDelegateMock.h>
@@ -77,7 +77,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
     // Old style struct
     struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
                              onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    chip::Test::ClusterTester tester(identify.mCluster.Cluster());
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
     EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Test onIdentifyStart callback by writing to IdentifyTime.
@@ -102,7 +102,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     onEffectIdentifierCalled = false;
     struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, onEffectIdentifier,
                              EffectIdentifierEnum::kStopEffect, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    chip::Test::ClusterTester tester(identify.mCluster.Cluster());
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
     EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Check that the effect identifier is the default one
@@ -144,7 +144,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestMActive)
 {
     struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, nullptr,
                              EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    chip::Test::ClusterTester tester(identify.mCluster.Cluster());
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
     EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Test that mActive is false initially.
@@ -181,7 +181,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, StopIdentifyingTest)
     // Old style struct
     struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
                              onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
-    chip::Test::ClusterTester tester(identify.mCluster.Cluster());
+    chip::Testing::ClusterTester tester(identify.mCluster.Cluster());
     EXPECT_EQ(identify.mCluster.Cluster().Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Start identifying.

@@ -16,12 +16,12 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Enums.h>
 #include <clusters/GroupKeyManagement/Ids.h>
@@ -37,7 +37,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
@@ -130,11 +130,11 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
-    chip::Test::TestServerClusterContext mTestContext;
+    TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     Crypto::DefaultSessionKeystore mMockKeystore;
     GroupKeyManagementCluster mCluster;
-    chip::Test::ClusterTester tester;
+    ClusterTester tester;
 
     TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
 

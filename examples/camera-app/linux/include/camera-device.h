@@ -89,7 +89,7 @@ public:
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
     void
     SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
     GetCameraAVSettingsUserLevelMgmtDelegate() override;
@@ -97,8 +97,6 @@ public:
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
-
-    void HandlePushAvZoneTrigger(uint16_t zoneId) override;
 
     CameraDevice();
     ~CameraDevice();
@@ -128,7 +126,7 @@ public:
 
     // Allocate snapshot stream
     CameraError AllocateSnapshotStream(
-        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
         uint16_t & outStreamID) override;
 
     // Start snapshot stream
@@ -300,7 +298,7 @@ public:
 
     CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
-    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+    CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
@@ -315,9 +313,9 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneId);
 
-    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
     // Audio playback pipeline methods
     CameraError StartAudioPlaybackStream();
