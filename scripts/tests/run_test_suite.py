@@ -20,7 +20,7 @@ import os
 import sys
 import time
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import chiptest
 import click
@@ -28,7 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessInfo
-from chiptest.test_definition import TestRunTime, TestTag
+from chiptest.test_definition import TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -59,17 +59,10 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 class RunContext:
     root: str
     tests: typing.List[chiptest.TestDefinition]
-    in_unshare: bool
     chip_tool: str
     dry_run: bool
     runtime: TestRunTime
     find_path: typing.List[str]
-
-    # If not empty, include only the specified test tags
-    include_tags: set(TestTag) = field(default_factory={})
-
-    # If not empty, exclude tests tagged with these tags
-    exclude_tags: set(TestTag) = field(default_factory={})
 
 
 @click.group(chain=True)
@@ -149,6 +142,13 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
+    if sys.platform == "linux":
+        if not internal_inside_unshare:
+            # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
+            chiptest.linux.ensure_network_namespace_availability()
+        else:
+            chiptest.linux.ensure_private_state()
+
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
         runtime = TestRunTime.MATTER_REPL_PYTHON
@@ -221,15 +221,24 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
-    tests.sort(key=lambda x: x.name)
+    tests_filtered: list[TestDefinition] = []
+    for test in tests:
+        if include_tags and not (test.tags & include_tags):
+            log.debug("Test '%s' not included", test.name)
+            continue
 
-    context.obj = RunContext(root=root, tests=tests,
-                             in_unshare=internal_inside_unshare,
+        if exclude_tags and test.tags & exclude_tags:
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
+    tests_filtered.sort(key=lambda x: x.name)
+
+    context.obj = RunContext(root=root, tests=tests_filtered,
                              chip_tool=chip_tool, dry_run=dry_run,
                              runtime=runtime,
-                             find_path=find_path,
-                             include_tags=include_tags,
-                             exclude_tags=exclude_tags)
+                             find_path=find_path)
 
 
 @main.command(
@@ -404,8 +413,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             setup_app_link_up=not ble_wifi,
             # Change the app link name so the interface will be recognized as WiFi or Ethernet
             # depending on the commissioning method used.
-            app_link_name='wlx-app' if ble_wifi else 'eth-app',
-            unshared=context.obj.in_unshare)
+            app_link_name='wlx-app' if ble_wifi else 'eth-app')
 
         if ble_wifi:
             bus = chiptest.linux.DBusTestSystemBus()
@@ -441,16 +449,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
-            if context.obj.include_tags:
-                if not (test.tags & context.obj.include_tags):
-                    log.debug("Test '%s' not included", test.name)
-                    continue
-
-            if context.obj.exclude_tags:
-                if test.tags & context.obj.exclude_tags:
-                    log.debug("Test '%s' excluded", test.name)
-                    continue
-
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
@@ -488,9 +486,8 @@ if sys.platform == 'linux':
         'shell',
         help=('Execute a bash shell in the environment (useful to test '
               'network namespaces)'))
-    @click.pass_context
-    def cmd_shell(context):
-        chiptest.linux.IsolatedNetworkNamespace(unshared=context.obj.in_unshare)
+    def cmd_shell():
+        chiptest.linux.IsolatedNetworkNamespace()
         os.execvpe("bash", ["bash"], os.environ.copy())
 
 

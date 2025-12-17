@@ -25,6 +25,7 @@
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/AccessControl/Enums.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <lib/core/CHIPError.h>
