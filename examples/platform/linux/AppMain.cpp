@@ -49,6 +49,8 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/Linux/FilesystemStorageLocationProvider.h>
+#include <platform/Linux/FilesystemStorageLocationProviderImpl.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -454,6 +456,14 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 }
 #endif
 
+class ExampleFilesystemStorageLocationProvider : public chip::DeviceLayer::FilesystemStorageLocationProvider
+{
+    std::string GetFactoryDataLocation() const { return std::string("/tmp/new-hope/factory"); }
+    std::string GetConfigDataLocation() const { return std::string("/tmp/new-hope/config"); }
+    std::string GetCountersDataLocation() const { return std::string("/tmp/new-hope/counters"); }
+    std::string GetKVSDataLocation() const { return std::string("/tmp/new-hope/kvs"); }
+};
+
 // Wrapper for DeviceInstanceInfoProvider that allows the example app to set
 // attribute values from the command-line, provide hardcoded values, or fall
 // back to the default DeviceInstanceInfoProvider.
@@ -576,6 +586,7 @@ private:
 };
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+ExampleFilesystemStorageLocationProvider sExampleProvider;
 
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
@@ -609,17 +620,24 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
+    SetFilesystemStorageLocationProvider(&sExampleProvider);
+
+    ChipLogProgress(NotSpecified, "Storage location provider returned %s",
+                    GetFilesystemStorageLocationProvider().GetConfigDataLocation().c_str());
+
+    /*
 #ifdef CHIP_CONFIG_KVS_PATH
-    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
-    }
-    else
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
-    }
-    SuccessOrExit(err);
+if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
+{
+err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+}
+else
+{
+err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
+}
+SuccessOrExit(err);
 #endif
+    */
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread
@@ -1077,9 +1095,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif

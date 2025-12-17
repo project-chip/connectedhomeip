@@ -30,6 +30,7 @@
 #include <platform/PersistedStorage.h>
 
 #include <map>
+#include <mutex>
 #include <string>
 
 namespace chip {
@@ -58,6 +59,7 @@ private:
     CHIP_ERROR GetDefaultSection(std::map<std::string, std::string> & section);
     CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer<char> & encodedData,
                                            size_t & encodedDataLen, size_t & decodedDataLen);
+    std::mutex mLock;
     inipp::Ini<char> mConfigStore;
 };
 

@@ -84,6 +84,7 @@ struct LinuxDeviceOptions
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
+    const char * KVSFileName            = nullptr;
     const char * KVS                    = nullptr;
     const char * app_pipe               = "";
     const char * app_pipe_out           = "";
