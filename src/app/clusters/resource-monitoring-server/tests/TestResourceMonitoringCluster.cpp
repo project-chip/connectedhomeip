@@ -19,12 +19,12 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Attributes.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
 #include <clusters/HepaFilterMonitoring/Attributes.h>
@@ -35,8 +35,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
-using namespace chip::Test;
-using chip::Test::TestServerClusterContext;
+using namespace chip::Testing;
 
 namespace {
 
@@ -92,7 +91,7 @@ struct TestResourceMonitoringCluster : public ::testing::Test
         activatedCarbonFilterMonitoring.Shutdown();
     }
 
-    chip::Test::TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     app::SafeAttributePersistenceProvider * oldPersistence;
     app::DefaultSafeAttributePersistenceProvider safePersistence;
 

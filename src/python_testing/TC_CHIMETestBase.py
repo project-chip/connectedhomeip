@@ -15,14 +15,10 @@
 #    limitations under the License.
 
 
-import logging
-
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-
-logger = logging.getLogger(__name__)
 
 
 class CHIMETestBase:
