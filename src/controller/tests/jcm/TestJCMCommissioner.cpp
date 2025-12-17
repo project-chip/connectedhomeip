@@ -48,6 +48,7 @@ using namespace chip::Credentials;
 using namespace chip::Messaging;
 using namespace chip::Platform;
 using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::TestCerts;
 using namespace chip::Transport;
 
