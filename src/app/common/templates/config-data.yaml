@@ -78,6 +78,7 @@ CommandHandlerInterfaceOnlyClusters:
     - TLS Certificate Management
     - TLS Client Management
     - Thread Border Router Management
+    - Thread Network Diagnostics
     - Thread Network Directory
     - Time Synchronization
     - User Label
@@ -171,6 +172,7 @@ CodeDrivenClusters:
     - Software Diagnostics
     - Time Format Localization
     - Time Synchronization
+    - Thread Network Diagnostics
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end

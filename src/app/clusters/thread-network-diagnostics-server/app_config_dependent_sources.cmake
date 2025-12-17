@@ -16,7 +16,16 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/thread-network-diagnostics-provider.cpp"
-    "${CLUSTER_DIR}/thread-network-diagnostics-provider.h"
-    "${CLUSTER_DIR}/thread-network-diagnostics-server.cpp"
+   "${CLUSTER_DIR}/CodegenIntegration.cpp"
+   "${CLUSTER_DIR}/CodegenIntegration.h"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.cpp"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.h"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.cpp"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.h"
 )
