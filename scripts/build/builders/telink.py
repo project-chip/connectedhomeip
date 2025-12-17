@@ -169,6 +169,7 @@ class TelinkBuilder(Builder):
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
+                 chip_enable_nfc_onboarding_payload: bool = False,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -185,6 +186,7 @@ class TelinkBuilder(Builder):
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
+        self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -231,6 +233,9 @@ class TelinkBuilder(Builder):
 
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
+
+        if self.chip_enable_nfc_onboarding_payload:
+            flags.append("-DCONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=y")
 
         if self.thread_analyzer_config:
             flags.append("-DCONFIG_THREAD_ANALYZER=y")
