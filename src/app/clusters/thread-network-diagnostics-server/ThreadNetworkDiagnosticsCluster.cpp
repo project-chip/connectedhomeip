@@ -36,9 +36,8 @@ ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endp
                                                                  const BitFlags<ThreadNetworkDiagnostics::Feature> features,
                                                                  const OptionalAttributeSet & optionalAttributeSet,
                                                                  const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mActiveTs(config.activeTs), mPendingTs(config.pendingTs),
-    mDelay(config.delay)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features),
+    mOptionalAttributeSet(optionalAttributeSet), mActiveTs(config.activeTs), mPendingTs(config.pendingTs), mDelay(config.delay)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -50,6 +49,12 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(ThreadNetworkDiagnostics::kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatures);
+    case ActiveTimestamp::Id:
+        return encoder.Encode(mActiveTs);
+    case PendingTimestamp::Id:
+        return encoder.Encode(mPendingTs);
+    case Delay::Id:
+        return encoder.Encode(mDelay);
     case NeighborTable::Id:
     case RouteTable::Id:
     case SecurityPolicy::Id:
@@ -109,9 +114,6 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
     case RxErrSecCount::Id:
     case RxErrFcsCount::Id:
     case RxErrOtherCount::Id:
-    case ActiveTimestamp::Id:
-    case PendingTimestamp::Id:
-    case Delay::Id:
     case ChannelPage0Mask::Id:
     case ExtAddress::Id:
     case Rloc16::Id:
