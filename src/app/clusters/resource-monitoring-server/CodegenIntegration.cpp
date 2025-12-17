@@ -99,8 +99,7 @@ Instance::Instance(Delegate * delegate, EndpointId endpointId, ClusterId cluster
 
 Instance::~Instance()
 {
-    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster(),
-                                                                                        ClusterShutdownType::kClusterShutdown);
+    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
 }
 
 } // namespace ResourceMonitoring

@@ -169,8 +169,7 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
 
 Identify::~Identify()
 {
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()),
-                                                                                     ClusterShutdownType::kClusterShutdown);
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     UnregisterLegacyIdentify(this);
 }
 

@@ -56,8 +56,7 @@ void WebRTCTransportRequestorManager::Init()
 
 void WebRTCTransportRequestorManager::Shutdown()
 {
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRegisteredServerCluster.Cluster(),
-                                                                                ClusterShutdownType::kClusterShutdown);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRegisteredServerCluster.Cluster());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());

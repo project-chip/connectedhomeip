@@ -56,8 +56,7 @@ void MatterDiagnosticLogsClusterShutdownCallback(EndpointId endpointId, MatterCl
 {
     // We implement the cluster as a singleton on the root endpoint. Shutdown is always "normal" (no full removal)
     VerifyOrReturn(endpointId == kRootEndpointId);
-    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get(),
-                                                                                        ClusterShutdownType::kClusterShutdown);
+    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get());
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
