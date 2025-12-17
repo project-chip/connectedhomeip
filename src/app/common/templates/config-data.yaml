@@ -170,9 +170,9 @@ CodeDrivenClusters:
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
+    - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization
-    - Thread Network Diagnostics
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
