@@ -19,15 +19,29 @@
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/Binding/Attributes.h>
+#include <clusters/Binding/Structs.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+using TargetStructType         = Binding::Structs::TargetStruct::Type;
+using DecodableBindingListType = Binding::Attributes::Binding::TypeInfo::DecodableType;
+
 class BindingCluster : public DefaultServerCluster
 {
 public:
-    constexpr BindingCluster(EndpointId endpointId) : DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, Binding::Id))
+    /// Injected dependencies for this cluster
+    struct Context
+    {
+        Binding::Table & bindingTable;
+        Binding::Manager & bindingManager;
+        DeviceLayer::PlatformManager & platformManager;
+    };
+
+    constexpr BindingCluster(Context && context, EndpointId endpointId) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, Binding::Id)), mClusterContext(std::move(context))
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -42,7 +56,14 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
+    bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & entry);
+
+    CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
+                                     FabricIndex accessingFabricIndex);
+
     CHIP_ERROR NotifyBindingsChanged(FabricIndex accessingFabricIndex);
+
+    Context mClusterContext;
 };
 
 } // namespace Clusters

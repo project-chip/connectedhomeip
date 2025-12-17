@@ -38,7 +38,13 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        gServers[clusterInstanceIndex].Create(
+            BindingCluster::Context{
+                .bindingTable    = Binding::Table::GetInstance(),
+                .bindingManager  = Binding::Manager::GetInstance(),
+                .platformManager = DeviceLayer::PlatformMgr(),
+            },
+            endpointId);
         return gServers[clusterInstanceIndex].Registration();
     }
 

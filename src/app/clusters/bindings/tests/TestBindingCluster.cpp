@@ -41,9 +41,18 @@ struct TestBindingCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
+BindingCluster::Context CreateStandardContext()
+{
+    return BindingCluster::Context{
+        .bindingTable    = Binding::Table::GetInstance(),
+        .bindingManager  = Binding::Manager::GetInstance(),
+        .platformManager = chip::DeviceLayer::PlatformMgr(),
+    };
+}
+
 TEST_F(TestBindingCluster, TestAttributes)
 {
-    BindingCluster cluster(1);
+    BindingCluster cluster(CreateStandardContext(), 1);
 
     ReadOnlyBufferBuilder<AttributeEntry> builder;
     ASSERT_EQ(cluster.Attributes({ 1, Binding::Id }, builder), CHIP_NO_ERROR);
