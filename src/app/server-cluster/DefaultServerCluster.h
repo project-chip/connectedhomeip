@@ -18,6 +18,8 @@
 
 #include <access/Privilege.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 
@@ -119,6 +121,26 @@ protected:
     ///
     /// Will return `status`
     DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
+
+    /// Convenience method for handling commands: every command generally
+    /// decodes a TLV request and then does the processing. This removes the boilerplate of
+    /// decoding the request and returning on failure.
+    template <typename SuperClass, typename RequestType, typename... Args>
+    inline std::optional<DataModel::ActionReturnStatus>
+    Handle(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+           std::optional<DataModel::ActionReturnStatus> (SuperClass::*handler)(const RequestType &, Args... args), Args &&... args)
+    {
+        RequestType decoded_arguments;
+        if constexpr (app::DataModel::IsFabricScoped<RequestType>::value)
+        {
+            ReturnErrorOnFailure(decoded_arguments.Decode(input_arguments, request.GetAccessingFabricIndex()));
+        }
+        else
+        {
+            ReturnErrorOnFailure(decoded_arguments.Decode(input_arguments));
+        }
+        return (static_cast<SuperClass *>(this)->*handler)(decoded_arguments, std::forward<Args>(args)...);
+    }
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

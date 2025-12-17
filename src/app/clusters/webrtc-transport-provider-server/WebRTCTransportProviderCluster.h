@@ -409,16 +409,16 @@ private:
                                      const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
 
     // Command Handlers
-    std::optional<DataModel::ActionReturnStatus> HandleSolicitOffer(CommandHandler & commandHandler,
-                                                                    const Commands::SolicitOffer::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus> HandleProvideOffer(CommandHandler & commandHandler,
-                                                                    const Commands::ProvideOffer::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus> HandleProvideAnswer(CommandHandler & commandHandler,
-                                                                     const Commands::ProvideAnswer::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleSolicitOffer(const Commands::SolicitOffer::DecodableType & req,
+                                                                    CommandHandler & commandHandler);
+    std::optional<DataModel::ActionReturnStatus> HandleProvideOffer(const Commands::ProvideOffer::DecodableType & req,
+                                                                    CommandHandler & commandHandler);
+    std::optional<DataModel::ActionReturnStatus> HandleProvideAnswer(const Commands::ProvideAnswer::DecodableType & req,
+                                                                     CommandHandler & commandHandler);
     std::optional<DataModel::ActionReturnStatus>
-    HandleProvideICECandidates(CommandHandler & commandHandler, const Commands::ProvideICECandidates::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus> HandleEndSession(CommandHandler & commandHandler,
-                                                                  const Commands::EndSession::DecodableType & req);
+    HandleProvideICECandidates(const Commands::ProvideICECandidates::DecodableType & req, CommandHandler & commandHandler);
+    std::optional<DataModel::ActionReturnStatus> HandleEndSession(const Commands::EndSession::DecodableType & req,
+                                                                  CommandHandler & commandHandler);
 };
 
 } // namespace WebRTCTransportProvider
