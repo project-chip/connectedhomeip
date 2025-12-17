@@ -70,22 +70,21 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
     {
         GeneralCommissioningCluster cluster(CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes(0));
 
-        std::vector<AttributeEntry> expectedAttributes = {
-            Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
-            LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
-        };
+        std::vector<AttributeEntry> expectedAttributes;
+        expectedAttributes.push_back(Breadcrumb::kMetadataEntry);
+        expectedAttributes.push_back(BasicCommissioningInfo::kMetadataEntry);
+        expectedAttributes.push_back(RegulatoryConfig::kMetadataEntry);
+        expectedAttributes.push_back(LocationCapability::kMetadataEntry);
+        expectedAttributes.push_back(SupportsConcurrentConnection::kMetadataEntry);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // This is both define AND feature map dependent. The feature map is hardcoded
         // based on compile-time defines, so we check the define directly.
-        expectedAttributes.insert(expectedAttributes.end(),
-                                  {
-                                      TCAcceptedVersion::kMetadataEntry,
-                                      TCMinRequiredVersion::kMetadataEntry,
-                                      TCAcknowledgements::kMetadataEntry,
-                                      TCAcknowledgementsRequired::kMetadataEntry,
-                                      TCUpdateDeadline::kMetadataEntry,
-                                  });
+        expectedAttributes.push_back(TCAcceptedVersion::kMetadataEntry);
+        expectedAttributes.push_back(TCMinRequiredVersion::kMetadataEntry);
+        expectedAttributes.push_back(TCAcknowledgements::kMetadataEntry);
+        expectedAttributes.push_back(TCAcknowledgementsRequired::kMetadataEntry);
+        expectedAttributes.push_back(TCUpdateDeadline::kMetadataEntry);
 #endif
 
         ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
@@ -96,22 +95,21 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
         GeneralCommissioningCluster cluster(
             CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes().Set<IsCommissioningWithoutPower::Id>());
 
-        std::vector<AttributeEntry> expectedAttributes = {
-            Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
-            LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
-        };
+        std::vector<AttributeEntry> expectedAttributes;
+        expectedAttributes.push_back(Breadcrumb::kMetadataEntry);
+        expectedAttributes.push_back(BasicCommissioningInfo::kMetadataEntry);
+        expectedAttributes.push_back(RegulatoryConfig::kMetadataEntry);
+        expectedAttributes.push_back(LocationCapability::kMetadataEntry);
+        expectedAttributes.push_back(SupportsConcurrentConnection::kMetadataEntry);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         // This is both define AND feature map dependent. The feature map is hardcoded
         // based on compile-time defines, so we check the define directly.
-        expectedAttributes.insert(expectedAttributes.end(),
-                                  {
-                                      TCAcceptedVersion::kMetadataEntry,
-                                      TCMinRequiredVersion::kMetadataEntry,
-                                      TCAcknowledgements::kMetadataEntry,
-                                      TCAcknowledgementsRequired::kMetadataEntry,
-                                      TCUpdateDeadline::kMetadataEntry,
-                                  });
+        expectedAttributes.push_back(TCAcceptedVersion::kMetadataEntry);
+        expectedAttributes.push_back(TCMinRequiredVersion::kMetadataEntry);
+        expectedAttributes.push_back(TCAcknowledgements::kMetadataEntry);
+        expectedAttributes.push_back(TCAcknowledgementsRequired::kMetadataEntry);
+        expectedAttributes.push_back(TCUpdateDeadline::kMetadataEntry);
 #endif
 
         expectedAttributes.push_back(IsCommissioningWithoutPower::kMetadataEntry);

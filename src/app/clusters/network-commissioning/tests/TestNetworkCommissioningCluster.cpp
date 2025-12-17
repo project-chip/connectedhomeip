@@ -73,18 +73,18 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
         //       For now keep the logic as inherited from previous implementation.
-        std::vector<AttributeEntry> expectedAttributes = {
-            MaxNetworks::kMetadataEntry,          Networks::kMetadataEntry,      InterfaceEnabled::kMetadataEntry,
-            LastNetworkingStatus::kMetadataEntry, LastNetworkID::kMetadataEntry, LastConnectErrorValue::kMetadataEntry,
-        };
+        std::vector<AttributeEntry> expectedAttributes;
+        expectedAttributes.push_back(MaxNetworks::kMetadataEntry);
+        expectedAttributes.push_back(Networks::kMetadataEntry);
+        expectedAttributes.push_back(InterfaceEnabled::kMetadataEntry);
+        expectedAttributes.push_back(LastNetworkingStatus::kMetadataEntry);
+        expectedAttributes.push_back(LastNetworkID::kMetadataEntry);
+        expectedAttributes.push_back(LastConnectErrorValue::kMetadataEntry);
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        expectedAttributes.insert(expectedAttributes.end(),
-                                  {
-                                      ScanMaxTimeSeconds::kMetadataEntry,
-                                      ConnectMaxTimeSeconds::kMetadataEntry,
-                                      SupportedWiFiBands::kMetadataEntry,
-                                  });
+        expectedAttributes.push_back(ScanMaxTimeSeconds::kMetadataEntry);
+        expectedAttributes.push_back(ConnectMaxTimeSeconds::kMetadataEntry);
+        expectedAttributes.push_back(SupportedWiFiBands::kMetadataEntry);
 #endif
 
         ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
