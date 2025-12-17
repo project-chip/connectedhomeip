@@ -38,19 +38,21 @@ logging.basicConfig(level=logging.INFO)
 
 
 # General configuration
-MAX_ATTEMPTS = 3                     # Number of attempts for failed operations
+# Number of attempts for failed operations (reduced to avoid segmentation fault from excessive retries)
+MAX_ATTEMPTS = 4                     # Reduced to prevent stack overflow from too many failed retries
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
 # Matter command timeouts
 TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s) - for individual Matter commands
 COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
 ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
+OPERATIONAL_DISCOVERY_TIMEOUT = 70   # Increased to handle network delays - for first attribute read after network change
 
 # Network operation timeouts
 CONNECTION_TIMEOUT = 20              # WiFi connection timeout (20s) - time to establish WiFi link
 IP_TIMEOUT = 15                      # IP assignment timeout (15s) - time to get IP address via DHCP
 NETWORK_CHANGE_TIMEOUT = 60          # Network transition timeout (60s) - for network changes
-MDNS_DISCOVERY_TIMEOUT = 20          # mDNS discovery timeout (20s) - device discovery after network changes
+MDNS_DISCOVERY_TIMEOUT = 8           # Slightly increased to improve mDNS resolution success - device typically responds in <5s
 
 # Wait periods (not timeouts, but delays for stability)
 WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic network settling time
@@ -201,32 +203,44 @@ def set_target_device_id(device_id):
     _target_device_id = str(device_id) if device_id is not None else None
 
 
-async def find_matter_devices_mdns():
+async def find_matter_devices_mdns(max_attempts=None):
     """
     Finds Matter devices via mDNS using zeroconf, optionally filtering by target device ID.
     Raises an exception if no device is found after max_attempts.
     Returns the list of discovered services.
+
+    Args:
+        max_attempts: Maximum number of discovery attempts. If None, uses global MAX_ATTEMPTS.
     """
     service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
     target_device_id = get_target_device_id()
+    attempts = max_attempts if max_attempts is not None else MAX_ATTEMPTS
 
     logger.info(
         f"find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + target_device_id if target_device_id else ''}")
 
-    for attempt in range(1, MAX_ATTEMPTS + 1):
+    for attempt in range(1, attempts + 1):
         try:
+            # Progressive retry delays: start fast, slow down for later attempts
+            if attempt > 1:
+                delay = min(2 + (attempt - 2) * 3, 5)  # 2s, 5s (max)
+                logger.info(f"Waiting {delay}s before attempt {attempt}...")
+                await asyncio.sleep(delay)
+
             zc = Zeroconf()
             listener = MatterServiceListener(target_device_id)
             browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
 
+            start_time = time.time()
             await asyncio.sleep(MDNS_DISCOVERY_TIMEOUT)
 
-            # Cleanup
             for browser in browsers:
                 browser.cancel()
             zc.close()
 
             if listener.discovered_services:
+                elapsed = time.time() - start_time
+                logger.info(f"Device found on attempt {attempt}/{attempts} after {elapsed:.1f}s")
                 return listener.discovered_services
 
         except Exception as e:
@@ -234,11 +248,11 @@ async def find_matter_devices_mdns():
             with contextlib.suppress(Exception):
                 zc.close()
 
-        if attempt < MAX_ATTEMPTS:
+        if attempt < attempts:
             await asyncio.sleep(2)
 
     raise Exception(
-        f"find_matter_devices_mdns: mDNS discovery failed after {MAX_ATTEMPTS} attempts - No Matter devices found{' for target device ID: ' + target_device_id if target_device_id else ''}")
+        f"find_matter_devices_mdns: mDNS discovery failed after {attempts} attempts - No Matter devices found{' for target device ID: ' + target_device_id if target_device_id else ''}")
 
 
 async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBUTE_READ_TIMEOUT):
@@ -535,12 +549,75 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                         break
 
         logger.info(f" --- connect_wifi_mac: Using interface: {interface}")
-        success = await run_subprocess([
-            "networksetup",
-            "-setairportnetwork", interface, ssid, password
-        ], check=True)
+
+        # Attempt WiFi connection
+        try:
+            await run_subprocess([
+                "networksetup",
+                "-setairportnetwork", interface, ssid, password
+            ], check=True)
+        except Exception as e:
+            logger.error(f" --- connect_wifi_mac: networksetup command failed: {e}")
+            return ConnectionResult(1, str(e))
+
+        # Wait for connection to establish
         await asyncio.sleep(WIFI_WAIT_SECONDS)
-        return ConnectionResult(0 if success else 1, "")
+
+        # Convert ssid to string for logging
+        if isinstance(ssid, bytes):
+            ssid_str = ssid.decode('utf-8')
+        else:
+            ssid_str = ssid
+
+        # Verify that connection was actually established by checking for IP address
+        for verify_attempt in range(1, 6):
+            try:
+                # Verify that we have an IP address on the interface
+                ip_output = await run_subprocess([
+                    "ipconfig", "getifaddr", interface
+                ], capture_output=True)
+
+                if ip_output and ip_output.strip():
+                    ip_addr = ip_output.strip()
+                    logger.info(f" --- connect_wifi_mac: Successfully connected to {ssid_str}, IP: {ip_addr}")
+
+                    # Additional verification: try to ping the gateway to confirm connectivity
+                    try:
+                        gateway_output = await run_subprocess([
+                            "route", "-n", "get", "default"
+                        ], capture_output=True)
+
+                        # Extract gateway IP
+                        for line in gateway_output.splitlines():
+                            if "gateway:" in line:
+                                gateway = line.split("gateway:")[1].strip()
+                                # Quick ping test (1 packet, 2 second timeout)
+                                ping_result = await run_subprocess([
+                                    "ping", "-c", "1", "-W", "2000", gateway
+                                ], capture_output=True)
+                                if "1 packets received" in ping_result or "1 received" in ping_result:
+                                    logger.info(f" --- connect_wifi_mac: Gateway {gateway} is reachable")
+                                break
+                    except Exception as ping_e:
+                        # Ping verification is optional, don't fail if it doesn't work
+                        logger.debug(f" --- connect_wifi_mac: Gateway ping failed (non-critical): {ping_e}")
+
+                    return ConnectionResult(0, "")
+                else:
+                    logger.warning(f" --- connect_wifi_mac: No IP address yet on {interface}")
+
+                # Wait before next verification attempt
+                if verify_attempt < 5:
+                    logger.info(f" --- connect_wifi_mac: Verification attempt {verify_attempt}/5 failed, waiting 3s...")
+                    await asyncio.sleep(3)
+
+            except Exception as verify_e:
+                logger.warning(f" --- connect_wifi_mac: Verification attempt {verify_attempt}/5 error: {verify_e}")
+                if verify_attempt < 5:
+                    await asyncio.sleep(3)
+
+        logger.error(f" --- connect_wifi_mac: Failed to verify connection to {ssid} after 5 attempts")
+        return ConnectionResult(1, "Connection verification failed")
 
     except Exception as e:
         logger.error(f" --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid}: {e}")
@@ -645,7 +722,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             try:
                 result = await asyncio.wait_for(
                     connect_host_wifi(ssid=ssid, password=password),
-                    timeout=NETWORK_CHANGE_TIMEOUT*6
+                    timeout=NETWORK_CHANGE_TIMEOUT
                 )
                 if result and result.returncode == 0:
                     # Extra wait for network stabilization after TH connects
@@ -691,7 +768,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     logger.info(f"change_networks: Ensuring fallback connectivity to {original_ssid}")
 
     try:
-        fallback_result = await connect_host_wifi(ssid=original_ssid, password=original_password)
+        fallback_result = await connect_host_wifi(original_ssid, original_password)
         if fallback_result and fallback_result.returncode == 0:
             logger.info(f"change_networks: Final fallback to {original_ssid} successful")
         else:
@@ -829,16 +906,27 @@ async def verify_operational_network(test, ssid):
     """ Verifies that the DUT is connected to the specified SSID by reading the Networks attribute. """
 
     networks = None
+
+    # Quick immediate check to catch device before potential firmware crash
+    logger.info("verify_operational_network: Performing immediate device check after network change...")
+    await asyncio.sleep(2)  # Brief settling time
+    try:
+        quick_check_services = await find_matter_devices_mdns(max_attempts=1)  # Single quick attempt
+        if quick_check_services:
+            logger.info("verify_operational_network: Device already reachable (immediate check)")
+    except Exception as e:
+        logger.debug(f"verify_operational_network: Immediate check failed (expected): {e}")
+
     logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
     await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
-            # Use extended timeout for mDNS discovery, especially on first attempt after network change
+            # Use extended timeout for operational discovery on first attempt after network change
             if attempt == 1:
-                timeout = MDNS_DISCOVERY_TIMEOUT
+                timeout = OPERATIONAL_DISCOVERY_TIMEOUT  # 70s for operational mDNS resolution
             else:
-                timeout = ATTRIBUTE_READ_TIMEOUT
+                timeout = ATTRIBUTE_READ_TIMEOUT  # 30s for subsequent attempts
 
             networks = await asyncio.wait_for(
                 test.read_single_attribute_check_success(
@@ -1152,8 +1240,8 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timeout=TIMEOUT
         )
-        await asyncio.sleep(3)
-        await find_matter_devices_mdns()
+        await asyncio.sleep(1)  # Brief delay for command processing
+        # Note: find_matter_devices_mdns() removed - verify_operational_network already does mDNS discovery
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(8)
@@ -1203,8 +1291,8 @@ class TC_CNET_4_11(MatterBaseTest):
             connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
             timeout=NETWORK_CHANGE_TIMEOUT
         )
-        await asyncio.sleep(3)
-        await find_matter_devices_mdns()
+        await asyncio.sleep(1)  # Brief delay for command processing
+        # Note: find_matter_devices_mdns() removed - verify_operational_network already does mDNS discovery
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(12)
@@ -1281,8 +1369,8 @@ class TC_CNET_4_11(MatterBaseTest):
             password=wifi_2nd_ap_credentials.encode(),
             breadcrumb=3
         )
-        await asyncio.sleep(3)
-        await find_matter_devices_mdns()
+        await asyncio.sleep(1)  # Brief delay for command processing
+        # Note: find_matter_devices_mdns() removed - verify_operational_network already does mDNS discovery
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(17)
