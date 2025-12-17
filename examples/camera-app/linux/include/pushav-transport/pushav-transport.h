@@ -170,6 +170,5 @@ private:
     uint16_t mConnectionID;
     uint32_t mCurrentlyUsedBandwidthbps    = 0;
     bool mActivationTimeSetByManualTrigger = false;
-    bool mRecordingTriggerByManual         = false;
     bool mIsZoneBasedTrigger               = false;
 };

@@ -33,7 +33,6 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     mConnectionID                     = connectionID;
     mTransportStatus                  = TransportStatusEnum::kInactive;
     mActivationTimeSetByManualTrigger = false;
-    mRecordingTriggerByManual         = false;
     mIsZoneBasedTrigger               = false;
 
     auto now               = std::chrono::system_clock::now();
@@ -311,7 +310,7 @@ bool PushAVTransport::HandleTriggerDetected()
     int64_t elapsed = 0;
     auto now        = std::chrono::steady_clock::now();
 
-    if (!mRecordingTriggerByManual && mIsZoneBasedTrigger && mTransportTriggerType != TransportTriggerTypeEnum::kCommand &&
+    if (mIsZoneBasedTrigger && mTransportTriggerType != TransportTriggerTypeEnum::kCommand &&
         InBlindPeriod(mBlindStartTime, mClipInfo.mBlindDurationS))
     {
         return false;
@@ -336,14 +335,6 @@ bool PushAVTransport::HandleTriggerDetected()
 
         mRecorder->Start();
         mStreaming = true;
-        if (mIsZoneBasedTrigger)
-        {
-            mRecordingTriggerByManual = false;
-        }
-        else
-        {
-            mRecordingTriggerByManual = true;
-        }
     }
     else
     {
