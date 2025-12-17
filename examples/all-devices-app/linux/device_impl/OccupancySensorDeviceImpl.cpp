@@ -40,7 +40,8 @@ OccupancySensorDeviceImpl::OccupancySensorDeviceImpl() :
                               .holdTimeDefault = 10,
                           },
                           mTimerDelegate)
-            .WithDelegate(this))
+            .WithDelegate(this),
+        mTimerDelegate)
 {
     // Kick off the timer loop to flip occupancy every few seconds
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)));
@@ -63,14 +64,15 @@ void OccupancySensorDeviceImpl::OnHoldTimeChanged(uint16_t holdTime)
 
 void OccupancySensorDeviceImpl::TimerFired()
 {
+    // Flips the occupancy state every kOccupancyStateChangeInterval seconds
+     
     // Only interact with the cluster if it has been constructed/registered
     if (mOccupancySensingCluster.IsConstructed())
     {
-        auto & cluster = OccupancySensingCluster();
-        bool nextState = !cluster.IsOccupied();
+        bool nextState = !mOccupancySensingCluster.Cluster().IsOccupied();
 
         ChipLogProgress(AppServer, "OccupancySensorDeviceImpl: Toggling occupancy to %s", nextState ? "Occupied" : "Unoccupied");
-        cluster.SetOccupancy(nextState);
+        mOccupancySensingCluster.Cluster().SetOccupancy(nextState);
     }
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)));

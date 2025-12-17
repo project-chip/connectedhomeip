@@ -29,7 +29,7 @@ class OccupancySensorDevice : public SingleEndpointDevice
 public:
     using OccupancySensingConfig = Clusters::OccupancySensingCluster::Config;
 
-    OccupancySensorDevice(OccupancySensingConfig config);
+    OccupancySensorDevice(OccupancySensingConfig config, TimerDelegate & timerDelegate);
     ~OccupancySensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -40,6 +40,7 @@ public:
 
 protected:
     OccupancySensingConfig mConfig;
+    TimerDelegate & mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OccupancySensingCluster> mOccupancySensingCluster;
 };

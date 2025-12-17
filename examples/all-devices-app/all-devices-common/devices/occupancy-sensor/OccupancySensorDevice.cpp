@@ -23,20 +23,18 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-OccupancySensorDevice::OccupancySensorDevice(OccupancySensingConfig config) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOccupancySensor, 1)), mConfig(config)
+OccupancySensorDevice::OccupancySensorDevice(OccupancySensingConfig config, TimerDelegate & timerDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOccupancySensor, 1)), mConfig(config),
+    mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR OccupancySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Create the identify cluster. Reuse timer delegate if provided.
-    if (mConfig.mHoldTimeDelegate != nullptr)
-    {
-        mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, *mConfig.mHoldTimeDelegate));
-        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-    }
+    // Create the identify cluster.
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // Update the config with the actual endpoint ID
     mConfig.mEndpointId = endpoint;

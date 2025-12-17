@@ -19,20 +19,19 @@ config("includes") {
   include_dirs = [
     ".",
     "include",
+    "device_impl",
   ]
 }
 
 executable("all-devices-app") {
-  sources = [
-    "OccupancySensorDeviceImpl.cpp",
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
+    "${chip_root}/examples/all-devices-app/linux/device_impl:device-factory",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
@@ -46,6 +45,7 @@ executable("all-devices-app") {
 
   include_dirs = [
     "include",
+    "device_impl",
     "${chip_root}/examples/common",
   ]
 
