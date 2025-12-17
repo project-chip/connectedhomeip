@@ -58,7 +58,10 @@ or ble-thread), some additional setup is needed.
 
 ### Running tests in Linux network namespaces
 
-The test suite on Linux uses user namespaces (`unshare --map-root-user`) to create these isolated network environments. On some systems, this feature might be disabled by default. To enable it, ensure the following lines are present in `/etc/sysctl.conf` or a new file under `/etc/sysctl.d/`:
+The test suite on Linux uses user namespaces (`unshare --map-root-user`) to
+create these isolated network environments. On some systems, this feature might
+be disabled by default. To enable it, ensure the following lines are present in
+`/etc/sysctl.conf` or a new file under `/etc/sysctl.d/`:
 
 ```
 kernel.unprivileged_userns_clone = 1
