@@ -65,7 +65,7 @@ void OccupancySensorDeviceImpl::OnHoldTimeChanged(uint16_t holdTime)
 void OccupancySensorDeviceImpl::TimerFired()
 {
     // Flips the occupancy state every kOccupancyStateChangeInterval seconds
-     
+
     // Only interact with the cluster if it has been constructed/registered
     if (mOccupancySensingCluster.IsConstructed())
     {

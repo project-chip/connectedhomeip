@@ -34,9 +34,7 @@ source_set("occupancy-sensor") {
 }
 
 source_set("device-factory") {
-  sources = [
-    "DeviceFactory.h",
-  ]
+  sources = [ "DeviceFactory.h" ]
 
   public_deps = [
     ":occupancy-sensor",
