@@ -278,15 +278,16 @@ inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoP
 namespace chip::app::Clusters {
 
 template <bool UseSingletonDeviceInfoProviderGetter>
-DataModel::ActionReturnStatus BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                     AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus
+BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                             AttributeValueEncoder & encoder)
 {
     using namespace BasicInformation::Attributes;
 
     // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
     //       costs some flash (even though code would be more readable that way...)
     auto * deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
-    auto & configManager      = ConfigurationMgr();
+    auto & configManager              = ConfigurationMgr();
 
     switch (request.path.mAttributeId)
     {
@@ -365,15 +366,17 @@ DataModel::ActionReturnStatus BasicInformationCluster<UseSingletonDeviceInfoProv
 }
 
 template <bool UseSingletonDeviceInfoProviderGetter>
-DataModel::ActionReturnStatus BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                      AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus
+BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                              AttributeValueDecoder & decoder)
 {
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
 template <bool UseSingletonDeviceInfoProviderGetter>
-DataModel::ActionReturnStatus BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                                                 AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus
+BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                         AttributeValueDecoder & decoder)
 {
     using namespace BasicInformation::Attributes;
 
@@ -395,7 +398,7 @@ DataModel::ActionReturnStatus BasicInformationCluster<UseSingletonDeviceInfoProv
     }
     case LocalConfigDisabled::Id: {
         auto deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
-        bool localConfigDisabled = false;
+        bool localConfigDisabled        = false;
         ReturnErrorOnFailure(deviceInstanceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
         auto decodeStatus = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, localConfigDisabled);
         ReturnErrorOnFailure(deviceInstanceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
@@ -407,8 +410,8 @@ DataModel::ActionReturnStatus BasicInformationCluster<UseSingletonDeviceInfoProv
 }
 
 template <bool UseSingletonDeviceInfoProviderGetter>
-CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Attributes(const ConcreteClusterPath & path,
-                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Attributes(
+    const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
     DataModel::AttributeEntry optionalAttributes[] = {
@@ -498,15 +501,20 @@ void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::OnShutDown()
 }
 
 template <bool UseSingletonDeviceInfoProviderGetter>
-CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::GetDeviceInfoProviderImpl(DeviceLayer::DeviceInfoProvider ** outDeviceInfoProvider)
+CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::GetDeviceInfoProviderImpl(
+    DeviceLayer::DeviceInfoProvider ** outDeviceInfoProvider)
 {
-    if constexpr(UseSingletonDeviceInfoProviderGetter) {
+    if constexpr (UseSingletonDeviceInfoProviderGetter)
+    {
         *outDeviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
-    } else {
+    }
+    else
+    {
         *outDeviceInfoProvider = mDeviceInfoProvider;
     }
 
-    if(*outDeviceInfoProvider == nullptr) {
+    if (*outDeviceInfoProvider == nullptr)
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     return CHIP_NO_ERROR;

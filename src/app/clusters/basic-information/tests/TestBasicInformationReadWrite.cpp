@@ -205,7 +205,7 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
     const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster<false> cluster(optionalAttributeSet , &mDeviceInfoProvider);
+    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 

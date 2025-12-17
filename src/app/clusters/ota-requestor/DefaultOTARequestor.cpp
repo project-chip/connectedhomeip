@@ -745,8 +745,7 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
     args.protocolsSupported = kProtocolsSupported;
 
     ReturnErrorOnFailure(deviceInstanceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
-    args.requestorCanConsent.SetValue(!localConfigDisabled &&
-                                      mOtaRequestorDriver->CanConsent());
+    args.requestorCanConsent.SetValue(!localConfigDisabled && mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
     if (deviceInstanceInfoProvider->GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)

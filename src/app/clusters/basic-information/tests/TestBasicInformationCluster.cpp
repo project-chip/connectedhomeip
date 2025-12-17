@@ -122,7 +122,8 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
     // All attributes
     {
-        const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet = BasicInformationCluster<false>::OptionalAttributesSet()
+        const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet =
+            BasicInformationCluster<false>::OptionalAttributesSet()
                 .Set<ManufacturingDate::Id>()
                 .Set<PartNumber::Id>()
                 .Set<ProductURL::Id>()

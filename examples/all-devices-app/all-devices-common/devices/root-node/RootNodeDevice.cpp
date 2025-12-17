@@ -37,14 +37,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     // TODO: This needs to be refactored so the optional attributes being set for
     //  the cluster are configurable to allow different settings
-    const BasicInformationCluster<true>::OptionalAttributesSet optionalAttributeSet = BasicInformationCluster<true>::OptionalAttributesSet()
-        .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
-        .Set<BasicInformation::Attributes::PartNumber::Id>()
-        .Set<BasicInformation::Attributes::ProductURL::Id>()
-        .Set<BasicInformation::Attributes::ProductLabel::Id>()
-        .Set<BasicInformation::Attributes::SerialNumber::Id>()
-        .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
-        .Set<BasicInformation::Attributes::Reachable::Id>();
+    const BasicInformationCluster<true>::OptionalAttributesSet optionalAttributeSet =
+        BasicInformationCluster<true>::OptionalAttributesSet()
+            .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
+            .Set<BasicInformation::Attributes::PartNumber::Id>()
+            .Set<BasicInformation::Attributes::ProductURL::Id>()
+            .Set<BasicInformation::Attributes::ProductLabel::Id>()
+            .Set<BasicInformation::Attributes::SerialNumber::Id>()
+            .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
+            .Set<BasicInformation::Attributes::Reachable::Id>();
 
     mBasicInformationCluster.Create(optionalAttributeSet);
 
