@@ -32,28 +32,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-// TODO: add binding table to the persistent storage
-namespace {
-
-CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
-{
-    Binding::TableEntry bindingEntry;
-
-    if (entry.group.HasValue())
-    {
-        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
-    }
-    else
-    {
-        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
-                                           entry.cluster.std_optional());
-    }
-
-    return AddBindingEntry(bindingEntry);
-}
-
-} // namespace
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -241,6 +219,42 @@ CHIP_ERROR BindingCluster::NotifyBindingsChanged(FabricIndex accessingFabricInde
     DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
                                         .BindingsChanged = { .fabricIndex = accessingFabricIndex } };
     return mClusterContext.platformManager.PostEvent(&event);
+}
+
+CHIP_ERROR BindingCluster::CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+{
+    Binding::TableEntry bindingEntry;
+
+    if (entry.group.HasValue())
+    {
+        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
+    }
+    else
+    {
+        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
+                                           entry.cluster.std_optional());
+    }
+
+    CHIP_ERROR err = mClusterContext.bindingTable.Add(bindingEntry);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+    ReturnErrorOnFailure(err);
+
+    if (bindingEntry.type == Binding::MATTER_UNICAST_BINDING)
+    {
+        err = mClusterContext.bindingManager.UnicastBindingCreated(bindingEntry.fabricIndex, bindingEntry.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogError(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(bindingEntry.nodeId), err.Format());
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clusters
