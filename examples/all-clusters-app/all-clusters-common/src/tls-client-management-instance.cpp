@@ -389,7 +389,10 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*InteractionModelEngine::GetInstance()->GetDataModelProvider(), fabric), Zcl,
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr, ChipLogError(Zcl, "No data model provider on fabric removal."));
+
+    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*provider, fabric), Zcl,
                           "Failure clearing TLS endpoints for fabric");
 
     UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
