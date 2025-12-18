@@ -129,7 +129,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
     darwin_tool = None
 
     try:
-        apps_register.createOtaImage(ota_image_file, ota_data_file, "This is some test OTA data", vid=TEST_VID, pid=TEST_PID)
+        apps_register.create_ota_image(ota_image_file, ota_data_file, "This is some test OTA data", vid=TEST_VID, pid=TEST_PID)
         json_data = {
             "deviceSoftwareVersionModel": [{
                 "vendorId": int(TEST_VID, 16),
@@ -180,7 +180,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         requestor_app.waitForMessage("OTA image downloaded to %s" % ota_destination_file)
 
         # Make sure the right thing was downloaded.
-        apps_register.compareFiles(ota_data_file, ota_destination_file)
+        apps_register.compare_files(ota_data_file, ota_destination_file)
 
     except Exception:
         log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
@@ -189,9 +189,9 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
     finally:
         if darwin_tool is not None:
             darwin_tool.stop()
-        apps_register.killAll()
-        apps_register.factoryResetAll()
-        apps_register.removeAll()
+        apps_register.kill_all()
+        apps_register.factory_reset_all()
+        apps_register.remove_all()
         apps_register.uninit()
 
 
