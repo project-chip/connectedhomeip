@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-#include "TimeSynchronizationCluster.h"
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
