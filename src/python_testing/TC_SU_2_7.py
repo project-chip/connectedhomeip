@@ -42,7 +42,7 @@
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_image_download_timeout:360
-#       --timeout 0
+#       --timeout 1800
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
@@ -113,6 +113,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         if not self.ota_image:
             asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
+
+        if self.matter_test_config.timeout is None or self.matter_test_config.timeout <= 0:
+            asserts.fail(
+                "Test timeout parameter must be defined and  greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -219,12 +223,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             "Update state is kIdle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
         update_state_attr_handler.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
 
         # Verify VersionAppliedEvent
         await self.verify_version_applied_basic_information(controller=controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -279,11 +278,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider)
         state_transition_event_handler.cancel()
-        # Added this block because after EventSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
         logger.info(f"About close the provider app with proc {self.current_provider_app_proc}")
         self.terminate_provider()
 
@@ -313,11 +307,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
         state_transition_event_handler.cancel()
-        # Added this block because after EventSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
         self.terminate_provider()
         self.restart_requestor()
 
@@ -345,11 +334,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
             state_transition_event_handler.cancel()
-            # Added this block because after AttributeSubscriptionHandler
-            # and calling an await method it was triggering an TimeoutError and CancelledError
-            # this is just to catch it and continue with the test
-            with contextlib.suppress(asyncio.CancelledError):
-                await asyncio.sleep(0.1)
             self.terminate_provider()
             self.restart_requestor()
 
@@ -380,8 +364,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
         # Wait some time to let it download some data and then Kill the current process
         state_transition_event_handler.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
         # Check for DownloadError
         error_download_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
@@ -408,11 +390,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         asserts.assert_equal(download_event_report.platformCode, NullValue,
                              f"Null value not found at platformCode {download_event_report.platformCode}")
         error_download_event_handler.cancel()
-        # Added this block because after EventSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
         self.terminate_provider()
 
         self.step(6)
@@ -455,11 +432,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider, expected_target_version=NullValue)
         update_state_attr_handler.cancel()
         state_transition_event_handler.cancel()
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
 
 
 if __name__ == "__main__":
