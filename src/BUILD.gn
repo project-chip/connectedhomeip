@@ -93,7 +93,6 @@ if (chip_build_tests) {
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/app/persistence/tests",
       "${chip_root}/src/app/server/tests",
-      "${chip_root}/src/controller/tests/jcm",
       "${chip_root}/src/credentials/tests/jcm",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
@@ -197,6 +196,7 @@ if (chip_build_tests) {
       tests += [
         "${chip_root}/src/controller/tests",
         "${chip_root}/src/controller/tests/data_model",
+        "${chip_root}/src/controller/tests/jcm",
       ]
     }
 
