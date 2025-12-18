@@ -34,11 +34,9 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId,
                                                                  const BitFlags<ThreadNetworkDiagnostics::Feature> features,
-                                                                 const OptionalAttributeSet & optionalAttributeSet,
                                                                  const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mActiveTs(config.activeTs), mPendingTs(config.pendingTs),
-    mDelay(config.delay)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mActiveTs(config.activeTs),
+    mPendingTs(config.pendingTs), mDelay(config.delay)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -129,162 +127,56 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
 {
     AttributeListBuilder attributeListBuilder(builder);
 
-    const DataModel::AttributeEntry optionalAttributes[] = {
-        DetachedRoleCount::kMetadataEntry,                 //
-        ChildRoleCount::kMetadataEntry,                    //
-        RouterRoleCount::kMetadataEntry,                   //
-        LeaderRoleCount::kMetadataEntry,                   //
-        AttachAttemptCount::kMetadataEntry,                //
-        PartitionIdChangeCount::kMetadataEntry,            //
-        BetterPartitionAttachAttemptCount::kMetadataEntry, //
-        ParentChangeCount::kMetadataEntry,                 //
-        TxTotalCount::kMetadataEntry,                      //
-        TxUnicastCount::kMetadataEntry,                    //
-        TxBroadcastCount::kMetadataEntry,                  //
-        TxAckRequestedCount::kMetadataEntry,               //
-        TxAckedCount::kMetadataEntry,                      //
-        TxNoAckRequestedCount::kMetadataEntry,             //
-        TxDataCount::kMetadataEntry,                       //
-        TxDataPollCount::kMetadataEntry,                   //
-        TxBeaconCount::kMetadataEntry,                     //
-        TxBeaconRequestCount::kMetadataEntry,              //
-        TxOtherCount::kMetadataEntry,                      //
-        TxRetryCount::kMetadataEntry,                      //
-        TxDirectMaxRetryExpiryCount::kMetadataEntry,       //
-        TxIndirectMaxRetryExpiryCount::kMetadataEntry,     //
-        TxErrCcaCount::kMetadataEntry,                     //
-        TxErrAbortCount::kMetadataEntry,                   //
-        TxErrBusyChannelCount::kMetadataEntry,             //
-        RxTotalCount::kMetadataEntry,                      //
-        RxUnicastCount::kMetadataEntry,                    //
-        RxBroadcastCount::kMetadataEntry,                  //
-        RxDataCount::kMetadataEntry,                       //
-        RxDataPollCount::kMetadataEntry,                   //
-        RxBeaconCount::kMetadataEntry,                     //
-        RxBeaconRequestCount::kMetadataEntry,              //
-        RxOtherCount::kMetadataEntry,                      //
-        RxAddressFilteredCount::kMetadataEntry,            //
-        RxDestAddrFilteredCount::kMetadataEntry,           //
-        RxDuplicatedCount::kMetadataEntry,                 //
-        RxErrNoFrameCount::kMetadataEntry,                 //
-        RxErrUnknownNeighborCount::kMetadataEntry,         //
-        RxErrInvalidSrcAddrCount::kMetadataEntry,          //
-        RxErrSecCount::kMetadataEntry,                     //
-        RxErrFcsCount::kMetadataEntry,                     //
-        RxErrOtherCount::kMetadataEntry,                   //
-        OverrunCount::kMetadataEntry,                      //
-        ActiveTimestamp::kMetadataEntry,                   //
-        PendingTimestamp::kMetadataEntry,                  //
-        Delay::kMetadataEntry                              //
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mFeatures.Has(Feature::kMLECounts), DetachedRoleCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), ChildRoleCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), RouterRoleCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), LeaderRoleCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), AttachAttemptCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), PartitionIdChangeCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), BetterPartitionAttachAttemptCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMLECounts), ParentChangeCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxTotalCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxUnicastCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxBroadcastCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxAckRequestedCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxAckedCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxNoAckRequestedCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxDataCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxDataPollCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxBeaconCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxOtherCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxRetryCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxRetryCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxDirectMaxRetryExpiryCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxIndirectMaxRetryExpiryCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxErrCcaCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxErrAbortCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxErrBusyChannelCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxTotalCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxUnicastCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxBroadcastCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxDataCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxDataPollCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxBeaconCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxBeaconRequestCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxOtherCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxAddressFilteredCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxDestAddrFilteredCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxDuplicatedCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxErrNoFrameCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxErrUnknownNeighborCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxErrInvalidSrcAddrCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxErrSecCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxErrFcsCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), RxErrOtherCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kErrorCounts), OverrunCount::kMetadataEntry },
+        { !mActiveTs.IsNull(), ActiveTimestamp::kMetadataEntry },
+        { !mPendingTs.IsNull(), PendingTimestamp::kMetadataEntry },
+        { !mDelay.IsNull(), Delay::kMetadataEntry }
     };
 
-    // Full attribute set, to combine real "optional" attributes but also
-    // attributes controlled by feature flags.
-    OptionalAttributeSet64<DetachedRoleCount::Id,                 //
-                           ChildRoleCount::Id,                    //
-                           RouterRoleCount::Id,                   //
-                           LeaderRoleCount::Id,                   //
-                           AttachAttemptCount::Id,                //
-                           PartitionIdChangeCount::Id,            //
-                           BetterPartitionAttachAttemptCount::Id, //
-                           ParentChangeCount::Id,                 //
-                           TxTotalCount::Id,                      //
-                           TxUnicastCount::Id,                    //
-                           TxBroadcastCount::Id,                  //
-                           TxAckRequestedCount::Id,               //
-                           TxAckedCount::Id,                      //
-                           TxNoAckRequestedCount::Id,             //
-                           TxDataCount::Id,                       //
-                           TxDataPollCount::Id,                   //
-                           TxBeaconCount::Id,                     //
-                           TxBeaconRequestCount::Id,              //
-                           TxOtherCount::Id,                      //
-                           TxRetryCount::Id,                      //
-                           TxDirectMaxRetryExpiryCount::Id,       //
-                           TxIndirectMaxRetryExpiryCount::Id,     //
-                           TxErrCcaCount::Id,                     //
-                           TxErrAbortCount::Id,                   //
-                           TxErrBusyChannelCount::Id,             //
-                           RxTotalCount::Id,                      //
-                           RxUnicastCount::Id,                    //
-                           RxBroadcastCount::Id,                  //
-                           RxDataCount::Id,                       //
-                           RxDataPollCount::Id,                   //
-                           RxBeaconCount::Id,                     //
-                           RxBeaconRequestCount::Id,              //
-                           RxOtherCount::Id,                      //
-                           RxAddressFilteredCount::Id,            //
-                           RxDestAddrFilteredCount::Id,           //
-                           RxDuplicatedCount::Id,                 //
-                           RxErrNoFrameCount::Id,                 //
-                           RxErrUnknownNeighborCount::Id,         //
-                           RxErrInvalidSrcAddrCount::Id,          //
-                           RxErrSecCount::Id,                     //
-                           RxErrFcsCount::Id,                     //
-                           RxErrOtherCount::Id,                   //
-                           OverrunCount::Id,                      //
-                           ActiveTimestamp::Id,                   //
-                           PendingTimestamp::Id,                  //
-                           Delay::Id                              //
-                           >
-        optionalAttributeSet(mOptionalAttributeSet);
-
-    if (mFeatures.Has(Feature::kMLECounts))
-    {
-        optionalAttributeSet.Set<Attributes::DetachedRoleCount::Id>();
-        optionalAttributeSet.Set<ChildRoleCount::Id>();
-        optionalAttributeSet.Set<RouterRoleCount::Id>();
-        optionalAttributeSet.Set<LeaderRoleCount::Id>();
-        optionalAttributeSet.Set<AttachAttemptCount::Id>();
-        optionalAttributeSet.Set<PartitionIdChangeCount::Id>();
-        optionalAttributeSet.Set<BetterPartitionAttachAttemptCount::Id>();
-        optionalAttributeSet.Set<ParentChangeCount::Id>();
-    }
-
-    if (mFeatures.Has(Feature::kMACCounts))
-    {
-        optionalAttributeSet.Set<TxTotalCount::Id>();
-        optionalAttributeSet.Set<TxUnicastCount::Id>();
-        optionalAttributeSet.Set<TxBroadcastCount::Id>();
-        optionalAttributeSet.Set<TxAckRequestedCount::Id>();
-        optionalAttributeSet.Set<TxAckedCount::Id>();
-        optionalAttributeSet.Set<TxNoAckRequestedCount::Id>();
-        optionalAttributeSet.Set<TxDataCount::Id>();
-        optionalAttributeSet.Set<TxDataPollCount::Id>();
-        optionalAttributeSet.Set<TxBeaconCount::Id>();
-        optionalAttributeSet.Set<TxBeaconRequestCount::Id>();
-        optionalAttributeSet.Set<TxOtherCount::Id>();
-        optionalAttributeSet.Set<TxRetryCount::Id>();
-        optionalAttributeSet.Set<TxDirectMaxRetryExpiryCount::Id>();
-        optionalAttributeSet.Set<TxIndirectMaxRetryExpiryCount::Id>();
-        optionalAttributeSet.Set<TxErrCcaCount::Id>();
-        optionalAttributeSet.Set<TxErrAbortCount::Id>();
-        optionalAttributeSet.Set<TxErrBusyChannelCount::Id>();
-        optionalAttributeSet.Set<RxTotalCount::Id>();
-        optionalAttributeSet.Set<RxUnicastCount::Id>();
-        optionalAttributeSet.Set<RxBroadcastCount::Id>();
-        optionalAttributeSet.Set<RxDataCount::Id>();
-        optionalAttributeSet.Set<RxDataPollCount::Id>();
-        optionalAttributeSet.Set<RxBeaconCount::Id>();
-        optionalAttributeSet.Set<RxBeaconRequestCount::Id>();
-        optionalAttributeSet.Set<RxOtherCount::Id>();
-        optionalAttributeSet.Set<RxAddressFilteredCount::Id>();
-        optionalAttributeSet.Set<RxDestAddrFilteredCount::Id>();
-        optionalAttributeSet.Set<RxDuplicatedCount::Id>();
-        optionalAttributeSet.Set<RxErrNoFrameCount::Id>();
-        optionalAttributeSet.Set<RxErrUnknownNeighborCount::Id>();
-        optionalAttributeSet.Set<RxErrInvalidSrcAddrCount::Id>();
-        optionalAttributeSet.Set<RxErrSecCount::Id>();
-        optionalAttributeSet.Set<RxErrFcsCount::Id>();
-        optionalAttributeSet.Set<RxErrOtherCount::Id>();
-    }
-
-    if (mFeatures.Has(Feature::kErrorCounts))
-    {
-        optionalAttributeSet.Set<OverrunCount::Id>();
-    }
-
-    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
 // Notified when the Node’s connection status to a Thread network has changed.

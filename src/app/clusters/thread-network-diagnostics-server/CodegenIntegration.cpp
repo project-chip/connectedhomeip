@@ -47,28 +47,27 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
         const BitFlags<Feature> featureMap(rawFeatureMap);
-        ThreadNetworkDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
         ActiveTimestamp::TypeInfo::Type activeTs;
-        if (optionalAttributeSet.IsSet(ActiveTimestamp::Id))
+        if (AttributeSet(optionalAttributeBits).IsSet(ActiveTimestamp::Id))
         {
             VerifyOrDie(ActiveTimestamp::Get(endpointId, activeTs) == Status::Success);
         }
 
         PendingTimestamp::TypeInfo::Type pendingTs;
-        if (optionalAttributeSet.IsSet(PendingTimestamp::Id))
+        if (AttributeSet(optionalAttributeBits).IsSet(PendingTimestamp::Id))
         {
             VerifyOrDie(PendingTimestamp::Get(endpointId, pendingTs) == Status::Success);
         }
 
         Delay::TypeInfo::Type delay;
-        if (optionalAttributeSet.IsSet(Delay::Id))
+        if (AttributeSet(optionalAttributeBits).IsSet(Delay::Id))
         {
             VerifyOrDie(Delay::Get(endpointId, delay) == Status::Success);
         }
 
         gServers[clusterInstanceIndex].Create(
-            endpointId, featureMap, optionalAttributeSet,
+            endpointId, featureMap,
             ThreadNetworkDiagnosticsCluster::StartupConfiguration{ .activeTs = activeTs, .pendingTs = pendingTs, .delay = delay });
         return gServers[clusterInstanceIndex].Registration();
     }
