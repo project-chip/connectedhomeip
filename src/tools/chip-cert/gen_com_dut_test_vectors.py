@@ -684,6 +684,22 @@ CD_STRUCT_TEST_CASES = [
         "error_flag": 'different-origin',
         "is_success_case": 'true',
     },
+    {
+        "description": 'CD certification type is provisional (signed by test key)',
+        "test_folder": "provisional_cd",
+        "error_flag": 'provisional-cd',
+        # This is currently success by default when the SDK supports test keys. This should be moved to
+        # default failure after a sufficient notice period.
+        # https://github.com/project-chip/connectedhomeip/issues/42460
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'CD certification type is official (signed by test key)',
+        "test_folder": "official_cd",
+        "error_flag": 'official-cd',
+        # This is an error because it is an official CD signed by a test key.
+        "is_success_case": 'false',
+    },
 ]
 
 
@@ -1018,9 +1034,18 @@ def main():
         else:
             authorized_paa_flag = ''
 
+        if test_case["error_flag"] == 'provisional-cd':
+            print('Provisional CD--------------------------------------------------------------------')
+            certification_type = 1
+        elif test_case["error_flag"] == 'official-cd':
+            print('Official CD--------------------------------------------------------------------')
+            certification_type = 2
+        else:
+            certification_type = 0
+
         cmd = chipcert + ' gen-cd -I -E ' + test_case["error_flag"] + ' -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + \
             test_case_out_dir + '/cd.der' + ' -f 1 ' + vid_flag + pid_flag + dac_origin_flag + authorized_paa_flag + \
-            ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+            ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t ' + str(certification_type)
         subprocess.run(cmd, shell=True)
 
         # Generate Test Case Data Container in JSON Format
