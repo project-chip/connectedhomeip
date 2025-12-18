@@ -344,10 +344,14 @@ protected:
     virtual void DecrementHoldOff(Handle * apHandle) {}
 
     /**
-     *  This version of GetExchangeContext is safe to call during asynchronous command processing. It should NOT be used by cluster
-     * implementations.
+     * Returns the ExchangeContext, if one is still available, for use during asynchronous
+     * command processing. This is a best-effort accessor with no guarantees that
+     * an ExchangeContext is present once a command has gone async.
+     *
+     * This method exists to prevent use of GetExchangeContext() in async code paths and
+     * must NOT be used by cluster implementations.
      */
-    virtual Messaging::ExchangeContext * GetExchangeContextUsableWhenGoneAsync() const { return nullptr; };
+    virtual Messaging::ExchangeContext * TryGetExchangeContextWhenAsync() const { return nullptr; };
 };
 
 } // namespace app

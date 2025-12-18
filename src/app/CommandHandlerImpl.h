@@ -455,9 +455,15 @@ private:
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
-    // This version of GetExchangeContext is safe to call even after
-    // mGoneAsync has been set to true. It should NOT be used by cluster implementations.
-    Messaging::ExchangeContext * GetExchangeContextUsableWhenGoneAsync() const override;
+    /**
+     * Returns the ExchangeContext, if one is still available, for use during asynchronous
+     * command processing. This is a best-effort accessor with no guarantees that
+     * an ExchangeContext is present once a command has gone async.
+     *
+     * This method exists to prevent use of GetExchangeContext() in async code paths and
+     * must NOT be used by cluster implementations.
+     */
+    Messaging::ExchangeContext * TryGetExchangeContextWhenAsync() const override;
 
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;

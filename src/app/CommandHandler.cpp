@@ -61,7 +61,7 @@ void CommandHandler::Handle::TestOnlyReleaseSession()
         return;
     }
 
-    if (auto * exchangeContext = handler->GetExchangeContextUsableWhenGoneAsync())
+    if (auto * exchangeContext = handler->TryGetExchangeContextWhenAsync())
     {
         exchangeContext->GetSessionHolder().Release();
         exchangeContext->OnSessionReleased();
