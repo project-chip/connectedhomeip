@@ -20,7 +20,7 @@ import os
 import sys
 import time
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -65,12 +65,6 @@ class RunContext:
     dry_run: bool
     runtime: TestRunTime
     find_path: typing.List[str]
-
-    # If not empty, include only the specified test tags
-    include_tags: set[TestTag] = field(default_factory=set)
-
-    # If not empty, exclude tests tagged with these tags
-    exclude_tags: set[TestTag] = field(default_factory=set)
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
@@ -196,7 +190,8 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
     # If just defaults specified, do not run manual and in development
     # Specific target basically includes everything
     exclude_tags_set = set(exclude_tags)
-    if 'all' in target and not include_tags and not exclude_tags_set:
+    include_tags_set = set(include_tags)
+    if 'all' in target and not include_tags_set and not exclude_tags_set:
         exclude_tags_set = {
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
@@ -232,14 +227,24 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
-    tests.sort(key=lambda x: x.name)
+    tests_filtered: list[TestDefinition] = []
+    for test in tests:
+        if include_tags_set and not (test.tags & include_tags_set):
+            log.debug("Test '%s' not included", test.name)
+            continue
 
-    context.obj = RunContext(root=root, tests=tests,
+        if exclude_tags_set and test.tags & exclude_tags_set:
+            log.debug("Test '%s' excluded", test.name)
+            continue
+
+        tests_filtered.append(test)
+
+    tests_filtered.sort(key=lambda x: x.name)
+
+    context.obj = RunContext(root=root, tests=tests_filtered,
                              chip_tool=chip_tool_info, dry_run=dry_run,
                              runtime=runtime,
-                             find_path=find_path,
-                             include_tags=set(include_tags),
-                             exclude_tags=exclude_tags_set)
+                             find_path=find_path)
 
 
 @main.command(
@@ -461,6 +466,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     def cleanup() -> None:
         apps_register.uninit()
+        executor.terminate()
         if sys.platform == 'linux':
             if ble_wifi:
                 wifi.terminate()
@@ -472,16 +478,6 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
-            if context.obj.include_tags:
-                if not (test.tags & context.obj.include_tags):
-                    log.debug("Test '%s' not included", test.name)
-                    continue
-
-            if context.obj.exclude_tags:
-                if test.tags & context.obj.exclude_tags:
-                    log.debug("Test '%s' excluded", test.name)
-                    continue
-
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:

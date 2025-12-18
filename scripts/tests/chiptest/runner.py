@@ -24,6 +24,7 @@ import shlex
 import subprocess
 import threading
 import typing
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import IO, TYPE_CHECKING, Any, Literal, Protocol
 
@@ -160,13 +161,53 @@ class SubprocessInfo:
 
 
 class Executor:
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None,
-            stdout: IO[Any] | LogPipe | None = None,
-            stderr: IO[Any] | LogPipe | None = None):
+    CLEANUP_TIMEOUT_S = 5
+
+    def __init__(self) -> None:
+        self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
+
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
         # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr,
         # but mypy doesn't think the same.
-        return subprocess.Popen(subproc.to_cmd(), stdin=stdin,
-                                stdout=stdout, stderr=stderr)  # type: ignore[arg-type]
+        self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin,
+                                                        stdout=stdout, stderr=stderr))  # type: ignore[arg-type]
+        return process
+
+    def terminate(self) -> None:
+        while True:
+            # Get process from the queue.
+            try:
+                process = self._processes.get_nowait()
+            except queue.Empty:
+                break
+
+            # Check if process already exited.
+            if process.poll() is not None:
+                continue
+            cmd = str(process.args)
+
+            # SIGTERM
+            log.debug('Terminating leftover process "%s"', cmd)
+            try:
+                process.terminate()
+            except OSError:
+                # Can occur in case of race condition when process exits between poll and terminate.
+                continue
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT_S)
+                continue
+
+            # SIGKILL
+            log.warning('Failed to terminate the process "%s". Killing instead', cmd)
+            try:
+                process.kill()
+            except OSError:
+                continue
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT_S)
+                continue
+
+            log.error('Failed to kill process "%s". It may become a zombie', cmd)
 
 
 class Runner:

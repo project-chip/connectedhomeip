@@ -16,13 +16,13 @@
 from __future__ import annotations
 
 import filecmp
+import functools
 import logging
-import os
 import subprocess
 import sys
 import threading
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Concatenate, ParamSpec, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
 if TYPE_CHECKING:
@@ -30,8 +30,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-_DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+_DEFAULT_CHIP_ROOT = Path(__file__).parent.parent.parent.parent.absolute()
 
 PORT = 9000
 if sys.platform == 'linux':
@@ -40,144 +39,170 @@ else:
     IP = '127.0.0.1'
 
 
+S = TypeVar("S", bound="AppsRegister")
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+    """Decorator to acquire self._accessories_lock around instance method calls.
+
+    As _accessories might be accessed either from the chiptest itself and from outside
+    via the XMLRPC server it's good to have it available only under mutex.
+    """
+    @functools.wraps(fn)
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+        if (lock := getattr(self, "_accessories_lock", None)) is None:
+            return fn(self, *args, **kwargs)
+        with lock:
+            return fn(self, *args, **kwargs)
+    return wrapper
+
+
 class AppsRegister:
     def __init__(self) -> None:
-        self.__accessories: dict[str, App] = {}
+        self._accessories: dict[str, App] = {}
+        self._accessories_lock = threading.RLock()
 
     def init(self) -> None:
-        self.__startXMLRPCServer()
+        self._start_xmlrpc_server()
 
     def uninit(self) -> None:
-        self.__stopXMLRPCServer()
+        self._stop_xmlrpc_server()
 
     @property
+    @with_accessories_lock
     def accessories(self):
         """List of registered accessory applications."""
-        return self.__accessories.values()
+        return self._accessories.values()
 
+    @with_accessories_lock
     def add(self, name: str, accessory: App) -> None:
-        self.__accessories[name] = accessory
+        self._accessories[name] = accessory
 
+    @with_accessories_lock
     def remove(self, name: str) -> None:
-        self.__accessories.pop(name)
+        self._accessories.pop(name)
 
-    def removeAll(self) -> None:
-        self.__accessories = {}
+    @with_accessories_lock
+    def remove_all(self) -> None:
+        self._accessories.clear()
 
+    @with_accessories_lock
     def get(self, name: str) -> App:
-        return self.__accessories[name]
+        return self._accessories[name]
 
+    @with_accessories_lock
     def kill(self, name: str) -> bool:
-        accessory = self.__accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             return accessory.kill()
         return False
 
-    def killAll(self) -> bool:
-        ok = True
-        for accessory in self.__accessories.values():
-            # make sure to do kill() on all of our apps, even if some of them returned False
-            ok = accessory.kill() and ok
-        return ok
+    @with_accessories_lock
+    def kill_all(self) -> bool:
+        # Make sure to do kill() on all of our apps, even if some of them returned False
+        results = [accessory.kill() for accessory in self._accessories.values()]
+        return all(results)
 
+    @with_accessories_lock
     def start(self, name: str, args: list[str]) -> bool:
-        accessory = self.__accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
             # key-value pair, e.g. [option1, value1, option2, value2, ...]
-            options = self.__createCommandLineOptions(args)
-            return accessory.start(options)
+            return accessory.start(self._create_command_line_options(args))
         return False
 
+    @with_accessories_lock
     def stop(self, name: str) -> bool:
-        accessory = self.__accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             return accessory.stop()
         return False
 
+    @with_accessories_lock
     def reboot(self, name: str) -> bool:
-        accessory = self.__accessories[name]
-        if accessory:
+        if accessory := self._accessories[name]:
             return accessory.stop() and accessory.start()
         return False
 
-    def factoryResetAll(self) -> None:
-        for accessory in self.__accessories.values():
+    @with_accessories_lock
+    def factory_reset_all(self) -> None:
+        for accessory in self._accessories.values():
             accessory.factoryReset()
 
-    def factoryReset(self, name: str) -> bool:
-        accessory = self.__accessories[name]
-        if accessory:
+    @with_accessories_lock
+    def factory_reset(self, name: str) -> bool:
+        if accessory := self._accessories[name]:
             return accessory.factoryReset()
         return False
 
-    def waitForMessage(self, name: str, message: list[str], timeoutInSeconds: float = 10) -> bool:
-        accessory = self.__accessories[name]
-        if accessory:
+    @with_accessories_lock
+    def wait_for_message(self, name: str, message: list[str], timeoutInSeconds: float = 10) -> bool:
+        if accessory := self._accessories[name]:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
             # comprise the entire message to wait for
             return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
-    def createOtaImage(self, otaImageFilePath: str, rawImageFilePath: str, rawImageContent: str, vid: str = '0xDEAD',
-                       pid: str = '0xBEEF') -> bool:
+    def create_ota_image(self, otaImageFilePath: str, rawImageFilePath: str, rawImageContent: str, vid: str = '0xDEAD',
+                         pid: str = '0xBEEF') -> bool:
         # Write the raw image content
-        with open(rawImageFilePath, 'w') as rawFile:
-            rawFile.write(rawImageContent)
+        Path(rawImageFilePath).write_text(rawImageContent)
 
         # Add an OTA header to the raw file
-        otaImageTool = _DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
-        cmd = [otaImageTool, 'create', '-v', vid, '-p', pid, '-vn', '2',
+        otaImageTool = _DEFAULT_CHIP_ROOT / 'src/app/ota_image_tool.py'
+        cmd = [str(otaImageTool), 'create', '-v', vid, '-p', pid, '-vn', '2',
                '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
         s = subprocess.Popen(cmd)
-        s.wait()
+        # We need to have some timeout so that in case the process hangs we don't wait infinitely in CI. 60 seconds is large enough
+        # for the OTA tool.
+        try:
+            s.communicate(timeout=60)
+        except subprocess.TimeoutExpired:
+            s.kill()
+            raise RuntimeError('OTA image tool timed out')
         if s.returncode != 0:
             raise RuntimeError('Cannot create OTA image file')
         return True
 
-    def compareFiles(self, file1: str | Path, file2: str | Path) -> bool:
-        if filecmp.cmp(file1, file2, shallow=False) is False:
+    def compare_files(self, file1: str | Path, file2: str | Path) -> bool:
+        if not filecmp.cmp(file1, file2, shallow=False):
             raise RuntimeError(f'Files {file1} and {file2} do not match')
         return True
 
-    def createFile(self, filePath: str | Path, fileContent: str) -> bool:
-        with open(filePath, 'w') as rawFile:
-            rawFile.write(fileContent)
+    def create_file(self, filePath: str | Path, fileContent: str) -> bool:
+        Path(filePath).write_text(fileContent)
         return True
 
-    def deleteFile(self, filePath: str | Path) -> bool:
-        if os.path.exists(filePath):
-            os.remove(filePath)
+    def delete_file(self, filePath: str | Path) -> bool:
+        Path(filePath).unlink(missing_ok=True)
         return True
 
-    def __startXMLRPCServer(self) -> None:
+    def _start_xmlrpc_server(self) -> None:
         self.server = SimpleXMLRPCServer((IP, PORT))
 
         # Typeshed issue: https://github.com/python/typeshed/issues/4837
         self.server.register_function(self.start, 'start')  # type: ignore[arg-type]
         self.server.register_function(self.stop, 'stop')  # type: ignore[arg-type]
         self.server.register_function(self.reboot, 'reboot')  # type: ignore[arg-type]
-        self.server.register_function(self.factoryReset, 'factoryReset')  # type: ignore[arg-type]
-        self.server.register_function(self.waitForMessage, 'waitForMessage')  # type: ignore[arg-type]
-        self.server.register_function(self.compareFiles, 'compareFiles')  # type: ignore[arg-type]
-        self.server.register_function(self.createOtaImage, 'createOtaImage')  # type: ignore[arg-type]
-        self.server.register_function(self.createFile, 'createFile')  # type: ignore[arg-type]
-        self.server.register_function(self.deleteFile, 'deleteFile')  # type: ignore[arg-type]
+        self.server.register_function(self.factory_reset, 'factoryReset')  # type: ignore[arg-type]
+        self.server.register_function(self.wait_for_message, 'waitForMessage')  # type: ignore[arg-type]
+        self.server.register_function(self.compare_files, 'compareFiles')  # type: ignore[arg-type]
+        self.server.register_function(self.create_ota_image, 'createOtaImage')  # type: ignore[arg-type]
+        self.server.register_function(self.create_file, 'createFile')  # type: ignore[arg-type]
+        self.server.register_function(self.delete_file, 'deleteFile')  # type: ignore[arg-type]
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
-    def __stopXMLRPCServer(self) -> None:
+    def _stop_xmlrpc_server(self) -> None:
         self.server.shutdown()
 
-    def __createCommandLineOptions(self, args: list[str]) -> dict[str, str]:
-        if not args:
-            return {}
-
-        # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
-        if (len(args) % 2) != 0:
+    @staticmethod
+    def _create_command_line_options(args: list[str]) -> dict[str, str]:
+        try:
+            # Create a dictionary from the key-value pair list
+            return dict(zip(args[::2], args[1::2], strict=True))
+        except ValueError:
+            # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
             log.warning("Unexpected command line options %r - not key/value pairs (odd length)", args)
             return {}
-
-        # Create a dictionary from the key-value pair list
-        return {args[i]: args[i+1] for i in range(0, len(args), 2)}
