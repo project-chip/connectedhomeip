@@ -208,9 +208,9 @@ void ApplicationInit()
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
     DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
-    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetSupportedTemperatureUnits(unitsList) ==
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationCluster::Instance().SetSupportedTemperatureUnits(unitsList) ==
                 CHIP_NO_ERROR);
-    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationCluster::Instance().SetTemperatureUnit(
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
     Clusters::PushAvStreamTransport::SetDelegate(chip::EndpointId(1), &gPushAvStreamTransportManager);

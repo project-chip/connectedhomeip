@@ -32,14 +32,14 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
-UnitLocalizationServer UnitLocalizationServer::mInstance;
+UnitLocalizationCluster UnitLocalizationCluster::mInstance;
 
-UnitLocalizationServer & UnitLocalizationServer::Instance()
+UnitLocalizationCluster & UnitLocalizationCluster::Instance()
 {
-    return UnitLocalizationServer::mInstance;
+    return UnitLocalizationCluster::mInstance;
 }
 
-CHIP_ERROR UnitLocalizationServer::Init()
+CHIP_ERROR UnitLocalizationCluster::Init()
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
@@ -58,7 +58,7 @@ CHIP_ERROR UnitLocalizationServer::Init()
     return err;
 }
 
-CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
+CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
 {
     VerifyOrReturnError(units.size() >= kMinSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(units.size() <= kMaxSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -74,7 +74,7 @@ CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR UnitLocalizationCluster::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     if (aPath.mClusterId != UnitLocalization::Id)
     {
@@ -96,7 +96,7 @@ CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR UnitLocalizationCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != UnitLocalization::Id)
     {
@@ -120,7 +120,7 @@ CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
+CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
 {
     bool isValid       = false;
     const auto & units = GetSupportedTemperatureUnits();
@@ -143,11 +143,11 @@ CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
 
 void MatterUnitLocalizationPluginServerInitCallback()
 {
-    TEMPORARY_RETURN_IGNORED UnitLocalizationServer::Instance().Init();
-    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
+    TEMPORARY_RETURN_IGNORED UnitLocalizationCluster::Instance().Init();
+    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationCluster::Instance());
 }
 
 void MatterUnitLocalizationPluginServerShutdownCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationServer::Instance());
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationCluster::Instance());
 }
