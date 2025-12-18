@@ -51,12 +51,12 @@ void OccupancySensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     SingleEndpointUnregistration(provider);
     if (mOccupancySensingCluster.IsConstructed())
     {
-        RETURN_SAFELY_IGNORED provider.RemoveCluster(&mOccupancySensingCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mOccupancySensingCluster.Cluster()));
         mOccupancySensingCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
-        RETURN_SAFELY_IGNORED provider.RemoveCluster(&mIdentifyCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
 }

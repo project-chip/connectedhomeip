@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "OccupancySensorDeviceImpl.h"
+#include "TogglingOccupancySensorDevice.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -24,10 +24,10 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr uint16_t kOccupancyStateChangeInterval = 30; // seconds
+constexpr uint16_t kOccupancyStateChangeIntervalSec = 30; // seconds
 } // namespace
 
-OccupancySensorDeviceImpl::OccupancySensorDeviceImpl() :
+TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
     OccupancySensorDevice(
         // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
         // when Register() is called by the application with a valid endpoint ID.
@@ -44,36 +44,36 @@ OccupancySensorDeviceImpl::OccupancySensorDeviceImpl() :
         mTimerDelegate)
 {
     // Kick off the timer loop to flip occupancy every few seconds
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)) == CHIP_NO_ERROR);
+    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec)) == CHIP_NO_ERROR);
 }
 
-OccupancySensorDeviceImpl::~OccupancySensorDeviceImpl()
+TogglingOccupancySensorDevice::~TogglingOccupancySensorDevice()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-void OccupancySensorDeviceImpl::OnOccupancyChanged(bool occupied)
+void TogglingOccupancySensorDevice::OnOccupancyChanged(bool occupied)
 {
-    ChipLogProgress(AppServer, "OccupancySensorDeviceImpl::OnOccupancyChanged: %s", occupied ? "Occupied" : "Unoccupied");
+    ChipLogProgress(AppServer, "TogglingOccupancySensorDevice::OnOccupancyChanged: %s", occupied ? "Occupied" : "Unoccupied");
 }
 
-void OccupancySensorDeviceImpl::OnHoldTimeChanged(uint16_t holdTime)
+void TogglingOccupancySensorDevice::OnHoldTimeChanged(uint16_t holdTime)
 {
-    ChipLogProgress(AppServer, "OccupancySensorDeviceImpl::OnHoldTimeChanged: %u", holdTime);
+    ChipLogProgress(AppServer, "TogglingOccupancySensorDevice::OnHoldTimeChanged: %u", holdTime);
 }
 
-void OccupancySensorDeviceImpl::TimerFired()
+void TogglingOccupancySensorDevice::TimerFired()
 {
-    // Flips the occupancy state every kOccupancyStateChangeInterval seconds
+    // Flips the occupancy state every kOccupancyStateChangeIntervalSec seconds
 
     // Only interact with the cluster if it has been constructed/registered
     if (mOccupancySensingCluster.IsConstructed())
     {
         bool nextState = !mOccupancySensingCluster.Cluster().IsOccupied();
 
-        ChipLogProgress(AppServer, "OccupancySensorDeviceImpl: Toggling occupancy to %s", nextState ? "Occupied" : "Unoccupied");
+        ChipLogProgress(AppServer, "TogglingOccupancySensorDevice: Toggling occupancy to %s", nextState ? "Occupied" : "Unoccupied");
         mOccupancySensingCluster.Cluster().SetOccupancy(nextState);
     }
 
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeInterval)) == CHIP_NO_ERROR);
+    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec)) == CHIP_NO_ERROR);
 }

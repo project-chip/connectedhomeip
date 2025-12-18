@@ -21,19 +21,19 @@
 #include <platform/DefaultTimerDelegate.h>
 
 /**
- * @brief An implementation of an Occupancy Sensor Device for Linux.
+ * @brief An implementation of an Occupancy Sensor Device.
  *
  * This class serves as a simple example of an occupancy sensor. It emulates
  * occupancy state changes by toggling between "Occupied" and "Unoccupied"
  * states every 30 seconds using a timer.
  */
-class OccupancySensorDeviceImpl : public chip::app::OccupancySensorDevice,
-                                  public chip::app::Clusters::OccupancySensingDelegate,
-                                  public chip::TimerContext
+class TogglingOccupancySensorDevice : public chip::app::OccupancySensorDevice,
+                                      public chip::app::Clusters::OccupancySensingDelegate,
+                                      public chip::TimerContext
 {
 public:
-    OccupancySensorDeviceImpl();
-    ~OccupancySensorDeviceImpl() override;
+    TogglingOccupancySensorDevice();
+    ~TogglingOccupancySensorDevice() override;
 
     // OccupancySensingDelegate
     void OnOccupancyChanged(bool occupied) override;

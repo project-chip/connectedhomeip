@@ -30,9 +30,4 @@ source_set("occupancy-sensor") {
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
-
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes",
-    "${chip_root}/src:includes",
-  ]
 }
