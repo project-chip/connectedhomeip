@@ -26,7 +26,7 @@ matter_add_gn_arg_bool("chip_config_network_layer_ble" CONFIG_BT)
 matter_add_gn_arg_bool("chip_inet_config_enable_ipv4" CONFIG_CHIP_IPV4)
 matter_add_gn_arg_bool("chip_persist_subscriptions" CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
 matter_add_gn_arg_bool("chip_monolithic_tests" CONFIG_CHIP_BUILD_TESTS)
-matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)
+matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" CONFIG_CHIP_INET_ENABLE_TCP_ENDPOINT)
 matter_add_gn_arg_bool("chip_error_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
 matter_add_gn_arg_bool("chip_progress_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 matter_add_gn_arg_bool("chip_detail_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
@@ -39,6 +39,7 @@ matter_add_gn_arg_bool("chip_enable_icd_server" CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_icd_lit" CONFIG_CHIP_ICD_LIT_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_icd_dsls" CONFIG_CHIP_ICD_DSLS_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
+matter_add_gn_arg_bool("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
 
 # Allows to set chip_stack_lock_tracking level
 # Required for freeRTOS build in case default value needs to be set to "none" for optimization

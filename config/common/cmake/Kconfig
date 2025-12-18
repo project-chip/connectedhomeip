@@ -695,4 +695,10 @@ config CHIP_CUSTOM_BLE_ADV_DATA
 	help
 	  Customization of BLE advertising data at the application layer
 
+config CHIP_INET_ENABLE_TCP_ENDPOINT
+	bool "Enable TCP endpoint in Inet layer"
+	default y if CHIP_BUILD_TESTS
+	help
+	  Enable TCP endpoint support in the Matter Inet layer.
+
 endif # CHIP
