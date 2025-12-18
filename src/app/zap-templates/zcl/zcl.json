@@ -840,7 +840,7 @@
             "ClusterRevision",
             "FeatureMap"
         ],
-        "Unit Localization": ["TemperatureUnit"],
+        "Unit Localization": ["TemperatureUnit", "ClusterRevision"],
         "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
