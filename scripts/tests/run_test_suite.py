@@ -76,10 +76,10 @@ def validate_test_order(ctx: click.Context, param: click.Parameter, value: typin
             return str(time.time_ns())
         if len(value_split) == 2:
             if not value_split[1]:
-                raise click.BadParameter("Random seed not specified. Should be: `random[:seed]`.")
+                raise click.BadParameter("Random seed not specified. Should be: 'random[:seed]'.")
             return value_split[1]
-        raise click.BadParameter("Wrong format of random test order. Should be: `random[:seed]`.")
-    raise click.BadParameter("Wrong format of test order. Should be: `alphabetic` or `random[:seed]`.")
+        raise click.BadParameter("Wrong format of random test order. Should be: 'random[:seed]'.")
+    raise click.BadParameter("Wrong format of test order. Should be: 'alphabetic' or 'random[:seed]'.")
 
 
 @click.group(chain=True)
