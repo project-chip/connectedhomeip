@@ -19,9 +19,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace chip::app;
 using namespace chip::app::Clusters;
+
+namespace chip {
+namespace app {
 
 namespace {
 constexpr uint16_t kOccupancyStateChangeIntervalSec = 30;
@@ -31,7 +32,7 @@ TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
     OccupancySensorDevice(
         // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
         // when Register() is called by the application with a valid endpoint ID.
-        chip::app::Clusters::OccupancySensingCluster::Config(kInvalidEndpointId)
+        OccupancySensingCluster::Config(kInvalidEndpointId)
             .WithFeatures(OccupancySensing::Feature::kPassiveInfrared)
             .WithHoldTime(10,
                           {
@@ -42,14 +43,24 @@ TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
                           mTimerDelegate)
             .WithDelegate(this),
         mTimerDelegate)
-{
-    // Kick off the timer loop to flip occupancy every few seconds
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec)) == CHIP_NO_ERROR);
-}
+{}
 
 TogglingOccupancySensorDevice::~TogglingOccupancySensorDevice()
 {
     mTimerDelegate.CancelTimer(this);
+}
+
+CHIP_ERROR TogglingOccupancySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+{
+    ReturnErrorOnFailure(OccupancySensorDevice::Register(endpoint, provider, parentId));
+    // Kick off the timer loop to flip occupancy every few seconds
+    return mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec));
+}
+
+void TogglingOccupancySensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+{
+    mTimerDelegate.CancelTimer(this);
+    OccupancySensorDevice::UnRegister(provider);
 }
 
 void TogglingOccupancySensorDevice::OnOccupancyChanged(bool occupied)
@@ -66,15 +77,13 @@ void TogglingOccupancySensorDevice::TimerFired()
 {
     // Flips the occupancy state every kOccupancyStateChangeIntervalSec seconds
 
-    // Only interact with the cluster if it has been constructed/registered
-    if (mOccupancySensingCluster.IsConstructed())
-    {
-        bool nextState = !mOccupancySensingCluster.Cluster().IsOccupied();
+    bool nextState = !mOccupancySensingCluster.Cluster().IsOccupied();
 
-        ChipLogProgress(AppServer, "TogglingOccupancySensorDevice: Toggling occupancy to %s",
-                        nextState ? "Occupied" : "Unoccupied");
-        mOccupancySensingCluster.Cluster().SetOccupancy(nextState);
-    }
+    ChipLogProgress(AppServer, "TogglingOccupancySensorDevice: Toggling occupancy to %s", nextState ? "Occupied" : "Unoccupied");
+    mOccupancySensingCluster.Cluster().SetOccupancy(nextState);
 
     VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec)) == CHIP_NO_ERROR);
 }
+
+} // namespace app
+} // namespace chip
