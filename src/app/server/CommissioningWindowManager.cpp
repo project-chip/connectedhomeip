@@ -43,6 +43,10 @@ namespace {
 // As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
 constexpr uint8_t kMaxFailedCommissioningAttempts = 20;
 
+// As per specifications (Section 5.5: Commissioning Flows), Upon completion of PASE session establishment, the Commissionee SHALL
+// autonomously arm the Fail-safe timer for a timeout of 60 seconds.
+constexpr Seconds16 kFailSafeTimeoutPostPaseCompletion(60);
+
 void HandleSessionEstablishmentTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     chip::CommissioningWindowManager * commissionMgr = static_cast<chip::CommissioningWindowManager *>(aAppState);
@@ -222,8 +226,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex,
-                                          System::Clock::Seconds16(CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC));
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex, kFailSafeTimeoutPostPaseCompletion);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
