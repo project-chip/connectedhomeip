@@ -16,9 +16,9 @@ import("//build_overrides/chip.gni")
 
 source_set("camera-av-stream-management-server") {
   sources = [
-    "CodegenIntegration.cpp",
     "CameraAVStreamManagementCluster.cpp",
     "CameraAVStreamManagementCluster.h",
+    "CodegenIntegration.cpp",
   ]
 
   deps = [
@@ -31,7 +31,6 @@ source_set("camera-av-stream-management-server") {
 }
 
 source_set("camera-av-stream-management-cluster") {
-
   public_deps = [
     "${chip_root}/src/app:constants",
     "${chip_root}/src/app:interaction-model",
