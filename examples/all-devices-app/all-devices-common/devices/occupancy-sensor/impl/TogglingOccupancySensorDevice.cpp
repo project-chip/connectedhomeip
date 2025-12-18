@@ -24,7 +24,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr uint16_t kOccupancyStateChangeIntervalSec = 30; // seconds
+constexpr uint16_t kOccupancyStateChangeIntervalSec = 30;
 } // namespace
 
 TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
