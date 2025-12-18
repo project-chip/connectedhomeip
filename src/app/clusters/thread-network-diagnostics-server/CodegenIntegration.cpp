@@ -21,6 +21,7 @@
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/static-cluster-config/ThreadNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -48,23 +49,9 @@ public:
     {
         const BitFlags<Feature> featureMap(rawFeatureMap);
 
-        ActiveTimestamp::TypeInfo::Type activeTs;
-        if (AttributeSet(optionalAttributeBits).IsSet(ActiveTimestamp::Id))
-        {
-            VerifyOrDie(ActiveTimestamp::Get(endpointId, activeTs) == Status::Success);
-        }
-
-        PendingTimestamp::TypeInfo::Type pendingTs;
-        if (AttributeSet(optionalAttributeBits).IsSet(PendingTimestamp::Id))
-        {
-            VerifyOrDie(PendingTimestamp::Get(endpointId, pendingTs) == Status::Success);
-        }
-
-        Delay::TypeInfo::Type delay;
-        if (AttributeSet(optionalAttributeBits).IsSet(Delay::Id))
-        {
-            VerifyOrDie(Delay::Get(endpointId, delay) == Status::Success);
-        }
+        bool activeTs  = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
+        bool pendingTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
+        bool delay     = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
 
         gServers[clusterInstanceIndex].Create(
             endpointId, featureMap,

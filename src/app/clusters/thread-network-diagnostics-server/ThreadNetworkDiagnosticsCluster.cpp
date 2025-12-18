@@ -35,8 +35,8 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId,
                                                                  const BitFlags<ThreadNetworkDiagnostics::Feature> features,
                                                                  const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mActiveTs(config.activeTs), mPendingTs(config.pendingTs), mDelay(config.delay)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mActiveTs(config.activeTs),
+    mPendingTs(config.pendingTs), mDelay(config.delay)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -48,12 +48,6 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(ThreadNetworkDiagnostics::kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatures);
-    case ActiveTimestamp::Id:
-        return encoder.Encode(mActiveTs);
-    case PendingTimestamp::Id:
-        return encoder.Encode(mPendingTs);
-    case Delay::Id:
-        return encoder.Encode(mDelay);
     case NeighborTable::Id:
     case RouteTable::Id:
     case SecurityPolicy::Id:
@@ -113,6 +107,9 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
     case RxErrSecCount::Id:
     case RxErrFcsCount::Id:
     case RxErrOtherCount::Id:
+    case ActiveTimestamp::Id:
+    case PendingTimestamp::Id:
+    case Delay::Id:
     case ChannelPage0Mask::Id:
     case ExtAddress::Id:
     case Rloc16::Id:
@@ -171,9 +168,9 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
         { mFeatures.Has(Feature::kMACCounts), RxErrFcsCount::kMetadataEntry },
         { mFeatures.Has(Feature::kMACCounts), RxErrOtherCount::kMetadataEntry },
         { mFeatures.Has(Feature::kErrorCounts), OverrunCount::kMetadataEntry },
-        { !mActiveTs.IsNull(), ActiveTimestamp::kMetadataEntry },
-        { !mPendingTs.IsNull(), PendingTimestamp::kMetadataEntry },
-        { !mDelay.IsNull(), Delay::kMetadataEntry }
+        { mActiveTs, ActiveTimestamp::kMetadataEntry },
+        { mPendingTs, PendingTimestamp::kMetadataEntry },
+        { mDelay, Delay::kMetadataEntry }
     };
 
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));

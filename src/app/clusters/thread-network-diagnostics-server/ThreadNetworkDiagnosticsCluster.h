@@ -30,9 +30,9 @@ class ThreadNetworkDiagnosticsCluster : public DefaultServerCluster, public Devi
 public:
     struct StartupConfiguration
     {
-        ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::TypeInfo::Type activeTs;
-        ThreadNetworkDiagnostics::Attributes::PendingTimestamp::TypeInfo::Type pendingTs;
-        ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo::Type delay;
+        bool activeTs{};
+        bool pendingTs{};
+        bool delay{};
     };
 
     ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<ThreadNetworkDiagnostics::Feature> features,
@@ -59,9 +59,9 @@ public:
 private:
     const BitFlags<ThreadNetworkDiagnostics::Feature> mFeatures;
 
-    ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::TypeInfo::Type mActiveTs;
-    ThreadNetworkDiagnostics::Attributes::PendingTimestamp::TypeInfo::Type mPendingTs;
-    ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo::Type mDelay;
+    bool mActiveTs{};
+    bool mPendingTs{};
+    bool mDelay{};
 
     std::optional<DataModel::ActionReturnStatus>
     HandleResetCounts(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
