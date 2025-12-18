@@ -139,7 +139,6 @@ class NFCReader:
 
         log.info(f"Successfully wrote URI '{uri}' to NFC tag.")
 
-
     def is_onboarding_data(self, ndef_uri: str) -> bool:
         """
         Checks if the NDEF URI string corresponds to a Matter onboarding payload.
