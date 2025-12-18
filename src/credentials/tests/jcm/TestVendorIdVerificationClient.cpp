@@ -39,11 +39,11 @@ using namespace chip::TestCerts;
 using namespace chip::Transport;
 
 // Mock function for linking
-void InitDataModelHandler() {}
+__attribute__((weak)) void InitDataModelHandler() {}
 
 namespace chip {
 namespace app {
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
+__attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {}
 } // namespace app
