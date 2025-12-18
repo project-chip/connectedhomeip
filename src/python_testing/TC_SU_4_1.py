@@ -401,6 +401,8 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             attribute=self.cluster_otar.Attributes.UpdatePossible)
 
         logger.info(f'Step #7 - Read UpdatePossible attribute on DUT using TH4 (fabric 1): {update_possible_th4}')
+        # Verify UpdatePossible attribute on DUT using TH4 is True
+        asserts.assert_true(update_possible_th4, "Expected UpdatePossible to be True")
 
         self.step(8)
         # Step #8 - Read UpdateState from TH4 (fabric 1)
