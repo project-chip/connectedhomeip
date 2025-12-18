@@ -206,7 +206,7 @@ CHIP_ERROR ValveConfigAndControlAttrAccess::Write(const ConcreteDataAttributePat
 
     return CHIP_NO_ERROR;
 }
-}
+} // namespace
 
 static void startRemainingDurationTick(EndpointId ep);
 
