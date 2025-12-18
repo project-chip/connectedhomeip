@@ -1035,10 +1035,8 @@ def main():
             authorized_paa_flag = ''
 
         if test_case["error_flag"] == 'provisional-cd':
-            print('Provisional CD--------------------------------------------------------------------')
             certification_type = 1
         elif test_case["error_flag"] == 'official-cd':
-            print('Official CD--------------------------------------------------------------------')
             certification_type = 2
         else:
             certification_type = 0
