@@ -66,6 +66,20 @@ class RunContext:
     find_path: typing.List[str]
 
 
+def validate_test_order(ctx: click.Context, param: click.Parameter, value: typing.Any) -> str | None:
+    if not isinstance(value, str):
+        raise click.BadParameter("Test order needs to be a string.")
+    if value == "alphabetic":
+        return None
+    if (value_split := value.split(":"))[0] == "random":
+        if len(value_split) == 1:
+            return str(time.time_ns())
+        if len(value_split) == 2:
+            return value_split[1]
+        raise click.BadParameter("Wrong format of random test order. Should be: random[:seed].")
+    raise click.BadParameter("Wrong format of test order")
+
+
 @click.group(chain=True)
 @click.option(
     '--log-level',
@@ -122,14 +136,12 @@ class RunContext:
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
-    '--no-randomize-tests',
-    is_flag=True,
-    default=False,
-    help='Don\'t randomize test order'
-)
-@click.option(
-    '--random-seed',
-    help='Seed for test order randomization'
+    '--test-order', 'random_seed',
+    type=click.UNPROCESSED,
+    callback=validate_test_order,
+    default="alphabetic",
+    show_default=True,
+    help="Order in which tests should be executed. Possible values: `alphabetic`, `random[:seed]`."
 )
 @click.option(
     '--find-path',
@@ -146,7 +158,7 @@ class RunContext:
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare,
-         include_tags, exclude_tags, no_randomize_tests: bool, random_seed: str | None, find_path, runner, chip_tool):
+         include_tags, exclude_tags, random_seed: str | None, find_path, runner, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -244,14 +256,12 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob, no_
 
         tests_filtered.append(test)
 
-    if no_randomize_tests:
-        if random_seed is not None:
-            log.warning("Setting a random seed when tests are not randomized has no effect on test order.")
+    if random_seed is None:
+        log.info('Executing the tests in alphabetic order')
         tests_filtered.sort(key=lambda x: x.name)
     else:
-        seed = str(time.time_ns()) if random_seed is None else random_seed
-        log.info('Using the following seed for test order randomization: %s', seed)
-        random.seed(seed)
+        log.info('Using the following seed for test order randomization: %s', random_seed)
+        random.seed(random_seed)
         random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
