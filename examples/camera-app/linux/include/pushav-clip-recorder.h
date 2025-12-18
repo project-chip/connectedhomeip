@@ -92,7 +92,7 @@ public:
         std::string mTrackName;                                ///< Track name for segmented files
         std::string mUrl;                                      ///< URL for uploading clips;
         int mTriggerType;                                      ///< Recording trigger type
-        std::chrono::steady_clock::time_point activationTimeS; ///< Time when the recording started
+        std::chrono::steady_clock::time_point mActivationTime; ///< Time when the recording started
     };
 
     /**
