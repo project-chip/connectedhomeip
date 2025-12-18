@@ -455,6 +455,10 @@ private:
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
+    // This version of GetExchangeContext is safe to call even after
+    // mGoneAsync has been set to true. It should NOT be used by cluster implementations.
+    Messaging::ExchangeContext * GetExchangeContextUsableWhenGoneAsync() const override;
+
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;

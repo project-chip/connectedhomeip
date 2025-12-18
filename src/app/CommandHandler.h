@@ -114,6 +114,11 @@ public:
 
         void Invalidate() { mpHandler = nullptr; }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // Test-only method to release the session held by the CommandHandler's exchange context.
+        void TestOnlyReleaseSession();
+#endif
+
     private:
         void Init(CommandHandler * handler);
 
@@ -232,6 +237,11 @@ public:
     /**
      * Gets the inner exchange context object, without ownership.
      *
+     * GetExchangeContext() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it will not work right if the session we're using was evicted.
+     *
      * WARNING: This is dangerous, since it is directly interacting with the
      *          exchange being managed automatically by mpResponder and
      *          if not done carefully, may end up with use-after-free errors.
@@ -332,6 +342,12 @@ protected:
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
     virtual void DecrementHoldOff(Handle * apHandle) {}
+
+    /**
+     *  This version of GetExchangeContext is safe to call during asynchronous command processing. It should NOT be used by cluster
+     * implementations.
+     */
+    virtual Messaging::ExchangeContext * GetExchangeContextUsableWhenGoneAsync() const { return nullptr; };
 };
 
 } // namespace app

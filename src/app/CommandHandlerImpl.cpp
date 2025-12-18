@@ -146,7 +146,7 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    auto context = GetExchangeContext();
+    auto context = GetExchangeContextUsableWhenGoneAsync();
     // If we have no exchange or it has no session, we won't be able to send a
     // response anyway, so it doesn't matter how we encode it, but we have unit
     // tests that have a kinda-broken CommandHandler with no session... just use
@@ -913,6 +913,13 @@ void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommand
 }
 
 Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContext() const
+{
+    VerifyOrDie(!mGoneAsync);
+    VerifyOrDie(mpResponder);
+    return mpResponder->GetExchangeContext();
+}
+
+Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContextUsableWhenGoneAsync() const
 {
     VerifyOrDie(mpResponder);
     return mpResponder->GetExchangeContext();

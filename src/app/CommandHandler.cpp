@@ -51,5 +51,23 @@ CommandHandler::Handle::Handle(CommandHandler * handler)
     Init(handler);
 }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+void CommandHandler::Handle::TestOnlyReleaseSession()
+{
+    CommandHandler * handler = Get();
+    if (handler == nullptr)
+    {
+        return;
+    }
+
+    if (auto * exchangeContext = handler->GetExchangeContextUsableWhenGoneAsync())
+    {
+        exchangeContext->GetSessionHolder().Release();
+        exchangeContext->OnSessionReleased();
+    }
+}
+#endif
+
 } // namespace app
 } // namespace chip

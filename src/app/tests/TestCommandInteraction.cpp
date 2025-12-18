@@ -2141,8 +2141,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchan
 
     // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
-    asyncCommandHandle.Get()->GetExchangeContext()->GetSessionHolder().Release();
-    asyncCommandHandle.Get()->GetExchangeContext()->OnSessionReleased();
+    asyncCommandHandle.TestOnlyReleaseSession();
     asyncCommandHandle = nullptr;
 }
 #endif
