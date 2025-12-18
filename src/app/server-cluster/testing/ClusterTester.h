@@ -77,11 +77,11 @@ namespace Testing {
 class ClusterTester
 {
 public:
-    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster), mFabricHelper(nullptr) {}
+    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster), mFabricTestFixture(nullptr) {}
 
     // Constructor with FabricHelper
     ClusterTester(app::ServerClusterInterface & cluster, FabricTestFixture * fabricHelper) :
-        mCluster(cluster), mFabricHelper(fabricHelper)
+        mCluster(cluster), mFabricTestFixture(fabricHelper)
     {}
 
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
@@ -281,7 +281,7 @@ public:
 
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
 
-    FabricTestFixture * GetFabricHelper() { return mFabricHelper; }
+    FabricTestFixture * GetFabricHelper() { return mFabricTestFixture; }
 
 private:
     bool VerifyClusterPathsValid()
@@ -308,7 +308,7 @@ private:
     uint8_t mTlvBuffer[kTlvBufferSize];
     std::vector<std::unique_ptr<ReadOperation>> mReadOperations;
 
-    FabricTestFixture * mFabricHelper;
+    FabricTestFixture * mFabricTestFixture;
 };
 
 } // namespace Testing
