@@ -69,6 +69,7 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
 
 void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
+    std::lock_guard<std::mutex> lock(trackStatusLock);
     if (mLocalVideoTrack)
     {
         // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
@@ -96,7 +97,6 @@ void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, 
         //     // No encryption - pass raw H.264 to RTP packetization
         // }
 
-        std::lock_guard<std::mutex> lock(trackStatusLock);
         mLocalVideoTrack->SendFrame(data, timestamp);
     }
 }
@@ -104,6 +104,7 @@ void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, 
 // Implementation of SendAudio method
 void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
+    std::lock_guard<std::mutex> lock(trackStatusLock);
     if (mLocalAudioTrack)
     {
         // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
@@ -130,8 +131,7 @@ void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, 
         // {
         //     // No encryption - pass raw Opus to RTP packetization
         // }
-
-        std::lock_guard<std::mutex> lock(trackStatusLock);
+    
         mLocalAudioTrack->SendFrame(data, timestamp);
     }
 }
@@ -205,6 +205,7 @@ void WebrtcTransport::Start()
 
 void WebrtcTransport::Stop()
 {
+    std::lock_guard<std::mutex> lock(trackStatusLock);
     if (mPeerConnection != nullptr)
     {
         mPeerConnection->Close();
@@ -250,14 +251,12 @@ void WebrtcTransport::OnLocalDescription(const std::string & sdp, SDPType type)
 
 bool WebrtcTransport::ClosePeerConnection()
 {
+    std::lock_guard<std::mutex> lock(trackStatusLock);
     if (mPeerConnection == nullptr)
     {
         return false;
     }
-    {
-        std::lock_guard<std::mutex> lock(trackStatusLock);
-        mPeerConnection->Close();
-    }
+    mPeerConnection->Close();
     mPeerConnection.reset();
 
     return true;
