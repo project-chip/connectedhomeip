@@ -186,12 +186,12 @@ CHIP_ERROR ValveConfigAndControlAttrAccess::Write(const ConcreteDataAttributePat
         // DefaultOpenDuration has a constraint: min value = 1
         DataModel::Nullable<uint32_t> value;
         ReturnErrorOnFailure(aDecoder.Decode(value));
-        
+
         if (!value.IsNull() && value.Value() < 1)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        
+
         Status status = DefaultOpenDuration::Set(aPath.mEndpointId, value);
         if (status != Status::Success)
         {
