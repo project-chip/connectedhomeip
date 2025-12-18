@@ -56,6 +56,8 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
+        Server::GetInstance().Shutdown();
+
         SetCommissionableDataProvider(&sTestCommissionableDataProvider);
 
         ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
@@ -193,13 +195,14 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
     }
 
     {
-        uint16_t revision;
+        uint16_t revision = 0;
         ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
         ASSERT_EQ(revision, 1u);
     }
 
     {
-        Attributes::WindowStatus::TypeInfo::Type winStatus;
+        Attributes::WindowStatus::TypeInfo::Type winStatus =
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
         auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
         ASSERT_TRUE(status.IsSuccess());
         EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
