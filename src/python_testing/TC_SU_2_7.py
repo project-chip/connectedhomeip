@@ -49,7 +49,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import contextlib
 import logging
 from time import time
 
