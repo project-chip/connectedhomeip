@@ -17,7 +17,7 @@
 #
 #   @file
 #     CMake sub-project defining 'chip' target which represents CHIP library
-#     and other optional libraries like unit tests, built with 'nxp_zephyr'
+#     and other optional libraries like unit tests, built with 'zephyr'
 #     platform.
 #     Since CHIP doesn't provide native CMake support, ExternalProject
 #     module is used to build the required artifacts with GN meta-build
