@@ -51,13 +51,18 @@ using namespace chip::Testing;
 using namespace chip::TestCerts;
 using namespace chip::Transport;
 
+// Mock function for linking
+__attribute__((weak)) void InitDataModelHandler() {}
+
 namespace chip {
+namespace app {
+__attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
+                                                        chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+{}
+} // namespace app
 namespace Controller {
 namespace JCM {
 using namespace ::chip::Credentials::JCM;
-
-// Mock function for linking
-void InitDataModelHandler() {}
 
 class MockTrustVerificationDelegate : public TrustVerificationDelegate
 {
