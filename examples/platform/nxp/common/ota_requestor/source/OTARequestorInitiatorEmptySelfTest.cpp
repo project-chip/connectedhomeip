@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Zephyr platform.
- *
- */
+#include "OTARequestorInitiator.h"
 
-#pragma once
-
-#include <platform/Zephyr/BlePlatformConfig.h>
+void chip::NXP::App::OTARequestorInitiator::HandleSelfTest() {}

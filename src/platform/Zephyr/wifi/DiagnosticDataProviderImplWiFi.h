@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 
 /**
  *    @file
- *          Provides an implementation of the DiagnosticDataProvider object
- *          for NXP Zephyr platform.
+ *          Provides an implementation of Wi-Fi network diagnostics methods of the DiagnosticDataProvider object.
  */
 
 #pragma once
@@ -28,10 +27,16 @@
 namespace chip {
 namespace DeviceLayer {
 
-class DiagnosticDataProviderImplNxp : public DiagnosticDataProviderImpl
+/**
+ * Concrete implementation of the DiagnosticDataProvider with WiFi network diagnostics support for Zephyr platforms.
+ */
+class DiagnosticDataProviderImplWiFi : public DiagnosticDataProviderImpl
 {
 public:
-#ifdef CONFIG_WIFI_NXP
+    static DiagnosticDataProviderImplWiFi & GetDefaultInstance();
+
+    // ===== WiFi Network Diagnostics Methods =====
+
     CHIP_ERROR GetWiFiBssId(MutableByteSpan & value) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion) override;
@@ -46,15 +51,10 @@ public:
     CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
-#endif
-
-    static DiagnosticDataProviderImplNxp & GetDefaultInstance();
 
 private:
-    DiagnosticDataProviderImplNxp() = default;
+    DiagnosticDataProviderImplWiFi() = default;
 };
-
-DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

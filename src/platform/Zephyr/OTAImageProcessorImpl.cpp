@@ -22,18 +22,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
-#include <zephyr/storage/stream_flash.h>
 #include <zephyr/sys/reboot.h>
-
-static struct stream_flash_ctx stream;
 
 #ifdef CONFIG_CHIP_OTA_REQUEST_UPGRADE_PERMANENT
 #define UPDATE_TYPE BOOT_UPGRADE_PERMANENT
 #else
 #define UPDATE_TYPE BOOT_UPGRADE_TEST
 #endif
-
-static constexpr uint16_t deltaRebootDelayMs = 200;
 
 static chip::OTAImageProcessorImpl gImageProcessor;
 
@@ -54,7 +49,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
@@ -71,7 +67,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         return System::MapErrorZephyr(-EFAULT);
     }
 
-    int err = stream_flash_init(&stream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
+    int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
                                 FIXED_PARTITION_SIZE(slot1_partition), NULL);
 
     if (err)
@@ -84,7 +80,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    int err = stream_flash_buffered_write(&stream, NULL, 0, true);
+    int err = stream_flash_buffered_write(&mStream, NULL, 0, true);
 
     if (err)
     {
@@ -117,7 +113,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
          */
         ChipLogProgress(SoftwareUpdate, "Restarting device, will reboot in %d seconds ...", mDelayBeforeRebootSec);
         return SystemLayer().StartTimer(
-            System::Clock::Milliseconds32(mDelayBeforeRebootSec * 1000 + deltaRebootDelayMs),
+            System::Clock::Milliseconds32(mDelayBeforeRebootSec * 1000 + kDeltaRebootDelayMs),
             [](System::Layer *, void * /* context */) {
                 k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
                 sys_reboot(SYS_REBOOT_WARM);
@@ -141,7 +137,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 
     if (error == CHIP_NO_ERROR)
     {
-        error = System::MapErrorZephyr(stream_flash_buffered_write(&stream, aBlock.data(), aBlock.size(), false));
+        error = System::MapErrorZephyr(stream_flash_buffered_write(&mStream, aBlock.data(), aBlock.size(), false));
         mParams.downloadedBytes += aBlock.size();
     }
 
@@ -151,7 +147,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
         {
             ChipLogDetail(SoftwareUpdate, "Downloaded %u/%u bytes", static_cast<unsigned>(mParams.downloadedBytes),
                           static_cast<unsigned>(mParams.totalFileBytes));
-            mDownloader->FetchNextData();
+            TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
         }
         else
         {
