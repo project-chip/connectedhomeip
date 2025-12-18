@@ -221,10 +221,8 @@ async def find_matter_devices_mdns(max_attempts=None):
 
     for attempt in range(1, attempts + 1):
         try:
-            # Progressive retry delays: start fast, slow down for later attempts
             if attempt > 1:
-                delay = min(2 + (attempt - 2) * 3, 5)  # 2s, 5s (max)
-                logger.info(f"Waiting {delay}s before attempt {attempt}...")
+                delay = min(2 + (attempt - 2) * 3, 5)
                 await asyncio.sleep(delay)
 
             zc = Zeroconf()
@@ -365,11 +363,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         return ConnectionResult(1, "No WiFi interface found")
 
     try:
-        # Ensure interface is up and reset state first
         await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
         await asyncio.sleep(1)
 
-        # Scan to ensure SSID is available (do this after interface is up)
         if not await scan_and_find_ssid(interface, ssid):
             logger.error(f"connect_wifi_linux: SSID {ssid} not found in scan")
             return ConnectionResult(1, f"SSID {ssid} not available")
@@ -396,7 +392,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
         network_id = network_id.strip()
 
-        # Configure network with explicit parameters
         config_commands = [
             f'SET_NETWORK {network_id} ssid "{ssid}"',
             f'SET_NETWORK {network_id} psk "{password}"',
@@ -412,7 +407,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                 logger.error(f"connect_wifi_linux: Failed to configure network: {cmd} -> {result}")
                 return ConnectionResult(1, f"Failed to configure network: {cmd}")
 
-        # Enable and select the network
         await wpa_command(interface, f"ENABLE_NETWORK {network_id}")
         await wpa_command(interface, f"SELECT_NETWORK {network_id}")
         await wpa_command(interface, "REASSOCIATE")
@@ -430,18 +424,16 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                     connected = True
                     break
                 if "wpa_state=4WAY_HANDSHAKE" in status:
-                    # Authentication in progress, wait a bit more
                     last_state = "4WAY_HANDSHAKE"
                     await asyncio.sleep(2)
                 if "wpa_state=DISCONNECTED" in status or "wpa_state=INACTIVE" in status:
                     disconnected_count += 1
                     last_state = "DISCONNECTED"
-                    # Exit after more disconnected states
                     if disconnected_count > 5:
                         logger.warning(
                             f"connect_wifi_linux: Persistent disconnected state after {disconnected_count} checks, attempt {attempt} failed")
                         break
-                    await asyncio.sleep(1)  # Shorter wait for disconnected state
+                    await asyncio.sleep(1)
                 elif "wpa_state=SCANNING" in status or "wpa_state=AUTHENTICATING" in status:
                     last_state = "AUTHENTICATING"
                     await asyncio.sleep(2)
@@ -548,9 +540,6 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                         interface = line.split(":")[1].strip()
                         break
 
-        logger.info(f" --- connect_wifi_mac: Using interface: {interface}")
-
-        # Attempt WiFi connection
         try:
             await run_subprocess([
                 "networksetup",
@@ -563,25 +552,18 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
         # Wait for connection to establish
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
-        # Convert ssid to string for logging
         if isinstance(ssid, bytes):
             ssid_str = ssid.decode('utf-8')
         else:
             ssid_str = ssid
 
-        # Verify that connection was actually established by checking for IP address
         for verify_attempt in range(1, 6):
             try:
-                # Verify that we have an IP address on the interface
                 ip_output = await run_subprocess([
                     "ipconfig", "getifaddr", interface
                 ], capture_output=True)
 
                 if ip_output and ip_output.strip():
-                    ip_addr = ip_output.strip()
-                    logger.info(f" --- connect_wifi_mac: Successfully connected to {ssid_str}, IP: {ip_addr}")
-
-                    # Additional verification: try to ping the gateway to confirm connectivity
                     try:
                         gateway_output = await run_subprocess([
                             "route", "-n", "get", "default"
@@ -596,8 +578,7 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                                     "ping", "-c", "1", "-W", "2000", gateway
                                 ], capture_output=True)
                                 if "1 packets received" in ping_result or "1 received" in ping_result:
-                                    logger.info(f" --- connect_wifi_mac: Gateway {gateway} is reachable")
-                                break
+                                    break
                     except Exception as ping_e:
                         # Ping verification is optional, don't fail if it doesn't work
                         logger.debug(f" --- connect_wifi_mac: Gateway ping failed (non-critical): {ping_e}")
@@ -606,9 +587,7 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                 else:
                     logger.warning(f" --- connect_wifi_mac: No IP address yet on {interface}")
 
-                # Wait before next verification attempt
                 if verify_attempt < 5:
-                    logger.info(f" --- connect_wifi_mac: Verification attempt {verify_attempt}/5 failed, waiting 3s...")
                     await asyncio.sleep(3)
 
             except Exception as verify_e:
@@ -616,11 +595,11 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                 if verify_attempt < 5:
                     await asyncio.sleep(3)
 
-        logger.error(f" --- connect_wifi_mac: Failed to verify connection to {ssid} after 5 attempts")
+        logger.error(f" --- connect_wifi_mac: Failed to verify connection to {ssid_str} after 5 attempts")
         return ConnectionResult(1, "Connection verification failed")
 
     except Exception as e:
-        logger.error(f" --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid}: {e}")
+        logger.error(f" --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid_str}: {e}")
         return ConnectionResult(1, str(e))
 
 
@@ -651,7 +630,6 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
         except Exception as e:
             logger.warning(f"connect_host_wifi: Exception on attempt {attempt}: {e}")
 
-        # Add delay between retries (except for the last attempt)
         if attempt < MAX_ATTEMPTS and (not conn or conn.returncode != 0):
             await asyncio.sleep(RETRY_DELAY_SECONDS)
 
@@ -671,10 +649,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     """ Changes networks in DUT by sending ConnectNetwork command and
         changes TH network by calling connect_host_wifi function with fallback."""
 
-    logger.info(f"change_networks: Starting network change to {ssid}")
-
     for attempt in range(1, MAX_ATTEMPTS + 1):
-        # Send ConnectNetwork command to DUT
         try:
             if attempt > 1:
                 await asyncio.sleep(RETRY_DELAY_SECONDS)
@@ -911,7 +886,7 @@ async def verify_operational_network(test, ssid):
     logger.info("verify_operational_network: Performing immediate device check after network change...")
     await asyncio.sleep(2)  # Brief settling time
     try:
-        quick_check_services = await find_matter_devices_mdns(max_attempts=1)  # Single quick attempt
+        quick_check_services = await find_matter_devices_mdns(max_attempts=1)
         if quick_check_services:
             logger.info("verify_operational_network: Device already reachable (immediate check)")
     except Exception as e:
@@ -922,11 +897,10 @@ async def verify_operational_network(test, ssid):
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
-            # Use extended timeout for operational discovery on first attempt after network change
             if attempt == 1:
-                timeout = OPERATIONAL_DISCOVERY_TIMEOUT  # 70s for operational mDNS resolution
+                timeout = OPERATIONAL_DISCOVERY_TIMEOUT
             else:
-                timeout = ATTRIBUTE_READ_TIMEOUT  # 30s for subsequent attempts
+                timeout = ATTRIBUTE_READ_TIMEOUT
 
             networks = await asyncio.wait_for(
                 test.read_single_attribute_check_success(
@@ -937,19 +911,16 @@ async def verify_operational_network(test, ssid):
             )
 
             if networks and len(networks) > 0:
-                # Check if we have any connected network
                 for network in networks:
                     if network.connected:
                         break
                 else:
-                    # No connected network found, continue trying
                     raise Exception("No connected network found in response")
                 break
 
         except Exception as e:
             logger.error(f"verify_operational_network: Exception reading networks: {e}")
 
-        # Progressive delay before next attempt
         if attempt == 1:
             retry_delay = 10
         elif attempt == 2:
