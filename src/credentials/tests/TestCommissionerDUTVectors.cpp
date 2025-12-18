@@ -87,6 +87,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
         if (strstr(entry->d_name, "struct_dac_sig_curve_secp256k1"))
             continue;
 
+        ChipLogProgress(NotSpecified, "Testing case: %s", entry->d_name);
         std::string jsonFilePath = dirPath + std::string(entry->d_name) + std::string("/test_case_vector.json");
 
         chip::Credentials::Examples::TestHarnessDACProvider dacProvider;
