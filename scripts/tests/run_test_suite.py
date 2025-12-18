@@ -438,6 +438,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     def cleanup():
         apps_register.uninit()
+        executor.terminate()
         if sys.platform == 'linux':
             if ble_wifi:
                 wifi.terminate()
