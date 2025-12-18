@@ -17,6 +17,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedBuffer.h>
@@ -31,6 +32,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using chip::Protocols::InteractionModel::Status;
+using chip::Testing::ClusterTester;
 
 class MockDelegate : public OTAProviderDelegate
 {
@@ -50,35 +52,41 @@ public:
     {}
 };
 
-struct TestOtaProviderLogic : public ::testing::Test
+struct TestOtaProviderCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestOtaProviderLogic, QueryImageValidation)
+TEST_F(TestOtaProviderCluster, QueryImageValidation)
 {
-    OtaProviderLogic logic;
-    const ConcreteCommandPath kCommandPath{ kRootEndpointId, OtaSoftwareUpdateProvider::Id, QueryImage::Id };
+    OtaProviderServer otaProvider(kRootEndpointId);
+    ClusterTester tester(otaProvider);
 
-    QueryImage::DecodableType input;
+    QueryImage::Type input;
 
     // Without a delegate, command is unsupported.
-    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::UnsupportedCommand);
+    auto result = tester.Invoke(QueryImage::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::UnsupportedCommand);
 
     MockDelegate mockDelegate;
-    logic.SetDelegate(&mockDelegate);
+    otaProvider.SetDelegate(&mockDelegate);
 
     // Location MUST be 2 bytes.
     static constexpr CharSpan tooLargeLocationSpan = "abc_too_large"_span;
     input.location                                 = MakeOptional(tooLargeLocationSpan);
-    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::InvalidCommand);
+    result                                         = tester.Invoke(QueryImage::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::InvalidCommand);
 
     // Valid location (empty is ok).
     input.location = NullOptional;
 
-    // Nullopt means delegate was called.
-    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
+    // Nullopt means delegate was called - this should succeed now
+    result = tester.Invoke(QueryImage::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::Success);
 
     // Test for metadata too large.
     {
@@ -89,7 +97,9 @@ TEST_F(TestOtaProviderLogic, QueryImageValidation)
         ASSERT_TRUE(kHugeBuffer.Alloc(kTooLargeMetadataBytes));
 
         input.metadataForProvider = MakeOptional(kHugeBuffer.Span());
-        EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), Status::InvalidCommand);
+        result                    = tester.Invoke(QueryImage::Id, input);
+        ASSERT_TRUE(result.IsSuccess());
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::InvalidCommand);
         input.metadataForProvider = NullOptional;
     }
 
@@ -99,52 +109,66 @@ TEST_F(TestOtaProviderLogic, QueryImageValidation)
 
     uint8_t someMeta[]        = { 1, 2, 3, 4, 5 };
     input.metadataForProvider = MakeOptional<Span<uint8_t>>(someMeta);
-    EXPECT_EQ(logic.QueryImage(kCommandPath, input, nullptr /* handler */), std::nullopt);
+    result                    = tester.Invoke(QueryImage::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::Success);
 }
 
-TEST_F(TestOtaProviderLogic, NotifyUpdateApplied)
+TEST_F(TestOtaProviderCluster, NotifyUpdateApplied)
 {
-    OtaProviderLogic logic;
-    const ConcreteCommandPath kCommandPath{ kRootEndpointId, OtaSoftwareUpdateProvider::Id, NotifyUpdateApplied::Id };
+    OtaProviderServer otaProvider(kRootEndpointId);
+    ClusterTester tester(otaProvider);
 
-    NotifyUpdateApplied::DecodableType input;
+    NotifyUpdateApplied::Type input;
 
     // Without a delegate, error out.
-    EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::UnsupportedCommand);
+    auto result = tester.Invoke(NotifyUpdateApplied::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::UnsupportedCommand);
 
     MockDelegate mockDelegate;
-    logic.SetDelegate(&mockDelegate);
+    otaProvider.SetDelegate(&mockDelegate);
 
     // Update token is not valid.
-    EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
+    result = tester.Invoke(NotifyUpdateApplied::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::InvalidCommand);
 
     constexpr uint8_t kUpdateToken[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
     input.softwareVersion = 123;
     input.updateToken     = Span<const uint8_t>(kUpdateToken);
-    EXPECT_EQ(logic.NotifyUpdateApplied(kCommandPath, input, nullptr /* handler not used */), std::nullopt);
+    result                = tester.Invoke(NotifyUpdateApplied::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::Success);
 }
 
-TEST_F(TestOtaProviderLogic, ApplyUpdateRequest)
+TEST_F(TestOtaProviderCluster, ApplyUpdateRequest)
 {
-    OtaProviderLogic logic;
-    const ConcreteCommandPath kCommandPath{ kRootEndpointId, OtaSoftwareUpdateProvider::Id, ApplyUpdateRequest::Id };
+    OtaProviderServer otaProvider(kRootEndpointId);
+    ClusterTester tester(otaProvider);
 
-    ApplyUpdateRequest::DecodableType input;
+    ApplyUpdateRequest::Type input;
 
     // Without a delegate, error out.
-    EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::UnsupportedCommand);
+    auto result = tester.Invoke(ApplyUpdateRequest::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::UnsupportedCommand);
 
     MockDelegate mockDelegate;
-    logic.SetDelegate(&mockDelegate);
+    otaProvider.SetDelegate(&mockDelegate);
 
     // Update token is not valid.
-    EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), Status::InvalidCommand);
+    result = tester.Invoke(ApplyUpdateRequest::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::InvalidCommand);
 
     constexpr uint8_t kUpdateToken[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
     input.newVersion                 = 124;
     input.updateToken                = Span<const uint8_t>(kUpdateToken);
-    EXPECT_EQ(logic.ApplyUpdateRequest(kCommandPath, input, nullptr /* handler not used */), std::nullopt);
+    result                           = tester.Invoke(ApplyUpdateRequest::Id, input);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Status::Success);
 }
 
 } // namespace
