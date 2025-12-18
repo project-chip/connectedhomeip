@@ -1938,7 +1938,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
-    callback attribute lightSensorType;
+    ram      attribute lightSensorType default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -2101,12 +2101,10 @@
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinMeasuredValue */                                                               \
         { ZAP_EMPTY_DEFAULT(), 0x00000002, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxMeasuredValue */                                                               \
-        { ZAP_EMPTY_DEFAULT(), 0x00000003, 2, ZAP_TYPE(INT16U),                                                                    \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Tolerance */                                   \
-        { ZAP_EMPTY_DEFAULT(), 0x00000004, 1, ZAP_TYPE(ENUM8),                                                                     \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LightSensorType */                                                                \
+              ZAP_ATTRIBUTE_MASK(NULLABLE) },                                                   /* MaxMeasuredValue */             \
+        { ZAP_EMPTY_DEFAULT(), 0x00000003, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Tolerance */                    \
+        { ZAP_SIMPLE_DEFAULT(0xFF), 0x00000004, 1, ZAP_TYPE(ENUM8),                                                                \
+          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LightSensorType */                                     \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
@@ -4552,7 +4550,7 @@
       .clusterId = 0x00000400, \
       .attributes = ZAP_ATTRIBUTE_INDEX(705), \
       .attributeCount = 7, \
-      .clusterSize = 0, \
+      .clusterSize = 3, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -4960,7 +4958,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 28, 187 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 73, 3389 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(28), 73, 3392 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 101 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
@@ -4974,7 +4972,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3677)
+#define ATTRIBUTE_MAX_SIZE (3680)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)

@@ -360,11 +360,9 @@
         "Illuminance Measurement": [
             "ClusterRevision",
             "FeatureMap",
-            "LightSensorType",
             "MaxMeasuredValue",
             "MeasuredValue",
-            "MinMeasuredValue",
-            "Tolerance"
+            "MinMeasuredValue"
         ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
