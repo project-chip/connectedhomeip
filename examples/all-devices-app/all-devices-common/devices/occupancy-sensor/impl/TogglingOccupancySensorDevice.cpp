@@ -71,7 +71,8 @@ void TogglingOccupancySensorDevice::TimerFired()
     {
         bool nextState = !mOccupancySensingCluster.Cluster().IsOccupied();
 
-        ChipLogProgress(AppServer, "TogglingOccupancySensorDevice: Toggling occupancy to %s", nextState ? "Occupied" : "Unoccupied");
+        ChipLogProgress(AppServer, "TogglingOccupancySensorDevice: Toggling occupancy to %s",
+                        nextState ? "Occupied" : "Unoccupied");
         mOccupancySensingCluster.Cluster().SetOccupancy(nextState);
     }
 
