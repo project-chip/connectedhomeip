@@ -214,24 +214,24 @@ private:
     void AttemptToGetFallbackNTPTimeFromDelegate();
 
     std::optional<DataModel::ActionReturnStatus>
-    HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                     const TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData);
+    HandleSetUTCTime(const TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData, CommandHandler * commandObj,
+                     const ConcreteCommandPath & commandPath);
 
     std::optional<DataModel::ActionReturnStatus>
-    HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                               const TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
+    HandleSetTrustedTimeSource(const TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData,
+                               CommandHandler * commandObj, const ConcreteCommandPath & commandPath);
 
     std::optional<DataModel::ActionReturnStatus>
-    HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                      const TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
+    HandleSetTimeZone(const TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData, CommandHandler * commandObj,
+                      const ConcreteCommandPath & commandPath);
 
     std::optional<DataModel::ActionReturnStatus>
-    HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                       const TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
+    HandleSetDSTOffset(const TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData, CommandHandler * commandObj,
+                       const ConcreteCommandPath & commandPath);
 
     std::optional<DataModel::ActionReturnStatus>
-    HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                        const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
+    HandleSetDefaultNTP(const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData,
+                        CommandHandler * commandObj, const ConcreteCommandPath & commandPath);
 
     DataModel::EventsGenerator * GetEventsGenerator() const
     {

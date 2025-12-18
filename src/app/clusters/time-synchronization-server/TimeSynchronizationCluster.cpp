@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#include "TimeSynchronizationCluster.h"
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -165,10 +166,9 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
-    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
-    mDelegate(config.delegate),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource), mDelegate(config.delegate),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -1050,31 +1050,17 @@ std::optional<DataModel::ActionReturnStatus> TimeSynchronizationCluster::InvokeC
 {
     switch (request.path.mCommandId)
     {
-    case Commands::SetUTCTime::Id: {
-        Commands::SetUTCTime::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetUTCTime(handler, request.path, data);
-    }
-    case Commands::SetTrustedTimeSource::Id: {
-        Commands::SetTrustedTimeSource::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments, handler->GetAccessingFabricIndex()));
-        return HandleSetTrustedTimeSource(handler, request.path, data);
-    }
-    case Commands::SetTimeZone::Id: {
-        Commands::SetTimeZone::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetTimeZone(handler, request.path, data);
-    }
-    case Commands::SetDSTOffset::Id: {
-        Commands::SetDSTOffset::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetDSTOffset(handler, request.path, data);
-    }
-    case Commands::SetDefaultNTP::Id: {
-        Commands::SetDefaultNTP::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetDefaultNTP(handler, request.path, data);
-    }
+    case Commands::SetUTCTime::Id:
+        return Handle(request, input_arguments, &TimeSynchronizationCluster::HandleSetUTCTime, std::move(handler), request.path);
+    case Commands::SetTrustedTimeSource::Id:
+        return Handle(request, input_arguments, &TimeSynchronizationCluster::HandleSetTrustedTimeSource, std::move(handler),
+                      request.path);
+    case Commands::SetTimeZone::Id:
+        return Handle(request, input_arguments, &TimeSynchronizationCluster::HandleSetTimeZone, std::move(handler), request.path);
+    case Commands::SetDSTOffset::Id:
+        return Handle(request, input_arguments, &TimeSynchronizationCluster::HandleSetDSTOffset, std::move(handler), request.path);
+    case Commands::SetDefaultNTP::Id:
+        return Handle(request, input_arguments, &TimeSynchronizationCluster::HandleSetDefaultNTP, std::move(handler), request.path);
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -1124,8 +1110,8 @@ CHIP_ERROR TimeSynchronizationCluster::GeneratedCommands(const ConcreteClusterPa
 }
 
 std::optional<DataModel::ActionReturnStatus>
-TimeSynchronizationCluster::HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                             const Commands::SetUTCTime::DecodableType & commandData)
+TimeSynchronizationCluster::HandleSetUTCTime(const Commands::SetUTCTime::DecodableType & commandData, CommandHandler * commandObj,
+                                             const ConcreteCommandPath & commandPath)
 {
     const auto & utcTime     = commandData.UTCTime;
     const auto & granularity = commandData.granularity;
@@ -1152,8 +1138,8 @@ TimeSynchronizationCluster::HandleSetUTCTime(CommandHandler * commandObj, const 
 }
 
 std::optional<DataModel::ActionReturnStatus>
-TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                       const Commands::SetTrustedTimeSource::DecodableType & commandData)
+TimeSynchronizationCluster::HandleSetTrustedTimeSource(const Commands::SetTrustedTimeSource::DecodableType & commandData,
+                                                       CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
 {
     const auto & timeSource = commandData.trustedTimeSource;
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
@@ -1177,8 +1163,8 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
 }
 
 std::optional<DataModel::ActionReturnStatus>
-TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                              const Commands::SetTimeZone::DecodableType & commandData)
+TimeSynchronizationCluster::HandleSetTimeZone(const Commands::SetTimeZone::DecodableType & commandData, CommandHandler * commandObj,
+                                              const ConcreteCommandPath & commandPath)
 {
     const auto & timeZone = commandData.timeZone;
 
@@ -1232,8 +1218,8 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
 }
 
 std::optional<DataModel::ActionReturnStatus>
-TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                               const Commands::SetDSTOffset::DecodableType & commandData)
+TimeSynchronizationCluster::HandleSetDSTOffset(const Commands::SetDSTOffset::DecodableType & commandData,
+                                               CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
 {
     const auto & dstOffset = commandData.DSTOffset;
 
@@ -1262,8 +1248,8 @@ TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, cons
 }
 
 std::optional<DataModel::ActionReturnStatus>
-TimeSynchronizationCluster::HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                const Commands::SetDefaultNTP::DecodableType & commandData)
+TimeSynchronizationCluster::HandleSetDefaultNTP(const Commands::SetDefaultNTP::DecodableType & commandData,
+                                                CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
 {
     const auto & dNtpChar = commandData.defaultNTP;
 
