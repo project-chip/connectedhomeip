@@ -769,7 +769,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
         if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
             LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
-                         "The payload is read directly from the NFC tag.")
+                         "The onboarding data is read directly from the NFC tag.")
             sys.exit(1)
 
         from matter.testing.nfc import NFCReader

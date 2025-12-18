@@ -117,15 +117,15 @@ class NFCReader:
             # If we get here, no URI record was found
             raise ValueError("No NDEF URI record found in message")
 
-    def write_ndef_uri(self, uri):
+    def write_ndef_uri(self, uri: str) -> None:
         """
         Writes an NDEF message with a single URI record to the NFC tag.
 
         Args:
             uri (str): The URI string to write.
 
-        Returns:
-            bool: True if write was successful, False otherwise.
+        Raises:
+            NFCTransmissionError or other exceptions if writing fails.
         """
         with NFCConnection(self) as connection:
 
@@ -138,7 +138,7 @@ class NFCReader:
             _write_ndef_record(connection, record)
 
         log.info(f"Successfully wrote URI '{uri}' to NFC tag.")
-        return True
+
 
     def is_onboarding_data(self, ndef_uri: str) -> bool:
         """
@@ -374,7 +374,15 @@ def _write_ndef_record(connection, record):
     ndef_length = len(ndef_message)
 
     # Write NDEF header
-    ndef_header = [0x00, 0xD6, 0x00, 0x00, 0x02, (ndef_length >> 8) & 0xFF, ndef_length & 0xFF]
+    ndef_header = [
+        CLA_ISO,
+        INS_UPDATE_BINARY,
+        0x00, 0x00,
+        0x02,
+        (ndef_length >> 8) & 0xFF,
+        ndef_length & 0xFF,
+    ]
+
     _, sw1, sw2 = connection.transmit(ndef_header)
     _check_transmission_status(sw1, sw2, "Write NDEF header failed")
 
@@ -384,7 +392,14 @@ def _write_ndef_record(connection, record):
     while offset < ndef_length:
         chunk = ndef_message[offset:offset+MAX_SHORT_APDU_LENGTH]
         chunk_len = len(chunk)
-        WRITE_NDEF = [0x00, 0xD6, (offset + 2) >> 8, (offset + 2) & 0xFF, chunk_len] + list(chunk)
+        WRITE_NDEF = [
+            CLA_ISO,
+            INS_UPDATE_BINARY,
+            (offset + 2) >> 8,
+            (offset + 2) & 0xFF,
+            chunk_len,
+        ] + list(chunk)
+
         _, sw1, sw2 = connection.transmit(WRITE_NDEF)
         _check_transmission_status(sw1, sw2, "Write NDEF message failed")
         offset += chunk_len
