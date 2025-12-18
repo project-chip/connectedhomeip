@@ -99,6 +99,9 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
     @async_test_body
     async def test_TC_SU_4_1(self):
         self.step(0)
+        th2_node_id = 1                     # nodeId=1, Fabric 1
+        th3_node_id = th2_node_id + 2       # nodeId=3, Fabric 2
+        th4_node_id = th3_node_id + 1       # nodeId=4, Fabric 1
 
         self.step(1)
         # Establishing TH1 controller - DUT (OTA Requestor) NodeID=2, TH1 on Fabric=1
@@ -118,7 +121,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         # Write DefaultOTAProviders to DUT using base class helper function
         await self.set_default_ota_providers_list(
             controller=th1,
-            provider_node_id=1,   # TH2 is the OTA Provider (NodeID=1)
+            provider_node_id=th2_node_id,   # TH2 is the OTA Provider (NodeID=1)
             requestor_node_id=th1_node_id
         )
         logger.info("Step #1 - DefaultOTAProviders attribute written successfully to DUT (TH1)")
@@ -126,7 +129,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         self.step(2)
         # Reference object for verifying DefaultOTAProviders (TH2 as OTA Provider, NodeID=1, Fabric 1)
         provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
-            providerNodeID=1,
+            providerNodeID=th2_node_id,
             endpoint=0,
             fabricIndex=th1_fabric_id
         )
@@ -154,13 +157,14 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         self.step(3)
 
         # Establishing TH3 controller - TH3, NodeID=3, Fabric=2
+        th2_fabric_id = th1.fabricId + 1
         th3_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId + 1)
-        th3 = th3_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
+        th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th2_fabric_id)
+        th3 = th3_fabric_admin.NewController(nodeId=th3_node_id, useTestCommissioner=True)
 
-        th3_node_id = th3.nodeId
+        # th3_node_id = th3.nodeId
         th3_fabric_id = th3.fabricId
-        logger.info(f'Step #3 - TH3 NodeID: {th3_node_id}')
+        logger.info(f'Step #3 - TH3 NodeID: {th3.nodeId}')
         logger.info(f'Step #3 - TH3 FabricID: {th3_fabric_id}')
 
         params = await self.open_commissioning_window(th1, th1_node_id)
@@ -231,11 +235,11 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
 
         # Establishing TH4 controller - TH4, NodeID=4, Fabric=1
         fabric_admin = self.default_controller.fabricAdmin
-        th4 = fabric_admin.NewController(nodeId=4)
+        th4 = fabric_admin.NewController(nodeId=th4_node_id)
 
-        th4_node_id = th4.nodeId
+        # th4_node_id = th4.nodeId
         th4_fabric_id = th4.fabricId
-        logger.info(f'Step #5 - TH4 NodeID: {th4_node_id}')
+        logger.info(f'Step #5 - TH4 NodeID: {th4.nodeId}')
         logger.info(f'Step #5 - TH4 FabricID: {th4_fabric_id}')
 
         params = await self.open_commissioning_window(th1, th1_node_id)
