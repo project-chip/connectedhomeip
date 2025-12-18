@@ -134,10 +134,10 @@ inline CHIP_ERROR ReadProductID(DeviceInstanceInfoProvider * deviceInfoProvider,
     return aEncoder.Encode(productId);
 }
 
-inline CHIP_ERROR ReadLocalConfigDisabled(DeviceInstanceInfoProvider * deviceInstanceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadLocalConfigDisabled(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     bool localConfigDisabled = false;
-    ReturnErrorOnFailure(deviceInstanceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
+    ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
     return aEncoder.Encode(localConfigDisabled);
 }
 
@@ -198,14 +198,14 @@ inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager
     return EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
 }
 
-inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceInfoProvider * deviceInfoProvider)
+inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceInstanceInfoProvider * deviceInfoProvider)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
-    DeviceInfoProvider::DeviceInfoCapabilityMinimas capabilityMinimasFromDeviceInfo =
+    DeviceInstanceInfoProvider::DeviceInfoCapabilityMinimas capabilityMinimasFromDeviceInfo =
         deviceInfoProvider->GetSupportedCapabilityMinimaValues();
 
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
@@ -277,16 +277,14 @@ inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoP
 
 namespace chip::app::Clusters {
 
-template <bool UseSingletonDeviceInfoProviderGetter>
 DataModel::ActionReturnStatus
-BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
     using namespace BasicInformation::Attributes;
 
-    // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
-    //       costs some flash (even though code would be more readable that way...)
-    auto * deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
+    DeviceInstanceInfoProvider * deviceInfoProvider;
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProviderImpl(&deviceInfoProvider));
     auto & configManager              = ConfigurationMgr();
 
     switch (request.path.mAttributeId)
@@ -304,52 +302,50 @@ BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::ReadAttribute(con
     case NodeLabel::Id:
         return encoder.Encode(mNodeLabel.Content());
     case LocalConfigDisabled::Id:
-        return ReadLocalConfigDisabled(deviceInstanceInfoProvider, encoder);
+        return ReadLocalConfigDisabled(deviceInfoProvider, encoder);
     case DataModelRevision::Id:
         return encoder.Encode(Revision::kDataModelRevision);
     case Location::Id:
         return ReadLocation(configManager, encoder);
     case VendorName::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetVendorName,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetVendorName,
                                        false /* unimplementedAllowed */, encoder);
     case VendorID::Id:
-        return ReadVendorID(deviceInstanceInfoProvider, encoder);
+        return ReadVendorID(deviceInfoProvider, encoder);
     case ProductName::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetProductName,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductName,
                                        false /* unimplementedAllowed */, encoder);
     case ProductID::Id:
-        return ReadProductID(deviceInstanceInfoProvider, encoder);
+        return ReadProductID(deviceInfoProvider, encoder);
     case HardwareVersion::Id:
-        return ReadHardwareVersion(deviceInstanceInfoProvider, encoder);
+        return ReadHardwareVersion(deviceInfoProvider, encoder);
     case HardwareVersionString::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetHardwareVersionString,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetHardwareVersionString,
                                        false /* unimplementedAllowed */, encoder);
     case SoftwareVersion::Id:
         return ReadSoftwareVersion(configManager, encoder);
     case SoftwareVersionString::Id:
         return ReadSoftwareVersionString(configManager, encoder);
     case ManufacturingDate::Id:
-        return ReadManufacturingDate(deviceInstanceInfoProvider, encoder);
+        return ReadManufacturingDate(deviceInfoProvider, encoder);
     case PartNumber::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetPartNumber,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetPartNumber,
                                        true /* unimplementedAllowed */, encoder);
     case ProductURL::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetProductURL,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductURL,
                                        true /* unimplementedAllowed */, encoder);
     case ProductLabel::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetProductLabel,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductLabel,
                                        true /* unimplementedAllowed */, encoder);
     case SerialNumber::Id:
-        return ReadConfigurationString(deviceInstanceInfoProvider, &DeviceInstanceInfoProvider::GetSerialNumber,
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetSerialNumber,
                                        true /* unimplementedAllowed */, encoder);
     case UniqueID::Id:
         return ReadUniqueID(configManager, encoder);
     case CapabilityMinima::Id:
-        DeviceLayer::DeviceInfoProvider * deviceInfoProvider;
-        ReturnErrorOnFailure(GetDeviceInfoProviderImpl(&deviceInfoProvider));
         return ReadCapabilityMinima(encoder, deviceInfoProvider);
     case ProductAppearance::Id:
-        return ReadProductAppearance(deviceInstanceInfoProvider, encoder);
+        return ReadProductAppearance(deviceInfoProvider, encoder);
     case SpecificationVersion::Id:
         return encoder.Encode(Revision::kSpecificationVersion);
     case MaxPathsPerInvoke::Id:
@@ -365,17 +361,15 @@ BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::ReadAttribute(con
     }
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
 DataModel::ActionReturnStatus
-BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+BasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                               AttributeValueDecoder & decoder)
 {
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
 DataModel::ActionReturnStatus
-BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteImpl(const DataModel::WriteAttributeRequest & request,
+BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
                                                                          AttributeValueDecoder & decoder)
 {
     using namespace BasicInformation::Attributes;
@@ -397,11 +391,11 @@ BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteImpl(const D
         return persistence.StoreString(request.path, mNodeLabel);
     }
     case LocalConfigDisabled::Id: {
-        auto deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
+        auto deviceInfoProvider = GetDeviceInstanceInfoProvider();
         bool localConfigDisabled        = false;
-        ReturnErrorOnFailure(deviceInstanceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
+        ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
         auto decodeStatus = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, localConfigDisabled);
-        ReturnErrorOnFailure(deviceInstanceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
+        ReturnErrorOnFailure(deviceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
         return decodeStatus;
     }
     default:
@@ -409,8 +403,7 @@ BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::WriteImpl(const D
     }
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
-CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Attributes(
+CHIP_ERROR BasicInformationCluster::Attributes(
     const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
@@ -435,8 +428,7 @@ CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Attrib
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), mEnabledOptionalAttributes);
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
-CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Startup(ServerClusterContext & context)
+CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     if (PlatformMgr().GetDelegate() == nullptr)
@@ -459,8 +451,7 @@ CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Startu
     return CHIP_NO_ERROR;
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
-void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Shutdown()
+void BasicInformationCluster::Shutdown()
 {
     if (PlatformMgr().GetDelegate() == this)
     {
@@ -469,8 +460,7 @@ void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::Shutdown()
     DefaultServerCluster::Shutdown();
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
-void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::OnStartUp(uint32_t softwareVersion)
+void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
 {
     // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
     VerifyOrReturn(mContext != nullptr);
@@ -484,8 +474,7 @@ void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::OnStartUp(ui
     eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
-void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::OnShutDown()
+void BasicInformationCluster::OnShutDown()
 {
     // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
     VerifyOrReturn(mContext != nullptr);
@@ -500,27 +489,20 @@ void BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::OnShutDown()
     eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
-template <bool UseSingletonDeviceInfoProviderGetter>
-CHIP_ERROR BasicInformationCluster<UseSingletonDeviceInfoProviderGetter>::GetDeviceInfoProviderImpl(
-    DeviceLayer::DeviceInfoProvider ** outDeviceInfoProvider)
+CHIP_ERROR BasicInformationCluster::GetDeviceInstanceInfoProviderImpl(
+    DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider)
 {
-    if constexpr (UseSingletonDeviceInfoProviderGetter)
+    if (mDeviceInfoProvider == nullptr)
     {
-        *outDeviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+        // NOTE: this should NEVER be nullptr
+        *outDeviceInfoProvider = GetDeviceInstanceInfoProvider();
+        VerifyOrReturn(*outDeviceInfoProvider!=nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {
         *outDeviceInfoProvider = mDeviceInfoProvider;
     }
-
-    if (*outDeviceInfoProvider == nullptr)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
     return CHIP_NO_ERROR;
 }
-
-template class BasicInformationCluster<true>;
-template class BasicInformationCluster<false>;
 
 } // namespace chip::app::Clusters

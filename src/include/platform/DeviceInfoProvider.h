@@ -65,20 +65,6 @@ public:
         Iterator() = default;
     };
 
-    /**
-     * This struct contains some of the values that are a part of the
-     * CapabilityMinimaStruct from the basic information cluster. These are
-     * only the values that are retrieved from the device info provider, other
-     * values of the CapabilityMinimaStruct are populated elsewhere.
-     */
-    struct DeviceInfoCapabilityMinimas
-    {
-        uint16_t simultaneousInvocationsSupported;
-        uint16_t simultaneousWritesSupported;
-        uint16_t readPathsSupported;
-        uint16_t subscribePathsSupported;
-    };
-
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
     using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
     using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
@@ -144,12 +130,6 @@ public:
      * @return CHIP_ERROR if an error occurs during storage.
      */
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
-
-    /**
-     * Get infromation that is used to report minima capability values for the device.
-     * @retval An instance of the DeviceInfoCapabilityMinimas struct
-     */
-    virtual DeviceInfoCapabilityMinimas GetSupportedCapabilityMinimaValues();
 
     // Iterators
     /**

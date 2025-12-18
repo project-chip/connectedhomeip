@@ -43,7 +43,7 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
                    BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Basic Information cluster MUST be on endpoint 0");
 
-LazyRegisteredServerCluster<BasicInformationCluster<true>> gServer;
+LazyRegisteredServerCluster<BasicInformationCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -52,7 +52,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
-        BasicInformationCluster<true>::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
+        BasicInformationCluster::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
         gServer.Create(optionalAttributeSet);
         return gServer.Registration();

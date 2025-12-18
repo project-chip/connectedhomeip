@@ -22,7 +22,7 @@
 #include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
-#include <platform/DeviceInfoProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -41,7 +41,6 @@ namespace Clusters {
 /// can save flash memory compared to a function-static instance, which often requires
 /// additional thread-safety mechanisms. The intended usage is via the static
 /// `Instance()` method, which returns a reference to the global instance.
-template <bool UseSingletonDeviceInfoProviderGetter>
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
@@ -61,7 +60,7 @@ public:
         >;
 
     BasicInformationCluster(OptionalAttributesSet optionalAttributeSet,
-                            DeviceLayer::DeviceInfoProvider * deviceInfoProvider = nullptr) :
+                            DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = nullptr) :
         DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }),
         mEnabledOptionalAttributes(
             optionalAttributeSet
@@ -87,12 +86,12 @@ public:
 private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
-    CHIP_ERROR GetDeviceInfoProviderImpl(DeviceLayer::DeviceInfoProvider ** outDeviceInfoProvider);
+    CHIP_ERROR GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider);
 
     OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
-    DeviceLayer::DeviceInfoProvider * mDeviceInfoProvider;
+    DeviceLayer::DeviceInstanceInfoProvider * mDeviceInfoProvider = nullptr;
 };
 
 } // namespace Clusters

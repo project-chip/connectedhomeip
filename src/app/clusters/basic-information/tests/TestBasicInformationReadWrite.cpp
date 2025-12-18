@@ -126,27 +126,6 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
 };
 
-// Mock DeviceInfoProvider for testing
-class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
-{
-public:
-    MockDeviceInfoProvider()           = default;
-    ~MockDeviceInfoProvider() override = default;
-
-    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; }
-    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
-    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
-    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
-
-protected:
-    // Simple no-op implementations - we only need these to return success
-    // so that the cluster's validation logic can be tested
-    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
-};
-
 static constexpr size_t kCountryCodeLength = 2;
 static constexpr const char * kUniqueId    = "TEST_UNIQUE_ID_12345";
 // Mock ConfigurationManager for testing
@@ -197,15 +176,13 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     }
 
     TestBasicInformationReadWrite() {}
-
-    MockDeviceInfoProvider mDeviceInfoProvider;
     chip::Testing::TestServerClusterContext testContext;
 };
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
-    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -258,8 +235,8 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
 
-    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
@@ -374,8 +351,8 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
-    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -396,8 +373,8 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
-    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -429,8 +406,8 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
     bool readValue{};
 
-    const BasicInformationCluster<false>::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster<false> cluster(optionalAttributeSet, &mDeviceInfoProvider);
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 

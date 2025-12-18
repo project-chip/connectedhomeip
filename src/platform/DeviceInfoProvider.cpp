@@ -89,21 +89,6 @@ void DeviceInfoProvider::SetStorageDelegate(PersistentStorageDelegate * storage)
     mStorage = storage;
 }
 
-DeviceInfoProvider::DeviceInfoCapabilityMinimas DeviceInfoProvider::GetSupportedCapabilityMinimaValues()
-{
-    static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000, "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be <= 10000");
-    static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000, "CHIP_IM_MAX_NUM_WRITE_HANDLER must be <= 10000");
-    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= 10000,
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be <= 10000");
-    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= 10000,
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be <= 10000");
-
-    return DeviceInfoCapabilityMinimas{ .simultaneousInvocationsSupported = CHIP_IM_MAX_NUM_COMMAND_HANDLER,
-                                        .simultaneousWritesSupported      = CHIP_IM_MAX_NUM_WRITE_HANDLER,
-                                        .readPathsSupported               = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS,
-                                        .subscribePathsSupported          = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS };
-}
-
 /**
  * Instance getter for the global DeviceInfoProvider.
  *

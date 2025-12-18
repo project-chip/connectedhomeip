@@ -30,6 +30,20 @@ public:
     virtual ~DeviceInstanceInfoProvider() = default;
 
     /**
+     * This struct contains some of the values that are a part of the
+     * CapabilityMinimaStruct from the basic information cluster. These are
+     * only the values that are retrieved from the device info provider, other
+     * values of the CapabilityMinimaStruct are populated elsewhere.
+     */
+    struct DeviceInfoCapabilityMinimas
+    {
+        uint16_t simultaneousInvocationsSupported;
+        uint16_t simultaneousWritesSupported;
+        uint16_t readPathsSupported;
+        uint16_t subscribePathsSupported;
+    };
+
+    /**
      * @brief Obtain the Vendor Name from the device's factory data.
      *
      * @param[out] buf Buffer to copy string.
@@ -226,8 +240,6 @@ public:
     /**
      * @brief Set the current value of LocalConfigDisabled flag
      *
-     * This method returns CHIP_NO_ERROR by default.
-     *
      * @param[in] localConfigDisabled the new value of to set mLocalConfigDisabled to.
      * @returns CHIP_NO_ERROR on success (which is returned here by default).
      */
@@ -235,6 +247,25 @@ public:
     {
         mLocalConfigDisabled = localConfigDisabled;
         return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Get infromation that is used to report minima capability values for the device.
+     * @retval An instance of the DeviceInfoCapabilityMinimas struct
+     */
+    virtual DeviceInfoCapabilityMinimas GetSupportedCapabilityMinimaValues()
+    {
+        static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000, "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be <= 10000");
+        static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000, "CHIP_IM_MAX_NUM_WRITE_HANDLER must be <= 10000");
+        static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= 10000,
+                    "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be <= 10000");
+        static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= 10000,
+                    "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be <= 10000");
+
+        return DeviceInfoCapabilityMinimas{ .simultaneousInvocationsSupported = CHIP_IM_MAX_NUM_COMMAND_HANDLER,
+                                            .simultaneousWritesSupported      = CHIP_IM_MAX_NUM_WRITE_HANDLER,
+                                            .readPathsSupported               = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS,
+                                            .subscribePathsSupported          = CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS };
     }
 
 protected:
