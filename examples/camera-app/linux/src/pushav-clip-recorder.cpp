@@ -122,7 +122,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
     mUploadFileBasePath              = sessionDir / mClipInfo.mTrackName;
 
     // Helper lambda to ensure a directory exists and is writable, creating it with mode 0755
-    auto ensure = [&](const std::filesystem::path & p) -> std::error_code {
+    auto ensure = [&](const std::filesystem::path & p) -> bool {
         std::error_code ec;
         if (!std::filesystem::exists(p, ec))
         {
@@ -130,7 +130,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
             {
                 ChipLogError(Camera, "Failed to create directory: %s, error code: %d (%s)", p.c_str(), ec.value(),
                              ec.message().c_str());
-                return ec;
+                return false;
             }
             // Set permissions to file: (owner rwx, group rx)
             std::filesystem::permissions(
@@ -141,21 +141,21 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         else if (!std::filesystem::is_directory(p, ec))
         {
             ChipLogError(Camera, "Path is not a directory: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
-            return ec;
+            return false;
         }
 
         auto perms = std::filesystem::status(p, ec).permissions();
         if ((perms & std::filesystem::perms::owner_write) == std::filesystem::perms::none)
         {
-            ChipLogError(Camera, "Directory is not writable: %s", p.c_str());
-            return std::make_error_code(std::errc::permission_denied);
+            ChipLogError(Camera, "Directory is not writable: %s (permissions: %o)", p.c_str(), static_cast<unsigned int>(perms));
+            return false;
         }
 
-        return std::error_code();
+        return true;
     };
 
     // Ensure base directory exists
-    if (ensure(basePath))
+    if (!ensure(basePath))
     {
         ChipLogError(Camera, "Failed to ensure base directory exists: %s", basePath.c_str());
         return false;
@@ -165,13 +165,13 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
     std::filesystem::remove_all(sessionDir);
 
     // Create session and track directories
-    if (ensure(sessionDir))
+    if (!ensure(sessionDir))
     {
         ChipLogError(Camera, "Failed to ensure session directory exists: %s", sessionDir.c_str());
         return false;
     }
 
-    if (ensure(mUploadFileBasePath))
+    if (!ensure(mUploadFileBasePath))
     {
         ChipLogError(Camera, "Failed to ensure upload directory exists: %s", mUploadFileBasePath.c_str());
         return false;
@@ -846,30 +846,6 @@ bool PushAVClipRecorder::IsFileReadyForUpload(const std::filesystem::path & path
 }
 
 /**
- * @brief Uploads the MPD file if it's ready
- *
- * @return true if MPD was uploaded or is not ready yet, false on error
- */
-bool PushAVClipRecorder::UploadMPDIfReady(const std::filesystem::path & mpdPath)
-{
-    if (mUploadMPD)
-    {
-        if (IsFileReadyForUpload(mpdPath))
-        {
-            UpdateMPDStartNumber(mpdPath.string());
-            CheckAndUploadFile(mpdPath.string());
-            mUploadMPD = false; // Reset flag after successful upload
-            return true;
-        }
-        else
-        {
-            return false; // Wait for MPD to be ready before proceeding
-        }
-    }
-    return true;
-}
-
-/**
  * @brief Finalizes the current clip and starts a new one.
  *
  * Writes the trailer of the current clip and initializes a new output file.
@@ -926,9 +902,18 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         return; // Wait for the first segment (segment_0001.m4s) to be created before starting any uploads
     }
 
-    if (!UploadMPDIfReady(mpdPath))
+    if (mUploadMPD)
     {
-        return; // Wait for MPD to be ready before proceeding
+        if (IsFileReadyForUpload(mpdPath))
+        {
+            UpdateMPDStartNumber(mpdPath.string());
+            CheckAndUploadFile(mpdPath.string());
+            mUploadMPD = false; // Reset flag after successful upload
+        }
+        else
+        {
+            return; // Wait for MPD to be ready before proceeding
+        }
     }
 
     if (!mUploadedInitSegment)
@@ -950,13 +935,16 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     {
         std::string renamed_segment_path = RenameSegmentFile(segment_path.string());
         CheckAndUploadFile(renamed_segment_path);
-
         mUploadSegmentID++;
         mUploadMPD   = true;
         segment_path = make_segment_path(mUploadSegmentID);
     }
-
-    UploadMPDIfReady(mpdPath);
+    if (IsFileReadyForUpload(mpdPath) && mUploadMPD)
+    {
+        UpdateMPDStartNumber(mpdPath.string());
+        CheckAndUploadFile(mpdPath.string());
+        mUploadMPD = false;
+    }
 }
 
 bool PushAVClipRecorder::CheckAndUploadFile(std::string filename)

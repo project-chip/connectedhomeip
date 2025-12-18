@@ -205,11 +205,11 @@ void PushAVUploader::Stop()
     }
 }
 
-void PushAVUploader::AddUploadData(std::string & filename, std::string & url)
+void PushAVUploader::AddUploadData(const std::string & filename, const std::string & url)
 {
     ChipLogProgress(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(mQueueMutex);
-    auto data = make_pair(filename, url);
+    auto data = std::make_pair(filename, url);
     mAvData.push(data);
 }
 
