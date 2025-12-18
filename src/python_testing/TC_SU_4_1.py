@@ -162,7 +162,6 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th2_fabric_id)
         th3 = th3_fabric_admin.NewController(nodeId=th3_node_id, useTestCommissioner=True)
 
-        # th3_node_id = th3.nodeId
         th3_fabric_id = th3.fabricId
         logger.info(f'Step #3 - TH3 NodeID: {th3.nodeId}')
         logger.info(f'Step #3 - TH3 FabricID: {th3_fabric_id}')
@@ -237,7 +236,6 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         fabric_admin = self.default_controller.fabricAdmin
         th4 = fabric_admin.NewController(nodeId=th4_node_id)
 
-        # th4_node_id = th4.nodeId
         th4_fabric_id = th4.fabricId
         logger.info(f'Step #5 - TH4 NodeID: {th4.nodeId}')
         logger.info(f'Step #5 - TH4 FabricID: {th4_fabric_id}')
