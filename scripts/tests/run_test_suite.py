@@ -60,7 +60,6 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 class RunContext:
     root: str
     tests: typing.List[chiptest.TestDefinition]
-    in_unshare: bool
     runtime: TestRunTime
     find_path: typing.List[str]
 
@@ -68,10 +67,10 @@ class RunContext:
     deprecated_chip_tool_path: str
 
     # If not empty, include only the specified test tags
-    include_tags: set(TestTag) = field(default_factory={})
+    include_tags: set(TestTag) = field(default_factory=set)
 
     # If not empty, exclude tests tagged with these tags
-    exclude_tags: set(TestTag) = field(default_factory={})
+    exclude_tags: set(TestTag) = field(default_factory=set)
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -331,7 +330,7 @@ def cmd_list(context):
 @click.option(
     '--custom-path', multiple=True,
     help="Set path with a custom kind, value should be <kind>:<key>:<path>, valid kind values are "
-    f"{[v.value for v in SubprocessKind.__members__.values()]}"
+    f"{[v.value for v in SubprocessKind]}"
 )
 @click.option(
     '--discover-paths',
