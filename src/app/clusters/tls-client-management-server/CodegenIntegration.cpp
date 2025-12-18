@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 // These callbacks are required by the Ember/codegen integration but are not
@@ -26,6 +27,6 @@ void MatterTlsClientManagementPluginServerInitCallback()
     ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
 }
 
-void MatterTlsClientManagementClusterInitCallback(unsigned short) {}
+void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId) {}
 
-void MatterTlsClientManagementClusterShutdownCallback(unsigned short) {}
+void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId) {}
