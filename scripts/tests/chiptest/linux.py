@@ -198,11 +198,12 @@ class IsolatedNetworkNamespace:
 
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
+        super().__init__()
         self.ns = ns
 
     def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
         wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess(subproc))
-        return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
 
 
 class DBusTestSystemBus(subprocess.Popen):
