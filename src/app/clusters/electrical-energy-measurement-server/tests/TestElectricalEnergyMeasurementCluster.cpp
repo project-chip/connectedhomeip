@@ -19,8 +19,6 @@
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model-provider/tests/ReadTesting.h>
-#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -214,52 +212,36 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        Span<const ConcreteClusterPath> paths = cluster.GetPaths();
-        ASSERT_EQ(paths.size(), 1u);
+        ClusterTester tester(cluster);
 
         // Test CumulativeEnergyImported (requires kCumulativeEnergy + kImportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyImported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyImported::Id, value).IsSuccess());
         }
 
         // Test CumulativeEnergyExported (requires kCumulativeEnergy + kExportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyExported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyExported::Id, value).IsSuccess());
         }
 
         // Test PeriodicEnergyImported (requires kPeriodicEnergy + kImportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyImported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyImported::Id, value).IsSuccess());
         }
 
         // Test PeriodicEnergyExported (requires kPeriodicEnergy + kExportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyExported::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyExported::Id, value).IsSuccess());
         }
 
         // Test CumulativeEnergyReset (requires kCumulativeEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyReset::Id };
-            chip::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::CumulativeEnergyResetStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyReset::Id, value).IsSuccess());
         }
 
         cluster.Shutdown();

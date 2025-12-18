@@ -16,13 +16,11 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributePathParams.h>
-#include <app/AttributeValueDecoder.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/data-model-provider/tests/TestConstants.h>
-#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
@@ -44,11 +42,9 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
 
-using chip::app::AttributeValueDecoder;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::ClusterTester;
 using chip::Testing::IsAttributesListEqualTo;
-using chip::Testing::kAdminSubjectDescriptor;
-using chip::Testing::WriteOperation;
 
 class NoopBreadcrumbTracker : public BreadCrumbTracker
 {
@@ -102,32 +98,24 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    {
-        WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
-        writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(false);
+    ClusterTester tester(cluster);
 
+    {
         // no notification if enable fails
-        context.ChangeListener().DirtyList().clear();
+        tester.GetDirtyList().clear();
         fakeWifiDriver.SetEnabledAllowed(false);
-        ASSERT_FALSE(cluster.WriteAttribute(writeOp.GetRequest(), decoder).IsSuccess());
-        ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+        ASSERT_FALSE(tester.WriteAttribute(InterfaceEnabled::Id, false).IsSuccess());
+        ASSERT_TRUE(tester.GetDirtyList().empty());
     }
 
     {
-        WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
-        writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(true);
-
         // Receive a notification if enable succeeds
-        context.ChangeListener().DirtyList().clear();
+        tester.GetDirtyList().clear();
         fakeWifiDriver.SetEnabledAllowed(true);
-        ASSERT_TRUE(cluster.WriteAttribute(writeOp.GetRequest(), decoder).IsSuccess());
-        ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-        ASSERT_EQ(context.ChangeListener().DirtyList()[0],
-                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id)
-
-        );
+        ASSERT_TRUE(tester.WriteAttribute(InterfaceEnabled::Id, true).IsSuccess());
+        ASSERT_EQ(tester.GetDirtyList().size(), 1u);
+        ASSERT_EQ(tester.GetDirtyList()[0],
+                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
     }
 
     cluster.Shutdown();

@@ -15,12 +15,13 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/ConcreteCommandPath.h>
 #include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
@@ -113,11 +114,13 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                                                       WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry,
                                                   }));
 
-        DataModel::InvokeRequest request2;
-        request2.path =
-            ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
-        TLV::TLVReader tlvReader2;
-        ASSERT_EQ(cluster.InvokeCommand(request2, tlvReader2, nullptr), Protocols::InteractionModel::Status::Success);
+        chip::Testing::TestServerClusterContext context;
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        WiFiNetworkDiagnostics::Commands::ResetCounts::Type resetCountsCommand;
+        auto result = tester.Invoke(resetCountsCommand);
+        ASSERT_TRUE(result.IsSuccess());
 
         ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                             {

@@ -16,12 +16,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributePathParams.h>
-#include <app/AttributeValueDecoder.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/data-model-provider/tests/TestConstants.h>
-#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -45,10 +42,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
-using chip::app::AttributeValueDecoder;
 using chip::app::DataModel::AttributeEntry;
-using chip::Testing::kAdminSubjectDescriptor;
-using chip::Testing::WriteOperation;
 
 class NoopBreadcrumbTracker : public BreadCrumbTracker
 {

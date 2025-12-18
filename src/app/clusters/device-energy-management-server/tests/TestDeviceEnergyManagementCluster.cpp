@@ -21,7 +21,6 @@
 #include <app/clusters/device-energy-management-server/tests/DeviceEnergyManagementMockDelegate.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>

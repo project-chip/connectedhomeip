@@ -26,7 +26,9 @@
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -758,61 +760,14 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     /*
      * Test ReadAttribute
      */
-    // Test reading current connections through attribute reader
-    uint8_t buf[1024];
+    // Test reading current connections through ClusterTester
+    chip::Testing::TestServerClusterContext context;
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    TLV::TLVWriter tlvWriter;
-    tlvWriter.Init(buf);
-
-    AttributeReportIBs::Builder builder;
-    EXPECT_SUCCESS(builder.Init(&tlvWriter));
-
-    ConcreteAttributePath path(1, Clusters::PushAvStreamTransport::Id,
-                               Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id);
-
-    DataModel::ReadAttributeRequest request;
-    request.path = path;
-    request.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
-    chip::DataVersion dataVersion(0);
-    Access::SubjectDescriptor subjectDescriptor;
-    FabricIndex peerFabricIndex   = 1;
-    subjectDescriptor.fabricIndex = peerFabricIndex;
-    AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion, true);
-
-    // Read the CurrentConnections attribute using the cluster's Read function
-    DataModel::ActionReturnStatus status = server.ReadAttribute(request, encoder);
-    EXPECT_TRUE(status.IsSuccess());
-
-    TLV::TLVReader reader;
-    reader.Init(buf);
-
-    PrintBufHex(buf, tlvWriter.GetLengthWritten());
-
-    TLV::TLVReader attrReportsReader;
-    TLV::TLVReader attrReportReader;
-    TLV::TLVReader attrDataReader;
-
-    EXPECT_SUCCESS(reader.Next());
-    EXPECT_SUCCESS(reader.OpenContainer(attrReportsReader));
-
-    EXPECT_SUCCESS(attrReportsReader.Next());
-    EXPECT_SUCCESS(attrReportsReader.OpenContainer(attrReportReader));
-
-    EXPECT_SUCCESS(attrReportReader.Next());
-    EXPECT_SUCCESS(attrReportReader.OpenContainer(attrDataReader));
-
-    // We're now in the attribute data IB, skip to the desired tag, we want TagNum = 2
-    EXPECT_SUCCESS(attrDataReader.Next());
-    for (int i = 0; i < 3 && !(IsContextTag(attrDataReader.GetTag()) && TagNumFromTag(attrDataReader.GetTag()) == 2); ++i)
-    {
-        EXPECT_SUCCESS(attrDataReader.Next());
-    }
-    EXPECT_TRUE(IsContextTag(attrDataReader.GetTag()));
-    EXPECT_EQ(TagNumFromTag(attrDataReader.GetTag()), 2u);
-
+    chip::Testing::ClusterTester tester(server);
     Clusters::PushAvStreamTransport::Attributes::CurrentConnections::TypeInfo::DecodableType currentConnections;
-    err = currentConnections.Decode(attrDataReader);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    auto status = tester.ReadAttribute(Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id, currentConnections);
+    EXPECT_TRUE(status.IsSuccess());
 
     auto iter = currentConnections.begin();
     EXPECT_TRUE(iter.Next());
