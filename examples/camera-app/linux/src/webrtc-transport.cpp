@@ -69,7 +69,7 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
 
 void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
-    std::lock_guard<std::mutex> lock(trackStatusLock);
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mLocalVideoTrack)
     {
         // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
@@ -104,7 +104,7 @@ void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, 
 // Implementation of SendAudio method
 void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
-    std::lock_guard<std::mutex> lock(trackStatusLock);
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mLocalAudioTrack)
     {
         // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
@@ -205,7 +205,7 @@ void WebrtcTransport::Start()
 
 void WebrtcTransport::Stop()
 {
-    std::lock_guard<std::mutex> lock(trackStatusLock);
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mPeerConnection != nullptr)
     {
         mPeerConnection->Close();
@@ -251,7 +251,7 @@ void WebrtcTransport::OnLocalDescription(const std::string & sdp, SDPType type)
 
 bool WebrtcTransport::ClosePeerConnection()
 {
-    std::lock_guard<std::mutex> lock(trackStatusLock);
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mPeerConnection == nullptr)
     {
         return false;

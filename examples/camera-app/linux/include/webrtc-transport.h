@@ -145,5 +145,5 @@ private:
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
 
-    std::mutex trackStatusLock;
+    std::mutex mTrackStatusLock;
 };
