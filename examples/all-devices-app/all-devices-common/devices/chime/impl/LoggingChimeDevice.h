@@ -18,29 +18,41 @@
 
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <devices/chime/ChimeDevice.h>
-#include <platform/DefaultTimerDelegate.h>
-#include <vector>
-#include <string>
 #include <lib/support/Span.h>
+#include <platform/DefaultTimerDelegate.h>
+#include <string>
+#include <vector>
 
-class ChimeDeviceImpl : public chip::app::ChimeDevice,
-                        public chip::app::Clusters::ChimeDelegate
+namespace chip {
+namespace app {
+
+/**
+ * @brief An implementation of a Chime Device.
+ *
+ * This class serves as a simple example of a chime. It implements the ChimeDelegate
+ * interface and logs a message ("Ding Dong" or "Ring Ring") when a chime sound is played.
+ */
+class LoggingChimeDevice : public ChimeDevice, public Clusters::ChimeDelegate
 {
 public:
-    ChimeDeviceImpl();
-    ~ChimeDeviceImpl() override = default;
+    LoggingChimeDevice();
+    ~LoggingChimeDevice() override = default;
 
     // ChimeDelegate
-    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
+    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) override;
     CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
-    chip::Protocols::InteractionModel::Status PlayChimeSound() override;
+    Protocols::InteractionModel::Status PlayChimeSound() override;
 
 private:
-    chip::app::DefaultTimerDelegate mTimerDelegate;
-    
-    struct ChimeSound {
+    DefaultTimerDelegate mTimerDelegate;
+
+    struct ChimeSound
+    {
         uint8_t id;
         std::string name;
     };
     std::vector<ChimeSound> mSounds;
 };
+
+} // namespace app
+} // namespace chip

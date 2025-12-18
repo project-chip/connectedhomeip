@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "ChimeDeviceImpl.h"
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/chime/impl/LoggingChimeDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
@@ -79,12 +79,8 @@ private:
             return std::make_unique<BooleanStateSensorDevice>(
                 &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
-<<<<<<< HEAD:examples/all-devices-app/all-devices-common/devices/device-factory/DeviceFactory.h
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
-=======
-        mRegistry["occupancy-sensor"] = []() { return std::make_unique<OccupancySensorDeviceImpl>(); };
-        mRegistry["chime"]            = []() { return std::make_unique<ChimeDeviceImpl>(); };
->>>>>>> dd446025c1 (Add Chime Device to all-devices-app and CI tests):examples/all-devices-app/linux/device_impl/DeviceFactory.h
+        mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
     }
 };
 

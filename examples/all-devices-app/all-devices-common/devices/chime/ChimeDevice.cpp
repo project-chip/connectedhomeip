@@ -14,28 +14,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/chime/ChimeDevice.h>
 #include <devices/Types.h>
+#include <devices/chime/ChimeDevice.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
 
-ChimeDevice::ChimeDevice(Clusters::ChimeDelegate & delegate, TimerDelegate * timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)),
-    mDelegate(delegate), mTimerDelegate(timerDelegate)
+ChimeDevice::ChimeDevice(Clusters::ChimeDelegate & delegate, TimerDelegate & timerDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mDelegate(delegate),
+    mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    if (mTimerDelegate != nullptr)
-    {
-        mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, *mTimerDelegate));
-        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-    }
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mChimeCluster.Create(endpoint, mDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mChimeCluster.Registration()));

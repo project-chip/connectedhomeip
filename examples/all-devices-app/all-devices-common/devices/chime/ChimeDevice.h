@@ -18,6 +18,7 @@
 
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -27,7 +28,7 @@ namespace app {
 class ChimeDevice : public SingleEndpointDevice
 {
 public:
-    ChimeDevice(Clusters::ChimeDelegate & delegate, TimerDelegate * timerDelegate = nullptr);
+    ChimeDevice(Clusters::ChimeDelegate & delegate, TimerDelegate & timerDelegate);
     ~ChimeDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,7 +39,7 @@ public:
 
 protected:
     Clusters::ChimeDelegate & mDelegate;
-    TimerDelegate * mTimerDelegate;
+    TimerDelegate & mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ChimeCluster> mChimeCluster;
 };

@@ -14,49 +14,49 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "ChimeDeviceImpl.h"
+#include "LoggingChimeDevice.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-using namespace chip;
-using namespace chip::app;
 using namespace chip::app::Clusters;
 
-ChimeDeviceImpl::ChimeDeviceImpl() :
-    ChimeDevice(*this, &mTimerDelegate)
+namespace chip {
+namespace app {
+
+LoggingChimeDevice::LoggingChimeDevice() : ChimeDevice(*this, mTimerDelegate)
 {
-    mSounds.push_back({0, "Ding Dong"});
-    mSounds.push_back({1, "Ring Ring"});
+    mSounds.push_back({ 0, "Ding Dong" });
+    mSounds.push_back({ 1, "Ring Ring" });
 }
 
-CHIP_ERROR ChimeDeviceImpl::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
+CHIP_ERROR LoggingChimeDevice::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {
     if (chimeIndex >= mSounds.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    
+
     const auto & sound = mSounds[chimeIndex];
-    chimeID = sound.id;
+    chimeID            = sound.id;
     return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(sound.name.c_str()), name);
 }
 
-CHIP_ERROR ChimeDeviceImpl::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
+CHIP_ERROR LoggingChimeDevice::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
 {
     if (chimeIndex >= mSounds.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    
+
     chimeID = mSounds[chimeIndex].id;
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status ChimeDeviceImpl::PlayChimeSound()
+Protocols::InteractionModel::Status LoggingChimeDevice::PlayChimeSound()
 {
     // Access the cluster to get the selected chime attribute
     // Note: ChimeDevice exposes ChimeCluster() accessor
     uint8_t selectedChime = ChimeCluster().GetSelectedChime();
-    
+
     // Find the name
     const char * soundName = "Unknown";
     for (const auto & sound : mSounds)
@@ -68,6 +68,9 @@ Protocols::InteractionModel::Status ChimeDeviceImpl::PlayChimeSound()
         }
     }
 
-    ChipLogProgress(AppServer, "ChimeDeviceImpl: Playing sound %s", soundName);
+    ChipLogProgress(AppServer, "LoggingChimeDevice: Playing sound %s", soundName);
     return Protocols::InteractionModel::Status::Success;
 }
+
+} // namespace app
+} // namespace chip
