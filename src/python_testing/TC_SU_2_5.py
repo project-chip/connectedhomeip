@@ -42,13 +42,12 @@
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
 #       --int-arg ota_image_download_timeout:300
-#       --timeout 0
+#       --timeout 2100
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import contextlib
 import logging
 
 from mobly import asserts
@@ -111,6 +110,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         if not self.ota_image:
             asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
+
+        if self.matter_test_config.timeout is None or self.matter_test_config.timeout <= 0:
+            asserts.fail(
+                "Test timeout parameter must be defined and  greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.requestor_passcode = self.matter_test_config.setup_passcodes[0]
@@ -202,12 +205,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.flush_reports()
         update_state_attr_handler.cancel()
 
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
-
         # Once in idle verify the version match the expected software version
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -284,12 +281,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=600)
         update_state_attr_handler.flush_reports()
         update_state_attr_handler.cancel()
-
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
 
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -370,11 +361,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
@@ -445,12 +431,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
-
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.terminate_provider()
@@ -508,12 +488,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
         update_state_attr_handler.reset()
         update_state_attr_handler.cancel()
-
-        # Added this block because after AttributeSubscriptionHandler
-        # and calling an await method it was triggering an TimeoutError and CancelledError
-        # this is just to catch it and continue with the test
-        with contextlib.suppress(asyncio.CancelledError):
-            await asyncio.sleep(0.1)
 
         # Make sure attr is Idle
         update_state = await self.read_single_attribute_check_success(
