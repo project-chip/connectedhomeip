@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("toggling-occupancy-sensor") {
+source_set("toggling") {
   sources = [
     "TogglingOccupancySensorDevice.cpp",
     "TogglingOccupancySensorDevice.h",
