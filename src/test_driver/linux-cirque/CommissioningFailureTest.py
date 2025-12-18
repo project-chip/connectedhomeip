@@ -92,11 +92,11 @@ class TestCommissioningFailure(CHIPVirtualHome):
         req_device_id = req_ids[0]
 
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.5.0-py3-none-any.whl")))
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.5.0-cp311-abi3-linux_x86_64.whl")))
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.5.0-py3-none-any.whl")))
 
         command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {}".format(
             os.path.join(
