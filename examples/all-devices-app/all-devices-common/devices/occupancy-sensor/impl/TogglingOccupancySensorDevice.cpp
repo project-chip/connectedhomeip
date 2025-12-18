@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 
 namespace {
-constexpr uint16_t kOccupancyStateChangeIntervalSec = 30;
+constexpr System::Clock::Seconds16 kOccupancyStateChangeIntervalSec = System::Clock::Seconds16(30);
 } // namespace
 
 TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
@@ -54,7 +54,7 @@ CHIP_ERROR TogglingOccupancySensorDevice::Register(EndpointId endpoint, CodeDriv
 {
     ReturnErrorOnFailure(OccupancySensorDevice::Register(endpoint, provider, parentId));
     // Kick off the timer loop to flip occupancy every few seconds
-    return mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec));
+    return mTimerDelegate.StartTimer(this, kOccupancyStateChangeIntervalSec);
 }
 
 void TogglingOccupancySensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
@@ -82,7 +82,7 @@ void TogglingOccupancySensorDevice::TimerFired()
     ChipLogProgress(AppServer, "TogglingOccupancySensorDevice: Toggling occupancy to %s", nextState ? "Occupied" : "Unoccupied");
     mOccupancySensingCluster.Cluster().SetOccupancy(nextState);
 
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(kOccupancyStateChangeIntervalSec)) == CHIP_NO_ERROR);
+    VerifyOrDie(mTimerDelegate.StartTimer(this, kOccupancyStateChangeIntervalSec) == CHIP_NO_ERROR);
 }
 
 } // namespace app
