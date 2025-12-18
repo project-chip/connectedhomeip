@@ -131,7 +131,7 @@ void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, 
         // {
         //     // No encryption - pass raw Opus to RTP packetization
         // }
-    
+
         mLocalAudioTrack->SendFrame(data, timestamp);
     }
 }
