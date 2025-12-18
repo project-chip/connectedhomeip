@@ -74,7 +74,8 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
     if (videoStreamId.HasValue())
     {
-        const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+        const std::vector<VideoStreamStruct> & allocatedVideoStreams =
+            GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
 
         // If no Video ID is provided, match to an allocated ID. Exact is preferred if found.  We know the stream requested is in
         // supported streams.
@@ -103,7 +104,8 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
     if (audioStreamId.HasValue())
     {
-        const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+        const std::vector<AudioStreamStruct> & allocatedAudioStreams =
+            GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
 
         // If no Audio ID is provided, match to an allocated ID. Exact is preferred if found.  We know the stream requested is in
         // supported streams.
@@ -308,7 +310,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             uint32_t candidateEncodedPixelRate =
                 allocateArgs.maxFrameRate * allocateArgs.maxResolution.height * allocateArgs.maxResolution.width;
             bool encoderRequired = true;
-            if (!GetCameraAVStreamManagementCluster()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate, encoderRequired))
+            if (!GetCameraAVStreamManagementCluster()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate,
+                                                                                              encoderRequired))
             {
                 return Status::ResourceExhausted;
             }
@@ -602,7 +605,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
     ChipLogProgress(Camera, "Stream usage priorities changed");
-    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(GetCameraAVStreamManagementCluster()->GetStreamUsagePriorities());
+    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(
+        GetCameraAVStreamManagementCluster()->GetStreamUsagePriorities());
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
@@ -665,7 +669,8 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case MicrophoneVolumeLevel::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(GetCameraAVStreamManagementCluster()->GetMicrophoneVolumeLevel());
+        mCameraDeviceHAL->GetCameraHALInterface().SetMicrophoneVolume(
+            GetCameraAVStreamManagementCluster()->GetMicrophoneVolumeLevel());
         break;
     }
     case LocalVideoRecordingEnabled::Id: {
@@ -679,7 +684,8 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case StatusLightEnabled::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(GetCameraAVStreamManagementCluster()->GetStatusLightEnabled());
+        mCameraDeviceHAL->GetCameraHALInterface().SetStatusLightEnabled(
+            GetCameraAVStreamManagementCluster()->GetStatusLightEnabled());
         break;
     }
     case ImageRotation::Id: {
@@ -687,11 +693,13 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         break;
     }
     case ImageFlipHorizontal::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipHorizontal(GetCameraAVStreamManagementCluster()->GetImageFlipHorizontal());
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipHorizontal(
+            GetCameraAVStreamManagementCluster()->GetImageFlipHorizontal());
         break;
     }
     case ImageFlipVertical::Id: {
-        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipVertical(GetCameraAVStreamManagementCluster()->GetImageFlipVertical());
+        mCameraDeviceHAL->GetCameraHALInterface().SetImageFlipVertical(
+            GetCameraAVStreamManagementCluster()->GetImageFlipVertical());
         break;
     }
     default:
@@ -775,7 +783,8 @@ CameraAVStreamManager::AllocatedAudioStreamsLoaded()
 CHIP_ERROR
 CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
 {
-    const std::vector<SnapshotStreamStruct> & persistedStreams = GetCameraAVStreamManagementCluster()->GetAllocatedSnapshotStreams();
+    const std::vector<SnapshotStreamStruct> & persistedStreams =
+        GetCameraAVStreamManagementCluster()->GetAllocatedSnapshotStreams();
     auto & halStreams = mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams();
     std::set<uint16_t> halStreamIds;
 
@@ -916,12 +925,14 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
     }
 
     // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) != CHIP_NO_ERROR)
+    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) !=
+        CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to increment audio stream %u ref count in SDK", audioStreamID);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) != CHIP_NO_ERROR)
+    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) !=
+        CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to increment video stream %u ref count in SDK", videoStreamID);
     }
@@ -965,12 +976,14 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     }
 
     // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) != CHIP_NO_ERROR)
+    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) !=
+        CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to decrement audio stream %u ref count in SDK", audioStreamID);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) != CHIP_NO_ERROR)
+    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) !=
+        CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to decrement video stream %u ref count in SDK", videoStreamID);
     }

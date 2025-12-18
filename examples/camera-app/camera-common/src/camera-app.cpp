@@ -106,7 +106,8 @@ void CameraApp::InitializeCameraAVStreamMgmt()
     // Set the attribute defaults
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetHDRModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetHDRMode());
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
@@ -125,14 +126,16 @@ void CameraApp::InitializeCameraAVStreamMgmt()
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision());
+        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetNightVision(
+            mCameraDevice->GetCameraHALInterface().GetNightVision());
     }
 
     TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
 
     if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerMuted(mCameraDevice->GetCameraHALInterface().GetSpeakerMuted());
+        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerMuted(
+            mCameraDevice->GetCameraHALInterface().GetSpeakerMuted());
         TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerVolumeLevel(
             mCameraDevice->GetCameraHALInterface().GetSpeakerVolume());
         TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerMaxLevel(
@@ -274,11 +277,11 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    mAVStreamMgmtServer.Create(
-        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs, maxConcurrentVideoEncoders,
-        maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
-        micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
-        streamUsagePriorities);
+    mAVStreamMgmtServer.Create(mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
+                               maxConcurrentVideoEncoders, maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport,
+                               rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities, spkrCapabilities,
+                               twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
+                               streamUsagePriorities);
 
     InitializeCameraAVStreamMgmt();
 }
