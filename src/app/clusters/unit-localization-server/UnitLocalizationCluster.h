@@ -36,10 +36,11 @@ inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
 class UnitLocalizationCluster : public AttributeAccessInterface
 {
 public:
+    UnitLocalizationCluster() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
+
     // Register for the UnitLocalization cluster on all endpoints.
     CHIP_ERROR Init();
     CHIP_ERROR Startup();
-    static UnitLocalizationCluster & Instance();
 
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -50,10 +51,8 @@ public:
     CHIP_ERROR SetTemperatureUnit(TempUnitEnum unit);
 
 private:
-    UnitLocalizationCluster() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
     CHIP_ERROR WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
-    static UnitLocalizationCluster mInstance;
     DataModel::List<TempUnitEnum> mSupportedTemperatureUnits{ DataModel::List<TempUnitEnum>(mUnitsBuffer) };
     TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = { TempUnitEnum::kFahrenheit, TempUnitEnum::kCelsius,
                                                                   TempUnitEnum::kKelvin };

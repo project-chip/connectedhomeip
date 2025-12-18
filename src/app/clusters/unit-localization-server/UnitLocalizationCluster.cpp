@@ -32,19 +32,12 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
-UnitLocalizationCluster UnitLocalizationCluster::mInstance;
-
-UnitLocalizationCluster & UnitLocalizationCluster::Instance()
-{
-    return UnitLocalizationCluster::mInstance;
-}
-
 CHIP_ERROR UnitLocalizationCluster::Init()
 {
     return Startup();
 }
 
-CHIP_ERROR UnitLocalizationServer::Startup()
+CHIP_ERROR UnitLocalizationCluster::Startup()
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
