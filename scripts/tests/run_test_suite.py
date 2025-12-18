@@ -76,8 +76,8 @@ def validate_test_order(ctx: click.Context, param: click.Parameter, value: typin
             return str(time.time_ns())
         if len(value_split) == 2:
             return value_split[1]
-        raise click.BadParameter("Wrong format of random test order. Should be: random[:seed].")
-    raise click.BadParameter("Wrong format of test order")
+        raise click.BadParameter("Wrong format of random test order. Should be: `random[:seed]`.")
+    raise click.BadParameter("Wrong format of test order. Should be: `alphabetic` or `random[:seed]`.")
 
 
 @click.group(chain=True)
