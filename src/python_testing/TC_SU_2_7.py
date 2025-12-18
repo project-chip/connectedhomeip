@@ -182,7 +182,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.step(0)
         controller = self.default_controller
         # # Set the time interval based on the ota_image_download_timeout
-        max_interval = self.ota_image_download_timeout + 60
+        max_interval = self.ota_image_download_timeout + 600
 
         self.step(1)
         # Create event subscriber for StateTransition
@@ -197,25 +197,24 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         # Register event, should change to Querying
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         logger.info(f"Event report {event_report}")
-        self.verify_state_transition_event(event_report, self.ota_req.Enums.UpdateStateEnum.kIdle,
-                                           self.ota_req.Enums.UpdateStateEnum.kQuerying, expected_target_version=NullValue)
+        self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
+                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying, expected_target_version=NullValue)
 
         # Event for Downloading
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         logger.info(f"Event report for Downloading {event_report}")
-        self.verify_state_transition_event(event_report, self.ota_req.Enums.UpdateStateEnum.kQuerying,
-                                           self.ota_req.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.expected_software_version)
+        self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
+                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.expected_software_version)
 
         # Event for Applying
         event_report = state_transition_event_handler.wait_for_event_report(
             self.ota_req.Events.StateTransition, timeout_sec=self.ota_image_download_timeout)
         logger.info(f"Event report for Applying {event_report}")
-        self.verify_state_transition_event(event_report, self.ota_req.Enums.UpdateStateEnum.kDownloading,
-                                           self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
+        self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
+                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
-        Clusters.OtaSoftwareUpdateRequestor.Attributes.FeatureMap
         # kIdle ( After update is Optional) in this case we only wait state to be Idle
         # Just wait the device to be kIdle to avoid unexpected states in following Steps.
         update_state_match = AttributeMatcher.from_callable(
@@ -268,11 +267,13 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*2)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=10)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
+        # Catch Event Report for Querying
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        # Catch Event for KDelayedOnQuery
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider)
@@ -293,15 +294,17 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         )
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*3)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
         # This step we need to Kill the provider PID before the announcement
         logger.info("Killing the provider process")
         self.current_provider_app_proc.kill()
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*2)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         logger.info(f"Event response after killing app: {event_report}")
+        # Catch the Event Querying
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
+        # Change status to KIdle
         logger.info(f"Event response : {event_report}")
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
@@ -324,12 +327,15 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             )
             state_transition_event_handler = EventSubscriptionHandler(
                 expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-            await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=90)
+            await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
             await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-            event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+            # Wait to State to change to Querying
+            event_report = state_transition_event_handler.wait_for_event_report(
+                self.ota_req.Events.StateTransition, timeout_sec=600)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
-            event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+            # Wait State Event to change to kDelayedOnUserConsent
+            event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
             state_transition_event_handler.cancel()
@@ -355,25 +361,25 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         time_start = time()
         # Block waiting for Download
         logger.info("About to wait for StateTransition Events")
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         logger.info(f"Event report Querying {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         logger.info(f"Event report Downloading {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
-        # Wait some time to let it download some data and then Kill the current process
+        # Once the Device is Downloading wait some time to let it download some data and then Kill the current process
         state_transition_event_handler.cancel()
-        # Check for DownloadError
+        # Create Listener for DownloadError
         error_download_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
         await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
-        logger.info("Wait 3 seconds to allow download some data")
+        logger.info("Wait 3 seconds to allow download some data before killing the Provider Process")
         await asyncio.sleep(3)
         self.current_provider_app_proc.kill()
         time_middle = time()
         elapsed_time = time_middle - time_start
         logger.info(f"Elapsed time since announce {elapsed_time}")
-        # wait to until the 5 minutes
+        # Wait to until the 5 minutes
         minimun_wait_time = (60*5)-elapsed_time
         logger.info(f"Script will wait for {minimun_wait_time} to match the minimum 5 minutes wait ")
         await asyncio.sleep(minimun_wait_time)

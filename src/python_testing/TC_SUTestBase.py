@@ -19,7 +19,6 @@ import logging
 import subprocess
 import tempfile
 from os import path
-from time import sleep
 from typing import Optional
 
 from mobly import asserts
@@ -336,11 +335,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
                 log.info("Created restart flag file to signal app restart")
-
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
-                sleep(1)
-
                 # Expire sessions and re-establish connections
                 log.info("Expiring sessions after manual device reboot")
                 self.controller.ExpireSessions(self.requestor_node_id)
