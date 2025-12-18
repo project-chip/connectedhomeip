@@ -41,6 +41,11 @@ UnitLocalizationCluster & UnitLocalizationCluster::Instance()
 
 CHIP_ERROR UnitLocalizationCluster::Init()
 {
+    return Startup();
+}
+
+CHIP_ERROR UnitLocalizationServer::Startup()
+{
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
 
@@ -75,6 +80,11 @@ CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List
 }
 
 CHIP_ERROR UnitLocalizationCluster::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    return WriteImpl(aPath, aDecoder);
+}
+
+CHIP_ERROR UnitLocalizationCluster::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     if (aPath.mClusterId != UnitLocalization::Id)
     {
