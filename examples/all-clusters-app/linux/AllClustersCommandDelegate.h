@@ -130,7 +130,6 @@ private:
      * Should be called when it is necessary to change the Occupancy attribute.
      */
     void HandleSetOccupancyChange(chip::EndpointId endpointId, uint8_t occupancyValue);
-    static void OccupancyPresentTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
     /**
      * Should be called when it is necessary to change the BooleanState cluster StateValue attribute.
