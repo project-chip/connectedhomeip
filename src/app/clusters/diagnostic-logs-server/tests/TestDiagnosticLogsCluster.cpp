@@ -104,8 +104,8 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_WithDelegate_Success)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().status, DiagnosticLogs::StatusEnum::kSuccess);
-    EXPECT_EQ(result.response.value().logContent.size(), sizeof(buffer));
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kSuccess); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.response->logContent.size(), sizeof(buffer));            // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // If request is BDX but logs can fit in the response payload, the response should be kExhausted
@@ -127,8 +127,8 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().status, DiagnosticLogs::StatusEnum::kExhausted);
-    EXPECT_EQ(result.response.value().logContent.size(), sizeof(buffer));
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kExhausted); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.response->logContent.size(), sizeof(buffer));              // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greater_than_kMaxLogContentSize)
@@ -149,8 +149,9 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greate
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().status, DiagnosticLogs::StatusEnum::kExhausted);
-    EXPECT_EQ(result.response.value().logContent.size(), static_cast<size_t>(chip::bdx::DiagnosticLogs::kMaxLogContentSize));
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kExhausted); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.response->logContent.size(),
+              static_cast<size_t>(chip::bdx::DiagnosticLogs::kMaxLogContentSize)); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
@@ -165,7 +166,7 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().status, DiagnosticLogs::StatusEnum::kNoLogs);
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kNoLogs); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
@@ -185,7 +186,7 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().status, DiagnosticLogs::StatusEnum::kNoLogs);
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kNoLogs); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
@@ -201,7 +202,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().status, DiagnosticLogs::StatusEnum::kNoLogs);
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kNoLogs); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 } // namespace app
