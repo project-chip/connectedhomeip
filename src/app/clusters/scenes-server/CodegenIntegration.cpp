@@ -30,11 +30,11 @@
 
 // Cluster configuration sets values based on this. Ensure config is valid.
 // This means it is NOT sufficient to just set the SCENES_MANAGEMENT_TABLE_SIZE in ZAP, but rather
-// the CHIP_CONFIG must be updated
+// the CHIP_CONFIG must be updated.
 
 #if defined(SCENES_MANAGEMENT_TABLE_SIZE) && SCENES_MANAGEMENT_TABLE_SIZE
-static_assert(chip::scenes::kMaxScenesPerEndpoint == SCENES_MANAGEMENT_TABLE_SIZE,
-              "ZAP configuration and CHIP_CONFIG_MAX_SCENES_TABLE_SIZE must be identical.");
+static_assert(chip::scenes::kMaxScenesPerEndpoint >= SCENES_MANAGEMENT_TABLE_SIZE,
+              "ZAP configuration for scenes table should be at most CHIP_CONFIG_MAX_SCENES_TABLE_SIZE");
 #endif
 
 using SceneTable = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
