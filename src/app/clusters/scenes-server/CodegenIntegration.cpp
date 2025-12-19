@@ -48,7 +48,7 @@ class DefaultScenesManagementTableProvider : public ScenesManagementTableProvide
 public:
     void SetParameters(EndpointId endpointId, uint16_t endpointTableSize)
     {
-        mEndpointId         = endpointId;
+        mEndpointId        = endpointId;
         mEndpointTableSize = endpointTableSize;
     }
     EndpointId GetEndpointId() const { return mEndpointId; }
@@ -57,15 +57,15 @@ public:
     void Release(ScenesManagementSceneTable *) override {}
 
 private:
-    EndpointId mEndpointId       = kInvalidEndpointId;
+    EndpointId mEndpointId      = kInvalidEndpointId;
     uint16_t mEndpointTableSize = scenes::kMaxScenesPerEndpoint;
 };
 
-constexpr size_t kScenesmanagementFixedClusterCount = StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kScenesmanagementMaxClusterCount = kScenesmanagementFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kScenesManagementFixedClusterCount = StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kScenesManagementMaxClusterCount = kScenesManagementFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<ScenesManagementCluster> gServers[kScenesmanagementMaxClusterCount];
-DefaultScenesManagementTableProvider gTableProviders[kScenesmanagementMaxClusterCount];
+LazyRegisteredServerCluster<ScenesManagementCluster> gServers[kScenesManagementMaxClusterCount];
+DefaultScenesManagementTableProvider gTableProviders[kScenesManagementMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -121,8 +121,8 @@ ScenesManagementCluster * FindClusterOnEndpoint(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = ScenesManagement::Id,
-            .fixedClusterInstanceCount = kScenesmanagementFixedClusterCount,
-            .maxClusterInstanceCount   = kScenesmanagementMaxClusterCount,
+            .fixedClusterInstanceCount = kScenesManagementFixedClusterCount,
+            .maxClusterInstanceCount   = kScenesManagementMaxClusterCount,
         },
         integrationDelegate);
     return static_cast<ScenesManagementCluster *>(cluster);
@@ -219,8 +219,8 @@ void MatterScenesManagementClusterInitCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = ScenesManagement::Id,
-            .fixedClusterInstanceCount = kScenesmanagementFixedClusterCount,
-            .maxClusterInstanceCount   = kScenesmanagementMaxClusterCount,
+            .fixedClusterInstanceCount = kScenesManagementFixedClusterCount,
+            .maxClusterInstanceCount   = kScenesManagementMaxClusterCount,
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
@@ -235,8 +235,8 @@ void MatterScenesManagementClusterShutdownCallback(EndpointId endpointId, Matter
         {
             .endpointId                = endpointId,
             .clusterId                 = ScenesManagement::Id,
-            .fixedClusterInstanceCount = kScenesmanagementFixedClusterCount,
-            .maxClusterInstanceCount   = kScenesmanagementMaxClusterCount,
+            .fixedClusterInstanceCount = kScenesManagementFixedClusterCount,
+            .maxClusterInstanceCount   = kScenesManagementMaxClusterCount,
         },
         integrationDelegate, shutdownType);
 }
