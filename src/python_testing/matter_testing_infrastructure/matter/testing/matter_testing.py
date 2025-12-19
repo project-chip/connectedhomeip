@@ -62,6 +62,7 @@ from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.tlv import uint
+from matter.exceptions import ChipStackError
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -1384,7 +1385,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                         try:
                             controller.ExpireSessions(self.dut_node_id)
                             LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
-                        except Exception as e:
+                        except ChipStackError as e:
                             LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
 
     async def request_device_reboot(self):
