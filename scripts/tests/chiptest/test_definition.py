@@ -21,13 +21,13 @@ import subprocess
 import tempfile
 import threading
 import time
+import typing
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, StrEnum, auto
 from pathlib import Path
 from types import MappingProxyType
-import typing
 
 from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
