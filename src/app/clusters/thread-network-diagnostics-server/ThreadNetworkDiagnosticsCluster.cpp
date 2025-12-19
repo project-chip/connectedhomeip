@@ -35,8 +35,8 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId,
                                                                  const BitFlags<ThreadNetworkDiagnostics::Feature> features,
                                                                  const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mActiveTs(config.activeTs), mPendingTs(config.pendingTs), mDelay(config.delay)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mActiveTs(config.activeTs),
+    mPendingTs(config.pendingTs), mDelay(config.delay)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -142,6 +142,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
         { mFeatures.Has(Feature::kMACCounts), TxDataCount::kMetadataEntry },
         { mFeatures.Has(Feature::kMACCounts), TxDataPollCount::kMetadataEntry },
         { mFeatures.Has(Feature::kMACCounts), TxBeaconCount::kMetadataEntry },
+        { mFeatures.Has(Feature::kMACCounts), TxBeaconRequestCount::kMetadataEntry },
         { mFeatures.Has(Feature::kMACCounts), TxOtherCount::kMetadataEntry },
         { mFeatures.Has(Feature::kMACCounts), TxRetryCount::kMetadataEntry },
         { mFeatures.Has(Feature::kMACCounts), TxRetryCount::kMetadataEntry },

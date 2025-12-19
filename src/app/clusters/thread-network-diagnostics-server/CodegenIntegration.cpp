@@ -49,9 +49,24 @@ public:
     {
         const BitFlags<Feature> featureMap(rawFeatureMap);
 
-        bool activeTs  = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
-        bool pendingTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
-        bool delay     = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
+        bool activeTs{};
+        bool pendingTs{};
+        bool delay{};
+
+        if (AttributeSet(optionalAttributeBits).IsSet(ActiveTimestamp::Id))
+        {
+            activeTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
+        }
+
+        if (AttributeSet(optionalAttributeBits).IsSet(PendingTimestamp::Id))
+        {
+            pendingTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
+        }
+
+        if (AttributeSet(optionalAttributeBits).IsSet(Delay::Id))
+        {
+            delay = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
+        }
 
         gServers[clusterInstanceIndex].Create(
             endpointId, featureMap,
