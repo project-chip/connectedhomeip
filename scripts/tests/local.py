@@ -362,13 +362,35 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
         )
     )
 
-    targets.append(ApplicationTarget(key="ALL_DEVICES_APP", target=f"{target_prefix}-all-devices-app", binary="all-devices-app"))
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ALL_DEVICES_APP",
+            cli_key="all-devices",
+            target=f"{target_prefix}-all-devices-app",
+            binary="all-devices-app"
+        )
+    )
 
-    targets.append(ApplicationTarget(key="CAMERA_CONTROLLER_APP",
-                   target=f"{target_prefix}-camera-controller", binary="chip-camera-controller"))
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CAMERA_CONTROLLER_APP",
+            cli_key="camera-controller",
+            target=f"{target_prefix}-camera-controller",
+            binary="chip-camera-controller"
+        )
+    )
 
-    targets.append(ApplicationTarget(key="WATER_LEAK_DETECTOR_APP",
-                   target=f"{target_prefix}-water-leak-detector-{suffix}", binary="water-leak-detector-app"))
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="WATER_LEAK_DETECTOR_APP",
+            cli_key="water-leak-detector",
+            target=f"{target_prefix}-water-leak-detector-{suffix}",
+            binary="water-leak-detector-app"
+        )
+    )
 
     return targets
 
@@ -627,7 +649,7 @@ def _specify_target_path(target: ApplicationTarget, runner) -> Iterable[str]:
     """
     path = f"./out/{target.target}/{target.binary}"
     path = _maybe_with_runner(target.cli_key, path, runner)
-    return [f"--{target.kind}-path", f"{target.cli_key}:{path}"]
+    return [f"--{target.kind.value}-path", f"{target.cli_key}:{path}"]
 
 
 @dataclass

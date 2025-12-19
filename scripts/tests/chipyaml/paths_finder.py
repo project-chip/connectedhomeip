@@ -47,7 +47,7 @@ class PathsFinder:
 
         return None
 
-    def _find_from_root(self, root: str, target_name: str) -> typing.Optional[str]:
+    def _find_from_root(self, root: str, target_name: str) -> Path | None:
         for path in Path(root).rglob(target_name):
             if not path.is_file() or path.name != target_name:
                 continue

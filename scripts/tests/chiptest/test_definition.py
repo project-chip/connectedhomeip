@@ -520,9 +520,6 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = subproc_info_repo['matter-repl-yaml-tester'].with_args(
-                    '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
-
                 assert 'matter-repl-yaml-tester' in subproc_info_repo, \
                     "Matter REPL YAML tester should have been set for selected test runtime"
                 python_cmd = subproc_info_repo['matter-repl-yaml-tester'].with_args(

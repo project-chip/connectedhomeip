@@ -65,7 +65,7 @@ class RunContext:
     find_path: typing.List[str]
 
     # Deprecated options passed to `cmd_run`
-    deprecated_chip_tool_path: Path
+    deprecated_chip_tool_path: Path | None
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -247,8 +247,9 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     tests_filtered.sort(key=lambda x: x.name)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
-                             runtime=runtime, find_path=find_path,
-                             deprecated_chip_tool_path=Path(chip_tool))
+                             runtime=runtime, find_path=find_path)
+    if chip_tool:
+        context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
 
 @main.command(
