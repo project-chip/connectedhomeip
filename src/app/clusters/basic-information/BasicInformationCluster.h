@@ -72,7 +72,7 @@ public:
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,

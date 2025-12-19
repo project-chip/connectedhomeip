@@ -199,7 +199,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
@@ -228,7 +228,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, persistedLabel);
     EXPECT_TRUE(persistedLabel.Content().data_equal(newLabelSpan));
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
@@ -368,7 +368,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
     ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(newLabel));
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
@@ -399,7 +399,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
@@ -433,7 +433,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
         EXPECT_EQ(readValue, finalValue);
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace
