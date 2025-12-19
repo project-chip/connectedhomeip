@@ -584,8 +584,7 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                         logger.debug(f" --- connect_wifi_mac: Gateway ping failed (non-critical): {ping_e}")
 
                     return ConnectionResult(0, "")
-                else:
-                    logger.warning(f" --- connect_wifi_mac: No IP address yet on {interface}")
+                logger.warning(f" --- connect_wifi_mac: No IP address yet on {interface}")
 
                 if verify_attempt < 5:
                     await asyncio.sleep(3)
