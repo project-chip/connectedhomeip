@@ -120,7 +120,7 @@ public:
     /// MUST be called while started up.
     CHIP_ERROR ClearPersistentData();
 
-    // Ingeration methods for other cluster integrations
+    // Integration methods for other cluster integrations
     CHIP_ERROR GroupWillBeRemoved(FabricIndex aFabricIdx, GroupId aGroupId);
     CHIP_ERROR MakeSceneInvalid(FabricIndex aFabricIdx);
     CHIP_ERROR StoreCurrentScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);

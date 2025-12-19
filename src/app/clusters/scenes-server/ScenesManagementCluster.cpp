@@ -484,7 +484,7 @@ CHIP_ERROR ScenesManagementCluster::Startup(ServerClusterContext & context)
 
 CHIP_ERROR ScenesManagementCluster::ClearPersistentData()
 {
-    // For the persistent storage to be likely correct, we enfoce cluster to be started up
+    // For the persistent storage to be likely correct, we enforce cluster to be started up
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ScopedSceneTable sceneTable(mSceneTableProvider);
@@ -959,7 +959,7 @@ ScenesManagementCluster::HandleCopyScene(FabricIndex fabricIndex, const ScenesMa
 
     // Copying a scene over an existing one should be ok. At this point we:
     //  - check if we overwrite a scene (then capacity is ok)
-    //  - adding a new slot (in this case we have to check cpacity)
+    //  - adding a new slot (in this case we have to check capacity)
     // Check if the destination scene already exists
     SceneTableEntry destScene(SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo));
     CHIP_ERROR err = sceneTable->GetSceneTableEntry(fabricIndex, destScene.mStorageId, destScene);
