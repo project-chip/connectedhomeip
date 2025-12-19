@@ -864,7 +864,7 @@ tests:
               - name: "SceneID"
                 value: 0x0003
 
-    - label: "TH3 copies Scene 0x01 from G1 to 0x02 in G1"
+    - label: "TH3 copies Scene 0x01 from G1 to 0x02 in G1 (no overwrite)"
       cluster: "Scenes Management"
       identity: "beta"
       command: "CopyScene"
@@ -879,7 +879,7 @@ tests:
               - name: "GroupIdentifierTo"
                 value: G1
               - name: "SceneIdentifierTo"
-                value: 0x04
+                value: 0x05
       response:
           values:
               - name: "Status"
