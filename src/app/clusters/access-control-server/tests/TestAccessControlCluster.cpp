@@ -23,17 +23,17 @@
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
-#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/AccessControl/Enums.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/Span.h>
-#include <vector>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include <app-common/zap-generated/cluster-objects.h>
 #endif
