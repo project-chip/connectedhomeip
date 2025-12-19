@@ -16,6 +16,7 @@
  */
 #include <devices/Types.h>
 #include <devices/chime/ChimeDevice.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
@@ -45,12 +46,12 @@ void ChimeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     SingleEndpointUnregistration(provider);
     if (mChimeCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mChimeCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mChimeCluster.Cluster()));
         mChimeCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mIdentifyCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
 }
