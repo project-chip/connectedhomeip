@@ -870,8 +870,15 @@ ScenesManagementCluster::HandleRecallScene(FabricIndex fabricIndex,
     CHIP_ERROR err = RecallSceneParse(fabricIndex, req.groupID, req.sceneID, req.transitionTime);
 
     // TODO : implement proper mapping between CHIP_ERROR and IM Status
-    VerifyOrReturnValue(CHIP_NO_ERROR != err, Status::Success);
-    VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
+    if (CHIP_NO_ERROR == err)
+    {
+        return Status::Success;
+    }
+
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        return Status::NotFound;
+    }
 
     return StatusIB(err).mStatus;
 }
