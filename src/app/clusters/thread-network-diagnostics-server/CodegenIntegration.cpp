@@ -53,20 +53,9 @@ public:
         bool pendingTs{};
         bool delay{};
 
-        if (AttributeSet(optionalAttributeBits).IsSet(ActiveTimestamp::Id))
-        {
-            activeTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
-        }
-
-        if (AttributeSet(optionalAttributeBits).IsSet(PendingTimestamp::Id))
-        {
-            pendingTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
-        }
-
-        if (AttributeSet(optionalAttributeBits).IsSet(Delay::Id))
-        {
-            delay = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
-        }
+        activeTs  = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
+        pendingTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
+        delay     = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
 
         gServers[clusterInstanceIndex].Create(
             endpointId, featureMap,
