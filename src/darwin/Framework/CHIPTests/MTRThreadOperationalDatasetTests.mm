@@ -91,7 +91,7 @@
     
     NSData * data = [NSData dataWithBytes:kValidExampleDataset length:sizeof(kValidExampleDataset)];
     MTRThreadOperationalDataset * dataset = [[MTRThreadOperationalDataset alloc] initWithData:data];
-    XCTAssertNotNil(data);
+    XCTAssertNotNil(dataset);
 
     XCTAssertEqualObjects(dataset.channelNumber, @15);
     XCTAssertEqualObjects(dataset.networkName, @"OpenThread-5938");
