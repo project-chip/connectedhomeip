@@ -122,7 +122,7 @@ struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluste
 
     void TearDown() override
     {
-        mCluster.Shutdown(ClusterShutdownType::klkClusterShutdown);
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         // Restore the previous provider to avoid use-after-free issues
         Access::GetAccessControl().SetAccessRestrictionProvider(mPreviousProvider);
     }
