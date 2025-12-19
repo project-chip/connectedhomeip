@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/mock/Constants.h>
@@ -686,6 +688,7 @@ public:
         ASSERT_NE(sceneTable, nullptr);
         ASSERT_EQ(sceneTable->Init(*mpTestStorage), CHIP_NO_ERROR);
         SetMockNodeConfig(SceneMockNodeConfig);
+        app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&app::CodegenDataModelProvider::Instance());
     }
 
     static void TearDownTestSuite()
