@@ -277,15 +277,14 @@ inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoP
 
 namespace chip::app::Clusters {
 
-DataModel::ActionReturnStatus
-BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                             AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                     AttributeValueEncoder & encoder)
 {
     using namespace BasicInformation::Attributes;
 
     DeviceInstanceInfoProvider * deviceInfoProvider;
     ReturnErrorOnFailure(GetDeviceInstanceInfoProviderImpl(&deviceInfoProvider));
-    auto & configManager              = ConfigurationMgr();
+    auto & configManager = ConfigurationMgr();
 
     switch (request.path.mAttributeId)
     {
@@ -361,16 +360,14 @@ BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & r
     }
 }
 
-DataModel::ActionReturnStatus
-BasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                              AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                      AttributeValueDecoder & decoder)
 {
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
-DataModel::ActionReturnStatus
-BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                                                         AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                 AttributeValueDecoder & decoder)
 {
     using namespace BasicInformation::Attributes;
 
@@ -391,8 +388,8 @@ BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & requ
         return persistence.StoreString(request.path, mNodeLabel);
     }
     case LocalConfigDisabled::Id: {
-        auto deviceInfoProvider = GetDeviceInstanceInfoProvider();
-        bool localConfigDisabled        = false;
+        auto deviceInfoProvider  = GetDeviceInstanceInfoProvider();
+        bool localConfigDisabled = false;
         ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
         auto decodeStatus = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, localConfigDisabled);
         ReturnErrorOnFailure(deviceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
@@ -403,8 +400,8 @@ BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & requ
     }
 }
 
-CHIP_ERROR BasicInformationCluster::Attributes(
-    const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
     DataModel::AttributeEntry optionalAttributes[] = {
@@ -489,14 +486,14 @@ void BasicInformationCluster::OnShutDown()
     eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
-CHIP_ERROR BasicInformationCluster::GetDeviceInstanceInfoProviderImpl(
-    DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider)
+CHIP_ERROR
+BasicInformationCluster::GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider)
 {
     if (mDeviceInfoProvider == nullptr)
     {
         // NOTE: this should NEVER be nullptr
         *outDeviceInfoProvider = GetDeviceInstanceInfoProvider();
-        VerifyOrReturn(*outDeviceInfoProvider!=nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturn(*outDeviceInfoProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {

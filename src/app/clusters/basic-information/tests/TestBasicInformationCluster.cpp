@@ -188,17 +188,16 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
     // All attributes
     {
-        const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet =
-            BasicInformationCluster::OptionalAttributesSet()
-                .Set<ManufacturingDate::Id>()
-                .Set<PartNumber::Id>()
-                .Set<ProductURL::Id>()
-                .Set<ProductLabel::Id>()
-                .Set<SerialNumber::Id>()
-                .Set<LocalConfigDisabled::Id>()
-                .Set<Reachable::Id>()
-                .Set<ProductAppearance::Id>()
-                .Set<UniqueID::Id>();
+        const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet = BasicInformationCluster::OptionalAttributesSet()
+                                                                                        .Set<ManufacturingDate::Id>()
+                                                                                        .Set<PartNumber::Id>()
+                                                                                        .Set<ProductURL::Id>()
+                                                                                        .Set<ProductLabel::Id>()
+                                                                                        .Set<SerialNumber::Id>()
+                                                                                        .Set<LocalConfigDisabled::Id>()
+                                                                                        .Set<Reachable::Id>()
+                                                                                        .Set<ProductAppearance::Id>()
+                                                                                        .Set<UniqueID::Id>();
 
         BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
 
