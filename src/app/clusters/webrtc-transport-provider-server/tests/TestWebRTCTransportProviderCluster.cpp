@@ -203,7 +203,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
     chip::Testing::ClusterTester tester(server);
 
     // Test reading cluster revision
-    chip::app::Clusters::Globals::Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
+    chip::app::Clusters::Globals::Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = 0;
     auto status = tester.ReadAttribute(chip::app::Clusters::Globals::Attributes::ClusterRevision::Id, clusterRevision);
     EXPECT_TRUE(status.IsSuccess());
     EXPECT_EQ(clusterRevision, WebRTCTransportProvider::kRevision);
