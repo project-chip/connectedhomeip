@@ -95,10 +95,8 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     NoopBreadcrumbTracker tracker;
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-    chip::Testing::TestServerClusterContext context;
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
     ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     {
         // no notification if enable fails
