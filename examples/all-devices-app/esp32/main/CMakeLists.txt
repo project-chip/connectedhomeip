@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip
 get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
+                      "${CMAKE_CURRENT_LIST_DIR}"
                       "${ALL_DEVICES_COMMON_DIR}"
                       "${CHIP_ROOT}/examples/providers"
 )
@@ -26,6 +27,7 @@ set(PRIV_INCLUDE_DIRS_LIST
 # Application sources
 set(APP_SRCS
     "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/DeviceShellCommands.cpp"
     # All-devices common sources
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
@@ -33,6 +35,8 @@ set(APP_SRCS
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     # Providers
     "${CHIP_ROOT}/examples/providers/DeviceInfoProviderImpl.cpp"
+    # Shell extension
+    "${CHIP_ROOT}/examples/platform/esp32/shell_extension/launch.cpp"
 )
 
 # Code-driven data model provider sources

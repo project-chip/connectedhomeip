@@ -29,13 +29,19 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
+#include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include <memory>
+#include <string>
+
 #if CONFIG_ENABLE_CHIP_SHELL
+#include <DeviceShellCommands.h>
 #include <lib/shell/commands/WiFi.h>
+#include <shell_extension/launch.h>
 #endif
 
 #ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
@@ -60,8 +66,16 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 using namespace chip::Credentials;
+using chip::DeviceLayer::Internal::ESP32Config;
 
 static const char TAG[] = "all-devices-app";
+
+// NVS key for storing the device type across reboots
+static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
+
+static std::string gDeviceType = "contact-sensor";
+
+static const size_t kMaxDeviceTypeLength = 64;
 
 namespace {
 
@@ -95,7 +109,6 @@ void DeInitBLEIfCommissioned()
 #endif
 }
 
-// Event handler - mirrors CommonDeviceCallbacks functionality
 void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     switch (event->Type)
@@ -191,7 +204,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     }
 
     // Default to contact-sensor device type
-    const char * deviceType = CONFIG_ALL_DEVICES_DEVICE_TYPE;
+    const char * deviceType = gDeviceType.c_str();
     gConstructedDevice      = DeviceFactory::GetInstance().Create(deviceType);
     if (gConstructedDevice == nullptr)
     {
@@ -229,6 +242,17 @@ void InitServer(intptr_t context)
         return;
     }
 
+    // Save device type to NVS only after successful device creation
+    err = ESP32Config::WriteConfigValueStr(kConfigKey_DeviceType, gDeviceType.c_str());
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGW(TAG, "Failed to save device type to NVS: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Device type '%s' saved to NVS", gDeviceType.c_str());
+    }
+
     err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
     {
@@ -239,12 +263,18 @@ void InitServer(intptr_t context)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::SetWiFiDriver(&sWiFiDriver);
 #endif
-
-    // Print QR Code URL
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 }
 
 } // namespace
+
+void InitServerWithDeviceType(std::string deviceType)
+{
+    // Set the device type (store the actual string, not a pointer to temporary)
+    gDeviceType = std::move(deviceType);
+
+    // Init the server
+    PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+}
 
 extern "C" void app_main()
 {
@@ -310,5 +340,30 @@ extern "C" void app_main()
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+    chip::Shell::DeviceCommands::GetInstance().Register();
+#endif // CONFIG_ENABLE_CHIP_SHELL
+
+    // Check if device type is stored in NVS from a previous boot
+    char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
+    size_t storedLen                            = 0;
+    CHIP_ERROR nvsErr =
+        ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
+
+    if (nvsErr == CHIP_NO_ERROR && storedLen > 0)
+    {
+        ESP_LOGI(TAG, "==================================================");
+        ESP_LOGI(TAG, "Found stored device type: %s", storedDeviceType);
+        ESP_LOGI(TAG, "Auto-initializing...");
+        ESP_LOGI(TAG, "==================================================");
+        InitServerWithDeviceType(std::string(storedDeviceType));
+    }
+    else
+    {
+        ESP_LOGI(TAG, "==================================================");
+        ESP_LOGI(TAG, "No stored device type found.");
+        ESP_LOGI(TAG, "Use command: device set <device-type>");
+        ESP_LOGI(TAG, "==================================================");
+    }
 }

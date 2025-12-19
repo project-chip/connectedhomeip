@@ -20,60 +20,6 @@
 
 menu "Demo"
 
-    choice
-        prompt "ESP32 Device Type"
-        default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
-        default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
-        default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
-        default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
-        default DEVICE_TYPE_ESP32_H2_DEVKITM if IDF_TARGET_ESP32H2
-        default DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD if IDF_TARGET_ESP32P4
-        help
-            Specifies the type of ESP32 device.
-
-            Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
-            available from third-party manufacturers.
-
-        config DEVICE_TYPE_ESP32_DEVKITC
-            bool "ESP32-DevKitC"
-            depends on IDF_TARGET_ESP32
-        config DEVICE_TYPE_ESP32_WROVER_KIT
-            bool "ESP32-WROVER-KIT_V4.1"
-            depends on IDF_TARGET_ESP32
-        config DEVICE_TYPE_ESP32_C3_DEVKITM
-            bool "ESP32C3-DevKitM"
-            depends on IDF_TARGET_ESP32C3
-        config DEVICE_TYPE_ESP32_C2_DEVKITM
-            bool "ESP32C2-DevKitM"
-            depends on IDF_TARGET_ESP32C2
-        config DEVICE_TYPE_ESP32_C6_DEVKITC
-            bool "ESP32C6-DevKitC"
-            depends on IDF_TARGET_ESP32C6
-        config DEVICE_TYPE_ESP32_H2_DEVKITM
-            bool "ESP32H2-DevKitM"
-            depends on IDF_TARGET_ESP32H2
-        config DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD
-            bool "ESP32P4 Function EV Board"
-            depends on IDF_TARGET_ESP32P4
-    endchoice
-
-    choice
-        prompt "Matter Device Type"
-        default ALL_DEVICES_TYPE_CONTACT_SENSOR
-        help
-            Specifies the Matter device type to emulate.
-
-        config ALL_DEVICES_TYPE_CONTACT_SENSOR
-            bool "Contact Sensor"
-        config ALL_DEVICES_TYPE_WATER_LEAK_DETECTOR
-            bool "Water Leak Detector"
-    endchoice
-
-    config ALL_DEVICES_DEVICE_TYPE
-        string
-        default "contact-sensor" if ALL_DEVICES_TYPE_CONTACT_SENSOR
-        default "water-leak-detector" if ALL_DEVICES_TYPE_WATER_LEAK_DETECTOR
-
     config ALL_DEVICES_ENDPOINT
         int "Device Endpoint ID"
         default 1
@@ -81,41 +27,4 @@ menu "Demo"
         help
             The endpoint ID to use for the device.
 
-    choice
-      prompt "Rendezvous Mode"
-      default RENDEZVOUS_MODE_BLE if BT_ENABLED
-      default RENDEZVOUS_MODE_WIFI
-      help
-          Specifies the Rendezvous mode of the peripheral.
-
-      config RENDEZVOUS_MODE_WIFI
-          bool "Wi-Fi"
-      config RENDEZVOUS_MODE_BLE
-          bool "BLE"
-          depends on BT_ENABLED
-      config RENDEZVOUS_MODE_ON_NETWORK
-          bool "On-Network"
-      config RENDEZVOUS_MODE_BLE_ON_NETWORK
-          bool "BLE / On-Network"
-          depends on BT_ENABLED
-    endchoice
-
-    config RENDEZVOUS_MODE
-       int
-       range 0 8
-       default 1 if RENDEZVOUS_MODE_WIFI
-       default 2 if RENDEZVOUS_MODE_BLE
-       default 4 if RENDEZVOUS_MODE_ON_NETWORK
-       default 6 if RENDEZVOUS_MODE_BLE_ON_NETWORK
-
-    config STATUS_LED_GPIO_NUM
-        int
-        range 0 48
-        default 2 if DEVICE_TYPE_ESP32_DEVKITC
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM || DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD
-        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
-        help
-            Each board has a status led, define its pin number.
-
 endmenu
-
