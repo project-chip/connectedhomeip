@@ -493,7 +493,7 @@ BasicInformationCluster::GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceIn
     {
         // NOTE: this should NEVER be nullptr
         *outDeviceInfoProvider = GetDeviceInstanceInfoProvider();
-        VerifyOrReturn(*outDeviceInfoProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(*outDeviceInfoProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {
