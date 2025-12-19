@@ -24,6 +24,7 @@ import asyncio
 import logging
 import os
 import pathlib
+import shlex
 import subprocess
 import sys
 import threading
@@ -32,7 +33,7 @@ from typing import IO, Any, Union
 
 import sdbus
 
-from .runner import Executor, LogPipe, SubprocessInfo
+from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
@@ -145,15 +146,20 @@ class IsolatedNetworkNamespace:
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
 
-        self._setup()
-        if setup_app_link_up:
-            self.setup_app_link_up(wait_for_dad=False)
-        if setup_tool_link_up:
-            self._setup_tool_link_up(wait_for_dad=False)
-        self._wait_for_duplicate_address_detection()
+        try:
+            self._setup()
+            if setup_app_link_up:
+                self.setup_app_link_up(wait_for_dad=False)
+            if setup_tool_link_up:
+                self._setup_tool_link_up(wait_for_dad=False)
+            self._wait_for_duplicate_address_detection()
+        except BaseException:
+            # Ensure that we leave a clean state on any exception.
+            self.terminate()
+            raise
 
-    def netns_for_subprocess(self, subproc: SubprocessInfo):
-        return "{}-{}".format(subproc.kind, self.index)
+    def netns_for_subprocess_kind(self, kind: SubprocessKind):
+        return "{}-{}".format(kind.name.lower(), self.index)
 
     def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
@@ -185,13 +191,16 @@ class IsolatedNetworkNamespace:
         for c in command:
             c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
             log.debug("Executing: '%s'", c)
-            if subprocess.run(c.split()).returncode != 0:
-                log.error("Failed to execute '%s'", c)
-                log.error("Are you using --privileged if running in docker?")
-                sys.exit(1)
+            if subprocess.run(shlex.split(c)).returncode != 0:
+                raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
-        self._run(*self.COMMANDS_TERMINATE)
+        """Execute all down commands gracefully omitting errors."""
+        for cmd in self.COMMANDS_TERMINATE:
+            try:
+                self._run(cmd)
+            except Exception as e:
+                log.warning("Encountered error during namespace termination: %s", e)
 
 
 class LinuxNamespacedExecutor(Executor):
@@ -201,7 +210,7 @@ class LinuxNamespacedExecutor(Executor):
 
     def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
             stderr: IO[Any] | LogPipe | None = None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess(subproc))
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
         return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
 
 
