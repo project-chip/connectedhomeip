@@ -61,8 +61,8 @@ public:
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
 
-        EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+        EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer,
+                                               logStorageResources, &mEventCounter);
     }
 
     void TearDown() override
