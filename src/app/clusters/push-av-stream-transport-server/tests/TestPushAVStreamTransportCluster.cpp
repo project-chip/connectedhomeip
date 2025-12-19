@@ -41,80 +41,48 @@
 namespace chip {
 namespace app {
 
-class MockCommandHandler : public Testing::MockCommandHandler
-{
-public:
-    ~MockCommandHandler() override {}
-
-    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
-    {
-        return FallibleAddStatus(aRequestCommandPath,
-                                 Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
-    }
-
-    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
-    {
-        return FallibleAddStatus(aRequestCommandPath,
-                                 Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
-    }
-
-    // Override base class methods for testing
-    bool IsTimedInvoke() const override { return mIsTimedInvoke; }
-    void FlushAcksRightAwayOnSlowCommand() override { mAcksFlushed = true; }
-    Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
-
-    // Configuration methods for testing
-    void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
-    void SetExchangeContext(Messaging::ExchangeContext * context) { mExchangeContext = context; }
-
-private:
-    bool mIsTimedInvoke                           = false;
-    bool mAcksFlushed                             = false;
-    Messaging::ExchangeContext * mExchangeContext = nullptr;
-};
-
 static uint8_t gDebugEventBuffer[120];
 static uint8_t gInfoEventBuffer[120];
 static uint8_t gCritEventBuffer[120];
-static chip::app::CircularEventBuffer gCircularEventBuffer[3];
+static CircularEventBuffer gCircularEventBuffer[3];
 
-class MockEventLogging : public chip::Testing::AppContext
+class MockEventLogging : public Testing::AppContext
 {
 public:
     void SetUp() override
     {
-        const chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+        const LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), PriorityLevel::Critical },
         };
 
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
 
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources),
+        EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
     void TearDown() override
     {
-        chip::app::EventManagement::DestroyEventManagement();
+        EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
 
 private:
-    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
 
-static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents, chip::app::PriorityLevel aPriority)
+static void CheckLogState(EventManagement & aLogMgmt, size_t expectedNumEvents, PriorityLevel aPriority)
 {
-    chip::TLV::TLVReader reader;
+    TLV::TLVReader reader;
     size_t elementCount;
-    chip::app::CircularEventBufferWrapper bufWrapper;
+    CircularEventBufferWrapper bufWrapper;
     EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
 
-    EXPECT_EQ(chip::TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
+    EXPECT_EQ(TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
 
     EXPECT_EQ(elementCount, expectedNumEvents);
 }
@@ -131,7 +99,7 @@ using TransportTriggerOptionsDecodableStruct           = Structs::TransportTrigg
 using TransportMotionTriggerTimeControlDecodableStruct = Structs::TransportMotionTriggerTimeControlStruct::DecodableType;
 using TransportOptionsDecodableStruct                  = Structs::TransportOptionsStruct::DecodableType;
 
-using namespace chip::Protocols::InteractionModel;
+using namespace Protocols::InteractionModel;
 
 struct PushAvStream
 {
@@ -388,8 +356,8 @@ public:
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
@@ -400,7 +368,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
     std::string url = "https://192.168.1.100:554/stream/";
@@ -529,7 +496,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
     std::string url = "https://192.168.1.100:554/stream/";
@@ -619,7 +585,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
-    MockCommandHandler commandHandler;
+    Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
     Commands::AllocatePushTransport::DecodableType commandData;
@@ -746,7 +712,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     DataModel::ReadAttributeRequest request;
     request.path = path;
     request.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
-    chip::DataVersion dataVersion(0);
+    DataVersion dataVersion(0);
     Access::SubjectDescriptor subjectDescriptor;
     FabricIndex peerFabricIndex   = 1;
     subjectDescriptor.fabricIndex = peerFabricIndex;
@@ -866,7 +832,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     /*
      * Test DeallocatePushTransport
      */
-    MockCommandHandler deallocateCommandHandler;
+    Testing::MockCommandHandler deallocateCommandHandler;
     deallocateCommandHandler.SetFabricIndex(1);
     ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
     Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
@@ -890,7 +856,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
     std::string url = "https://192.168.1.100:554/stream/";
@@ -980,7 +945,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
-    MockCommandHandler commandHandler;
+    Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
     Commands::AllocatePushTransport::DecodableType commandData;
@@ -1076,7 +1041,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    MockCommandHandler modifyCommandHandler;
+    Testing::MockCommandHandler modifyCommandHandler;
     modifyCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kModifyCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
@@ -1092,7 +1057,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
      * Test FindPushTransport
      */
 
-    MockCommandHandler findCommandHandler;
+    Testing::MockCommandHandler findCommandHandler;
     findCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kFindCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::FindTransport::Id };
@@ -1199,7 +1164,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
     std::string url = "https://192.168.1.100:554/stream/";
@@ -1289,7 +1253,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
-    MockCommandHandler commandHandler;
+    Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
     Commands::AllocatePushTransport::DecodableType commandData;
@@ -1306,7 +1270,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
      * Test SetTransportStatus
      */
 
-    MockCommandHandler setCommandHandler;
+    Testing::MockCommandHandler setCommandHandler;
     setCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kSetCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::SetTransportStatus::Id };
@@ -1318,7 +1282,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
 
-    MockCommandHandler triggerCommandHandler;
+    Testing::MockCommandHandler triggerCommandHandler;
     triggerCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kTriggerCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ManuallyTriggerTransport::Id };
@@ -1328,9 +1292,9 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     server.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
 
-    chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    EventManagement & logMgmt = EventManagement::GetInstance();
 
-    CheckLogState(logMgmt, 1, chip::app::PriorityLevel::Info);
+    CheckLogState(logMgmt, 1, PriorityLevel::Info);
 }
 
 } // namespace PushAvStreamTransport
