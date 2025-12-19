@@ -40,6 +40,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_command,
                                            run_if_endpoint_matches)
 
@@ -105,37 +106,38 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("0b")
         log.info(f"Sending On command to endpoint {self.endpoint}")
 
-        await self.send_single_cmd(
+        ret = await self.send_single_cmd(
             endpoint=self.endpoint,
             cmd=Clusters.OnOff.Commands.On(),
             node_id=self.dut_node_id)
+        log.info(ret)
         log.info("Lights On!")
 
         self.step("0c")
         color_temp_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorTemperatureMireds, self.TH1, endpoint=self.endpoint)
         log.info(f"Current color temperature response: {color_temp_mireds}")
-        asserts.assert_true(isinstance(color_temp_mireds, int), "Color temperature value should be an integer")
+        matter_asserts.assert_valid_uint16(color_temp_mireds, "Color temperature value should be an integer")
 
         self.step("0d")
         colortemp_physical_min_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorTempPhysicalMinMireds, self.TH1, endpoint=self.endpoint)
         log.info(f"Extracted min mireds value: {colortemp_physical_min_mireds}")
-        asserts.assert_true(isinstance(colortemp_physical_min_mireds, int), "Min mireds value should be an integer")
+        matter_asserts.assert_valid_uint16(colortemp_physical_min_mireds, "Min mireds value should be an integer")
 
         self.step("0e")
         colortemp_physical_max_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorTempPhysicalMaxMireds, self.TH1, endpoint=self.endpoint)
         log.info(f"Extracted max mireds value: {colortemp_physical_max_mireds}")
-        asserts.assert_true(isinstance(colortemp_physical_max_mireds, int), "Max mireds value should be an integer")
+        matter_asserts.assert_valid_uint16(colortemp_physical_max_mireds, "Max mireds value should be an integer")
 
         self.step("1")
         startup_color_temp_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.StartUpColorTemperatureMireds, self.TH1, endpoint=self.endpoint)
         log.info(f"Extracted startup color temperature value: {startup_color_temp_mireds}")
-        asserts.assert_true(startup_color_temp_mireds is not NullValue, "StartUpColorTemperatureMireds is NullValue")
-        asserts.assert_true(isinstance(startup_color_temp_mireds, int),
-                            "Startup color temperature value should be an integer")
+
+        asserts.assert_true(startup_color_temp_mireds is NullValue or matter_asserts.is_valid_uint_value(
+            startup_color_temp_mireds, 16), "Startup color is different from Int[] or NullValue")
         asserts.assert_greater_equal(startup_color_temp_mireds, MIN_STARTUP_COLOR_TEMP,
                                      f"Startup color temperature {startup_color_temp_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
         asserts.assert_less_equal(startup_color_temp_mireds, MAX_STARTUP_COLOR_TEMP,
@@ -148,11 +150,11 @@ class TC_CC_6_5(MatterBaseTest):
         #   StartUpColorTemperatureMireds = (ColorTempPhysicalMaxMireds - ColorTempPhysicalMinMireds)/2 + ColorTempPhysicalMinMireds
         startup_color_temperature_mireds2a = None
         if ((colortemp_physical_max_mireds - colortemp_physical_min_mireds)/2 + colortemp_physical_min_mireds) == color_temp_mireds:
-            startup_color_temperature_mireds2a = (colortemp_physical_max_mireds -
-                                                  colortemp_physical_min_mireds)/4 + colortemp_physical_min_mireds
+            startup_color_temperature_mireds2a = int((colortemp_physical_max_mireds -
+                                                      colortemp_physical_min_mireds)/4 + colortemp_physical_min_mireds)
         else:
-            startup_color_temperature_mireds2a = (colortemp_physical_max_mireds -
-                                                  colortemp_physical_min_mireds)/2 + colortemp_physical_min_mireds
+            startup_color_temperature_mireds2a = int((colortemp_physical_max_mireds -
+                                                      colortemp_physical_min_mireds)/2 + colortemp_physical_min_mireds)
 
         log.info(f"Defined new value for StartUpColorTemperatureMireds with value {startup_color_temperature_mireds2a}")
         # First attempt: Write with minimal parameters
