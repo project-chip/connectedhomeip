@@ -17,7 +17,7 @@
 
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
 
-// most ember implementations will want acces to these
+// most ember implementations will want access to these
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 
 namespace chip::app::Clusters::ScenesManagement {
