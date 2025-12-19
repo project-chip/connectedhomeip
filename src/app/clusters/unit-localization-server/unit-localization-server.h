@@ -20,4 +20,4 @@
 // New code should directly use UnitLocalizationCluster.h instead.
 
 #pragma once
-#include "CodegenIntegration.h"
+#include <app/clusters/unit-localization-server/CodegenIntegration.h>

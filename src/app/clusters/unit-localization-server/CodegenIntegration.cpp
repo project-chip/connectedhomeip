@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include "CodegenIntegration.h"
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/clusters/unit-localization-server/CodegenIntegration.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::UnitLocalization;
