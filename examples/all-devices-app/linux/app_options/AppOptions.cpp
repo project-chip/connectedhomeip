@@ -71,7 +71,7 @@ OptionSet * AppOptions::GetOptions()
     static OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
                                          sAllDevicesAppOptionDefs,   // array of option definitions
                                          "PROGRAM OPTIONS",          // help group
-                                         "-d, --device <contact-sensor|water-leak-detector>\n"
+                                         "-d, --device <contact-sensor|water-leak-detector|occupancy-sensor>\n"
                                          "-e, --endpoint <endpoint-number>\n" };
 
     return &sCmdLineOptions;

@@ -18,6 +18,8 @@
 Handles linux-specific functionality for running test cases
 """
 
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
@@ -27,10 +29,11 @@ import subprocess
 import sys
 import threading
 import time
+from typing import IO, Any, Union
 
 import sdbus
 
-from .runner import Executor, SubprocessInfo, SubprocessKind
+from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
@@ -138,7 +141,7 @@ class IsolatedNetworkNamespace:
     ]
 
     def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
-                 wait_for_dad: bool = True, app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool'):
+                 app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool'):
         self.index = index
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
@@ -146,11 +149,10 @@ class IsolatedNetworkNamespace:
         try:
             self._setup()
             if setup_app_link_up:
-                self._setup_app_link_up(wait_for_dad=False)
+                self.setup_app_link_up(wait_for_dad=False)
             if setup_tool_link_up:
                 self._setup_tool_link_up(wait_for_dad=False)
-            if wait_for_dad:
-                self._wait_for_duplicate_address_detection()
+            self._wait_for_duplicate_address_detection()
         except BaseException:
             # Ensure that we leave a clean state on any exception.
             self.terminate()
@@ -173,18 +175,15 @@ class IsolatedNetworkNamespace:
             log.warning("Some addresses look to still be tentative")
 
     def _setup(self):
-        for command in self.COMMANDS_SETUP:
-            self._run(command)
+        self._run(*self.COMMANDS_SETUP)
 
-    def _setup_app_link_up(self, wait_for_dad=True):
-        for command in self.COMMANDS_APP_LINK_UP:
-            self._run(command)
+    def setup_app_link_up(self, wait_for_dad: bool = True):
+        self._run(*self.COMMANDS_APP_LINK_UP)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def _setup_tool_link_up(self, wait_for_dad=True):
-        for command in self.COMMANDS_TOOL_LINK_UP:
-            self._run(command)
+    def _setup_tool_link_up(self, wait_for_dad: bool = True):
+        self._run(*self.COMMANDS_TOOL_LINK_UP)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
@@ -206,14 +205,16 @@ class IsolatedNetworkNamespace:
 
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
+        super().__init__()
         self.ns = ns
 
-    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
+            stderr: IO[Any] | LogPipe | None = None):
         wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
-        return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
 
 
-class DBusTestSystemBus(subprocess.Popen):
+class DBusTestSystemBus(subprocess.Popen[bytes]):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
     SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
@@ -224,6 +225,7 @@ class DBusTestSystemBus(subprocess.Popen):
                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
         # Wait for the bus to start (it will print the address to stdout).
+        assert self.stdout is not None, "stdout should have been set to subprocess.PIPE"
         self.stdout.readline()
 
     def terminate(self):
@@ -232,13 +234,14 @@ class DBusTestSystemBus(subprocess.Popen):
         self.wait()
 
 
-class BluetoothMock(subprocess.Popen):
+class BluetoothMock(subprocess.Popen[str]):
     """Run a BlueZ mock server in a subprocess."""
 
     # The MAC addresses of the virtual Bluetooth adapters.
     ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
 
     def __forward_stderr(self):
+        assert self.stderr is not None, "stderr should have been set to subprocess.PIPE"
         for line in self.stderr:
             if "adapter[1][00:00:00:22:22:22]" in line:
                 self.event.set()
@@ -256,6 +259,10 @@ class BluetoothMock(subprocess.Popen):
     def terminate(self):
         super().terminate()
         self.wait()
+
+
+DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
+DictVariantT = dict[str, tuple[str, DbusAnyT]]
 
 
 class WpaSupplicantMock(threading.Thread):
@@ -278,12 +285,12 @@ class WpaSupplicantMock(threading.Thread):
         path = "/fi/w1/wpa_supplicant1"
 
         @sdbus.dbus_method_async("a{sv}", "o")
-        async def CreateInterface(self, args) -> str:
+        async def CreateInterface(self, args: DictVariantT) -> str:
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
         @sdbus.dbus_method_async("s", "o")
-        async def GetInterface(self, name) -> str:
+        async def GetInterface(self, name: str) -> str:
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
@@ -293,68 +300,68 @@ class WpaSupplicantMock(threading.Thread):
         state = "disconnected"
         current_network = "/"
 
-        def __init__(self, mock):
+        def __init__(self, mock: WpaSupplicantMock):
             super().__init__()
             self.mock = mock
 
         @sdbus.dbus_method_async("s")
-        async def AutoScan(self, arg):
+        async def AutoScan(self, arg: str) -> None:
             pass
 
         @sdbus.dbus_method_async("a{sv}")
-        async def Scan(self, args):
+        async def Scan(self, args: DictVariantT) -> None:
             pass
 
         @sdbus.dbus_method_async("a{sv}", "o")
-        async def AddNetwork(self, args):
+        async def AddNetwork(self, args: DictVariantT) -> str:
             # Always return our pre-defined mock network.
             return WpaSupplicantMock.WpaNetwork.path
 
         @sdbus.dbus_method_async("o")
-        async def SelectNetwork(self, path):
+        async def SelectNetwork(self, path: str) -> None:
             async def associate():
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
-                self.mock.networking._setup_app_link_up()
+                self.mock.networking.setup_app_link_up()
                 await self.State.set_async("completed")
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
-        async def RemoveNetwork(self, path):
+        async def RemoveNetwork(self, path: str) -> None:
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
-        async def RemoveAllNetworks(self):
+        async def RemoveAllNetworks(self) -> None:
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
-        async def Disconnect(self):
+        async def Disconnect(self) -> None:
             pass
 
         @sdbus.dbus_method_async()
-        async def SaveConfig(self):
+        async def SaveConfig(self) -> None:
             pass
 
         @sdbus.dbus_property_async("s")
-        def State(self):
+        def State(self) -> str:
             return self.state
 
         @State.setter_private
-        def State_setter(self, value):
+        def State_setter(self, value: str) -> None:
             self.state = value
 
         @sdbus.dbus_property_async("o")
-        def CurrentNetwork(self):
+        def CurrentNetwork(self) -> str:
             return self.current_network
 
         @CurrentNetwork.setter_private
-        def CurrentNetwork_setter(self, value):
+        def CurrentNetwork_setter(self, value: str) -> None:
             self.current_network = value
 
         @sdbus.dbus_property_async("s")
-        def CurrentAuthMode(self):
+        def CurrentAuthMode(self) -> str:
             return "WPA2-PSK"
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
@@ -362,20 +369,20 @@ class WpaSupplicantMock(threading.Thread):
         path = "/fi/w1/wpa_supplicant1/Interfaces/1/Networks/1"
         enabled = False
 
-        def __init__(self, mock):
+        def __init__(self, mock: WpaSupplicantMock):
             super().__init__()
             self.mock = mock
 
         @sdbus.dbus_property_async("a{sv}")
-        def Properties(self):
+        def Properties(self) -> DictVariantT:
             return {"ssid": ("s", self.mock.ssid)}
 
         @sdbus.dbus_property_async("b")
-        def Enabled(self):
+        def Enabled(self) -> bool:
             return self.enabled
 
         @Enabled.setter
-        def Enabled_setter(self, value):
+        def Enabled_setter(self, value: bool) -> None:
             self.enabled = value
 
     async def startup(self):
