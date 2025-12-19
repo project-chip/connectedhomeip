@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterInterface.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/AccessControl.h>
@@ -121,7 +122,7 @@ struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluste
 
     void TearDown() override
     {
-        mCluster.Shutdown();
+        mCluster.Shutdown(ClusterShutdownType::klkClusterShutdown);
         // Restore the previous provider to avoid use-after-free issues
         Access::GetAccessControl().SetAccessRestrictionProvider(mPreviousProvider);
     }
@@ -266,7 +267,7 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     ASSERT_EQ(arlCount, 0u);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
