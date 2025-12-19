@@ -335,9 +335,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
                 log.info("Created restart flag file to signal app restart")
-                # Expire sessions and re-establish connections
-                # This sleep allows the app to reconnect before atempt to perform actions.
+                # This sleep allows the app start while waiting for app ready pattern. If not in some cases connections will Drop.
                 sleep(1)
+                # Expire sessions and re-establish connections
                 log.info("Expiring sessions after manual device reboot")
                 self.controller.ExpireSessions(self.requestor_node_id)
                 log.info("App restart completed successfully")

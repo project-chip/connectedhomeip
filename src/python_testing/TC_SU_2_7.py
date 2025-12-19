@@ -45,6 +45,7 @@
 #       --timeout 1800
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
+#     app-ready-pattern: Server initialization complete
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
