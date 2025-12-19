@@ -30,7 +30,7 @@ UnitLocalizationServer & UnitLocalizationServer::Instance()
 
 void MatterUnitLocalizationPluginServerInitCallback()
 {
-    TEMPORARY_RETURN_IGNORED UnitLocalizationServer::Instance().Init();
+    LogErrorOnFailure(UnitLocalizationServer::Instance().Init());
     AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
 }
 
