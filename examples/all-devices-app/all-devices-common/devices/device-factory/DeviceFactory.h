@@ -19,6 +19,7 @@
 
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
@@ -77,6 +78,7 @@ private:
             return std::make_unique<BooleanStateSensorDevice>(
                 &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
+        mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
     }
 };
 

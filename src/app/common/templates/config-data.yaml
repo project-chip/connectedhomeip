@@ -154,9 +154,11 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Chime
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs
+    - Electrical Power Measurement
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
