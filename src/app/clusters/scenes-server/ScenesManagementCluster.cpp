@@ -968,8 +968,9 @@ ScenesManagementCluster::HandleCopyScene(FabricIndex fabricIndex, const ScenesMa
     //  - check if we overwrite a scene (then capacity is ok)
     //  - adding a new slot (in this case we have to check capacity)
     // Check if the destination scene already exists
-    SceneTableEntry destScene(SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo));
-    CHIP_ERROR err = sceneTable->GetSceneTableEntry(fabricIndex, destScene.mStorageId, destScene);
+    const SceneStorageId destStorageId(req.sceneIdentifierTo, req.groupIdentifierTo);
+    SceneTableEntry destScene;
+    CHIP_ERROR err = sceneTable->GetSceneTableEntry(fabricIndex, destStorageId, destScene);
 
     if (err == CHIP_ERROR_NOT_FOUND)
     {
@@ -1023,8 +1024,7 @@ ScenesManagementCluster::HandleCopyScene(FabricIndex fabricIndex, const ScenesMa
     SceneTableEntry scene(SceneStorageId(req.sceneIdentifierFrom, req.groupIdentifierFrom));
     SuccessOrReturnWithFailureStatus(sceneTable->GetSceneTableEntry(fabricIndex, scene.mStorageId, scene), response);
 
-    scene.mStorageId = SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo);
-
+    scene.mStorageId = destStorageId;
     SuccessOrReturnWithFailureStatus(sceneTable->SetSceneTableEntry(fabricIndex, scene), response);
 
     // Update Attributes
