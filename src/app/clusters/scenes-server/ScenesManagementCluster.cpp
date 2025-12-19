@@ -447,13 +447,13 @@ DataModel::ActionReturnStatus ScenesManagementCluster::ReadAttribute(const DataM
     }
     case ScenesManagement::Attributes::FabricSceneInfo::Id: {
         ScopedSceneTable sceneTable(mSceneTableProvider);
-        return encoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        return encoder.EncodeList([&](const auto & listEncoder) -> CHIP_ERROR {
             Span<SceneInfoStruct::Type> fabricSceneInfoSpan = mFabricSceneInfo.GetFabricSceneInfo();
             for (auto & info : fabricSceneInfoSpan)
             {
                 // Update the SceneInfoStruct's Capacity in case it's capacity was limited by other fabrics
                 ReturnErrorOnFailure(sceneTable->GetRemainingCapacity(info.fabricIndex, info.remainingCapacity));
-                ReturnErrorOnFailure(encoder.Encode(info));
+                ReturnErrorOnFailure(listEncoder.Encode(info));
             }
             return CHIP_NO_ERROR;
         });
