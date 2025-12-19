@@ -60,7 +60,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import AttributeValue, TestStep, async_test_body, default_matter_test_main
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -189,7 +189,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Create event subscriber for StateTransition
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            # expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
@@ -216,12 +216,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
-        # kIdle ( After update is Optional) in this case we only wait state to be Idle
-        # Just wait the device to be kIdle to avoid unexpected states in following Steps.
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is kIdle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        attribute_idle = AttributeValue(
+            endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+        update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
         update_state_attr_handler.cancel()
 
         # Verify VersionAppliedEvent
@@ -415,16 +412,15 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # EventHandlers and AttributeSubscriptionHandler
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            # expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         # To avoid possible transiton between Querying and Idle use AttributeHandler
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is Downloading",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
+        attribute_idle = AttributeValue(
+            endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
