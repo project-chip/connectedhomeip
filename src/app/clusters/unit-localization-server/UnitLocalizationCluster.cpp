@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
-#include "UnitLocalizationCluster.h"
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/reporting/reporting.h>
+#include <clusters/UnitLocalization/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -114,7 +114,7 @@ CHIP_ERROR UnitLocalizationCluster::Read(const ConcreteReadAttributePath & aPath
         return aEncoder.Encode(GetSupportedTemperatureUnits());
     }
     case ClusterRevision::Id: {
-        return aEncoder.Encode(kClusterRevision);
+        return aEncoder.Encode(kRevision);
     }
     default:
         break;

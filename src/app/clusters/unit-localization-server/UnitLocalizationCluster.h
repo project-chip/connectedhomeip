@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -29,7 +30,6 @@ namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 
-inline constexpr uint16_t kClusterRevision              = 2;
 inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
 inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
 

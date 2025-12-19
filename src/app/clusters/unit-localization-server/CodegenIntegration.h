@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
-#include "UnitLocalizationCluster.h"
+#pragma once
+
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 
 namespace chip {
 namespace app {
