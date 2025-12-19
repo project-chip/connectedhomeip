@@ -388,11 +388,11 @@ CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
     return mClusterContext.fabricTable.AddFabricDelegate(this);
 }
 
-void GeneralCommissioningCluster::Shutdown(ClusterShutdownType type)
+void GeneralCommissioningCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     mClusterContext.fabricTable.RemoveFabricDelegate(this);
-    DefaultServerCluster::Shutdown(type);
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 std::optional<DataModel::ActionReturnStatus>

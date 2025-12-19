@@ -430,13 +430,13 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void BasicInformationCluster::Shutdown(ClusterShutdownType type)
+void BasicInformationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     if (PlatformMgr().GetDelegate() == this)
     {
         PlatformMgr().SetDelegate(nullptr);
     }
-    DefaultServerCluster::Shutdown(type);
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)

@@ -29,9 +29,9 @@ CHIP_ERROR ServerClusterExtension::Startup(ServerClusterContext & context)
     return mUnderlying.Startup(context);
 }
 
-void ServerClusterExtension::Shutdown(ClusterShutdownType type)
+void ServerClusterExtension::Shutdown(ClusterShutdownType shutdownType)
 {
-    mUnderlying.Shutdown(type);
+    mUnderlying.Shutdown(shutdownType);
     mContext = nullptr;
 }
 
