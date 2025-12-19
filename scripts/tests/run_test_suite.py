@@ -149,7 +149,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     callback=validate_test_order,
     default="alphabetic",
     show_default=True,
-    help="Order in which tests should be executed. Possible values: `alphabetic`, `random[:seed]`."
+    help="Order in which tests should be executed. Possible values: 'alphabetic', 'random[:seed]'."
 )
 @click.option(
     '--find-path',
