@@ -20,7 +20,6 @@
 #include <devices/chime/ChimeDevice.h>
 #include <lib/support/Span.h>
 #include <platform/DefaultTimerDelegate.h>
-#include <string>
 #include <vector>
 
 namespace chip {
@@ -49,7 +48,7 @@ private:
     struct ChimeSound
     {
         uint8_t id;
-        std::string name;
+        CharSpan name;
     };
     std::vector<ChimeSound> mSounds;
 };

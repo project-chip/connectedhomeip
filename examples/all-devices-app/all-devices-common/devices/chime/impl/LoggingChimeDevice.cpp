@@ -24,8 +24,8 @@ namespace app {
 
 LoggingChimeDevice::LoggingChimeDevice() : ChimeDevice(*this, mTimerDelegate)
 {
-    mSounds.push_back({ 0, "Ding Dong" });
-    mSounds.push_back({ 1, "Ring Ring" });
+    mSounds.push_back({ 0, "Ding Dong"_span });
+    mSounds.push_back({ 1, "Ring Ring"_span });
 }
 
 CHIP_ERROR LoggingChimeDevice::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
@@ -37,7 +37,7 @@ CHIP_ERROR LoggingChimeDevice::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t 
 
     const auto & sound = mSounds[chimeIndex];
     chimeID            = sound.id;
-    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(sound.name.c_str()), name);
+    return CopyCharSpanToMutableCharSpan(sound.name, name);
 }
 
 CHIP_ERROR LoggingChimeDevice::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
@@ -58,17 +58,17 @@ Protocols::InteractionModel::Status LoggingChimeDevice::PlayChimeSound()
     uint8_t selectedChime = ChimeCluster().GetSelectedChime();
 
     // Find the name
-    const char * soundName = "Unknown";
+    CharSpan soundName = "Unknown"_span;
     for (const auto & sound : mSounds)
     {
         if (sound.id == selectedChime)
         {
-            soundName = sound.name.c_str();
+            soundName = sound.name;
             break;
         }
     }
 
-    ChipLogProgress(AppServer, "LoggingChimeDevice: Playing sound %s", soundName);
+    ChipLogProgress(AppServer, "LoggingChimeDevice: Playing sound %.*s", static_cast<int>(soundName.size()), soundName.data());
     return Protocols::InteractionModel::Status::Success;
 }
 

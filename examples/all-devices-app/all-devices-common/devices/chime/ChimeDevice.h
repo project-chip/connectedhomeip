@@ -35,7 +35,7 @@ public:
                         EndpointId parentId = kInvalidEndpointId) override;
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::ChimeCluster & ChimeCluster() { return mChimeCluster.Cluster(); }
+    Clusters::ChimeCluster & ChimeCluster();
 
 protected:
     Clusters::ChimeDelegate & mDelegate;

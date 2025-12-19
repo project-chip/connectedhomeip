@@ -56,5 +56,11 @@ void ChimeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     }
 }
 
+Clusters::ChimeCluster & ChimeDevice::ChimeCluster()
+{
+    VerifyOrDie(mChimeCluster.IsConstructed());
+    return mChimeCluster.Cluster();
+}
+
 } // namespace app
 } // namespace chip
