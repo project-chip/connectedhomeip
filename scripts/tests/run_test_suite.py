@@ -21,7 +21,7 @@ import sys
 import time
 import typing
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import chiptest
 import click
@@ -65,12 +65,6 @@ class RunContext:
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: str
-
-    # If not empty, include only the specified test tags
-    include_tags: set(TestTag) = field(default_factory=set)
-
-    # If not empty, exclude tests tagged with these tags
-    exclude_tags: set(TestTag) = field(default_factory=set)
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
