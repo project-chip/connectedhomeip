@@ -15,36 +15,19 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("device-interface") {
+source_set("occupancy-sensor") {
   sources = [
-    "DeviceInterface.cpp",
-    "DeviceInterface.h",
+    "OccupancySensorDevice.cpp",
+    "OccupancySensorDevice.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/descriptor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-  ]
-
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes",
-    "${chip_root}/src:includes",
-  ]
-}
-
-source_set("single-endpoint-device") {
-  sources = [
-    "SingleEndpointDevice.cpp",
-    "SingleEndpointDevice.h",
-  ]
-
-  public_deps = [
-    ":device-interface",
-    "${chip_root}/src/app/clusters/descriptor",
-    "${chip_root}/src/data-model-providers/codedriven",
-    "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/devices/",
   ]
 }
