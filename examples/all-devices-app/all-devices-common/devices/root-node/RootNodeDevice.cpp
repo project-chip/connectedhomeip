@@ -161,12 +161,12 @@ void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     RootNodeDevice::UnRegister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));
         mNetworkCommissioningCluster.Destroy();
     }
     if (mWifiDiagnosticsCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster()));
         mWifiDiagnosticsCluster.Destroy();
     }
 }
