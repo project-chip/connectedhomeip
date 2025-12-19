@@ -600,7 +600,7 @@ AddSceneResponse::Type ScenesManagementCluster::HandleAddScene(FabricIndex fabri
     auto fieldSetIter = req.extensionFieldSetStructs.begin();
     uint8_t EFSCount  = 0;
     // Goes through all EFS in command
-    while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)
+    while (fieldSetIter.Next() && EFSCount++ < scenes::kMaxClustersPerScene)
     {
         scenes::ExtensionFieldSet tempEFS;
         tempEFS.mID = fieldSetIter.GetValue().clusterID;
