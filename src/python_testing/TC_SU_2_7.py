@@ -355,7 +355,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         )
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*7)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=9000)
 
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         time_start = time()
@@ -368,23 +368,27 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         logger.info(f"Event report Downloading {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
         # Once the Device is Downloading wait some time to let it download some data and then Kill the current process
-        state_transition_event_handler.cancel()
-        # Create Listener for DownloadError
-        error_download_event_handler = EventSubscriptionHandler(
-            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
-        await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=5000)
+
+        # Force an DownloadError by Killing the app during the image download.
         logger.info("Wait 3 seconds to allow download some data before killing the Provider Process")
         await asyncio.sleep(3)
         self.current_provider_app_proc.kill()
-        time_middle = time()
-        elapsed_time = time_middle - time_start
-        logger.info(f"Elapsed time since announce {elapsed_time}")
-        # Wait to until the 5 minutes
-        minimun_wait_time = (60*5)-elapsed_time
-        logger.info(f"Script will wait for {minimun_wait_time} to match the minimum 5 minutes wait ")
-        await asyncio.sleep(minimun_wait_time)
-        logger.info("Completed waiting for 5 minutes")
-        # After waiting 5 minutes the device must try trigger the DownloadError Event this may take a while.
+        start_time = time()
+        logger.info("Waiting for the StateTransitionEvent with value KIdle.")
+        # Device must wait for State kIdle in this case we wait for Idle status which should not happend in less than 5 minutes
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
+        logger.info(f"Event Transition Event for kIdle Timeout: {event_report}")
+        self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
+                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle)
+        state_transition_event_handler.cancel()
+        end_time = time()
+        total_time_to_kidle = int(end_time - start_time)
+        logger.info(f"Total time taken to UpdateStatus kIdle {total_time_to_kidle} seconds")
+        asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
+        # Create and Wait for DownloadErrorEvent
+        error_download_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
+        await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
         download_event_report = error_download_event_handler.wait_for_event_report(
             self.ota_req.Events.DownloadError, timeout_sec=600)
         logger.info(f"Download error Event: {download_event_report}")
