@@ -17,27 +17,27 @@
 
  #include <DeviceShellCommands.h>
  #include <lib/shell/streamer.h>
- 
+
  void InitServerWithDeviceType(std::string deviceType);
- 
+
  namespace chip {
  namespace Shell {
- 
+
  Shell::Engine DeviceCommands::sSubShell;
- 
+
  void DeviceCommands::Register()
  {
      static const shell_command_t subCommands[] = {
          { &SetDeviceTypeHandler, "set", "Usage: device set <device-type>" },
      };
      sSubShell.RegisterCommands(subCommands, MATTER_ARRAY_SIZE(subCommands));
- 
+
      // Register the root `device` command in the top-level shell.
      static const shell_command_t deviceCommand = { &DeviceHandler, "device", "Device type management commands" };
- 
+
      Engine::Root().RegisterCommands(&deviceCommand, 1);
  }
- 
+
  CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
  {
      if (argc != 1)
@@ -46,19 +46,19 @@
          streamer_printf(streamer_get(), "Example: device set contact-sensor\r\n");
          return CHIP_ERROR_INVALID_ARGUMENT;
      }
- 
+
      const char * deviceType = argv[0];
-     
+
      streamer_printf(streamer_get(), "Device type set to: %s\r\n", deviceType);
- 
+
      InitServerWithDeviceType(std::string(deviceType));
-     
+
      return CHIP_NO_ERROR;
  }
- 
+
  } // namespace Shell
  } // namespace chip
- 
+
  // C-style API implementation
  extern "C" {
      const char * GetStoredDeviceType()

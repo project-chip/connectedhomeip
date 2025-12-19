@@ -23,10 +23,10 @@
  #include <lib/support/CodeUtils.h>
  #include <lib/support/logging/CHIPLogging.h>
  #include <string>
- 
+
  namespace chip {
  namespace Shell {
- 
+
  class DeviceCommands
  {
  public:
@@ -36,25 +36,25 @@
      DeviceCommands(DeviceCommands &&) = delete;
      // delete the assignment operator
      DeviceCommands & operator=(const DeviceCommands &) = delete;
- 
+
      static DeviceCommands & GetInstance()
      {
          static DeviceCommands instance;
          return instance;
      }
- 
+
      // Register the Device commands
      void Register();
- 
+
      // API to get the stored device type
      const std::string & GetStoredDeviceType() const { return mStoredDeviceType; }
- 
+
  private:
      DeviceCommands() {}
- 
+
      // Simple storage for device type input
      static std::string mStoredDeviceType;
- 
+
      static CHIP_ERROR DeviceHandler(int argc, char ** argv)
      {
          if (argc == 0)
@@ -62,25 +62,25 @@
              sSubShell.ForEachCommand(PrintCommandHelp, nullptr);
              return CHIP_NO_ERROR;
          }
- 
+
          CHIP_ERROR error = sSubShell.ExecCommand(argc, argv);
- 
+
          if (error != CHIP_NO_ERROR)
          {
              streamer_printf(streamer_get(), "Error: %" CHIP_ERROR_FORMAT "\r\n", error.Format());
          }
- 
+
          return error;
      }
- 
+
     static CHIP_ERROR SetDeviceTypeHandler(int argc, char ** argv);
 
     static Shell::Engine sSubShell;
  };
- 
+
  } // namespace Shell
  } // namespace chip
- 
+
  // C-style API for accessing stored device type
  extern "C" {
      const char * GetStoredDeviceType();
