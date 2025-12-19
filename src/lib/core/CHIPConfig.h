@@ -1651,7 +1651,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * per spec and MUST be increased to allow for configuring a greater scene table size from Zap.
  */
 #ifndef CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+#if CHIP_CONFIG_TEST
+#define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 24
+#else
 #define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 16
+#endif // CHIP_CONFIG_TEST
 #endif // CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
 
 /**
