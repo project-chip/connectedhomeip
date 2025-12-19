@@ -358,7 +358,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=9000)
 
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-        time_start = time()
         # Block waiting for Download
         logger.info("About to wait for StateTransition Events")
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
