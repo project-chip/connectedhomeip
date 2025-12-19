@@ -106,11 +106,10 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("0b")
         log.info(f"Sending On command to endpoint {self.endpoint}")
 
-        ret = await self.send_single_cmd(
+        await self.send_single_cmd(
             endpoint=self.endpoint,
             cmd=Clusters.OnOff.Commands.On(),
             node_id=self.dut_node_id)
-        log.info(ret)
         log.info("Lights On!")
 
         self.step("0c")
