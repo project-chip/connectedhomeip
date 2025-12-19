@@ -39,26 +39,27 @@
 
 import logging
 
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
 import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
+
 
 class TC_CHANNEL_5_5(MatterBaseTest):
     def desc_TC_CHANNEL_5_5(self) -> str:
         return "[TC-CHANNEL-5.5] Change Channel By Number Verification (DUT as Client)"
 
     def steps_TC_CHANNEL_5_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commission TH to DUT", is_commissioning=True),
             TestStep(1, "DUT sends ChangeChannelByNumber command to TH"),
         ]
-        return steps
 
     def pics_TC_CHANNEL_5_5(self) -> list[str]:
         return ["CHANNEL.C"]
-    
+
     @async_test_body
     async def test_TC_CHANNEL_5_5(self):
         # Step 0: Commission TH to DUT
@@ -68,14 +69,14 @@ class TC_CHANNEL_5_5(MatterBaseTest):
         if self.pics_guard(self.check_pics("CHANNEL.C.C02.Tx")):
             # Get endpoint from command line argument
             endpoint = self.get_endpoint()
-            logging.info(f"Using endpoint: {endpoint}")
+            logger.info(f"Using endpoint: {endpoint}")
             # 1. Read ChannelList attribute
             channel_list = await self.read_single_attribute_check_success(
                 cluster=Clusters.Channel,
                 attribute=Clusters.Channel.Attributes.ChannelList,
                 endpoint=endpoint
             )
-            logging.info(f"Read ChannelList: {channel_list}")
+            logger.info(f"Read ChannelList: {channel_list}")
 
             # 2. Read CurrentChannel to know which channel to avoid
             current_channel = await self.read_single_attribute_check_success(
@@ -83,13 +84,13 @@ class TC_CHANNEL_5_5(MatterBaseTest):
                 attribute=Clusters.Channel.Attributes.CurrentChannel,
                 endpoint=endpoint
             )
-            logging.info(f"Read CurrentChannel before change: {current_channel}")
+            logger.info(f"Read CurrentChannel before change: {current_channel}")
             # 3. Find a channel different from CurrentChannel
             # ChangeChannelByNumber returns FAILURE if target equals current channel
             target_channel = None
             for channel in channel_list:
                 if (channel.majorNumber != current_channel.majorNumber or
-                    channel.minorNumber != current_channel.minorNumber):
+                        channel.minorNumber != current_channel.minorNumber):
                     target_channel = channel
                     break
             if target_channel is None:
@@ -100,28 +101,31 @@ class TC_CHANNEL_5_5(MatterBaseTest):
                 )
             target_major_number = target_channel.majorNumber
             target_minor_number = target_channel.minorNumber
-            logging.info(f"Selected different channel from list: MajorNumber={target_major_number}, MinorNumber={target_minor_number}")
+            logger.info(
+                f"Selected different channel from list: MajorNumber={target_major_number}, MinorNumber={target_minor_number}")
             # 4. Send ChangeChannelByNumber command
-            logging.info(f"Sending ChangeChannelByNumber command with majorNumber={target_major_number}, minorNumber={target_minor_number} to endpoint {endpoint}")
+            logger.info(
+                f"Sending ChangeChannelByNumber command with majorNumber={target_major_number}, minorNumber={target_minor_number} to endpoint {endpoint}")
             cmd = Clusters.Channel.Commands.ChangeChannelByNumber(
                 majorNumber=target_major_number,
                 minorNumber=target_minor_number
             )
             await self.send_single_cmd(cmd, endpoint=endpoint)
-            logging.info("ChangeChannelByNumber command sent successfully.")
+            logger.info("ChangeChannelByNumber command sent successfully.")
             # 5. Verify CurrentChannel matches
             current_channel = await self.read_single_attribute_check_success(
                 cluster=Clusters.Channel,
                 attribute=Clusters.Channel.Attributes.CurrentChannel,
                 endpoint=endpoint
             )
-            logging.info(f"Read CurrentChannel: {current_channel}")
+            logger.info(f"Read CurrentChannel: {current_channel}")
             # Verify that the current channel matches the requested target
             asserts.assert_equal(current_channel.majorNumber, target_major_number,
                                  f"CurrentChannel majorNumber ({current_channel.majorNumber}) does not match requested target ({target_major_number})")
             asserts.assert_equal(current_channel.minorNumber, target_minor_number,
                                  f"CurrentChannel minorNumber ({current_channel.minorNumber}) does not match requested target ({target_minor_number})")
-            logging.info("Verification successful: CurrentChannel matches target.")
+            logger.info("Verification successful: CurrentChannel matches target.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
