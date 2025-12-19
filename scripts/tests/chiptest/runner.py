@@ -18,9 +18,11 @@ import pathlib
 import pty
 import queue
 import re
+import shlex
 import subprocess
 import threading
 import typing
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import Literal
 
@@ -147,8 +149,50 @@ class SubprocessInfo:
 
 
 class Executor:
+    CLEANUP_TIMEOUT_S = 5
+
+    def __init__(self) -> None:
+        self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
+
     def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
-        return subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+        self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr))
+        return process
+
+    def terminate(self) -> None:
+        while True:
+            # Get process from the queue.
+            try:
+                process = self._processes.get_nowait()
+            except queue.Empty:
+                break
+
+            # Check if process already exited.
+            if process.poll() is not None:
+                continue
+            cmd = str(process.args)
+
+            # SIGTERM
+            log.debug('Terminating leftover process "%s"', cmd)
+            try:
+                process.terminate()
+            except OSError:
+                # Can occur in case of race condition when process exits between poll and terminate.
+                continue
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT_S)
+                continue
+
+            # SIGKILL
+            log.warning('Failed to terminate the process "%s". Killing instead', cmd)
+            try:
+                process.kill()
+            except OSError:
+                continue
+            with suppress(subprocess.TimeoutExpired):
+                process.wait(self.CLEANUP_TIMEOUT_S)
+                continue
+
+            log.error('Failed to kill process "%s". It may become a zombie', cmd)
 
 
 class Runner:
@@ -189,13 +233,12 @@ class Runner:
                 break
             # dependencies MUST NOT be done
             s.kill()
-            raise Exception("Unexpected return %d for %r/%r" %
-                            (process.returncode, process, userdata))
+            raise RuntimeError(f"Unexpected return {process.returncode} for {process!r}/{userdata!r}")
 
         if s.returncode != 0:
             if wait.timed_out:
-                raise Exception("Command %r exceeded test timeout (%d seconds)" % (cmd, wait.timeout_seconds))
-            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+                raise TimeoutError(f'Command "{shlex.join(cmd)}" exceeded test timeout ({wait.timeout_seconds} seconds)')
+            raise RuntimeError(f'Command "{shlex.join(cmd)}" failed: {s.returncode}')
 
         log.debug("Command %r completed with error code 0", cmd)
         return None

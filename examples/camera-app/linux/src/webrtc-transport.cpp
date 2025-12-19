@@ -71,6 +71,31 @@ void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, 
 {
     if (mLocalVideoTrack)
     {
+        // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
+        // Current state: data contains raw H.264 encoded frames from GStreamer
+        //
+        // SFrame encryption should happen here because:
+        // 1. Each transport may have different sFrameConfig (different keys, cipher suites)
+        // 2. Multiple transports can share the same video stream
+        // 3. Encryption must be per-client, not per-stream
+        //
+        // Implementation steps:
+        // if (sFrameConfig.HasValue())
+        // {
+        //     auto& config = sFrameConfig.Value();
+        //     // 1. Encrypt H.264 payload using config.baseKey and config.cipherSuite:
+        //     //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+        //     //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+        //     // 2. Build SFrame header with config.kid and frame counter
+        //     // 3. Prepend SFrame header to encrypted payload
+        //     // 4. Pass encrypted data to RTP packetization
+        //     //    Result: [RTP Header | SFrame Header | Encrypted(H.264)]
+        // }
+        // else
+        // {
+        //     // No encryption - pass raw H.264 to RTP packetization
+        // }
+
         mLocalVideoTrack->SendFrame(data, timestamp);
     }
 }
@@ -80,6 +105,31 @@ void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, 
 {
     if (mLocalAudioTrack)
     {
+        // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
+        // Current state: data contains raw Opus encoded frames from GStreamer
+        //
+        // SFrame encryption should happen here because:
+        // 1. Each transport may have different sFrameConfig (different keys, cipher suites)
+        // 2. Multiple transports can share the same audio stream
+        // 3. Encryption must be per-client, not per-stream
+        //
+        // Implementation steps:
+        // if (sFrameConfig.HasValue())
+        // {
+        //     auto& config = sFrameConfig.Value();
+        //     // 1. Encrypt Opus payload using config.baseKey and config.cipherSuite:
+        //     //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+        //     //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+        //     // 2. Build SFrame header with config.kid and frame counter
+        //     // 3. Prepend SFrame header to encrypted payload
+        //     // 4. Pass encrypted data to RTP packetization
+        //     //    Result: [RTP Header | SFrame Header | Encrypted(Opus)]
+        // }
+        // else
+        // {
+        //     // No encryption - pass raw Opus to RTP packetization
+        // }
+
         mLocalAudioTrack->SendFrame(data, timestamp);
     }
 }

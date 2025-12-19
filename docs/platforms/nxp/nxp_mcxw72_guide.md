@@ -102,8 +102,8 @@ Normally the `NBU` image should be written/updated only when migrating to a new
 NXP SDK or to a new Matter release altogether. The procedure below can be used
 to upload/refresh the board's NBU firmware.
 
-1. Install
-   [NXP LinkServer for Microcontrollers](https://www.nxp.com/design/design-center/software/development-software/mcuxpresso-software-and-tools-/linkserver-for-microcontrollers:LINKERSERVER).
+1. Install the Bootloader Host Application (`blhost`) from the
+   [MCU Bootloader for NXP Microcontrollers downloads page](https://www.nxp.com/design/design-center/software/development-software/mcuxpresso-software-and-tools-/mcu-bootloader-for-nxp-microcontrollers:MCUBOOT).
 
 2. The NBU image is available in your Matter source code tree in
 
@@ -115,8 +115,7 @@ to upload/refresh the board's NBU firmware.
    down the SW3 button while reconnecting it back. When you release the SW3
    button the board should be operating in ISP mode.
 
-4. Erase the host and NBU flash memories using the `blhost` tool from the _NXP
-   LinkServer for Microcontrollers_
+4. Erase the host and NBU flash memories using the `blhost` tool
 
     ```
     blhost -p <assigned_port> flash-erase-all 0
