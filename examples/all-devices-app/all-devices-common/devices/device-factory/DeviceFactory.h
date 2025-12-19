@@ -19,10 +19,7 @@
 
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
-<<<<<<< HEAD
 #include <devices/chime/impl/LoggingChimeDevice.h>
-=======
->>>>>>> master
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
