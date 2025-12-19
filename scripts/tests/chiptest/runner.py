@@ -27,7 +27,7 @@ import typing
 from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import IO, TYPE_CHECKING, Any, Literal, Protocol
+from typing import IO, TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture

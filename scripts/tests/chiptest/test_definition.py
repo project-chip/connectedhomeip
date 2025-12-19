@@ -27,6 +27,7 @@ from datetime import datetime
 from enum import Enum, StrEnum, auto
 from pathlib import Path
 from types import MappingProxyType
+import typing
 
 from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
@@ -459,7 +460,7 @@ class TestDefinition:
         """Get a human readable list of tags applied to this test"""
         return ", ".join([t.to_s() for t in self.tags])
 
-    def Run(self, runner: Runner, apps_register: S, subproc_info_repo: SubprocessInfoRepo,
+    def Run(self, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
             pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: int | None = None,
@@ -533,9 +534,9 @@ class TestDefinition:
                     runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:  # CHIP_TOOL_PYTHON
-                assert apps.chip_tool is not None, \
+                assert 'chip-tool' in subproc_info_repo, \
                     "Chip tool should have been set for selected test runtime"
-                assert apps.chip_tool_with_python_cmd is not None, \
+                assert 'chip-tool-with-python' in subproc_info_repo, \
                     "Chip tool with Python should have been set for selected test runtime"
                 pairing_server_args = []
 

@@ -23,7 +23,6 @@ import typing
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
 
 import chiptest
 import click
