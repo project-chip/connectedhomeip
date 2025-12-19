@@ -248,6 +248,7 @@ config CHIP_USE_MARS_SENSOR
 	default n
 
 config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default n if BOARD_TL3218X_RETENTION
 	default y
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
@@ -262,13 +263,13 @@ config CHIP_MAX_FABRICS
 
 config CHIP_MAX_ACTIVE_CASE_CLIENTS
 	int "Maximum number of outgoing CASE sessions"
-	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default CHIP_MAX_FABRICS
 	help
-	  The maximum number of outgoing CASE sessions that can be simutaneously handled by the end device.
+	  The maximum number of outgoing CASE sessions that can be simultaneously handled by the end device.
 
 config CHIP_MAX_ACTIVE_DEVICES
 	int "Maximum number of simultaneous connections over CASE"
-	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default CHIP_MAX_FABRICS
 	help
 	  The maximum number of devices to which the Server implementers will be able to
 	  concurrently connect over CASE and interact with.
