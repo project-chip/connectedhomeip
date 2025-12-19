@@ -54,6 +54,12 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        // The Server class calls MemoryInit in Init and MemoryShutdown in Shutdown.
+        // However, PlatformMgr().Shutdown() also relies on memory being initialized (e.g. for timer release),
+        // but it doesn't manage the memory refcount itself.
+        // If Server::Shutdown() drops the refcount to 0, PlatformMgr().Shutdown() will abort.
+        // We increment the refcount here to ensure memory remains initialized until after PlatformMgr().Shutdown().
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
         Server::GetInstance().Shutdown();
@@ -88,7 +94,7 @@ chip::PersistentStorageOperationalKeystore TestAdministratorCommissioningCluster
 chip::TestPersistentStorageDelegate TestAdministratorCommissioningCluster::sStorageDelegate;
 chip::Testing::EmptyProvider TestAdministratorCommissioningCluster::sEmptyProvider;
 
-const chip::FabricIndex kTestFabricIndex = chip::Testing::kTestFabrixIndex;
+const chip::FabricIndex kTestFabricIndex = chip::Testing::kTestFabricIndex;
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
@@ -189,7 +195,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
     chip::Testing::ClusterTester tester(cluster);
 
     {
-        Attributes::FeatureMap::TypeInfo::Type feature{};
+        Attributes::FeatureMap::TypeInfo::Type feature = 1;
         ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
         ASSERT_EQ(feature, 0u);
     }
@@ -202,7 +208,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
 
     {
         Attributes::WindowStatus::TypeInfo::Type winStatus =
-            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen;
         auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
         ASSERT_TRUE(status.IsSuccess());
         EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
@@ -210,12 +216,14 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
 
     {
         Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        adminFabric.SetNonNull(1);
         ASSERT_EQ(tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric), CHIP_NO_ERROR);
         ASSERT_TRUE(adminFabric.IsNull());
     }
 
     {
         Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        // adminVendor.SetNonNull(1);
         ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
         ASSERT_TRUE(adminVendor.IsNull());
     }
