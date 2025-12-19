@@ -100,6 +100,7 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_bool("chip_malloc_sys_heap" CONFIG_CHIP_MALLOC_SYS_HEAP)
     matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)
     matter_add_gn_arg_bool("chip_enable_read_client" CONFIG_CHIP_ENABLE_READ_CLIENT)
+    matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 
     if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")
