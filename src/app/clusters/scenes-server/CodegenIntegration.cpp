@@ -34,7 +34,7 @@
 
 #if defined(SCENES_MANAGEMENT_TABLE_SIZE) && SCENES_MANAGEMENT_TABLE_SIZE
 static_assert(chip::scenes::kMaxScenesPerEndpoint == SCENES_MANAGEMENT_TABLE_SIZE,
-              "ZAP configration and CHIP_CONFIG_MAX_SCENES_TABLE_SIZE must be identical.");
+              "ZAP configuration and CHIP_CONFIG_MAX_SCENES_TABLE_SIZE must be identical.");
 #endif
 
 using SceneTable = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
