@@ -58,6 +58,8 @@ public:
 
     IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
 
+    CHIP_ERROR SetMeasuredValue(IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type measuredValue);
+
 protected:
     IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type mLightSensorType{};
     IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
