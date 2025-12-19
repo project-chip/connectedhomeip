@@ -98,7 +98,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
     void TearDown() override
     {
         tester.SetFabricIndex(kUndefinedFabricIndex);
-        mCluster.Shutdown();
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         Credentials::SetGroupDataProvider(nullptr);
         CHIP_ERROR err = fabricHelper.TearDownTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
