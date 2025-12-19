@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -16,8 +15,22 @@
  *    limitations under the License.
  */
 
-// Note: This file exists for backwards compatibility only.
-// New code should directly use UnitLocalizationCluster.h instead.
-
 #pragma once
-#include <app/clusters/unit-localization-server/CodegenIntegration.h>
+
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace UnitLocalization {
+
+class UnitLocalizationServer : public UnitLocalizationCluster
+{
+public:
+    static UnitLocalizationServer & Instance();
+};
+
+} // namespace UnitLocalization
+} // namespace Clusters
+} // namespace app
+} // namespace chip
