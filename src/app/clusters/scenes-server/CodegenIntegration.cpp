@@ -49,16 +49,16 @@ public:
     void SetParameters(EndpointId endpointId, uint16_t endpointTableSize)
     {
         mEndpointId         = endpointId;
-        mEnddpointTableSize = endpointTableSize;
+        mEndpointTableSize = endpointTableSize;
     }
     EndpointId GetEndpointId() const { return mEndpointId; }
 
-    ScenesManagementSceneTable * Take() override { return scenes::GetSceneTableImpl(mEndpointId, mEnddpointTableSize); }
+    ScenesManagementSceneTable * Take() override { return scenes::GetSceneTableImpl(mEndpointId, mEndpointTableSize); }
     void Release(ScenesManagementSceneTable *) override {}
 
 private:
     EndpointId mEndpointId       = kInvalidEndpointId;
-    uint16_t mEnddpointTableSize = scenes::kMaxScenesPerEndpoint;
+    uint16_t mEndpointTableSize = scenes::kMaxScenesPerEndpoint;
 };
 
 constexpr size_t kScenesmanagementFixedClusterCount = StaticApplicationConfig::kFixedClusterConfig.size();
