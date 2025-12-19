@@ -13,6 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from __future__ import annotations
+
 import filecmp
 import functools
 import logging
@@ -20,18 +22,21 @@ import subprocess
 import sys
 import threading
 from pathlib import Path
-from typing import Callable, Concatenate, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Callable, Concatenate, ParamSpec, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
+
+if TYPE_CHECKING:
+    from .test_definition import App
 
 log = logging.getLogger(__name__)
 
 _DEFAULT_CHIP_ROOT = Path(__file__).parent.parent.parent.parent.absolute()
 
-IP = '127.0.0.1'
 PORT = 9000
-
 if sys.platform == 'linux':
     IP = '10.10.10.5'
+else:
+    IP = '127.0.0.1'
 
 
 S = TypeVar("S", bound="AppsRegister")
@@ -56,13 +61,13 @@ def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concat
 
 class AppsRegister:
     def __init__(self) -> None:
-        self._accessories = {}
+        self._accessories: dict[str, App] = {}
         self._accessories_lock = threading.RLock()
 
-    def init(self):
+    def init(self) -> None:
         self._start_xmlrpc_server()
 
-    def uninit(self):
+    def uninit(self) -> None:
         self._stop_xmlrpc_server()
 
     @property
@@ -72,35 +77,35 @@ class AppsRegister:
         return self._accessories.values()
 
     @with_accessories_lock
-    def add(self, name, accessory):
+    def add(self, name: str, accessory: App) -> None:
         self._accessories[name] = accessory
 
     @with_accessories_lock
-    def remove(self, name):
+    def remove(self, name: str) -> None:
         self._accessories.pop(name)
 
     @with_accessories_lock
-    def remove_all(self):
+    def remove_all(self) -> None:
         self._accessories.clear()
 
     @with_accessories_lock
-    def get(self, name):
+    def get(self, name: str) -> App:
         return self._accessories[name]
 
     @with_accessories_lock
-    def kill(self, name):
+    def kill(self, name: str) -> bool:
         if accessory := self._accessories[name]:
             return accessory.kill()
         return False
 
     @with_accessories_lock
-    def kill_all(self):
+    def kill_all(self) -> bool:
         # Make sure to do kill() on all of our apps, even if some of them returned False
         results = [accessory.kill() for accessory in self._accessories.values()]
         return all(results)
 
     @with_accessories_lock
-    def start(self, name, args):
+    def start(self, name: str, args: list[str]) -> bool:
         if accessory := self._accessories[name]:
             # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
             # key-value pair, e.g. [option1, value1, option2, value2, ...]
@@ -108,37 +113,38 @@ class AppsRegister:
         return False
 
     @with_accessories_lock
-    def stop(self, name):
+    def stop(self, name: str) -> bool:
         if accessory := self._accessories[name]:
             return accessory.stop()
         return False
 
     @with_accessories_lock
-    def reboot(self, name):
+    def reboot(self, name: str) -> bool:
         if accessory := self._accessories[name]:
             return accessory.stop() and accessory.start()
         return False
 
     @with_accessories_lock
-    def factory_reset_all(self):
+    def factory_reset_all(self) -> None:
         for accessory in self._accessories.values():
             accessory.factoryReset()
 
     @with_accessories_lock
-    def factory_reset(self, name):
+    def factory_reset(self, name: str) -> bool:
         if accessory := self._accessories[name]:
             return accessory.factoryReset()
         return False
 
     @with_accessories_lock
-    def wait_for_message(self, name, message, timeoutInSeconds=10):
+    def wait_for_message(self, name: str, message: list[str], timeoutInSeconds: float = 10) -> bool:
         if accessory := self._accessories[name]:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
             # comprise the entire message to wait for
             return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
-    def create_ota_image(self, otaImageFilePath, rawImageFilePath, rawImageContent, vid='0xDEAD', pid='0xBEEF'):
+    def create_ota_image(self, otaImageFilePath: str, rawImageFilePath: str, rawImageContent: str, vid: str = '0xDEAD',
+                         pid: str = '0xBEEF') -> bool:
         # Write the raw image content
         Path(rawImageFilePath).write_text(rawImageContent)
 
@@ -158,40 +164,41 @@ class AppsRegister:
             raise RuntimeError('Cannot create OTA image file')
         return True
 
-    def compare_files(self, file1, file2):
+    def compare_files(self, file1: str | Path, file2: str | Path) -> bool:
         if not filecmp.cmp(file1, file2, shallow=False):
             raise RuntimeError(f'Files {file1} and {file2} do not match')
         return True
 
-    def create_file(self, filePath, fileContent):
+    def create_file(self, filePath: str | Path, fileContent: str) -> bool:
         Path(filePath).write_text(fileContent)
         return True
 
-    def delete_file(self, filePath):
+    def delete_file(self, filePath: str | Path) -> bool:
         Path(filePath).unlink(missing_ok=True)
         return True
 
-    def _start_xmlrpc_server(self):
+    def _start_xmlrpc_server(self) -> None:
         self.server = SimpleXMLRPCServer((IP, PORT))
 
-        self.server.register_function(self.start, 'start')
-        self.server.register_function(self.stop, 'stop')
-        self.server.register_function(self.reboot, 'reboot')
-        self.server.register_function(self.factory_reset, 'factoryReset')
-        self.server.register_function(self.wait_for_message, 'waitForMessage')
-        self.server.register_function(self.compare_files, 'compareFiles')
-        self.server.register_function(self.create_ota_image, 'createOtaImage')
-        self.server.register_function(self.create_file, 'createFile')
-        self.server.register_function(self.delete_file, 'deleteFile')
+        # Typeshed issue: https://github.com/python/typeshed/issues/4837
+        self.server.register_function(self.start, 'start')  # type: ignore[arg-type]
+        self.server.register_function(self.stop, 'stop')  # type: ignore[arg-type]
+        self.server.register_function(self.reboot, 'reboot')  # type: ignore[arg-type]
+        self.server.register_function(self.factory_reset, 'factoryReset')  # type: ignore[arg-type]
+        self.server.register_function(self.wait_for_message, 'waitForMessage')  # type: ignore[arg-type]
+        self.server.register_function(self.compare_files, 'compareFiles')  # type: ignore[arg-type]
+        self.server.register_function(self.create_ota_image, 'createOtaImage')  # type: ignore[arg-type]
+        self.server.register_function(self.create_file, 'createFile')  # type: ignore[arg-type]
+        self.server.register_function(self.delete_file, 'deleteFile')  # type: ignore[arg-type]
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
-    def _stop_xmlrpc_server(self):
+    def _stop_xmlrpc_server(self) -> None:
         self.server.shutdown()
 
     @staticmethod
-    def _create_command_line_options(args):
+    def _create_command_line_options(args: list[str]) -> dict[str, str]:
         try:
             # Create a dictionary from the key-value pair list
             return dict(zip(args[::2], args[1::2], strict=True))
