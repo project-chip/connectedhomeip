@@ -53,7 +53,7 @@
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
-#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -208,9 +208,9 @@ void ApplicationInit()
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
     DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
-    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationCluster::Instance().SetSupportedTemperatureUnits(unitsList) ==
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetSupportedTemperatureUnits(unitsList) ==
                 CHIP_NO_ERROR);
-    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationCluster::Instance().SetTemperatureUnit(
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
     Clusters::PushAvStreamTransport::SetDelegate(chip::EndpointId(1), &gPushAvStreamTransportManager);

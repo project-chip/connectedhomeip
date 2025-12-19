@@ -20,7 +20,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/reporting/reporting.h>
 #include <lib/support/CodeUtils.h>
@@ -142,15 +141,4 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
     return CHIP_NO_ERROR;
-}
-
-void MatterUnitLocalizationPluginServerInitCallback()
-{
-    TEMPORARY_RETURN_IGNORED UnitLocalizationCluster::Instance().Init();
-    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationCluster::Instance());
-}
-
-void MatterUnitLocalizationPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationCluster::Instance());
 }

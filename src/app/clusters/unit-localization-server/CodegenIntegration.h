@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "UnitLocalizationCluster.cpp"
+#include "UnitLocalizationCluster.h"
 
 namespace chip {
 namespace app {
@@ -24,8 +24,9 @@ namespace UnitLocalization {
 
 class UnitLocalizationServer : public UnitLocalizationCluster
 {
-    static UnitLocalizationCluster & Instance();
-}
+public:
+    static UnitLocalizationServer & Instance();
+};
 
 } // namespace UnitLocalization
 } // namespace Clusters
