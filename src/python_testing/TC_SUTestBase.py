@@ -19,6 +19,7 @@ import logging
 import subprocess
 import tempfile
 from os import path
+from time import sleep
 from typing import Optional
 
 from mobly import asserts
@@ -321,15 +322,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             if restore:
                 action_str = "Restore"
                 prompt_message = "Manually restore the DUT to it's original version. Please type Enter when its ready.\n"
-
             log.info(f"Restart file not found. Entering Manual {action_str}.")
             # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
             # restore to the previous software version.
             self.controller.ExpireSessions(self.requestor_node_id)
             self.wait_for_user_input(prompt_msg=prompt_message)
             # After manual reboot, expire previous sessions so that we can re-establish connections
+            # In manual reboot or device no sleep is added as the user notify until the Device is ready.
             log.info(f"Manual device {action_str} completed")
-
         else:
             try:
                 # Create the restart flag file to signal the test runner
@@ -337,6 +337,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                     f.write("restart")
                 log.info("Created restart flag file to signal app restart")
                 # Expire sessions and re-establish connections
+                # This sleep allows the app to reconnect before atempt to perform actions.
+                sleep(1)
                 log.info("Expiring sessions after manual device reboot")
                 self.controller.ExpireSessions(self.requestor_node_id)
                 log.info("App restart completed successfully")

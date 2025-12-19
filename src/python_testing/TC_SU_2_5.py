@@ -44,6 +44,7 @@
 #       --int-arg ota_image_download_timeout:300
 #       --timeout 2100
 #     factory-reset: true
+#     app-ready-pattern: Server initialization complete
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
