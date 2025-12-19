@@ -19,14 +19,14 @@
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <clusters/ElectricalEnergyMeasurement/Metadata.h>
@@ -222,7 +222,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
         // Test CumulativeEnergyImported (requires kCumulativeEnergy + kImportedEnergy)
         {
             const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyImported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
+            chip::Testing::ReadOperation readOperation(path);
             std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
             auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
             EXPECT_TRUE(result.IsSuccess());
@@ -231,7 +231,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
         // Test CumulativeEnergyExported (requires kCumulativeEnergy + kExportedEnergy)
         {
             const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyExported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
+            chip::Testing::ReadOperation readOperation(path);
             std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
             auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
             EXPECT_TRUE(result.IsSuccess());
@@ -240,7 +240,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
         // Test PeriodicEnergyImported (requires kPeriodicEnergy + kImportedEnergy)
         {
             const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyImported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
+            chip::Testing::ReadOperation readOperation(path);
             std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
             auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
             EXPECT_TRUE(result.IsSuccess());
@@ -249,7 +249,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
         // Test PeriodicEnergyExported (requires kPeriodicEnergy + kExportedEnergy)
         {
             const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyExported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
+            chip::Testing::ReadOperation readOperation(path);
             std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
             auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
             EXPECT_TRUE(result.IsSuccess());
@@ -258,7 +258,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
         // Test CumulativeEnergyReset (requires kCumulativeEnergy)
         {
             const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyReset::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
+            chip::Testing::ReadOperation readOperation(path);
             std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
             auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
             EXPECT_TRUE(result.IsSuccess());
