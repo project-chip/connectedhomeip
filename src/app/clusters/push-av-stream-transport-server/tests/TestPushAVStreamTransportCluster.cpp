@@ -23,7 +23,6 @@
 #include <app/CommandHandler.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
@@ -642,38 +641,12 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
      */
 
     // Check the response
-    const auto & responses = commandHandler.GetResponses();
-    EXPECT_EQ(responses.size(), (size_t) 1);
+    EXPECT_TRUE(commandHandler.HasResponse());
+    EXPECT_EQ(commandHandler.GetResponseCount(), (size_t) 1);
 
-    // Get the encoded buffer
-    const auto & encodedBuffer = responses[0].encodedData;
-
-    PrintBufHex(encodedBuffer->Start(), encodedBuffer->DataLength());
-
-    EXPECT_FALSE(encodedBuffer.IsNull());
-
-    // Set up TLV reader
-    TLV::TLVReader responseReader;
-    responseReader.Init(encodedBuffer->Start(), static_cast<uint32_t>(encodedBuffer->DataLength()));
-
-    // Enter the top-level anonymous structure (CommandDataIB wrapper)
-    err = responseReader.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    TLV::TLVReader outerContainer;
-    err = responseReader.OpenContainer(outerContainer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    // Read the next element inside the container: should be kFields
-    err = outerContainer.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    EXPECT_TRUE(IsContextTag(outerContainer.GetTag()));
-    EXPECT_EQ(TagNumFromTag(outerContainer.GetTag()), chip::to_underlying(CommandDataIB::Tag::kFields));
-
-    // Decode into response object
+    // Decode response using MockCommandHandler helper
     Commands::AllocatePushTransportResponse::DecodableType decodedResponse;
-    err = decodedResponse.Decode(outerContainer);
+    err = commandHandler.DecodeResponse(decodedResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Validate decoded fields
@@ -1130,38 +1103,12 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     server.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
 
     // Check the response
-    const auto & responses = findCommandHandler.GetResponses();
-    EXPECT_EQ(responses.size(), (size_t) 1);
+    EXPECT_TRUE(findCommandHandler.HasResponse());
+    EXPECT_EQ(findCommandHandler.GetResponseCount(), (size_t) 1);
 
-    // Get the encoded buffer
-    const auto & encodedBuffer = responses[0].encodedData;
-
-    PrintBufHex(encodedBuffer->Start(), encodedBuffer->DataLength());
-
-    EXPECT_FALSE(encodedBuffer.IsNull());
-
-    // Set up TLV reader
-    TLV::TLVReader responseReader;
-    responseReader.Init(encodedBuffer->Start(), static_cast<uint32_t>(encodedBuffer->DataLength()));
-
-    // Enter the top-level anonymous structure (CommandDataIB wrapper)
-    err = responseReader.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    TLV::TLVReader outerContainer;
-    err = responseReader.OpenContainer(outerContainer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    // Read the next element inside the container: should be kFields
-    err = outerContainer.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    EXPECT_TRUE(IsContextTag(outerContainer.GetTag()));
-    EXPECT_EQ(TagNumFromTag(outerContainer.GetTag()), chip::to_underlying(CommandDataIB::Tag::kFields));
-
-    // Decode into response object
+    // Decode response using MockCommandHandler helper
     Commands::FindTransportResponse::DecodableType decodedResponse;
-    err = decodedResponse.Decode(outerContainer);
+    err = findCommandHandler.DecodeResponse(decodedResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     auto iter = decodedResponse.transportConfigurations.begin();
