@@ -250,7 +250,7 @@ public:
     }
 
     /**
-     * Get infromation that is used to report minima capability values for the device.
+     * Get information that is used to report capability minima values for the device.
      * @retval An instance of the DeviceInfoCapabilityMinimas struct
      */
     virtual DeviceInfoCapabilityMinimas GetSupportedCapabilityMinimaValues()

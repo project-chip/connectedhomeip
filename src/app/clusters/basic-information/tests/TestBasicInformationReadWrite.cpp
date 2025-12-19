@@ -336,16 +336,16 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         EXPECT_GE(val.subscriptionsPerFabric, 3);
 
         ASSERT_TRUE(val.simultaneousInvocationsSupported.HasValue());
-        EXPECT_GE(val.simultaneousInvocationsSupported.Value(), 4);
+        EXPECT_GE(val.simultaneousInvocationsSupported.Value(), CHIP_IM_MAX_NUM_COMMAND_HANDLER);
 
         ASSERT_TRUE(val.simultaneousWritesSupported.HasValue());
-        EXPECT_GE(val.simultaneousWritesSupported.Value(), 4);
+        EXPECT_GE(val.simultaneousWritesSupported.Value(), CHIP_IM_MAX_NUM_WRITE_HANDLER);
 
         ASSERT_TRUE(val.readPathsSupported.HasValue());
-        EXPECT_GE(val.readPathsSupported.Value(), 144);
+        EXPECT_GE(val.readPathsSupported.Value(), CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS);
 
         ASSERT_TRUE(val.subscribePathsSupported.HasValue());
-        EXPECT_GE(val.subscribePathsSupported.Value(), 3);
+        EXPECT_GE(val.subscribePathsSupported.Value(), CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS);
     }
 }
 
