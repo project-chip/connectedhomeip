@@ -22,6 +22,8 @@ import time
 import typing
 import warnings
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Literal
 
 import chiptest
 import click
@@ -64,7 +66,7 @@ class RunContext:
     find_path: typing.List[str]
 
     # Deprecated options passed to `cmd_run`
-    deprecated_chip_tool_path: str
+    deprecated_chip_tool_path: Path
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -82,11 +84,14 @@ class DeprecatedOption(click.Option):
         super().__init__(*args, **kwargs, callback=deprecation_warning)
 
 
+ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
+
+
 @click.group(chain=True)
 @click.option(
     '--log-level',
     default='info',
-    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+    type=click.Choice(tuple(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
     '--target',
@@ -122,13 +127,14 @@ class DeprecatedOption(click.Option):
 )
 @click.option(
     '--include-tags',
-    type=click.Choice(TestTag.__members__.keys(), case_sensitive=False),
+    # Click allows passing StrEnum class directly, but doesn't show it in type hints.
+    type=click.Choice(TestTag, case_sensitive=False),  # type: ignore[arg-type]
     multiple=True,
-    help='What test tags to include when running. Equivalent to "exlcude all except these" for priority purpuses.',
+    help='What test tags to include when running. Equivalent to "exclude all except these" for priority purposes.',
 )
 @click.option(
     '--exclude-tags',
-    type=click.Choice(TestTag.__members__.keys(), case_sensitive=False),
+    type=click.Choice(TestTag, case_sensitive=False),  # type: ignore[arg-type]
     multiple=True,
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
@@ -136,19 +142,22 @@ class DeprecatedOption(click.Option):
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
-    help='Default directory path for finding compiled apps and tools.')
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Default directory path for finding compiled targets.')
 @click.option(
     '--runner',
     type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
-    '--chip-tool', cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
+
+    '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, include_tags,
-         exclude_tags, find_path, runner, chip_tool):
+def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
+         no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
+         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
+
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -182,12 +191,14 @@ def main(context, log_level, target, target_glob, target_skip_glob,
     else:
         all_tests = list(chiptest.AllChipToolYamlTests())
 
-    tests = all_tests
+    tests: list[TestDefinition] = all_tests
 
     # If just defaults specified, do not run manual and in development
     # Specific target basically includes everything
-    if 'all' in target and not include_tags and not exclude_tags:
-        exclude_tags = {
+    exclude_tags_set = set(exclude_tags)
+    include_tags_set = set(include_tags)
+    if 'all' in target and not include_tags_set and not exclude_tags_set:
+        exclude_tags_set = {
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
             TestTag.FLAKY,
@@ -196,7 +207,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
         }
 
         if runtime == TestRunTime.MATTER_REPL_PYTHON:
-            exclude_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
+            exclude_tags_set.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
         tests = []
@@ -224,11 +235,11 @@ def main(context, log_level, target, target_glob, target_skip_glob,
 
     tests_filtered: list[TestDefinition] = []
     for test in tests:
-        if include_tags and not (test.tags & include_tags):
+        if include_tags_set and not (test.tags & include_tags_set):
             log.debug("Test '%s' not included", test.name)
             continue
 
-        if exclude_tags and test.tags & exclude_tags:
+        if exclude_tags_set and test.tags & exclude_tags_set:
             log.debug("Test '%s' excluded", test.name)
             continue
 
@@ -238,13 +249,14 @@ def main(context, log_level, target, target_glob, target_skip_glob,
 
     context.obj = RunContext(root=root, tests=tests_filtered,
                              runtime=runtime, find_path=find_path,
-                             deprecated_chip_tool_path=chip_tool)
+                             deprecated_chip_tool_path=Path(chip_tool))
 
 
 @main.command(
     'list', help='List available test suites')
 @click.pass_context
-def cmd_list(context):
+def cmd_list(context: click.Context) -> None:
+    assert isinstance(context.obj, RunContext)
     for test in context.obj.tests:
         tags = test.tags_str()
         if tags:
@@ -266,52 +278,52 @@ def cmd_list(context):
     help='Number of iterations to run')
 # Deprecated flags:
 @click.option(
-    '--all-clusters-app', cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
+    '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
     help='what all clusters app to use')
 @click.option(
-    '--lock-app', cls=DeprecatedOption, replacement='--app-path lock:<path>',
+    '--lock-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path lock:<path>',
     help='what lock app to use')
 @click.option(
-    '--fabric-bridge-app', cls=DeprecatedOption, replacement='--app-path fabric-bridge:<path>',
+    '--fabric-bridge-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path fabric-bridge:<path>',
     help='what fabric bridge app to use')
 @click.option(
-    '--ota-provider-app', cls=DeprecatedOption, replacement='--app-path ota-provider:<path>',
+    '--ota-provider-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path ota-provider:<path>',
     help='what ota provider app to use')
 @click.option(
-    '--ota-requestor-app', cls=DeprecatedOption, replacement='--app-path ota-requestor:<path>',
+    '--ota-requestor-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path ota-requestor:<path>',
     help='what ota requestor app to use')
 @click.option(
-    '--tv-app', cls=DeprecatedOption, replacement='--app-path tv:<path>',
+    '--tv-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path tv:<path>',
     help='what tv app to use')
 @click.option(
-    '--bridge-app', cls=DeprecatedOption, replacement='--app-path bridge:<path>',
+    '--bridge-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path bridge:<path>',
     help='what bridge app to use')
 @click.option(
-    '--lit-icd-app', cls=DeprecatedOption, replacement='--app-path lit-icd:<path>',
+    '--lit-icd-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path lit-icd:<path>',
     help='what lit-icd app to use')
 @click.option(
-    '--microwave-oven-app', cls=DeprecatedOption, replacement='--app-path microwave-oven:<path>',
+    '--microwave-oven-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path microwave-oven:<path>',
     help='what microwave oven app to use')
 @click.option(
-    '--rvc-app', cls=DeprecatedOption, replacement='--app-path rvc:<path>',
+    '--rvc-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path rvc:<path>',
     help='what rvc app to use')
 @click.option(
-    '--network-manager-app', cls=DeprecatedOption, replacement='--app-path network-manager:<path>',
+    '--network-manager-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path network-manager:<path>',
     help='what network-manager app to use')
 @click.option(
-    '--energy-gateway-app', cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
+    '--energy-gateway-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
     help='what energy-gateway app to use')
 @click.option(
-    '--energy-management-app', cls=DeprecatedOption, replacement='--app-path energy-management:<path>',
+    '--energy-management-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-management:<path>',
     help='what energy-management app to use')
 @click.option(
-    '--closure-app', cls=DeprecatedOption, replacement='--app-path closure:<path>',
+    '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
 @click.option(
-    '--matter-repl-yaml-tester', cls=DeprecatedOption, replacement='--tool-path matter-repl-yaml-tester:<path>',
+    '--matter-repl-yaml-tester', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path matter-repl-yaml-tester:<path>',
     help='what python script to use for running yaml tests using matter-repl as controller')
 @click.option(
-    '--chip-tool-with-python', cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
+    '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.option(
     '--app-path', multiple=True,
@@ -334,7 +346,7 @@ def cmd_list(context):
 )
 @click.option(
     '--pics-file',
-    type=click.Path(exists=True),
+    type=ExistingFilePath,
     default="src/app/tests/suites/certification/ci-pics-values",
     show_default=True,
     help='PICS file to use for test runs.')
@@ -351,7 +363,7 @@ def cmd_list(context):
     help='If provided, fail if a test runs for longer than this time')
 @click.option(
     '--expected-failures',
-    type=int,
+    type=click.IntRange(min=0),
     default=0,
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
@@ -362,11 +374,17 @@ def cmd_list(context):
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
-def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, discover_paths,
-            all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, fabric_bridge_app, tv_app, bridge_app, lit_icd_app,
-            microwave_oven_app, rvc_app, network_manager_app, energy_gateway_app, energy_management_app, closure_app,
-            matter_repl_yaml_tester, chip_tool_with_python,
-            pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
+def cmd_run(context: click.Context, dry_run: bool, iterations: int,
+            app_path: list[str], tool_path: list[str], custom_path: list[str], discover_paths: bool,
+            # Deprecated CLI flags
+            all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
+            fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
+            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
+            energy_management_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
+            chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
+            expected_failures: int, ble_wifi: bool) -> None:
+    assert isinstance(context.obj, RunContext)
+
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
@@ -467,8 +485,9 @@ def cmd_run(context, dry_run, iterations, app_path, tool_path, custom_path, disc
     apps_register = AppsRegister()
     apps_register.init()
 
-    def cleanup():
+    def cleanup() -> None:
         apps_register.uninit()
+        executor.terminate()
         if sys.platform == 'linux':
             if ble_wifi:
                 wifi.terminate()
@@ -518,7 +537,7 @@ if sys.platform == 'linux':
         'shell',
         help=('Execute a bash shell in the environment (useful to test '
               'network namespaces)'))
-    def cmd_shell():
+    def cmd_shell() -> None:
         chiptest.linux.IsolatedNetworkNamespace()
         os.execvpe("bash", ["bash"], os.environ.copy())
 
