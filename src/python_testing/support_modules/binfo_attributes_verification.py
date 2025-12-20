@@ -200,7 +200,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             if vendor_name:
                 asserts.assert_not_in(
                     vendor_name, ret15, "ProductLabel should not include the name of the vendor as defined within the VendorName attribute")
-            
+
         # Step 16: SerialNumber
         self.step(16)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
