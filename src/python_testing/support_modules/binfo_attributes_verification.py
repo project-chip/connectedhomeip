@@ -17,9 +17,10 @@
 
 import logging
 from datetime import datetime
-from mobly import asserts
+
 import pycountry
 import validators
+from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.matter_testing import MatterBaseTest, TestStep
