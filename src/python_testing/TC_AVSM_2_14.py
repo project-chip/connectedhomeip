@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_14(MatterBaseTest):
@@ -102,7 +102,7 @@ class TC_AVSM_2_14(MatterBaseTest):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio)
     )
     async def test_TC_AVSM_2_14(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -111,26 +111,26 @@ class TC_AVSM_2_14(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        logger.info("Verified Audio feature is supported")
+        log.info("Verified Audio feature is supported")
 
         self.step(2)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0.")
 
         self.step(3)
         aMicrophoneCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
-        logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
+        log.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
 
         self.step(4)
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        log.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
 
         self.step(5)
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
@@ -144,7 +144,7 @@ class TC_AVSM_2_14(MatterBaseTest):
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            logger.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            log.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
             )
@@ -157,7 +157,7 @@ class TC_AVSM_2_14(MatterBaseTest):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
         self.step(7)
@@ -171,7 +171,7 @@ class TC_AVSM_2_14(MatterBaseTest):
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            logger.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            log.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
             )
@@ -185,7 +185,7 @@ class TC_AVSM_2_14(MatterBaseTest):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
         # Clear all allocated streams

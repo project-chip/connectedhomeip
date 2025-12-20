@@ -47,7 +47,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +56,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.16] Validate ProvideOffer resource exhaustion - PROVISIONAL"
 
     def steps_TC_WEBRTCP_2_16(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
@@ -65,10 +65,9 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             TestStep(3, "TH sends an additional ProvideOffer command beyond DUT's capacity",
                      "DUT responds with RESOURCE_EXHAUSTED status code"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_16(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
             "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
@@ -76,7 +75,10 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTCP_2_16(self):
@@ -86,7 +88,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams
@@ -99,7 +101,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(2)
         # Send multiple ProvideOffer commands to exhaust the DUT's capacity
-        logger.info("Starting to send ProvideOffer commands to exhaust DUT capacity")
+        log.info("Starting to send ProvideOffer commands to exhaust DUT capacity")
 
         # Get the maximum concurrent WebRTC sessions from user or use default for CI
         prompt_msg = (
@@ -111,14 +113,14 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             # Use default value for CI testing
             max_attempts = 5
-            logger.info(f"Using default max_attempts={max_attempts} for CI testing")
+            log.info(f"Using default max_attempts={max_attempts} for CI testing")
         else:
             # Prompt user for DUT-specific value
             user_input = self.wait_for_user_input(prompt_msg)
             try:
                 max_attempts = int(user_input.strip())
                 asserts.assert_true(max_attempts > 0, "Maximum concurrent sessions must be greater than 0")
-                logger.info(f"Using user-specified max_attempts={max_attempts}")
+                log.info(f"Using user-specified max_attempts={max_attempts}")
             except ValueError:
                 asserts.fail(f"Invalid input '{user_input}'. Please enter a valid number.")
 
@@ -151,7 +153,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
 
         # Try to allocate multiple sessions to reach the DUT's capacity limit
         for attempt in range(max_attempts):
-            logger.info(f"Attempt {attempt + 1}: Sending ProvideOffer command")
+            log.info(f"Attempt {attempt + 1}: Sending ProvideOffer command")
             resp = await self.send_single_cmd(
                 cmd=provide_offer_cmd,
                 endpoint=1,
@@ -159,11 +161,11 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                                  "Incorrect response type")
-            logger.info(f"Successfully created ProvideOffer session {attempt + 1}")
+            log.info(f"Successfully created ProvideOffer session {attempt + 1}")
 
         self.step(3)
         # Send an additional ProvideOffer command when DUT capacity is exhausted
-        logger.info("Sending additional ProvideOffer command to trigger resource exhaustion")
+        log.info("Sending additional ProvideOffer command to trigger resource exhaustion")
 
         # This should fail with RESOURCE_EXHAUSTED status
         try:
@@ -178,9 +180,9 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             # Verify that we got the expected RESOURCE_EXHAUSTED status
             asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  f"Expected RESOURCE_EXHAUSTED status, got {e.status}")
-            logger.info(f"Correctly received RESOURCE_EXHAUSTED status: {e.status}")
+            log.info(f"Correctly received RESOURCE_EXHAUSTED status: {e.status}")
 
-        logger.info("Successfully validated ProvideOffer resource exhaustion behavior")
+        log.info("Successfully validated ProvideOffer resource exhaustion behavior")
 
 
 if __name__ == "__main__":

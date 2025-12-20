@@ -17,7 +17,7 @@
  */
 
 #include "CodegenIntegration.h"
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/static-cluster-config/BooleanState.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -73,7 +73,7 @@ void MatterBooleanStateClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -84,7 +84,7 @@ void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kBooleanStateFixedClusterCount,
             .maxClusterInstanceCount   = kBooleanStateMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 namespace chip::app::Clusters::BooleanState {

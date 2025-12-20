@@ -262,11 +262,11 @@ if CHIP_APP_OTA_REQUESTOR
     choice CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
         prompt "Select OTA Requestor Initiator"
 
-        config CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE
-            bool "OTA Requestor Initiator Multi-Image"
+        config CHIP_APP_OTA_REQUESTOR_INITIATOR_EMPTY_SELF_TEST
+            bool "OTA Requestor Initiator Empty Self Test"
             depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
             help
-                Enable OTA Requestor Initiator for multiple image OTA SW update.
+                Enable OTA Requestor Initiator with an empty self test function for OTA SW update.
 
         config CHIP_APP_OTA_REQUESTOR_INITIATOR_FREERTOS
             bool "OTA Requestor Initiator FreeRTOS"
@@ -289,6 +289,12 @@ if CHIP_APP_OTA_REQUESTOR
             Use platform OtaUtils.cpp file.
 
 endif # CHIP_APP_OTA_REQUESTOR
+
+config CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
+	bool "Registration of simple test event trigger delegate"
+	default y if CHIP_ENABLE_ICD_SUPPORT
+	help
+	  Enable registration of a simple test event trigger delegate, ONLY enable it for matter certification testing.
 
 config CHIP_APP_RPC
     bool "App RPC"

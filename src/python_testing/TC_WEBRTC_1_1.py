@@ -47,10 +47,12 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -78,7 +80,6 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-        return steps
 
     def desc_TC_WEBRTC_1_1(self) -> str:
         return "[TC-WEBRTC-1.1] Validate that setting an SDP Offer successfully initiates a new WebRTC session"
@@ -90,11 +91,15 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
     def default_timeout(self) -> int:
         return 4 * 60  # 4 minutes
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTC_1_1(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
@@ -158,7 +163,7 @@ class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):
 
         self.step(5)
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only and aVideoStreamID != NullValue:

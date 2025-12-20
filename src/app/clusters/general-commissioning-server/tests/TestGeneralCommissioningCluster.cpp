@@ -16,11 +16,11 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralCommissioning/Metadata.h>

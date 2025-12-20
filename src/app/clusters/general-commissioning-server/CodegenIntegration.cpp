@@ -17,7 +17,7 @@
  */
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
@@ -121,7 +121,7 @@ void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -135,7 +135,7 @@ void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGeneralCommissioningPluginServerInitCallback() {}

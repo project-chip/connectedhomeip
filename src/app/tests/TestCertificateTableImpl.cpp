@@ -17,8 +17,11 @@
  */
 
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
+
+#include <app/InteractionModelEngine.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -26,7 +29,7 @@
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app::DataModel;
 using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
@@ -43,13 +46,13 @@ static constexpr uint16_t kSpecMaxCertBytes = 3000;
 
 struct InlineBufferedRootCert : CertificateTable::BufferedRootCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
     InlineBufferedRootCert() : CertificateTable::BufferedRootCert(buffer) {}
 };
 
 struct InlineBufferedClientCert : CertificateTable::BufferedClientCert
 {
-    PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
+    PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
     InlineBufferedClientCert() : CertificateTable::BufferedClientCert(buffer) {}
 };
 
@@ -63,9 +66,11 @@ public:
     static void SetUpTestSuite()
     {
         mpTestStorage = new chip::TestPersistentStorageDelegate;
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_NE(mpTestStorage, nullptr);
         ASSERT_EQ(sCertificateTable.Init(*mpTestStorage), CHIP_NO_ERROR);
         ASSERT_EQ(sCertificateTable.SetEndpoint(kMockEndpoint1), CHIP_NO_ERROR);
+        app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&app::CodegenDataModelProvider::Instance());
     }
 
     static void TearDownTestSuite()
@@ -73,6 +78,7 @@ public:
         sCertificateTable.Finish();
         delete mpTestStorage;
         mpTestStorage = nullptr;
+        Platform::MemoryShutdown();
     }
 
     static void ResetCertificateTable()

@@ -177,7 +177,8 @@ mcxw72_executable("contact_sensor_app") {
     include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
     sources += [
       "${common_example_dir}/../mcxw71/ota/OtaUtils.cpp",
-      "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp",
+      "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorCommon.cpp",
+      "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorEmptySelfTest.cpp",
     ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
   }

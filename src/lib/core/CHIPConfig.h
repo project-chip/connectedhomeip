@@ -738,6 +738,16 @@
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_TRACING_BACKENDS
+ *
+ * @brief The maximum number of tracing backends that can be registered.
+ * This value only takes effect if tracing is enabled at all.
+ */
+#ifndef CHIP_CONFIG_MAX_TRACING_BACKENDS
+#define CHIP_CONFIG_MAX_TRACING_BACKENDS 4
+#endif
+
+/**
  * @def CHIP_CONFIG_ENABLE_ARG_PARSER
  *
  * @brief Enable support functions for parsing command-line arguments
@@ -1706,6 +1716,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+ *
+ * The CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC is a configuration for shorter idle mode interval for LIT capable devices
+ * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availability status with their
+ * subscribers.
+ *
+ * The short idleMode duration SHALL be lesser than or equal to the IdleModeDuration.
+ *
+ * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+ */
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #endif
 
 /**

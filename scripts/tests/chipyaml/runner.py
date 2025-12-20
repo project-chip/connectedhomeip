@@ -17,6 +17,7 @@
 import relative_importer  # isort: split # noqa: F401
 
 import asyncio
+import contextlib
 import importlib
 import os
 import sys
@@ -74,9 +75,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
-    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
-                     help='Path to a directory containing additional pseudo clusters.')(f)
-    return f
+    return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
+                        help='Path to a directory containing additional pseudo clusters.')(f)
 
 
 def test_runner_options(f):
@@ -94,9 +94,8 @@ def test_runner_options(f):
                      help='Show additional logs provided by the adapter on error.')(f)
     f = click.option('--use_test_harness_log_format', type=bool, default=False, show_default=True,
                      help='Use the test harness log format.')(f)
-    f = click.option('--delay-in-ms', type=int, default=0, show_default=True,
-                     help='Add a delay between test suite steps.')(f)
-    return f
+    return click.option('--delay-in-ms', type=int, default=0, show_default=True,
+                        help='Add a delay between test suite steps.')(f)
 
 
 def websocket_runner_options(f):
@@ -108,9 +107,8 @@ def websocket_runner_options(f):
                      help='Name of a websocket server to run at launch.')(f)
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
                      help='Path to a websocket server to run at launch.')(f)
-    f = click.option('--server_arguments', type=str, default=None,
-                     help='Optional arguments to pass to the websocket server at launch.')(f)
-    return f
+    return click.option('--server_arguments', type=str, default=None,
+                        help='Optional arguments to pass to the websocket server at launch.')(f)
 
 
 def matter_repl_runner_options(f):
@@ -118,9 +116,8 @@ def matter_repl_runner_options(f):
                      help='Path to persistent storage configuration file.')(f)
     f = click.option('--commission_on_network_dut', type=bool, default=False,
                      help='Prior to running test should we try to commission DUT on network.')(f)
-    f = click.option('--runner', type=str, default=None, show_default=True,
-                     help='The runner to run the test with.')(f)
-    return f
+    return click.option('--runner', type=str, default=None, show_default=True,
+                        help='The runner to run the test with.')(f)
 
 
 @dataclass
@@ -204,10 +201,8 @@ class YamlTestParserGroup(click.Group):
 
         # There is a single test, extract the custom config
         if len(tests) == 1:
-            try:
+            with contextlib.suppress(Exception):
                 custom_options = TestConfigParser.get_config(tests[0])
-            except Exception:
-                pass
             for key, value in custom_options.items():
                 param = click.Option(['--' + key], default=value, show_default=True)
                 # click converts parameter name to lowercase internally, so we need to override
@@ -263,7 +258,7 @@ def runner_base(ctx, configuration_directory: str, test_name: str, configuration
 
     test_list = tests_finder.get(test_name)
     if len(test_list) == 0:
-        raise Exception(f"No tests found for test name '{test_name}'")
+        raise ValueError(f"No tests found for test name '{test_name}'")
 
     parser_config = TestParserConfig(pics, specifications, kwargs)
     parser_builder_config = TestParserBuilderConfig(test_list, parser_config, hooks=TestParserLogger())

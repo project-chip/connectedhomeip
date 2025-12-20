@@ -17,7 +17,7 @@
  */
 
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -115,7 +115,7 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
+void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -128,7 +128,7 @@ void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterTimeSynchronizationPluginServerInitCallback() {}

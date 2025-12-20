@@ -16,10 +16,10 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/TimeSynchronization/Attributes.h>
 #include <clusters/TimeSynchronization/Enums.h>
@@ -33,7 +33,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TimeSynchronization;
 using namespace chip::app::Clusters::TimeSynchronization::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 struct TestTimeSynchronizationCluster : public ::testing::Test
 {
@@ -43,7 +43,7 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 
     TestTimeSynchronizationCluster() {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     TimeSynchronization::DefaultTimeSyncDelegate delegate;
 };
 
@@ -67,7 +67,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -88,7 +88,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -111,7 +111,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -135,7 +135,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -158,7 +158,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -191,7 +191,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -218,7 +218,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::DecodableType utcTime{};
         ASSERT_EQ(tester.ReadAttribute(UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -246,7 +246,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TimeSourceEnum timeSource{};
         ASSERT_EQ(tester.ReadAttribute(TimeSource::Id, timeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -273,7 +273,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource{};
         ASSERT_EQ(tester.ReadAttribute(TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -303,7 +303,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         SupportsDNSResolve::TypeInfo::DecodableType supportsDNSResolve{};
         ASSERT_EQ(tester.ReadAttribute(SupportsDNSResolve::Id, supportsDNSResolve), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -330,7 +330,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         NTPServerAvailable::TypeInfo::DecodableType ntpServerAvailable{};
         ASSERT_EQ(tester.ReadAttribute(NTPServerAvailable::Id, ntpServerAvailable), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -372,6 +372,6 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         DSTOffsetListMaxSize::TypeInfo::DecodableType dstOffsetListMaxSize{};
         ASSERT_EQ(tester.ReadAttribute(DSTOffsetListMaxSize::Id, dstOffsetListMaxSize), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }

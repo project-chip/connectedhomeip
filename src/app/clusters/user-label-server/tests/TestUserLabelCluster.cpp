@@ -16,10 +16,10 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
@@ -34,7 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 // Mock DeviceInfoProvider for testing
 class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
@@ -75,13 +75,13 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void TearDown() override
     {
-        userLabel.Shutdown();
+        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
         DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 
     TestUserLabelCluster() : userLabel(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     UserLabelCluster userLabel;
     MockDeviceInfoProvider mDeviceInfoProvider;
 };

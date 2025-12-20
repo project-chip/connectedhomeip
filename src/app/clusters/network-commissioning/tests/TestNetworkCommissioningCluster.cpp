@@ -19,11 +19,11 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -36,7 +36,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
-#include "FakeWifiDriver.h"
+#include "FakeDrivers.h"
 
 namespace {
 
@@ -45,9 +45,10 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
 
 using chip::app::AttributeValueDecoder;
+using chip::app::ClusterShutdownType;
 using chip::app::DataModel::AttributeEntry;
-using chip::app::Testing::kAdminSubjectDescriptor;
-using chip::app::Testing::WriteOperation;
+using chip::Testing::kAdminSubjectDescriptor;
+using chip::Testing::WriteOperation;
 
 class NoopBreadcrumbTracker : public BreadCrumbTracker
 {
@@ -108,13 +109,13 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     NoopBreadcrumbTracker tracker;
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     {
         WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
         writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(true);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(false);
 
         // no notification if enable fails
         context.ChangeListener().DirtyList().clear();
@@ -139,7 +140,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
         );
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

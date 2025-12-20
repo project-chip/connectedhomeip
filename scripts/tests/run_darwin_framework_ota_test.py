@@ -4,14 +4,17 @@ import io
 import json
 import logging
 import time
+from pathlib import Path
 from subprocess import PIPE
 
 import click
 from chiptest.accessories import AppsRegister
 from chiptest.darwin import DarwinExecutor
-from chiptest.runner import Runner, SubprocessInfo
+from chiptest.runner import Runner, SubprocessInfo, SubprocessKind
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
+
+log = logging.getLogger(__name__)
 
 TEST_NODE_ID = '0x12344321'
 TEST_VID = '0xFFF1'
@@ -39,24 +42,23 @@ class DarwinToolRunner:
             self.process.kill()
 
     def waitForMessage(self, message):
-        logging.debug('Waiting for %s' % message)
+        log.debug("Waiting for '%s'", message)
 
         start_time = time.monotonic()
         ready, self.lastLogIndex = self.outpipe.CapturedLogContains(
             message, self.lastLogIndex)
         while not ready:
             if self.process.poll() is not None:
-                died_str = ('Process died while waiting for %s, returncode %d' %
-                            (message, self.process.returncode))
-                logging.error(died_str)
-                raise Exception(died_str)
+                died_str = f'Process died while waiting for {message}, returncode {self.process.returncode}'
+                log.error(died_str)
+                raise RuntimeError(died_str)
             if time.monotonic() - start_time > 10:
-                raise Exception('Timeout while waiting for %s' % message)
+                raise TimeoutError(f'Timeout while waiting for {message}')
             time.sleep(0.1)
             ready, self.lastLogIndex = self.outpipe.CapturedLogContains(
                 message, self.lastLogIndex)
 
-        logging.debug('Success waiting for: %s' % message)
+        log.debug("Success waiting for: '%s'", message)
 
 
 class InteractiveDarwinTool(DarwinToolRunner):
@@ -68,7 +70,7 @@ class InteractiveDarwinTool(DarwinToolRunner):
         self.waitForMessage(self.prompt)
 
     def sendCommand(self, command):
-        logging.debug('Sending command %s' % command)
+        log.debug("Sending command '%s'", command)
         print(command, file=self.stdin)
         self.waitForPrompt()
 
@@ -113,10 +115,10 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
 
     if darwin_framework_tool is not None:
-        darwin_framework_tool = SubprocessInfo(kind='tool', path=darwin_framework_tool)
+        darwin_framework_tool = SubprocessInfo(kind=SubprocessKind.TOOL, path=Path(darwin_framework_tool))
 
     if ota_requestor_app is not None:
-        ota_requestor_app = SubprocessInfo(kind='app', path=ota_requestor_app,
+        ota_requestor_app = SubprocessInfo(kind=SubprocessKind.APP, path=Path(ota_requestor_app),
                                            args=('--otaDownloadPath', ota_destination_file))
 
     runner = Runner(executor=DarwinExecutor())
@@ -128,7 +130,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
     darwin_tool = None
 
     try:
-        apps_register.createOtaImage(ota_image_file, ota_data_file, "This is some test OTA data", vid=TEST_VID, pid=TEST_PID)
+        apps_register.create_ota_image(ota_image_file, ota_data_file, "This is some test OTA data", vid=TEST_VID, pid=TEST_PID)
         json_data = {
             "deviceSoftwareVersionModel": [{
                 "vendorId": int(TEST_VID, 16),
@@ -159,7 +161,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         darwin_tool.waitForMessage(": Commissioner Node Id")
         nodeIdLine = darwin_tool.outpipe.FindLastMatchingLine('.*: Commissioner Node Id (0x[0-9A-F]+)')
         if not nodeIdLine:
-            raise Exception("Unable to find commissioner node id")
+            raise RuntimeError("Unable to find commissioner node id")
         commissionerNodeId = nodeIdLine.group(1)
         darwin_tool.stop()
 
@@ -179,18 +181,18 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         requestor_app.waitForMessage("OTA image downloaded to %s" % ota_destination_file)
 
         # Make sure the right thing was downloaded.
-        apps_register.compareFiles(ota_data_file, ota_destination_file)
+        apps_register.compare_files(ota_data_file, ota_destination_file)
 
     except Exception:
-        logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+        log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
         runner.capture_delegate.LogContents()
         raise
     finally:
         if darwin_tool is not None:
             darwin_tool.stop()
-        apps_register.killAll()
-        apps_register.factoryResetAll()
-        apps_register.removeAll()
+        apps_register.kill_all()
+        apps_register.factory_reset_all()
+        apps_register.remove_all()
         apps_register.uninit()
 
 
