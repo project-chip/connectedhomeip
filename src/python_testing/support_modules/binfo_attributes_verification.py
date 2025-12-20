@@ -16,15 +16,13 @@
 #
 
 import logging
-import re
 from datetime import datetime
-
-import pycountry
 from mobly import asserts
+import pycountry
+import validators
 
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.matter_testing import MatterBaseTest, TestStep
-
 
 class BasicInformationAttributesVerificationBase(MatterBaseTest):
     def steps(self) -> list[TestStep]:
@@ -46,7 +44,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             TestStep(11, "TH reads SoftwareVersionString from the DUT.",
                      "Verify it is of type string, has a length of 1 to 64 bytes"),
             TestStep(12, "TH reads ManufacturingDate from the DUT",
-                     "Verify it is of type string, length in the range of 8 to 16 bytes, and the first 8 characters specify date according to YYYYMMDD."),
+                     "Verify it is of type string, length in the range of 8 to 16 bytes, and the first 8 characters specify date according to YYYYMMDD, additionally the date should not be in the future and not before the first Matter release date (2022-10-04)."),
             TestStep(13, "TH reads PartNumber from the DUT", "Verify it is of type string, and has a max length of 32 bytes"),
             TestStep(14, "TH reads ProductURL from the DUT.",
                      "Verify it is of type string, less than or equal to 256 ASCII characters, and follows the syntax rules specified in RFC 3986"),
@@ -68,18 +66,16 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
     def pics(self, cluster_pics) -> list[str]:
         return [f"{cluster_pics}.S"]
 
-    async def implementation(self, cluster: Cluster, cluster_name: str):
+    async def implementation(self, cluster: Cluster):
         self.endpoint = self.get_endpoint()
         self.step(0)  # commissioning already done
 
-        # Step 1: DataModelRevision
-        if cluster_name == "BRBINFO":
-            self.skip_step(1)
-        else:
-            self.step(1)
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
-                ret1 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DataModelRevision)
-                asserts.assert_equal(ret1, 19, "DataModelRevision should be 19")
+        self.step(1)
+        if hasattr(cluster.Attributes, 'DataModelRevision') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
+            ret1 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DataModelRevision)
+            asserts.assert_equal(ret1, 19, "DataModelRevision should be 19")
+        elif not hasattr(cluster.Attributes, 'DataModelRevision'):
+            self.mark_current_step_skipped()
 
         # Step 2: VendorName
         self.step(2)
@@ -116,10 +112,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             asserts.assert_equal(len(ret6) <= 32, True, "NodeLabel should be a string with max 32 bytes")
 
         # Step 7: Location
-        if cluster_name == "BRBINFO":
-            self.skip_step(7)
-        else:
-            self.step(7)
+        self.step(7)
+        if hasattr(cluster.Attributes, 'Location') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.Location):
             ret7 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.Location)
             asserts.assert_true(isinstance(ret7, str), "Location should be a string")
             asserts.assert_less_equal(len(ret7), 2, "Location should have max 2 characters")
@@ -128,6 +122,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                 # Use pycountry to validate the country code
                 country = pycountry.countries.get(alpha_2=ret7)
                 asserts.assert_is_not_none(country, f"Location '{ret7}' should be a valid ISO 3166-1 alpha-2 country code")
+        elif not hasattr(cluster.Attributes, 'Location'):
+            self.mark_current_step_skipped()
 
         # Step 8: HardwareVersion
         self.step(8)
@@ -170,6 +166,10 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                 parsed_date = datetime.strptime(date_str, "%Y%m%d")
                 # Verify it's not a future date
                 asserts.assert_less_equal(parsed_date, datetime.now(), "ManufacturingDate should not be in the future")
+                # Verify it's also not before the first Matter release (Matter 1.0 released October 4, 2022)
+                # TODO: the current default value for manufacturing date appears to be 2020-01-01, need to verify this is acceptable before continuing with this validation
+                # first_matter_release = datetime(2022, 10, 4)
+                # asserts.assert_greater_equal(parsed_date, first_matter_release, "ManufacturingDate should not be before the first Matter release date (2022-10-04)")
             except ValueError:
                 asserts.fail(f"ManufacturingDate '{date_str}' is not a valid date in YYYYMMDD format")
 
@@ -188,7 +188,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             asserts.assert_less_equal(len(ret14), 256, "ProductURL should be a string with max 256 bytes")
             # Only validate URL format if the string is not empty
             if len(ret14) > 0:
-                asserts.assert_true(re.match(r"^https?://[^\s]+$", ret14), f"ProductURL '{ret14}' should be a valid URL")
+                asserts.assert_true(validators.url(ret14), f"ProductURL '{ret14}' should be a valid URL per RFC 3986")
 
         # Step 15: ProductLabel
         self.step(15)
@@ -210,14 +210,13 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             asserts.assert_less_equal(len(serial_number), 32, "SerialNumber should be a string with max 32 bytes")
 
         # Step 17: LocalConfigDisabled
-        if cluster_name == "BRBINFO":
-            self.skip_step(17)
-        else:
-            self.step(17)
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.LocalConfigDisabled):
-                ret17 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.LocalConfigDisabled)
-                asserts.assert_true(isinstance(ret17, bool), "LocalConfigDisabled should be a boolean")
-                asserts.assert_equal(ret17, False, "LocalConfigDisabled should be set to false")
+        self.step(17)
+        if hasattr(cluster.Attributes, 'LocalConfigDisabled') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.LocalConfigDisabled):
+            ret17 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.LocalConfigDisabled)
+            asserts.assert_true(isinstance(ret17, bool), "LocalConfigDisabled should be a boolean")
+            asserts.assert_equal(ret17, False, "LocalConfigDisabled should be set to false")
+        elif not hasattr(cluster.Attributes, 'LocalConfigDisabled'):
+            self.mark_current_step_skipped()
 
         # Step 18: Reachable
         self.step(18)
@@ -236,19 +235,19 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                     ret19, serial_number, "UniqueID should not be identical to SerialNumber attribute if SerialNumber attribute is supported")
 
         # Step 20: CapabilityMinima
-        if cluster_name == "BRBINFO":
-            self.skip_step(20)
-        else:
-            self.step(20)
+        self.step(20)
+        if hasattr(cluster.Attributes, 'CapabilityMinima') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.CapabilityMinima):
             capability_minima = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CapabilityMinima)
             asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3,
-                                         "CaseSessionsPerFabric should be greater than or equal to 3")
+                                            "CaseSessionsPerFabric should be greater than or equal to 3")
             asserts.assert_less_equal(capability_minima.caseSessionsPerFabric, 65535,
-                                      "CaseSessionsPerFabric should be less than or equal to 65535")
+                                        "CaseSessionsPerFabric should be less than or equal to 65535")
             asserts.assert_greater_equal(capability_minima.subscriptionsPerFabric, 3,
-                                         "SubscriptionsPerFabric should be greater than or equal to 3")
+                                            "SubscriptionsPerFabric should be greater than or equal to 3")
             asserts.assert_less_equal(capability_minima.subscriptionsPerFabric, 65535,
-                                      "SubscriptionsPerFabric should be less than or equal to 65535")
+                                        "SubscriptionsPerFabric should be less than or equal to 65535")
+        elif not hasattr(cluster.Attributes, 'CapabilityMinima'):
+            self.mark_current_step_skipped()
 
         # Step 21: ProductAppearance
         self.step(21)
@@ -258,28 +257,26 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                                 "ProductAppearance should be a ProductAppearanceStruct")
 
         # Step 22: SpecificationVersion
-        if cluster_name == "BRBINFO":
-            self.skip_step(22)
-        else:
-            self.step(22)
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
-                ret22 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SpecificationVersion)
-                major = (ret22 >> 24) & 0xFF
-                minor = (ret22 >> 16) & 0xFF
-                dot = (ret22 >> 8) & 0xFF
-                reserved = ret22 & 0xFF
-                asserts.assert_equal(reserved, 0, "SpecificationVersion lower 8 bits (reserved) should be zero")
-                # For Matter 1.5, expect Major=1, Minor=5, Dot=0
-                asserts.assert_equal(major, 1, f"SpecificationVersion Major should be 1, got {major}")
-                asserts.assert_equal(minor, 5, f"SpecificationVersion Minor should be 5 for Matter 1.5, got {minor}")
-                asserts.assert_equal(dot, 0, f"SpecificationVersion Dot should be 0, got {dot}")
+        self.step(22)
+        if hasattr(cluster.Attributes, 'SpecificationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
+            ret22 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SpecificationVersion)
+            major = (ret22 >> 24) & 0xFF
+            minor = (ret22 >> 16) & 0xFF
+            dot = (ret22 >> 8) & 0xFF
+            reserved = ret22 & 0xFF
+            asserts.assert_equal(reserved, 0, "SpecificationVersion lower 8 bits (reserved) should be zero")
+            # For Matter 1.5, expect Major=1, Minor=5, Dot=0
+            asserts.assert_equal(major, 1, f"SpecificationVersion Major should be 1, got {major}")
+            asserts.assert_equal(minor, 5, f"SpecificationVersion Minor should be 5 for Matter 1.5, got {minor}")
+            asserts.assert_equal(dot, 0, f"SpecificationVersion Dot should be 0, got {dot}")
+        elif not hasattr(cluster.Attributes, 'SpecificationVersion'):
+            self.mark_current_step_skipped()
 
         # Step 23: MaxPathsPerInvoke
-        if cluster_name == "BRBINFO":
-            self.skip_step(23)
-        else:
-            self.step(23)
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.MaxPathsPerInvoke):
-                ret23 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.MaxPathsPerInvoke)
-                asserts.assert_greater_equal(ret23, 1, "MaxPathsPerInvoke should be greater than or equal to 1")
-                asserts.assert_less_equal(ret23, 65535, "MaxPathsPerInvoke should be less than or equal to 65535")
+        self.step(23)
+        if hasattr(cluster.Attributes, 'MaxPathsPerInvoke') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.MaxPathsPerInvoke):
+            ret23 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.MaxPathsPerInvoke)
+            asserts.assert_greater_equal(ret23, 1, "MaxPathsPerInvoke should be greater than or equal to 1")
+            asserts.assert_less_equal(ret23, 65535, "MaxPathsPerInvoke should be less than or equal to 65535")
+        elif not hasattr(cluster.Attributes, 'MaxPathsPerInvoke'):
+            self.mark_current_step_skipped()

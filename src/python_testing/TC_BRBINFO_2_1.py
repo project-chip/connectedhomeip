@@ -54,7 +54,7 @@ class TC_BRBINFO_2_1(BasicInformationAttributesVerificationBase):
 
     @async_test_body
     async def test_TC_BRBINFO_2_1(self):
-        await self.implementation(Clusters.BridgedDeviceBasicInformation, "BRBINFO")
+        await self.implementation(Clusters.BridgedDeviceBasicInformation)
 
 
 if __name__ == "__main__":

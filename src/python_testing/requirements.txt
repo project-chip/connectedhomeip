@@ -6,3 +6,4 @@ ifaddr
 langcodes
 requests
 pycountry
+validators

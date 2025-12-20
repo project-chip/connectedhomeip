@@ -51,7 +51,7 @@ class TC_BINFO_2_1(BasicInformationAttributesVerificationBase):
 
     @async_test_body
     async def test_TC_BINFO_2_1(self):
-        await self.implementation(Clusters.BasicInformation, "BINFO")
+        await self.implementation(Clusters.BasicInformation)
 
 
 if __name__ == "__main__":
