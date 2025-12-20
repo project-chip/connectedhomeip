@@ -31,7 +31,7 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Current cluster version -->
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="7"/>
 
     <features>
       <feature bit="0" code="LF" name="Lift" summary="Lift control and behavior for lifting/sliding window coverings">
