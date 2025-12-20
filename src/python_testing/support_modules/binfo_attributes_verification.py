@@ -24,6 +24,7 @@ import validators
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 
+
 class BasicInformationAttributesVerificationBase(MatterBaseTest):
     def steps(self) -> list[TestStep]:
         return [
@@ -239,13 +240,13 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         if hasattr(cluster.Attributes, 'CapabilityMinima') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.CapabilityMinima):
             capability_minima = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CapabilityMinima)
             asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3,
-                                            "CaseSessionsPerFabric should be greater than or equal to 3")
+                                         "CaseSessionsPerFabric should be greater than or equal to 3")
             asserts.assert_less_equal(capability_minima.caseSessionsPerFabric, 65535,
-                                        "CaseSessionsPerFabric should be less than or equal to 65535")
+                                      "CaseSessionsPerFabric should be less than or equal to 65535")
             asserts.assert_greater_equal(capability_minima.subscriptionsPerFabric, 3,
-                                            "SubscriptionsPerFabric should be greater than or equal to 3")
+                                         "SubscriptionsPerFabric should be greater than or equal to 3")
             asserts.assert_less_equal(capability_minima.subscriptionsPerFabric, 65535,
-                                        "SubscriptionsPerFabric should be less than or equal to 65535")
+                                      "SubscriptionsPerFabric should be less than or equal to 65535")
         elif not hasattr(cluster.Attributes, 'CapabilityMinima'):
             self.mark_current_step_skipped()
 
