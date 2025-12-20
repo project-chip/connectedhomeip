@@ -1385,7 +1385,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                         try:
                             controller.ExpireSessions(self.dut_node_id)
                             LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
-                        except ChipStackError as e: # chipstack-ok
+                        except ChipStackError as e:  # chipstack-ok
                             LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
 
     async def request_device_reboot(self):
