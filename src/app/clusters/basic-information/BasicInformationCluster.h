@@ -22,6 +22,7 @@
 #include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -43,12 +44,6 @@ namespace Clusters {
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id })
-    {
-        // Unless told otherwise, unique id is mandatory
-        mEnabledOptionalAttributes.Set<BasicInformation::Attributes::UniqueID::Id>();
-    }
-
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
         BasicInformation::Attributes::ManufacturingDate::Id,       //
         BasicInformation::Attributes::PartNumber::Id,              //
@@ -64,11 +59,16 @@ public:
         BasicInformation::Attributes::UniqueID::Id //
         >;
 
-    static BasicInformationCluster & Instance();
+    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet,
+                            DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = nullptr) :
+        DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }),
+        mEnabledOptionalAttributes(
+            optionalAttributeSet
+                .ForceSet<BasicInformation::Attributes::UniqueID::Id>()), // Unless told otherwise, unique id is mandatory
+        mDeviceInfoProvider(deviceInfoProvider)
+    {}
 
     OptionalAttributesSet & OptionalAttributes() { return mEnabledOptionalAttributes; }
-
-    bool GetLocalConfigDisabled() { return mLocalConfigDisabled; }
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -86,11 +86,12 @@ public:
 private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+    CHIP_ERROR GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider);
 
     OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
-    bool mLocalConfigDisabled = false;
+    DeviceLayer::DeviceInstanceInfoProvider * mDeviceInfoProvider = nullptr;
 };
 
 } // namespace Clusters
