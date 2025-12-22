@@ -175,7 +175,8 @@ def _GetZapVersionToUse(project_root) -> str:
 
     zap_version = ""
     zap_path = os.path.join(project_root, "scripts/setup/zap.json")
-    zap_json = json.load(open(zap_path))
+    with open(zap_path) as f:
+        zap_json = json.load(f)
     for package in zap_json.get("packages", []):
         for tag in package.get("tags", []):
             if tag.startswith("version:"):

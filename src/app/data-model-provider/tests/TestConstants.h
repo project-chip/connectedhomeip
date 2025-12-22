@@ -20,7 +20,6 @@
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
-namespace app {
 namespace Testing {
 
 constexpr FabricIndex kTestFabrixIndex = kMinValidFabricIndex;
@@ -45,5 +44,4 @@ constexpr Access::SubjectDescriptor kDenySubjectDescriptor{
 };
 
 } // namespace Testing
-} // namespace app
 } // namespace chip

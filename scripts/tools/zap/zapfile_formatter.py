@@ -213,7 +213,7 @@ class ValidateMandatoryClusterParam(Mutator):
 
 
 def loadZapfile(filename: str):
-    with open(filename, "rt") as infile:
+    with open(filename) as infile:
         return json.load(infile)
 
 

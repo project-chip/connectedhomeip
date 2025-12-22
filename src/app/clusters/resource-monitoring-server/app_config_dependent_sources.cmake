@@ -12,7 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
+# app_config_dependent_sources.cmake
+# This block adds the codegen integration sources, similar to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/resource-monitoring-server.h"
+)
+
+# These are the things that BUILD.gn dependencies would pull
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
@@ -20,5 +30,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/resource-monitoring-cluster-objects.cpp"
     "${CLUSTER_DIR}/resource-monitoring-cluster-objects.h"
     "${CLUSTER_DIR}/ResourceMonitoringCluster.cpp"
-    "${CLUSTER_DIR}/resource-monitoring-server.h"
+    "${CLUSTER_DIR}/ResourceMonitoringCluster.h"
+    "${CLUSTER_DIR}/ResourceMonitoringDelegate.h"
 )

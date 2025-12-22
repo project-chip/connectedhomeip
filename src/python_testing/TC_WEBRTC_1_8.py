@@ -49,6 +49,8 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
+log = logging.getLogger(__name__)
+
 
 class TC_WEBRTC_1_8(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_8(self) -> list[TestStep]:
@@ -259,12 +261,12 @@ class TC_WEBRTC_1_8(MatterBaseTest, WebRTCTestHelper):
 
         self.step(10)
         if not await webrtc_peer1.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         self.step(11)
         if not await webrtc_peer2.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         self.step(12)

@@ -17,9 +17,10 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <clusters/TlsClientManagement/Commands.h>
 #include <lib/support/CHIPMem.h>
@@ -68,10 +69,10 @@ static constexpr size_t kTlsEndpointMaxBytes =
 struct BufferedEndpoint
 {
     TlsClientManagementDelegate::EndpointStructType mEndpoint;
-    PersistentStore<kTlsEndpointMaxBytes> mBuffer;
+    PersistenceBuffer<kTlsEndpointMaxBytes> mBuffer;
 };
 
-class GlobalEndpointData : public PersistentData<kPersistentBufferNextIdBytes>
+class GlobalEndpointData : public PersistableData<kPersistentBufferNextIdBytes>
 {
     IncrementingIdHelper<TlsEndpointId, kMaxProvisionedEndpoints * CHIP_CONFIG_MAX_FABRICS> mEndpoints;
     EndpointId mEndpointId = kInvalidEndpointId;
@@ -124,16 +125,10 @@ public:
         return reader.ExitContainer(container);
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
-        CHIP_ERROR err = PersistentData::Load(storage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            Clear();
-        }
-
-        return CHIP_NO_ERROR;
+        CHIP_ERROR err = PersistableData::Load(storage);
+        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND); // NOT_FOUND is OK; DataAccessor::Load already called Clear()
     }
 
     CHIP_ERROR GetNextId(FabricIndex fabric, uint16_t & id)
@@ -279,7 +274,11 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
         {
             numInFabric++;
             auto & endpointStruct = endpoint.mEndpoint;
-            if (endpointStruct.hostname.data_equal(provisionReq.hostname) && (endpointStruct.port == provisionReq.port))
+            // A host/port collision is detected if we are either:
+            //  - provisioning a new endpoint (endpointID is null)
+            //  - updating an existing endpoint, but the colliding endpoint is not the one being updated.
+            if (endpointStruct.hostname.data_equal(provisionReq.hostname) && (endpointStruct.port == provisionReq.port) &&
+                (provisionReq.endpointID.IsNull() || provisionReq.endpointID.Value() != endpointStruct.endpointID))
             {
                 installedCheck = ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointAlreadyInstalled);
                 return CHIP_ERROR_BAD_REQUEST;
@@ -291,7 +290,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
     if (provisionReq.endpointID.IsNull())
     {
-        VerifyOrReturnError(numInFabric < mTlsClientManagementServer->GetMaxProvisioned(),
+        VerifyOrReturnError(numInFabric < mTlsClientManagementCluster->GetMaxProvisioned(),
                             ClusterStatusCode(Status::ResourceExhausted));
         EndpointSerializer::Clear(endpoint.mEndpoint);
         auto & endpointStruct = endpoint.mEndpoint;
@@ -390,7 +389,10 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(fabric), Zcl, "Failure clearing TLS endpoints for fabric");
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr, ChipLogError(Zcl, "No data model provider on fabric removal."));
+
+    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*provider, fabric), Zcl, "Failure clearing TLS endpoints for fabric");
 
     UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
     VerifyOrReturn(globalData);
@@ -423,16 +425,16 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
-static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
+static TlsClientManagementCluster gTlsClientManagementClusterInstance = TlsClientManagementCluster(
     EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisionedEndpoints);
 
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
     TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterServerInstance.Init();
+    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Init();
 }
 
 void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
 {
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterServerInstance.Finish();
+    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Finish();
 }
