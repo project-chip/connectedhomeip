@@ -437,10 +437,9 @@ class WpaSupplicantMock(threading.Thread):
             name_lower = name.lower()
             if 'app' in name_lower:
                 return self.mock.interfaces[0].path
-            elif 'tool' in name_lower and len(self.mock.interfaces) > 1:
+            if 'tool' in name_lower and len(self.mock.interfaces) > 1:
                 return self.mock.interfaces[1].path
-            else:
-                return self.mock.interfaces[0].path
+            return self.mock.interfaces[0].path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
                        interface_name="fi.w1.wpa_supplicant1.Interface"):
