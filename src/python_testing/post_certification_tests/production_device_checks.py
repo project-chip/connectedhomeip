@@ -64,17 +64,17 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 try:
     from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.decorators import async_test_body
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.decorators import async_test_body
     from matter.testing.matter_testing import MatterBaseTest, TestStep, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.decorators import async_test_body
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.decorators import async_test_body
     from matter.testing.matter_testing import TestStep, run_tests_no_exit
 
 try:
