@@ -32,7 +32,8 @@ from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
+                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag,
+                                         Revision)
 
 
 class GeneratorContentStorage(GeneratorStorage):
@@ -128,6 +129,9 @@ class TestParser(unittest.TestCase):
 
             /** Documentation for MyCluster #2 */
             client cluster MyCluster2 = 0x322 {
+                /** Revision comment */
+                revision 1;
+
                 /** Attribute comment */
                 attribute boolean value = 0;
 
@@ -198,6 +202,7 @@ class TestParser(unittest.TestCase):
             actual.clusters[1].events[0].description, "Multi line\n                Event comment")
         self.assertIdlEqual(
             actual.clusters[1].events[0].fields[0].description, "Event field comment")
+        self.assertIdlEqual(actual.clusters[1].revision.description, "Revision comment")
 
     def test_sized_attribute(self):
         actual = parseText("""
@@ -1084,7 +1089,7 @@ server cluster A = 1 { /* Test comment */ }
                      entries=[ConstantEntry(name="A", code=1234)],
                      is_global=True)],
             clusters=[
-                Cluster(name="A", code=1, revision=1, enums=[
+                Cluster(name="A", code=1, revision=Revision(number=1), enums=[
                     Enum(name="FooEnum", base_type="ENUM32",
                          entries=[ConstantEntry(name="B", code=234)])],
                         structs=[
@@ -1104,10 +1109,10 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(name="A", code=1, revision=1),
-            Cluster(name="B", code=2, revision=1),
-            Cluster(name="C", code=3, revision=2),
-            Cluster(name="D", code=4, revision=123),
+            Cluster(name="A", code=1, revision=Revision(number=1)),
+            Cluster(name="B", code=2, revision=Revision(number=1)),
+            Cluster(name="C", code=3, revision=Revision(number=2)),
+            Cluster(name="D", code=4, revision=Revision(number=123)),
         ])
         self.assertIdlEqual(actual, expected)
 

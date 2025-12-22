@@ -27,7 +27,7 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
                                          CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
                                          EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
-                                         StructQuality, StructTag)
+                                         StructQuality, StructTag, Revision)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -65,6 +65,7 @@ class PrefixCppDocComment:
         """List all types supported by doc comments."""
         for cluster in idl.clusters:
             yield cluster
+            yield cluster.revision
             for attribute in cluster.attributes:
                 yield attribute.definition
             for command in cluster.commands:
@@ -358,9 +359,10 @@ class MatterIdlTransformer(Transformer):
 
         return init_args
 
-    @v_args(inline=True)
-    def cluster_revision(self, revision):
-        return revision
+    @v_args(meta=True, inline=True)
+    def cluster_revision(self, meta, revision):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Revision(parse_meta=meta, number=revision)
 
     @v_args(meta=True)
     def event(self, meta, args):
@@ -517,7 +519,7 @@ class MatterIdlTransformer(Transformer):
             api_maturity = ApiMaturity.STABLE
 
         if not revision:
-            revision = 1
+            revision = Revision(number=1)
 
         result = Cluster(parse_meta=meta, name=name, code=code,
                          revision=revision, api_maturity=api_maturity)
