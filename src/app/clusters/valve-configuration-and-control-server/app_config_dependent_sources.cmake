@@ -24,8 +24,8 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ValveConfigurationAndControlCluster.cpp"
-    "${CLUSTER_DIR}/ValveConfigurationAndControlCluster.h"
+    "${CLUSTER_DIR}/valve-configuration-and-control-cluster.cpp"
+    "${CLUSTER_DIR}/valve-configuration-and-control-cluster.h"
     "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
     "${CLUSTER_DIR}/TimeSyncTracker.h"
 )

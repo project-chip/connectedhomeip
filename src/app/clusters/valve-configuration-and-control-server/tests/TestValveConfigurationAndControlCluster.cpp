@@ -17,7 +17,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
