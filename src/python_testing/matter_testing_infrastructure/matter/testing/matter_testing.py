@@ -1429,19 +1429,10 @@ id_str = conversions.format_decimal_and_hex
 cluster_id_str = conversions.cluster_id_with_name
 
 async_test_body = decorators.async_test_body
-run_if_endpoint_matches = decorators.run_if_endpoint_matches
 run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-has_cluster = decorators.has_cluster
-has_attribute = decorators.has_attribute
-has_command = decorators.has_command
-has_feature = decorators.has_feature
 should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
 # autopep8: off
 _get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
-# autopep8: on
-_has_feature = decorators._has_feature
-_has_command = decorators._has_command
-_has_attribute = decorators._has_attribute
 
 default_matter_test_main = runner.default_matter_test_main
 get_test_info = runner.get_test_info

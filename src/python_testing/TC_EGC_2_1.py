@@ -45,7 +45,8 @@ from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 cluster = Clusters.ElectricalGridConditions
 

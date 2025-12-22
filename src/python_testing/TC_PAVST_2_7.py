@@ -44,8 +44,8 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):

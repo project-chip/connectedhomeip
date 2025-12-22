@@ -47,7 +47,8 @@ from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
 log = logging.getLogger(__name__)

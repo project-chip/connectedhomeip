@@ -49,7 +49,8 @@ from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityPrice
 

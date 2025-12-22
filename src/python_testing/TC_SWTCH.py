@@ -89,9 +89,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import EventReadResult
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
-                                           run_if_endpoint_matches)
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)

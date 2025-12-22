@@ -40,7 +40,8 @@ from TC_CHIMETestBase import CHIMETestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 
 class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):

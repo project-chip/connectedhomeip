@@ -41,7 +41,8 @@ from TC_AVSUMTestBase import AVSUMTestBase
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 
 class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):

@@ -23,8 +23,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.matter_asserts import assert_non_empty_string, is_valid_bool_value
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
-                                           run_if_endpoint_matches)
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
 
 log = logging.getLogger(__name__)
 

@@ -45,7 +45,8 @@
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityMetering
 
