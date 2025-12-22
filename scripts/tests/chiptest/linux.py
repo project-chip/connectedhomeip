@@ -448,7 +448,7 @@ class WpaSupplicantMock(threading.Thread):
         _publish_id_counter = 0
         _subscribe_id_counter = 0
 
-        def __init__(self, mock: WpaSupplicantMock: 'WpaSupplicantMock', index: int):
+        def __init__(self, mock: str, index: int):
             super().__init__()
             self.mock = mock
             self.index = index
@@ -984,7 +984,7 @@ class WpaSupplicantMock(threading.Thread):
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
                      interface_name="fi.w1.wpa_supplicant1.Network"):
-        def __init__(self, mock: WpaSupplicantMock: 'WpaSupplicantMock', interface_index: int):
+        def __init__(self, mock: str, interface_index: int):
             super().__init__()
             self.mock = mock
             self.interface_index = interface_index
