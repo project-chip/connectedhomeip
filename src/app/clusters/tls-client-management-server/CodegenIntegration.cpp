@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/util/af-types.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -29,4 +30,4 @@ void MatterTlsClientManagementPluginServerInitCallback()
 
 void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId) {}
 
-void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId) {}
+void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType) {}
