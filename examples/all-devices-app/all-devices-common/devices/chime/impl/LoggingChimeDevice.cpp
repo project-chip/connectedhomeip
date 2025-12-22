@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <devices/chime/impl/LoggingChimeDevice.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -68,7 +69,7 @@ Protocols::InteractionModel::Status LoggingChimeDevice::PlayChimeSound()
         }
     }
 
-    ChipLogProgress(AppServer, "LoggingChimeDevice: Playing sound %.*s", static_cast<int>(soundName.size()), soundName.data());
+    ChipLogProgress(AppServer, "LoggingChimeDevice: Playing sound %s", chip::NullTerminated(soundName).c_str());
     return Protocols::InteractionModel::Status::Success;
 }
 

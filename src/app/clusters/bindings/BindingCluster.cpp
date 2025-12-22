@@ -246,7 +246,7 @@ CHIP_ERROR BindingCluster::NotifyBindingsChanged(FabricIndex accessingFabricInde
 {
     DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
                                         .BindingsChanged = { .fabricIndex = accessingFabricIndex } };
-    return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+    return chip::DeviceLayer::PlatformMgr().PostEvent(       &event);
 }
 
 } // namespace Clusters
