@@ -68,7 +68,7 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        runs-on: macos-14
+        runs-on: macos-26
         if: github.actor != 'restyled-io[bot]'
 
         steps:
