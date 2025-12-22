@@ -512,12 +512,6 @@
         ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
-        "TLS Client Management": [
-            "MaxProvisioned",
-            "ProvisionedEndpoints",
-            "ClusterRevision",
-            "FeatureMap"
-        ],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
