@@ -18,9 +18,21 @@
             {% for stream in streams %}
             <li> Stream {{stream['id']}}
                 <ul>
+                    <li>{{stream['errors']|length}} errors in all sessions</li>
+                    
                     {% for session in stream.sessions %}
                     <li> Session {{session['id']}}
+                        {%- set errors = stream['errors'] | selectattr('session_id', 'eq', session['id']) | list -%}
                         <ul>
+                            <li>
+                                {{- errors|length}} errors:
+
+                                <ul>
+                                    {% for error in errors %}
+                                        <li>{{error.file_path}} : {{error.reasons}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
                             {% for (file, crt) in session['uploaded_segments'] %}
                             <li><a href="/ui/streams/{{stream['id']}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{stream['id']}}/{{crt}}">{{crt}}</a>)</li>
                             {% endfor %}

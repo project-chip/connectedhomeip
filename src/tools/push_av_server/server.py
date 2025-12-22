@@ -555,6 +555,10 @@ class PushAvServer:
             request=request, name="streams_list.jinja2", context={"streams": s["streams"]}
         )
 
+    # TODO Change what we show in here.
+    # Stream listing page should only show the number of sessions and errors.
+    # Stream details should provide the ffprobe of the index.mpd, the session history details (including errors?),
+    # the stream configuration, and the per-file details (should reconsider if it's actually useful for media)
     def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
         context = {}
         context['streams'] = self.list_streams()['streams']
@@ -638,6 +642,8 @@ class PushAvServer:
 
                 session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
 
+                # TODO Validate the path is always session_name/index.mpd
+
                 root = xml.etree.ElementTree.fromstring(body)
                 mpd_type = root.attrib.get('type')
 
@@ -668,17 +674,36 @@ class PushAvServer:
                 else:
                     errors.append("No active session when uploading " + file_path_with_ext)
 
-                # Checks if CMAF extended path matches the pattern session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>
-                # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#12-operation
-                match = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$").match(file_path)
+                # The Track's init segment is uploaded as `session_name/track_name/track_name.init`
+                #
+                # `/session_1/index.mpd` - Initial upload. Has `MPD@type="dynamic"`.
+                # `/session_1/video1/video1.init`
+                # `/session_1/audio1/audio1.init`
+                # `/session_1/video1/segment_1001.m4s`
+                # `/session_1/audio1/segment_1001.m4s`
+                # `/session_1/video1/segment_1002.m4s`
+                # `/session_1/audio1/segment_1002.m4s`
+                # `/session_1/video1/segment_1003.m4s`
+                # `/session_1/audio1/segment_1003.m4s`
+                # `/session_1/index.mpd` - Final upload. Has `MPD@type="static"`.
+
+                # TODO Make sure this is correct. Most likely not at this point.
+
+                path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$"
+                if ext == "init":
+                    path_regex = r"^session_\d+/(?P<trackName>.init$"
+                path_regex = re.compile(path_regex)
+
+                match = path_regex.match(file_path)
                 if not match:
-                    errors.append("Path does not adhere to Matter's extended path format: session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>")
+                    errors.append("Path does not adhere to Matter's path format")
                 else:
                     # Validate if the trackName is same as the one assigned during transport allocation.
                     # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#685-trackname-field
                     track_name_in_path = match.group("trackName")
                     track_name = stream.track_name
 
+                    # TODO Need to find out where the number after the symbolic track name is coming from
                     if track_name and track_name != track_name_in_path:
                         errors.append("Track name mismatch: "
                                       f"{track_name_in_path} != {track_name}, "
@@ -720,7 +745,11 @@ class PushAvServer:
         if not p.exists():
             raise HTTPException(404, detail="Media file doesn't exists")
 
-        cmd = ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())]
+        cmd = [
+            "ffprobe", "-allowed_extensions", "init,m4s",
+            "-show_streams", "-show_format", "-output_format", "json",
+            str(p.absolute())
+            ]
 
         print(cmd)
         # ffprobe -show_streams -show_format -output_format json /Users/francoismonniot/.pavstest/streams/1/index.mpd
