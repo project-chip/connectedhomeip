@@ -387,7 +387,9 @@ class TestDefinition:
             pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: int | None = None,
-            ble_controller_tool: int | None = None):
+            ble_controller_tool: int | None = None,
+            wifi_paf: bool = False,
+            nan_simulator: int | None = None):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -447,6 +449,10 @@ class TestDefinition:
                         key = 'default'
                     if ble_controller_app is not None:
                         command = command.with_args("--ble-controller", str(ble_controller_app), "--wifi")
+                    elif wifi_paf is not None:
+                    # Use WiFi PAF mode for testing
+                        command = command.with_args("--wifi", "--wifipaf", "")
+
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -500,6 +506,10 @@ class TestDefinition:
                     pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
                         "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
                     pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                elif wifi_paf is not None:
+                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args("pairing", "wifipaf-wifi", TEST_NODE_ID,
+                        "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR)
+
                 else:
                     pairing_cmd = apps.chip_tool_with_python_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 

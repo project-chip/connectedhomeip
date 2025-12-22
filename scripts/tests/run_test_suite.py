@@ -368,13 +368,19 @@ class Terminable(Protocol):
     default=False,
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+@click.option(
+    '--wifi-paf',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use WiFi-PAF (NAN/USD) mock for commissioning without real WiFi hardware. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | None, lock_app: Path | None,
             ota_provider_app: Path | None, ota_requestor_app: Path | None, fabric_bridge_app: Path | None, tv_app: Path | None,
             bridge_app: Path | None, lit_icd_app: Path | None, microwave_oven_app: Path | None, rvc_app: Path | None,
             network_manager_app: Path | None, energy_gateway_app: Path | None, energy_management_app: Path | None,
             closure_app: Path | None, matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None, pics_file: Path,
-            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool) -> None:
+            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool, wifi_paf: bool) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -418,6 +424,12 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
 
+    if wifi_paf and sys.platform != "linux":
+        raise click.BadOptionUsage("wifi-paf", "Option --wifi-paf is available on Linux platform only")
+
+    if ble_wifi and wifi_paf:
+        raise click.BadOptionUsage("wifi-paf", "Options --ble-wifi and --wifi-paf are mutually exclusive")
+
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=context.obj.chip_tool,
@@ -441,6 +453,8 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     ble_controller_app = None
     ble_controller_tool = None
+    # WiFi-PAF mode variables
+    nan_simulator = None
     to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
@@ -456,18 +470,34 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         if sys.platform == 'linux':
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
-                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not ble_wifi,
+                # Do not bring up the app interface link automatically when doing BLE-WiFi or WiFi-PAF commissioning.
+                setup_app_link_up=not (ble_wifi or wifi_paf),
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if ble_wifi else 'eth-app'))
+                app_link_name='wlx-app' if (ble_wifi or wifi_paf) else 'eth-app',
+                tool_link_name='wlx-tool' if wifi_paf else 'eth-tool'))
 
             if ble_wifi:
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, num_interfaces=1))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+            if wifi_paf:
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+
+                # Single mock with two interfaces (like real wpa_supplicant)
+                wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns,
+                                                        num_interfaces=2)
+
+                to_terminate.append(wifi)
+                # NANSimulator coordinates between interfaces
+                nan_simulator = chiptest.linux.NANSimulator(discovery_delay=0.1)
+                nan_simulator.register_interface("app", wifi.interfaces[0])   # For app/publisher
+                nan_simulator.register_interface("tool", wifi.interfaces[1])  # For tool/subscriber
+
+                log.info("WiFi-PAF mode enabled with NAN simulator")
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -498,6 +528,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        nan_simulator=nan_simulator
                     )
                     if not context.obj.dry_run:
                         test_end = time.monotonic()
