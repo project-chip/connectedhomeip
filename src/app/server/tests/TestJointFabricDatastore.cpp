@@ -23,7 +23,7 @@ TEST(JointFabricDatastoreTest, AddPendingNodeNotifiesListener)
     store.AddListener(listener);
 
     // Add a pending node — should notify the listener via MarkNodeListChange
-    store.AddPendingNode(123, CharSpan::fromCharString("controller-a"));
+    TEMPORARY_RETURN_IGNORED store.AddPendingNode(123, CharSpan::fromCharString("controller-a"));
 
     EXPECT_TRUE(listener.mNotified);
 }
@@ -37,7 +37,7 @@ TEST(JointFabricDatastoreTest, RemoveListenerPreventsNotification)
     store.RemoveListener(listener);
     listener.Reset();
 
-    store.AddPendingNode(456, CharSpan::fromCharString("controller-b"));
+    TEMPORARY_RETURN_IGNORED store.AddPendingNode(456, CharSpan::fromCharString("controller-b"));
 
     EXPECT_FALSE(listener.mNotified);
 }

@@ -212,38 +212,45 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        TEMPORARY_RETURN_IGNORED writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
 
         TLV::TLVType structType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
+        TEMPORARY_RETURN_IGNORED writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
 
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(
-                       Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
-                   ByteSpan(kDummyRootKey, sizeof(kDummyRootKey)));
-        writer.Put(TLV::ContextTag(
-                       static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
-                   static_cast<uint16_t>(0x1234));
-        writer.Put(TLV::ContextTag(
-                       static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
-                   static_cast<FabricId>(0x1122334455667788ULL));
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(
-                       Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
-                   fabricIndex);
+        TEMPORARY_RETURN_IGNORED writer.Put(
+            TLV::ContextTag(
+                static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
+            ByteSpan(kDummyRootKey, sizeof(kDummyRootKey)));
 
-        writer.EndContainer(structType);
-        writer.EndContainer(outerType);
+        TEMPORARY_RETURN_IGNORED writer.Put(
+            TLV::ContextTag(
+                static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
+            static_cast<uint16_t>(0x1234));
+
+        TEMPORARY_RETURN_IGNORED writer.Put(
+            TLV::ContextTag(
+                static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
+            static_cast<FabricId>(0x1122334455667788ULL));
+
+        TEMPORARY_RETURN_IGNORED writer.Put(
+            TLV::ContextTag(
+                static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
+            fabricIndex);
+
+        TEMPORARY_RETURN_IGNORED writer.EndContainer(structType);
+        TEMPORARY_RETURN_IGNORED writer.EndContainer(outerType);
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        TEMPORARY_RETURN_IGNORED reader.EnterContainer(innerType);
 
         value.SetReader(reader);
         value.SetFabricIndex(fabricIndex);
 
-        reader.ExitContainer(innerType);
+        TEMPORARY_RETURN_IGNORED reader.ExitContainer(innerType);
 
         ConcreteAttributePath path(kRootEndpointId, FabricsAttr::GetClusterId(), FabricsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -268,20 +275,20 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
-        writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert)));
-        writer.EndContainer(outerType);
+        TEMPORARY_RETURN_IGNORED writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        TEMPORARY_RETURN_IGNORED writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert)));
+        TEMPORARY_RETURN_IGNORED writer.EndContainer(outerType);
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        TEMPORARY_RETURN_IGNORED reader.EnterContainer(innerType);
 
         value.SetReader(reader);
 
-        reader.ExitContainer(innerType);
+        TEMPORARY_RETURN_IGNORED reader.ExitContainer(innerType);
 
         ConcreteAttributePath path(kRootEndpointId, CertsAttr::GetClusterId(), CertsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -310,32 +317,36 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        TEMPORARY_RETURN_IGNORED writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
 
         TLV::TLVType structType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
-                   ByteSpan(kDummyNoc, sizeof(kDummyNoc)));
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
-                   ByteSpan(kDummyIcac, sizeof(kDummyIcac)));
-        writer.Put(
+        TEMPORARY_RETURN_IGNORED writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
+        TEMPORARY_RETURN_IGNORED writer.Put(
+            TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
+            ByteSpan(kDummyNoc, sizeof(kDummyNoc)));
+
+        TEMPORARY_RETURN_IGNORED writer.Put(
+            TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
+            ByteSpan(kDummyIcac, sizeof(kDummyIcac)));
+
+        TEMPORARY_RETURN_IGNORED writer.Put(
             TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kFabricIndex)),
             fabricIndex);
 
-        writer.EndContainer(structType);
-        writer.EndContainer(outerType);
+        TEMPORARY_RETURN_IGNORED writer.EndContainer(structType);
+        TEMPORARY_RETURN_IGNORED writer.EndContainer(outerType);
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        TEMPORARY_RETURN_IGNORED reader.EnterContainer(innerType);
 
         value.SetReader(reader);
         value.SetFabricIndex(fabricIndex);
 
-        reader.ExitContainer(innerType);
+        TEMPORARY_RETURN_IGNORED reader.ExitContainer(innerType);
 
         ConcreteAttributePath path(kRootEndpointId, NOCsAttr::GetClusterId(), NOCsAttr::GetAttributeId());
         onSuccess(path, value);

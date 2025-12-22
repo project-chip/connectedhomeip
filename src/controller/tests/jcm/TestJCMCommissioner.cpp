@@ -386,7 +386,7 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mCommissioningParams.SetUseJCM(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        TEMPORARY_RETURN_IGNORED mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
 
         CHIP_ERROR err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
         if (err != CHIP_NO_ERROR)
@@ -430,7 +430,7 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     // Simulate user consenting
     mTrustVerificationDelegate.mShouldConsent = true;
     // Set up the mock ReadCommissioningInfo
-    mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    TEMPORARY_RETURN_IGNORED mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
 
     TrustVerificationStage stage = TrustVerificationStage::kIdle;
     TrustVerificationError error = TrustVerificationError::kSuccess;
