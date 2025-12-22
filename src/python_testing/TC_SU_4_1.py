@@ -249,9 +249,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         # - The write may fail with a ConstraintError if any entry violates constraints.
         # - Only one valid entry in the list is guaranteed to be preserved ; which entry is preserved
         #   is not deterministic, as observed in current Matter SDK behavior (Bug #40294).
-        # The SUTestBase set_default_ota_providers_list() only supports one provider.
-        #  - Using it here would bypass the test purpose (we need to trigger ConstraintError),
-        #    so we use WriteAttribute() directly instead of the helper.
+        # Use WriteAttribute() instead of set_default_ota_providers_list(), which only supports a single provider.
         # This is expected behavior for list attributes and should be verified in the test.
 
         # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
@@ -336,7 +334,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         # Verify Fabric 1 still has exactly one provider
         asserts.assert_equal(len(th_actual_otap_info), 1, "DefaultOTAProviders list on Fabric 1 should contain one provider")
 
-        # Remaining provider must still be TH4
+        # Remaining provider must be unchanged (either TH2 or TH4)
         asserts.assert_equal(
             th_actual_otap_info[0],
             provider_th4_for_fabric1,
@@ -382,7 +380,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
 
         asserts.assert_true(th_update_state in valid_states,
                             f"Unexpected UpdateState value: {th_update_state}")
-        logger.info("Step #8 - UpdateStates value are valid.")
+        logger.info("Step #8 - UpdateState values are valid.")
 
         # NOTE: Step 9 skipped per test plan refinement.
         # Fabric separation and image download behavior will be validated in TC-SU-2.1 and TC-SU-2.2 tests.
