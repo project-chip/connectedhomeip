@@ -19,10 +19,10 @@ import logging
 import os
 import sys
 import time
-import typing
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol
 
 import chiptest
 import click
@@ -60,12 +60,12 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 @dataclass
 class RunContext:
     root: str
-    tests: typing.List[chiptest.TestDefinition]
+    tests: list[chiptest.TestDefinition]
     runtime: TestRunTime
-    find_path: typing.List[str]
+    find_path: list[str]
 
     # Deprecated options passed to `cmd_run`
-    deprecated_chip_tool_path: Path | None
+    deprecated_chip_tool_path: Path | None = None
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -176,12 +176,6 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
-    if include_tags:
-        include_tags = {TestTag.__members__[t] for t in include_tags}
-
-    if exclude_tags:
-        exclude_tags = {TestTag.__members__[t] for t in exclude_tags}
-
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.MATTER_REPL_PYTHON:
         all_tests = list(chiptest.AllReplYamlTests())
@@ -263,6 +257,16 @@ def cmd_list(context: click.Context) -> None:
             tags = f" ({tags})"
 
         print("%s%s" % (test.name, tags))
+
+
+class Terminable(Protocol):
+    """Protocol for resources that can be explicitly terminated or cleaned up.
+
+    Implement this protocol for any class that manages external resources (such as subprocesses, network connections, or files) that
+    require explicit cleanup. The `terminate` method should perform any necessary actions to release or clean up the resource.
+    """
+
+    def terminate(self) -> None: ...
 
 
 @main.command(
@@ -386,8 +390,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
-        log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
-        sys.exit(2)
+        raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
@@ -454,92 +457,104 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     ble_controller_app = None
     ble_controller_tool = None
-
-    if sys.platform == 'linux':
-        ns = chiptest.linux.IsolatedNetworkNamespace(
-            index=0,
-            # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-            setup_app_link_up=not ble_wifi,
-            # Change the app link name so the interface will be recognized as WiFi or Ethernet
-            # depending on the commissioning method used.
-            app_link_name='wlx-app' if ble_wifi else 'eth-app')
-
-        if ble_wifi:
-            bus = chiptest.linux.DBusTestSystemBus()
-            bluetooth = chiptest.linux.BluetoothMock()
-            wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
-            ble_controller_app = 0   # Bind app to the first BLE controller
-            ble_controller_tool = 1  # Bind tool to the second BLE controller
-
-        executor = chiptest.linux.LinuxNamespacedExecutor(ns)
-    elif sys.platform == 'darwin':
-        executor = chiptest.darwin.DarwinExecutor()
-    else:
-        log.warning("No platform-specific executor for '%s'", sys.platform)
-        executor = Executor()
-
-    runner = chiptest.runner.Runner(executor=executor)
-
-    log.info("Each test will be executed %d times", iterations)
-
-    apps_register = AppsRegister()
-    apps_register.init()
+    to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
-        apps_register.uninit()
-        executor.terminate()
-        if sys.platform == 'linux':
-            if ble_wifi:
-                wifi.terminate()
-                bluetooth.terminate()
-                bus.terminate()
-            ns.terminate()
-
-    for i in range(iterations):
-        log.info("Starting iteration %d", i+1)
-        observed_failures = 0
-        for test in context.obj.tests:
-            test_start = time.monotonic()
+        for item in reversed(to_terminate):
             try:
-                if dry_run:
-                    log.info("Would run test: '%s'", test.name)
-                else:
-                    log.info("%-20s - Starting test", test.name)
-                test.Run(
-                    runner, apps_register, subproc_info_repo,
-                    pics_file, test_timeout_seconds, dry_run,
-                    test_runtime=context.obj.runtime,
-                    ble_controller_app=ble_controller_app,
-                    ble_controller_tool=ble_controller_tool,
-                )
-                if not dry_run:
+                log.info("Cleaning up %s", item.__class__.__name__)
+                item.terminate()
+            except Exception as e:
+                log.warning("Encountered exception during cleanup: %r", e)
+        to_terminate.clear()
+
+    try:
+        if sys.platform == 'linux':
+            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+                index=0,
+                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+                setup_app_link_up=not ble_wifi,
+                # Change the app link name so the interface will be recognized as WiFi or Ethernet
+                # depending on the commissioning method used.
+                app_link_name='wlx-app' if ble_wifi else 'eth-app'))
+
+            if ble_wifi:
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                ble_controller_app = 0   # Bind app to the first BLE controller
+                ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
+        elif sys.platform == 'darwin':
+            to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
+        else:
+            log.warning("No platform-specific executor for '%s'", sys.platform)
+            to_terminate.append(executor := Executor())
+
+        runner = chiptest.runner.Runner(executor=executor)
+
+        log.info("Each test will be executed %d times", iterations)
+
+        to_terminate.append(apps_register := AppsRegister())
+        apps_register.init()
+
+        for i in range(iterations):
+            log.info("Starting iteration %d", i+1)
+            observed_failures = 0
+            for test in context.obj.tests:
+                test_start = time.monotonic()
+                try:
+                    if dry_run:
+                        log.info("Would run test: '%s'", test.name)
+                    else:
+                        log.info("%-20s - Starting test", test.name)
+                    test.Run(
+                        runner, apps_register, subproc_info_repo, pics_file,
+                        test_timeout_seconds, dry_run,
+                        test_runtime=context.obj.runtime,
+                        ble_controller_app=ble_controller_app,
+                        ble_controller_tool=ble_controller_tool,
+                    )
+                    if not dry_run:
+                        test_end = time.monotonic()
+                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
+                except Exception:
                     test_end = time.monotonic()
-                    log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-            except Exception:
-                test_end = time.monotonic()
-                log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                observed_failures += 1
-                if not keep_going:
-                    cleanup()
-                    sys.exit(2)
+                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
+                    observed_failures += 1
+                    if not keep_going:
+                        sys.exit(2)
 
-        if observed_failures != expected_failures:
-            log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
-            cleanup()
-            sys.exit(2)
+            if observed_failures != expected_failures:
+                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+                sys.exit(2)
+    except KeyboardInterrupt:
+        log.info("Interrupting execution on user request")
+        raise
+    except Exception as e:
+        log.error("Caught exception during test execution: %s", e, exc_info=True)
+        raise
+    finally:
+        cleanup()
 
-    cleanup()
 
-
-# On linux, allow an execution shell to be prepared
+# On Linux, allow an execution shell to be prepared
 if sys.platform == 'linux':
     @main.command(
         'shell',
-        help=('Execute a bash shell in the environment (useful to test '
-              'network namespaces)'))
-    def cmd_shell() -> None:
-        chiptest.linux.IsolatedNetworkNamespace()
-        os.execvpe("bash", ["bash"], os.environ.copy())
+        help=('Execute a bash shell in the environment (useful to test network namespaces)'))
+    @click.option(
+        '--ns-index',
+        default=0,
+        type=click.IntRange(min=0),
+        help='Index of Linux network namespace'
+    )
+    def cmd_shell(ns_index: int) -> None:
+        chiptest.linux.IsolatedNetworkNamespace(ns_index)
+
+        shell = os.environ.get("SHELL", "bash")
+        os.execvpe(shell, [shell], os.environ.copy())
 
 
 if __name__ == '__main__':

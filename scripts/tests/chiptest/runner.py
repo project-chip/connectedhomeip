@@ -23,9 +23,8 @@ import re
 import shlex
 import subprocess
 import threading
-import typing
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import IO, TYPE_CHECKING, Any, Protocol
 
@@ -49,7 +48,7 @@ class LogPipe(threading.Thread):
         """
         Setup the object with a logger and a loglevel and start the thread.
         """
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name=name)
 
         self.daemon = False
         self.level = level
@@ -57,8 +56,6 @@ class LogPipe(threading.Thread):
         self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')  # noqa: SIM115
         self.captured_logs: list[str] = []
         self.capture_delegate = capture_delegate
-        if name is not None:
-            self.name = name
 
         self.start()
 
@@ -142,12 +139,11 @@ class RunnerWaitQueue:
 class SubprocessKind(StrEnum):
     APP = 'app'
     TOOL = 'tool'
+    RPC = 'rpc'
 
 
 @dataclass
 class SubprocessInfo:
-    # Restricted as this identifies the name of the network namespace in an executor implementing
-    # test case isolation.
     kind: SubprocessKind
     path: pathlib.Path
     wrapper: tuple[str, ...] = ()
@@ -157,12 +153,12 @@ class SubprocessInfo:
         self.path = pathlib.Path(self.path)
 
     def with_args(self, *args: str):
-        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
+        return replace(self, args=self.args + tuple(args))
 
     def wrap_with(self, *args: str):
-        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
+        return replace(self, wrapper=tuple(args) + self.wrapper)
 
-    def to_cmd(self) -> typing.List[str]:
+    def to_cmd(self) -> list[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
 
 
