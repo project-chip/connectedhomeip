@@ -23,6 +23,7 @@ source_set("testing") {
     "ClusterTester.h",
     "EmptyProvider.cpp",
     "EmptyProvider.h",
+    "FabricTestFixture.h",
     "MockCommandHandler.cpp",
     "MockCommandHandler.h",
     "TestEventGenerator.h",

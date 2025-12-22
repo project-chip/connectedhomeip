@@ -65,7 +65,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                 Granularity::kMetadataEntry,
                                             }));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -83,7 +83,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                 TimeSource::kMetadataEntry,
                                             }));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -100,7 +100,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                 TrustedTimeSource::kMetadataEntry,
                                             }));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -118,7 +118,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                 SupportsDNSResolve::kMetadataEntry,
                                             }));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -135,7 +135,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                 NTPServerAvailable::kMetadataEntry,
                                             }));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -157,7 +157,7 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                 DSTOffsetListMaxSize::kMetadataEntry,
                                             }));
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -184,7 +184,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::DecodableType utcTime{};
         ASSERT_EQ(tester.ReadAttribute(UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -212,7 +212,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TimeSourceEnum timeSource{};
         ASSERT_EQ(tester.ReadAttribute(TimeSource::Id, timeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -239,7 +239,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource{};
         ASSERT_EQ(tester.ReadAttribute(TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -269,7 +269,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         SupportsDNSResolve::TypeInfo::DecodableType supportsDNSResolve{};
         ASSERT_EQ(tester.ReadAttribute(SupportsDNSResolve::Id, supportsDNSResolve), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -296,7 +296,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         NTPServerAvailable::TypeInfo::DecodableType ntpServerAvailable{};
         ASSERT_EQ(tester.ReadAttribute(NTPServerAvailable::Id, ntpServerAvailable), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -338,6 +338,6 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         DSTOffsetListMaxSize::TypeInfo::DecodableType dstOffsetListMaxSize{};
         ASSERT_EQ(tester.ReadAttribute(DSTOffsetListMaxSize::Id, dstOffsetListMaxSize), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }

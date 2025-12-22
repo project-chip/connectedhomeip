@@ -77,7 +77,7 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void TearDown() override
     {
-        userLabel.Shutdown();
+        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
         DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 

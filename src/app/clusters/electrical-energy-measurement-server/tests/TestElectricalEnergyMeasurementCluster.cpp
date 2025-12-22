@@ -64,7 +64,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 2: All features activated - optional attributes are automatically determined by features
@@ -91,7 +91,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
                                                 Attributes::CumulativeEnergyReset::kMetadataEntry,
                                             }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 3: CumulativeEnergyReset requires kCumulativeEnergy feature
@@ -111,7 +111,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
         // Verify CumulativeEnergyReset is NOT present because kCumulativeEnergy feature is not enabled
         EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -166,7 +166,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         EXPECT_EQ(cluster.GetCumulativeEnergyReset(readResetValue), CHIP_NO_ERROR);
         EXPECT_TRUE(readResetValue.HasValue());
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 2: Cluster with no features - getters should fail
@@ -191,7 +191,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> readResetValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyReset(readResetValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -244,7 +244,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
             EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyReset::Id, value).IsSuccess());
         }
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -300,7 +300,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
     DataModel::Nullable<Structs::CumulativeEnergyResetStruct::DecodableType> resetValue;
     ASSERT_EQ(tester.ReadAttribute(CumulativeEnergyReset::Id, resetValue), CHIP_NO_ERROR);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEvents)
@@ -403,7 +403,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
         EXPECT_EQ(decodedEvent.energyExported.Value().energy, 5000);
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

@@ -62,7 +62,7 @@ TEST_F(TestPowerTopologyCluster, EmptyAttributeListTest)
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     EXPECT_TRUE(IsAttributesListEqualTo(cluster, {}));
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, AllAttributeListTest)
@@ -84,7 +84,7 @@ TEST_F(TestPowerTopologyCluster, AllAttributeListTest)
                                             Attributes::AvailableEndpoints::kMetadataEntry,
                                             Attributes::ActiveEndpoints::kMetadataEntry,
                                         }));
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, NoActiveEndpointsWithoutDYPFTest)
@@ -105,7 +105,7 @@ TEST_F(TestPowerTopologyCluster, NoActiveEndpointsWithoutDYPFTest)
                                         {
                                             Attributes::AvailableEndpoints::kMetadataEntry,
                                         }));
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, OnlyDynamicPowerFlowFeatureTest)
@@ -121,7 +121,7 @@ TEST_F(TestPowerTopologyCluster, OnlyDynamicPowerFlowFeatureTest)
 
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INCORRECT_STATE);
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
@@ -144,7 +144,7 @@ TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
     ASSERT_TRUE(tester.ReadAttribute(FeatureMap::Id, featureMapValue).IsSuccess());
     EXPECT_EQ(featureMapValue, features.Raw());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsEmptyTest)
@@ -171,7 +171,7 @@ TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsEmptyTest)
     auto iter = availableEndpoints.begin();
     EXPECT_FALSE(iter.Next());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsSingleTest)
@@ -200,7 +200,7 @@ TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsSingleTest)
     EXPECT_EQ(iter.GetValue(), 5u);
     EXPECT_FALSE(iter.Next());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsMultipleTest)
@@ -235,7 +235,7 @@ TEST_F(TestPowerTopologyCluster, ReadAvailableEndpointsMultipleTest)
     EXPECT_EQ(iter.GetValue(), 10u);
     EXPECT_FALSE(iter.Next());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsEmptyTest)
@@ -262,7 +262,7 @@ TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsEmptyTest)
     auto iter = activeEndpoints.begin();
     EXPECT_FALSE(iter.Next());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsMultipleTest)
@@ -295,7 +295,7 @@ TEST_F(TestPowerTopologyCluster, ReadActiveEndpointsMultipleTest)
     EXPECT_EQ(iter.GetValue(), 9u);
     EXPECT_FALSE(iter.Next());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, DelegateAvailableEndpointsErrorTest)
@@ -318,7 +318,7 @@ TEST_F(TestPowerTopologyCluster, DelegateAvailableEndpointsErrorTest)
     auto status = tester.ReadAttribute(AvailableEndpoints::Id, availableEndpoints);
     EXPECT_FALSE(status.IsSuccess());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestPowerTopologyCluster, DelegateActiveEndpointsErrorTest)
@@ -341,7 +341,7 @@ TEST_F(TestPowerTopologyCluster, DelegateActiveEndpointsErrorTest)
     auto status = tester.ReadAttribute(ActiveEndpoints::Id, activeEndpoints);
     EXPECT_FALSE(status.IsSuccess());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "app/server-cluster/ServerClusterInterface.h"
 #include <app/clusters/electrical-power-measurement-server/ElectricalPowerMeasurementCluster.h>
 #include <app/clusters/electrical-power-measurement-server/tests/MockElectricalPowerMeasurementDelegate.h>
 #include <pw_unit_test/framework.h>
@@ -66,7 +67,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, BasicConfigurations)
             IsAttributesListEqualTo(cluster,
                                     { Attributes::PowerMode::kMetadataEntry, Attributes::NumberOfMeasurementTypes::kMetadataEntry,
                                       Attributes::Accuracy::kMetadataEntry, Attributes::ActivePower::kMetadataEntry }));
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test DirectCurrent feature only
@@ -78,7 +79,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, BasicConfigurations)
             .optionalAttributes = ElectricalPowerMeasurementCluster::OptionalAttributesSet(),
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -101,7 +102,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
             .optionalAttributes = optionalAttrs,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test full feature set
@@ -122,7 +123,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ComplexFeatureSets)
             .optionalAttributes = optionalAttrs,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -271,7 +272,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadBasicAttributes)
     EXPECT_EQ(tester.ReadAttribute(Voltage::Id, voltage), CHIP_NO_ERROR);
     EXPECT_TRUE(voltage.IsNull());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
@@ -405,7 +406,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadRangesList)
     EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
     EXPECT_EQ(count, 2u);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadHarmonicAttributes)
@@ -515,7 +516,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadHarmonicAttributes)
         EXPECT_EQ(count, 2u);
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestElectricalPowerMeasurementCluster, ReadPolyphaseAttributes)
@@ -570,7 +571,7 @@ TEST_F(TestElectricalPowerMeasurementCluster, ReadPolyphaseAttributes)
     EXPECT_EQ(tester.ReadAttribute(NeutralCurrent::Id, value), CHIP_NO_ERROR);
     EXPECT_EQ(value.Value(), expectedNeutralCurrent);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

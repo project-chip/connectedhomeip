@@ -15,6 +15,7 @@
  */
 
 #pragma once
+#include "FabricTestFixture.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -30,11 +31,15 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <credentials/FabricTable.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
+#include <lib/support/Span.h>
 #include <memory>
 #include <optional>
 #include <type_traits>
@@ -42,7 +47,6 @@
 
 namespace chip {
 namespace Testing {
-
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
@@ -73,7 +77,12 @@ namespace Testing {
 class ClusterTester
 {
 public:
-    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster) {}
+    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster), mFabricTestFixture(nullptr) {}
+
+    // Constructor with FabricHelper
+    ClusterTester(app::ServerClusterInterface & cluster, FabricTestFixture * fabricHelper) :
+        mCluster(cluster), mFabricTestFixture(fabricHelper)
+    {}
 
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
@@ -272,6 +281,8 @@ public:
 
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
 
+    FabricTestFixture * GetFabricHelper() { return mFabricTestFixture; }
+
 private:
     bool VerifyClusterPathsValid()
     {
@@ -295,7 +306,9 @@ private:
 
     chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
-    std::vector<std::unique_ptr<chip::Testing::ReadOperation>> mReadOperations;
+    std::vector<std::unique_ptr<ReadOperation>> mReadOperations;
+
+    FabricTestFixture * mFabricTestFixture;
 };
 
 } // namespace Testing
