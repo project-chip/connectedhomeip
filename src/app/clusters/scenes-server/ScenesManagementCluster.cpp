@@ -70,8 +70,8 @@ constexpr Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
 class ScopedSceneTable
 {
 public:
-    ScopedSceneTable(const ScopedSceneTable &) = delete;
-    ScopedSceneTable &operator=(const ScopedSceneTable &) = delete;
+    ScopedSceneTable(const ScopedSceneTable &)             = delete;
+    ScopedSceneTable & operator=(const ScopedSceneTable &) = delete;
 
     ScopedSceneTable(ScenesManagementTableProvider & provider) : mProvider(provider), mTable(provider.Take()) {}
     ~ScopedSceneTable() { mProvider.Release(mTable); }

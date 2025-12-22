@@ -120,6 +120,7 @@ if (chip_build_tests) {
       "${chip_root}/src/tracing/esp32_diagnostics/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
+
       # keep-sorted: end
 
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
