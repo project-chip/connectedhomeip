@@ -64,9 +64,15 @@ constexpr Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
     return StatusIB(err).mStatus;
 }
 
+/// RAII for a scenes management table provider:
+///    - does a `Take()` on a scene at creation
+///    - ensures `Release()` is called on destruction
 class ScopedSceneTable
 {
 public:
+    ScopedSceneTable(const ScopedSceneTable &) = delete;
+    ScopedSceneTable &operator=(const ScopedSceneTable &) = delete;
+
     ScopedSceneTable(ScenesManagementTableProvider & provider) : mProvider(provider), mTable(provider.Take()) {}
     ~ScopedSceneTable() { mProvider.Release(mTable); }
 
