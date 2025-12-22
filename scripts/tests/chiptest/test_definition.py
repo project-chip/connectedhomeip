@@ -291,7 +291,7 @@ class SubprocessInfoRepo(dict):
     # don't want to create a dependency on the diskcache module which PathsFinder imports.
     # Instead we just want a dict-like object
     def __init__(self, paths: PathsFinderProto,
-                 subproc_knowhow: dict[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
+                 subproc_knowhow: MappingProxyType[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.paths = paths
@@ -302,13 +302,13 @@ class SubprocessInfoRepo(dict):
         el = spec.split(':')
         if len(el) == 3:
             # <kind>:<key>:<path>
-            kind_s, key, path = el
+            kind_s, key, path_s = el
             kind = SubprocessKind(kind_s)
-            path = Path(path)
+            path = Path(path_s)
         elif len(el) == 2:
             # <key>:<path>
-            key, path = el
-            path = Path(path)
+            key, path_s = el
+            path = Path(path_s)
             if kind is None:
                 if key not in self.subproc_knowhow:
                     raise ValueError(f"Kind not provided for key '{key}' and not specified in know-how")
