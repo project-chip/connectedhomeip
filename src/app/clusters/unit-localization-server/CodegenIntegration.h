@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,13 +15,22 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Zephyr platform.
- *
- */
-
 #pragma once
 
-#include <platform/Zephyr/BlePlatformConfig.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace UnitLocalization {
+
+class UnitLocalizationServer : public UnitLocalizationCluster
+{
+public:
+    static UnitLocalizationServer & Instance();
+};
+
+} // namespace UnitLocalization
+} // namespace Clusters
+} // namespace app
+} // namespace chip

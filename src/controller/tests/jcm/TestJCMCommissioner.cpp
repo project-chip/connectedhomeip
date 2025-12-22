@@ -20,19 +20,21 @@
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/Context.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/test-interaction-model-api.h>
+#include <app/util/mock/Functions.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/jcm/AutoCommissioner.h>
 #include <controller/jcm/DeviceCommissioner.h>
-#include <controller/tests/data_model/DataModelFixtures.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <messaging/tests/MessagingContext.h>
 #include <pw_unit_test/framework.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
@@ -49,13 +51,18 @@ using namespace chip::Testing;
 using namespace chip::TestCerts;
 using namespace chip::Transport;
 
+// Mock function for linking
+__attribute__((weak)) void InitDataModelHandler() {}
+
 namespace chip {
+namespace app {
+__attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
+                                                        chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+{}
+} // namespace app
 namespace Controller {
 namespace JCM {
 using namespace ::chip::Credentials::JCM;
-
-// Mock function for linking
-void InitDataModelHandler() {}
 
 class MockTrustVerificationDelegate : public TrustVerificationDelegate
 {
@@ -77,7 +84,7 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
-                                              ByteSpan & globallyTrustedRootSpan)
+                                              ByteSpan & globallyTrustedRootSpan) override
     {
         mLookedUpOperationalTrustAnchor = true;
         globallyTrustedRootSpan         = mRemoteAdminTrustedRoot;
@@ -148,7 +155,7 @@ public:
 
         // Setup NOCs list attribute
         OperationalCredentials::Structs::NOCStruct::Type nocStruct;
-        nocStruct.fabricIndex = fabricDescriptor.fabricIndex;
+        nocStruct.fabricIndex = static_cast<chip::FabricIndex>(fabricIndex);
 
         uint8_t icacBuf[Credentials::kMaxCHIPCertLength];
         MutableByteSpan icacSpan{ icacBuf };
@@ -254,17 +261,22 @@ public:
 class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
 {
 public:
-    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) : mMessagingContext(messagingContext) {}
+    TestVendorIDVerificationDataModel() : mMessagingContext(nullptr) {}
 
     static TestVendorIDVerificationDataModel & Instance(MessagingContext * messagingContext)
     {
-        static TestVendorIDVerificationDataModel instance(messagingContext);
+        static TestVendorIDVerificationDataModel instance;
+        instance.SetMessagingContext(messagingContext);
         return instance;
     }
+
+    void SetMessagingContext(MessagingContext * messagingContext) { mMessagingContext = messagingContext; }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & aRequest,
                                                                chip::TLV::TLVReader & aReader, CommandHandler * aHandler) override
     {
+        VerifyOrDie(mMessagingContext != nullptr);
+
         if (aRequest.path.mClusterId != Clusters::OperationalCredentials::Id ||
             aRequest.path.mCommandId !=
                 Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type::GetCommandId())
@@ -386,9 +398,13 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mCommissioningParams.SetUseJCM(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        CHIP_ERROR err = mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "mAutoCommissioner.SetCommissioningParameters failed with error: %s", ErrorStr(err));
+        }
 
-        CHIP_ERROR err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
+        err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "MockClusterStateCache::SetUp failed with error: %s", ErrorStr(err));
@@ -430,7 +446,8 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     // Simulate user consenting
     mTrustVerificationDelegate.mShouldConsent = true;
     // Set up the mock ReadCommissioningInfo
-    mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    CHIP_ERROR err = mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     TrustVerificationStage stage = TrustVerificationStage::kIdle;
     TrustVerificationError error = TrustVerificationError::kSuccess;
