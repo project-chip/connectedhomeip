@@ -54,15 +54,7 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        // The Server class calls MemoryInit in Init and MemoryShutdown in Shutdown.
-        // However, PlatformMgr().Shutdown() also relies on memory being initialized (e.g. for timer release),
-        // but it doesn't manage the memory refcount itself.
-        // If Server::Shutdown() drops the refcount to 0, PlatformMgr().Shutdown() will abort.
-        // We increment the refcount here to ensure memory remains initialized until after PlatformMgr().Shutdown().
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-
-        Server::GetInstance().Shutdown();
 
         SetCommissionableDataProvider(&sTestCommissionableDataProvider);
 
@@ -274,6 +266,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     ASSERT_FALSE(adminFabric.IsNull());
 
     Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+    adminVendor.SetNonNull(static_cast<chip::VendorId>(1));
     status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
     ASSERT_TRUE(status.IsSuccess());
     ASSERT_FALSE(adminVendor.IsNull());
