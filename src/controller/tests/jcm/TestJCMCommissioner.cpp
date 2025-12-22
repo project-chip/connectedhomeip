@@ -77,7 +77,7 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
-                                              ByteSpan & globallyTrustedRootSpan)
+                                              ByteSpan & globallyTrustedRootSpan) override
     {
         mLookedUpOperationalTrustAnchor = true;
         globallyTrustedRootSpan         = mRemoteAdminTrustedRoot;

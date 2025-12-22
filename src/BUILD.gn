@@ -208,7 +208,7 @@ if (chip_build_tests) {
       output_dir = "${root_out_dir}/lib"
     }
 
-    if (chip_device_config_enable_joint_fabric) {
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
       tests += [
         "${chip_root}/src/app/server/tests",
         "${chip_root}/src/controller/tests/jcm",
