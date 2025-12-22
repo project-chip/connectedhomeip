@@ -38,10 +38,9 @@ using namespace chip::Testing;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsGeneratedCommandsListEqualTo;
 
-static constexpr chip::EndpointId kRootEndpointId = 0;
-chip::FabricIndex kTestFabricIndex                = Testing::kTestFabrixIndex;
-const chip::GroupId kTestGroupId                  = 0x1234;
-constexpr uint16_t kTestKeySetId                  = 1;
+chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
+const chip::GroupId kTestGroupId   = 0x1234;
+constexpr uint16_t kTestKeySetId   = 1;
 
 namespace TestHelpers {
 
