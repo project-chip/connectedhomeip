@@ -17,7 +17,6 @@
 #    limitations under the License.
 #
 
-from matter.testing.runner import default_matter_test_main
 import os
 import pprint
 import sys
@@ -27,6 +26,7 @@ from rich.console import Console
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.runner import default_matter_test_main
 
 # Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
