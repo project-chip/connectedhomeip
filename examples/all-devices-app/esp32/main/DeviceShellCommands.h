@@ -43,17 +43,11 @@ public:
         return instance;
     }
 
-    // Register the Device commands
+    // Register the devtype commands
     void Register();
-
-    // API to get the stored device type
-    const std::string & GetStoredDeviceType() const { return mStoredDeviceType; }
 
 private:
     DeviceCommands() {}
-
-    // Simple storage for device type input
-    static std::string mStoredDeviceType;
 
     static CHIP_ERROR DeviceHandler(int argc, char ** argv)
     {
@@ -80,8 +74,3 @@ private:
 
 } // namespace Shell
 } // namespace chip
-
-// C-style API for accessing stored device type
-extern "C" {
-const char * GetStoredDeviceType();
-}

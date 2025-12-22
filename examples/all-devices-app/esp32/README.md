@@ -28,7 +28,7 @@ On first boot, the application will display:
 ```
 ==================================================
 No stored device type found.
-Use command: device set <device-type>
+Use command: devtype set <device-type>
 ==================================================
 ```
 
@@ -37,13 +37,13 @@ Use command: device set <device-type>
 Use the shell command to set and initialize a device type:
 
 ```
-matter device set <device-type>
+devtype set <device-type>
 ```
 
 Example:
 
 ```
-matter device set contact-sensor
+devtype set contact-sensor
 ```
 
 On successful initialization, the device type is saved to NVS and the Matter
@@ -82,4 +82,4 @@ matter device factoryreset
 ```
 
 After factory reset, reboot the device and set a new device type using the
-`device set` command.
+`devtype set` command.

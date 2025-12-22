@@ -18,6 +18,7 @@
 #include <DeviceShellCommands.h>
 #include <lib/shell/streamer.h>
 
+// Forward declaration of the function defined in main.cpp
 void InitServerWithDeviceType(std::string deviceType);
 
 namespace chip {
@@ -28,22 +29,22 @@ Shell::Engine DeviceCommands::sSubShell;
 void DeviceCommands::Register()
 {
     static const shell_command_t subCommands[] = {
-        { &SetDeviceTypeHandler, "set", "Usage: device set <device-type>" },
+        { &SetDeviceTypeHandler, "set", "Usage: devtype set <device-type>" },
     };
     sSubShell.RegisterCommands(subCommands, MATTER_ARRAY_SIZE(subCommands));
 
-    // Register the root `device` command in the top-level shell.
-    static const shell_command_t deviceCommand = { &DeviceHandler, "device", "Device type management commands" };
+    // Register the root `devtype` command in the top-level shell.
+    static const shell_command_t devtypeCommand = { &DeviceHandler, "devtype", "Device type management commands" };
 
-    Engine::Root().RegisterCommands(&deviceCommand, 1);
+    Engine::Root().RegisterCommands(&devtypeCommand, 1);
 }
 
 CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 {
     if (argc != 1)
     {
-        streamer_printf(streamer_get(), "Usage: device set <device-type>\r\n");
-        streamer_printf(streamer_get(), "Example: device set contact-sensor\r\n");
+        streamer_printf(streamer_get(), "Usage: devtype set <device-type>\r\n");
+        streamer_printf(streamer_get(), "Example: devtype set contact-sensor\r\n");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -58,12 +59,3 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 
 } // namespace Shell
 } // namespace chip
-
-// C-style API implementation
-extern "C" {
-const char * GetStoredDeviceType()
-{
-    const std::string & deviceType = chip::Shell::DeviceCommands::GetInstance().GetStoredDeviceType();
-    return deviceType.empty() ? nullptr : deviceType.c_str();
-}
-}

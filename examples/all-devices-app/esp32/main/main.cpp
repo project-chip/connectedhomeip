@@ -340,11 +340,6 @@ extern "C" void app_main()
         return;
     }
 
-#if CONFIG_ENABLE_CHIP_SHELL
-    chip::LaunchShell();
-    chip::Shell::DeviceCommands::GetInstance().Register();
-#endif // CONFIG_ENABLE_CHIP_SHELL
-
     // Check if device type is stored in NVS from a previous boot
     char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
     size_t storedLen                            = 0;
@@ -361,9 +356,13 @@ extern "C" void app_main()
     }
     else
     {
+#if CONFIG_ENABLE_CHIP_SHELL
+        chip::LaunchShell();
+        chip::Shell::DeviceCommands::GetInstance().Register();
+#endif // CONFIG_ENABLE_CHIP_SHELL
         ESP_LOGI(TAG, "==================================================");
         ESP_LOGI(TAG, "No stored device type found.");
-        ESP_LOGI(TAG, "Use command: device set <device-type>");
+        ESP_LOGI(TAG, "Use command: devtype set <device-type>");
         ESP_LOGI(TAG, "==================================================");
     }
 }
