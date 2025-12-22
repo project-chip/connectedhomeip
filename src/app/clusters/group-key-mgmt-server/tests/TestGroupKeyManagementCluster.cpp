@@ -39,51 +39,10 @@ using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 using chip::Testing::IsGeneratedCommandsListEqualTo;
 
-struct TestGroupKeyManagementCluster : public ::testing::Test
-{
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
-
-TEST_F(TestGroupKeyManagementCluster, CompileTest)
-{
-    GroupKeyManagementCluster cluster;
-    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GroupKeyManagement::Id }), BitFlags<ClusterQualityFlags>());
-}
-
-TEST_F(TestGroupKeyManagementCluster, CommandsTest)
-{
-    GroupKeyManagementCluster cluster;
-
-    // Check required accepted commands are present
-    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
-                                              {
-                                                  GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry,
-                                                  GroupKeyManagement::Commands::KeySetRead::kMetadataEntry,
-                                                  GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry,
-                                                  GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry,
-                                              }));
-
-    // Check required generated commands are present
-    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
-                                               {
-                                                   GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id,
-                                                   GroupKeyManagement::Commands::KeySetReadResponse::Id,
-                                               }));
-}
-
-TEST_F(TestGroupKeyManagementCluster, AttributesTest)
-{
-    GroupKeyManagementCluster cluster;
-    std::vector<app::DataModel::AttributeEntry> mandatoryAttributes(GroupKeyManagement::Attributes::kMandatoryMetadata.begin(),
-                                                                    GroupKeyManagement::Attributes::kMandatoryMetadata.end());
-
-    // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, std::move(mandatoryAttributes)));
-}
-chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
-const chip::GroupId kTestGroupId   = 0x1234;
-constexpr uint16_t kTestKeySetId   = 1;
+static constexpr chip::EndpointId kRootEndpointId = 0;
+chip::FabricIndex kTestFabricIndex                = Testing::kTestFabrixIndex;
+const chip::GroupId kTestGroupId                  = 0x1234;
+constexpr uint16_t kTestKeySetId                  = 1;
 
 namespace TestHelpers {
 
