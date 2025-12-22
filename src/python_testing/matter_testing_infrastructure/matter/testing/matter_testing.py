@@ -32,7 +32,6 @@ from enum import IntFlag
 from typing import Any, Callable, List, Optional, Type, Union
 
 import matter.testing.matchers as matchers
-import matter.testing.runner as runner
 
 # isort: off
 
