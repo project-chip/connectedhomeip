@@ -375,7 +375,10 @@ class CAHierarchy:
 
         return (key_path, cert_bundle_path, False)
 
-    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1), ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
+    def gen_keypair(self, dns: str,
+                    override=False,
+                    duration: datetime.timedelta = datetime.timedelta(hours=1),
+                    ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.
@@ -401,6 +404,9 @@ class CAHierarchy:
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
+
+        if key_path is None:
+            raise ValueError("Key path should always be set")
 
         log.debug("leaf generated. dns=%s; path=%s", dns, cert_bundle_path)
 
@@ -819,16 +825,18 @@ class PushAvServer:
         return {key, cert, created}
 
     # Seems unused in the current TH tests
+    # TODO Verify in spec how a track name updated should be handled mid-stream
     async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
         """Updates the track_name for a given stream_id."""
-        with self._open_session(stream_id) as session:
-            session.track_name = track_request.track_name
+        with self._open_stream(stream_id) as stream:
+            stream.track_name = track_request.track_name
 
     def sign_client_certificate(
         self, name: str, req: SignClientCertificate, override: bool = True
     ):
         (key, cert, created) = self.device_hierarchy.gen_cert(name, req.csr, override)
 
+        # TODO Verify that key is always None, and if true, get rid of it
         return {key, cert, created}
 
 
