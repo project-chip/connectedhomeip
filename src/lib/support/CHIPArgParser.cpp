@@ -25,8 +25,6 @@
 
 #include "CHIPArgParser.hpp"
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
-
 #include <climits>
 #include <ctype.h>
 #include <errno.h>
@@ -1575,5 +1573,3 @@ static bool SanityCheckOptions(OptionSet * optSets[])
 
 } // namespace ArgParser
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER
