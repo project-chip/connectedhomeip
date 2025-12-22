@@ -78,16 +78,16 @@ public:
                     Protocols::InteractionModel::Status::Success);
 
         const EmberAfCluster * cluster = emberAfFindServerCluster(endpointId, ScenesManagement::Id);
+
         bool supportsCopyScene         = false;
-        if (cluster->acceptedCommandList != nullptr)
+        // NOTE: acceptedCommandList is KNOWN to not be nullptr because ScenesManagement should have mandatory commands
+        //       as such we iterate here directly without a 'empty list' (i.e. nullptr) check.
+        for (const CommandId * cmd = cluster->acceptedCommandList; *cmd != kInvalidCommandId; cmd++)
         {
-            for (const CommandId * cmd = cluster->acceptedCommandList; *cmd != kInvalidCommandId; cmd++)
+            if (*cmd == ScenesManagement::Commands::CopyScene::Id)
             {
-                if (*cmd == ScenesManagement::Commands::CopyScene::Id)
-                {
-                    supportsCopyScene = true;
-                    break;
-                }
+                supportsCopyScene = true;
+                break;
             }
         }
 
