@@ -451,7 +451,7 @@ class TestDefinition:
                         command = command.with_args("--ble-controller", str(ble_controller_app), "--wifi")
                     elif wifi_paf is not None:
                         # Use WiFi PAF mode for testing
-                        command = command.with_args("--wifi", "--wifipaf", "")
+                        command = command.with_args("--wifi", "--wifipaf", "freq_list=2437")
 
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
