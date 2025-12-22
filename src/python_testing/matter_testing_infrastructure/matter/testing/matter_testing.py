@@ -1413,16 +1413,3 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     ])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
-
-
-# TODO(#37537): Remove these temporary aliases after transition period
-default_matter_test_main = runner.default_matter_test_main
-get_test_info = runner.get_test_info
-run_tests = runner.run_tests
-run_tests_no_exit = runner.run_tests_no_exit
-get_default_paa_trust_store = runner.get_default_paa_trust_store
-
-# Backward compatibility aliases for relocated functions
-parse_matter_test_args = runner.parse_matter_test_args
-
-# isort: off

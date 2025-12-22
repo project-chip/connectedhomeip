@@ -17,6 +17,7 @@
 #    limitations under the License.
 #
 
+from matter.testing.runner import default_matter_test_main
 import os
 import pprint
 import sys
@@ -29,7 +30,7 @@ from matter.testing.decorators import async_test_body
 
 # Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main  # noqa: E402
+from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
 
 console = None
 maxClusterNameLength = 30

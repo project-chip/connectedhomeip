@@ -47,7 +47,8 @@ import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClustersObjects
 from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
 log = logging.getLogger(__name__)

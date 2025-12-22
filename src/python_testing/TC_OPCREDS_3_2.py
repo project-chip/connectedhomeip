@@ -41,7 +41,8 @@ from test_plan_support import (commission_from_existing, commission_if_required,
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 from matter.utils import CommissioningBuildingBlocks
 

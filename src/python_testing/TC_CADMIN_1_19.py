@@ -40,7 +40,8 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, TestStep, default_matter_test_main
+from matter.testing.matter_testing import AttributeValue, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_CADMIN_1_19(CADMINBaseTest):

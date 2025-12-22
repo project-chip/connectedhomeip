@@ -22,7 +22,8 @@ from mobly import asserts
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 

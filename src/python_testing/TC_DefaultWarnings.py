@@ -41,7 +41,8 @@ from test_testing.DefaultChecker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAUL
 
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import TestStep, default_matter_test_main
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_DefaultChecker(BasicCompositionTests, DefaultChecker):

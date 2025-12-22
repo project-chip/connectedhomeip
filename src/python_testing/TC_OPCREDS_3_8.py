@@ -54,7 +54,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_command, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.testing.pics import accepted_cmd_pics_str
 from matter.tlv import TLVReader
 from matter.utils import CommissioningBuildingBlocks

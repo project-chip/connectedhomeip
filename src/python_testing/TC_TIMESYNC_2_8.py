@@ -46,7 +46,8 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 

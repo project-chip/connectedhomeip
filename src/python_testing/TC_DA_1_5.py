@@ -51,7 +51,8 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
 
