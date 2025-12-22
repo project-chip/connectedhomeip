@@ -200,6 +200,20 @@ protected:
     TlsClientManagementCluster * GetTlsClientManagementCluster() const { return mTlsClientManagementCluster; }
 };
 
+/**
+ * Set the delegate for the TLS Client Management cluster.
+ * MUST be called before server initialization (e.g. in main() before ServerInit()).
+ * If not called, a default delegate with minimal functionality will be used.
+ */
+void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate);
+
+/**
+ * Set the certificate table for the TLS Client Management cluster.
+ * MUST be called before server initialization (e.g. in main() before ServerInit()).
+ * If not called, a default certificate table will be used.
+ */
+void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTable & certificateTable);
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

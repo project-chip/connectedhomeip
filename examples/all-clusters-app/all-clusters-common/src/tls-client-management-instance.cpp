@@ -428,27 +428,8 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
 
-static LazyRegisteredServerCluster<TlsClientManagementCluster> sTlsClientManagementClusterServer;
-
-void MatterTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
+void InitializeTlsClientManagement()
 {
-    // TLS Client Management cluster is a singleton that must exist on the root endpoint only
-    VerifyOrDie(matterEndpoint == kRootEndpointId);
-
-    LogErrorOnFailure(gCertificateTableInstance.SetEndpoint(matterEndpoint));
-
-    sTlsClientManagementClusterServer.Create(matterEndpoint, TlsClientManagementCommandDelegate::GetInstance(),
-                                             gCertificateTableInstance, kMaxProvisionedEndpoints);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(sTlsClientManagementClusterServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to register TLS Client Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT, matterEndpoint,
-                     err.Format());
-    }
-}
-
-void MatterTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint, MatterClusterShutdownType shutdownType)
-{
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsClientManagementClusterServer.Cluster()));
-    sTlsClientManagementClusterServer.Destroy();
+    MatterTlsClientManagementSetDelegate(TlsClientManagementCommandDelegate::GetInstance());
+    MatterTlsClientManagementSetCertificateTable(gCertificateTableInstance);
 }

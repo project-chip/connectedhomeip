@@ -104,6 +104,12 @@ public:
     static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
 };
 
+/**
+ * Initialize the TLS Client Management cluster with application-specific delegate and certificate table.
+ * MUST be called before server initialization (e.g. in ApplicationInit()).
+ */
+void InitializeTlsClientManagement();
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
