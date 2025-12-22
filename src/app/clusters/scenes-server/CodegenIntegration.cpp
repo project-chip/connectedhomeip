@@ -77,6 +77,8 @@ public:
         VerifyOrDie(Attributes::SceneTableSize::Get(endpointId, &endpointTableSize) ==
                     Protocols::InteractionModel::Status::Success);
 
+        // Guaranteed non-null: if CreateRegistration is called, this means the ember cluster
+        // was found (because we have a valid clusterInstanceIndex)
         const EmberAfCluster * cluster = emberAfFindServerCluster(endpointId, ScenesManagement::Id);
 
         bool supportsCopyScene         = false;
