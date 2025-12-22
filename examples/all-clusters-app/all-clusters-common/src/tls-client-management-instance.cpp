@@ -432,6 +432,9 @@ static LazyRegisteredServerCluster<TlsClientManagementCluster> sTlsClientManagem
 
 void MatterTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
+    // TLS Client Management cluster is a singleton that must exist on the root endpoint only
+    VerifyOrDie(matterEndpoint == kRootEndpointId);
+
     LogErrorOnFailure(gCertificateTableInstance.SetEndpoint(matterEndpoint));
 
     sTlsClientManagementClusterServer.Create(matterEndpoint, TlsClientManagementCommandDelegate::GetInstance(),
@@ -447,4 +450,5 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 void MatterTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint, MatterClusterShutdownType shutdownType)
 {
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsClientManagementClusterServer.Cluster()));
+    sTlsClientManagementClusterServer.Destroy();
 }
