@@ -46,7 +46,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
 
 log = logging.getLogger(__name__)
 

@@ -33,10 +33,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import Attribute
-from matter.testing.decorators import has_attribute, has_cluster, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_attribute, has_cluster, has_feature, run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.matter_testing import (MatterBaseTest, async_test_body, run_on_singleton_matching_endpoint,
-                                           should_run_test_on_endpoint)
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import MockTestRunner
 
 

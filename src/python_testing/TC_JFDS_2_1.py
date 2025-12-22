@@ -45,7 +45,8 @@ import matter.clusters as Clusters
 from matter import CertificateAuthority
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

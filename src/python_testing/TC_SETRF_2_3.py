@@ -47,7 +47,8 @@ from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityTariff
 

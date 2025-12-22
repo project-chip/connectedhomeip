@@ -43,8 +43,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):

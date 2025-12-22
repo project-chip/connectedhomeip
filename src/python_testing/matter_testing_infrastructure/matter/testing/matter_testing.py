@@ -56,6 +56,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
+from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -1418,22 +1419,6 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
 
 
 # TODO(#37537): Remove these temporary aliases after transition period
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
-bytes_from_hex = conversions.bytes_from_hex
-hex_from_bytes = conversions.hex_from_bytes
-id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_with_name
-
-async_test_body = decorators.async_test_body
-run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-# autopep8: off
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
-
 default_matter_test_main = runner.default_matter_test_main
 get_test_info = runner.get_test_info
 run_tests = runner.run_tests

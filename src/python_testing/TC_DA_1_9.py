@@ -51,7 +51,8 @@ import signal
 from mobly import asserts
 
 from matter import ChipDeviceCtrl
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 
 class TC_DA_1_9(MatterBaseTest):

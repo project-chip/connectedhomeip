@@ -49,8 +49,9 @@ from matter import ChipUtility
 from matter.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)

@@ -44,7 +44,8 @@ import matter.discovery as Discovery
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from matter.tlv import TLVReader, TLVWriter
 
 log = logging.getLogger(__name__)
