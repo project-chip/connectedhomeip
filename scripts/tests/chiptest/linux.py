@@ -387,7 +387,6 @@ class NANSimulator:
             log.warning("NANSimulator: No receiver found for peer_addr=%s", peer_addr)
             return
 
-
         # Emit NANReceive on receiver
         receive_args = {
             'id': ('u', req_instance_id),
@@ -429,7 +428,7 @@ class WpaSupplicantMock(threading.Thread):
             ifname = ''
             if 'Ifname' in args:
                 value = args['Ifname']
-                ifname = value [1] if isinstance (value, tuple) else value
+                ifname = value[1] if isinstance(value, tuple) else value
             return await self.GetInterface(ifname)
 
         @sdbus.dbus_method_async("s", "o")
