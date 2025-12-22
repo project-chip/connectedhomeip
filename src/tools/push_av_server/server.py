@@ -387,7 +387,11 @@ class CAHierarchy:
             key_path = self.directory / f"{dns}.key"
 
             if cert_path.exists() and key_path.exists():
-                return (key_path, cert_path, True)
+                cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
+
+                if datetime.datetime.now() > cert.not_valid_after:
+                    # We only reuse the certificate/key if the cert is still valid
+                    return (key_path, cert_path, True)
 
         # Generate private key
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -841,7 +845,7 @@ class PushAvContext:
         # Create CA hierarchies (for webserver and devices)
         self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
         self.server_hierarchy = CAHierarchy(self.directory.mkdir("certs", "server"), "server", "server")
-        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True, ip_address=server_ip)
+        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, ip_address=server_ip)
 
         # mDNS configuration. Registration only happen if the dns isn't localhost.
         self.zeroconf = Zeroconf()
