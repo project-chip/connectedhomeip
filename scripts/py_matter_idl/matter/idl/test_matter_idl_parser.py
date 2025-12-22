@@ -197,12 +197,13 @@ class TestParser(unittest.TestCase):
         self.assertEqual(
             actual.clusters[1].bitmaps[0].description, "Multi line\n                Bitmap comment")
         self.assertEqual(actual.clusters[1].bitmaps[0].entries[0].description,
-                            "Multi line\n                    Bitmap field comment")
+                         "Multi line\n                    Bitmap field comment")
         self.assertEqual(
             actual.clusters[1].events[0].description, "Multi line\n                Event comment")
         self.assertEqual(
             actual.clusters[1].events[0].fields[0].description, "Event field comment")
-        self.assertEqual(actual.clusters[1].revision.description, "Revision comment")
+        self.assertEqual(
+            actual.clusters[1].revision.description, "Revision comment")
 
     def test_sized_attribute(self):
         actual = parseText("""
