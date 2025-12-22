@@ -428,8 +428,16 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
 
+namespace chip {
+namespace app {
+namespace Clusters {
+
 void InitializeTlsClientManagement()
 {
     MatterTlsClientManagementSetDelegate(TlsClientManagementCommandDelegate::GetInstance());
     MatterTlsClientManagementSetCertificateTable(gCertificateTableInstance);
 }
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

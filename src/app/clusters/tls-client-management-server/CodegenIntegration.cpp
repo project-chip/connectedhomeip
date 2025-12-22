@@ -97,10 +97,9 @@ LazyRegisteredServerCluster<TlsClientManagementCluster> gClusterInstance;
 
 } // anonymous namespace
 
-void MatterTlsClientManagementPluginServerInitCallback()
-{
-    ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
-}
+namespace chip {
+namespace app {
+namespace Clusters {
 
 void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate)
 {
@@ -108,10 +107,19 @@ void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate
     gDelegate = &delegate;
 }
 
-void MatterTlsClientManagementSetCertificateTable(CertificateTable & certificateTable)
+void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTable & certificateTable)
 {
     VerifyOrDie(!gClusterInstance.IsConstructed());
     gCertificateTable = &certificateTable;
+}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+void MatterTlsClientManagementPluginServerInitCallback()
+{
+    ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
 }
 
 void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
