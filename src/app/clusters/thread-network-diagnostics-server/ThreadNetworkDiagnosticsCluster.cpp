@@ -35,8 +35,8 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId,
                                                                  const BitFlags<ThreadNetworkDiagnostics::Feature> features,
                                                                  const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mActiveTs(config.activeTs), mPendingTs(config.pendingTs), mDelay(config.delay)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mActiveTs(config.activeTs),
+    mPendingTs(config.pendingTs), mDelay(config.delay)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -220,10 +220,10 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Startup(ServerClusterContext & conte
     return CHIP_NO_ERROR;
 }
 
-void ThreadNetworkDiagnosticsCluster::Shutdown()
+void ThreadNetworkDiagnosticsCluster::Shutdown(ClusterShutdownType type)
 {
     GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(type);
 }
 
 std::optional<DataModel::ActionReturnStatus>

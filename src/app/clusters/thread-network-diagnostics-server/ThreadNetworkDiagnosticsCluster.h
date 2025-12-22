@@ -50,7 +50,7 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
 
     void OnConnectionStatusChanged(ThreadNetworkDiagnostics::ConnectionStatusEnum newConnectionStatus) override;
     void OnNetworkFaultChanged(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,

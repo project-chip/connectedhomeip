@@ -90,7 +90,7 @@ void MatterThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterThreadNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterThreadNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -101,7 +101,7 @@ void MatterThreadNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId
             .fixedClusterInstanceCount = kThreadNetworkDiagnosticsFixedClusterCount,
             .maxClusterInstanceCount   = kThreadNetworkDiagnosticsMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
