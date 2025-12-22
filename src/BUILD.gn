@@ -72,6 +72,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
       "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/identify-server/tests",
+      "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
@@ -95,6 +96,8 @@ if (chip_build_tests) {
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/app/persistence/tests",
       "${chip_root}/src/app/server-cluster/tests",
+      "${chip_root}/src/app/server/tests",
+      "${chip_root}/src/credentials/tests/jcm",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
@@ -117,7 +120,6 @@ if (chip_build_tests) {
       "${chip_root}/src/tracing/esp32_diagnostics/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
-
       # keep-sorted: end
 
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
@@ -194,6 +196,7 @@ if (chip_build_tests) {
       tests += [
         "${chip_root}/src/controller/tests",
         "${chip_root}/src/controller/tests/data_model",
+        "${chip_root}/src/controller/tests/jcm",
       ]
     }
 
@@ -207,15 +210,6 @@ if (chip_build_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
-    }
-
-    if (chip_device_config_enable_joint_fabric) {
-      tests += [
-        "${chip_root}/src/app/server/tests",
-        "${chip_root}/src/controller/tests/jcm",
-        "${chip_root}/src/credentials/tests/jcm",
-        "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
-      ]
     }
   }
 

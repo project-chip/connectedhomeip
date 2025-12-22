@@ -12,13 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/UnitLocalizationCluster.cpp"
-    "${CLUSTER_DIR}/UnitLocalizationCluster.h"
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
-    "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/unit-localization-server.h"
-)
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("chime") {
+  sources = [
+    "ChimeDevice.cpp",
+    "ChimeDevice.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/src/app/clusters/chime-server",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
