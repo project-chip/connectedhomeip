@@ -81,7 +81,7 @@ public:
         // was found (because we have a valid clusterInstanceIndex)
         const EmberAfCluster * cluster = emberAfFindServerCluster(endpointId, ScenesManagement::Id);
 
-        bool supportsCopyScene         = false;
+        bool supportsCopyScene = false;
         // NOTE: acceptedCommandList is KNOWN to not be nullptr because ScenesManagement should have mandatory commands
         //       as such we iterate here directly without a 'empty list' (i.e. nullptr) check.
         for (const CommandId * cmd = cluster->acceptedCommandList; *cmd != kInvalidCommandId; cmd++)
