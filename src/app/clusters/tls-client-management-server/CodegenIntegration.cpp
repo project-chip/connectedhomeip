@@ -22,11 +22,23 @@
 
 // MatterTlsClientManagementPluginServerInitCallback is called once during application startup.
 // MatterTlsClientManagementClusterInitCallback and MatterTlsClientManagementClusterShutdownCallback
-// are called per-endpoint and must be implemented by the application to create/destroy cluster
+// are called per-endpoint and should be implemented by the application to create/destroy cluster
 // instances with application-provided dependencies (TlsClientManagementDelegate, CertificateTable).
 // See examples/all-clusters-app for reference implementation.
+// The weak implementations below provide fallbacks for applications that don't implement these.
 
 void MatterTlsClientManagementPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
+}
+
+void __attribute__((weak)) MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId)
+{
+    // Default weak implementation - applications should provide their own
+}
+
+void __attribute__((weak))
+MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    // Default weak implementation - applications should provide their own
 }
