@@ -299,9 +299,12 @@ struct TestScenesManagementCluster : public ::testing::Test
         auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request_data);
         ASSERT_TRUE(response.IsSuccess());
         ASSERT_TRUE(response.response.has_value());
+
+        // NOLINTBEGIN(bugprone-unchecked-optional-access)
         ASSERT_EQ(response.response->status, to_underlying(Status::Success));
         EXPECT_EQ(response.response->groupID, groupID);
         EXPECT_EQ(response.response->sceneID, sceneID);
+        // NOLINTEND(bugprone-unchecked-optional-access)
     }
 
     void VerifySceneInfoCount(ClusterTester & tester, FabricIndex fabricIndex, uint16_t expectedCount)
@@ -329,6 +332,7 @@ struct TestScenesManagementCluster : public ::testing::Test
     {
         ASSERT_TRUE(response.IsSuccess());
         ASSERT_TRUE(response.response.has_value());
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_EQ(response.response->status, to_underlying(expectedStatus));
     }
 
@@ -385,6 +389,7 @@ TEST_F(TestScenesManagementCluster, AddSceneCommandModifyExistingScene)
     auto view_response   = tester.Invoke<ViewScene::Type, ViewSceneResponse::DecodableType>(ViewScene::Id, view_request);
     ASSERT_TRUE(view_response.IsSuccess());
     ASSERT_TRUE(view_response.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto & data = *view_response.response;
     EXPECT_EQ(data.groupID, kTestGroupId);
     EXPECT_EQ(data.sceneID, kTestSceneId);
@@ -452,6 +457,7 @@ TEST_F(TestScenesManagementCluster, ViewSceneCommandSuccess)
 
     ExpectCommandStatus(view_response, Status::Success);
     ASSERT_TRUE(view_response.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto & data = *view_response.response;
 
     EXPECT_EQ(data.groupID, kTestGroupId);
@@ -506,8 +512,10 @@ TEST_F(TestScenesManagementCluster, RemoveSceneCommandSuccess)
 
     ExpectCommandStatus(remove_response, Status::Success);
     ASSERT_TRUE(remove_response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_EQ(remove_response.response->groupID, remove_request.groupID);
     EXPECT_EQ(remove_response.response->sceneID, remove_request.sceneID);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId(kTestSceneId, kTestGroupId);
     SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry(sceneStorageId);
@@ -549,6 +557,7 @@ TEST_F(TestScenesManagementCluster, RemoveAllScenesCommandSuccess)
 
     ExpectCommandStatus(remove_all_response, Status::Success);
     ASSERT_TRUE(remove_all_response.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(remove_all_response.response->groupID, kTestGroupId);
 
     // Verify scenes based on toBeRemoved flag
@@ -620,6 +629,7 @@ TEST_F(TestScenesManagementCluster, GetSceneMembershipCommandSuccess)
 
     ExpectCommandStatus(response, Status::Success);
     ASSERT_TRUE(response.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto & data = *response.response;
     EXPECT_EQ(data.groupID, kTestGroupId);
     ASSERT_FALSE(data.capacity.IsNull());
@@ -692,8 +702,10 @@ TEST_F(TestScenesManagementCluster, StoreSceneCommandSuccess)
 
     ExpectCommandStatus(response, Status::Success);
     ASSERT_TRUE(response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_EQ(response.response->groupID, kTestGroupId);
     EXPECT_EQ(response.response->sceneID, kTestSceneId);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId(kTestSceneId, kTestGroupId);
     SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry(sceneStorageId);
@@ -729,9 +741,11 @@ TEST_F(TestScenesManagementCluster, StoreSceneCommandCreatesSceneIfNotFound)
 
     ASSERT_TRUE(response.IsSuccess());
     ASSERT_TRUE(response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_EQ(response.response->status, to_underlying(Status::Success));
     EXPECT_EQ(response.response->groupID, kTestGroupId);
     EXPECT_EQ(response.response->sceneID, kTestSceneId);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     ViewScene::Type view_request;
     view_request.groupID = kTestGroupId;
@@ -740,9 +754,10 @@ TEST_F(TestScenesManagementCluster, StoreSceneCommandCreatesSceneIfNotFound)
     auto view_response = tester.Invoke<ViewScene::Type, ViewSceneResponse::DecodableType>(ViewScene::Id, view_request);
     ASSERT_TRUE(view_response.IsSuccess());
     ASSERT_TRUE(view_response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_EQ(view_response.response->status, to_underlying(Status::Success));
-
     auto & data = view_response.response.value();
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     // Per Matter Spec 1.4 - 1.10.6.9, when creating a scene via StoreScene,
     // the transition time is 0 and the scene name is an empty string.
@@ -819,6 +834,7 @@ TEST_F(TestScenesManagementCluster, RecallSceneNotFound)
 
     ASSERT_FALSE(recall_response.IsSuccess());
     ASSERT_TRUE(recall_response.status.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(recall_response.status.value(), Status::NotFound);
 }
 
@@ -848,8 +864,10 @@ TEST_F(TestScenesManagementCluster, CopySceneCommandSuccess)
     auto copy_response = tester.Invoke<CopyScene::Type, CopySceneResponse::DecodableType>(CopyScene::Id, copy_request);
     ExpectCommandStatus(copy_response, Status::Success);
     ASSERT_TRUE(copy_response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_EQ(copy_response.response->groupIdentifierFrom, kTestGroupId);
     EXPECT_EQ(copy_response.response->sceneIdentifierFrom, kTestSceneId);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     // 3. Verify the copied scene exists and is identical to the source.
     SceneTable<ExtensionFieldSetsImpl>::SceneStorageId destSceneId(kTestOtherSceneId, kTestOtherGroupId);
@@ -1062,8 +1080,10 @@ TEST_F(TestScenesManagementCluster, SceneNamesFeatureEnabledTest)
 
     ExpectCommandStatus(view_response, Status::Success);
     ASSERT_TRUE(view_response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_TRUE(view_response.response->sceneName.HasValue());
     EXPECT_TRUE(view_response.response->sceneName.Value().data_equal("MySceneName"_span));
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestScenesManagementCluster, SceneNamesFeatureDisabledTest)
@@ -1095,6 +1115,7 @@ TEST_F(TestScenesManagementCluster, SceneNamesFeatureDisabledTest)
     ExpectCommandStatus(view_response, Status::Success);
     ASSERT_TRUE(view_response.response.has_value());
     // When kSceneNames is not supported, the Scene Name must be an empty string.
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(!view_response.response.value().sceneName.HasValue() || view_response.response.value().sceneName.Value().empty());
     clusterWithoutSceneNames.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1122,6 +1143,7 @@ TEST_F(TestScenesManagementCluster, CopyAllScenesCommandSuccess)
     auto copy_response = tester.Invoke<CopyScene::Type, CopySceneResponse::DecodableType>(CopyScene::Id, copy_request);
     ExpectCommandStatus(copy_response, Status::Success);
     ASSERT_TRUE(copy_response.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(copy_response.response->groupIdentifierFrom, kTestGroupId);
 
     // 3. Verify that all scenes were copied to the destination group.
@@ -1168,8 +1190,10 @@ TEST_F(TestScenesManagementCluster, CopySceneOverwriteExisting)
     auto view_response   = tester.Invoke<ViewScene::Type, ViewSceneResponse::DecodableType>(ViewScene::Id, view_request);
     ExpectCommandStatus(view_response, Status::Success);
     ASSERT_TRUE(view_response.response.has_value());
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_TRUE(view_response.response->sceneName.Value().data_equal("SourceScene"_span));
     EXPECT_EQ(view_response.response->transitionTime.Value(), 1234u);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestScenesManagementCluster, FabricScopingAddScene)
@@ -1192,6 +1216,7 @@ TEST_F(TestScenesManagementCluster, FabricScopingAddScene)
     auto view_response1   = tester.Invoke<ViewScene::Type, ViewSceneResponse::DecodableType>(ViewScene::Id, view_request1);
     ExpectCommandStatus(view_response1, Status::Success);
     ASSERT_TRUE(view_response1.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(view_response1.response->sceneName.Value().data_equal("Fabric1Scene"_span));
 
     // Verify fabric 2 scene
@@ -1202,6 +1227,7 @@ TEST_F(TestScenesManagementCluster, FabricScopingAddScene)
     auto view_response2   = tester.Invoke<ViewScene::Type, ViewSceneResponse::DecodableType>(ViewScene::Id, view_request2);
     ExpectCommandStatus(view_response2, Status::Success);
     ASSERT_TRUE(view_response2.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(view_response2.response->sceneName.Value().data_equal("Fabric2Scene"_span));
 
     // Verify scene counts for both fabrics
