@@ -26,8 +26,8 @@ from lark.visitors import Transformer, v_args
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation,
                                          AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
                                          CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
-                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
-                                         StructQuality, StructTag, Revision)
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, Revision,
+                                         ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 LOGGER = logging.getLogger(__name__)
 

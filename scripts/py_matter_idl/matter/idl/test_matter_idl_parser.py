@@ -32,8 +32,8 @@ from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag,
-                                         Revision)
+                                         Field, FieldQuality, Idl, ParseMetaData, Revision, ServerClusterInstantiation, Struct,
+                                         StructTag)
 
 
 class GeneratorContentStorage(GeneratorStorage):
