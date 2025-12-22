@@ -20,8 +20,8 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_asserts import assert_valid_uint8
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_asserts import assert_valid_uint8
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
