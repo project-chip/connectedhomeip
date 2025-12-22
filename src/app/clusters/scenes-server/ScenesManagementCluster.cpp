@@ -89,11 +89,14 @@ private:
 /// A very common pattern of:
 ///   - if error (i.e. NOT CHIP_NO_ERROR), then set response status and return response
 #define SuccessOrReturnWithFailureStatus(err_expr, response)                                                                       \
-    if (CHIP_ERROR __err = err_expr; __err != CHIP_NO_ERROR)                                                                       \
+    do                                                                                                                             \
     {                                                                                                                              \
-        response.status = to_underlying(ResponseStatus(__err));                                                                    \
-        return response;                                                                                                           \
-    }
+        if (CHIP_ERROR __err = err_expr; __err != CHIP_NO_ERROR)                                                                   \
+        {                                                                                                                          \
+            response.status = to_underlying(ResponseStatus(__err));                                                                \
+            return response;                                                                                                       \
+        }                                                                                                                          \
+    } while (0)
 
 } // namespace
 
