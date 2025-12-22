@@ -15,3 +15,4 @@ types in the SDK.
 -   [Cluster and device type development](./cluster_and_device_type_dev.md)
 -   [How To Add New Device Types & Clusters](./how_to_add_new_dts_and_clusters.md)
 -   [Cluster Server design](./unit_testing_clusters.md)
+-   [Cluster Tester Helper Class](./cluster_tester.md)
