@@ -176,33 +176,33 @@ class TestParser(unittest.TestCase):
         # meta_data may not match but is required for doc comments. Clean it up
 
         # Metadata parsing varies line/column, so only check doc comments
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[0].description, "Documentation for MyCluster")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].description, "Documentation for MyCluster #2")
         self.assertIsNone(actual.clusters[1].commands[0].description)
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].commands[1].description, "Some command doc comment")
 
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].attributes[0].definition.description, "Attribute comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].enums[0].description, "Multi line\n                Enum comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].enums[0].entries[0].description, "Enum field comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].structs[0].description, "Multi line\n                Struct comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].structs[0].fields[0].description, "Struct field comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].bitmaps[0].description, "Multi line\n                Bitmap comment")
-        self.assertIdlEqual(actual.clusters[1].bitmaps[0].entries[0].description,
+        self.assertEqual(actual.clusters[1].bitmaps[0].entries[0].description,
                             "Multi line\n                    Bitmap field comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].events[0].description, "Multi line\n                Event comment")
-        self.assertIdlEqual(
+        self.assertEqual(
             actual.clusters[1].events[0].fields[0].description, "Event field comment")
-        self.assertIdlEqual(actual.clusters[1].revision.description, "Revision comment")
+        self.assertEqual(actual.clusters[1].revision.description, "Revision comment")
 
     def test_sized_attribute(self):
         actual = parseText("""
