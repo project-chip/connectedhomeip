@@ -194,7 +194,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
     auto fabric = commandHandler.GetAccessingFabricIndex();
     if (mCertificateTable.HasRootCertificateEntry(fabric, req.caid) != CHIP_NO_ERROR)
     {
-        return DataModel::ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound));
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound);
     }
     if (!req.ccdid.IsNull() && mCertificateTable.HasClientCertificateEntry(fabric, req.ccdid.Value()) != CHIP_NO_ERROR)
     {
