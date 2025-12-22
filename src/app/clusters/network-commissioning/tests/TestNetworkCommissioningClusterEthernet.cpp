@@ -42,7 +42,6 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
-using chip::app::AttributeValueDecoder;
 using chip::app::ClusterShutdownType;
 using chip::app::DataModel::AttributeEntry;
 

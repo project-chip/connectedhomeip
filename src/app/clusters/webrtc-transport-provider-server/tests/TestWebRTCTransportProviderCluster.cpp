@@ -38,6 +38,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
+using chip::app::ClusterShutdownType;
+
 using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
 using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
@@ -190,7 +192,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadCurrentSessionsAttribute)
     auto iter = sessions.begin();
     EXPECT_FALSE(iter.Next()); // Should be empty
 
-    server.Shutdown();
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
@@ -208,7 +210,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
     EXPECT_TRUE(status.IsSuccess());
     EXPECT_EQ(clusterRevision, WebRTCTransportProvider::kRevision);
 
-    server.Shutdown();
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
@@ -226,7 +228,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
     EXPECT_FALSE(status.IsSuccess());
     EXPECT_EQ(status.GetStatusCode().GetStatus(), chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    server.Shutdown();
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace
