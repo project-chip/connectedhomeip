@@ -18,6 +18,8 @@
 
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
+#include <app/util/generic-callbacks.h>
+
 #include <cstdint>
 
 namespace chip::app {
@@ -127,7 +129,8 @@ public:
     ///
     /// In case of errors, this method will log the error and return (error state is not
     /// returned to the caller as it is generally not actionable/fixable)
-    static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate);
+    static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate,
+                                 MatterClusterShutdownType clusterShutdownType);
 
     struct FindClusterOnEndpointOptions
     {
