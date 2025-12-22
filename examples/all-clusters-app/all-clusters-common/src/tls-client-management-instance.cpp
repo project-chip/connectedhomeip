@@ -22,6 +22,7 @@
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
+#include <app/util/af-types.h>
 #include <clusters/TlsClientManagement/Commands.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>
@@ -429,25 +430,21 @@ TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
 
 static LazyRegisteredServerCluster<TlsClientManagementCluster> sTlsClientManagementClusterServer;
 
-void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
+void MatterTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
-    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
+    LogErrorOnFailure(gCertificateTableInstance.SetEndpoint(matterEndpoint));
 
-    sTlsClientManagementClusterServer.Create(EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(),
+    sTlsClientManagementClusterServer.Create(matterEndpoint, TlsClientManagementCommandDelegate::GetInstance(),
                                              gCertificateTableInstance, kMaxProvisionedEndpoints);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(sTlsClientManagementClusterServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to register TLS Client Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT, EndpointId(1),
+        ChipLogError(Zcl, "Failed to register TLS Client Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT, matterEndpoint,
                      err.Format());
     }
 }
 
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
+void MatterTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint, MatterClusterShutdownType shutdownType)
 {
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsClientManagementClusterServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "TLS Client Management Cluster unregister error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsClientManagementClusterServer.Cluster()));
 }

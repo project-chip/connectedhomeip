@@ -20,14 +20,13 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-// These callbacks are required by the Ember/codegen integration but are not
-// needed for the server cluster interface implementation.
+// MatterTlsClientManagementPluginServerInitCallback is called once during application startup.
+// MatterTlsClientManagementClusterInitCallback and MatterTlsClientManagementClusterShutdownCallback
+// are called per-endpoint and must be implemented by the application to create/destroy cluster
+// instances with application-provided dependencies (TlsClientManagementDelegate, CertificateTable).
+// See examples/all-clusters-app for reference implementation.
 
 void MatterTlsClientManagementPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
 }
-
-void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId) {}
-
-void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType) {}

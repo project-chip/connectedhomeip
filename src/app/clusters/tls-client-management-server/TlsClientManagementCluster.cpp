@@ -73,8 +73,8 @@ CHIP_ERROR TlsClientManagementCluster::Startup(ServerClusterContext & context)
     ChipLogProgress(DataManagement, "TlsClientManagementCluster: initializing");
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
-    ReturnErrorOnFailure(mDelegate.Init(Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(mCertificateTable.Init(context.storage));
+    ReturnErrorOnFailure(mDelegate.Init(context.storage));
 
     return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
@@ -198,7 +198,7 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
     }
     if (!req.ccdid.IsNull() && mCertificateTable.HasClientCertificateEntry(fabric, req.ccdid.Value()) != CHIP_NO_ERROR)
     {
-        return DataModel::ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound));
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound);
     }
 
     Commands::ProvisionEndpointResponse::Type response;
