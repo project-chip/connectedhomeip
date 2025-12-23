@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
+
 #include <stdint.h>
 
 namespace chip {
@@ -63,6 +65,14 @@ extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out);
 extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out, Base64ValToCharFunct valToCharFunct);
 extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out);
 extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct);
+
+// High-level encode/decode functions that operate on chip::ByteSpan and chip::MutableCharSpan types.
+// These functions perform buffer size checks and return CHIP_ERROR codes and offload
+// work to existing pointer based overloads.
+extern CHIP_ERROR Base64Encode(const ByteSpan & input, MutableCharSpan & output);
+extern CHIP_ERROR Base64URLEncode(const ByteSpan & input, MutableCharSpan & output);
+extern CHIP_ERROR Base64Decode(const CharSpan & input, MutableByteSpan & output);
+extern CHIP_ERROR Base64URLDecode(const CharSpan & input, MutableByteSpan & output);
 
 /** Computes the base-64 encoded length for a given input length.
  *

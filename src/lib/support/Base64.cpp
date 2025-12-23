@@ -292,6 +292,92 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
     return Base64Decode32(in, inLen, out, Base64CharToVal);
 }
 
+CHIP_ERROR Base64Encode(const ByteSpan & input, MutableCharSpan & output)
+{
+    if (input.size() > UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t encodedLen = BASE64_ENCODED_LEN(input.size());
+    if (output.size() < encodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64Encode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Base64URLEncode(const ByteSpan & input, MutableCharSpan & output)
+{
+    if (input.size() > UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t encodedLen = BASE64_ENCODED_LEN(input.size());
+    if (output.size() < encodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64URLEncode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Base64Decode(const CharSpan & input, MutableByteSpan & output)
+{
+    if (input.size() > UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t maxDecodedLen = BASE64_MAX_DECODED_LEN(input.size());
+    if (output.size() < maxDecodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64Decode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    if (actualLen == UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Base64URLDecode(const CharSpan & input, MutableByteSpan & output)
+{
+    if (input.size() > UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t maxDecodedLen = BASE64_MAX_DECODED_LEN(input.size());
+    if (output.size() < maxDecodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64URLDecode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    if (actualLen == UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip
 
 #ifdef TEST
