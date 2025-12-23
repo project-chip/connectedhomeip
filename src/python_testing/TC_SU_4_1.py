@@ -290,6 +290,22 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             "Remaining provider must be either TH2 or TH4 after ConstraintError"
         )
 
+        # Read DefaultOTAProviders on second fabric (TH3)
+        fabric2_val = await self.read_single_attribute_check_success(
+            dev_ctrl=th3,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders
+        )
+
+        # Verify fabric 2 still has TH3
+        asserts.assert_equal(len(fabric2_val), 1, "Fabric 2 should still have exactly one provider after failed write on Fabric 1")
+        asserts.assert_equal(
+            fabric2_val[0],
+            provider_th3_for_fabric2,
+            "Fabric 2 provider should remain TH3 after ConstraintError on Fabric 1"
+        )
+        logger.info(f'Step #5 - Fabric 2 DefaultOTAProviders unchanged as expected: {fabric2_val}')
+
         self.step(6)
         # Create Empty Providers list
         providers_list_empty = []
@@ -338,9 +354,9 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
         asserts.assert_equal(
             th_actual_otap_info[0],
             provider_th4_for_fabric1,
-            "DefaultOTAProviders on Fabric 1 should remain set to TH4"
+            "DefaultOTAProviders on Fabric 1 should remain set to TH2 or TH4"
         )
-        logger.info("Step #6 - Fabric 1 DefaultOTAProviders remains set to TH4.")
+        logger.info("Step #6 - Fabric 1 DefaultOTAProviders remains unchanged (either TH2 or TH4).")
 
         self.step(7)
         # Step #7: Verify UpdatePossible attribute.
