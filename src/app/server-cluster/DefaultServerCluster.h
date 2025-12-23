@@ -56,7 +56,7 @@ public:
     ///
     /// Call Shutdown to de-initialize the object.
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType) override;
 
     [[nodiscard]] Span<const ConcreteClusterPath> GetPaths() const override { return { &mPath, 1 }; }
 

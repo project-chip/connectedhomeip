@@ -280,7 +280,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
         await self.send_test_event_clear()
 
         self.step("16")
-        await subscription_handler.cancel()
+        subscription_handler.cancel()
 
 
 if __name__ == "__main__":

@@ -19,10 +19,10 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/BooleanStateConfiguration/Enums.h>
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -35,6 +35,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanStateConfiguration;
 
+using chip::app::ClusterShutdownType;
 using chip::app::Clusters::BooleanStateConfiguration::Feature;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
@@ -300,7 +301,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, currentLevel),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(currentLevel, 5);
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -327,7 +328,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         uint8_t levelToWrite = 6;
         EXPECT_EQ(tester.WriteAttribute(Attributes::CurrentSensitivityLevel::Id, levelToWrite),
                   Protocols::InteractionModel::Status::Success);
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // 2. Create a new cluster instance with the same context, and check if the value was restored.
@@ -341,7 +342,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 6); // Check if value is persisted.
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // 3. Create another new cluster with a smaller supported range and check clamping on startup.
@@ -359,7 +360,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 4); // 5-1. Clamped from persisted value.
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // 4. Test that if persistence fails, default is used. Let's clear the storage.
@@ -375,7 +376,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 5); // Should be default, as storage is empty.
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -410,7 +411,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
         EXPECT_TRUE(alarmsEnabled.Has(AlarmModeBitmap::kVisual));
         EXPECT_FALSE(alarmsEnabled.Has(AlarmModeBitmap::kAudible));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // 2. Create a new cluster instance with the same context, and check if the value was restored.
@@ -426,7 +427,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
         EXPECT_EQ(tester.ReadAttribute(Attributes::AlarmsEnabled::Id, alarmsEnabled), Protocols::InteractionModel::Status::Success);
         EXPECT_TRUE(alarmsEnabled.Has(AlarmModeBitmap::kVisual)); // Check if value is persisted.
         EXPECT_FALSE(alarmsEnabled.Has(AlarmModeBitmap::kAudible));
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // 3. Test that if persistence fails, default is used. Let's clear the storage.
@@ -442,7 +443,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsEnabled;
         EXPECT_EQ(tester.ReadAttribute(Attributes::AlarmsEnabled::Id, alarmsEnabled), Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(alarmsEnabled.Raw(), 0); // Should be default, as storage is empty.
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
