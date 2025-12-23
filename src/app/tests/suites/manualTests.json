@@ -60,7 +60,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
         "Test_TC_DISHALM_3_3",
