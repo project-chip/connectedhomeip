@@ -66,8 +66,6 @@ config("openthread_rt1170_config") {
       "OPENTHREAD_CONFIG_NAT64_BORDER_ROUTING_ENABLE=1",
       "DISABLE_TCPIP_INIT=1",
       "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
-      "OPENTHREAD_CONFIG_TREL_MANAGE_DNSSD_ENABLE=1",
-      "OPENTHREAD_CONFIG_BORDER_ROUTING_DHCP6_PD_CLIENT_ENABLE=1",
     ]
 
     if (nxp_enable_matter_cli) {
@@ -118,7 +116,6 @@ source_set("libopenthread-rt1170") {
     sources += [
       "${openthread_nxp_root}/src/common/br/border_agent.c",
       "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
-      "${openthread_nxp_root}/src/common/br/dhcp6pd_socket.c",
       "${openthread_nxp_root}/src/common/br/dns_upstream_resolver.c",
       "${openthread_nxp_root}/src/common/br/infra_if.c",
       "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
