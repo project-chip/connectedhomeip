@@ -88,6 +88,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ScenesManagement::Id:
+        MatterScenesManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::HepaFilterMonitoring::Id:
         MatterHepaFilterMonitoringClusterInitCallback(endpoint);
         break;
@@ -178,6 +181,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::ScenesManagement::Id:
+        MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::HepaFilterMonitoring::Id:
         MatterHepaFilterMonitoringClusterShutdownCallback(endpoint, shutdownType);

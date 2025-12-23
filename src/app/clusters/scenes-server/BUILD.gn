@@ -40,7 +40,19 @@ source_set("scenes") {
   cflags = [ "-Wconversion" ]
 }
 
-# Empty default target, so that data_model.gni can properly depend on this
-group("scenes-server") {
-  public_deps = [ ":scenes" ]
+source_set("scenes-server") {
+  sources = [
+    "ScenesManagementCluster.cpp",
+    "ScenesManagementCluster.h",
+  ]
+
+  public_deps = [
+    ":scenes",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing:macros",
+    "${chip_root}/zzz_generated/app-common/clusters/ScenesManagement",
+  ]
 }

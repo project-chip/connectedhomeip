@@ -16,4 +16,4 @@
  */
 #pragma once
 
-#include <app/clusters/scenes-server/ScenesManagementCluster.h>
+#include <app/clusters/scenes-server/CodegenIntegration.h>

@@ -104,6 +104,10 @@ void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterScenesManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterScenesManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
