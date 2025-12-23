@@ -314,7 +314,7 @@ class AndroidBuilder(Builder):
             "CHIPClusterID.jar": "src/controller/java/CHIPClusterID.jar",
         }
 
-        for jarName in jars:
+        for jarName in jars.keys():
             self._Execute(
                 [
                     "cp",

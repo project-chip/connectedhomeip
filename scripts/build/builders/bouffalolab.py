@@ -103,13 +103,13 @@ class BouffalolabBuilder(GnBuilder):
                  enable_debug_coredump: bool = False,
                  ):
 
-        if module_type == 'BL602':
+        if 'BL602' == module_type:
             bouffalo_chip = 'bl602'
-        elif module_type == 'BL704L':
+        elif 'BL704L' == module_type:
             bouffalo_chip = 'bl702l'
         elif "BL70" in module_type:
             bouffalo_chip = 'bl702'
-        elif module_type == "BL616":
+        elif "BL616" == module_type:
             bouffalo_chip = "bl616"
         else:
             raise Exception(f"module_type {module_type} is not supported")
