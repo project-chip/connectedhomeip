@@ -414,7 +414,7 @@ void ApplicationInit()
         (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
-        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
+        LogErrorOnFailure(sChipNamedPipeCommands.Stop());
     }
     else
     {
