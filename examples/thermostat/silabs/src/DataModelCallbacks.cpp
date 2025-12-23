@@ -28,6 +28,12 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "sl_component_catalog.h"
+#ifndef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+#include "thermostat-delegate-impl.h"
+#include <app/clusters/thermostat-server/thermostat-server.h>
+#endif // !SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+
 #ifdef SL_MATTER_ENABLE_AWS
 #include "MatterAwsControl.h"
 #endif // SL_MATTER_ENABLE_AWS
@@ -55,3 +61,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #endif // SL_MATTER_ENABLE_AWS
     }
 }
+
+#ifndef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+using namespace chip::app::Clusters::Thermostat;
+
+void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & delegate = ThermostatDelegate::GetInstance();
+    SetDefaultDelegate(endpoint, &delegate);
+}
+#endif // !SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
