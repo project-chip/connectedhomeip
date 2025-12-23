@@ -119,6 +119,7 @@ Generally regenerate using one of:
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
 |       1072 |      0x430 | SoilMeasurement                                         |
 |       1073 |      0x431 | AmbientContextSensing                                   |
+|       1074 |      0x432 | AmbientSensingUnion                                     |
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1106 |      0x452 | ThreadBorderRouterManagement                            |
 |       1107 |      0x453 | ThreadNetworkDirectory                                  |

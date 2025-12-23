@@ -2946,6 +2946,30 @@ public class ClusterWriteMapping {
     );
     writeAmbientContextSensingInteractionInfo.put("writeHoldTimeAttribute", writeAmbientContextSensingHoldTimeAttributeInteractionInfo);
     writeAttributeMap.put("ambientContextSensing", writeAmbientContextSensingInteractionInfo);
+    Map<String, InteractionInfo> writeAmbientSensingUnionInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAmbientSensingUnionUnionNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo ambientSensingUnionunionNameCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            String.class, 
+            String.class 
+        );
+    writeAmbientSensingUnionUnionNameCommandParams.put(
+        "value",
+        ambientSensingUnionunionNameCommandParameterInfo
+    );
+    InteractionInfo writeAmbientSensingUnionUnionNameAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AmbientSensingUnionCluster) cluster).writeUnionNameAttribute(
+          (DefaultClusterCallback) callback,
+          (String) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAmbientSensingUnionUnionNameCommandParams
+    );
+    writeAmbientSensingUnionInteractionInfo.put("writeUnionNameAttribute", writeAmbientSensingUnionUnionNameAttributeInteractionInfo);
+    writeAttributeMap.put("ambientSensingUnion", writeAmbientSensingUnionInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
     Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();

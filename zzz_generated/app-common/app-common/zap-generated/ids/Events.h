@@ -27,6 +27,7 @@
 #include <clusters/AdministratorCommissioning/EventIds.h>
 #include <clusters/AirQuality/EventIds.h>
 #include <clusters/AmbientContextSensing/EventIds.h>
+#include <clusters/AmbientSensingUnion/EventIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>

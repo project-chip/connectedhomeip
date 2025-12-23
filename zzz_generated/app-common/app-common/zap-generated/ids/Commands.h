@@ -27,6 +27,7 @@
 #include <clusters/AdministratorCommissioning/CommandIds.h>
 #include <clusters/AirQuality/CommandIds.h>
 #include <clusters/AmbientContextSensing/CommandIds.h>
+#include <clusters/AmbientSensingUnion/CommandIds.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>

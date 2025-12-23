@@ -6512,6 +6512,52 @@ public static class OccupancySensingClusterOccupancyChangedEvent {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterUnionContributorListChangeEvent {
+  public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionMemberStruct> unionContributorList;
+  private static final long UNION_CONTRIBUTOR_LIST_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorListChangeEvent(
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionMemberStruct> unionContributorList
+  ) {
+    this.unionContributorList = unionContributorList;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UNION_CONTRIBUTOR_LIST_ID, ArrayType.generateArrayType(unionContributorList, (elementunionContributorList) -> elementunionContributorList.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorListChangeEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionMemberStruct> unionContributorList = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UNION_CONTRIBUTOR_LIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          unionContributorList = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionMemberStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorListChangeEvent(
+      unionContributorList
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorListChangeEvent {\n");
+    output.append("\tunionContributorList: ");
+    output.append(unionContributorList);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;
