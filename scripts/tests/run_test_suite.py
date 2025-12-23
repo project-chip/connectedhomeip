@@ -528,6 +528,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        wifi_paf=wifi_paf,
                         nan_simulator=nan_simulator
                     )
                     if not context.obj.dry_run:
