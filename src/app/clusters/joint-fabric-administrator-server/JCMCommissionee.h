@@ -56,6 +56,11 @@ public:
     {
         mInfo.adminEndpointId = endpointId;
         mAccessingFabricIndex = mCommandHandle.Get()->GetAccessingFabricIndex();
+        // Extract the session from the exchange before going async.
+        // GetExchangeContext() must not be be called once we cross the async boundary,
+        // since the exchange is not guaranteed to remain valid.
+        SessionHandle sessionHandle = mCommandHandle.Get()->GetExchangeContext()->GetSessionHandle();
+        mSessionHolder.Grab(sessionHandle);
     }
     ~JCMCommissionee() {}
 
@@ -99,18 +104,19 @@ protected:
                              std::function<void(const ConcreteAttributePath &, const typename T::DecodableType &)> onSuccess,
                              std::function<void(const ConcreteAttributePath *, CHIP_ERROR err)> onError, const bool fabricFiltered)
     {
-        Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-        VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        SessionHandle session                          = exchangeContext->GetSessionHandle();
+        VerifyOrReturnError(mSessionHolder, CHIP_ERROR_INCORRECT_STATE);
+
         chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
 
-        return chip::Controller::ReadAttribute<T>(exchangeMgr, session, endpointId, onSuccess, onError, fabricFiltered);
+        return chip::Controller::ReadAttribute<T>(exchangeMgr, mSessionHolder.Get().Value(), endpointId, onSuccess, onError,
+                                                  fabricFiltered);
     }
 
 private:
     CommandHandler::Handle & mCommandHandle;
     OnCompletionFunc mOnCompletion;
     FabricIndex mAccessingFabricIndex;
+    SessionHolder mSessionHolder;
 
     // Trust Verification Stages
     /**

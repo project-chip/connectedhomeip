@@ -145,6 +145,9 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
                                                                const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
+
+        // TODO: This runs asynchronously; getSession() may return Missing(). Make sure to not call .Value() without checking
+        // HasValue().
         ByteSpan attestationChallenge = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         CHIP_ERROR err                = Verify(info, clientChallenge, attestationChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
@@ -155,7 +158,8 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         ChipLogError(Controller, "Failed to receive SignVIDVerificationResponse: %s", ErrorStr(err));
         OnVendorIdVerificationComplete(err);
     };
-
+    // TODO: This runs asynchronously; getSession() may return Missing(). Make sure to not call .Value() without checking
+    // HasValue().
     CHIP_ERROR err =
         Controller::InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
