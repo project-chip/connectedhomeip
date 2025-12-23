@@ -229,6 +229,7 @@ CHIP_ERROR ZephyrConfig::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR ZephyrConfig::WriteConfigValueStr(Key key, const char * str)
 {
+    /* The API contract requires using null-terminated string, so using strlen here should be safe. */
     return WriteConfigValueStr(key, str, str ? strlen(str) : 0);
 }
 
@@ -291,7 +292,7 @@ void ZephyrConfig::RunConfigUnitTest()
 bool ZephyrConfig::BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[SETTINGS_MAX_NAME_LEN])
 {
     constexpr size_t KEY_PREFIX_LEN = sizeof(NAMESPACE_COUNTERS) - 1;
-    const size_t keySuffixLen       = strlen(counterId) + 1; // including null-character
+    const size_t keySuffixLen       = strnlen(counterId, SETTINGS_MAX_NAME_LEN) + 1; // including null-character
 
     if (KEY_PREFIX_LEN + keySuffixLen > SETTINGS_MAX_NAME_LEN)
         return false;

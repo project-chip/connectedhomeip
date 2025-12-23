@@ -73,7 +73,8 @@ struct DiscoveryFilter
         }
         if (type == DiscoveryFilterType::kInstanceName)
         {
-            return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
+            return (instanceName != nullptr) && (other.instanceName != nullptr) &&
+                (strncmp(instanceName, other.instanceName, Common::kInstanceNameMaxLength + 1) == 0);
         }
 
         return code == other.code;
@@ -130,7 +131,7 @@ struct CommonResolutionData
             (mrpRetryIntervalActive.has_value() && (*mrpRetryIntervalActive > defaultMRPConfig->mActiveRetransTimeout));
     }
 
-    bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
+    bool IsHost(const char * host) const { return strncmp(host, hostName, kHostNameMaxLength + 1) == 0; }
 
     void Reset()
     {
@@ -256,7 +257,10 @@ struct CommissionNodeData : public CommonResolutionData
         new (this) CommissionNodeData();
     }
 
-    bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
+    bool IsInstanceName(const char * instance) const
+    {
+        return strncmp(instance, instanceName, Common::kInstanceNameMaxLength + 1) == 0;
+    }
 
     void LogDetail() const
     {
@@ -270,7 +274,7 @@ struct CommissionNodeData : public CommonResolutionData
                                                                          sizeof(rotatingIdString));
             ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
         }
-        if (strlen(deviceName) != 0)
+        if (strnlen(deviceName, kMaxDeviceNameLen + 1) != 0)
         {
             ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);
         }
@@ -290,7 +294,7 @@ struct CommissionNodeData : public CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tLong Discriminator: %u", longDiscriminator);
         }
-        if (strlen(pairingInstruction) != 0)
+        if (strnlen(pairingInstruction, kMaxPairingInstructionLen + 1) != 0)
         {
             ChipLogDetail(Discovery, "\tPairing Instruction: %s", pairingInstruction);
         }
