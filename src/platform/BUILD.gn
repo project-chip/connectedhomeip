@@ -150,12 +150,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
     ]
 
+    _enable_joint_fabric = chip_device_config_enable_joint_fabric
     if (chip_build_tests &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1" ]
-    } else {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${chip_device_config_enable_joint_fabric}" ]
+      _enable_joint_fabric = true
     }
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${_enable_joint_fabric}" ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
 
