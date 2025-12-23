@@ -423,7 +423,7 @@ jobs:
                      --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
                      --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT-unified}/chip-rvc-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
                      --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
@@ -953,35 +953,35 @@ jobs:
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
+                  # keep-sorted: start
+                  echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-app-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
-                  echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
-                  echo "ENERGY_MANAGEMENT_APP: objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
-                  echo "ENERGY_GATEWAY_APP: objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
-                  echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
-                  echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
+                  echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified/chip-rvc-app" >> /tmp/test_env.yaml
-                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
+                  echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified/closure-app" >> /tmp/test_env.yaml
+                  echo "ENERGY_GATEWAY_APP: objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
+                  echo "ENERGY_MANAGEMENT_APP: objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
+                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
+                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
-                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
+                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
-                  echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
-                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
-                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
-                  echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified/closure-app" >> /tmp/test_env.yaml
-                  echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
-
-                  # SU OTA Images
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
+                  # keep-sorted: end
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
