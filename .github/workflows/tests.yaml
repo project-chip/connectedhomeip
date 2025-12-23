@@ -319,6 +319,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
