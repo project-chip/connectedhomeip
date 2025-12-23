@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "thread-network-diagnostics-provider.cpp",
-  "thread-network-diagnostics-provider.h",
-  "thread-network-diagnostics-server.cpp",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]
