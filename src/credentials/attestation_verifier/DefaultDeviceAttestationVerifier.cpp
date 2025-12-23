@@ -649,8 +649,7 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarati
     // Ensure we didn't use a test key for official or provisional certificates (if disallowed)
     bool testKeyAllowedForCertificateType =
         (cdContent.certificationType == to_underlying(CertificationType::kDevelopmentAndTest)) ||
-        (cdContent.certificationType == to_underlying(CertificationType::kProvisional) &&
-         kEnableCdTestKeysForProvisionalCds);
+        (cdContent.certificationType == to_underlying(CertificationType::kProvisional) && kEnableCdTestKeysForProvisionalCds);
     ChipLogProgress(NotSpecified, "Certification type %u", cdContent.certificationType);
     if (mCdKeysTrustStore.IsCdTestKey(kid) && !testKeyAllowedForCertificateType)
     {
