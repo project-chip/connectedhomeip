@@ -15,14 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/StatusResponse.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/CameraAvStreamManagement/Attributes.h>
+#include <clusters/CameraAvStreamManagement/Commands.h>
 
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -397,7 +396,7 @@ enum class OptionalAttribute : uint32_t
     kStatusLightBrightness = 0x0080,
 };
 
-class CameraAVStreamManagementCluster : public CommandHandlerInterface, public AttributeAccessInterface
+class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
     /**
@@ -458,6 +457,25 @@ public:
      * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     bool HasFeature(Feature feature) const;
 
@@ -602,7 +620,7 @@ public:
 
     Globals::ThreeLevelAutoEnum GetStatusLightBrightness() const { return mStatusLightBrightness; }
 
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    // EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
     // Add/Remove Management functions for streams
 
@@ -686,8 +704,8 @@ private:
     friend struct StreamTraits;
 
     CameraAVStreamManagementDelegate & mDelegate;
+    const BitFlags<Feature> mEnabledFeatures;
     EndpointId mEndpointId;
-    const BitFlags<Feature> mFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
@@ -745,7 +763,7 @@ private:
         if (currentValue != newValue)
         {
             currentValue = newValue;
-            auto path    = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+            auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
                 ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
@@ -757,24 +775,25 @@ private:
     }
 
     template <typename StreamContainer, typename IdGetter>
-    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
-                                                 StreamType streamType, IdGetter id_getter, bool isDeallocate)
+    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, CommandHandler & handler,
+                                                 const ConcreteCommandPath & commandPath, StreamType streamType, IdGetter id_getter,
+                                                 bool isDeallocate)
     {
         auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
 
         if (it == streams.end())
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+            handler.AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
             return false;
         }
 
         if (isDeallocate && it->referenceCount > 0)
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+            handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
             return false;
         }
 
@@ -783,9 +802,9 @@ private:
         {
             if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
             {
-                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mPath.mEndpointId,
                              StreamTypeToString(streamType), streamID);
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                handler.AddStatus(commandPath, Protocols::InteractionModel::Status::DynamicConstraintError);
                 return false;
             }
         }
@@ -812,14 +831,14 @@ private:
                             Zcl,
                             "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
                             "not modifiable",
-                            mEndpointId, streamID);
-                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+                            mPath.mEndpointId, streamID);
+                        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
                         return false;
                     }
                 }
                 else
                 {
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+                    handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidInState);
                     return false;
                 }
             }
@@ -829,18 +848,6 @@ private:
     }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
-
-    /**
-     * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * IM-level implementation of write
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.
@@ -884,40 +891,59 @@ private:
 
     bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
-    /**
-     * @brief Inherited from CommandHandlerInterface
-     */
-    void InvokeCommand(HandlerContext & ctx) override;
+    std::optional<DataModel::ActionReturnStatus>
+    HandleVideoStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                              const Commands::VideoStreamAllocate::DecodableType & req);
 
-    void HandleVideoStreamAllocate(HandlerContext & ctx, const Commands::VideoStreamAllocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamModify(CommandHandler & handler,
+                                                                         const ConcreteCommandPath & commandPath,
+                                                                         const Commands::VideoStreamModify::DecodableType & req);
 
-    void HandleVideoStreamModify(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleVideoStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                const Commands::VideoStreamDeallocate::DecodableType & req);
 
-    void HandleVideoStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamDeallocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAudioStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                              const Commands::AudioStreamAllocate::DecodableType & req);
 
-    void HandleAudioStreamAllocate(HandlerContext & ctx, const Commands::AudioStreamAllocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAudioStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                const Commands::AudioStreamDeallocate::DecodableType & req);
 
-    void HandleAudioStreamDeallocate(HandlerContext & ctx, const Commands::AudioStreamDeallocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSnapshotStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                 const Commands::SnapshotStreamAllocate::DecodableType & req);
 
-    void HandleSnapshotStreamAllocate(HandlerContext & ctx, const Commands::SnapshotStreamAllocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSnapshotStreamModify(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                               const Commands::SnapshotStreamModify::DecodableType & req);
 
-    void HandleSnapshotStreamModify(HandlerContext & ctx, const Commands::SnapshotStreamModify::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSnapshotStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                   const Commands::SnapshotStreamDeallocate::DecodableType & req);
 
-    void HandleSnapshotStreamDeallocate(HandlerContext & ctx, const Commands::SnapshotStreamDeallocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetStreamPriorities(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                              const Commands::SetStreamPriorities::DecodableType & req);
 
-    void HandleSetStreamPriorities(HandlerContext & ctx, const Commands::SetStreamPriorities::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleCaptureSnapshot(CommandHandler & handler,
+                                                                       const ConcreteCommandPath & commandPath,
+                                                                       const Commands::CaptureSnapshot::DecodableType & req);
 
-    void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::CaptureSnapshot::DecodableType & req);
+    bool CheckSnapshotStreamsAvailability(CommandHandler & handler, const ConcreteCommandPath & commandPath);
 
-    bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
+    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, CommandHandler & handler,
+                                  const ConcreteCommandPath & commandPath);
 
-    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
+    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, CommandHandler & handler,
+                                                  const ConcreteCommandPath & commandPath, bool isDeallocate);
 
-    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx, bool isDeallocate);
+    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, CommandHandler & handler,
+                                          const ConcreteCommandPath & commandPath);
 
-    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
-
-    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx, bool isDeallocate);
+    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, CommandHandler & handler,
+                                                     const ConcreteCommandPath & commandPath, bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement
