@@ -216,9 +216,9 @@ attribute to allow applications to interact with cluster state.
 
 -   **Setter Methods:** Provide setter methods for all non-fixed (mutable)
     attributes (e.g., `SetAlarmsActive()`, `SetCurrentSensitivityLevel()`) to
-    allow spec-compliant modifications. When the application's driver state
-    changes, these setters can be used to update the cluster's state
-    accordingly.
+    allow applications to make spec-compliant modifications to the cluster
+    state. When the application's driver state changes, these setters can be
+    used to update the cluster's state accordingly.
 
 -   **Example:** The
     [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
