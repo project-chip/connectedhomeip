@@ -233,25 +233,32 @@ class TC_IDM_2_2(BasicCompositionTests):
         return read_request
 
     async def _read_endpoint_all_clusters(self, endpoint):
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
-        asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+        read_request = await self.default_controller.Read(self.dut_node_id, [endpoint])
+        print("-------------------------------------------------------------")
+        print(type(read_request))
+        print("-------------------------------------------------------------")
+        asserts.assert_in(Clusters.Descriptor, read_request.attributes[endpoint].keys(), "Descriptor cluster not in output")
         asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
-                          read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+                          read_request.attributes[endpoint][Clusters.Descriptor], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
-        server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        returned_cluster_ids = sorted(read_request.tlvAttributes[endpoint].keys())
+        server_list = sorted(read_request.attributes[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
         asserts.assert_equal(
             returned_cluster_ids,
             server_list,
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
-        for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
+        # Checking only the standard cluster attributes because we don't know if there are read-only attributes
+        # on MEI clusters. MEI clusters are tested comprehensively in IDM-10.1.
+        for cluster in read_request.attributes[endpoint]:
+            attribute_ids = [a.attribute_id for a in read_request.attributes[endpoint][cluster]
                              if a != Clusters.Attribute.DataVersion]
+            standard_attributes = [id for id in read_request.attributes[endpoint][cluster]
+                                   [cluster.Attributes.AttributeList] if global_attribute_ids.is_standard_attribute_id(id)]
             asserts.assert_equal(
                 sorted(attribute_ids),
-                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
+                sorted(standard_attributes),
                 f"Expected attribute list does not match for cluster {cluster}"
             )
         return read_request
