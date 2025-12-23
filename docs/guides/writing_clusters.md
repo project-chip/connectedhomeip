@@ -211,9 +211,15 @@ Your cluster implementation must provide public getter and setter APIs for each
 attribute to allow applications to interact with cluster state.
 
 -   **Getter Methods:** Provide a getter method for every attribute (e.g.,
-    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`).
+    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`). Applications need
+    these to read the current cluster state.
+
 -   **Setter Methods:** Provide setter methods for all non-fixed (mutable)
-    attributes (e.g., `SetAlarmsActive()`, `SetCurrentSensitivityLevel()`).
+    attributes (e.g., `SetAlarmsActive()`, `SetCurrentSensitivityLevel()`) to
+    allow spec-compliant modifications. When the application's driver state
+    changes, these setters can be used to update the cluster's state
+    accordingly.
+
 -   **Example:** The
     [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
     cluster demonstrates this pattern.
