@@ -61,6 +61,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
+      "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
       "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
@@ -92,6 +93,8 @@ if (chip_build_tests) {
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/app/persistence/tests",
+      "${chip_root}/src/app/server/tests",
+      "${chip_root}/src/credentials/tests/jcm",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
@@ -194,6 +197,7 @@ if (chip_build_tests) {
       tests += [
         "${chip_root}/src/controller/tests",
         "${chip_root}/src/controller/tests/data_model",
+        "${chip_root}/src/controller/tests/jcm",
       ]
     }
 
@@ -207,15 +211,6 @@ if (chip_build_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
-    }
-
-    if (chip_device_config_enable_joint_fabric) {
-      tests += [
-        "${chip_root}/src/app/server/tests",
-        "${chip_root}/src/controller/tests/jcm",
-        "${chip_root}/src/credentials/tests/jcm",
-        "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
-      ]
     }
   }
 

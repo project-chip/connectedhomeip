@@ -231,8 +231,6 @@ static_library("support") {
     "BytesCircularBuffer.h",
     "BytesToHex.cpp",
     "BytesToHex.h",
-    "CHIPArgParser.cpp",
-    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
     "CommonIterator.h",
@@ -297,6 +295,13 @@ static_library("support") {
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
   ]
+
+  if (chip_config_enable_arg_parser) {
+    sources += [
+      "CHIPArgParser.cpp",
+      "CHIPArgParser.hpp",
+    ]
+  }
 
   if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {
