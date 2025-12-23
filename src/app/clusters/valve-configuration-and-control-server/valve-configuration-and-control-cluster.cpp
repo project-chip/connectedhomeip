@@ -412,14 +412,7 @@ bool ValveConfigurationAndControlCluster::ValueCompliesWithLevelStep(const uint8
     {
         return true;
     }
-    return value == kMaxLevelValuePercent) || (value % mLevelStep) == 0;
-    {
-        if ((value != kMaxLevelValuePercent) && ((value % mLevelStep) != 0))
-        {
-            return false;
-        }
-    }
-    return true;
+    return (value == kMaxLevelValuePercent) || (value % mLevelStep) == 0;
 }
 
 void ValveConfigurationAndControlCluster::SetDelegate(Delegate * delegate)

@@ -38,7 +38,7 @@ public:
     static constexpr uint8_t kDefaultLevelStep     = 1u;
     static constexpr uint8_t kMaxLevelValuePercent = 100u;
 
-    using OptionalAttributeSet = OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
                                                                  ValveConfigurationAndControl::Attributes::ValveFault::Id,
                                                                  ValveConfigurationAndControl::Attributes::LevelStep::Id>;
 
