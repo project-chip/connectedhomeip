@@ -440,6 +440,9 @@ protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 
+    // Defaults to true for now. Should be set to false after a notification period.
+    // https://github.com/project-chip/connectedhomeip/issues/42460 to track.
+    const bool kEnableCdTestKeysForProvisionalCds = true;
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;

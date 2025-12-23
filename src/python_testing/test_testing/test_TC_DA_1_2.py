@@ -78,6 +78,11 @@ def main():
     exclude_cases = ['struct_cd_version_number_wrong',
                      'struct_cd_cert_id_mismatch']
 
+    # struct_cd_provisional_cd and struct_cd_official_cd will be handled when TC-DA-1.2
+    # is updated to handle provisional CDs.
+    # https://github.com/project-chip/matter-test-scripts/issues/731 - fast follow to this PR
+    exclude_cases += ['struct_cd_provisional_cd', 'struct_cd_official_cd']
+
     passes = []
     for p in os.listdir(cert_path):
         matches = list(filter(lambda t: t in str(p), test_cases))
