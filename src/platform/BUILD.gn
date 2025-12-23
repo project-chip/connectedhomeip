@@ -155,7 +155,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       _enable_joint_fabric = true
     }
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${_enable_joint_fabric}" ]
+    defines +=
+        [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${_enable_joint_fabric}" ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
 
