@@ -92,7 +92,7 @@ void MatterIlluminanceMeasurementClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterIlluminanceMeasurementClusterShutdownCallback(EndpointId endpointId)
+void MatterIlluminanceMeasurementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -103,7 +103,7 @@ void MatterIlluminanceMeasurementClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kIlluminanceMeasurementFixedClusterCount,
             .maxClusterInstanceCount   = kIlluminanceMeasurementMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 namespace chip::app::Clusters::IlluminanceMeasurement {
