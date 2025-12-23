@@ -38,7 +38,7 @@ public:
     static constexpr uint8_t kDefaultLevelStep     = 1u;
     static constexpr uint8_t kMaxLevelValuePercent = 100u;
 
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
+    using OptionalAttributeSet = OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
                                                                  ValveConfigurationAndControl::Attributes::ValveFault::Id,
                                                                  ValveConfigurationAndControl::Attributes::LevelStep::Id>;
 
@@ -70,9 +70,9 @@ public:
 
     CHIP_ERROR CloseValve();
     CHIP_ERROR SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
-    void UpdateCurrentLevel(chip::Percent currentLevel);
+    void UpdateCurrentLevel(Percent currentLevel);
     void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
-    void EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+    void EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
     void UpdateAutoCloseTime(uint64_t epochTime);
 
 private:
@@ -82,7 +82,7 @@ private:
     std::optional<DataModel::ActionReturnStatus> HandleCloseCommand(const DataModel::InvokeRequest & request,
                                                                     CommandHandler * handler);
     CHIP_ERROR GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
-                                      DataModel::Nullable<chip::Percent> & adjustedTargetLevel) const;
+                                      DataModel::Nullable<Percent> & adjustedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
@@ -91,7 +91,7 @@ private:
     void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState);
 
     template <typename T, typename U>
-    inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, chip::AttributeId attributeId)
+    inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, AttributeId attributeId)
     {
         if (currentValue != newValue)
         {

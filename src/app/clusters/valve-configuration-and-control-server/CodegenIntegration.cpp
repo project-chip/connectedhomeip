@@ -174,7 +174,7 @@ void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate)
     interface->SetDelegate(delegate);
 }
 
-CHIP_ERROR CloseValve(chip::EndpointId ep)
+CHIP_ERROR CloseValve(EndpointId ep)
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -188,7 +188,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     return interface->SetValveLevel(level, openDuration);
 }
 
-CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel)
+CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -196,7 +196,7 @@ CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
+CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -204,7 +204,7 @@ CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);

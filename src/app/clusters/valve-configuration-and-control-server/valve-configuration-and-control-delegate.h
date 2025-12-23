@@ -37,7 +37,7 @@ public:
     Delegate(){};
 
     // shall return current level if supported, otherwise null
-    virtual DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) = 0;
+    virtual DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) = 0;
     virtual CHIP_ERROR HandleCloseValve()                                                                = 0;
     virtual void HandleRemainingDurationTick(uint32_t duration)                                          = 0;
 

@@ -157,12 +157,9 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         Percent defaultOpenLevel;
         ReturnErrorOnFailure(decoder.Decode(defaultOpenLevel));
         VerifyOrReturnValue(defaultOpenLevel != mDefaultOpenLevel, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
-        // If the LevelStep attribute is Set, verify that the provided DefaultOpenLevel complies with the spec.
-        if (mOptionalAttributeSet.IsSet(Attributes::LevelStep::Id))
-        {
-            VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        }
+        // TODO: Currently the `DecodeAndStoreNativeEndianValue` function doesn't allow to perform specific check on provided values
+        // we may need to change this once a fix for https://github.com/project-chip/connectedhomeip/issues/40708 is merged.
+        VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
         return mContext->attributeStorage.WriteValue(
@@ -207,8 +204,7 @@ ValveConfigurationAndControlCluster::HandleCloseCommand(const DataModel::InvokeR
     // Check if there is any Fault registered
     if (mValveFault.HasAny())
     {
-        ReturnErrorOnFailure(handler->AddClusterSpecificFailure(request.path, to_underlying(StatusCodeEnum::kFailureDueToFault)));
-        return std::nullopt;
+        return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
     }
 
     return CloseValve();
@@ -223,8 +219,8 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
     SetRemainingDuration(DataModel::NullNullable);
 
     // TargetState should be set to Closed and CurrentState to Transitioning
-    SaveAndReportIfChanged(mTargetState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
+    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
 
     // If TimeSync is enabled, AutoCloseTime should be set to Null
     if (mFeatures.Has(Feature::kTimeSync))
@@ -251,22 +247,32 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
                                                        CommandHandler * handler)
 {
     Commands::Open::DecodableType commandData;
-    DataModel::Nullable<chip::Percent> openTargetLevel;
+    DataModel::Nullable<Percent> openTargetLevel;
     DataModel::Nullable<uint32_t> openDuration;
 
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
+    // Verify "min 1" constraint on TargetLevel field.
+    VerifyOrReturnValue(commandData.targetLevel.HasValue() ? commandData.targetLevel.Value() > 0 : true, Status::ConstraintError);
+
+    if (commandData.openDuration.HasValue())
+    {
+        // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
+        // Save the duration if provided, it can be Null or an actual value.
+        VerifyOrReturnValue(commandData.openDuration.Value().IsNull() ? true : commandData.openDuration.Value().Value() > 0, Status::ConstraintError);
+        openDuration = commandData.openDuration.Value();
+    }
+    else
+    {
+        // If no value is provided, use the DefaultOpenDuration attribute value.
+        openDuration = mDefaultOpenDuration;
+    }
+
     // Check if there is any Fault registered
     if (mValveFault.HasAny())
     {
-        ReturnErrorOnFailure(handler->AddClusterSpecificFailure(request.path, to_underlying(StatusCodeEnum::kFailureDueToFault)));
-        return std::nullopt;
+        return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
     }
-
-    // Check if the provided openDuration has a value
-    // Save the duration if provided, it can be Null or an actual value.
-    // If no value is provided, use the DefaultOpenDuration attribute value.
-    openDuration = commandData.openDuration.HasValue() ? commandData.openDuration.Value() : mDefaultOpenDuration;
 
     // Check rules for TargetLevel if enabled
     if (mFeatures.Has(Feature::kLevel))
@@ -289,8 +295,8 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Null
         ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
         VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
-        uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
-        SaveAndReportIfChanged(mAutoCloseTime, DataModel::Nullable<uint64_t>(time + chipEpochTime), Attributes::AutoCloseTime::Id);
+        uint64_t time = openDuration.Value() * kMicrosecondsPerSecond;
+        SaveAndReportIfChanged(mAutoCloseTime, DataModel::MakeNullable(time + chipEpochTime), Attributes::AutoCloseTime::Id);
     }
     else
     {
@@ -305,8 +311,8 @@ void ValveConfigurationAndControlCluster::UpdateAutoCloseTime(uint64_t epochTime
 {
     if (!mRemainingDuration.value().IsNull() && mRemainingDuration.value().Value() != 0)
     {
-        uint64_t closingTime = mRemainingDuration.value().Value() * chip::kMicrosecondsPerSecond + epochTime;
-        SaveAndReportIfChanged(mAutoCloseTime, DataModel::Nullable<uint64_t>(closingTime), Attributes::AutoCloseTime::Id);
+        uint64_t closingTime = mRemainingDuration.value().Value() * kMicrosecondsPerSecond + epochTime;
+        SaveAndReportIfChanged(mAutoCloseTime, DataModel::MakeNullable(closingTime), Attributes::AutoCloseTime::Id);
     }
 }
 void ValveConfigurationAndControlCluster::HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context)
@@ -380,7 +386,7 @@ void ValveConfigurationAndControlCluster::SetCurrentState(
 //   - Validate that the TargetLevel and LevelStep are compatible.
 CHIP_ERROR
 ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
-                                                            DataModel::Nullable<chip::Percent> & adjustedTargetLevel) const
+                                                            DataModel::Nullable<Percent> & adjustedTargetLevel) const
 {
     if (!targetLevel.HasValue())
     {
@@ -420,7 +426,7 @@ void ValveConfigurationAndControlCluster::SetDelegate(Delegate * delegate)
 
 void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigurationAndControl::ValveStateEnum currentState)
 {
-    SetCurrentState(DataModel::Nullable<ValveStateEnum>(currentState));
+    SetCurrentState(DataModel::MakeNullable(currentState));
 
     if (mTargetState.ValueOr(ValveStateEnum::kUnknownEnumValue) == currentState)
     {
@@ -428,7 +434,7 @@ void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigur
     }
 }
 
-void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent currentLevel)
+void ValveConfigurationAndControlCluster::UpdateCurrentLevel(Percent currentLevel)
 {
     VerifyOrReturn(mFeatures.Has(Feature::kLevel));
     SaveAndReportIfChanged(mCurrentLevel, currentLevel, Attributes::CurrentLevel::Id);
@@ -444,8 +450,8 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
                                                               DataModel::Nullable<uint32_t> openDuration)
 {
     // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
-    SaveAndReportIfChanged(mTargetState, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
+    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
 
     // Check for the AutoCloseTime feature
     if (mFeatures.Has(Feature::kTimeSync))
@@ -496,7 +502,7 @@ void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfiguratio
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void ValveConfigurationAndControlCluster::EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+void ValveConfigurationAndControlCluster::EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
 {
     ValveConfigurationAndControl::Events::ValveFault::Type event;
     event.valveFault = fault;
