@@ -3,38 +3,33 @@
 #include "webrtc-provider-manager.h"
 #include <lib/support/logging/CHIPLogging.h>
 
+void webrtc_bridge_message_received_cb(void * data, int len);
 
-
-void webrtc_bridge_message_received_cb(void *data, int len);
-
-class EspWebRTCPeerConnection {
+class EspWebRTCPeerConnection
+{
 private:
-  std::string peerConnectionId;
+    std::string peerConnectionId;
 
 public:
-  EspWebRTCPeerConnection(std::string peerConnectionId) {
-    this->peerConnectionId = peerConnectionId;
-  }
-  std::string GetPeerConnectionId() { return peerConnectionId; }
+    EspWebRTCPeerConnection(std::string peerConnectionId) { this->peerConnectionId = peerConnectionId; }
+    std::string GetPeerConnectionId() { return peerConnectionId; }
 };
 
-class KVSWebRTCPeerConnection : public WebRTCPeerConnection {
+class KVSWebRTCPeerConnection : public WebRTCPeerConnection
+{
 public:
-  KVSWebRTCPeerConnection();
+    KVSWebRTCPeerConnection();
 
-  void SetCallbacks(OnLocalDescriptionCallback onLocalDescription,
-                    OnICECandidateCallback onICECandidate,
-                    OnConnectionStateCallback onConnectionState,
-                    OnTrackCallback onTrack) override;
-  void Close() override;
-  void CreateOffer(uint16_t sessionId) override;
-  void CreateAnswer() override;
-  void SetRemoteDescription(const std::string &sdp, SDPType type) override;
-  void AddRemoteCandidate(const std::string &candidate,
-                          const std::string &mid) override;
-  std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType) override;
-  std::string GetPeerConnectionId();
+    void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
+                      OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack) override;
+    void Close() override;
+    void CreateOffer(uint16_t sessionId) override;
+    void CreateAnswer() override;
+    void SetRemoteDescription(const std::string & sdp, SDPType type) override;
+    void AddRemoteCandidate(const std::string & candidate, const std::string & mid) override;
+    std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType) override;
+    std::string GetPeerConnectionId();
 
 private:
-  std::shared_ptr<EspWebRTCPeerConnection> mPeerConnection;
+    std::shared_ptr<EspWebRTCPeerConnection> mPeerConnection;
 };

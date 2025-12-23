@@ -109,7 +109,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0); // return immediately if the queue is empty
+            eventReceived = xQueueReceive(sAppEventQueue, &event,
+                                          0); // return immediately if the queue is empty
         }
     }
 }
@@ -152,5 +153,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::UpdateClusterState()
 {
     ESP_LOGI(TAG, "Writing to Camera cluster");
-
 }

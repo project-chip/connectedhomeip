@@ -41,12 +41,11 @@
 
 #include "esp_webrtc_time.h"
 #include "esp_work_queue.h"
+#include "network_coprocessor.h"
 #include "signaling_serializer.h"
 #include "webrtc_bridge.h"
-#include "network_coprocessor.h"
 
 #include "esp_wifi.h"
-
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
@@ -122,34 +121,36 @@ static void InitServer(intptr_t context)
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
-    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
+                            // Initialize device attestation config
 }
 
 #ifdef CONFIG_SLAVE_LWIP_ENABLED
-static void create_slave_sta_netif(uint8_t dhcp_at_slave) {
-  /* Create "almost" default station, but with un-flagged DHCP client */
-  esp_netif_inherent_config_t netif_cfg;
-  memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
+static void create_slave_sta_netif(uint8_t dhcp_at_slave)
+{
+    /* Create "almost" default station, but with un-flagged DHCP client */
+    esp_netif_inherent_config_t netif_cfg;
+    memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
 
-  if (!dhcp_at_slave) {
-    netif_cfg.flags =
-        (esp_netif_flags_t)(netif_cfg.flags & ~ESP_NETIF_DHCP_CLIENT);
-  }
+    if (!dhcp_at_slave)
+    {
+        netif_cfg.flags = (esp_netif_flags_t) (netif_cfg.flags & ~ESP_NETIF_DHCP_CLIENT);
+    }
 
-  esp_netif_config_t cfg_sta = {
-      .base = &netif_cfg,
-      .stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
-  };
-  esp_netif_t *netif_sta = esp_netif_new(&cfg_sta);
-  assert(netif_sta);
+    esp_netif_config_t cfg_sta = {
+        .base  = &netif_cfg,
+        .stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
+    };
+    esp_netif_t * netif_sta = esp_netif_new(&cfg_sta);
+    assert(netif_sta);
 
-  ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_sta));
-  ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
+    ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_sta));
+    ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
 
-  if (!dhcp_at_slave)
-    ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif_sta));
+    if (!dhcp_at_slave)
+        ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif_sta));
 
-  // slave_sta_netif = netif_sta;
+    // slave_sta_netif = netif_sta;
 }
 #endif
 
@@ -166,9 +167,9 @@ extern "C" void app_main()
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    #ifdef CONFIG_SLAVE_LWIP_ENABLED
+#ifdef CONFIG_SLAVE_LWIP_ENABLED
     create_slave_sta_netif(true);
-    #endif
+#endif
 
     signaling_serializer_init();
     network_coprocessor_init();

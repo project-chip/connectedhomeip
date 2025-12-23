@@ -3,7 +3,7 @@ dependencies:
         version: "*"
         path: ${KVS_SDK_PATH}/esp_port/components/network_coprocessor
         rules:
-        - if: "target in [esp32c6]"
+            - if: "target in [esp32c6]"
 
     esp_webrtc_utils:
         path: ${KVS_SDK_PATH}/esp_port/components/esp_webrtc_utils

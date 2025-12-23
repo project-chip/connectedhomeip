@@ -62,7 +62,8 @@ void IRAM_ATTR button_isr_handler(void * arg)
     }
     BaseType_t taskWoken = pdFALSE;
     xTimerStartFromISR(gButtons[idx].mbuttonTimer,
-                       &taskWoken); // If the timer had already been started ,restart it will reset its expiry time
+                       &taskWoken); // If the timer had already been started
+                                    // ,restart it will reset its expiry time
 }
 
 esp_err_t Button::Init()

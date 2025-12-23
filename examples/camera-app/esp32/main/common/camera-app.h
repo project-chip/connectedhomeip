@@ -10,35 +10,33 @@
 #include <utility>
 
 // Camera App defines all the cluster servers needed for a particular device
-class CameraApp {
+class CameraApp
+{
 
 public:
-  // This class is responsible for initialising all the camera clusters and
-  // managing the interactions between them
-  CameraApp(chip::EndpointId aClustersEndpoint,
-            CameraDeviceInterface *cameraDevice);
+    // This class is responsible for initialising all the camera clusters and
+    // managing the interactions between them
+    CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice);
 
-  // Initialize all the camera device clusters.
-  void InitCameraDeviceClusters();
+    // Initialize all the camera device clusters.
+    void InitCameraDeviceClusters();
 
-  // Shutdown all the camera device clusters
-  void ShutdownCameraDeviceClusters();
+    // Shutdown all the camera device clusters
+    void ShutdownCameraDeviceClusters();
 
 private:
-  chip::EndpointId mEndpoint;
-  CameraDeviceInterface *mCameraDevice;
+    chip::EndpointId mEndpoint;
+    CameraDeviceInterface * mCameraDevice;
 
-  // SDK cluster servers
-  chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
-  mWebRTCTransportProviderServer;
-  std::unique_ptr<
-      chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster>
-      mAVStreamMgmtServerPtr;
+    // SDK cluster servers
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
+        mWebRTCTransportProviderServer;
+    std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster> mAVStreamMgmtServerPtr;
 
-  // Helper to set attribute defaults for CameraAVStreamMgmt
-  void InitializeCameraAVStreamMgmt();
+    // Helper to set attribute defaults for CameraAVStreamMgmt
+    void InitializeCameraAVStreamMgmt();
 };
 
-void CameraAppInit(CameraDeviceInterface *cameraDevice);
+void CameraAppInit(CameraDeviceInterface * cameraDevice);
 
 void CameraAppShutdown();
