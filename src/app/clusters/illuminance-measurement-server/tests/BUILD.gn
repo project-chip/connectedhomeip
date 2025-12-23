@@ -28,7 +28,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/illuminance-measurementserver",
+    "${chip_root}/src/app/clusters/illuminance-measurement-server",
     "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
