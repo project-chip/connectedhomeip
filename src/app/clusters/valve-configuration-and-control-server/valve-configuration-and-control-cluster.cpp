@@ -46,7 +46,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // This feature shall not be supported if the cluster doesn't support the TimeSync cluster.
+    // This feature shall not be supported if the node doesn't support the TimeSync cluster.
     if (mFeatures.Has(Feature::kTimeSync))
     {
         VerifyOrReturnError((mTsTracker != nullptr && mTsTracker->IsTimeSyncClusterSupported()), CHIP_ERROR_INVALID_ARGUMENT);
@@ -198,7 +198,7 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
 std::optional<DataModel::ActionReturnStatus>
 ValveConfigurationAndControlCluster::HandleCloseCommand(const DataModel::InvokeRequest & request, CommandHandler * handler)
 {
-    // Cancel time if running.
+    // Cancel timer if running.
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
 
     // Check if there is any Fault registered
@@ -214,7 +214,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // OpenDuration and RemainingDuration should be set to Null
+    // OpenDuration and RemainingDuration should be set to null
     SaveAndReportIfChanged(mOpenDuration, DataModel::NullNullable, Attributes::OpenDuration::Id);
     SetRemainingDuration(DataModel::NullNullable);
 
@@ -222,7 +222,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
     SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
     SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
 
-    // If TimeSync is enabled, AutoCloseTime should be set to Null
+    // If TimeSync is enabled, AutoCloseTime should be set to null
     if (mFeatures.Has(Feature::kTimeSync))
     {
         SaveAndReportIfChanged(mAutoCloseTime, DataModel::NullNullable, Attributes::AutoCloseTime::Id);
@@ -370,8 +370,7 @@ void ValveConfigurationAndControlCluster::SetCurrentState(
     mCurrentState = newState;
     NotifyAttributeChanged(Attributes::CurrentState::Id);
 
-    // It looks like the ValveStateChanged event expects a non-nullable value does this mean that
-    // changes to Null shouldn't be reported?
+    // Only emit ValveStateChanged when the new state is non-null; transitions to Null are not reported.
     if (!mCurrentState.IsNull())
     {
         EmitValveChangeEvent(mCurrentState.Value());
@@ -409,7 +408,11 @@ ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Perce
 // the value of TargetLevel should be 0, 100 or a multiple of LevelStep.
 bool ValveConfigurationAndControlCluster::ValueCompliesWithLevelStep(const uint8_t value) const
 {
-    if (mOptionalAttributeSet.IsSet(Attributes::LevelStep::Id))
+    if (!mOptionalAttributeSet.IsSet(Attributes::LevelStep::Id))
+    {
+        return true;
+    }
+    return value == kMaxLevelValuePercent) || (value % mLevelStep) == 0;
     {
         if ((value != kMaxLevelValuePercent) && ((value % mLevelStep) != 0))
         {
