@@ -424,7 +424,7 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
-    SuccessOrLog(sChipNamedPipeCommands.Stop());
+    SuccessOrDie(sChipNamedPipeCommands.Stop());
 }
 
 namespace {

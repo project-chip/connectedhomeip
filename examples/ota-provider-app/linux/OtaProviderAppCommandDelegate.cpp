@@ -135,6 +135,7 @@ void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(OtaProviderAppCommandHandler::HandleCommand,
-                                                        reinterpret_cast<intptr_t>(handler));
+    // Defer handling to the platform work queue to ensure this command is executed asynchronously and not from the command parsing context
+    SuccessOrDie(PlatformMgr().ScheduleWork(OtaProviderAppCommandHandler::HandleCommand,
+                                                        reinterpret_cast<intptr_t>(handler)));
 }
