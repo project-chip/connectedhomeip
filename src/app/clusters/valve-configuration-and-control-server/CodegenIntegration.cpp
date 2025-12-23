@@ -131,7 +131,7 @@ void MatterValveConfigurationAndControlClusterInitCallback(EndpointId endpointId
         integrationDelegate);
 }
 
-void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpointId,  MatterClusterShutdownType shutdownType)
+void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
