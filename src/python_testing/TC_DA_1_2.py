@@ -72,7 +72,9 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.credentials import CredentialSource, get_cd_certs
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
 log = logging.getLogger(__name__)

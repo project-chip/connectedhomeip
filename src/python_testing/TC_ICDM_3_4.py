@@ -41,9 +41,11 @@ import asyncio
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 kRootEndpointId = 0
 cluster = Clusters.Objects.IcdManagement

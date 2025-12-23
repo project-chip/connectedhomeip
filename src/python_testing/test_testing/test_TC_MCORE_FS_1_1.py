@@ -33,12 +33,12 @@ from matter.testing.runner import AsyncMock, MockTestRunner
 
 try:
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
+    from matter.testing.runner import get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
+    from matter.testing.runner import get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0

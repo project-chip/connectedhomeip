@@ -55,7 +55,9 @@ from support_modules.cadmin_support import CADMINBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
-from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
 log = logging.getLogger(__name__)
