@@ -424,10 +424,7 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
-    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
-    }
+    SuccessOrLog(sChipNamedPipeCommands.Stop());
 }
 
 namespace {
