@@ -79,7 +79,6 @@ void WebrtcTransport::Stop() {
   mAudioTrack = nullptr;
   if (mPeerConnection != nullptr) {
     // KVSWebRTC close is handled by the KVSWebRTCManager.
-    // mPeerConnection->Close();
   }
 }
 
@@ -126,9 +125,6 @@ bool WebrtcTransport::ClosePeerConnection() {
     return false;
   }
   // KVSWebRTC close is handled by the KVSWebRTCManager.
-  // mPeerConnection->Close();
-  // mPeerConnection.reset();
-
   return true;
 }
 

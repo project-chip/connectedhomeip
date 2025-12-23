@@ -3,10 +3,7 @@
 #include "webrtc-provider-manager.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <signaling_serializer.h>
-#include <sstream>
-#include <string.h>
-#include <time.h>
+
 
 void webrtc_bridge_message_received_cb(void *data, int len);
 

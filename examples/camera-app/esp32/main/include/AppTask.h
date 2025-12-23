@@ -50,13 +50,7 @@ private:
     friend AppTask & GetAppTask(void);
     CHIP_ERROR Init();
     void DispatchEvent(AppEvent * event);
-    static void SwitchActionEventHandler(AppEvent * aEvent);
-    static void LightingActionEventHandler(AppEvent * aEvent);
-
-#if CONFIG_DEVICE_TYPE_M5STACK
-    static void ButtonPressedAction(AppEvent * aEvent);
-#endif
-
+    static void CameraActionEventHandler(AppEvent * aEvent);
     static AppTask sAppTask;
 };
 

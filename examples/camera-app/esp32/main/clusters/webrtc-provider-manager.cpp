@@ -7,13 +7,13 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <webrtc-transport.h>
 #include <webrtc_bridge.h>
+#include "webrtc-kvs_esp_port_utils.h"
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
-extern void sdp_mem_dump();
 extern bool deferred_offer;
 
 namespace {
