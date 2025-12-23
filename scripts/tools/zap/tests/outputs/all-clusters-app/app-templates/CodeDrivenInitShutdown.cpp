@@ -192,7 +192,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ValveConfigurationAndControl::Id:
-        MatterValveConfigurationAndControlClusterShutdownCallback(endpoint);
+        MatterValveConfigurationAndControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterShutdownCallback(endpoint, shutdownType);

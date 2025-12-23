@@ -119,7 +119,7 @@ void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId end
 
 void MatterValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterValveConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterValveConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpointId);
 

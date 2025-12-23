@@ -131,7 +131,7 @@ void MatterValveConfigurationAndControlClusterInitCallback(EndpointId endpointId
         integrationDelegate);
 }
 
-void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpointId)
+void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpointId,  MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -142,7 +142,7 @@ void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpoi
             .fixedClusterInstanceCount = kValveConfigurationAndControlFixedClusterCount,
             .maxClusterInstanceCount   = kValveConfigurationAndControlMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterValveConfigurationAndControlPluginServerInitCallback() {}

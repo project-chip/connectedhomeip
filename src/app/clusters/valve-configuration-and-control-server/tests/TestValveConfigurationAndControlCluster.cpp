@@ -212,7 +212,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)
     TargetState::TypeInfo::DecodableType targetState;
     ASSERT_EQ(tester.ReadAttribute(TargetState::Id, targetState), CHIP_NO_ERROR);
 
-    valveCluster.Shutdown();
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLevel)
@@ -236,7 +236,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
     chip::Percent defaultOpenLevel{};
     ASSERT_EQ(tester.ReadAttribute(DefaultOpenLevel::Id, defaultOpenLevel), CHIP_NO_ERROR);
 
-    valveCluster.Shutdown();
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestValveFault)
@@ -257,7 +257,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestValveFault)
     BitMask<ValveFaultBitmap> valveFault;
     ASSERT_EQ(tester.ReadAttribute(ValveFault::Id, valveFault), CHIP_NO_ERROR);
 
-    valveCluster.Shutdown();
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestLevel)
@@ -284,7 +284,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestLevel)
     uint8_t levelStep{};
     ASSERT_EQ(tester.ReadAttribute(LevelStep::Id, levelStep), CHIP_NO_ERROR);
 
-    valveCluster.Shutdown();
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
@@ -304,7 +304,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
     AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
     ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
 
-    valveCluster.Shutdown();
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace
