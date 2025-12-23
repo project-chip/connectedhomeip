@@ -360,6 +360,11 @@
             "IdentifyTime",
             "IdentifyType"
         ],
+        "Illuminance Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
