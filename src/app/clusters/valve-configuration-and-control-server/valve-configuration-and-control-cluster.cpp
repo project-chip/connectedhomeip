@@ -135,6 +135,7 @@ public:
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadRemainingDuration(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -170,6 +171,40 @@ CHIP_ERROR ValveConfigAndControlAttrAccess::Read(const ConcreteReadAttributePath
     }
 
     return err;
+}
+
+CHIP_ERROR ValveConfigAndControlAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    if (aPath.mClusterId != ValveConfigurationAndControl::Id)
+    {
+        return CHIP_ERROR_INVALID_PATH_LIST;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case DefaultOpenDuration::Id: {
+        // DefaultOpenDuration has a constraint: min value = 1
+        DataModel::Nullable<uint32_t> value;
+        ReturnErrorOnFailure(aDecoder.Decode(value));
+
+        if (!value.IsNull() && value.Value() < 1)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        Status status = DefaultOpenDuration::Set(aPath.mEndpointId, value);
+        if (status != Status::Success)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return CHIP_NO_ERROR;
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
 }
 } // namespace
 

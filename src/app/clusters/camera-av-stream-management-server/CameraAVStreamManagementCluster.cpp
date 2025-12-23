@@ -1225,7 +1225,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetMicrophoneAGCEnabled(bool aMicrop
 
 CHIP_ERROR CameraAVStreamManagementCluster::SetImageRotation(uint16_t aImageRotation)
 {
-    if (mImageRotation > kMaxImageRotationDegrees)
+    if (aImageRotation > kMaxImageRotationDegrees)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
