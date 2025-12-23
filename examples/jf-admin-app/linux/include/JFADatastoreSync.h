@@ -46,6 +46,36 @@ public:
              std::function<void()> onSuccess) override;
     CHIP_ERROR SyncNode(NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
                         std::function<void()> onSuccess) override;
+    CHIP_ERROR SyncNode(NodeId nodeId,
+                        const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
+                        std::function<void()> onSuccess) override;
+    CHIP_ERROR FetchEndpointList(
+        NodeId nodeId,
+        std::function<void(CHIP_ERROR,
+                           const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> &)>
+            onSuccess) override;
+    CHIP_ERROR FetchEndpointGroupList(
+        NodeId nodeId, EndpointId endpointId,
+        std::function<
+            void(CHIP_ERROR,
+                 const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type> &)>
+            onSuccess) override;
+    CHIP_ERROR FetchEndpointBindingList(
+        NodeId nodeId,
+        std::function<
+            void(CHIP_ERROR,
+                 const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &)>
+            onSuccess) override;
+    CHIP_ERROR FetchGroupKeySetList(
+        NodeId nodeId,
+        std::function<void(CHIP_ERROR,
+                           const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> &)>
+            onSuccess) override;
+    CHIP_ERROR FetchACLList(
+        NodeId nodeId,
+        std::function<void(CHIP_ERROR,
+                           const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> &)>
+            onSuccess) override;
 
 private:
     friend JFADatastoreSync & JFADSync(void);
