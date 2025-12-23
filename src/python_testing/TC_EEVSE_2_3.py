@@ -41,6 +41,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+from datetime import datetime
 
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
@@ -283,8 +284,10 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                                  f"Unexpected 'GetTargets' response value - expected {targets}, was {get_targets_response}")
 
         self.step("11")
-        # This should be all days Sun-Sat (0x7F) with an TargetTime 1 and SoC of 100%, AddedEnergy= NullValue
-        minutes_past_midnight = 1
+        # This should be all days Sun-Sat (0x7F) with a TargetTime in the future and SoC of 100%, AddedEnergy= NullValue
+        # Use a time that's always at least 1 hour in the future to avoid flaky test failures around midnight
+        now = datetime.now()
+        minutes_past_midnight = ((now.hour * 60 + now.minute + 61) % 1440)  # Current time + 61 minutes, wrapped to valid range
         daily_targets_step_11 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=minutes_past_midnight,
                                                                                   targetSoC=100)]
         targets_step_11 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
