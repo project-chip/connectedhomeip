@@ -259,7 +259,8 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     {
         // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
         // Save the duration if provided, it can be Null or an actual value.
-        VerifyOrReturnValue(commandData.openDuration.Value().IsNull() ? true : commandData.openDuration.Value().Value() > 0, Status::ConstraintError);
+        VerifyOrReturnValue(commandData.openDuration.Value().IsNull() ? true : commandData.openDuration.Value().Value() > 0,
+                            Status::ConstraintError);
         openDuration = commandData.openDuration.Value();
     }
     else
