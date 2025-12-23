@@ -7849,10 +7849,11 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled;
+    callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 2;
     callback attribute clusterRevision;
 
     handle command TestEventTrigger;
