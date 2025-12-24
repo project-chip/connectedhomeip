@@ -37,8 +37,8 @@ ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(Endpoin
                                                                          OptionalAttributeSet optionalAttributeSet,
                                                                          const StartupConfiguration & config,
                                                                          TimeSyncTracker * tsTracker) :
-    DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
+    DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }), mFeatures(features),
+    mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
     mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker)
 {}
 
@@ -157,8 +157,9 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         Percent defaultOpenLevel;
         ReturnErrorOnFailure(decoder.Decode(defaultOpenLevel));
         VerifyOrReturnValue(defaultOpenLevel != mDefaultOpenLevel, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-        // TODO: Currently the `DecodeAndStoreNativeEndianValue` function doesn't allow to perform specific check on provided values
-        // we may need to change this once a fix for https://github.com/project-chip/connectedhomeip/issues/40708 is merged.
+        // TODO(#40708): Currently the `DecodeAndStoreNativeEndianValue` function doesn't allow performing specific checks
+        // on provided values; update this logic once a fix for
+        // https://github.com/project-chip/connectedhomeip/issues/40708 is merged.
         VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
