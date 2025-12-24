@@ -31,6 +31,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/RAIIMockClock.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
@@ -526,21 +527,28 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
+// BEGIN-IF-CHANGE-ALSO-CHANGE(src/app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.cpp)
 void RevokeCommissioningCommandEquivalent()
 {
-    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+    auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
-    if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    if (commissionMgr.GetPASESession().HasValue())
+    {
+        Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+    }
+
+    if (!commissionMgr.IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
         return;
     }
 
-    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    commissionMgr.CloseCommissioningWindow();
     ChipLogProgress(Zcl, "Commissioning window is now closed");
 }
+// END-IF-CHANGE-ALSO-CHANGE(src/app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.cpp)
 
-TEST_F(TestCommissioningWindowManager, SecurePairingHandshakeTestECM)
+TEST_F(TestCommissioningWindowManager, RevokeCommissioningClearsPASESession)
 {
     TemporarySessionManager sessionManager(*this);
 
@@ -586,6 +594,81 @@ TEST_F(TestCommissioningWindowManager, SecurePairingHandshakeTestECM)
 
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
 
+    // This asserts that the CommissioningWindowManager has cleared the PASESession
+    EXPECT_FALSE(commissionMgr.GetPASESession().HasValue());
+
+    // Asserting that PASESession is still present on the Commissioner side
+    commissionerSession = pairingCommissioner.CopySecureSession();
+    EXPECT_TRUE(commissionerSession.HasValue());
+}
+
+// In this test-case RevokeCommissioning is called after commissioning Window times out but BEFORE fail-safe timer expires.
+// The aim is to ensure that Revoke Commissioning forces Fail-Safe expiry and clears PASESession EVEN when Commissioning Window is
+// Closed.
+
+// This Test will fail if RevokeCommissioning ONLY forces Fail-safe expiry when Commissioning Window is Open.
+// This is a corner case that was not covered in Spec, that could happen if we establish PASE towards the end of the commissioning
+// window, and then the administrator calls RevokeCommissioning; in that case, we would need to wait for fail-safe timer to expire
+// --> The call to RevokeCommissioning should still clear the PASESession without having to wait for fail-safe timer expiry.
+TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTimeoutClearsPASESession)
+{
+    System::Clock::Internal::RAIIMockClock clock;
+
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateCommissioner;
+    PASESession pairingCommissioner;
+    auto & loopback = GetLoopback();
+    loopback.Reset();
+
+    // Open an Enhanced Commissioning Window
+    uint16_t originDiscriminator;
+    EXPECT_EQ(chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
+    uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
+
+    constexpr auto fabricIndex = static_cast<chip::FabricIndex>(1);
+    constexpr auto vendorId    = static_cast<chip::VendorId>(0xFFF3);
+
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    EXPECT_EQ(commissionMgr.OpenEnhancedCommissioningWindow(commissionMgr.MinCommissioningTimeout(), newDiscriminator,
+                                                            sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                            ByteSpan(sTestSpake2p01_Salt), fabricIndex, vendorId),
+              CHIP_NO_ERROR);
+
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    auto commissioningTimeout = commissionMgr.MinCommissioningTimeout();
+
+    // Advance time to just before commissioning window times out
+    clock.AdvanceMonotonic(commissioningTimeout - 300_ms);
+    ServiceEvents();
+
+    // Establish PASE Handshake to the server's CommissioningWindowManager
+    EstablishPASEHandshake(sessionManager, pairingCommissioner, delegateCommissioner);
+
+    // Ensure that a PASE Session exists for pairingCommissioner
+    auto commissionerSession = pairingCommissioner.CopySecureSession();
+    EXPECT_TRUE(commissionerSession.HasValue());
+    EXPECT_TRUE(commissionerSession.Value()->AsSecureSession()->IsPASESession());
+
+    // Ensure that a PASE Session exists for the CommissioningWindowManager
+    EXPECT_TRUE(commissionMgr.GetPASESession().HasValue());
+    EXPECT_TRUE(commissionMgr.GetPASESession().Value()->AsSecureSession()->IsPASESession());
+
+    // Advance time to just after commissioning window times out, but before fail-safe timer expiry
+    clock.AdvanceMonotonic(301_ms);
+    ServiceEvents();
+
+    // Ensuring Fail-Safe is still armed
+    EXPECT_TRUE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
+
+    RevokeCommissioningCommandEquivalent();
+
+    // We need to service events here to allow the Async Events to be processed and make sure that the CommissioningWindowManager
+    // successfully shutdown the PASESession
+    ServiceEvents();
+
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
     // This asserts that the CommissioningWindowManager has cleared the PASESession
     EXPECT_FALSE(commissionMgr.GetPASESession().HasValue());
 
