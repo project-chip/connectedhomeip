@@ -69,7 +69,7 @@ void MatterOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -80,7 +80,7 @@ void MatterOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointI
             .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
             .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback() {}
