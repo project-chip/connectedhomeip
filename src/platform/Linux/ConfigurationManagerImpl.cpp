@@ -48,6 +48,16 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::SetStorageSpace(const char *path)
+{
+    CHIP_ERROR err;
+
+    err = PosixConfig::SetStorageSpace(path);
+
+    return err;
+}
+
+
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
