@@ -345,6 +345,11 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     auto iter = commandData.protocolsSupported.begin();
     while (iter.Next())
     {
+        if (i >= MATTER_ARRAY_SIZE(mProtocolsSupported))
+        {
+            ChipLogError(AppServer, "protocolsSupported overflow: received more than %u entries, truncating", static_cast<unsigned>(MATTER_ARRAY_SIZE(mProtocolsSupported)));
+            break;
+        }
         mProtocolsSupported[i++] = iter.GetValue();
     }
     kProtocolsSupportedCount = i;
