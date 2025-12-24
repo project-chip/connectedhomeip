@@ -30,7 +30,7 @@
 
 static constexpr const size_t kChipEventCmdBufSize = 256;
 
-CHIP_ERROR NamedPipeCommands::Start(std::string & path, NamedPipeCommandDelegate * delegate)
+CHIP_ERROR NamedPipeCommands::Start(const std::string & path, NamedPipeCommandDelegate * delegate)
 {
     VerifyOrReturnError(!mStarted, CHIP_NO_ERROR);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -49,7 +49,7 @@ CHIP_ERROR NamedPipeCommands::Start(std::string & path, NamedPipeCommandDelegate
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NamedPipeCommands::Start(std::string & path, std::string & path_out, NamedPipeCommandDelegate * delegate)
+CHIP_ERROR NamedPipeCommands::Start(const std::string & path, const std::string & path_out, NamedPipeCommandDelegate * delegate)
 {
     VerifyOrReturnError(!mStarted, CHIP_NO_ERROR);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
