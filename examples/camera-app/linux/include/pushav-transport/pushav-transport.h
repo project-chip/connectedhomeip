@@ -83,7 +83,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity, bool isZoneBasedTrigger = false);
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -169,6 +169,6 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
     uint32_t mCurrentlyUsedBandwidthbps    = 0;
-    bool mActivationTimeSetByManualTrigger = false;
-    bool mIsZoneBasedTrigger               = false;
+    bool mIsPreviousRecordingTriggerByManual  = false;
+    bool mIsCurrentZoneBasedTrigger                = false;
 };
