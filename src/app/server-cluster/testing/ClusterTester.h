@@ -311,16 +311,14 @@ private:
     }
 
     // Verifies that an attribute is present in the cluster's AttributeList.
-    // This mimics the real-world Interaction Model behavior where AttributeList is checked first.
     // @returns CHIP_NO_ERROR if the attribute is found in AttributeList.
     // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) if the attribute is not found in AttributeList.
-    // @returns error status if Attributes cannot be retrieved (indicates a problem with cluster implementation).
+    // @returns error status if Attributes cannot be retrieved.
     app::DataModel::ActionReturnStatus VerifyAttributeInAttributeList(AttributeId attr_id)
     {
         auto path = mCluster.GetPaths()[0];
 
         // Get the list of attributes from the cluster's metadata
-        // This is more efficient than reading AttributeList attribute, and matches how IM works internally
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
         CHIP_ERROR err = mCluster.Attributes(path, builder);
         ReturnErrorOnFailure(err);
@@ -332,11 +330,11 @@ private:
         {
             if (entry.attributeId == attr_id)
             {
-                return CHIP_NO_ERROR; // Attribute found in AttributeList
+                return CHIP_NO_ERROR;
             }
         }
 
-        // Attribute not found in AttributeList - this matches real-world IM behavior
+        // Attribute not found in AttributeList
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 

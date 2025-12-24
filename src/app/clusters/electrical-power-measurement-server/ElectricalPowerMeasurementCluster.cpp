@@ -167,8 +167,8 @@ CHIP_ERROR ElectricalPowerMeasurementCluster::Attributes(const ConcreteClusterPa
         Attributes::RMSCurrent::kMetadataEntry,       //
         Attributes::RMSPower::kMetadataEntry,         //
         Attributes::Frequency::kMetadataEntry,        //
-        Attributes::HarmonicCurrents::kMetadataEntry, // Derived from Harmonics feature
-        Attributes::HarmonicPhases::kMetadataEntry,   // Derived from PowerQuality feature
+        Attributes::HarmonicCurrents::kMetadataEntry, //
+        Attributes::HarmonicPhases::kMetadataEntry,   //
         Attributes::PowerFactor::kMetadataEntry,      //
         Attributes::NeutralCurrent::kMetadataEntry,   //
     };
