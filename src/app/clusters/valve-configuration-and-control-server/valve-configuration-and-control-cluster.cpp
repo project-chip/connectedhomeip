@@ -37,8 +37,8 @@ ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(Endpoin
                                                                          OptionalAttributeSet optionalAttributeSet,
                                                                          const StartupConfiguration & config,
                                                                          TimeSyncTracker * tsTracker) :
-    DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }), mFeatures(features),
-    mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
+    DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
+    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
     mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker)
 {}
 
