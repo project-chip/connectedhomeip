@@ -12,20 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
-)
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/valve-configuration-and-control-cluster.cpp"
-    "${CLUSTER_DIR}/valve-configuration-and-control-cluster.h"
-    "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
-    "${CLUSTER_DIR}/TimeSyncTracker.h"
-)
+chip_test_suite("tests") {
+  output_name = "libTestValveConfigurationAndControlCluster"
+
+  test_sources = [ "TestValveConfigurationAndControlCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
+  ]
+}

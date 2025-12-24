@@ -82,6 +82,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Thread Network Directory
     - Time Synchronization
     - User Label
+    - Valve Configuration and Control
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
@@ -177,5 +178,6 @@ CodeDrivenClusters:
     - Time Format Localization
     - Time Synchronization
     - User Label
+    - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
     # keep-sorted end

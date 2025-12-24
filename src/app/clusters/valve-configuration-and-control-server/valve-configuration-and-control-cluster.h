@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,40 +21,99 @@
 
 #pragma once
 
+#include "TimeSyncTracker.h"
 #include "valve-configuration-and-control-delegate.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/core/Optional.h>
-#include <lib/support/BitMask.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/ValveConfigurationAndControl/Metadata.h>
+#include <system/SystemLayer.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ValveConfigurationAndControl {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
-Delegate * GetDefaultDelegate(EndpointId endpoint);
-
-CHIP_ERROR CloseValve(chip::EndpointId ep);
-CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
-CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel);
-CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState);
-CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
-void UpdateAutoCloseTime(uint64_t time);
-
-inline bool HasFeature(EndpointId ep, Feature feature)
+namespace chip::app::Clusters {
+class ValveConfigurationAndControlCluster : public DefaultServerCluster
 {
-    uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
-    return success ? (map & to_underlying(feature)) : false;
-}
+public:
+    static constexpr uint8_t kDefaultOpenLevel     = 100u;
+    static constexpr uint8_t kDefaultLevelStep     = 1u;
+    static constexpr uint8_t kMaxLevelValuePercent = 100u;
 
-} // namespace ValveConfigurationAndControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
+                                                                 ValveConfigurationAndControl::Attributes::ValveFault::Id,
+                                                                 ValveConfigurationAndControl::Attributes::LevelStep::Id>;
+
+    struct StartupConfiguration
+    {
+        const DataModel::Nullable<uint32_t> defaultOpenDuration;
+        Percent defaultOpenLevel;
+        uint8_t levelStep;
+    };
+
+    ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
+                                        OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
+                                        TimeSyncTracker * tsTracker);
+
+    // Server cluster implementation
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    void SetDelegate(ValveConfigurationAndControl::Delegate * delegate);
+    static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
+
+    CHIP_ERROR CloseValve();
+    CHIP_ERROR SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
+    void UpdateCurrentLevel(Percent currentLevel);
+    void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
+    void EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+    void UpdateAutoCloseTime(uint64_t epochTime);
+
+private:
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+    std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request,
+                                                                   TLV::TLVReader & input_arguments, CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleCloseCommand();
+    CHIP_ERROR GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
+                                      DataModel::Nullable<Percent> & adjustedTargetLevel) const;
+    bool ValueCompliesWithLevelStep(const uint8_t value) const;
+    void HandleUpdateRemainingDurationInternal();
+    void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
+    void SetCurrentState(const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState);
+    CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
+    void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState);
+
+    template <typename T, typename U>
+    inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, AttributeId attributeId)
+    {
+        if (currentValue != newValue)
+        {
+            currentValue = newValue;
+            NotifyAttributeChanged(attributeId);
+        }
+    }
+
+    // Attributes
+    const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
+    const OptionalAttributeSet mOptionalAttributeSet;
+    DataModel::Nullable<uint32_t> mOpenDuration{ DataModel::NullNullable };
+    DataModel::Nullable<uint32_t> mDefaultOpenDuration{ DataModel::NullNullable };
+    DataModel::Nullable<uint64_t> mAutoCloseTime{ DataModel::NullNullable };
+    QuieterReportingAttribute<uint32_t> mRemainingDuration{ DataModel::NullNullable };
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mCurrentState{ DataModel::NullNullable };
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState{ DataModel::NullNullable };
+    DataModel::Nullable<Percent> mCurrentLevel{ DataModel::NullNullable };
+    DataModel::Nullable<Percent> mTargetLevel{ DataModel::NullNullable };
+    Percent mDefaultOpenLevel{ kDefaultOpenLevel };
+    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault{ 0u };
+    uint8_t mLevelStep{ kDefaultLevelStep };
+    ValveConfigurationAndControl::Delegate * mDelegate;
+    TimeSyncTracker * mTsTracker;
+};
+} // namespace chip::app::Clusters
