@@ -67,7 +67,7 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     mMetadataSet          = false;
     mDeinitializeRecorder = false;
     mUploadedInitSegment  = false;
-    mUploadMPD            = false;
+    mUploadMPD            = true;
     mUploadSegmentID      = 0001;
     mCurrentClipStartPts  = AV_NOPTS_VALUE;
     mFoundFirstIFramePts  = -1;
@@ -103,6 +103,15 @@ PushAVClipRecorder::~PushAVClipRecorder()
     {
         mWorkerThread.join();
     }
+
+    std::filesystem::path mpdPath = mUploadFileBasePath.string() + ".mpd";
+    if (IsFileReadyForUpload(mpdPath))
+    {
+        UpdateMPDStartNumber(mpdPath);
+        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %lu, connectionID: %u", mpdPath.c_str(),
+                        mClipInfo.mTrackName.c_str(), mClipInfo.mSessionNumber, mConnectionID);
+        mUploader->UploadFinalMPD(mpdPath, mClipInfo.mUrl);
+    }
 }
 
 bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
@@ -110,7 +119,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
     // Base output path
     std::filesystem::path basePath(path);
     std::filesystem::path sessionDir = basePath / ("session_" + std::to_string(mClipInfo.mSessionNumber));
-    std::filesystem::path trackDir   = sessionDir / mClipInfo.mTrackName;
+    mUploadFileBasePath              = sessionDir / mClipInfo.mTrackName;
 
     // Helper lambda to ensure a directory exists and is writable, creating it with mode 0755
     auto ensure = [&](const std::filesystem::path & p) -> bool {
@@ -138,53 +147,35 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         auto perms = std::filesystem::status(p, ec).permissions();
         if ((perms & std::filesystem::perms::owner_write) == std::filesystem::perms::none)
         {
-            ChipLogError(Camera, "Directory is not writable: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
+            ChipLogError(Camera, "Directory is not writable: %s (permissions: %o)", p.c_str(), static_cast<unsigned int>(perms));
             return false;
         }
+
         return true;
     };
 
     // Ensure base directory exists
-
-    std::string basePathStr = basePath.string();
-    std::string pathExists;
-    pathExists.reserve(basePathStr.length());
-
-    size_t startIndex = (basePathStr[0] == '/') ? 1 : 0;
-
-    for (size_t i = startIndex; i < basePathStr.length(); ++i)
+    if (!ensure(basePath))
     {
-        if (basePathStr[i] == '/' || i == basePathStr.length() - 1)
-        {
-            // Include the current character if it's the last character and not a slash
-            size_t endPos = (basePathStr[i] == '/' && i != basePathStr.length() - 1) ? i : i + 1;
-
-            // Build the path incrementally
-            pathExists = basePathStr.substr(0, endPos);
-
-            // Skip empty paths (can happen with consecutive slashes)
-            if (pathExists.empty() || pathExists.back() == '/')
-            {
-                continue;
-            }
-
-            if (!ensure(pathExists))
-            {
-                ChipLogError(Camera, "Failed to ensure directory exists: %s", pathExists.c_str());
-                return false;
-            }
-        }
+        ChipLogError(Camera, "Failed to ensure base directory exists: %s", basePath.c_str());
+        return false;
     }
 
     // Clean up previous session directory if it exists
     std::filesystem::remove_all(sessionDir);
 
     // Create session and track directories
-    if (!ensure(sessionDir) || !ensure(trackDir))
+    if (!ensure(sessionDir))
     {
+        ChipLogError(Camera, "Failed to ensure session directory exists: %s", sessionDir.c_str());
         return false;
     }
 
+    if (!ensure(mUploadFileBasePath))
+    {
+        ChipLogError(Camera, "Failed to ensure upload directory exists: %s", mUploadFileBasePath.c_str());
+        return false;
+    }
     return true;
 }
 
@@ -645,12 +636,9 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
 
         std::string initSegName =
             mClipInfo.mTrackName + std::filesystem::path::preferred_separator + mClipInfo.mTrackName + ".init";
-        std::string mediaSegName = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + "segment_$Number%04d$.m4s";
-        std::string mpdPrefix = "session_" + std::to_string(mClipInfo.mSessionNumber) + std::filesystem::path::preferred_separator +
-            mClipInfo.mTrackName;
-
-        mInputFormatContext          = avformat_alloc_context();
-        int64_t avioCtxBufferSize    = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
+        std::string mediaSegName  = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + "segment_$Number%04d$.m4s";
+        mInputFormatContext       = avformat_alloc_context();
+        int64_t avioCtxBufferSize = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
         uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
         struct BufferData data       = { 0 };
         data.mPtr                    = static_cast<uint8_t *>(pkt->data);
@@ -682,7 +670,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             ChipLogProgress(Camera, "Setting up audio-only stream, skipping input format initialization");
         }
 
-        if (SetupOutput(mClipInfo.mOutputPath + mpdPrefix, initSegName, mediaSegName) < 0)
+        if (SetupOutput(mUploadFileBasePath, initSegName, mediaSegName) < 0)
         {
             ChipLogError(Camera, "Error: setting up output");
             return -1;
@@ -822,7 +810,7 @@ std::string RenameSegmentFile(const std::string & originalPath)
     return originalPath;
 }
 
-void UpdateMPDStartNumber(const std::string & mpdPath)
+void PushAVClipRecorder::UpdateMPDStartNumber(const std::string & mpdPath)
 {
     std::ifstream file(mpdPath);
     if (!file)
@@ -850,6 +838,11 @@ void UpdateMPDStartNumber(const std::string & mpdPath)
     outFile.close();
 
     ChipLogProgress(Camera, "Successfully updated startNumber to 1001 in MPD file: %s", mpdPath.c_str());
+}
+
+bool PushAVClipRecorder::IsFileReadyForUpload(const std::filesystem::path & path) const
+{
+    return std::filesystem::exists(path) && !std::filesystem::exists(path.string() + ".tmp");
 }
 
 /**
@@ -885,10 +878,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         }
     }
 
-    // Pre-calculate common path components
-    std::filesystem::path basePath = std::filesystem::path(mClipInfo.mOutputPath) /
-        ("session_" + std::to_string(mClipInfo.mSessionNumber)) / mClipInfo.mTrackName;
-
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
         ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %lu Track name: %s, Reason: %s",
@@ -902,42 +891,59 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     auto make_segment_path = [&](int number) -> std::filesystem::path {
         std::ostringstream oss;
         oss << "segment_" << std::setw(4) << std::setfill('0') << number << ".m4s";
-        return basePath / oss.str();
+        return mUploadFileBasePath / oss.str();
     };
 
-    std::filesystem::path segment_path = make_segment_path(mUploadSegmentID);
-    while (std::filesystem::exists(segment_path) && !std::filesystem::exists(segment_path.string() + ".tmp"))
+    std::filesystem::path mpdPath = mUploadFileBasePath.string() + ".mpd";
+
+    std::filesystem::path first_segment_path = make_segment_path(1);
+    if (mUploadSegmentID == 1 && !IsFileReadyForUpload(first_segment_path))
     {
-        mUploadMPD                       = true;
+        return; // Wait for the first segment (segment_0001.m4s) to be created before starting any uploads
+    }
+
+    if (mUploadMPD)
+    {
+        if (IsFileReadyForUpload(mpdPath))
+        {
+            UpdateMPDStartNumber(mpdPath.string());
+            CheckAndUploadFile(mpdPath.string());
+            mUploadMPD = false; // Reset flag after successful upload
+        }
+        else
+        {
+            return; // Wait for MPD to be ready before proceeding
+        }
+    }
+
+    if (!mUploadedInitSegment)
+    {
+        const std::filesystem::path init_path = mUploadFileBasePath / (mClipInfo.mTrackName + ".init");
+        if (IsFileReadyForUpload(init_path))
+        {
+            CheckAndUploadFile(init_path.string());
+            mUploadedInitSegment = true;
+        }
+        else
+        {
+            return; // Wait for init segment to be ready before proceeding
+        }
+    }
+
+    std::filesystem::path segment_path = make_segment_path(mUploadSegmentID);
+    while (IsFileReadyForUpload(segment_path))
+    {
         std::string renamed_segment_path = RenameSegmentFile(segment_path.string());
         CheckAndUploadFile(renamed_segment_path);
         mUploadSegmentID++;
+        mUploadMPD   = true;
         segment_path = make_segment_path(mUploadSegmentID);
     }
-
-    // Handle MPD and init file upload
-    if (mUploadMPD)
+    if (IsFileReadyForUpload(mpdPath) && mUploadMPD)
     {
-        std::filesystem::path mpd_path = basePath;
-        mpd_path += ".mpd";
-        if (std::filesystem::exists(mpd_path) && !std::filesystem::exists(mpd_path.string() + ".tmp"))
-        {
-            mUploader->setMPDPath(std::make_pair(mpd_path.string(), mClipInfo.mUrl));
-            UpdateMPDStartNumber(mpd_path.string());
-            CheckAndUploadFile(mpd_path.string());
-            mUploadMPD = false; // Reset flag after successful upload
-        }
-
-        // Handle init segment upload if needed
-        if (!mUploadedInitSegment)
-        {
-            std::filesystem::path init_path = basePath / (mClipInfo.mTrackName + ".init");
-            if (std::filesystem::exists(init_path) && !std::filesystem::exists(init_path.string() + ".tmp"))
-            {
-                CheckAndUploadFile(init_path.string());
-            }
-            mUploadedInitSegment = true;
-        }
+        UpdateMPDStartNumber(mpdPath.string());
+        CheckAndUploadFile(mpdPath.string());
+        mUploadMPD = false;
     }
 }
 
