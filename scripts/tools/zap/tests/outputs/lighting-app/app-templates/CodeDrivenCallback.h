@@ -22,75 +22,76 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <app/util/generic-callbacks.h>
 
 void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterAccessControlClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterAccessControlClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterAccessControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterLocalizationConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterLocalizationConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterLocalizationConfigurationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterDiagnosticLogsClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterDiagnosticLogsClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterDiagnosticLogsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterGeneralDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterGeneralDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterOperationalCredentialsClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterGroupKeyManagementClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterFixedLabelClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterUserLabelClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

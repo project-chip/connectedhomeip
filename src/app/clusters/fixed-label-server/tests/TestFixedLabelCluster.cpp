@@ -17,10 +17,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/fixed-label-server/FixedLabelCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/FixedLabel/Attributes.h>
 #include <clusters/FixedLabel/Metadata.h>
@@ -42,7 +42,7 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(fixedLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { fixedLabel.Shutdown(); }
+    void TearDown() override { fixedLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
 

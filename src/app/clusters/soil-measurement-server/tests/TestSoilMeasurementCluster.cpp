@@ -17,9 +17,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/SoilMeasurement/Attributes.h>
 #include <clusters/SoilMeasurement/Metadata.h>
@@ -69,7 +69,7 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(soilMeasurement.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { soilMeasurement.Shutdown(); }
+    void TearDown() override { soilMeasurement.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestSoilMeasurementCluster() : soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits) {}
 
