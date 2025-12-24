@@ -248,6 +248,22 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
 }
 
+void CommissioningWindowManager::OnNfcBasedCommissioningStarting()
+{
+    ChipLogProgress(AppServer, "OnNfcBasedCommissioningStarting");
+
+    DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionStarted();
+    }
+
+    DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+
+    StopAdvertisement(/* aShuttingDown = */ false);
+}
+
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds32 commissioningTimeout)
 {
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
