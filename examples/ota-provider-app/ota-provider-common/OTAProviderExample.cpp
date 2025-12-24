@@ -332,13 +332,7 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
 
     if (commandData.location.HasValue())
     {
-        chip::CharSpan loc = commandData.location.Value();
-        const size_t n     = (loc.size() < 2) ? loc.size() : 2;
-        for (size_t i = 0; i < n; ++i)
-        {
-            mLocation[i] = loc.data()[i];
-        }
-        mLocation[2] = '\0';
+        Platform::CopyString(mLocation, 3, commandData.location.Value());
     }
 
     size_t i  = 0;
