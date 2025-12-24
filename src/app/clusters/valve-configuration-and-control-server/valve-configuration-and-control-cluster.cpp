@@ -195,8 +195,7 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
 }
 
 // Command Handlers
-std::optional<DataModel::ActionReturnStatus>
-ValveConfigurationAndControlCluster::HandleCloseCommand()
+std::optional<DataModel::ActionReturnStatus> ValveConfigurationAndControlCluster::HandleCloseCommand()
 {
     // Cancel timer if running.
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
