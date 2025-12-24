@@ -330,10 +330,15 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
-    if (commandData.location.HasValue())
+
+    chip::CharSpan loc = commandData.location.Value();
+    if (loc.size() >= sizeof(mLocation))
     {
-        Platform::CopyString(mLocation, 3, commandData.location.Value());
+        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
+        return;
     }
+
+    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
 
     size_t i  = 0;
     auto iter = commandData.protocolsSupported.begin();
