@@ -1817,6 +1817,7 @@ class ChipDeviceControllerBase():
                              ]],
                              timedRequestTimeoutMs: typing.Optional[int] = None,
                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                             suppressResponse: bool = False,
                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Write a list of attributes on a target node.
@@ -1826,6 +1827,7 @@ class ChipDeviceControllerBase():
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        suppressResponse: if True, the controller will set the suppressResponse flag on the write request. Note that handling for suppressResponse is not currently implemented on the server side of the SDK thus this flag will have no effect, but should not cause problems on the device.
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
@@ -1842,6 +1844,7 @@ class ChipDeviceControllerBase():
                                           timedRequestTimeoutMs=timedRequestTimeoutMs,
                                           interactionTimeoutMs=interactionTimeoutMs,
                                           busyWaitMs=busyWaitMs,
+                                          suppressResponse=suppressResponse,
                                           payloadCapability=payloadCapability,
                                           forceLegacyListEncoding=False)
 
@@ -1852,6 +1855,7 @@ class ChipDeviceControllerBase():
                               ]],
                               timedRequestTimeoutMs: typing.Optional[int] = None,
                               interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                              suppressResponse: bool = False,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
 
         self.CheckIsActive()
@@ -1865,7 +1869,7 @@ class ChipDeviceControllerBase():
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
         return await future
 
     async def TestOnlyWriteAttributeWithLegacyList(self, nodeId: int,
@@ -1875,6 +1879,7 @@ class ChipDeviceControllerBase():
                                                    ]],
                                                    timedRequestTimeoutMs: typing.Optional[int] = None,
                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                   suppressResponse: bool = False,
                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Please see WriteAttribute for description.
@@ -1895,6 +1900,7 @@ class ChipDeviceControllerBase():
                                           timedRequestTimeoutMs=timedRequestTimeoutMs,
                                           interactionTimeoutMs=interactionTimeoutMs,
                                           busyWaitMs=busyWaitMs,
+                                          suppressResponse=suppressResponse,
                                           payloadCapability=payloadCapability,
                                           forceLegacyListEncoding=True)
 
