@@ -26,8 +26,18 @@
 
 #include <string>
 
-class OtaProviderAppCommandDelegate;
 extern OTAProviderExample gOtaProvider;
+
+class OtaProviderAppCommandDelegate : public NamedPipeCommandDelegate
+{
+public:
+    void OnEventCommandReceived(const char * json) override;
+    void SetPipes(NamedPipeCommands * pipes) { mPipes = pipes; }
+    NamedPipeCommands * GetPipes() const { return mPipes; }
+
+private:
+    NamedPipeCommands * mPipes = nullptr;
+};
 
 class OtaProviderAppCommandHandler
 {
@@ -42,15 +52,4 @@ public:
 private:
     Json::Value mJsonValue;
     OtaProviderAppCommandDelegate * mDelegate = nullptr;
-};
-
-class OtaProviderAppCommandDelegate : public NamedPipeCommandDelegate
-{
-public:
-    void OnEventCommandReceived(const char * json) override;
-    void SetPipes(NamedPipeCommands * pipes) { mPipes = pipes; }
-    NamedPipeCommands * GetPipes() const { return mPipes; }
-
-private:
-    NamedPipeCommands * mPipes = nullptr;
 };
