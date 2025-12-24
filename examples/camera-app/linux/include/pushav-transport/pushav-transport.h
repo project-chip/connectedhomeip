@@ -171,4 +171,5 @@ private:
     uint32_t mCurrentlyUsedBandwidthbps    = 0;
     bool mIsPreviousRecordingTriggerByManual  = false;
     bool mIsCurrentZoneBasedTrigger                = false;
+    void NotifyTransportStartedIfNeeded();
 };
