@@ -24,6 +24,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/List.h>
@@ -106,11 +107,8 @@ namespace Testing {
 
             // Verify that the attribute is present in AttributeList before attempting to read it.
             // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-            // Skip this check for AttributeList itself to avoid infinite recursion.
-            if (attr_id != app::Clusters::Globals::Attributes::AttributeList::Id) {
-                auto checkStatus = VerifyAttributeInAttributeList(attr_id);
-                VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
-            }
+            auto checkStatus = VerifyAttributeInAttributeList(attr_id);
+            VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
 
             auto path = mCluster.GetPaths()[0];
 
@@ -150,11 +148,8 @@ namespace Testing {
 
             // Verify that the attribute is present in AttributeList before attempting to write it.
             // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-            // Skip this check for AttributeList itself to avoid infinite recursion.
-            if (attr != app::Clusters::Globals::Attributes::AttributeList::Id) {
-                auto checkStatus = VerifyAttributeInAttributeList(attr);
-                VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
-            }
+            auto checkStatus = VerifyAttributeInAttributeList(attr);
+            VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
 
             app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
             chip::Testing::WriteOperation writeOp(path);
@@ -307,42 +302,22 @@ namespace Testing {
         // This mimics the real-world Interaction Model behavior where AttributeList is checked first.
         // @returns CHIP_NO_ERROR if the attribute is found in AttributeList.
         // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) if the attribute is not found in AttributeList.
-        // @returns error status if AttributeList cannot be read or decoded (indicates a problem with cluster implementation).
+        // @returns error status if Attributes cannot be retrieved (indicates a problem with cluster implementation).
         app::DataModel::ActionReturnStatus VerifyAttributeInAttributeList(AttributeId attr_id)
         {
             auto path = mCluster.GetPaths()[0];
 
-            // Read the AttributeList attribute
-            std::unique_ptr<chip::Testing::ReadOperation> readOperation = std::make_unique<chip::Testing::ReadOperation>(
-                path.mEndpointId, path.mClusterId, app::Clusters::Globals::Attributes::AttributeList::Id);
+            // Get the list of attributes from the cluster's metadata
+            // This is more efficient than reading AttributeList attribute, and matches how IM works internally
+            ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
+            CHIP_ERROR err = mCluster.Attributes(path, builder);
+            ReturnErrorOnFailure(err);
 
-            mReadOperations.push_back(std::move(readOperation));
-            chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
+            ReadOnlyBuffer<app::DataModel::AttributeEntry> attributeEntries = builder.TakeBuffer();
 
-            std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
-            app::DataModel::ActionReturnStatus status = mCluster.ReadAttribute(readOperationRef.GetRequest(), *encoder);
-
-            // If we cannot read AttributeList, return the error - this indicates a problem with cluster implementation
-            VerifyOrReturnError(status.IsSuccess(), status);
-
-            ReturnErrorOnFailure(readOperationRef.FinishEncoding());
-
-            std::vector<chip::Testing::DecodedAttributeData> attributeData;
-            ReturnErrorOnFailure(readOperationRef.GetEncodedIBs().Decode(attributeData));
-
-            VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-
-            // Decode the AttributeList
-            app::Clusters::Globals::Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-            CHIP_ERROR decodeError = app::DataModel::Decode(attributeData[0].dataReader, attributeList);
-
-            // If decoding failed, return the error - this indicates a problem with cluster implementation
-            ReturnErrorOnFailure(decodeError);
-
-            // Check if the requested attribute ID is present in the AttributeList
-            auto it = attributeList.begin();
-            while (it.Next()) {
-                if (it.GetValue() == attr_id) {
+            // Check if the requested attribute ID is present in the attribute list
+            for (const auto & entry : attributeEntries) {
+                if (entry.attributeId == attr_id) {
                     return CHIP_NO_ERROR; // Attribute found in AttributeList
                 }
             }
