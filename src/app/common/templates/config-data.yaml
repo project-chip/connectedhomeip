@@ -81,6 +81,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Thread Border Router Management
     - Thread Network Directory
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Water Heater Management
     - Water Heater Mode
@@ -176,6 +177,7 @@ CodeDrivenClusters:
     - Software Diagnostics
     - Time Format Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
