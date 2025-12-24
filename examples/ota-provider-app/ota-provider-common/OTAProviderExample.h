@@ -38,12 +38,12 @@ public:
     using OTAApplyUpdateAction = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
     using DownloadProtocolEnum = chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum;
 
-    static constexpr uint16_t SW_VER_STR_MAX_LEN   = 64;
-    static constexpr uint16_t OTA_URL_MAX_LEN      = 512;
-    static constexpr size_t kFilepathBufLen        = 256;
-    static constexpr size_t kUriMaxLen             = 256;
-    static constexpr size_t kMaxLocation           = 3;
-    static constexpr size_t kMaxProtocolsSupported = 4;
+    static constexpr uint16_t kSwVersionStringMaxLen = 64;
+    static constexpr uint16_t kOtaUrlMaxLen          = 512;
+    static constexpr size_t kFilepathBufLen          = 256;
+    static constexpr size_t kUriMaxLen               = 256;
+    static constexpr size_t kMaxLocation             = 3;
+    static constexpr size_t kMaxProtocolsSupported   = 4;
 
     size_t kProtocolsSupportedCount = 0;
 
@@ -52,12 +52,12 @@ public:
         chip::VendorId vendorId;
         uint16_t productId;
         uint32_t softwareVersion;
-        char softwareVersionString[SW_VER_STR_MAX_LEN];
+        char softwareVersionString[kSwVersionStringMaxLen];
         uint16_t cDVersionNumber;
         bool softwareVersionValid;
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
-        char otaURL[OTA_URL_MAX_LEN];
+        char otaURL[kOtaUrlMaxLen];
     } DeviceSoftwareVersionModel;
 
     //////////// OTAProviderDelegate Implementation ///////////////
@@ -141,7 +141,7 @@ private:
     chip::ota::OTAProviderUserConsentDelegate * mUserConsentDelegate;
     bool mUserConsentNeeded;
     uint32_t mSoftwareVersion;
-    char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
+    char mSoftwareVersionString[kSwVersionStringMaxLen];
     uint32_t mPollInterval;
     uint16_t mMaxBDXBlockSize;
     uint16_t mVendorId;
