@@ -53,7 +53,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
     }
 
     // The RemainingDuration attribute shall be reported when:
-    // - It changes from Null or vice versa (default handling for QuieterReportingAttribute)
+    // - It changes from null or vice versa (default handling for QuieterReportingAttribute)
     // - It changes to 0
     // - It increases.
     mRemainingDuration.policy()
@@ -186,7 +186,7 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
     switch (request.path.mCommandId)
     {
     case ValveConfigurationAndControl::Commands::Close::Id:
-        return HandleCloseCommand(request, handler);
+        return HandleCloseCommand();
     case ValveConfigurationAndControl::Commands::Open::Id:
         return HandleOpenCommand(request, input_arguments, handler);
     default:
@@ -196,7 +196,7 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
 
 // Command Handlers
 std::optional<DataModel::ActionReturnStatus>
-ValveConfigurationAndControlCluster::HandleCloseCommand(const DataModel::InvokeRequest & request, CommandHandler * handler)
+ValveConfigurationAndControlCluster::HandleCloseCommand()
 {
     // Cancel timer if running.
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
@@ -258,7 +258,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     if (commandData.openDuration.HasValue())
     {
         // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
-        // Save the duration if provided, it can be Null or an actual value.
+        // Save the duration if provided, it can be null or an actual value.
         VerifyOrReturnValue(commandData.openDuration.Value().IsNull() ? true : commandData.openDuration.Value().Value() > 0,
                             Status::ConstraintError);
         openDuration = commandData.openDuration.Value();
@@ -301,7 +301,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Null
     }
     else
     {
-        // No synchronized time or OpenDuration is null, setting the AutoCloseTime attribute to Null
+        // No synchronized time or OpenDuration is null, setting the AutoCloseTime attribute to null
         SaveAndReportIfChanged(mAutoCloseTime, DataModel::NullNullable, Attributes::AutoCloseTime::Id);
     }
 
@@ -330,7 +330,7 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
 
     if (mOpenDuration.IsNull() || mRemainingDuration.value().IsNull())
     {
-        // If openDuration is NULL, RemainingDuration should also be Null and this timer shouldn't be running.
+        // If openDuration is null, RemainingDuration should also be null and this timer shouldn't be running.
         SetRemainingDuration(DataModel::NullNullable);
         return;
     }
@@ -371,7 +371,7 @@ void ValveConfigurationAndControlCluster::SetCurrentState(
     mCurrentState = newState;
     NotifyAttributeChanged(Attributes::CurrentState::Id);
 
-    // Only emit ValveStateChanged when the new state is non-null; transitions to Null are not reported.
+    // Only emit ValveStateChanged when the new state is non-null; transitions to null are not reported.
     if (!mCurrentState.IsNull())
     {
         EmitValveChangeEvent(mCurrentState.Value());
@@ -457,10 +457,10 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
         ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
     }
 
-    // Set OpenDuration to the provided value (can be Null).
+    // Set OpenDuration to the provided value (can be null).
     SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
 
-    // Set the RemainingDuration to the value of OpenDuration (either a value or Null)
+    // Set the RemainingDuration to the value of OpenDuration (either a value or null)
     SetRemainingDuration(mOpenDuration);
 
     // Set target level
@@ -479,7 +479,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
         }
     }
 
-    // Start countdown if applicable (e.g. OpenDuration is not Null).
+    // Start countdown if applicable (e.g. OpenDuration is not null).
     HandleUpdateRemainingDurationInternal();
 
     return CHIP_NO_ERROR;

@@ -79,8 +79,7 @@ private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
     std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request,
                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler);
-    std::optional<DataModel::ActionReturnStatus> HandleCloseCommand(const DataModel::InvokeRequest & request,
-                                                                    CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleCloseCommand();
     CHIP_ERROR GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
                                       DataModel::Nullable<Percent> & adjustedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
