@@ -35,7 +35,14 @@ even hours).
 
 **MEI** :Manufacturer Extensible Identifier
 
+**PAF** :Public Action Frame
+
 **PCC** :Pump Configuration and Control
+
+**Public Action Frames** :Wi-Fi Public Action Frames (PAFs) are IEEE 802.11
+management frames (Category 4) used for unencrypted, public communication
+between stations (STAs) and Access Points (APs) without requiring prior
+association.
 
 **RVC** :Robotic Vacuum Cleaner
 
