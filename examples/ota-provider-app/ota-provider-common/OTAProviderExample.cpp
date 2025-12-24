@@ -330,7 +330,6 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
-
     chip::CharSpan loc = commandData.location.Value();
     if (loc.size() >= sizeof(mLocation))
     {
@@ -346,7 +345,8 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     {
         if (i >= MATTER_ARRAY_SIZE(mProtocolsSupported))
         {
-            ChipLogError(AppServer, "protocolsSupported overflow: received more than %u entries, truncating", static_cast<unsigned>(MATTER_ARRAY_SIZE(mProtocolsSupported)));
+            ChipLogError(AppServer, "protocolsSupported overflow: received more than %u entries, truncating",
+                         static_cast<unsigned>(MATTER_ARRAY_SIZE(mProtocolsSupported)));
             break;
         }
         mProtocolsSupported[i++] = iter.GetValue();
