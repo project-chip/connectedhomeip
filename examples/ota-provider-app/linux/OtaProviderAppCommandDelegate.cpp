@@ -89,11 +89,11 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
     uint16_t endpoint                        = 0;
     OtaProviderAppCommandDelegate * delegate = nullptr;
 
-    VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+    VerifyOrExit(!self->mCommandPayload.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
 
-    name     = self->mJsonValue["Name"].asString();
-    cluster  = self->mJsonValue.get("Cluster", "").asString();
-    endpoint = static_cast<uint16_t>(self->mJsonValue.get("Endpoint", 0).asUInt());
+    name     = self->mCommandPayload["Name"].asString();
+    cluster  = self->mCommandPayload.get("Cluster", "").asString();
+    endpoint = static_cast<uint16_t>(self->mCommandPayload.get("Endpoint", 0).asUInt());
     delegate = self->mDelegate;
 
     if (name == "QueryImageSnapshot")

@@ -47,9 +47,9 @@ public:
     static void HandleCommand(intptr_t context);
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
-    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d) : mJsonValue(std::move(v)), mDelegate(d) {}
+    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d) : mCommandPayload(std::move(v)), mDelegate(d) {}
 
 private:
-    Json::Value mJsonValue;
+    Json::Value mCommandPayload;
     OtaProviderAppCommandDelegate * mDelegate = nullptr;
 };
