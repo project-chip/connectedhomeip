@@ -322,10 +322,44 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     commandObj->AddResponse(commandPath, response);
 }
 
+void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & commandData)
+{
+    mVendorId                 = commandData.vendorID;
+    mProductId                = commandData.productID;
+    mHardwareVersion          = commandData.hardwareVersion.ValueOr(0);
+    mRequestorSoftwareVersion = commandData.softwareVersion;
+    mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
+
+    chip::CharSpan loc = commandData.location.Value();
+    if (loc.size() >= sizeof(mLocation))
+    {
+        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
+        return;
+    }
+
+    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
+
+    size_t i  = 0;
+    auto iter = commandData.protocolsSupported.begin();
+    while (iter.Next())
+    {
+        if (i >= MATTER_ARRAY_SIZE(mProtocolsSupported))
+        {
+            ChipLogError(AppServer, "protocolsSupported overflow: received more than %u entries, truncating",
+                         static_cast<unsigned>(MATTER_ARRAY_SIZE(mProtocolsSupported)));
+            break;
+        }
+        mProtocolsSupported[i++] = iter.GetValue();
+    }
+    kProtocolsSupportedCount = i;
+}
+
 void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const QueryImage::DecodableType & commandData)
 {
     bool requestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
+
+    SaveCommandSnapshot(commandData);
 
     if (mIgnoreQueryImageCount > 0)
     {
