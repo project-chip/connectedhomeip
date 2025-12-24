@@ -86,7 +86,7 @@ public:
     ///
     /// Default implementation errors out with an UnsupportedCommand error.
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
+                                                               chip::TLV::TLVReader & inputArguments,
                                                                CommandHandler * handler) override;
 
     /// Must only be implemented if commands are supported by the cluster
@@ -119,6 +119,16 @@ protected:
     ///
     /// Will return `status`
     DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
+
+    // Templated helper to decode and dispatch commands
+    template <typename DecodableType, typename HandlerFunc>
+    __attribute__((always_inline)) std::optional<DataModel::ActionReturnStatus>
+    HandleCommand(TLV::TLVReader & inputArguments, FabricIndex fabricIndex, HandlerFunc handlerFunc)
+    {
+        DecodableType req;
+        ReturnErrorOnFailure(req.Decode(inputArguments, fabricIndex));
+        return handlerFunc(req);
+    }
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
