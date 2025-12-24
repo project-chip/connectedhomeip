@@ -80,7 +80,7 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
     {{#if struct_has_fabric_sensitive_fields}}
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex) || fabricIndex == kUndefinedFabricIndex;
     {{/if}}
 
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
