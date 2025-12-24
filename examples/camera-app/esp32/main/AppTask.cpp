@@ -15,9 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-// #include "camera-app.h"
-// #include "camera-device.h"
-
 #include "AppTask.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -33,7 +30,6 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (3072)
 #define BUTTON_PRESSED 1
-#define APP_LIGHT_SWITCH 1
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -43,7 +39,7 @@ using namespace Camera;
 static const char TAG[] = "app-task";
 
 namespace {
-constexpr EndpointId kLightEndpointId = 1;
+constexpr EndpointId kCameraEndpointId = 1;
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
 } // namespace
@@ -83,7 +79,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
+    ChipLogProgress(Camera, "[ESP32] Matter Camera App: ApplicationInit()");
     PlatformMgr().LockChipStack();
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);

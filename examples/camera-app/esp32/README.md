@@ -1,6 +1,6 @@
-# Matter ESP32 Lighting Example
+# Matter ESP32 Camera Example
 
-This example demonstrates the Matter Lighting application on ESP platforms.
+This example demonstrates the Matter Camera application on ESP platforms.
 
 Please
 [setup ESP-IDF and CHIP Environment](../../../docs/platforms/esp32/setup_idf_chip.md)

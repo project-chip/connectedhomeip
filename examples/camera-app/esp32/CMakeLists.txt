@@ -39,7 +39,7 @@ project(chip-camera-app)
 # WARNING: This is just an example for using key for decrypting the encrypted OTA image
 # Please do not use it as is.
 if(CONFIG_ENABLE_ENCRYPTED_OTA)
-    target_add_binary_data(chip-lighting-app.elf "esp_image_encryption_key.pem" TEXT)
+    target_add_binary_data(chip-camera-app.elf "esp_image_encryption_key.pem" TEXT)
 endif()
 
 # C++17 is required for RPC build.
