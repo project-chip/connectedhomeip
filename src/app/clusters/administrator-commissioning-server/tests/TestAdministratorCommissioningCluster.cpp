@@ -226,14 +226,15 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     AdministratorCommissioningCluster cluster(kRootEndpointId, {});
     chip::Testing::ClusterTester tester(cluster);
 
-    Attributes::WindowStatus::TypeInfo::DecodableType winStatus;
+    Attributes::WindowStatus::TypeInfo::DecodableType winStatus =
+        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen;
     auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
     ASSERT_TRUE(status.IsSuccess());
     EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
 
     Commands::OpenCommissioningWindow::Type request;
     request.commissioningTimeout = 900;
-    uint16_t originDiscriminator;
+    uint16_t originDiscriminator = 0;
     EXPECT_EQ(sTestCommissionableDataProvider.GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
     request.discriminator = static_cast<uint16_t>(originDiscriminator + 1);
     chip::Crypto::Spake2pVerifier verifier{};
