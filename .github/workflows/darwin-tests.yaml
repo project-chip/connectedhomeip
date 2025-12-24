@@ -81,6 +81,10 @@ jobs:
         working-directory: src/darwin/Framework
         run: xcodebuild -target "darwin-framework-tool" -sdk iphoneos -configuration Debug
 
+      - name: Build Mac Catalyst Darwin Framework Tool Build Debug
+        working-directory: src/darwin/Framework
+        run: xcodebuild -scheme "darwin-framework-tool" -sdk macosx -configuration Debug -destination 'platform=macOS,variant=Mac Catalyst' SUPPORTS_MACCATALYST=YES AD_HOC_CODE_SIGNING_ALLOWED=YES
+
       - name: Run macOS Darwin Framework Tool Build Debug
         working-directory: src/darwin/Framework
         run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug
