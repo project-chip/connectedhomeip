@@ -25,6 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -34,9 +36,23 @@ using namespace ::chip::DeviceLayer;
 
 CriticalFailure PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge)
 {
-    ChipDeviceEvent event{ .Type = DeviceEventType::kChipLambdaEvent, .LambdaEvent = std::move(bridge) };
+    VerifyOrReturnError(bridge.IsInitialized(), CHIP_ERROR_UNINITIALIZED);
 
-    return PlatformMgr().PostEvent(&event);
+    ChipDeviceEvent event{ .Type = DeviceEventType::kChipLambdaEvent };
+
+    event.LambdaEvent.Take(std::move(bridge));
+
+    auto err = PlatformMgr().PostEvent(&event);
+
+    // If the event is successfully posted, the LambdaBridge will be cleaned up either by calling the LambdaBridge or destroy the
+    // event scheduler.
+    // Otherwise, clean it up immediately.
+    if (err != CHIP_NO_ERROR)
+    {
+        event.LambdaEvent.Destroy();
+    }
+
+    return err;
 }
 
 CriticalFailure PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::Timeout delay)
