@@ -74,6 +74,7 @@ source_set("air-purifier_app_sdk") {
     "${chip_root}/examples/air-purifier-app/air-purifier-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread:warnings_fix",
   ]
 }
 
@@ -102,6 +103,7 @@ ti_simplelink_executable("air-purifier_app") {
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread:warnings_fix",
   ]
 
   include_dirs = [

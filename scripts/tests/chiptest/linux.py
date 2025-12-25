@@ -24,6 +24,7 @@ import asyncio
 import logging
 import os
 import pathlib
+import re
 import shlex
 import subprocess
 import sys
@@ -67,6 +68,13 @@ def ensure_private_state():
         log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
+    # TODO remove this mount once otbr-agent doesn't require it anymore
+    log.debug("Remounting /var/lib/thread")
+    if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/var/lib/thread"]).returncode != 0:
+        log.error("Failed to mount /var/lib/thread as a temporary filesystem")
+        log.error("Are you using --privileged if running in docker?")
+        sys.exit(1)
+
 
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
@@ -77,6 +85,8 @@ class IsolatedNetworkNamespace:
         # Create 2 virtual hosts: for app and for the tool
         "ip netns add app-{index}",
         "ip netns add tool-{index}",
+        'sysctl -w net.ipv6.conf.all.forwarding=1',
+        'sysctl -w net.ipv6.conf.default.forwarding=1',
 
         # Create links for switch to net connections
         "ip link add {app_link_name}-{index} type veth peer name {app_link_name}-sw-{index}",
@@ -109,7 +119,10 @@ class IsolatedNetworkNamespace:
         # Force IPv6 to use ULAs that we control.
         "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
         "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
-
+        "ip netns exec app-{index} ip -6 a add fe80::1/64 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} sysctl -w net.ipv6.conf.{app_link_name}-{index}.accept_ra_rt_info_max_plen=64",
+        'ip netns exec app-{index} sysctl -w net.ipv6.conf.all.forwarding=1',
+        'ip netns exec app-{index} sysctl -w net.ipv6.conf.default.forwarding=1',
     ]
 
     # Bring up tool (controller) connection link.
@@ -121,6 +134,8 @@ class IsolatedNetworkNamespace:
         # Force IPv6 to use ULAs that we control.
         "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
         "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip -6 a add fe80::2/64 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} sysctl -w net.ipv6.conf.{tool_link_name}-{index}.accept_ra_rt_info_max_plen=64",
     ]
 
     # Commands for removing namespaces previously created.
@@ -261,8 +276,80 @@ class BluetoothMock(subprocess.Popen[str]):
         self.wait()
 
 
-DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
+DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"],
+                 tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
+
+
+class ThreadBorderRouter:
+
+    # The Thread radio simulation node id
+    THREAD_NODE_ID = 9
+
+    def __init__(self, ns: IsolatedNetworkNamespace):
+        self._event = threading.Event()
+        self._pattern = None
+        self._event.set()
+        self._netns_app = f'app-{ns.index}'
+        self._netns_tool = f'tool-{ns.index}'
+        self._link_name_app = f'{ns.app_link_name}-{ns.index}'
+        self._link_name_tool = f'{ns.tool_link_name}-{ns.index}'
+
+        radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.THREAD_NODE_ID}'
+        args = [
+            'ip', 'netns', 'exec', self._netns_app, 'otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url
+        ]
+
+        self._otbr = subprocess.Popen(args,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT,
+                                      text=True,
+                                      encoding='UTF-8')
+
+        threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
+
+        self.expect(r'Co-processor version:', timeout=20)
+        self.join_network('0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff')
+
+    def join_network(self, dataset):
+        status = os.system(
+            f'ot-ctl dataset init tlvs {dataset} &&'
+            'ot-ctl dataset commit active &&'
+            'ot-ctl ifconfig up &&'
+            'ot-ctl routerselectionjitter 1 &&'
+            'ot-ctl thread start &&'
+            'ot-ctl state leader &&'
+            'while !(ot-ctl state | grep leader); do sleep 1; done &&'
+            'ot-ctl netdata show &&'
+            'ot-ctl srp server enable &&'
+            'while !(ot-ctl br state | grep running); do sleep 1; done &&'
+            'echo TBR ready'
+        )
+        if status != 0:
+            raise RuntimeError("Failed to control Thread Border Router")
+
+        self.expect(r'Sent RA on infra netif', timeout=15)
+
+    def expect(self, pattern: str, timeout=10):
+        self._pattern = re.compile(pattern)
+        self._event.clear()
+        if not self._event.wait(timeout):
+            raise Exception(f'Failed to expect: {pattern}')
+
+    def _otbr_read_stdout(self):
+        assert self._otbr.stdout is not None
+        while (line := self._otbr.stdout.readline()):
+            log.info(line)
+            if self._event.is_set():
+                continue
+            if not self._pattern:
+                continue
+            if self._pattern.search(line):
+                self._event.set()
+
+    def terminate(self):
+        if self._otbr:
+            self._otbr.terminate()
 
 
 class WpaSupplicantMock(threading.Thread):

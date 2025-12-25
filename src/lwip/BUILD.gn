@@ -249,6 +249,8 @@ if (current_os == "zephyr") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+
+    deps = [ "${chip_root}/third_party/openthread:warnings_fix" ]
   }
 
   group("lwip") {

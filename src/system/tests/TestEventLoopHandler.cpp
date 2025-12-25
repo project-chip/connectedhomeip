@@ -21,7 +21,7 @@
 #include <pw_unit_test/framework.h>
 #include <system/SystemConfig.h>
 
-// EventLoopHandlers are only supported by a select-based LayerSocketsLoop
+// EventLoopHandlers are only supported by a select-based LayerSelectLoop
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 // The fake PlatformManagerImpl does not drive the system layer event loop
 #if !CHIP_DEVICE_LAYER_TARGET_FAKE
@@ -49,7 +49,7 @@ public:
         Platform::MemoryShutdown();
     }
 
-    static System::LayerSocketsLoop & SystemLayer() { return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()); }
+    static System::LayerSelectLoop & SystemLayer() { return static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()); }
 
     // Schedules a call to the provided lambda and returns a cancel function.
     template <class Lambda>

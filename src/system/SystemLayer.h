@@ -41,8 +41,8 @@
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <lib/support/IntrusiveList.h>
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -65,7 +65,7 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  * - Layer: Core timer methods.
  *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
- *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
+ *     - LayerSelectLoop: Adds methods for event-loop-based implementations.
  *
  * Threading notes:
  *
@@ -289,21 +289,22 @@ public:
      */
     virtual SocketWatchToken InvalidSocketWatchToken() = 0;
 };
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-class LayerSocketsLoop;
+class LayerSelectLoop;
 
 /**
- * EventLoopHandlers can be registered with a LayerSocketsLoop instance to enable
+ * EventLoopHandlers can be registered with a LayerSelectLoop instance to enable
  * participation of those handlers in the processing cycle of the event loop. This makes
  * it possible to implement adapters that allow components utilizing a third-party event
  * loop API to participate in the Matter event loop, instead of having to run an entirely
  * separate event loop on another thread.
  *
  * Specifically, the `PrepareEvents` and `HandleEvents` methods of registered event loop
- * handlers will be called from the LayerSocketsLoop methods of the same names.
+ * handlers will be called from the LayerSelectLoop methods of the same names.
  *
- * @see LayerSocketsLoop::PrepareEvents
- * @see LayerSocketsLoop::HandleEvents
+ * @see LayerSelectLoop::PrepareEvents
+ * @see LayerSelectLoop::HandleEvents
  */
 class EventLoopHandler : public chip::IntrusiveListNodeBase<>
 {
@@ -322,13 +323,18 @@ public:
     virtual void HandleEvents() = 0;
 
 private:
-    // mState is provided exclusively for use by the LayerSocketsLoop implementation
-    // sub-class and can be accessed by it via the LayerSocketsLoop::LoopHandlerState() helper.
-    friend class LayerSocketsLoop;
+    // mState is provided exclusively for use by the LayerSelectLoop implementation
+    // sub-class and can be accessed by it via the LayerSelectLoop::LoopHandlerState() helper.
+    friend class LayerSelectLoop;
     intptr_t mState = 0;
 };
 
-class LayerSocketsLoop : public LayerSockets
+class LayerSelectLoop :
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    public LayerSockets
+#else
+    public Layer
+#endif
 {
 public:
     virtual void Signal()          = 0;
@@ -350,8 +356,6 @@ protected:
     // Expose EventLoopHandler.mState as a non-const reference to sub-classes
     decltype(EventLoopHandler::mState) & LoopHandlerState(EventLoopHandler & handler) { return handler.mState; }
 };
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 class LayerDispatch :

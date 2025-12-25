@@ -405,6 +405,7 @@ class HostBuilder(GnBuilder):
                  use_googletest=False,
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 openthread_endpoint=False,
                  unified=False
                  ):
         """
@@ -568,6 +569,12 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_terms_and_conditions_required=true')
             else:
                 self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+
+        if openthread_endpoint:
+            if enable_wifi:
+                raise Exception("OpenThread EndPoint mode does not support Wifi")
+
+            self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
