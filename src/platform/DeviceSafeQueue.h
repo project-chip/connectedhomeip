@@ -47,8 +47,8 @@ namespace Internal {
 class DeviceSafeQueue
 {
 public:
-    DeviceSafeQueue()  = default;
-    ~DeviceSafeQueue() = default;
+    DeviceSafeQueue() = default;
+    ~DeviceSafeQueue();
 
     void Push(const ChipDeviceEvent & event);
     bool Empty();

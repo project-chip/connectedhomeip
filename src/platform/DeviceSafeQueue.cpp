@@ -22,11 +22,29 @@
  *      and provides a specific set of member functions to access its elements wth thread safety.
  */
 
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/DeviceSafeQueue.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+DeviceSafeQueue::~DeviceSafeQueue()
+{
+    std::unique_lock<std::mutex> lock(mEventQueueLock);
+
+    while (!mEventQueue.empty())
+    {
+        auto & event = mEventQueue.front();
+
+        if (event.Type == DeviceEventType::kChipLambdaEvent)
+        {
+            event.LambdaEvent.Destroy();
+        }
+
+        mEventQueue.pop();
+    }
+}
 
 void DeviceSafeQueue::Push(const ChipDeviceEvent & event)
 {
