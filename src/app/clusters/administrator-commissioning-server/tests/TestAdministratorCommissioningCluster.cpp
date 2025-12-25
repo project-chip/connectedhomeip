@@ -255,21 +255,36 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     tester.SetFabricIndex(testFabricIndex);
 
     auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
-    ASSERT_TRUE(result.IsSuccess());
 
-    status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
-    ASSERT_TRUE(status.IsSuccess());
-    EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
+    if (chip::Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        ASSERT_TRUE(result.IsSuccess());
 
-    Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
-    status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
-    ASSERT_TRUE(status.IsSuccess());
-    ASSERT_FALSE(adminFabric.IsNull());
+        status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+        ASSERT_TRUE(status.IsSuccess());
+        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
 
-    Attributes::AdminVendorId::TypeInfo::Type adminVendor;
-    adminVendor.SetNonNull(static_cast<chip::VendorId>(1));
-    status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
-    ASSERT_TRUE(status.IsSuccess());
-    ASSERT_FALSE(adminVendor.IsNull());
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminFabric.IsNull());
+
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        adminVendor.SetNonNull(static_cast<chip::VendorId>(1));
+        status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminVendor.IsNull());
+    }
+    else
+    {
+        ASSERT_FALSE(result.IsSuccess());
+        EXPECT_TRUE(result.status.has_value());
+        // On platforms where DNS-SD is disabled, the logic swallows the error and returns kPAKEParameterError
+        auto statusCode = result.status->GetStatusCode();
+        EXPECT_EQ(statusCode.GetStatus(), chip::Protocols::InteractionModel::Status::Failure);
+        EXPECT_TRUE(statusCode.GetClusterSpecificCode().has_value());
+        EXPECT_EQ(statusCode.GetClusterSpecificCode().value(),
+                  to_underlying(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    }
 }
 } // namespace
