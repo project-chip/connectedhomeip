@@ -53,6 +53,7 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
 
     static void SetUpTestSuite()
     {
+        chip::DeviceLayer::PlatformMgr().Shutdown();
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
@@ -280,7 +281,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
         ASSERT_FALSE(result.IsSuccess());
         EXPECT_TRUE(result.status.has_value());
         // On platforms where DNS-SD is disabled, the logic swallows the error and returns kPAKEParameterError
-        auto statusCode = result.status->GetStatusCode();
+        auto statusCode = result.status.value().GetStatusCode();
         EXPECT_EQ(statusCode.GetStatus(), chip::Protocols::InteractionModel::Status::Failure);
         EXPECT_TRUE(statusCode.GetClusterSpecificCode().has_value());
         EXPECT_EQ(statusCode.GetClusterSpecificCode().value(),
