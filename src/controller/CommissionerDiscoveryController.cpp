@@ -29,8 +29,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
@@ -745,5 +743,3 @@ UDCClientState * CommissionerDiscoveryController::GetUDCClientState()
     }
     return mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
 }
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

@@ -36,8 +36,6 @@
 #include <platform/PlatformManager.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
 using chip::NodeId;
 using chip::OperationalSessionSetup;
 using chip::Protocols::UserDirectedCommissioning::UDCClientState;
@@ -471,5 +469,3 @@ protected:
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
