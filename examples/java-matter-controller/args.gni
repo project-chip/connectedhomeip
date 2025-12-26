@@ -25,3 +25,5 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 chip_stack_lock_tracking = "fatal"
 chip_build_controller_dynamic_server = true
+
+chip_device_config_enable_commissioner_discovery = true

@@ -34,3 +34,5 @@ chip_tlv_validate_char_string_on_read = true
 chip_tlv_validate_char_string_on_write = true
 
 chip_device_config_enable_wifipaf = false
+
+chip_device_config_enable_commissioner_discovery = true

@@ -20,7 +20,6 @@
 
 #include <AppMainLoop.h>
 #include <app/server/Server.h>
-#include <controller/CommissionerDiscoveryController.h>
 #include <crypto/RawKeySessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
