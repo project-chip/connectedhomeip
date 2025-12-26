@@ -73,7 +73,7 @@ public:
                 (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
                 !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
             {
-                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%lu]", i);
+                ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%zu]", i);
                 return elem;
             }
 #ifdef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
@@ -454,8 +454,8 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         case PafInfoAccess::kAccNodeInfo:
             pPafSession->nodeId        = SessionInfo.nodeId;
             pPafSession->discriminator = SessionInfo.discriminator;
-            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x, sessions", SessionInfo.nodeId,
-                            SessionInfo.discriminator);
+            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x, sessions",
+                            static_cast<unsigned long int>(SessionInfo.nodeId), SessionInfo.discriminator);
             return CHIP_NO_ERROR;
         case PafInfoAccess::kAccSessionId:
             pPafSession->id = SessionInfo.id;
