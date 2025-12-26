@@ -20,4 +20,8 @@ declare_args() {
 
   # Build controller with webrtc python bindings
   chip_support_webrtc_python_bindings = false
+
+  # Enable Commissioner Discovery Controller for User Directed Commissioning.
+  # For Video Players, this value will be true.
+  chip_device_config_enable_commissioner_discovery = false
 }
