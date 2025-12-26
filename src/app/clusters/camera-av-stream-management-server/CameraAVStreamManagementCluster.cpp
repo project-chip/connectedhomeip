@@ -1898,7 +1898,7 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
 
         Commands::VideoStreamModify::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-        return HandleVideoStreamModify(*aHandler, aRequest.path, commandData);
+        return HandleVideoStreamModify(commandData);
     }
 
     case Commands::VideoStreamDeallocate::Id: {
@@ -1910,7 +1910,7 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
         }
         Commands::VideoStreamDeallocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-        return HandleVideoStreamDeallocate(*aHandler, aRequest.path, commandData);
+        return HandleVideoStreamDeallocate(commandData);
     }
 
     case Commands::AudioStreamAllocate::Id: {
@@ -1934,7 +1934,7 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
         }
         Commands::AudioStreamDeallocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-        return HandleAudioStreamDeallocate(*aHandler, aRequest.path, commandData);
+        return HandleAudioStreamDeallocate(commandData);
     }
 
     case Commands::SnapshotStreamAllocate::Id: {
@@ -1960,7 +1960,7 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
 
         Commands::SnapshotStreamModify::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-        return HandleSnapshotStreamModify(*aHandler, aRequest.path, commandData);
+        return HandleSnapshotStreamModify(commandData);
     }
 
     case Commands::SnapshotStreamDeallocate::Id: {
@@ -1970,9 +1970,10 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
         {
             return Status::UnsupportedCommand;
         }
+\
         Commands::SnapshotStreamDeallocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-        return HandleSnapshotStreamDeallocate(*aHandler, aRequest.path, commandData);
+        return HandleSnapshotStreamDeallocate(commandData);
     }
 
     case Commands::SetStreamPriorities::Id: {
@@ -1980,7 +1981,7 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
 
         Commands::SetStreamPriorities::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-        return HandleSetStreamPriorities(*aHandler, aRequest.path, commandData);
+        return HandleSetStreamPriorities(commandData);
     }
 
     case Commands::CaptureSnapshot::Id: {
@@ -2178,8 +2179,7 @@ CameraAVStreamManagementCluster::HandleVideoStreamAllocate(CommandHandler & hand
 }
 
 std::optional<DataModel::ActionReturnStatus>
-CameraAVStreamManagementCluster::HandleVideoStreamModify(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                         const Commands::VideoStreamModify::DecodableType & commandData)
+CameraAVStreamManagementCluster::HandleVideoStreamModify(const Commands::VideoStreamModify::DecodableType & commandData)
 {
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
     auto & isOSDEnabled       = commandData.OSDEnabled;
@@ -2214,13 +2214,14 @@ CameraAVStreamManagementCluster::HandleVideoStreamModify(CommandHandler & handle
         return Status::InvalidCommand;
     }
 
-    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, handler, commandPath, /* isDeallocate = */ false))
+    Status status = ValidateVideoStreamForModifyOrDeallocate(videoStreamID, /* isDeallocate = */ false);
+    if (status != Status::Success)
     {
-        return Status::NotFound;
+        return status;
     }
 
     // Call the delegate
-    Status status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
+    status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
     {
@@ -2230,19 +2231,20 @@ CameraAVStreamManagementCluster::HandleVideoStreamModify(CommandHandler & handle
     return status;
 }
 
+
 std::optional<DataModel::ActionReturnStatus>
-CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                             const Commands::VideoStreamDeallocate::DecodableType & commandData)
+CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(const Commands::VideoStreamDeallocate::DecodableType & commandData)
 {
     auto & videoStreamID = commandData.videoStreamID;
 
-    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, handler, commandPath, /* isDeallocate = */ true))
+    Status status = ValidateVideoStreamForModifyOrDeallocate(videoStreamID, /* isDeallocate = */ true);
+    if (status != Status::Success)
     {
-        return Status::NotFound;
+        return status;
     }
 
     // Call the delegate
-    Status status = mDelegate.VideoStreamDeallocate(videoStreamID);
+    status = mDelegate.VideoStreamDeallocate(videoStreamID);
 
     if (status == Status::Success)
     {
@@ -2334,19 +2336,21 @@ CameraAVStreamManagementCluster::HandleAudioStreamAllocate(CommandHandler & hand
     return std::nullopt;
 }
 
+\
 std::optional<DataModel::ActionReturnStatus>
-CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                             const Commands::AudioStreamDeallocate::DecodableType & commandData)
+CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(const Commands::AudioStreamDeallocate::DecodableType & commandData)
 {
     auto & audioStreamID = commandData.audioStreamID;
 
-    if (!ValidateAudioStreamForDeallocate(audioStreamID, handler, commandPath))
+    Status status = ValidateAudioStreamForDeallocate(audioStreamID);
+
+    if (status != Status::Success)
     {
-        return Status::NotFound;
+        return status;
     }
 
     // Call the delegate
-    Status status = mDelegate.AudioStreamDeallocate(audioStreamID);
+    status = mDelegate.AudioStreamDeallocate(audioStreamID);
 
     if (status == Status::Success)
     {
@@ -2479,8 +2483,7 @@ CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(CommandHandler & h
 }
 
 std::optional<DataModel::ActionReturnStatus>
-CameraAVStreamManagementCluster::HandleSnapshotStreamModify(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                            const Commands::SnapshotStreamModify::DecodableType & commandData)
+CameraAVStreamManagementCluster::HandleSnapshotStreamModify(const Commands::SnapshotStreamModify::DecodableType & commandData)
 {
     Status status             = Status::Success;
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
@@ -2517,9 +2520,10 @@ CameraAVStreamManagementCluster::HandleSnapshotStreamModify(CommandHandler & han
         return Status::InvalidCommand;
     }
 
-    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, handler, commandPath, /* isDeallocate = */ false))
+    status = ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, /* isDeallocate = */ false);
+    if (status != Status::Success)
     {
-        return Status::NotFound;
+        return status;
     }
 
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
@@ -2533,18 +2537,18 @@ CameraAVStreamManagementCluster::HandleSnapshotStreamModify(CommandHandler & han
 }
 
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(
-    CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
 {
     auto & snapshotStreamID = commandData.snapshotStreamID;
 
-    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, handler, commandPath, /* isDeallocate = */ true))
+    Status status = ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, /* isDeallocate = */ true);
+    if (status != Status::Success)
     {
-        return Status::NotFound;
+        return status;
     }
 
     // Call the delegate
-    Status status = mDelegate.SnapshotStreamDeallocate(snapshotStreamID);
+    status = mDelegate.SnapshotStreamDeallocate(snapshotStreamID);
 
     if (status == Status::Success)
     {
@@ -2554,9 +2558,9 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     return status;
 }
 
+\
 std::optional<DataModel::ActionReturnStatus>
-CameraAVStreamManagementCluster::HandleSetStreamPriorities(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                           const Commands::SetStreamPriorities::DecodableType & commandData)
+CameraAVStreamManagementCluster::HandleSetStreamPriorities(const Commands::SetStreamPriorities::DecodableType & commandData)
 {
     auto & streamPriorities = commandData.streamPriorities;
     std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
@@ -2610,14 +2614,14 @@ CameraAVStreamManagementCluster::HandleCaptureSnapshot(CommandHandler & handler,
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
 
-    if (!CheckSnapshotStreamsAvailability(handler, commandPath))
+    if (!CheckSnapshotStreamsAvailability())
     {
         return Status::NotFound;
     }
 
     if (!snapshotStreamID.IsNull())
     {
-        if (!ValidateSnapshotStreamId(snapshotStreamID, handler, commandPath))
+        if (!ValidateSnapshotStreamId(snapshotStreamID))
         {
             return Status::NotFound;
         }
@@ -2657,8 +2661,7 @@ CameraAVStreamManagementCluster::HandleCaptureSnapshot(CommandHandler & handler,
     return std::nullopt;
 }
 
-bool CameraAVStreamManagementCluster::CheckSnapshotStreamsAvailability(CommandHandler & handler,
-                                                                       const ConcreteCommandPath & commandPath)
+bool CameraAVStreamManagementCluster::CheckSnapshotStreamsAvailability()
 {
     if (mAllocatedSnapshotStreams.empty())
     {
@@ -2668,8 +2671,7 @@ bool CameraAVStreamManagementCluster::CheckSnapshotStreamsAvailability(CommandHa
     return true;
 }
 
-bool CameraAVStreamManagementCluster::ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID,
-                                                               CommandHandler & handler, const ConcreteCommandPath & commandPath)
+bool CameraAVStreamManagementCluster::ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID)
 {
     auto found = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
                               [&](const SnapshotStreamStruct & s) { return s.snapshotStreamID == snapshotStreamID.Value(); });
@@ -2677,38 +2679,35 @@ bool CameraAVStreamManagementCluster::ValidateSnapshotStreamId(const DataModel::
     {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot stream exist by id %d", mPath.mEndpointId,
                      snapshotStreamID.Value());
-        handler.AddStatus(commandPath, Status::NotFound);
         return false;
     }
     return true;
 }
 
-bool CameraAVStreamManagementCluster::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID,
-                                                                               CommandHandler & handler,
-                                                                               const ConcreteCommandPath & commandPath,
-                                                                               bool isDeallocate)
+Protocols::InteractionModel::Status
+CameraAVStreamManagementCluster::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID,
+                                                                          bool isDeallocate)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
-        mAllocatedVideoStreams, videoStreamID, handler, commandPath, StreamType::kVideo,
+        mAllocatedVideoStreams, videoStreamID, StreamType::kVideo,
         [](const VideoStreamStruct & s) { return s.videoStreamID; }, isDeallocate);
 }
 
-bool CameraAVStreamManagementCluster::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, CommandHandler & handler,
-                                                                       const ConcreteCommandPath & commandPath)
+Protocols::InteractionModel::Status
+CameraAVStreamManagementCluster::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
-        mAllocatedAudioStreams, audioStreamID, handler, commandPath, StreamType::kAudio,
+        mAllocatedAudioStreams, audioStreamID, StreamType::kAudio,
         [](const AudioStreamStruct & s) { return s.audioStreamID; },
         /* isDeallocate = */ true);
 }
 
-bool CameraAVStreamManagementCluster::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID,
-                                                                                  CommandHandler & handler,
-                                                                                  const ConcreteCommandPath & commandPath,
-                                                                                  bool isDeallocate)
+Protocols::InteractionModel::Status
+CameraAVStreamManagementCluster::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID,
+                                                                             bool isDeallocate)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
-        mAllocatedSnapshotStreams, snapshotStreamID, handler, commandPath, StreamType::kSnapshot,
+        mAllocatedSnapshotStreams, snapshotStreamID, StreamType::kSnapshot,
         [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; }, isDeallocate);
 }
 
