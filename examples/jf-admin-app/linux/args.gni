@@ -38,3 +38,5 @@ chip_build_controller = true
 chip_support_commissioning_in_controller = true
 
 chip_device_config_enable_joint_fabric = true
+
+chip_device_config_enable_commissioner_discovery = true
