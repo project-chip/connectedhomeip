@@ -281,9 +281,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStreamUsagePriorities(const std::
 {
     mStreamUsagePriorities = newPriorities;
     ReturnErrorOnFailure(StoreStreamUsagePriorities());
-    auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
     mDelegate.OnAttributeChanged(Attributes::StreamUsagePriorities::Id);
-    MatterReportingAttributeChangeCallback(path);
+    NotifyAttributeChanged(Attributes::StreamUsagePriorities::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -1099,7 +1098,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNig
         auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, to_underlying(mNightVision)));
         mDelegate.OnAttributeChanged(Attributes::NightVision::Id);
-        MatterReportingAttributeChangeCallback(path);
+        NotifyAttributeChanged(Attributes::NightVision::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -1112,7 +1111,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVisionIllum(TriStateAutoEnum
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, to_underlying(mNightVisionIllum)));
         mDelegate.OnAttributeChanged(Attributes::NightVisionIllum::Id);
-        MatterReportingAttributeChangeCallback(path);
+        NotifyAttributeChanged(Attributes::NightVisionIllum::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -1148,8 +1147,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetViewport(const Globals::Structs::
 
     ReturnErrorOnFailure(StoreViewport(mViewport));
     mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
-    auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
-    MatterReportingAttributeChangeCallback(path);
+    NotifyAttributeChanged(Attributes::Viewport::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -1274,7 +1272,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
         ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, to_underlying(mStatusLightBrightness)));
         mDelegate.OnAttributeChanged(Attributes::StatusLightBrightness::Id);
-        MatterReportingAttributeChangeCallback(path);
+        NotifyAttributeChanged(Attributes::StatusLightBrightness::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -1733,9 +1731,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::PersistAndNotify()
     ReturnErrorAndLogOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
                                "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated streams", mPath.mEndpointId);
 
-    auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, TAttributeId);
     mDelegate.OnAttributeChanged(TAttributeId);
-    MatterReportingAttributeChangeCallback(path);
+    NotifyAttributeChanged(TAttributeId);
 
     return CHIP_NO_ERROR;
 }

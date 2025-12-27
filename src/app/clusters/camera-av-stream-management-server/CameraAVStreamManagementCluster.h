@@ -769,7 +769,7 @@ private:
                 ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
             }
             mDelegate.OnAttributeChanged(attributeId);
-            MatterReportingAttributeChangeCallback(path);
+            NotifyAttributeChanged(attributeId);
         }
         return CHIP_NO_ERROR;
     }
