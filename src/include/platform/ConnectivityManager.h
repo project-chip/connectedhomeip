@@ -329,7 +329,7 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl();
 } // namespace DeviceLayer
 } // namespace chip
 
-/* Include a header file containing the implementation of the ConfigurationManager
+/* Include a header file containing the implementation of the ConnectivityManager
  * object for the selected platform.
  */
 #ifdef EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
