@@ -27,7 +27,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <controller/CHIPDeviceController.h>
-#include <controller/CommissionerDiscoveryController.h>
 
 using namespace chip;
 using namespace chip::app;

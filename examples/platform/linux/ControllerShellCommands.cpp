@@ -250,6 +250,7 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "ux") == 0)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         // ux ok|cancel [pincode]
         if (argc < 2)
         {
@@ -277,6 +278,9 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         {
             return PrintAllCommands();
         }
+#else  // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     }
     else if (strcmp(argv[0], "udc-commission") == 0)
     {
