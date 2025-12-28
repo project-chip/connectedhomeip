@@ -28,6 +28,10 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
 #include <app/OperationalSessionSetup.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
@@ -469,3 +473,5 @@ protected:
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

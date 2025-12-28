@@ -82,16 +82,14 @@ static_library("controller") {
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
+      "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "SetUpCodePairer.cpp",
     ]
 
     if (chip_device_config_enable_commissioner_discovery) {
-      sources += [
-        "CommissionerDiscoveryController.cpp",
-        "CommissionerDiscoveryController.h",
-      ]
+      sources += [ "CommissionerDiscoveryController.cpp" ]
     }
 
     # ExampleOperationalCredentialsIssuer uses TestGroupData

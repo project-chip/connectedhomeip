@@ -23,9 +23,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <controller/CHIPDeviceController.h> // nogncheck
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #include <controller/CommissionerDiscoveryController.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
