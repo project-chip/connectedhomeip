@@ -96,7 +96,7 @@ class TC_CHANNEL_5_4(MatterBaseTest):
 
         # 6. Verify that the current channel name matches the requested target
         asserts.assert_equal(current_channel.name, target_match,
-                                f"CurrentChannel name ({current_channel.name}) does not match requested target ({target_match})")
+                             f"CurrentChannel name ({current_channel.name}) does not match requested target ({target_match})")
         logger.info("Verification successful: CurrentChannel matches target.")
 
 
