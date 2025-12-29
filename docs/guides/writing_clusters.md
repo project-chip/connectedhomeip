@@ -214,11 +214,16 @@ attribute to allow applications to interact with cluster state.
     `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`). Applications need
     these to read the current cluster state.
 
--   **Setter Methods:** Provide setter methods for all non-fixed (mutable)
-    attributes (e.g., `SetAlarmsActive()`, `SetCurrentSensitivityLevel()`) to
-    allow spec-compliant modifications. When the application's driver state
-    changes, these setters can be used to update the cluster's state
-    accordingly.
+-   **Setter Methods:** Provide methods to modify all non-fixed (mutable)
+    attributes in spec-compliant ways. For simple attributes, this may be a
+    straightforward setter (e.g., `SetCurrentSensitivityLevel()`). However, spec
+    compliance may require updating multiple attributes together atomically—in
+    such cases, provide a higher-level API that encapsulates the required
+    behavior rather than individual setters. When the application's driver state
+    changes, these methods can be used to update the cluster's state
+    accordingly. Setters are also responsible for triggering attribute change
+    notifications (see
+    [Attribute Change Notifications](#attribute-change-notifications)).
 
 -   **Example:** The
     [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
