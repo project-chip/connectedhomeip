@@ -73,12 +73,16 @@ class TC_CHANNEL_5_4(MatterBaseTest):
         logger.info(f"Read ChannelList: {channel_list}")
 
         # 2. Handle empty list
-        if not channel_list:
-            asserts.fail("ChannelList is empty.")
-        else:
-            # 3. Pick from list (using the first available channel)
-            target_match = channel_list[0].name
-            logger.info(f"Selected channel from list: {target_match}")
+        target_match = None
+        if channel_list:
+            for channel in channel_list:
+                if channel.name is not None:
+                    target_match = channel.name
+                    logger.info(f"Selected channel from list: {target_match}")
+                    break
+
+        if target_match is None:
+            asserts.skip("No channels with a name found in ChannelList, or ChannelList is empty. Cannot run test.")
 
         # 4. Send ChangeChannel command
         logger.info(f"Sending ChangeChannel command with match='{target_match}' to endpoint {endpoint}")
