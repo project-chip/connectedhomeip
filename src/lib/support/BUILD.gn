@@ -85,20 +85,10 @@ source_set("safeint") {
   sources = [ "SafeInt.h" ]
 }
 
-# Standalone argument parser - include this explicitly in targets that need it.
-# LTO will optimize out unused code if not referenced.
-source_set("arg_parser") {
-  sources = [
-    "CHIPArgParser.cpp",
-    "CHIPArgParser.hpp",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/platform:platform_config_header",
-  ]
-
-  public_configs = [ "${chip_root}/src:includes" ]
+# This group exists for backwards compatibility with targets that explicitly
+# depend on :arg_parser. LTO will optimize out unused code if not referenced.
+group("arg_parser") {
+  public_deps = [ ":support" ]
 }
 
 source_set("numeric-primitives") {
@@ -237,6 +227,8 @@ static_library("support") {
     "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
+    "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
     "BitFlags.h",
     "BitMask.h",
     "BufferReader.cpp",
