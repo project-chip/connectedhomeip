@@ -132,7 +132,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
-    ChipLogError(NotSpecified, "Unhandled command: Should never happen")
+    ChipLogError(NotSpecified, "Unhandled command: Should never happen");
 }
 
 void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
