@@ -16,8 +16,25 @@
  *    limitations under the License.
  */
 
-// Note: This file exists for backwards compatibility only.
-// New code should directly use UnitLocalizationCluster.h instead.
-
-#pragma once
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
+
+using namespace chip::app;
+using namespace chip::app::Clusters::UnitLocalization;
+
+UnitLocalizationServer & UnitLocalizationServer::Instance()
+{
+    static UnitLocalizationServer mInstance;
+    return mInstance;
+}
+
+void MatterUnitLocalizationPluginServerInitCallback()
+{
+    LogErrorOnFailure(UnitLocalizationServer::Instance().Init());
+    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
+}
+
+void MatterUnitLocalizationPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationServer::Instance());
+}

@@ -35,7 +35,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpointId, provider, parentId));
 
-    // TODO: This needs to be refactored so the optional attributes being set for
+    // TODO: This needs to be refactored so the optional attributes, commands and features being set for
     //  the cluster are configurable to allow different settings
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet =
         BasicInformationCluster::OptionalAttributesSet()
