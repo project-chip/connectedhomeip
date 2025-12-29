@@ -46,7 +46,7 @@ private:
 //  - Keep JSON parsing and command dispach logic isolated from OTA logic
 //  - Allow early validation and reporting
 //  - Extracts generic command fields and delegates the actual OTA operations to OtaProviderAppCommandDelegate
- 
+
 class OtaProviderAppCommandHandler
 {
 public:
