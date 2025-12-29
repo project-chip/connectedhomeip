@@ -72,8 +72,7 @@ async def execute_test(yaml, runner):
 
         test_action = runner.encode(test_step)
         if test_action is None:
-            raise Exception(
-                f'Failed to encode test step {test_step.label}')
+            raise RuntimeError(f'Failed to encode test step {test_step.label}')
 
         response = await runner.execute(test_action)
         decoded_response = runner.decode(response)
@@ -85,7 +84,7 @@ async def execute_test(yaml, runner):
                 if entry.state == PostProcessCheckStatus.SUCCESS:
                     continue
                 log.warning("%s: %s", entry.state, entry.message)
-            raise Exception(f"Test step failed '{test_step.label}'")
+            raise RuntimeError(f"Test step failed '{test_step.label}'")
 
 
 def asyncio_executor(f):

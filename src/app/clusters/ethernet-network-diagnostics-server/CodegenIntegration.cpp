@@ -78,7 +78,7 @@ void MatterEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -89,7 +89,7 @@ void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpoint
             .fixedClusterInstanceCount = kEthernetNetworkDiagnosticsFixedClusterCount,
             .maxClusterInstanceCount   = kEthernetNetworkDiagnosticsMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback() {}
