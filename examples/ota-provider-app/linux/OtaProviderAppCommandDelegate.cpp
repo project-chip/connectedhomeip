@@ -25,6 +25,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
+extern OTAProviderExample gOtaProvider;
+
+OTAProviderExample & GetOtaProviderExample()
+{
+    return gOtaProvider;
+}
+
 OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate)
 {
     Json::Reader reader;
@@ -63,17 +70,17 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
 {
     Json::Value payload(Json::objectValue);
 
-    payload["VendorID"]            = gOtaProvider.GetVendorId();
-    payload["ProductID"]           = gOtaProvider.GetProductId();
-    payload["SoftwareVersion"]     = gOtaProvider.GetSoftwareVersion();
-    payload["HardwareVersion"]     = gOtaProvider.GetHardwareVersion();
-    payload["Location"]            = gOtaProvider.GetLocation();
-    payload["RequestorCanConsent"] = gOtaProvider.GetRequestorCanConsent();
+    payload["VendorID"]            = GetOtaProviderExample().GetVendorId();
+    payload["ProductID"]           = GetOtaProviderExample().GetProductId();
+    payload["SoftwareVersion"]     = GetOtaProviderExample().GetSoftwareVersion();
+    payload["HardwareVersion"]     = GetOtaProviderExample().GetHardwareVersion();
+    payload["Location"]            = GetOtaProviderExample().GetLocation();
+    payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
 
-    const auto & protos = gOtaProvider.GetProtocolsSupported();
+    const auto & protos = GetOtaProviderExample().GetProtocolsSupported();
 
     Json::Value arr(Json::arrayValue);
-    for (size_t i = 0; i < gOtaProvider.kProtocolsSupportedCount; ++i)
+    for (size_t i = 0; i < GetOtaProviderExample().kProtocolsSupportedCount; ++i)
     {
         arr.append(Json::UInt(protos[i]));
     }
