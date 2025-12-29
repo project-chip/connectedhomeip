@@ -16,7 +16,6 @@
 #
 
 import asyncio
-import contextlib
 import logging
 import os
 import platform
@@ -220,6 +219,8 @@ async def find_matter_devices_mdns(max_attempts=None):
         f"find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + target_device_id if target_device_id else ''}")
 
     for attempt in range(1, attempts + 1):
+        zc = None
+        browsers = []
         try:
             if attempt > 1:
                 delay = min(2 + (attempt - 2) * 3, 5)
@@ -232,10 +233,6 @@ async def find_matter_devices_mdns(max_attempts=None):
             start_time = time.time()
             await asyncio.sleep(MDNS_DISCOVERY_TIMEOUT)
 
-            for browser in browsers:
-                browser.cancel()
-            zc.close()
-
             if listener.discovered_services:
                 elapsed = time.time() - start_time
                 logger.info(f"Device found on attempt {attempt}/{attempts} after {elapsed:.1f}s")
@@ -243,8 +240,21 @@ async def find_matter_devices_mdns(max_attempts=None):
 
         except Exception as e:
             logger.error(f"find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
-            with contextlib.suppress(Exception):
-                zc.close()
+
+        finally:
+            for browser in browsers:
+                try:
+                    browser.cancel()
+                except Exception as e:
+                    logger.debug(f"find_matter_devices_mdns: Error canceling browser: {e}")
+
+            if zc is not None:
+                try:
+                    zc.close()
+                except Exception as e:
+                    logger.debug(f"find_matter_devices_mdns: Error closing Zeroconf: {e}")
+
+            await asyncio.sleep(0.5)
 
         if attempt < attempts:
             await asyncio.sleep(2)
@@ -894,7 +904,9 @@ async def verify_operational_network(test, ssid):
     logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
     await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
 
-    for attempt in range(1, MAX_ATTEMPTS + 1):
+    # Reduced from MAX_ATTEMPTS to 3 to prevent excessive retries that can cause segmentation faults
+    max_read_attempts = 3
+    for attempt in range(1, max_read_attempts + 1):
         try:
             if attempt == 1:
                 timeout = OPERATIONAL_DISCOVERY_TIMEOUT
@@ -918,7 +930,7 @@ async def verify_operational_network(test, ssid):
                 break
 
         except Exception as e:
-            logger.error(f"verify_operational_network: Exception reading networks: {e}")
+            logger.error(f"verify_operational_network: Exception reading networks (attempt {attempt}/{max_read_attempts}): {e}")
 
         if attempt == 1:
             retry_delay = 10
@@ -927,9 +939,10 @@ async def verify_operational_network(test, ssid):
         else:
             retry_delay = RETRY_DELAY_SECONDS
 
-        await asyncio.sleep(retry_delay)
+        if attempt < max_read_attempts:
+            await asyncio.sleep(retry_delay)
     else:
-        asserts.fail(f"verify_operational_network: Could not read networks after {MAX_ATTEMPTS} retries.")
+        asserts.fail(f"verify_operational_network: Could not read networks after {max_read_attempts} retries.")
 
     userwifi_netidx = await find_network_and_assert(test, networks, ssid)
     if userwifi_netidx is not None:
@@ -1210,8 +1223,9 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timeout=TIMEOUT
         )
-        await asyncio.sleep(1)  # Brief delay for command processing
-        # Note: find_matter_devices_mdns() removed - verify_operational_network already does mDNS discovery
+        # Give extra time for DUT to update mDNS announcements with new IP after network change
+        # This prevents TH from attempting to connect to stale/cached IP addresses
+        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(8)
@@ -1251,7 +1265,7 @@ class TC_CNET_4_11(MatterBaseTest):
             logger.info("Proceeding with network change as this is expected behavior")
 
         # Wait for DUT to complete network reversion
-        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         self.step(11)
@@ -1339,8 +1353,9 @@ class TC_CNET_4_11(MatterBaseTest):
             password=wifi_2nd_ap_credentials.encode(),
             breadcrumb=3
         )
-        await asyncio.sleep(1)  # Brief delay for command processing
-        # Note: find_matter_devices_mdns() removed - verify_operational_network already does mDNS discovery
+        # Give extra time for DUT to update mDNS announcements with new IP after network change
+        # This prevents TH from attempting to connect to stale/cached IP addresses
+        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(17)
