@@ -55,10 +55,10 @@ public:
     BasicInformationCluster(OptionalAttributesSet optionalAttributeSet,
                             DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = nullptr) :
         DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }),
-        mEnabledOptionalAttributes(optionalAttributeSet),
-        mDeviceInfoProvider(deviceInfoProvider)
+        mEnabledOptionalAttributes(optionalAttributeSet), mDeviceInfoProvider(deviceInfoProvider)
     {
-        mEnabledOptionalAttributes.Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
+        mEnabledOptionalAttributes
+            .Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
     }
 
     OptionalAttributesSet & OptionalAttributes() { return mEnabledOptionalAttributes; }
