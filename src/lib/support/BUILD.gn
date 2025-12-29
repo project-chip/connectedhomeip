@@ -98,6 +98,8 @@ source_set("arg_parser") {
   public_deps = [
     ":memory",
     ":safeint",
+    ":support",
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",
