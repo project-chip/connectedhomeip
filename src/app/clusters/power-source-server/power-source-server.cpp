@@ -164,13 +164,11 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     if (endpointList.size() == 0)
     {
         sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
-        sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
-    }
-    return CHIP_NO_ERROR;
+
+    sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
+    return sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
 }
 const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSourceClusterEndpoint) const
 {

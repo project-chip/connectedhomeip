@@ -57,7 +57,7 @@ void ApplicationInit()
     if ((!appPipePath.empty()) && (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
     gCameraDevice.Init();
@@ -70,7 +70,7 @@ void ApplicationShutdown()
 {
     CameraAppShutdown();
 
-    sChipNamedPipeCommands.Stop();
+    TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])

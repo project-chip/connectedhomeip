@@ -26,7 +26,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>
@@ -35,6 +34,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #endif
 
 #include <app/server/Dnssd.h>
@@ -69,6 +69,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mDataModelProvider         = params.dataModelProvider;
 
     // Initialize the system state. Note that it is left in a somewhat
     // special state where it is initialized, but has a ref count of 0.
@@ -102,10 +103,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
-
-    // re-initialization keeps any previously initialized values. The only place where
-    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
-    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    params.dataModelProvider         = mDataModelProvider;
 
     return InitSystemState(params);
 }
@@ -333,7 +331,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .groupDataProvider         = stateParams.groupDataProvider,
         // Don't provide an MRP local config, so each CASE initiation will use
         // the then-current value.
-        .mrpLocalConfig = NullOptional,
+        .mrpLocalConfig            = NullOptional,
+        .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
@@ -480,6 +479,7 @@ void DeviceControllerFactory::Shutdown()
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
     mSessionResumptionStorage  = nullptr;
+    mDataModelProvider         = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -562,6 +562,7 @@ void DeviceControllerSystemState::Shutdown()
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
 
     // Shut down the TransportMgr. This holds Inet::UDPEndPoints so it must be shut down
     // before PlatformMgr().Shutdown() shuts down Inet.

@@ -85,6 +85,20 @@ source_set("safeint") {
   sources = [ "SafeInt.h" ]
 }
 
+source_set("numeric-primitives") {
+  sources = [
+    "attribute-storage-null-handling.h",
+    "odd-sized-integers.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 source_set("memory") {
   sources = [
     "CHIPMem.cpp",
@@ -172,11 +186,32 @@ source_set("testing") {
 }
 
 source_set("type-traits") {
-  sources = [ "TypeTraits.h" ]
+  sources = [
+    "CompileTimeString.h",
+    "FunctionTraits.h",
+    "TypeTraits.h",
+  ]
 }
 
 source_set("static-support") {
   sources = [ "static_support_smart_ptr.h" ]
+}
+
+source_set("timer-delegate") {
+  sources = [ "TimerDelegate.h" ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("timer-delegate-mock") {
+  sources = [ "TimerDelegateMock.h" ]
+  public_deps = [
+    ":timer-delegate",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 static_library("support") {
@@ -196,8 +231,6 @@ static_library("support") {
     "BytesCircularBuffer.h",
     "BytesToHex.cpp",
     "BytesToHex.h",
-    "CHIPArgParser.cpp",
-    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
     "CommonIterator.h",
@@ -211,7 +244,6 @@ static_library("support") {
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
-    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
     "IntrusiveList.h",
@@ -263,6 +295,13 @@ static_library("support") {
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
   ]
+
+  if (chip_config_enable_arg_parser) {
+    sources += [
+      "CHIPArgParser.cpp",
+      "CHIPArgParser.hpp",
+    ]
+  }
 
   if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {

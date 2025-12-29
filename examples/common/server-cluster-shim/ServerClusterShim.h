@@ -18,7 +18,6 @@
 
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <app/util/AttributesChangedListener.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <optional>
@@ -52,7 +51,7 @@ public:
     ~ServerClusterShim() override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataVersion GetDataVersion(const ConcreteClusterPath & path) const override;
     BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override

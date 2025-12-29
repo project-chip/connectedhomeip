@@ -28,9 +28,9 @@ source_set("software-fault-listener") {
 
 source_set("software-diagnostics-server") {
   sources = [
-    "software-diagnostics-cluster.h",
-    "software-diagnostics-logic.cpp",
-    "software-diagnostics-logic.h",
+    "SoftwareDiagnosticsCluster.h",
+    "SoftwareDiagnosticsLogic.cpp",
+    "SoftwareDiagnosticsLogic.h",
   ]
 
   public_deps = [

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -87,7 +87,7 @@ void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -98,7 +98,7 @@ void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
             .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterPushAvStreamTransportPluginServerInitCallback() {}
@@ -117,7 +117,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
         cluster->SetDelegate(delegate);
-        cluster->Init();
+        TEMPORARY_RETURN_IGNORED cluster->Init();
     }
 }
 

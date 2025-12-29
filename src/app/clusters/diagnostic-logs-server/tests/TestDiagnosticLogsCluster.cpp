@@ -22,6 +22,7 @@
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
+#include <app/server-cluster/testing/MockCommandHandler.h>
 #include <lib/support/Span.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
@@ -35,72 +36,6 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr EndpointId kRootEndpoint = 0;
-
-class MockCommandHandler : public CommandHandler
-{
-public:
-    ~MockCommandHandler() override {}
-
-    struct ResponseRecord
-    {
-        ConcreteCommandPath path;
-        CommandId commandId;
-        chip::System::PacketBufferHandle encodedData;
-    };
-
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
-                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                                 const char * context = nullptr) override
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                   const char * context = nullptr) override
-    {
-        CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-    }
-
-    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
-
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const DataModel::EncodableToTLV & aEncodable) override
-    {
-        chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
-        TLV::TLVWriter baseWriter;
-        baseWriter.Init(handle->Start(), handle->MaxDataLength());
-        DataModel::FabricAwareTLVWriter writer(baseWriter, /*fabricIndex*/ 1);
-        TLV::TLVType ct;
-        ReturnErrorOnFailure(
-            static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
-        ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(app::CommandDataIB::Tag::kFields)));
-        ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
-        handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
-        mResponse.path        = aRequestCommandPath;
-        mResponse.commandId   = aResponseCommandId;
-        mResponse.encodedData = std::move(handle);
-        return CHIP_NO_ERROR;
-    }
-
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const DataModel::EncodableToTLV & aEncodable) override
-    {
-        (void) AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
-    }
-
-    bool IsTimedInvoke() const override { return false; }
-    void FlushAcksRightAwayOnSlowCommand() override {}
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return Access::SubjectDescriptor{}; }
-    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
-
-    const ResponseRecord & GetResponse() const { return mResponse; }
-
-private:
-    ResponseRecord mResponse;
-    FabricIndex mFabricIndex = 0;
-};
 
 class MockDelegate : public DiagnosticLogs::DiagnosticLogsProviderDelegate
 {
@@ -150,25 +85,11 @@ private:
     uint16_t bufferSize        = 0;
 };
 
-static Commands::RetrieveLogsResponse::DecodableType DecodeRetrieveLogsResponse(const MockCommandHandler::ResponseRecord & rec)
+static Commands::RetrieveLogsResponse::DecodableType DecodeRetrieveLogsResponse(const Testing::MockCommandHandler & handler)
 {
-    TLV::TLVReader reader;
-    reader.Init(rec.encodedData->Start(), static_cast<uint32_t>(rec.encodedData->DataLength()));
-
-    CHIP_ERROR err = reader.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    TLV::TLVReader outer;
-    err = reader.OpenContainer(outer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    err = outer.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(IsContextTag(outer.GetTag()));
-    EXPECT_EQ(TagNumFromTag(outer.GetTag()), chip::to_underlying(CommandDataIB::Tag::kFields));
-
     Commands::RetrieveLogsResponse::DecodableType decoded;
-    EXPECT_EQ(decoded.Decode(outer), CHIP_NO_ERROR);
+    CHIP_ERROR err = handler.DecodeResponse(decoded);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     return decoded;
 }
 
@@ -188,10 +109,13 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_WithDelegate_Success)
     diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
+    Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
+    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kSuccess);
     size_t logContentSize = decoded.logContent.size();
     EXPECT_EQ(logContentSize, sizeof(buffer));
@@ -208,11 +132,14 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted)
     diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
+    Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
+    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
     size_t logContentSize = decoded.logContent.size();
     EXPECT_EQ(logContentSize, sizeof(buffer));
@@ -228,11 +155,14 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greate
     diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
+    Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
+    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
     size_t logContentSize = decoded.logContent.size();
 
@@ -245,10 +175,13 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
     DiagnosticLogsCluster diagnosticLogsCluster;
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
+    Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
+    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
 }
 
@@ -262,10 +195,13 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
     diagnosticLogsCluster.SetDelegate(&delegate);
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
+    Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
+    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
 }
 
@@ -274,11 +210,14 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
     DiagnosticLogsCluster diagnosticLogsCluster;
 
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    MockCommandHandler handler;
+    Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
-    EXPECT_EQ(handler.GetResponse().commandId, DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler.GetResponse());
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
+    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
+    auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
 }
 

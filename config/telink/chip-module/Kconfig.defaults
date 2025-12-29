@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023-2024 Project CHIP Authors
+#   Copyright (c) 2023-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -68,21 +68,21 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
+    default 4864 if SOC_RISCV_TELINK_W91
     default 3240 if PM || SOC_RISCV_TELINK_TL321X
-    default 4608 if SOC_RISCV_TELINK_W91 && !ZEPHYR_VERSION_3_3
     default 4096
 
 config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 512 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 560 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config ISR_STACK_SIZE
     default 800 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-    default 664 if PM
+    default 664 if PM && !SOC_RISCV_TELINK_W91
 
 config HEAP_MEM_POOL_SIZE
     default 256 if ZEPHYR_VERSION_3_3
@@ -97,25 +97,33 @@ config NET_IPV6_MLD
     default n if PM
     default y
 
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
+
 config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 8 if PM
     default 15
 
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
+
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 16 if SOC_RISCV_TELINK_W91
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 16 if SOC_RISCV_TELINK_W91
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -163,7 +171,7 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 896 if BT_W91
+    default 1024 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 664 if BT_B9X || BT_TLX
@@ -244,6 +252,13 @@ config RISCV_MTVEC_VECTORED_MODE
 config CHIP_OTA_REQUESTOR
     default y
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
@@ -269,7 +284,7 @@ config NVS_LOOKUP_CACHE
 
 config NVS_LOOKUP_CACHE_SIZE
     default 400  if SOC_RISCV_TELINK_TL321X
-    default 2048 if !PM
+    default 2048 if !PM || SOC_RISCV_TELINK_W91
 
 # Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
 # nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
@@ -344,9 +359,11 @@ config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
+    default 1200 if SOC_RISCV_TELINK_W91
     default 600 if PM || SOC_RISCV_TELINK_TL321X
 
 config NET_RX_STACK_SIZE
+    default 2048 if SOC_RISCV_TELINK_W91
     default 664 if PM || SOC_RISCV_TELINK_TL321X
 
 # Disable certain parts of Zephyr IPv6 stack
@@ -440,17 +457,8 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 config NET_MGMT_EVENT_STACK_SIZE
     default 2048
 
-if !ZEPHYR_VERSION_3_3
-config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
-    int "Size of RX work queue stack"
-    default 2400 if TELINK_W91_IPC_DISPATCHER
-endif
-
 config TELINK_W91_WIFI_EVENT_THREAD_STACK_SIZE
     default 1136
-
-config IPC_SERVICE_ICMSG_WORK_QUEUE_STACK_SIZE
-    default 544
 
 endif # CHIP_WIFI
 

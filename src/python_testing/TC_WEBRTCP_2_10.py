@@ -50,8 +50,8 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.10] Validate SolicitOffer OriginatingEndpointID storage"
 
     def steps_TC_WEBRTCP_2_10(self) -> list[TestStep]:
-        steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+        return [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid parameters from a specific endpoint ID",
@@ -59,10 +59,9 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
             TestStep(3, "TH reads currentSessions attribute from WebRTCTransportProvider on DUT",
                      "Verify the WebRTCSession entry has PeerEndpointID matching the OriginatingEndpointID from step 2"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_10(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -70,7 +69,10 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTCP_2_10(self):
@@ -80,7 +82,7 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
         # Use a specific originating endpoint ID to test storage
         originating_endpoint_id = 5
 

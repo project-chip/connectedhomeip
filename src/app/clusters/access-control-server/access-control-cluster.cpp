@@ -440,10 +440,9 @@ CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void AccessControlCluster::Shutdown()
+void AccessControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
-    DefaultServerCluster::Shutdown();
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
@@ -454,6 +453,7 @@ void AccessControlCluster::Shutdown()
 #endif
 
     GetAccessControl().RemoveEntryListener(*this);
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -639,19 +639,16 @@ std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewF
     CHIP_ERROR err = GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
         commandObj->GetAccessingFabricIndex(), entries, token);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
-        response.token = token;
-        commandObj->AddResponse(commandPath, response);
-    }
-    else
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
         return Protocols::InteractionModel::ClusterStatusCode(err);
     }
 
-    return Protocols::InteractionModel::Status::Success;
+    Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
+    response.token = token;
+    commandObj->AddResponse(commandPath, response);
+    return std::nullopt;
 }
 
 void AccessControlCluster::MarkCommissioningRestrictionListChanged()

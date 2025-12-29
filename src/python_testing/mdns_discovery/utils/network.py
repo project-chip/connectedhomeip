@@ -21,21 +21,21 @@ import logging
 import ifaddr
 from zeroconf import InterfaceChoice
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def get_host_ipv6_addresses():
     """
     Retrieves a list of valid IPv6 addresses for all network interfaces on the host.
 
-    This function scans all network adapters for assigned IPv6 addresses and filters out 
-    unusable ones such as loopback (::1) and invalid addresses. It includes both link-local 
+    This function scans all network adapters for assigned IPv6 addresses and filters out
+    unusable ones such as loopback (::1) and invalid addresses. It includes both link-local
     (with interface scope) and routable (ULA or global) IPv6 addresses.
 
     Returns:
         list[str] | InterfaceChoice:
             - A list of formatted IPv6 addresses (with scope if required), or
-            - InterfaceChoice.All if no usable IPv6 addresses are found, in which case Zeroconf's 
+            - InterfaceChoice.All if no usable IPv6 addresses are found, in which case Zeroconf's
               default interface selection behavior will apply.
     """
     results = []
@@ -68,8 +68,8 @@ def get_host_ipv6_addresses():
                     results.append(base_addr)
 
     if not results:
-        logger.info("Returning Zeroconf's interface defaults")
+        log.info("Returning Zeroconf's interface defaults")
         return InterfaceChoice.All
 
-    logger.info(f"Discovered IPv6 addresses: {results}")
+    log.info(f"Discovered IPv6 addresses: {results}")
     return results

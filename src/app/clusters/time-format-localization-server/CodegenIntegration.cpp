@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
+#include <app/clusters/time-format-localization-server/TimeFormatLocalizationCluster.h>
 #include <app/static-cluster-config/TimeFormatLocalization.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
@@ -94,7 +95,6 @@ void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // register a singleton server (root endpoint only)
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
         {
@@ -108,12 +108,11 @@ void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
         integrationDelegate);
 }
 
-void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
+void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType shutdownType)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // register a singleton server (root endpoint only)
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {
@@ -122,7 +121,7 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
             .fixedClusterInstanceCount = TimeFormatLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterTimeFormatLocalizationPluginServerInitCallback() {}

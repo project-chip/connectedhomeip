@@ -48,17 +48,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-class ContextAttributesChangeListener : public AttributesChangedListener
-{
-public:
-    ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
-    {}
-    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
-
-private:
-    DataModel::ProviderChangeListener & mListener;
-};
-
 /// Attempts to read via an attribute access interface (AAI)
 ///
 /// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success).
@@ -181,7 +170,7 @@ CHIP_ERROR ServerClusterShim::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ServerClusterShim::Shutdown()
+void ServerClusterShim::Shutdown(ClusterShutdownType)
 {
     mContext = nullptr;
 }
@@ -330,8 +319,6 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
     }
 
-    ContextAttributesChangeListener changeListener(mContext->interactionContext);
-
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
@@ -341,7 +328,8 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         {
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
-            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId, &changeListener);
+            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
+                                    &mContext->interactionContext.dataModelChangeListener);
         }
         return *aai_result;
     }
@@ -360,7 +348,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
 
     Protocols::InteractionModel::Status status;
     EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
-    dataInput.SetChangeListener(&changeListener);
+    dataInput.SetChangeListener(&mContext->interactionContext.dataModelChangeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))

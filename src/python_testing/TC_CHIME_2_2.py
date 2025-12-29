@@ -33,6 +33,20 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device chime
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
@@ -48,25 +62,23 @@ class TC_CHIME_2_2(MatterBaseTest, CHIMETestBase):
         return "[TC-CHIME-2.2] Verify that Chime can be enabled"
 
     def steps_TC_CHIME_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the Enabled attribute, store as myEnabled"),
             TestStep(3, "Write to the DUT a new value that is !myEnabled"),
             TestStep(4, "Read the Enabled attribute, verify it was as written in Step 3"),
         ]
-        return steps
 
     def pics_TC_CHIME_2_2(self) -> list[str]:
-        pics = [
+        return [
             "CHIME.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_2(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

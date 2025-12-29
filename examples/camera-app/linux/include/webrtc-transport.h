@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 
+#include <mutex>
 #include <string>
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
@@ -105,9 +106,9 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    std::vector<std::string> GetCandidates() { return mLocalCandidates; }
+    const std::vector<ICECandidateInfo> & GetCandidates() { return mLocalCandidates; }
 
-    void SetCandidates(std::vector<std::string> candidates) { mLocalCandidates = candidates; }
+    void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
 
@@ -119,7 +120,7 @@ public:
 
     // WebRTC Callbacks
     void OnLocalDescription(const std::string & sdp, SDPType type);
-    void OnICECandidate(const std::string & candidate);
+    void OnICECandidate(const ICECandidateInfo & candidateInfo);
     void OnConnectionStateChanged(bool connected);
     void OnTrack(std::shared_ptr<WebRTCTrack> track);
 
@@ -138,9 +139,11 @@ private:
 
     std::string mLocalSdp;
     SDPType mLocalSdpType;
-    std::vector<std::string> mLocalCandidates;
+    std::vector<ICECandidateInfo> mLocalCandidates;
 
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+
+    std::mutex mTrackStatusLock;
 };

@@ -14,7 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import time
+
+import asyncio
 
 from mobly import asserts
 
@@ -61,12 +62,12 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
                                                                 cluster=Clusters.TimeSynchronization.id)]
                                                             )
         acl.append(new_acl_entry)
-        await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(acl))])
+        await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(acl))])
 
     async def ReadFromTrustedTimeSource(self):
         # Give the node a couple of seconds to reach out and set itself up
         # TODO: Subscribe to granularity instead.
-        time.sleep(6)
+        await asyncio.sleep(6)
         ret = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
         asserts.assert_not_equal(ret, NullValue, "Returned time is null")
         ret = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.Granularity)

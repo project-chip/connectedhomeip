@@ -79,7 +79,8 @@ distDir = os.path.abspath(args.dist_dir)
 # for the installable package.
 tmpDir = os.path.join(buildDir, "matter-wheel-components")
 
-manifest = json.load(open(manifestFile, "r"))
+with open(manifestFile) as f:
+    manifest = json.load(f)
 
 try:
 
@@ -132,7 +133,7 @@ try:
             "License :: OSI Approved :: Apache Software License",
             "Programming Language :: Python :: 3"
         ],
-        python_requires=">=3.7",
+        python_requires=">=3.11",
         packages=packages,
         package_dir={
             # By default, look in the tmp directory for packages/modules to be included.
@@ -143,17 +144,14 @@ try:
                 libName
             ]
         } if libName else {},
-        scripts=[name for name in map(
-            lambda script: os.path.join(tmpDir, script.installName),
-            installScripts
-        )],
+        scripts=[os.path.join(tmpDir, script.installName) for script in installScripts],
         install_requires=requiredPackages,
         options={
             'bdist_wheel': {
                 'universal': False,
                 # Place the generated .whl in the dist directory.
                 'dist_dir': distDir,
-                'py_limited_api': 'cp37',
+                'py_limited_api': 'cp311',
                 'plat_name': args.plat_name,
             },
             'egg_info': {

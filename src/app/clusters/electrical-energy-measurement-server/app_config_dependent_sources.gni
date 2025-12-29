@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "EnergyReportingTestEventTriggerHandler.h",
-  "electrical-energy-measurement-server.cpp",
   "electrical-energy-measurement-server.h",
 ]

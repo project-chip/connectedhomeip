@@ -163,8 +163,7 @@ class PICSChecker():
         value = self.__remove_comments(value)
         value = self.__remove_control_characters(value)
         value = self.__remove_whitespaces(value)
-        value = self.__make_lowercase(value)
-        return value
+        return self.__make_lowercase(value)
 
     def __remove_comments(self, value: str) -> str:
         return value if not value else value.split(_COMMENT_CHARACTER, 1)[0]
@@ -181,7 +180,6 @@ class PICSChecker():
     def __normalize(self, token: str):
         # Convert to all-lowercase so people who mess up cases don't have things
         # break on them in subtle ways.
-        token = self.__make_lowercase(token)
+        return self.__make_lowercase(token)
 
         # TODO strip off "(Additional Context)" bits from the end of the code.
-        return token

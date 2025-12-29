@@ -29,13 +29,23 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <functional>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
 #include <vector>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PushAvStreamTransport {
+class PushAvStreamTransportManager; // Forward declaration
+} // namespace PushAvStreamTransport
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 static constexpr int kInvalidZoneId      = -1;
 static constexpr int kDefaultSensitivity = 5;
@@ -73,7 +83,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity, bool isZoneBasedTrigger = false);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -116,17 +126,27 @@ public:
         mPushAvStreamTransportServer = server;
     }
 
+    void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
+    {
+        mPushAvStreamTransportManager = manager;
+    }
+
     void ConfigureRecorderTimeSetting(
         const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType &
             timeControl);
 
-private:
-    bool mHasAugmented                                                              = false;
-    bool mStreaming                                                                 = false;
-    std::unique_ptr<PushAVClipRecorder> mRecorder                                   = nullptr;
-    std::unique_ptr<PushAVUploader> mUploader                                       = nullptr;
-    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
+    void SetFabricIndex(chip::FabricIndex accessingFabricIndex) { mFabricIndex = accessingFabricIndex; }
 
+    void StartNewSession(uint64_t newSessionID);
+
+private:
+    bool mHasAugmented                                                                                       = false;
+    bool mStreaming                                                                                          = false;
+    std::unique_ptr<PushAVClipRecorder> mRecorder                                                            = nullptr;
+    std::unique_ptr<PushAVUploader> mUploader                                                                = nullptr;
+    chip::FabricIndex mFabricIndex                                                                           = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer                          = nullptr;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mPushAvStreamTransportManager = nullptr;
     std::chrono::steady_clock::time_point mBlindStartTime;
     PushAVClipRecorder::ClipInfoStruct mClipInfo;
     PushAVClipRecorder::AudioInfoStruct mAudioInfo;
@@ -148,5 +168,7 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    uint32_t mCurrentlyUsedBandwidthbps = 0;
+    uint32_t mCurrentlyUsedBandwidthbps    = 0;
+    bool mActivationTimeSetByManualTrigger = false;
+    bool mIsZoneBasedTrigger               = false;
 };

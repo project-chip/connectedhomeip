@@ -43,6 +43,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_RVCCLEANM_1_2(MatterBaseTest):
     def __init__(self, *args):
@@ -80,7 +82,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             self.print_step(2, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            logging.info("SupportedModes: %s" % (supported_modes))
+            log.info("SupportedModes: %s" % (supported_modes))
 
             # Verify that the list has at least 2 and at most 255 entries
             asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
@@ -143,7 +145,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             self.print_step(3, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
+            log.info("CurrentMode: %s" % (current_mode))
             asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
 
 

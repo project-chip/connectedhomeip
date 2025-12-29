@@ -74,21 +74,27 @@ if CHIP_APP_BLE_MANAGER
 
     endchoice # CHIP_APP_BLE_MANAGER
 
-    config CHIP_APP_EXTRA_GATT_DB_HEADER
-        string "Extra application Gatt db header"
-        default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_db.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-        depends on CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
-        help
+endif # CHIP_APP_BLE_MANAGER
+
+config CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
+    bool "Enable customization of GATT service on MCXW platform"
+    default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+    help
+        Enable customization of GATT service on MCXW platform
+
+if CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
+config CHIP_APP_EXTRA_GATT_DB_HEADER
+    string "Extra application Gatt db header"
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_db.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
         Set path to extra application Gatt db header.
 
-    config CHIP_APP_EXTRA_GATT_UUID_HEADER
-        string "Extra application Gatt UUID header"
-        default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_uuid128.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-        depends on CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
-        help
+config CHIP_APP_EXTRA_GATT_UUID_HEADER
+    string "Extra application Gatt UUID header"
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_uuid128.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
         Set path to extra application Gatt UUID header.
-
-endif # CHIP_APP_BLE_MANAGER
+endif
 
 config DIAG_LOGS_DEMO
 	bool "Diagnostic log demo"
@@ -256,11 +262,11 @@ if CHIP_APP_OTA_REQUESTOR
     choice CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
         prompt "Select OTA Requestor Initiator"
 
-        config CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE
-            bool "OTA Requestor Initiator Multi-Image"
+        config CHIP_APP_OTA_REQUESTOR_INITIATOR_EMPTY_SELF_TEST
+            bool "OTA Requestor Initiator Empty Self Test"
             depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
             help
-                Enable OTA Requestor Initiator for multiple image OTA SW update.
+                Enable OTA Requestor Initiator with an empty self test function for OTA SW update.
 
         config CHIP_APP_OTA_REQUESTOR_INITIATOR_FREERTOS
             bool "OTA Requestor Initiator FreeRTOS"
@@ -283,6 +289,12 @@ if CHIP_APP_OTA_REQUESTOR
             Use platform OtaUtils.cpp file.
 
 endif # CHIP_APP_OTA_REQUESTOR
+
+config CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
+	bool "Registration of simple test event trigger delegate"
+	default y if CHIP_ENABLE_ICD_SUPPORT
+	help
+	  Enable registration of a simple test event trigger delegate, ONLY enable it for matter certification testing.
 
 config CHIP_APP_RPC
     bool "App RPC"

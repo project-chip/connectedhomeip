@@ -18,26 +18,32 @@
 Handles linux-specific functionality for running test cases
 """
 
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 import pathlib
+import shlex
 import subprocess
 import sys
 import threading
 import time
+from typing import IO, Any, Union
 
 import sdbus
 
-from .test_definition import ApplicationPaths
+from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
+
+log = logging.getLogger(__name__)
 
 test_environ = os.environ.copy()
 
 
-def EnsureNetworkNamespaceAvailability():
+def ensure_network_namespace_availability():
     if os.getuid() == 0:
-        logging.debug("Current user is root")
-        logging.warning("Running as root and this will change global namespaces.")
+        log.debug("Current user is root")
+        log.warning("Running as root and this will change global namespaces.")
         return
 
     os.execvpe(
@@ -46,19 +52,19 @@ def EnsureNetworkNamespaceAvailability():
         test_environ)
 
 
-def EnsurePrivateState():
-    logging.info("Ensuring /run is privately accessible")
+def ensure_private_state():
+    log.info("Ensuring /run is privately accessible")
 
-    logging.debug("Making / private")
+    log.debug("Making / private")
     if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
-        logging.error("Failed to make / private")
-        logging.error("Are you using --privileged if running in docker?")
+        log.error("Failed to make / private")
+        log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
-    logging.debug("Remounting /run")
+    log.debug("Remounting /run")
     if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
-        logging.error("Failed to mount /run as a temporary filesystem")
-        logging.error("Are you using --privileged if running in docker?")
+        log.error("Failed to mount /run as a temporary filesystem")
+        log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
 
@@ -69,136 +75,146 @@ class IsolatedNetworkNamespace:
     # in the simulated isolated network.
     COMMANDS_SETUP = [
         # Create 2 virtual hosts: for app and for the tool
-        "ip netns add app",
-        "ip netns add tool",
+        "ip netns add app-{index}",
+        "ip netns add tool-{index}",
 
         # Create links for switch to net connections
-        "ip link add {app_link_name} type veth peer name {app_link_name}-switch",
-        "ip link add {tool_link_name} type veth peer name {tool_link_name}-switch",
-        "ip link add eth-ci type veth peer name eth-ci-switch",
+        "ip link add {app_link_name}-{index} type veth peer name {app_link_name}-sw-{index}",
+        "ip link add {tool_link_name}-{index} type veth peer name {tool_link_name}-sw-{index}",
+        "ip link add eth-ci-{index} type veth peer name eth-ci-sw-{index}",
 
         # Link the connections together
-        "ip link set {app_link_name} netns app",
-        "ip link set {tool_link_name} netns tool",
+        "ip link set {app_link_name}-{index} netns app-{index}",
+        "ip link set {tool_link_name}-{index} netns tool-{index}",
 
         # Bridge all the connections together.
-        "ip link add name br1 type bridge",
-        "ip link set br1 up",
-        "ip link set {app_link_name}-switch master br1",
-        "ip link set {tool_link_name}-switch master br1",
-        "ip link set eth-ci-switch master br1",
+        "ip link add name br1-{index} type bridge",
+        "ip link set br1-{index} up",
+        "ip link set {app_link_name}-sw-{index} master br1-{index}",
+        "ip link set {tool_link_name}-sw-{index} master br1-{index}",
+        "ip link set eth-ci-sw-{index} master br1-{index}",
 
         # Create link between virtual host 'tool' and the test runner
-        "ip addr add 10.10.10.5/24 dev eth-ci",
-        "ip link set dev eth-ci up",
-        "ip link set dev eth-ci-switch up",
+        "ip addr add 10.10.10.5/24 dev eth-ci-{index}",
+        "ip link set dev eth-ci-{index} up",
+        "ip link set dev eth-ci-sw-{index} up",
     ]
 
     # Bring up application connection link.
     COMMANDS_APP_LINK_UP = [
-        "ip netns exec app ip addr add 10.10.10.1/24 dev {app_link_name}",
-        "ip netns exec app ip link set dev {app_link_name} up",
-        "ip netns exec app ip link set dev lo up",
-        "ip link set dev {app_link_name}-switch up",
+        "ip netns exec app-{index} ip addr add 10.10.10.1/24 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} ip link set dev {app_link_name}-{index} up",
+        "ip netns exec app-{index} ip link set dev lo up",
+        "ip link set dev {app_link_name}-sw-{index} up",
         # Force IPv6 to use ULAs that we control.
-        "ip netns exec app ip -6 addr flush {app_link_name}",
-        "ip netns exec app ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}",
+        "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
+        "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
 
     ]
 
     # Bring up tool (controller) connection link.
     COMMANDS_TOOL_LINK_UP = [
-        "ip netns exec tool ip addr add 10.10.10.2/24 dev {tool_link_name}",
-        "ip netns exec tool ip link set dev {tool_link_name} up",
-        "ip netns exec tool ip link set dev lo up",
-        "ip link set dev {tool_link_name}-switch up",
+        "ip netns exec tool-{index} ip addr add 10.10.10.2/24 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip link set dev {tool_link_name}-{index} up",
+        "ip netns exec tool-{index} ip link set dev lo up",
+        "ip link set dev {tool_link_name}-sw-{index} up",
         # Force IPv6 to use ULAs that we control.
-        "ip netns exec tool ip -6 addr flush {tool_link_name}",
-        "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}",
+        "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
     ]
 
     # Commands for removing namespaces previously created.
     COMMANDS_TERMINATE = [
-        "ip link set dev eth-ci down",
-        "ip link set dev eth-ci-switch down",
-        "ip addr del 10.10.10.5/24 dev eth-ci",
+        "ip link set dev eth-ci-{index} down",
+        "ip link set dev eth-ci-sw-{index} down",
+        "ip addr del 10.10.10.5/24 dev eth-ci-{index}",
 
-        "ip link set br1 down",
-        "ip link delete br1",
+        "ip link set br1-{index} down",
+        "ip link delete br1-{index}",
 
-        "ip link delete eth-ci-switch",
-        "ip link delete {tool_link_name}-switch",
-        "ip link delete {app_link_name}-switch",
+        "ip link delete eth-ci-sw-{index}",
+        "ip link delete {tool_link_name}-sw-{index}",
+        "ip link delete {app_link_name}-sw-{index}",
 
-        "ip netns del tool",
-        "ip netns del app",
+        "ip netns del tool-{index}",
+        "ip netns del app-{index}",
     ]
 
-    def __init__(self, setup_app_link_up=True, setup_tool_link_up=True,
-                 app_link_name='eth-app', tool_link_name='eth-tool',
-                 unshared=False):
-
-        if not unshared:
-            # If not running in an unshared network namespace yet, try
-            # to rerun the script with the 'unshare' command.
-            EnsureNetworkNamespaceAvailability()
-        else:
-            EnsurePrivateState()
-
+    def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
+                 app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool'):
+        self.index = index
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
 
-        self.setup()
-        if setup_app_link_up:
-            self.setup_app_link_up(wait_for_dad=False)
-        if setup_tool_link_up:
-            self.setup_tool_link_up(wait_for_dad=False)
-        self._wait_for_duplicate_address_detection()
+        try:
+            self._setup()
+            if setup_app_link_up:
+                self.setup_app_link_up(wait_for_dad=False)
+            if setup_tool_link_up:
+                self._setup_tool_link_up(wait_for_dad=False)
+            self._wait_for_duplicate_address_detection()
+        except BaseException:
+            # Ensure that we leave a clean state on any exception.
+            self.terminate()
+            raise
+
+    def netns_for_subprocess_kind(self, kind: SubprocessKind):
+        return "{}-{}".format(kind.name.lower(), self.index)
 
     def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-        logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
+        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                logging.info('No more tentative addresses')
+                log.info("No more tentative addresses")
                 break
             time.sleep(0.1)
         else:
-            logging.warning("Some addresses look to still be tentative")
+            log.warning("Some addresses look to still be tentative")
 
-    def setup(self):
-        for command in self.COMMANDS_SETUP:
-            self.run(command)
+    def _setup(self):
+        self._run(*self.COMMANDS_SETUP)
 
-    def setup_app_link_up(self, wait_for_dad=True):
-        for command in self.COMMANDS_APP_LINK_UP:
-            self.run(command)
+    def setup_app_link_up(self, wait_for_dad: bool = True):
+        self._run(*self.COMMANDS_APP_LINK_UP)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def setup_tool_link_up(self, wait_for_dad=True):
-        for command in self.COMMANDS_TOOL_LINK_UP:
-            self.run(command)
+    def _setup_tool_link_up(self, wait_for_dad: bool = True):
+        self._run(*self.COMMANDS_TOOL_LINK_UP)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def run(self, command: str):
-        command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name)
-        logging.debug("Executing: %s", command)
-        if subprocess.run(command.split()).returncode != 0:
-            logging.error("Failed to execute '%s'" % command)
-            logging.error("Are you using --privileged if running in docker?")
-            sys.exit(1)
+    def _run(self, *command: str):
+        for c in command:
+            c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
+            log.debug("Executing: '%s'", c)
+            if subprocess.run(shlex.split(c)).returncode != 0:
+                raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
 
     def terminate(self):
-        for command in self.COMMANDS_TERMINATE:
-            self.run(command)
+        """Execute all down commands gracefully omitting errors."""
+        for cmd in self.COMMANDS_TERMINATE:
+            try:
+                self._run(cmd)
+            except Exception as e:
+                log.warning("Encountered error during namespace termination: %s", e)
 
 
-class DBusTestSystemBus(subprocess.Popen):
+class LinuxNamespacedExecutor(Executor):
+    def __init__(self, ns: IsolatedNetworkNamespace):
+        super().__init__()
+        self.ns = ns
+
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
+            stderr: IO[Any] | LogPipe | None = None):
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
+        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
+
+
+class DBusTestSystemBus(subprocess.Popen[bytes]):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
     SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
@@ -209,6 +225,7 @@ class DBusTestSystemBus(subprocess.Popen):
                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
         # Wait for the bus to start (it will print the address to stdout).
+        assert self.stdout is not None, "stdout should have been set to subprocess.PIPE"
         self.stdout.readline()
 
     def terminate(self):
@@ -217,17 +234,18 @@ class DBusTestSystemBus(subprocess.Popen):
         self.wait()
 
 
-class BluetoothMock(subprocess.Popen):
+class BluetoothMock(subprocess.Popen[str]):
     """Run a BlueZ mock server in a subprocess."""
 
     # The MAC addresses of the virtual Bluetooth adapters.
     ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
 
     def __forward_stderr(self):
+        assert self.stderr is not None, "stderr should have been set to subprocess.PIPE"
         for line in self.stderr:
             if "adapter[1][00:00:00:22:22:22]" in line:
                 self.event.set()
-            logging.debug("%s", line.strip())
+            log.debug(line.strip())
 
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
@@ -241,6 +259,10 @@ class BluetoothMock(subprocess.Popen):
     def terminate(self):
         super().terminate()
         self.wait()
+
+
+DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
+DictVariantT = dict[str, tuple[str, DbusAnyT]]
 
 
 class WpaSupplicantMock(threading.Thread):
@@ -263,12 +285,12 @@ class WpaSupplicantMock(threading.Thread):
         path = "/fi/w1/wpa_supplicant1"
 
         @sdbus.dbus_method_async("a{sv}", "o")
-        async def CreateInterface(self, args) -> str:
+        async def CreateInterface(self, args: DictVariantT) -> str:
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
         @sdbus.dbus_method_async("s", "o")
-        async def GetInterface(self, name) -> str:
+        async def GetInterface(self, name: str) -> str:
             # Always return our pre-defined mock interface.
             return WpaSupplicantMock.WpaInterface.path
 
@@ -278,25 +300,25 @@ class WpaSupplicantMock(threading.Thread):
         state = "disconnected"
         current_network = "/"
 
-        def __init__(self, mock):
+        def __init__(self, mock: WpaSupplicantMock):
             super().__init__()
             self.mock = mock
 
         @sdbus.dbus_method_async("s")
-        async def AutoScan(self, arg):
+        async def AutoScan(self, arg: str) -> None:
             pass
 
         @sdbus.dbus_method_async("a{sv}")
-        async def Scan(self, args):
+        async def Scan(self, args: DictVariantT) -> None:
             pass
 
         @sdbus.dbus_method_async("a{sv}", "o")
-        async def AddNetwork(self, args):
+        async def AddNetwork(self, args: DictVariantT) -> str:
             # Always return our pre-defined mock network.
             return WpaSupplicantMock.WpaNetwork.path
 
         @sdbus.dbus_method_async("o")
-        async def SelectNetwork(self, path):
+        async def SelectNetwork(self, path: str) -> None:
             async def associate():
                 # Mock AP association process.
                 await self.State.set_async("associating")
@@ -307,39 +329,39 @@ class WpaSupplicantMock(threading.Thread):
             asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
-        async def RemoveNetwork(self, path):
+        async def RemoveNetwork(self, path: str) -> None:
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
-        async def RemoveAllNetworks(self):
+        async def RemoveAllNetworks(self) -> None:
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
-        async def Disconnect(self):
+        async def Disconnect(self) -> None:
             pass
 
         @sdbus.dbus_method_async()
-        async def SaveConfig(self):
+        async def SaveConfig(self) -> None:
             pass
 
         @sdbus.dbus_property_async("s")
-        def State(self):
+        def State(self) -> str:
             return self.state
 
         @State.setter_private
-        def State_setter(self, value):
+        def State_setter(self, value: str) -> None:
             self.state = value
 
         @sdbus.dbus_property_async("o")
-        def CurrentNetwork(self):
+        def CurrentNetwork(self) -> str:
             return self.current_network
 
         @CurrentNetwork.setter_private
-        def CurrentNetwork_setter(self, value):
+        def CurrentNetwork_setter(self, value: str) -> None:
             self.current_network = value
 
         @sdbus.dbus_property_async("s")
-        def CurrentAuthMode(self):
+        def CurrentAuthMode(self) -> str:
             return "WPA2-PSK"
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
@@ -347,20 +369,20 @@ class WpaSupplicantMock(threading.Thread):
         path = "/fi/w1/wpa_supplicant1/Interfaces/1/Networks/1"
         enabled = False
 
-        def __init__(self, mock):
+        def __init__(self, mock: WpaSupplicantMock):
             super().__init__()
             self.mock = mock
 
         @sdbus.dbus_property_async("a{sv}")
-        def Properties(self):
+        def Properties(self) -> DictVariantT:
             return {"ssid": ("s", self.mock.ssid)}
 
         @sdbus.dbus_property_async("b")
-        def Enabled(self):
+        def Enabled(self) -> bool:
             return self.enabled
 
         @Enabled.setter
-        def Enabled_setter(self, value):
+        def Enabled_setter(self, value: bool) -> None:
             self.enabled = value
 
     async def startup(self):
@@ -389,29 +411,3 @@ class WpaSupplicantMock(threading.Thread):
     def terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
         self.join()
-
-
-def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
-    """
-    Returns a copy of paths with updated command arrays to invoke the
-    commands in an appropriate network namespace.
-    """
-    return ApplicationPaths(
-        chip_tool='ip netns exec tool'.split() + paths.chip_tool,
-        all_clusters_app='ip netns exec app'.split() + paths.all_clusters_app,
-        lock_app='ip netns exec app'.split() + paths.lock_app,
-        fabric_bridge_app='ip netns exec app'.split() + paths.fabric_bridge_app,
-        ota_provider_app='ip netns exec app'.split() + paths.ota_provider_app,
-        ota_requestor_app='ip netns exec app'.split() + paths.ota_requestor_app,
-        tv_app='ip netns exec app'.split() + paths.tv_app,
-        lit_icd_app='ip netns exec app'.split() + paths.lit_icd_app,
-        microwave_oven_app='ip netns exec app'.split() + paths.microwave_oven_app,
-        rvc_app='ip netns exec app'.split() + paths.rvc_app,
-        network_manager_app='ip netns exec app'.split() + paths.network_manager_app,
-        energy_gateway_app='ip netns exec app'.split() + paths.energy_gateway_app,
-        energy_management_app='ip netns exec app'.split() + paths.energy_management_app,
-        bridge_app='ip netns exec app'.split() + paths.bridge_app,
-        matter_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.matter_repl_yaml_tester_cmd,
-        chip_tool_with_python_cmd='ip netns exec tool'.split() + paths.chip_tool_with_python_cmd,
-        closure_app='ip netns exec app'.split() + paths.closure_app,
-    )

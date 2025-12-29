@@ -158,7 +158,7 @@ CHIP_ERROR WhmManufacturerShutdown()
     if (gWhmManufacturer)
     {
         /* Shutdown the WhmManufacturer */
-        gWhmManufacturer->Shutdown();
+        TEMPORARY_RETURN_IGNORED gWhmManufacturer->Shutdown();
         gWhmManufacturer.reset();
     }
 
@@ -178,7 +178,7 @@ CHIP_ERROR WhmApplicationInit(EndpointId endpointId)
 CHIP_ERROR WhmApplicationShutdown()
 {
     /* Shutdown in reverse order that they were created */
-    WhmManufacturerShutdown();
+    TEMPORARY_RETURN_IGNORED WhmManufacturerShutdown();
 
     return WhmShutdown();
 }

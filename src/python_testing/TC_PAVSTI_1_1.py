@@ -49,7 +49,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
@@ -198,10 +198,14 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
         ]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PAVSTI_1_1(self):
         PICS_PRIVACY = "AVSM.S.F03"
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
         pushavAttr = Clusters.PushAvStreamTransport.Attributes
@@ -220,7 +224,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.CurrentConnections,
         )
-        logger.info(f"Rx'd CurrentConnections: {currentConnections}")
+        log.info(f"Rx'd CurrentConnections: {currentConnections}")
         if len(currentConnections) > 0:
             for connectionId in currentConnections:
                 await self.send_single_cmd(
@@ -236,7 +240,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.SupportedFormats,
         )
-        logger.info(f"Rx'd SupportedFormats: {supportedFormats}")
+        log.info(f"Rx'd SupportedFormats: {supportedFormats}")
         asserts.assert_greater_equal(
             len(supportedFormats), 1, "SupportedFormats must not be empty"
         )
@@ -258,7 +262,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedVideoStreams,
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {allocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {allocatedVideoStreams}")
         asserts.assert_true(
             len(allocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
         )
@@ -271,7 +275,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedAudioStreams,
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
         asserts.assert_true(
             len(allocatedAudioStreams) != 0, "AllocatedAudioStreams must not be empty"
         )
@@ -301,7 +305,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
             endpoint=endpoint,
         )
-        logger.info(
+        log.info(
             f"Rx'd allocatePushTransportResponse = {allocatePushTransportResponse}"
         )
 
@@ -309,7 +313,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         event_callback = EventSubscriptionHandler(expected_cluster=pushavCluster)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
-                                   self.get_endpoint(1))
+                                   self.get_endpoint())
 
         self.step(7)
         aConnectionID = (
@@ -494,7 +498,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(19)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportBegin, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
         asserts.assert_equal(event_data.triggerType, pushavCluster.Enums.TransportTriggerTypeEnum.kCommand,
                              "Unexpected value for TriggerType returned")
@@ -548,7 +552,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(23)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
 

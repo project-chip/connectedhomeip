@@ -348,7 +348,7 @@ void RegisterContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
     ChipLogError(Discovery, "Mdns: Register failure (%s)", errorStr);
     callback(context, nullptr, nullptr, err);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void RegisterContext::DispatchSuccess()
@@ -382,7 +382,7 @@ void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
         ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
     }
     callback(context, nullptr, 0, true, err);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
@@ -459,14 +459,14 @@ void BrowseWithDelegateContext::DispatchFailure(const char * errorStr, CHIP_ERRO
 
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     delegate->OnBrowseStop(err);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseWithDelegateContext::DispatchSuccess()
 {
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     delegate->OnBrowseStop(CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseWithDelegateContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain,

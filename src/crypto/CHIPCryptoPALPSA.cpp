@@ -128,6 +128,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     constexpr uint8_t kBlockSize = PSA_BLOCK_CIPHER_BLOCK_LENGTH(PSA_KEY_TYPE_AES);
     size_t block_aligned_length  = (plaintext_length / kBlockSize) * kBlockSize;
     size_t partial_block_length  = plaintext_length % kBlockSize;
+    size_t ciphertext_length     = 0;
 
     // Make sure the calculated block_aligned_length is compliant with PSA's output size requirements.
     VerifyOrReturnError(block_aligned_length == PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, block_aligned_length),
@@ -137,37 +138,45 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     {
         status = psa_aead_update(&operation, plaintext, block_aligned_length, ciphertext, block_aligned_length, &out_length);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-        ciphertext += out_length;
+        VerifyOrReturnError(out_length <= block_aligned_length, CHIP_ERROR_INTERNAL);
+        ciphertext_length += out_length;
     }
 
     if (partial_block_length > 0)
     {
-        uint8_t temp_buffer[kBlockSize];
+        uint8_t temp[kBlockSize] = { 0 };
         size_t rounded_up_length = PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, partial_block_length);
 
-        VerifyOrReturnError(rounded_up_length <= sizeof(temp_buffer), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(rounded_up_length <= sizeof(temp), CHIP_ERROR_INTERNAL);
 
         out_length = 0;
-        status     = psa_aead_update(&operation, plaintext + block_aligned_length, partial_block_length, &temp_buffer[0],
-                                     rounded_up_length, &out_length);
+        status     = psa_aead_update(&operation, plaintext + block_aligned_length, partial_block_length, temp, rounded_up_length,
+                                     &out_length);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-        VerifyOrReturnError(partial_block_length == out_length, CHIP_ERROR_INTERNAL);
-        memcpy(ciphertext, temp_buffer, partial_block_length);
-
-        ciphertext += out_length;
+        VerifyOrReturnError(ciphertext_length + out_length <= plaintext_length, CHIP_ERROR_INTERNAL);
+        // Add the encrypted output, if any
+        memcpy(&ciphertext[ciphertext_length], temp, out_length);
+        ciphertext_length += out_length;
     }
 
     if (plaintext_length != 0)
     {
-        out_length     = 0;
-        tag_out_length = 0;
+        uint8_t temp[kBlockSize] = { 0 };
 
-        status = psa_aead_finish(&operation, ciphertext, PSA_AEAD_FINISH_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &out_length, tag,
-                                 tag_length, &tag_out_length);
+        // The finish output should fit in the temp buffer
+        size_t max_finish = PSA_AEAD_FINISH_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm);
+        VerifyOrReturnError(max_finish <= sizeof(temp), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        // The finish may return the last part of the ciphertext
+        status = psa_aead_finish(&operation, temp, max_finish, &out_length, tag, tag_length, &tag_out_length);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+        // For CCM encryption, the ciphertext and plaintext length are equal
+        VerifyOrReturnError((ciphertext_length + out_length) == plaintext_length, CHIP_ERROR_INTERNAL);
+        // Add the encrypted output, if any
+        memcpy(&ciphertext[ciphertext_length], temp, out_length);
+        ciphertext_length += out_length;
     }
-
     else
     {
         out_length     = 0;
@@ -242,6 +251,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     constexpr uint8_t kBlockSize = PSA_BLOCK_CIPHER_BLOCK_LENGTH(PSA_KEY_TYPE_AES);
     size_t block_aligned_length  = (ciphertext_length / kBlockSize) * kBlockSize;
     size_t partial_block_length  = ciphertext_length % kBlockSize;
+    size_t plaintext_length      = 0;
+    uint8_t temp[kBlockSize]     = { 0 };
 
     // Make sure the calculated block_aligned_length is compliant with PSA's output size requirements.
     VerifyOrReturnError(block_aligned_length == PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, block_aligned_length),
@@ -251,33 +262,42 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     {
         status = psa_aead_update(&operation, ciphertext, block_aligned_length, plaintext, block_aligned_length, &out_length);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-        plaintext += out_length;
+        VerifyOrReturnError(out_length <= block_aligned_length, CHIP_ERROR_INTERNAL);
+        plaintext_length += out_length;
     }
 
     if (partial_block_length > 0)
     {
-        uint8_t temp_buffer[kBlockSize];
         size_t rounded_up_length = PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, partial_block_length);
-
-        VerifyOrReturnError(rounded_up_length <= sizeof(temp_buffer), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(rounded_up_length <= sizeof(temp), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         out_length = 0;
-        status     = psa_aead_update(&operation, ciphertext + block_aligned_length, partial_block_length, &temp_buffer[0],
-                                     rounded_up_length, &out_length);
+        status     = psa_aead_update(&operation, ciphertext + block_aligned_length, partial_block_length, temp, rounded_up_length,
+                                     &out_length);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-        VerifyOrReturnError(partial_block_length == out_length, CHIP_ERROR_INTERNAL);
-        memcpy(plaintext, &temp_buffer[0], partial_block_length);
-
-        plaintext += out_length;
+        VerifyOrReturnError(plaintext_length + out_length <= ciphertext_length, CHIP_ERROR_INTERNAL);
+        // Add the decrypted output, if any
+        memcpy(&plaintext[plaintext_length], temp, out_length);
+        plaintext_length += out_length;
     }
+
+    // The finish output should fit in the temp buffer
+    size_t max_verify = PSA_AEAD_VERIFY_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm);
+    VerifyOrReturnError(max_verify <= sizeof(temp), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (ciphertext_length != 0)
     {
         out_length = 0;
-        status = psa_aead_verify(&operation, plaintext, PSA_AEAD_VERIFY_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &out_length, tag,
-                                 tag_length);
+        memset(temp, 0, sizeof(temp));
+
+        status = psa_aead_verify(&operation, temp, max_verify, &out_length, tag, tag_length);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+        // For CCM decryption, the ciphertext and plaintext length are equal
+        VerifyOrReturnError((plaintext_length + out_length) == ciphertext_length, CHIP_ERROR_INTERNAL);
+        // Add the decrypted output, if any
+        memcpy(&plaintext[plaintext_length], temp, out_length);
+        plaintext_length += out_length;
     }
     else
     {
@@ -771,7 +791,7 @@ int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
          * This avoids IAR compiler warning:
          * 'the order of volatile accesses is undefined ..' */
         unsigned char x = A[i], y = B[i];
-        diff |= x ^ y;
+        diff = diff | (x ^ y);
     }
 
     return ((int) diff);

@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -531,7 +538,12 @@ cluster Binding = 30 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 2;
+  revision 3;
+
+  enum AccessControlAuxiliaryTypeEnum : enum8 {
+    kSystem = 0;
+    kGroupcast = 1;
+  }
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1 [spec_name = "PASE"];
@@ -563,6 +575,7 @@ cluster AccessControl = 31 {
   bitmap Feature : bitmap32 {
     kExtension = 0x1;
     kManagedDevice = 0x2;
+    kAuxiliary = 0x4;
   }
 
   struct AccessRestrictionStruct {
@@ -594,6 +607,7 @@ cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
+    optional fabric_sensitive AccessControlAuxiliaryTypeEnum auxiliaryType = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -625,6 +639,11 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+    nullable node_id adminNodeID = 0;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
@@ -632,6 +651,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
+  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -654,7 +674,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 5;
+  revision 6;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -692,6 +712,10 @@ cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+    optional int16u simultaneousInvocationsSupported = 2;
+    optional int16u simultaneousWritesSupported = 3;
+    optional int16u readPathsSupported = 4;
+    optional int16u subscribePathsSupported = 5;
   }
 
   struct ProductAppearanceStruct {
@@ -732,12 +756,12 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
-  readonly attribute int32u specificationVersion = 21;
-  readonly attribute int16u maxPathsPerInvoke = 22;
-  readonly attribute int32u configurationVersion = 24;
+  readonly attribute optional int32u specificationVersion = 21;
+  readonly attribute optional int16u maxPathsPerInvoke = 22;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1276,7 +1300,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 2;
+  revision 3;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1340,7 +1364,7 @@ cluster NetworkCommissioning = 49 {
     char_string<16> networkName = 2;
     int16u channel = 3;
     int8u version = 4;
-    octet_string<8> extendedAddress = 5;
+    octet_string extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
   }
@@ -1362,9 +1386,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  provisional readonly attribute optional int16u threadVersion = 10;
+  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1378,7 +1402,7 @@ cluster NetworkCommissioning = 49 {
 
   response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string debugText = 1;
+    optional long_char_string<512> debugText = 1;
     optional WiFiInterfaceScanResultStruct wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResultStruct threadScanResults[] = 3;
   }
@@ -1404,7 +1428,7 @@ cluster NetworkCommissioning = 49 {
 
   response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string<512> debugText = 1;
+    optional long_char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
     optional octet_string<140> clientIdentity = 3;
     optional octet_string<64> possessionSignature = 4;
@@ -1437,19 +1461,19 @@ cluster NetworkCommissioning = 49 {
     optional octet_string<64> possessionSignature = 1;
   }
 
-  /** Detemine the set of networks the device sees as available. */
+  /** This command is used to scan for available networks on the network interface associated with the cluster instance. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
-  /** Add or update the credentials for a given Wi-Fi network. */
+  /** This command is used to add or update a Wi-Fi network configuration. */
   command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  /** Add or update the credentials for a given Thread network. */
+  /** This command is used to add or update a Thread network configuration. */
   command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  /** Remove the definition of a given network (including its credentials). */
+  /** This command is used to remove a network configuration on the network interface associated with the cluster instance. */
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  /** Connect to the specified network, using previously-defined credentials. */
+  /** This command is used to connect to a network on the network interface associated with the cluster instance. */
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  /** Modify the order in which networks will be presented in the Networks attribute. */
+  /** This command is used to re-order the network configuration list. */
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-  /** Retrieve details about and optionally proof of possession of a network client identity. */
+  /** This command is used to query the identity of a network configuration. */
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
@@ -1501,7 +1525,7 @@ cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 2;
+  revision 3;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -1554,6 +1578,15 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
+    kDeviceLoad = 0x2;
+  }
+
+  struct DeviceLoadStruct {
+    int16u currentSubscriptions = 0;
+    int16u currentSubscriptionsForFabric = 1;
+    int32u totalSubscriptionsEstablished = 2;
+    int32u totalInteractionModelMessagesSent = 3;
+    int32u totalInteractionModelMessagesReceived = 4;
   }
 
   struct NetworkInterface {
@@ -1561,7 +1594,7 @@ cluster GeneralDiagnostics = 51 {
     boolean isOperational = 1;
     nullable boolean offPremiseServicesReachableIPv4 = 2;
     nullable boolean offPremiseServicesReachableIPv6 = 3;
-    octet_string<8> hardwareAddress = 4;
+    octet_string hardwareAddress = 4;
     octet_string IPv4Addresses[] = 5;
     octet_string IPv6Addresses[] = 6;
     InterfaceTypeEnum type = 7;
@@ -1595,6 +1628,7 @@ cluster GeneralDiagnostics = 51 {
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
+  readonly attribute optional DeviceLoadStruct deviceLoadStatus = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1618,14 +1652,14 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct PayloadTestResponse = 4 {
-    octet_string payload = 0;
+    long_octet_string<2048> payload = 0;
   }
 
-  /** Provide a means for certification tests to trigger some test-plan-specific events */
+  /** This command SHALL be supported to provide a means for certification tests to trigger some test-plan-specific events, necessary to assist in automation of device interactions for some certification test cases. */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
-  /** Take a snapshot of system time and epoch time. */
+  /** This command MAY be used by a client to obtain a correlated view of both System Time, and, if currently synchronized and supported, "wall clock time" of the server. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
-  /** Request a variable length payload response. */
+  /** This command provides a means for certification tests or manufacturer's internal tests to validate particular command handling and encoding constraints by generating a response of a given size. */
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
@@ -2388,7 +2422,7 @@ cluster UserLabel = 65 {
 }
 
 /** This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. */
-provisional cluster ZoneManagement = 1360 {
+cluster ZoneManagement = 1360 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -2516,7 +2550,7 @@ provisional cluster ZoneManagement = 1360 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-provisional cluster CameraAvStreamManagement = 1361 {
+cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -2789,7 +2823,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 }
 
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   enum PhysicalMovementEnum : enum8 {
@@ -2892,7 +2926,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 }
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
-provisional cluster WebRTCTransportProvider = 1363 {
+cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -2977,7 +3011,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
 }
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
-provisional cluster WebRTCTransportRequestor = 1364 {
+cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
@@ -3020,7 +3054,7 @@ provisional cluster WebRTCTransportRequestor = 1364 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-provisional cluster PushAvStreamTransport = 1365 {
+cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum CMAFInterfaceEnum : enum8 {
@@ -3202,7 +3236,7 @@ provisional cluster PushAvStreamTransport = 1365 {
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
-provisional cluster Chime = 1366 {
+cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {
@@ -3219,12 +3253,13 @@ provisional cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** This command will play the currently selected chime. */
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
       TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
+cluster TlsCertificateManagement = 2049 {
   revision 1;
 
   fabric_scoped struct TLSCertStruct {
@@ -3337,7 +3372,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 }
 
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsClientManagement = 2050 {
+cluster TlsClientManagement = 2050 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -3546,11 +3581,8 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ArmFailSafe;
-    handle command ArmFailSafeResponse;
     handle command SetRegulatoryConfig;
-    handle command SetRegulatoryConfigResponse;
     handle command CommissioningComplete;
-    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -3567,13 +3599,10 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command ScanNetworks;
-    handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
-    handle command NetworkConfigResponse;
     handle command ConnectNetwork;
-    handle command ConnectNetworkResponse;
     handle command ReorderNetwork;
   }
 
@@ -3582,7 +3611,6 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
-    handle command RetrieveLogsResponse;
   }
 
   server cluster GeneralDiagnostics {
@@ -3601,7 +3629,6 @@ endpoint 0 {
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
-    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -3739,12 +3766,11 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command SetUTCTime;
     handle command SetTrustedTimeSource;
     handle command SetTimeZone;
-    handle command SetTimeZoneResponse;
     handle command SetDSTOffset;
     handle command SetDefaultNTP;
   }
@@ -3777,20 +3803,15 @@ endpoint 0 {
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
-    handle command AttestationResponse;
     handle command CertificateChainRequest;
-    handle command CertificateChainResponse;
     handle command CSRRequest;
-    handle command CSRResponse;
     handle command AddNOC;
     handle command UpdateNOC;
-    handle command NOCResponse;
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
     handle command SetVIDVerificationStatement;
     handle command SignVIDVerificationRequest;
-    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -3806,16 +3827,14 @@ endpoint 0 {
 
     handle command KeySetWrite;
     handle command KeySetRead;
-    handle command KeySetReadResponse;
     handle command KeySetRemove;
     handle command KeySetReadAllIndices;
-    handle command KeySetReadAllIndicesResponse;
   }
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster FaultInjection {
@@ -3850,13 +3869,9 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
-    handle command AddGroupResponse;
     handle command ViewGroup;
-    handle command ViewGroupResponse;
     handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
     handle command RemoveGroup;
-    handle command RemoveGroupResponse;
     handle command RemoveAllGroups;
     handle command AddGroupIfIdentifying;
   }
@@ -3899,7 +3914,6 @@ endpoint 1 {
     callback attribute clusterRevision;
 
     handle command CreateTwoDCartesianZone;
-    handle command CreateTwoDCartesianZoneResponse;
     handle command UpdateTwoDCartesianZone;
     handle command RemoveZone;
     handle command CreateOrUpdateTrigger;
@@ -3955,19 +3969,15 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command AudioStreamAllocate;
-    handle command AudioStreamAllocateResponse;
     handle command AudioStreamDeallocate;
     handle command VideoStreamAllocate;
-    handle command VideoStreamAllocateResponse;
     handle command VideoStreamModify;
     handle command VideoStreamDeallocate;
     handle command SnapshotStreamAllocate;
-    handle command SnapshotStreamAllocateResponse;
     handle command SnapshotStreamModify;
     handle command SnapshotStreamDeallocate;
     handle command SetStreamPriorities;
     handle command CaptureSnapshot;
-    handle command CaptureSnapshotResponse;
   }
 
   server cluster CameraAvSettingsUserLevelManagement {
@@ -4005,9 +4015,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command SolicitOffer;
-    handle command SolicitOfferResponse;
     handle command ProvideOffer;
-    handle command ProvideOfferResponse;
     handle command ProvideAnswer;
     handle command ProvideICECandidates;
     handle command EndSession;
@@ -4025,13 +4033,11 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command AllocatePushTransport;
-    handle command AllocatePushTransportResponse;
     handle command DeallocatePushTransport;
     handle command ModifyPushTransport;
     handle command SetTransportStatus;
     handle command ManuallyTriggerTransport;
     handle command FindTransport;
-    handle command FindTransportResponse;
   }
 
   server cluster Chime {
@@ -4059,19 +4065,13 @@ endpoint 1 {
     callback attribute clusterRevision;
 
     handle command ProvisionRootCertificate;
-    handle command ProvisionRootCertificateResponse;
     handle command FindRootCertificate;
-    handle command FindRootCertificateResponse;
     handle command LookupRootCertificate;
-    handle command LookupRootCertificateResponse;
     handle command RemoveRootCertificate;
     handle command ClientCSR;
-    handle command ClientCSRResponse;
     handle command ProvisionClientCertificate;
     handle command FindClientCertificate;
-    handle command FindClientCertificateResponse;
     handle command LookupClientCertificate;
-    handle command LookupClientCertificateResponse;
     handle command RemoveClientCertificate;
   }
 
@@ -4085,9 +4085,7 @@ endpoint 1 {
     callback attribute clusterRevision;
 
     handle command ProvisionEndpoint;
-    handle command ProvisionEndpointResponse;
     handle command FindEndpoint;
-    handle command FindEndpointResponse;
     handle command RemoveEndpoint;
   }
 }

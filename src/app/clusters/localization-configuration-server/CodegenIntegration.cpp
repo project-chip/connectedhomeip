@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/localization-configuration-server/localization-configuration-cluster.h>
+#include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
 #include <app/static-cluster-config/LocalizationConfiguration.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>
@@ -80,7 +80,7 @@ void MatterLocalizationConfigurationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId)
+void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
@@ -91,5 +91,5 @@ void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointI
                 static_cast<uint16_t>(LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size()),
             .maxClusterInstanceCount = 1, // only root-node functionality supported by this implementation
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }

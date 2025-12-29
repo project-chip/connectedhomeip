@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import signal
-import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from sys import stderr, stdout
+from tempfile import NamedTemporaryFile
+from typing import BinaryIO, Optional, Union
 
-import matter.clusters as Clusters
-from matter.ChipDeviceCtrl import ChipDeviceController
-from matter.clusters.Types import NullValue
 from matter.testing.tasks import Subprocess
 
 
@@ -51,39 +48,35 @@ class AppServerSubprocess(Subprocess):
 
     # Prefix for log messages from the application server.
     PREFIX = b"[SERVER]"
+    # Custom file descriptor logs
+    log_file: BinaryIO = stdout.buffer
+    err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = []):
-        # Create a temporary KVS file and keep the descriptor to avoid leaks.
-        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
-        try:
-            # Build the command list
-            command = [app]
-            if extra_args:
-                command.extend(extra_args)
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
 
-            command.extend([
-                "--KVS", kvs_path,
-                '--secured-device-port', str(port),
-                "--discriminator", str(discriminator),
-                "--passcode", str(passcode)
-            ])
+        if kvs_path is None:
+            # Create a temporary KVS file in the specified storage directory. The underlying
+            # file will be automatically deleted when the object is garbage collected.
+            self.kvs_tmp_file = NamedTemporaryFile(dir=storage_dir, prefix="kvs-app-")  # noqa: SIM115
+            kvs_path = self.kvs_tmp_file.name
 
-            # Start the server application
-            super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line)
-        except Exception:
-            # Do not leak KVS file descriptor on failure
-            os.close(self.kvs_fd)
-            raise
+        # Build the command list
+        command = [app]
+        if extra_args:
+            command.extend(extra_args)
 
-    def __del__(self):
-        # Do not leak KVS file descriptor.
-        if hasattr(self, "kvs_fd"):
-            try:
-                os.close(self.kvs_fd)
-            except OSError:
-                pass
+        command.extend([
+            "--KVS", kvs_path,
+            '--secured-device-port', str(port),
+            "--discriminator", str(discriminator),
+            "--passcode", str(passcode)
+        ])
+
+        # Start the server application
+        super().__init__(*command,  # Pass the constructed command list
+                         output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -143,76 +136,56 @@ class JFControllerSubprocess(Subprocess):
 class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
-    DEFAULT_ADMIN_NODE_ID = 112233
-
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = []):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 log_file: str | BinaryIO = stdout.buffer, err_log_file: str | BinaryIO = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 
         Args:
-            app: Path to the chip-ota-provider-app executable
-            storage_dir: Directory for persistent storage
-            discriminator: Discriminator for commissioning
-            passcode: Passcode for commissioning
-            port: UDP port for secure connections (default: 5541)
-            ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
-            extra_args: Additional command line arguments
+            app(str): Path to the chip-ota-provider-app executable
+            storage_dir(str): Directory for persistent storage
+            discriminator(int): Discriminator for commissioning
+            passcode(int): Passcode for commissioning
+            port(int): UDP port for secure connections (default: 5541)
+            ota_source(OtaImagePath,ImageListPath): Either OtaImagePath or ImageListPath specifying the OTA image source
+            extra_args(list): Additional command line arguments
+            kvs_path(str): Str of the path for the kvs path, if not will use temp file.
+            log_file(str,BinaryIO): Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
+            err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
         """
+
+        self._log_file = None
+        self._err_log_file = None
+
+        # Create the BinaryIO fp allow to use if path is provided.
+        # Or assign it to the previously opened fp.
+        if isinstance(log_file, str):
+            self._log_file = open(log_file, "ab")  # noqa: SIM115
+            log_file = self._log_file
+        if isinstance(err_log_file, str):
+            self._err_log_file = open(err_log_file, "ab")  # noqa: SIM115
+            err_log_file = self._err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
 
         # Initialize with the combined arguments
-        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args)
+        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator, passcode=passcode, port=port,
+                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=log_file, f_stderr=err_log_file)
 
-    def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
-        """Create ACL entries to allow OTA requestors to access the provider.
+    def terminate(self):
+        if self._log_file is not None:
+            self._log_file.close()
+        if self._err_log_file is not None:
+            self._err_log_file.close()
+        return super().terminate()
 
-        Args:
-            dev_ctrl: Device controller for sending commands
-            provider_node_id: Node ID of the OTA provider
-            requestor_node_id: Optional specific requestor node ID for targeted access
+    def kill(self):
+        self.p.send_signal(signal.SIGKILL)
 
-        Returns:
-            Result of the ACL write operation
-        """
-        # Standard ACL entry for OTA Provider cluster
-        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
-        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
-
-        # Create ACL entries using proper struct constructors
-        acl_entries = [
-            # Admin entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                subjects=[admin_node_id],  # type: ignore
-                targets=NullValue
-            ),
-            # Operate entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                subjects=requestor_subjects,  # type: ignore
-                targets=[
-                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
-                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
-                        endpoint=NullValue,
-                        deviceType=NullValue
-                    )
-                ],
-            )
-        ]
-
-        # Create the attribute descriptor for the ACL attribute
-        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
-
-        return dev_ctrl.WriteAttribute(
-            nodeid=provider_node_id,
-            attributes=[(0, acl_attribute)]
-        )
+    def get_pid(self) -> int:
+        return self.p.pid

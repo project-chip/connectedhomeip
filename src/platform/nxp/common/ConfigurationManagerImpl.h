@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -83,7 +83,7 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 
-    CHIP_ERROR DetermineBootReason(uint8_t rebootCause);
+    CHIP_ERROR DetermineBootReason(uint32_t rebootCause);
 };
 
 /**
