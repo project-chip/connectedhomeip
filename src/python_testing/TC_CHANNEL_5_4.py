@@ -87,8 +87,14 @@ class TC_CHANNEL_5_4(MatterBaseTest):
         # 4. Send ChangeChannel command
         logger.info(f"Sending ChangeChannel command with match='{target_match}' to endpoint {endpoint}")
         cmd = Clusters.Channel.Commands.ChangeChannel(match=target_match)
-        await self.send_single_cmd(cmd, endpoint=endpoint)
-        logger.info("ChangeChannel command sent successfully.")
+        response = await self.send_single_cmd(cmd, endpoint=endpoint)
+        logger.info(f"ChangeChannel response: {response}")
+        asserts.assert_equal(
+            response.status,
+            Clusters.Channel.Enums.ChannelStatusEnum.kSuccess,
+            f"ChangeChannel command failed with status: {response.status}"
+        )
+        logger.info("ChangeChannel command completed with Success status.")
 
         # 5. Verify CurrentChannel matches
         current_channel = await self.read_single_attribute_check_success(
