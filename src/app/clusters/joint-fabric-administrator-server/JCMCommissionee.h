@@ -59,7 +59,9 @@ public:
         // Extract the session from the exchange before going async.
         // GetExchangeContext() must not be be called once we cross the async boundary,
         // since the exchange is not guaranteed to remain valid.
-        SessionHandle sessionHandle = mCommandHandle.Get()->GetExchangeContext()->GetSessionHandle();
+        Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
+        VerifyOrDie(exchangeContext != nullptr);
+        SessionHandle sessionHandle = exchangeContext->GetSessionHandle();
         mSessionHolder.Grab(sessionHandle);
     }
     ~JCMCommissionee() {}
