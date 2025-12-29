@@ -39,6 +39,12 @@ private:
     NamedPipeCommands * mPipes = nullptr;
 };
 
+// This class is a helper that parses and validates incoming JSON commands received over the out-of-band channel.
+// It is separated from OtaProviderAppCommandDelegate to:
+//  - Keep JSON parsing and command dispach logic isolated from OTA logic
+//  - Allow early validation and reporting
+//  - Extracts generic command fields and delegates the actual OTA operations to OtaProviderAppCommandDelegate
+ 
 class OtaProviderAppCommandHandler
 {
 public:
