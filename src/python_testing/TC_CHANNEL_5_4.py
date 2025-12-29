@@ -45,11 +45,10 @@ class TC_CHANNEL_5_4(MatterBaseTest):
         return "[TC-CHANNEL-5.4] Change Channel Verification"
 
     def steps_TC_CHANNEL_5_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commission TH to DUT", is_commissioning=True),
             TestStep(1, "TH sends ChangeChannel command to DUT"),
         ]
-        return steps
 
     def pics_TC_CHANNEL_5_4(self) -> list[str]:
         return ["CHANNEL.C"]
