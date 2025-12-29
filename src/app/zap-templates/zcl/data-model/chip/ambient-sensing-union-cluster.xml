@@ -45,7 +45,7 @@ Alchemy: v1.6.5
     <item fieldId="2" name="ContributorHealth" type="UnionContributorHealthBitmap" max="0x0F"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>Measurement &amp; Sensing</domain>
     <name>Ambient Sensing Union</name>
     <code>0x0432</code>
