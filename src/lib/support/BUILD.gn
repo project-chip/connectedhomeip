@@ -85,6 +85,22 @@ source_set("safeint") {
   sources = [ "SafeInt.h" ]
 }
 
+# Standalone argument parser - include this explicitly in targets that need it.
+# LTO will optimize out unused code if not referenced.
+source_set("arg_parser") {
+  sources = [
+    "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform:platform_config_header",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 source_set("numeric-primitives") {
   sources = [
     "attribute-storage-null-handling.h",
@@ -295,13 +311,6 @@ static_library("support") {
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
   ]
-
-  if (chip_config_enable_arg_parser) {
-    sources += [
-      "CHIPArgParser.cpp",
-      "CHIPArgParser.hpp",
-    ]
-  }
 
   if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {
