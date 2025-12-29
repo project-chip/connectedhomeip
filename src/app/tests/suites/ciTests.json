@@ -12,8 +12,13 @@
         "Test_TC_ACL_2_10"
     ],
     "ContentAppObserver": [],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
-    "BooleanState": ["Test_TC_BOOL_2_1"],
+    "AccessControlEnforcement": [
+        "Test_TC_ACE_1_1",
+        "Test_TC_ACE_1_5"
+    ],
+    "BooleanState": [
+        "Test_TC_BOOL_2_1"
+    ],
     "Binding": [],
     "BridgedDeviceBasicInformation": [],
     "Actions": [],
@@ -46,28 +51,51 @@
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": [],
-    "DeviceEnergyManagementMode": ["Test_TC_DEMM_2_1"],
-    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_2_1", "Test_TC_DGETH_2_2"],
+    "DeviceEnergyManagementMode": [
+        "Test_TC_DEMM_2_1"
+    ],
+    "EthernetNetworkDiagnostics": [
+        "Test_TC_DGETH_2_1",
+        "Test_TC_DGETH_2_2"
+    ],
     "DiagnosticsLogs": [],
-    "EnergyEVSE": ["Test_TC_EEVSE_2_1"],
+    "EnergyEVSE": [
+        "Test_TC_EEVSE_2_1"
+    ],
     "EnergyEVSEMode": [
         "Test_TC_EEVSEM_2_1",
         "Test_TC_EEVSEM_3_1",
         "Test_TC_EEVSEM_3_2",
         "Test_TC_EEVSEM_3_3"
     ],
-    "FlowMeasurement": ["Test_TC_FLW_2_1"],
-    "FanControl": ["Test_TC_FAN_3_6"],
+    "FlowMeasurement": [
+        "Test_TC_FLW_2_1"
+    ],
+    "FanControl": [
+        "Test_TC_FAN_3_6"
+    ],
     "GeneralDiagnostics": [],
-    "GroupKeyManagement": ["Test_TC_GRPKEY_2_2"],
+    "GroupKeyManagement": [
+        "Test_TC_GRPKEY_2_2"
+    ],
     "IcdManagement": [
         "TestIcdManagementCluster",
         "Test_TC_ICDM_1_1",
         "Test_TC_ICDM_4_1"
     ],
-    "Identify": ["Test_TC_I_2_1", "Test_TC_I_2_2", "Test_TC_I_2_3"],
-    "IlluminanceMeasurement": ["Test_TC_ILL_2_1", "Test_TC_ILL_2_2"],
-    "OccupancySensing": ["Test_TC_OCC_2_1", "Test_TC_OCC_2_3"],
+    "Identify": [
+        "Test_TC_I_2_1",
+        "Test_TC_I_2_2",
+        "Test_TC_I_2_3"
+    ],
+    "IlluminanceMeasurement": [
+        "Test_TC_ILL_2_1",
+        "Test_TC_ILL_2_2"
+    ],
+    "OccupancySensing": [
+        "Test_TC_OCC_2_1",
+        "Test_TC_OCC_2_3"
+    ],
     "LevelControl": [
         "Test_TC_LVL_2_1",
         "Test_TC_LVL_2_2",
@@ -79,7 +107,9 @@
         "Test_TC_LVL_9_1"
     ],
     "LocalizationConfiguration": [],
-    "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
+    "TimeFormatLocalization": [
+        "Test_TC_LTIME_1_2"
+    ],
     "UserLabel": [
         "Test_TC_ULABEL_2_1",
         "Test_TC_ULABEL_2_2",
@@ -102,7 +132,9 @@
         "Test_TC_OTCCM_3_2",
         "Test_TC_OTCCM_3_3"
     ],
-    "LaundryDryerControl": ["Test_TC_DRYERCTRL_2_1"],
+    "LaundryDryerControl": [
+        "Test_TC_DRYERCTRL_2_1"
+    ],
     "MediaControl": [
         "Test_TC_LOWPOWER_2_1",
         "Test_TC_KEYPADINPUT_3_2",
@@ -117,6 +149,7 @@
         "Test_TC_CHANNEL_5_1",
         "Test_TC_CHANNEL_5_2",
         "Test_TC_CHANNEL_5_3",
+        "Test_TC_CHANNEL_5_4",
         "Test_TC_MEDIAPLAYBACK_6_1",
         "Test_TC_MEDIAPLAYBACK_6_2",
         "Test_TC_MEDIAPLAYBACK_6_3",
@@ -134,7 +167,9 @@
     ],
     "ModeSelect": [],
     "MultipleFabrics": [],
-    "OTASoftwareUpdate": ["OTA_SuccessfulTransfer"],
+    "OTASoftwareUpdate": [
+        "OTA_SuccessfulTransfer"
+    ],
     "OnOff": [
         "Test_TC_OO_2_1",
         "Test_TC_OO_2_2",
@@ -142,9 +177,16 @@
         "Test_TC_OO_2_6",
         "Test_TC_OO_2_7"
     ],
-    "PowerSource": ["Test_TC_PS_2_1"],
-    "PowerTopology": ["Test_TC_PWRTL_1_1"],
-    "PressureMeasurement": ["Test_TC_PRS_2_1", "Test_TC_PRS_2_2"],
+    "PowerSource": [
+        "Test_TC_PS_2_1"
+    ],
+    "PowerTopology": [
+        "Test_TC_PWRTL_1_1"
+    ],
+    "PressureMeasurement": [
+        "Test_TC_PRS_2_1",
+        "Test_TC_PRS_2_2"
+    ],
     "PumpConfigurationControl": [
         "Test_TC_PCC_1_1",
         "Test_TC_PCC_2_1",
@@ -152,10 +194,18 @@
         "Test_TC_PCC_2_3",
         "Test_TC_PCC_2_4"
     ],
-    "PowerSourceConfiguration": ["Test_TC_PSCFG_2_1"],
-    "RefrigeratorAlarm": ["Test_TC_REFALM_2_1"],
-    "RelativeHumidityMeasurement": ["Test_TC_RH_2_1"],
-    "RoboticVacuumCleaner": ["Test_TC_RVCRUNM_3_1"],
+    "PowerSourceConfiguration": [
+        "Test_TC_PSCFG_2_1"
+    ],
+    "RefrigeratorAlarm": [
+        "Test_TC_REFALM_2_1"
+    ],
+    "RelativeHumidityMeasurement": [
+        "Test_TC_RH_2_1"
+    ],
+    "RoboticVacuumCleaner": [
+        "Test_TC_RVCRUNM_3_1"
+    ],
     "SecureChannel": [],
     "SmokeCOAlarm": [
         "Test_TC_SMOKECO_1_1",
@@ -166,24 +216,40 @@
         "Test_TC_SMOKECO_2_5",
         "Test_TC_SMOKECO_2_6"
     ],
-    "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
+    "Switch": [
+        "Test_TC_SWTCH_1_1",
+        "Test_TC_SWTCH_2_1"
+    ],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_3_1",
         "Test_TC_TCCM_3_2",
         "Test_TC_TCCM_3_3"
     ],
     "TemperatureControl": [],
-    "TemperatureMeasurement": ["Test_TC_TMP_2_1"],
-    "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
-    "ThermostatUserConfiguration": ["Test_TC_TSUIC_2_1", "Test_TC_TSUIC_2_2"],
+    "TemperatureMeasurement": [
+        "Test_TC_TMP_2_1"
+    ],
+    "Thermostat": [
+        "Test_TC_TSTAT_1_1",
+        "Test_TC_TSTAT_2_1"
+    ],
+    "ThermostatUserConfiguration": [
+        "Test_TC_TSUIC_2_1",
+        "Test_TC_TSUIC_2_2"
+    ],
     "ThreadNetworkDiagnostics": [
         "Test_TC_DGTHREAD_2_1",
         "Test_TC_DGTHREAD_2_2",
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
-    "TimeSynchronization": ["Test_TC_TIMESYNC_2_3"],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_1", "Test_TC_DGWIFI_2_3"],
+    "TimeSynchronization": [
+        "Test_TC_TIMESYNC_2_3"
+    ],
+    "WiFiNetworkDiagnostics": [
+        "Test_TC_DGWIFI_2_1",
+        "Test_TC_DGWIFI_2_3"
+    ],
     "WindowCovering": [
         "Test_TC_WNCV_1_1",
         "Test_TC_WNCV_2_1",
@@ -251,7 +317,9 @@
         "TestDishwasherAlarm",
         "Test_AddNewFabricFromExistingFabric"
     ],
-    "MultiAdmin": ["TestMultiAdmin"],
+    "MultiAdmin": [
+        "TestMultiAdmin"
+    ],
     "SoftwareDiagnostics": [],
     "Subscriptions": [
         "TestSubscribe_OnOff",
@@ -268,7 +336,11 @@
         "Test_TC_DRLK_2_8",
         "Test_TC_DRLK_2_11"
     ],
-    "Groups": ["TestGroupMessaging", "TestGroupsCluster", "Test_TC_G_2_1"],
+    "Groups": [
+        "TestGroupMessaging",
+        "TestGroupsCluster",
+        "Test_TC_G_2_1"
+    ],
     "ScenesManagement": [
         "TestScenesFabricRemoval",
         "TestScenesFabricSceneInfo",
@@ -285,7 +357,9 @@
         "Test_TC_ACFREMON_2_1",
         "Test_TC_HEPAFREMON_2_1"
     ],
-    "AirQuality": ["Test_TC_AIRQUAL_2_1"],
+    "AirQuality": [
+        "Test_TC_AIRQUAL_2_1"
+    ],
     "ConcentrationMeasurement": [
         "Test_TC_CDOCONC_1_1",
         "Test_TC_CDOCONC_2_1",
