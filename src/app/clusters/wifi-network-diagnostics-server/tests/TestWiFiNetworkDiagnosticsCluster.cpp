@@ -39,13 +39,14 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using namespace chip::app::DataModel;
+using namespace chip::Testing;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 struct TestWiFiNetworkDiagnosticsCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestWiFiNetworkDiagnosticsCluster, CompileTest)
@@ -114,9 +115,9 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                                                       WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry,
                                                   }));
 
-        chip::Testing::TestServerClusterContext context;
+        TestServerClusterContext context;
         ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        chip::Testing::ClusterTester tester(cluster);
+        ClusterTester tester(cluster);
 
         WiFiNetworkDiagnostics::Commands::ResetCounts::Type resetCountsCommand;
         auto result = tester.Invoke(resetCountsCommand);

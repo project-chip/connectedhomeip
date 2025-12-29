@@ -37,16 +37,17 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
+using namespace chip::Testing;
 
 using chip::app::ClusterShutdownType;
 
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+using ICEServerDecodableStruct = Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = Clusters::Globals::WebRTCEndReasonEnum;
 
-static constexpr chip::EndpointId kTestEndpointId = 1;
+static constexpr EndpointId kTestEndpointId = 1;
 
 // Mock delegate for testing WebRTCTransportProvider
 class MockWebRTCTransportProviderDelegate : public Delegate
@@ -123,8 +124,8 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestWebRTCTransportProviderCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
@@ -132,7 +133,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(Testing::IsAttributesListEqualTo(server, { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry }));
+    ASSERT_TRUE(IsAttributesListEqualTo(server, { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry }));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
@@ -140,14 +141,14 @@ TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(server,
-                                                       {
-                                                           WebRTCTransportProvider::Commands::SolicitOffer::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::ProvideOffer::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::ProvideAnswer::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::ProvideICECandidates::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::EndSession::kMetadataEntry,
-                                                       }));
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server,
+                                              {
+                                                  WebRTCTransportProvider::Commands::SolicitOffer::kMetadataEntry,
+                                                  WebRTCTransportProvider::Commands::ProvideOffer::kMetadataEntry,
+                                                  WebRTCTransportProvider::Commands::ProvideAnswer::kMetadataEntry,
+                                                  WebRTCTransportProvider::Commands::ProvideICECandidates::kMetadataEntry,
+                                                  WebRTCTransportProvider::Commands::EndSession::kMetadataEntry,
+                                              }));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCurrentSessionsAttribute)
@@ -177,12 +178,12 @@ TEST_F(TestWebRTCTransportProviderCluster, TestSessionManagement)
 
 TEST_F(TestWebRTCTransportProviderCluster, TestReadCurrentSessionsAttribute)
 {
-    chip::Testing::TestServerClusterContext context;
+    TestServerClusterContext context;
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Testing::ClusterTester tester(server);
+    ClusterTester tester(server);
 
     // Test reading empty sessions
     WebRTCTransportProvider::Attributes::CurrentSessions::TypeInfo::DecodableType sessions;
@@ -197,16 +198,16 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadCurrentSessionsAttribute)
 
 TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
 {
-    chip::Testing::TestServerClusterContext context;
+    TestServerClusterContext context;
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Testing::ClusterTester tester(server);
+    ClusterTester tester(server);
 
     // Test reading cluster revision
-    chip::app::Clusters::Globals::Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = 0;
-    auto status = tester.ReadAttribute(chip::app::Clusters::Globals::Attributes::ClusterRevision::Id, clusterRevision);
+    Globals::Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = 0;
+    auto status = tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision);
     EXPECT_TRUE(status.IsSuccess());
     EXPECT_EQ(clusterRevision, WebRTCTransportProvider::kRevision);
 
@@ -215,18 +216,18 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
 
 TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
 {
-    chip::Testing::TestServerClusterContext context;
+    TestServerClusterContext context;
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
     ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Testing::ClusterTester tester(server);
+    ClusterTester tester(server);
 
     // Test reading unsupported attribute
     uint32_t dummyValue;
     auto status = tester.ReadAttribute(0xFFFF /* Invalid attribute ID */, dummyValue);
     EXPECT_FALSE(status.IsSuccess());
-    EXPECT_EQ(status.GetStatusCode().GetStatus(), chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
+    EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
