@@ -30,7 +30,7 @@ namespace app {
 namespace Clusters {
 
 /// This class provides a code-driven implementation for the Basic Information cluster,
-/// centralizing its logic and state. 
+/// centralizing its logic and state.
 
 /// As a PlatformManagerDelegate, it automatically hooks into the node's lifecycle to
 /// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
