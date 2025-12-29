@@ -33,8 +33,8 @@ jobs:
   efr32:
     #TODO: Re-enable these tests once the Silabs version of the DeviceInstanceInfoProvider is updated
     # to support the latest changes with reporting device capability minima. 
-    if: false
     name: EFR32
+    if: false
 
     env:
       SILABS_BOARD: BRD4187C
