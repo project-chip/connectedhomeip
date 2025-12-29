@@ -17,6 +17,7 @@
  */
 
 #include "OtaProviderAppCommandDelegate.h"
+#include <lib/support/Defer.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -84,12 +85,24 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
 void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
 {
     auto * self = reinterpret_cast<OtaProviderAppCommandHandler *>(context);
+
+    if (self == nullptr)
+    {
+        return;
+    }
+
+    auto cleanup = MakeDefer([&]() { Platform::Delete(self); });
+
     std::string name;
     std::string cluster;
     uint16_t endpoint                        = 0;
     OtaProviderAppCommandDelegate * delegate = nullptr;
 
-    VerifyOrExit(!self->mCommandPayload.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+    if (self->mCommandPayload.empty())
+    {
+        ChipLogError(NotSpecified, "Invalid JSON event command received");
+        return;
+    }
 
     name     = self->mCommandPayload["Name"].asString();
     cluster  = self->mCommandPayload.get("Cluster", "").asString();
@@ -116,14 +129,10 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         {
             delegate->GetPipes()->WriteToOutPipe(ToString(out));
         }
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unhandled command: Should never happen");
+        return;
     }
 
-exit:
-    Platform::Delete(self);
+    ChipLogError(NotSpecified, "Unhandled command: Should never happen")
 }
 
 void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
