@@ -1936,8 +1936,8 @@ endpoint 1 {
 
   server cluster IlluminanceMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 1;
-    ram      attribute maxMeasuredValue default = 0xfffe;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     ram      attribute lightSensorType default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

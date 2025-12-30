@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CodegenIntegration.h"
+#include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/illuminance-measurement-cluster.h>
 #include <app/static-cluster-config/IlluminanceMeasurement.h>
 #include <app/util/attribute-storage.h>
@@ -43,7 +43,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+                                                   uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         LightSensorType::TypeInfo::Type lightSensorType;

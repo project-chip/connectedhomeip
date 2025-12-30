@@ -34,10 +34,8 @@ public:
 
     struct StartupConfiguration
     {
-        IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type lightSensorType{
-            IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode
-        };
-        IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type tolerance{ 0 };
+        IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type lightSensorType{};
+        IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type tolerance{};
     };
 
     IlluminanceMeasurementCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
@@ -60,6 +58,10 @@ public:
 
     CHIP_ERROR SetMeasuredValue(IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type measuredValue);
 
+    CHIP_ERROR SetMinMeasuredValue(IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type minMeasuredValue);
+
+    CHIP_ERROR SetMaxMeasuredValue(IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type maxMeasuredValue);
+
 protected:
     IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type mLightSensorType{};
     IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
@@ -67,6 +69,15 @@ protected:
     IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};
     IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type mTolerance{};
     const OptionalAttributeSet mOptionalAttributeSet;
+
+private:
+    bool CheckConstraintMinMax(IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type value,
+                               IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type minValue,
+                               IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type maxValue);
+    bool CheckConstraintsLessThanOrEqualTo(IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type value,
+                                           IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type minValue);
+    bool CheckConstraintsGreaterThanOrEqualTo(IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type value,
+                                              IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type maxValue);
 };
 
 } // namespace chip::app::Clusters

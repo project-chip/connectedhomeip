@@ -83,10 +83,73 @@ CHIP_ERROR IlluminanceMeasurementCluster::Attributes(const ConcreteClusterPath &
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
 }
 
+/**
+ * This checks if a given nullable float is within the min and max constraints or two other nullable floats.
+ * @param value The value to check.
+ * @param minValue The minimum value.
+ * @param maxValue The maximum value.
+ * @return true if the value is within the min and max constraints. If either of the pair of values being compared is null,
+ * that's considered to be within the constraint.
+ */
+bool IlluminanceMeasurementCluster::CheckConstraintMinMax(MeasuredValue::TypeInfo::Type value,
+                                                          MinMeasuredValue::TypeInfo::Type minValue,
+                                                          MaxMeasuredValue::TypeInfo::Type maxValue)
+{
+    return (minValue.IsNull() || value.IsNull() || (value.Value() >= minValue.Value())) &&
+        (maxValue.IsNull() || value.IsNull() || (value.Value() <= maxValue.Value()));
+}
+
+/**
+ * This checks if a given nullable float is less than or equal to another given nullable float.
+ * @param value The value to check.
+ * @param valueToBeLessThanOrEqualTo The value to be less than or equal to.
+ * @return true if value is less than or equal to valueToBeLessThanOrEqualTo, or if either of the values is Null.
+ */
+bool IlluminanceMeasurementCluster::CheckConstraintsLessThanOrEqualTo(MeasuredValue::TypeInfo::Type value,
+                                                                      MinMeasuredValue::TypeInfo::Type minValue)
+{
+    return minValue.IsNull() || value.IsNull() || (value.Value() <= minValue.Value());
+}
+
+/**
+ * This checks if a given nullable float is greater than or equal to another given nullable float.
+ * @param value The value to check.
+ * @param valueToBeGreaterThanOrEqualTo The value to be greater than or equal to.
+ * @return true if value is greater than or equal to valueToBeGreaterThanOrEqualTo, or if either of the values is Null.
+ */
+bool IlluminanceMeasurementCluster::CheckConstraintsGreaterThanOrEqualTo(MeasuredValue::TypeInfo::Type value,
+                                                                         MaxMeasuredValue::TypeInfo::Type maxValue)
+{
+    return maxValue.IsNull() || value.IsNull() || (value.Value() >= maxValue.Value());
+}
+
 CHIP_ERROR IlluminanceMeasurementCluster::SetMeasuredValue(MeasuredValue::TypeInfo::Type measuredValue)
 {
+    VerifyOrReturnError(mMeasuredValue != measuredValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(!CheckConstraintMinMax(measuredValue, mMinMeasuredValue, mMaxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+
     mMeasuredValue = measuredValue;
     NotifyAttributeChanged(MeasuredValue::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR IlluminanceMeasurementCluster::SetMinMeasuredValue(MinMeasuredValue::TypeInfo::Type minMeasuredValue)
+{
+    VerifyOrReturnError(mMinMeasuredValue != minMeasuredValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(!CheckConstraintsLessThanOrEqualTo(minMeasuredValue, mMinMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mMinMeasuredValue = minMeasuredValue;
+    NotifyAttributeChanged(MinMeasuredValue::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR IlluminanceMeasurementCluster::SetMaxMeasuredValue(MaxMeasuredValue::TypeInfo::Type maxMeasuredValue)
+{
+    VerifyOrReturnError(mMaxMeasuredValue != maxMeasuredValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(!CheckConstraintsGreaterThanOrEqualTo(maxMeasuredValue, mMaxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mMaxMeasuredValue = maxMeasuredValue;
+    NotifyAttributeChanged(MaxMeasuredValue::Id);
     return CHIP_NO_ERROR;
 }
 
