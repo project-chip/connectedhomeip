@@ -42,7 +42,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_command, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_command, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
