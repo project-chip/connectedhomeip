@@ -16,6 +16,12 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Provides an implementation of the ConnectivityManager
+ *          object for Linux platforms.
+ */
+
 #pragma once
 
 #include <platform/ConnectivityManager.h>
