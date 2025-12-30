@@ -775,10 +775,9 @@ private:
     }
 
     template <typename StreamContainer, typename IdGetter>
-    Protocols::InteractionModel::Status
-    ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID,
-                                            StreamType streamType, IdGetter id_getter,
-                                            bool isDeallocate)
+    Protocols::InteractionModel::Status ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID,
+                                                                                StreamType streamType, IdGetter id_getter,
+                                                                                bool isDeallocate)
     {
         auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
 
@@ -904,8 +903,7 @@ private:
     HandleAudioStreamDeallocate(const Commands::AudioStreamDeallocate::DecodableType & req);
 
     std::optional<DataModel::ActionReturnStatus>
-    HandleSnapshotStreamAllocate(CommandHandler & handler,
-                                 const ConcreteCommandPath & commandPath,
+    HandleSnapshotStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                  const Commands::SnapshotStreamAllocate::DecodableType & req);
 
     std::optional<DataModel::ActionReturnStatus>
@@ -925,14 +923,12 @@ private:
 
     bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID);
 
-    Protocols::InteractionModel::Status
-    ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, bool isDeallocate);
+    Protocols::InteractionModel::Status ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, bool isDeallocate);
 
-    Protocols::InteractionModel::Status
-    ValidateAudioStreamForDeallocate(const uint16_t audioStreamID);
+    Protocols::InteractionModel::Status ValidateAudioStreamForDeallocate(const uint16_t audioStreamID);
 
-    Protocols::InteractionModel::Status
-    ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, bool isDeallocate);
+    Protocols::InteractionModel::Status ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID,
+                                                                                    bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement
