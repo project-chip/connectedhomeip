@@ -182,20 +182,19 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Requestor has the flag --autoApply
         self.step(0)
         controller = self.default_controller
-        # # Set the time interval based on the ota_image_download_timeout
-        max_interval = self.ota_image_download_timeout + 600
 
         self.step(1)
-        # Create event subscriber for StateTransition
-        update_state_attr_handler = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            # expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-        await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
-                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        # Create Event SubscriptionHandler
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=1, max_interval_sec=20, autoResubscribe=True)
+        # Create AttributeSubscriptionHandler
+        update_state_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+        await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
+                                              fabric_filtered=False, min_interval_sec=1, max_interval_sec=5)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         # Register event, should change to Querying
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
@@ -204,7 +203,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying, expected_target_version=NullValue)
 
         # Event for Downloading
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=70)
         logger.info(f"Event report for Downloading {event_report}")
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.expected_software_version)
@@ -216,6 +215,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
+
         attribute_idle = AttributeValue(
             endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
@@ -265,7 +265,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         # Catch Event Report for Querying
@@ -292,7 +292,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         )
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
         # This step we need to Kill the provider PID before the announcement
         logger.info("Killing the provider process")
         self.current_provider_app_proc.kill()
@@ -325,7 +325,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             )
             state_transition_event_handler = EventSubscriptionHandler(
                 expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-            await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=700)
+            await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
             await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
             # Wait to State to change to Querying
             event_report = state_transition_event_handler.wait_for_event_report(
@@ -353,7 +353,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         )
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=9000)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
 
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         # Block waiting for Download
@@ -368,7 +368,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Create and Wait for DownloadErrorEvent
         error_download_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
-        await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=800)
+        await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
         # Force an DownloadError by Killing the app during the image download.
         logger.info("Wait 3 seconds to allow download some data before killing the Provider Process")
         await asyncio.sleep(3)
@@ -409,10 +409,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             timeout=10
         )
-        # EventHandlers and AttributeSubscriptionHandler
+        # AttributeSubscriptionHandler
         update_state_attr_handler = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            # expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor
         )
         await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
@@ -421,9 +420,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         attribute_idle = AttributeValue(
             endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
+        # EventSubscriptionHandler
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
         # Download complete then Applying
         event_report = state_transition_event_handler.wait_for_event_report(
             self.ota_req.Events.StateTransition, timeout_sec=self.ota_image_download_timeout)
