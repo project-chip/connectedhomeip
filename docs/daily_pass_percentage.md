@@ -1,5 +1,6 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
+| dependabot-updates             |           0 |
 | codeql                         |           0 |
 | cancel-workflows-on-failing-ci |         100 |
 | delete-old-artifacts           |         100 |
