@@ -257,10 +257,56 @@ static_library("Linux") {
     }
   }
 
-  if (chip_enable_wifi) {
-    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
+  # If either Ethernet or Wi-Fi are enabled, validate and setup the
+  # network management sources and artifacts.
 
-    public_deps += [ "dbus/wpa" ]
+  if (chip_enable_ethernet || chip_enable_wifi) {
+    if (chip_enable_wifi) {
+      sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
+    }
+
+    defines = [
+      "CHIP_LINUX_NETWORK_MANAGER=\"${chip_linux_network_manager}\"",
+      "CHIP_LINUX_WIFI_PAF_MANAGER=\"${chip_linux_wifi_paf_manager}\"",
+    ]
+
+    if (chip_linux_network_manager == "wpa_supplicant") {
+      defines += [ "CHIP_LINUX_NETWORK_MANAGER_WPA_SUPPLICANT=1" ]
+
+      sources +=
+          [ "ConnectivityManagerImpl_NetworkManagementWpaSupplicant.cpp" ]
+    } else {
+      assert(false,
+             "Linux network manager not specified or not supported: " +
+                 chip_linux_network_manager +
+                 ". chip_linux_network_manager must be 'wpa_supplicant'.")
+    }
+
+    # If Wi-Fi is enabled, validate and setup the Wi-Fi Neighbor
+    # Awareness Networking (NAN) Unsynchronized Service Discovery
+    # (USD) / Public Action Frame (PAF) commissioning transport
+    # management sources and artifacts.
+
+    if (chip_enable_wifi) {
+      if (chip_linux_wifi_paf_manager == "") {
+        defines += [ "CHIP_LINUX_WIFI_PAF_MANAGER_WPA_SUPPLICANT=0" ]
+      } else if (chip_linux_wifi_paf_manager == "wpa_supplicant") {
+        defines += [ "CHIP_LINUX_WIFI_PAF_MANAGER_WPA_SUPPLICANT=1" ]
+
+        sources += [ "ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp" ]
+      } else {
+        assert(
+            false,
+            "Linux Wi-Fi NAN USD / PAF manager not specified or not supported: " + chip_linux_wifi_paf_manager + ". chip_linux_paf_manager must be empty or 'wpa_supplicant'.")
+      }
+    }
+
+    needs_wpa_supplicant = chip_linux_network_manager == "wpa_supplicant" ||
+                           chip_linux_wifi_paf_manager == "wpa_supplicant"
+
+    if (needs_wpa_supplicant) {
+      public_deps += [ "dbus/wpa" ]
+    }
   }
 
   if (chip_enable_ble) {
