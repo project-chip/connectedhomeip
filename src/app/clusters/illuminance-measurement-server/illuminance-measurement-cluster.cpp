@@ -35,8 +35,8 @@ namespace chip::app::Clusters {
 IlluminanceMeasurementCluster::IlluminanceMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }),
-    mLightSensorType(config.lightSensorType), mTolerance(config.tolerance), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }), mLightSensorType(config.lightSensorType),
+    mTolerance(config.tolerance), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus IlluminanceMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -136,7 +136,7 @@ CHIP_ERROR IlluminanceMeasurementCluster::SetMeasuredValue(MeasuredValue::TypeIn
 CHIP_ERROR IlluminanceMeasurementCluster::SetMinMeasuredValue(MinMeasuredValue::TypeInfo::Type minMeasuredValue)
 {
     VerifyOrReturnError(mMinMeasuredValue != minMeasuredValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(!CheckConstraintsLessThanOrEqualTo(minMeasuredValue, mMinMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!CheckConstraintsLessThanOrEqualTo(mMeasuredValue, minMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
     mMinMeasuredValue = minMeasuredValue;
     NotifyAttributeChanged(MinMeasuredValue::Id);
@@ -146,7 +146,7 @@ CHIP_ERROR IlluminanceMeasurementCluster::SetMinMeasuredValue(MinMeasuredValue::
 CHIP_ERROR IlluminanceMeasurementCluster::SetMaxMeasuredValue(MaxMeasuredValue::TypeInfo::Type maxMeasuredValue)
 {
     VerifyOrReturnError(mMaxMeasuredValue != maxMeasuredValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(!CheckConstraintsGreaterThanOrEqualTo(maxMeasuredValue, mMaxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!CheckConstraintsGreaterThanOrEqualTo(mMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
     mMaxMeasuredValue = maxMeasuredValue;
     NotifyAttributeChanged(MaxMeasuredValue::Id);
