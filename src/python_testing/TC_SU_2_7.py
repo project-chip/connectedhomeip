@@ -216,10 +216,26 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
 
-        attribute_idle = AttributeValue(
-            endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
-        update_state_attr_handler.cancel()
+        # On Physical Devices we dont know how much time it can take to apply the update so let the user help us.
+        # This should be updated to work automatically by detecting if the session is up and then read the UpdateState attribute
+        # This will allow us to remove the AttributeEventListener for kIdle and just read the attribute
+        if self.is_pics_sdk_ci_only:
+            attribute_idle = AttributeValue(
+                endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+            update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
+            update_state_attr_handler.cancel()
+        else:
+            # Avoid keep listening if the device is gone.
+            update_state_attr_handler.cancel()
+            self.wait_for_user_input(
+                prompt_msg="Waiting for device to Apply the Software update. Please press Enter when it is ready.\n")
+            update_state = await self.read_single_attribute_check_success(
+                dev_ctrl=controller,
+                cluster=Clusters.OtaSoftwareUpdateRequestor,
+                attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            )
+            # After restart UpdateState must be kIdle
+            asserts.assert_equal(update_state, self.ota_req.Enums.UpdateStateEnum.kIdle)
 
         # Verify VersionAppliedEvent
         await self.verify_version_applied_basic_information(controller=controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
