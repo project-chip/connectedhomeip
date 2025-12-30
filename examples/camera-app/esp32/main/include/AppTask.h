@@ -42,7 +42,7 @@ public:
     static void AppTaskMain(void * pvParameter);
     void PostEvent(const AppEvent * event);
 
-    void ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction);
+    static void ButtonEventHandler();
 
     void UpdateClusterState();
 

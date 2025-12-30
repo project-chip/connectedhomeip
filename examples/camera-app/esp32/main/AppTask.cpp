@@ -38,6 +38,9 @@ using namespace Camera;
 
 static const char TAG[] = "app-task";
 
+Button standbyButton;
+
+bool deferred_offer = false;
 namespace {
 constexpr EndpointId kCameraEndpointId = 1;
 QueueHandle_t sAppEventQueue;
@@ -62,14 +65,9 @@ CHIP_ERROR AppTask::StartAppTask()
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
-void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler()
 {
-    if (btnAction != APP_BUTTON_PRESSED)
-    {
-        return;
-    }
-
-    AppEvent button_event = {};
+    AppEvent button_event;
     button_event.Type     = AppEvent::kEventType_Button;
     button_event.mHandler = AppTask::CameraActionEventHandler;
     sAppTask.PostEvent(&button_event);
@@ -84,6 +82,10 @@ CHIP_ERROR AppTask::Init()
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
     PlatformMgr().UnlockChipStack();
+
+    standbyButton.Init();
+    standbyButton.SetButtonPressCallback(ButtonEventHandler);
+
     return err;
 }
 
@@ -143,6 +145,24 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         ESP_LOGI(TAG, "Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::CameraActionEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        ESP_LOGI(TAG, "Camera action event received");
+        if (deferred_offer)
+        {
+            ESP_LOGI(TAG, "Moving Camera out of Standby Mode");
+            deferred_offer = false;
+        }
+        else
+        {
+            ESP_LOGI(TAG, "Moving Camera into Standby Mode");
+            deferred_offer = true;
+        }
     }
 }
 
