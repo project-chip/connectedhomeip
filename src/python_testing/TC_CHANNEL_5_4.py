@@ -84,13 +84,13 @@ class TC_CHANNEL_5_4(MatterBaseTest):
         if target_match is None:
             asserts.skip("No channels with a name found in ChannelList, or ChannelList is empty. Cannot run test.")
 
-        # 4. Send ChangeChannel command
+        # 3. Send ChangeChannel command
         logger.info(f"Sending ChangeChannel command with match='{target_match}' to endpoint {endpoint}")
         cmd = Clusters.Channel.Commands.ChangeChannel(match=target_match)
         response = await self.send_single_cmd(cmd, endpoint=endpoint)
         logger.info(f"ChangeChannel response: {response}")
 
-        # 5. Verify CurrentChannel matches
+        # 4. Verify CurrentChannel matches
         current_channel = await self.read_single_attribute_check_success(
             cluster=Clusters.Channel,
             attribute=Clusters.Channel.Attributes.CurrentChannel,
@@ -98,7 +98,7 @@ class TC_CHANNEL_5_4(MatterBaseTest):
         )
         logger.info(f"Read CurrentChannel: {current_channel}")
 
-        # 6. Verify that the current channel name matches the requested target
+        # 5. Verify that the current channel name matches the requested target
         asserts.assert_is_not_none(current_channel, "CurrentChannel is null after the ChangeChannel command.")
         asserts.assert_equal(current_channel.name, target_match,
                              f"CurrentChannel name ({current_channel.name}) does not match requested target ({target_match})")
