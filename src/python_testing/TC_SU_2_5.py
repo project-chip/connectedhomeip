@@ -171,6 +171,29 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                      "Verify the SoftwareVersion attribute from the Basic Information cluster of the DUT to be the same as it was previously."),
         ]
 
+    async def _wait_for_idle_after_softwareaupdate(self, update_state_handler):
+        # On Physical Devices we dont know how much time it can take to apply the update so let the user help us.
+        # This should be updated to work automatically by detecting if the session is up and then read the UpdateState attribute
+        # This will allow us to remove the AttributeEventListener for kIdle and just read the attribute
+        if self.is_pics_sdk_ci_only:
+            update_state_match = AttributeMatcher.from_callable(
+                "Update state is Idle",
+                lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+            update_state_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+            update_state_handler.cancel()
+        else:
+            # Avoid keep listening if the device is gone.
+            update_state_handler.cancel()
+            self.wait_for_user_input(
+                prompt_msg="Waiting for device to Apply the Software update. Please press Enter when it is ready.\n")
+            update_state = await self.read_single_attribute_check_success(
+                dev_ctrl=self.controller,
+                cluster=Clusters.OtaSoftwareUpdateRequestor,
+                attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            )
+            # After restart UpdateState must be kIdle
+            asserts.assert_equal(update_state, self.ota_req.Enums.UpdateStateEnum.kIdle)
+
     @async_test_body
     async def test_TC_SU_2_5(self):
 
@@ -196,15 +219,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
-        # Wait to the idle status for good period of time like 600 seconds.
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is Idle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=600)
-
-        update_state_attr_handler.flush_reports()
-        update_state_attr_handler.cancel()
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
         # Once in idle verify the version match the expected software version
         await self.verify_version_applied_basic_information(
@@ -275,13 +290,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         software_version_attr_handler.flush_reports()
         software_version_attr_handler.cancel()
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is kIdle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=600)
-        update_state_attr_handler.flush_reports()
-        update_state_attr_handler.cancel()
+
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -349,18 +359,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.await_all_period_expected_report_matches(
             expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
-
-        # Lets wait the device to switch idle state (After Update)
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is kIdle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=600)
-        update_state_attr_handler.reset()
-        # Cancel handlers
-        update_state_attr_handler.cancel()
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
+
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -419,18 +421,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.await_all_period_expected_report_matches(
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
-
-        # Lets wait the device to switch idle state (After Update)
-        update_state_match = AttributeMatcher.from_callable(
-            "Update state is kIdle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=600)
-
-        update_state_attr_handler.reset()
-        update_state_attr_handler.cancel()
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
+
+        await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -481,6 +475,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             "Waiting Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
 
+        # Did not apply the software update
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
         update_state_match = AttributeMatcher.from_callable(
