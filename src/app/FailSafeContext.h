@@ -50,16 +50,16 @@ public:
     void DisarmFailSafe();
     void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     {
-        mAddNocCommandHasBeenInvoked = true;
-        mFabricIndex                 = nocFabricIndex;
+        mContextFlags.Set(ContextFlags::kAddNocCommandInvoked);
+        mFabricIndex = nocFabricIndex;
     }
-    void SetUpdateNocCommandInvoked() { mUpdateNocCommandHasBeenInvoked = true; }
-    void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
-    void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
-    void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
-    void RecordSetVidVerificationStatementHasBeenInvoked() { mSetVidVerificationStatementHasBeenInvoked = true; }
+    void SetUpdateNocCommandInvoked() { mContextFlags.Set(ContextFlags::kUpdateNocCommandInvoked); }
+    void SetAddTrustedRootCertInvoked() { mContextFlags.Set(ContextFlags::kAddTrustedRootCertInvoked); }
+    void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mContextFlags.Set(ContextFlags::kIsCsrRequestForUpdateNoc); }
+    void SetUpdateTermsAndConditionsHasBeenInvoked() { mContextFlags.Set(ContextFlags::kUpdateTermsAndConditionsInvoked); }
+    void RecordSetVidVerificationStatementHasBeenInvoked() { mContextFlags.Set(ContextFlags::kSetVidVerificationStatementInvoked); }
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    void SetAddICACHasBeenInvoked() { mAddICACHasBeenInvoked = true; }
+    void SetAddICACHasBeenInvoked() { mContextFlags.Set(ContextFlags::kAddICACInvoked); }
 #endif
 
     /**
@@ -91,15 +91,27 @@ public:
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    bool NocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked || mUpdateNocCommandHasBeenInvoked; }
-    bool AddNocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked; }
-    bool UpdateNocCommandHasBeenInvoked() const { return mUpdateNocCommandHasBeenInvoked; }
-    bool AddTrustedRootCertHasBeenInvoked() const { return mAddTrustedRootCertHasBeenInvoked; }
-    bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
-    bool UpdateTermsAndConditionsHasBeenInvoked() const { return mUpdateTermsAndConditionsHasBeenInvoked; }
-    bool HasSetVidVerificationStatementHasBeenInvoked() const { return mSetVidVerificationStatementHasBeenInvoked; }
+    bool NocCommandHasBeenInvoked() const
+    {
+        return mContextFlags.Has(ContextFlags::kAddNocCommandInvoked) || mContextFlags.Has(ContextFlags::kUpdateNocCommandInvoked);
+    }
+    bool AddNocCommandHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kAddNocCommandInvoked); }
+    bool UpdateNocCommandHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kUpdateNocCommandInvoked); }
+    bool AddTrustedRootCertHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kAddTrustedRootCertInvoked); }
+    bool IsCsrRequestForUpdateNoc() const { return mContextFlags.Has(ContextFlags::kIsCsrRequestForUpdateNoc); }
+    bool UpdateTermsAndConditionsHasBeenInvoked() const
+    {
+        return mContextFlags.Has(ContextFlags::kUpdateTermsAndConditionsInvoked);
+    }
+    bool HasSetVidVerificationStatementHasBeenInvoked() const
+    {
+        return mContextFlags.Has(ContextFlags::kSetVidVerificationStatementInvoked);
+    }
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    bool AddICACCommandHasBeenInvoked() const { return mAddICACHasBeenInvoked; }
+    bool AddICACCommandHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kAddICACInvoked); }
+    {
+        return mContextFlags.Has(ContextFlags::kAddICACInvoked);
+    }
 #endif
 
     FabricIndex GetFabricIndex() const
@@ -113,19 +125,25 @@ public:
     void ForceFailSafeTimerExpiry();
 
 private:
-    bool mFailSafeArmed                    = false;
-    bool mFailSafeBusy                     = false;
-    bool mAddNocCommandHasBeenInvoked      = false;
-    bool mUpdateNocCommandHasBeenInvoked   = false;
-    bool mAddTrustedRootCertHasBeenInvoked = false;
-    // The fact of whether a CSR occurred at all is stored elsewhere.
-    bool mIsCsrRequestForUpdateNoc                  = false;
-    FabricIndex mFabricIndex                        = kUndefinedFabricIndex;
-    bool mUpdateTermsAndConditionsHasBeenInvoked    = false;
-    bool mSetVidVerificationStatementHasBeenInvoked = false;
+    bool mFailSafeArmed = false;
+    bool mFailSafeBusy  = false;
+
+    enum class ContextFlags : uint8_t
+    {
+        kAddNocCommandInvoked               = 0x01,
+        kUpdateNocCommandInvoked            = 0x02,
+        kAddTrustedRootCertInvoked          = 0x04,
+        kIsCsrRequestForUpdateNoc           = 0x08,
+        kUpdateTermsAndConditionsInvoked    = 0x10,
+        kSetVidVerificationStatementInvoked = 0x20,
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    bool mAddICACHasBeenInvoked = false;
+        kAddICACInvoked = 0x40,
 #endif
+    };
+
+    BitFlags<ContextFlags> mContextFlags;
+
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     /**
      * @brief
@@ -155,16 +173,8 @@ private:
     {
         SetFailSafeArmed(false);
 
-        mAddNocCommandHasBeenInvoked               = false;
-        mUpdateNocCommandHasBeenInvoked            = false;
-        mAddTrustedRootCertHasBeenInvoked          = false;
-        mFailSafeBusy                              = false;
-        mIsCsrRequestForUpdateNoc                  = false;
-        mUpdateTermsAndConditionsHasBeenInvoked    = false;
-        mSetVidVerificationStatementHasBeenInvoked = false;
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mAddICACHasBeenInvoked = false;
-#endif
+        mFailSafeBusy = false;
+        mContextFlags.ClearAll();
     }
 
     void FailSafeTimerExpired();
