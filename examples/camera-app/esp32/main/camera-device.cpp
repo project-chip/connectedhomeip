@@ -17,7 +17,6 @@
 #include "camera-device.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
@@ -548,7 +547,7 @@ bool CameraDevice::AddSnapshotStream(
 
     if (mSnapshotStreams.size() >= kMaxSnapshotStreams)
     {
-        ChipLogError(Camera,"Maximum number of snapshot streams reached. Cannot allocate new one");
+        ChipLogError(Camera, "Maximum number of snapshot streams reached. Cannot allocate new one");
         return false;
     }
 
