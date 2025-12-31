@@ -38,21 +38,22 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 
-static constexpr const char * kVendorName            = "TestVendor";
-static constexpr const char * kProductName           = "TestProduct";
-static constexpr const char * kHardwareVersionString = "HW1.0";
-static constexpr const char * kPartNumber            = "PART123";
-static constexpr const char * kProductURL            = "http://example.com";
-static constexpr const char * kProductLabel          = "Label123";
-static constexpr const char * kSerialNumber          = "SN123456";
-static constexpr uint16_t kVendorId                  = static_cast<uint16_t>(VendorId::TestVendor1);
-static constexpr uint16_t kProductId                 = 0x5678;
-static constexpr uint16_t kHardwareVersion           = 1;
-static constexpr uint16_t kManufacturingYear         = 2023;
-static constexpr uint8_t kManufacturingMonth         = 6;
-static constexpr uint8_t kManufacturingDay           = 15;
-static constexpr ProductFinishEnum kProductFinish    = ProductFinishEnum::kMatte;
-static constexpr ColorEnum kProductPrimaryColor      = ColorEnum::kBlack;
+static constexpr const char * kVendorName              = "TestVendor";
+static constexpr const char * kProductName             = "TestProduct";
+static constexpr const char * kHardwareVersionString   = "HW1.0";
+static constexpr const char * kPartNumber              = "PART123";
+static constexpr const char * kProductURL              = "http://example.com";
+static constexpr const char * kProductLabel            = "Label123";
+static constexpr const char * kSerialNumber            = "SN123456";
+static constexpr uint16_t kVendorId                    = static_cast<uint16_t>(VendorId::TestVendor1);
+static constexpr uint16_t kProductId                   = 0x5678;
+static constexpr uint16_t kHardwareVersion             = 1;
+static constexpr uint16_t kManufacturingYear           = 2023;
+static constexpr uint8_t kManufacturingMonth           = 6;
+static constexpr uint8_t kManufacturingDay             = 15;
+static constexpr const char * kManufacturingDateSuffix = "ABCDEFGH";
+static constexpr ProductFinishEnum kProductFinish      = ProductFinishEnum::kMatte;
+static constexpr ColorEnum kProductPrimaryColor        = ColorEnum::kBlack;
 
 // Helper function to safely copy strings and check for buffer size
 CHIP_ERROR SafeCopyString(char * buf, size_t bufSize, const char * source)
@@ -100,6 +101,13 @@ public:
         year  = kManufacturingYear;
         month = kManufacturingMonth;
         day   = kManufacturingDay;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer) override
+    {
+        ReturnErrorOnFailure(SafeCopyString(suffixBuffer.data(), suffixBuffer.size(), kManufacturingDateSuffix));
+        suffixBuffer.reduce_size(strlen(kManufacturingDateSuffix));
         return CHIP_NO_ERROR;
     }
 
@@ -309,7 +317,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         char buf[32];
         CharSpan val(buf);
         ASSERT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
-        EXPECT_TRUE(val.data_equal("20230615"_span));
+        EXPECT_TRUE(val.data_equal("20230615ABCDEFGH"_span));
     }
 
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)
