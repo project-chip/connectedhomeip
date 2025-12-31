@@ -105,3 +105,5 @@ idf.py -p [PORT] flash monitor
 ```
 
 **Note**: If the console selection is wrong, you will only see the initial bootloader logs. Please change the console as instructed above and reflash the app to see the complete logs.
+
+⚠️ **Caution**: Currently, due to flash size limitations of ESP32-C6 onboard the ESP32-P4 Function EV Board, the `ota_1` partition (see [`partitions.csv`](partitions.csv)) is disabled and the size of the `ota_0` partition is increased. This prevents the firmware from performing OTA updates. Hence, this configuration is not recommended for production use.

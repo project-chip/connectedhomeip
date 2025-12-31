@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -115,16 +115,6 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
-static void InitServer(intptr_t context)
-{
-    // Print QR Code URL
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-
-    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
-    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
-                            // Initialize device attestation config
-}
-
 #ifdef CONFIG_SLAVE_LWIP_ENABLED
 static void create_slave_sta_netif(uint8_t dhcp_at_slave)
 {
@@ -216,8 +206,6 @@ extern "C" void app_main()
 #endif
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
-
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
