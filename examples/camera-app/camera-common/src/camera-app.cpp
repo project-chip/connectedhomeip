@@ -183,6 +183,7 @@ void CameraApp::InitializeCameraAVStreamMgmt()
 
     TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().Init();
 }
+
 void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
 {
 
@@ -282,6 +283,13 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
                                rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities, spkrCapabilities,
                                twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
                                streamUsagePriorities);
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVStreamMgmtServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register CameraAVStreamManagementServer on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
 
     InitializeCameraAVStreamMgmt();
 }

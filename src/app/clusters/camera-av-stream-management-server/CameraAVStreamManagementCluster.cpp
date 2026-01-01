@@ -173,6 +173,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
 
 CHIP_ERROR CameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
 {
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
     return CHIP_NO_ERROR;
 }
 
