@@ -94,10 +94,7 @@ public:
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    bool NocCommandHasBeenInvoked() const
-    {
-        return mContextFlags.Has(ContextFlags::kAddNocCommandInvoked) || mContextFlags.Has(ContextFlags::kUpdateNocCommandInvoked);
-    }
+    bool NocCommandHasBeenInvoked() const { return AddNocCommandHasBeenInvoked() || UpdateNocCommandHasBeenInvoked(); }
     bool AddNocCommandHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kAddNocCommandInvoked); }
     bool UpdateNocCommandHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kUpdateNocCommandInvoked); }
     bool AddTrustedRootCertHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kAddTrustedRootCertInvoked); }
