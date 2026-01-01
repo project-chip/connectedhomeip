@@ -25,6 +25,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitFlags.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
 
