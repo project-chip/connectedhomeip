@@ -55,7 +55,10 @@ public:
     }
     void SetUpdateNocCommandInvoked() { mContextFlags.Set(ContextFlags::kUpdateNocCommandInvoked); }
     void SetAddTrustedRootCertInvoked() { mContextFlags.Set(ContextFlags::kAddTrustedRootCertInvoked); }
-    void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mContextFlags.Set(ContextFlags::kIsCsrRequestForUpdateNoc); }
+    void SetCsrRequestForUpdateNoc(bool isForUpdateNoc)
+    {
+        mContextFlags.Set(ContextFlags::kIsCsrRequestForUpdateNoc, isForUpdateNoc);
+    }
     void SetUpdateTermsAndConditionsHasBeenInvoked() { mContextFlags.Set(ContextFlags::kUpdateTermsAndConditionsInvoked); }
     void RecordSetVidVerificationStatementHasBeenInvoked() { mContextFlags.Set(ContextFlags::kSetVidVerificationStatementInvoked); }
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -109,9 +112,6 @@ public:
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     bool AddICACCommandHasBeenInvoked() const { return mContextFlags.Has(ContextFlags::kAddICACInvoked); }
-    {
-        return mContextFlags.Has(ContextFlags::kAddICACInvoked);
-    }
 #endif
 
     FabricIndex GetFabricIndex() const
@@ -125,15 +125,12 @@ public:
     void ForceFailSafeTimerExpiry();
 
 private:
-    bool mFailSafeArmed = false;
-    bool mFailSafeBusy  = false;
-
     enum class ContextFlags : uint8_t
     {
         kAddNocCommandInvoked               = 0x01,
         kUpdateNocCommandInvoked            = 0x02,
         kAddTrustedRootCertInvoked          = 0x04,
-        kIsCsrRequestForUpdateNoc           = 0x08,
+        kIsCsrRequestForUpdateNoc           = 0x08, /* The fact of whether a CSR occurred at all is stored elsewhere. */
         kUpdateTermsAndConditionsInvoked    = 0x10,
         kSetVidVerificationStatementInvoked = 0x20,
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -142,8 +139,10 @@ private:
     };
 
     BitFlags<ContextFlags> mContextFlags;
-
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
+
+    bool mFailSafeArmed = false;
+    bool mFailSafeBusy  = false;
 
     /**
      * @brief
