@@ -42,7 +42,6 @@
 
 
 import logging
-from enum import Enum
 
 from mobly import asserts
 
