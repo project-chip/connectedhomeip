@@ -146,7 +146,7 @@ jobs:
               run: |
                 scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
-              
+
 
             - name: Build example Lighting App (external platform)
               run: |
@@ -193,6 +193,9 @@ jobs:
 
             - name: Build example Bridge App
               run: scripts/examples/esp_example.sh bridge-app
+
+            - name: Build example Camera App
+              run: scripts/examples/esp_example.sh camera-app sdkconfig.defaults esp32c6
 
             - name: Build example Persistent Storage App
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
