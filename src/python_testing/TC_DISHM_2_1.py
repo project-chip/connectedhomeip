@@ -100,12 +100,6 @@ class TC_DISHM_2_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.DishwasherMode))
     async def test_TC_DISHM_2_1(self):
 
-        class CommonCodes(Enum):
-            SUCCESS = 0x00
-            UNSUPPORTED_MODE = 0x01
-            GENERIC_FAILURE = 0x02
-            INVALID_IN_MODE = 0x03
-
         cluster = Clusters.Objects.DishwasherMode
         supported_modes_attribute = cluster.Attributes.SupportedModes
         current_mode_attribute = cluster.Attributes.CurrentMode
@@ -165,7 +159,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         # DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response
         asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
-        asserts.assert_equal(change_to_mode_response.status, CommonCodes.SUCCESS.value,
+        asserts.assert_equal(change_to_mode_response.status, cluster.Enums.ChangeToModeStatus.kSuccess,
                              f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
 
         # Manually put the device in a state from which it will FAIL to transition to PIXIT.DISHM.MODE_CHANGE_FAIL
@@ -206,7 +200,8 @@ class TC_DISHM_2_1(MatterBaseTest):
             st = change_to_mode_response.status
 
             is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
+            is_err_code = (st == cluster.Enums.ChangeToModeStatus.kGenericFailure) or (
+                st == cluster.Enums.ChangeToModeStatus.kInvalidInMode) or is_mfg_code
 
             asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
 
@@ -249,7 +244,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         # DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response
         asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
-        asserts.assert_equal(change_to_mode_response.status, CommonCodes.SUCCESS.value,
+        asserts.assert_equal(change_to_mode_response.status, cluster.Enums.ChangeToModeStatus.kSuccess,
                              f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
 
         # TH reads from the DUT the CurrentMode attribute
@@ -267,7 +262,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
         # DUT responds contains a ChangeToModeResponse command with a UnsupportedMode(0x01) status response
-        asserts.assert_equal(change_to_mode_response.status, CommonCodes.UNSUPPORTED_MODE.value,
+        asserts.assert_equal(change_to_mode_response.status, cluster.Enums.ChangeToModeStatus.kUnsupportedMode,
                              f"Attempt to change to invalid mode {invalid_mode_th} didn't fail as expected")
 
         # TH reads from the DUT the CurrentMode attribute

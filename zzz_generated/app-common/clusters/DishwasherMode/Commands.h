@@ -108,7 +108,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
 
-    uint8_t status = static_cast<uint8_t>(0);
+    ChangeToModeStatus status = static_cast<ChangeToModeStatus>(0);
     Optional<chip::CharSpan> statusText;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
@@ -124,7 +124,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
 
-    uint8_t status = static_cast<uint8_t>(0);
+    ChangeToModeStatus status = static_cast<ChangeToModeStatus>(0);
     Optional<chip::CharSpan> statusText;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
