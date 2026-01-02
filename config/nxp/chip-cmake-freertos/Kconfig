@@ -164,7 +164,7 @@ config CHIP_OPENTHREAD_FTD
 
 config CHIP_USE_OT_ENDPOINT
 	bool "Use OpenThread TCP/UDP stack directly"
-	default y if !HAVE_LWIP
+	default y if !CHIP_WITH_LWIP
 	depends on NET_L2_OPENTHREAD
 	help
 	  Use OpenThread TCP/UDP stack directly
