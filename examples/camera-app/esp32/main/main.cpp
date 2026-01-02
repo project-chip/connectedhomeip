@@ -19,9 +19,6 @@
 
 #include "AppTask.h"
 #include "esp_log.h"
-#include <common/CHIPDeviceManager.h>
-#include <common/Esp32AppServer.h>
-#include <common/Esp32ThreadInit.h>
 #include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
@@ -30,6 +27,9 @@
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
 #include <app/server/Dnssd.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
+#include <common/Esp32ThreadInit.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -46,7 +46,6 @@
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 #include <platform/ESP32/ESP32DeviceInfoProvider.h>
@@ -122,18 +121,18 @@ static void InitServer(intptr_t context)
 static void create_slave_sta_netif(void)
 {
     /* Create "almost" default station, but with un-flagged DHCP client */
-	esp_netif_inherent_config_t netif_cfg;
-	memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
+    esp_netif_inherent_config_t netif_cfg;
+    memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
 
-	esp_netif_config_t cfg_sta = {
-		.base = &netif_cfg,
-		.stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
-	};
-	esp_netif_t *netif_sta = esp_netif_new(&cfg_sta);
-	assert(netif_sta);
+    esp_netif_config_t cfg_sta = {
+        .base  = &netif_cfg,
+        .stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
+    };
+    esp_netif_t * netif_sta = esp_netif_new(&cfg_sta);
+    assert(netif_sta);
 
-	ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_sta));
-	ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
+    ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_sta));
+    ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
 }
 #endif
 

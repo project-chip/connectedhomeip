@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
-static size_t gSDPLength = CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES;
+static size_t gSDPLength       = CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES;
 static size_t gCandidateLength = 1024;
 static char peerClientId[SS_MAX_SIGNALING_CLIENT_ID_LEN + 1];
 
@@ -62,8 +62,8 @@ void KVSWebRTCPeerConnection::CreateOffer(uint16_t sessionId)
         ChipLogError(Camera, "CreateOffer: failed to allocate signaling_msg_t");
         return;
     }
-    message->version                         = 0;
-    message->messageType                     = SIGNALING_MSG_TYPE_TRIGGER_OFFER;
+    message->version     = 0;
+    message->messageType = SIGNALING_MSG_TYPE_TRIGGER_OFFER;
     snprintf(message->correlationId, sizeof(message->correlationId), "%u", sessionId);
     std::string peerConnectionId = this->GetPeerConnectionId();
     snprintf(peerClientId, sizeof(peerClientId), "%s", peerConnectionId.c_str());
@@ -77,7 +77,6 @@ void KVSWebRTCPeerConnection::CreateOffer(uint16_t sessionId)
     {
         webrtc_bridge_send_message(serialized_msg, serialized_len);
     }
-
 }
 
 void KVSWebRTCPeerConnection::CreateAnswer()
@@ -149,9 +148,9 @@ void KVSWebRTCPeerConnection::AddRemoteCandidate(const std::string & candidate, 
         ChipLogError(Camera, "AddRemoteCandidate: failed to allocate signaling_msg_t");
         return;
     }
-    message->version                         = 0;
-    message->messageType                     = SIGNALING_MSG_TYPE_ICE_CANDIDATE;
-    std::string peerConnectionId             = this->GetPeerConnectionId();
+    message->version             = 0;
+    message->messageType         = SIGNALING_MSG_TYPE_ICE_CANDIDATE;
+    std::string peerConnectionId = this->GetPeerConnectionId();
     snprintf(peerClientId, sizeof(peerClientId), "%s", peerConnectionId.c_str());
     memcpy(message->peerClientId, peerClientId, sizeof(peerClientId));
     message->payloadLen = json_len;
