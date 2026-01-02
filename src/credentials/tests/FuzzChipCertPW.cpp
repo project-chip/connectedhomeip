@@ -110,7 +110,7 @@ void ValidateChipRCACFuzz(const std::string & fuzzRcacCerts)
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
     {
         ByteSpan span(reinterpret_cast<const uint8_t *>(fuzzRcacCerts.data()), fuzzRcacCerts.size());
-        ValidateChipRCAC(span);
+        (void) ValidateChipRCAC(span);
     }
     chip::Platform::MemoryShutdown();
 }
@@ -127,7 +127,7 @@ void ConvertX509CertToChipCertFuzz(const std::string & fuzzDerCerts)
     uint8_t outCertBuf[kMaxDERCertLength];
     MutableByteSpan outCert(outCertBuf);
 
-    ConvertX509CertToChipCert(span, outCert);
+    (void) ConvertX509CertToChipCert(span, outCert);
 }
 FUZZ_TEST(FuzzChipCert, ConvertX509CertToChipCertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
 
@@ -138,7 +138,7 @@ void ExtractSubjectDNFromX509CertFuzz(const std::string & fuzzDerCerts)
 {
     ByteSpan span(reinterpret_cast<const uint8_t *>(fuzzDerCerts.data()), fuzzDerCerts.size());
     ChipDN subjectDN;
-    ExtractSubjectDNFromX509Cert(span, subjectDN);
+    (void) ExtractSubjectDNFromX509Cert(span, subjectDN);
 }
 FUZZ_TEST(FuzzChipCert, ExtractSubjectDNFromX509CertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
 
