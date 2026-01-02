@@ -156,6 +156,12 @@ std::string json_escape(const std::string & input)
 
 static int extract_sdp(const char * json, char * sdp_buf, size_t sdp_buf_len)
 {
+    if (json == nullptr || sdp_buf == nullptr || sdp_buf_len == 0)
+    {
+        ChipLogError(Camera, "extract_sdp failed");
+        return -1;
+    }
+
     jsmn_parser parser;
     jsmntok_t tokens[64];
     int ret;
@@ -186,6 +192,13 @@ static int extract_sdp(const char * json, char * sdp_buf, size_t sdp_buf_len)
 
 static int extract_candidate(const char * json, char * sdp_buf, size_t sdp_buf_len)
 {
+    // Sanity checks for input parameters
+    if (json == nullptr || sdp_buf == nullptr || sdp_buf_len == 0)
+    {
+        ChipLogError(Camera, "extract_candidate failed");
+        return -1;
+    }
+
     jsmn_parser parser;
     jsmntok_t tokens[64];
     int ret;
@@ -211,7 +224,7 @@ static int extract_candidate(const char * json, char * sdp_buf, size_t sdp_buf_l
         }
     }
 
-    return -1; // SDP not found
+    return -1; // Candidate not found
 }
 
 void webrtc_bridge_message_received_cb(void * data, int len)
@@ -219,12 +232,15 @@ void webrtc_bridge_message_received_cb(void * data, int len)
     // handle message
     printf("Received Message from P4-Streamer: \n%.*s\n", len, (char *) data);
 
-    signaling_msg_t * msg = new signaling_msg_t;
+    // Use nothrow to check for allocation failure
+    std::unique_ptr<signaling_msg_t> msg(new (std::nothrow) signaling_msg_t());
+    if (msg == nullptr)
+    {
+        ChipLogError(Camera, "webrtc_bridge_message_received_cb: failed to allocate signaling_msg_t");
+        return;
+    }
 
-    msg->payload    = NULL;
-    msg->payloadLen = 0;
-
-    deserialize_signaling_message((const char *) data, len, msg);
+    deserialize_signaling_message((const char *) data, len, msg.get());
 
     char sdp_buf[gSDPLength];
     switch (msg->messageType)
@@ -341,7 +357,6 @@ cleanup:
     {
         free(msg->payload);
     }
-    delete msg;
 }
 
 std::string generateMonotonicPeerConnectionId()

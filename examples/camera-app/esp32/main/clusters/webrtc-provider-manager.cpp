@@ -903,7 +903,7 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
     std::string localSdp = sdp;
     ChipLogProgress(Camera, "Local Description (%s):", typeStr);
     ChipLogProgress(Camera, "%s", localSdp.c_str());
-    printf("Size of SDP: %zu\n", localSdp.size());
+    ChipLogProgress(Camera, "Size of SDP: %zu", localSdp.size());
 
     switch (state)
     {
@@ -911,7 +911,6 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
         ScheduleOfferSend(sessionId);
         break;
     case WebrtcTransport::State::SendingAnswer:
-        // sdp_mem_dump();
         ScheduleAnswerSend(sessionId);
         break;
     default:
@@ -997,7 +996,6 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
     command.sdp             = CharSpan::fromCharString(localSdp.c_str());
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
-    printf("\nInvoke Answer Command\n");
     // Now invoke the command using the found session handle
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
                                             onFailure,

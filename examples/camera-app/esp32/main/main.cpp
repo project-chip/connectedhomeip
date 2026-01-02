@@ -22,11 +22,7 @@
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-#include "spi_flash_mmap.h"
-#else
 #include "esp_spi_flash.h"
-#endif
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -51,9 +47,6 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-#if CONFIG_ENABLE_PW_RPC
-#include "Rpc.h"
-#endif
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 #include <platform/ESP32/ESP32DeviceInfoProvider.h>
@@ -115,32 +108,32 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
+static void InitServer(intptr_t context)
+{
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
+
+    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
+                            // Initialize device attestation config
+}
+
 #ifdef CONFIG_SLAVE_LWIP_ENABLED
-static void create_slave_sta_netif(uint8_t dhcp_at_slave)
+static void create_slave_sta_netif(void)
 {
     /* Create "almost" default station, but with un-flagged DHCP client */
-    esp_netif_inherent_config_t netif_cfg;
-    memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
+	esp_netif_inherent_config_t netif_cfg;
+	memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
 
-    if (!dhcp_at_slave)
-    {
-        netif_cfg.flags = (esp_netif_flags_t) (netif_cfg.flags & ~ESP_NETIF_DHCP_CLIENT);
-    }
+	esp_netif_config_t cfg_sta = {
+		.base = &netif_cfg,
+		.stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
+	};
+	esp_netif_t *netif_sta = esp_netif_new(&cfg_sta);
+	assert(netif_sta);
 
-    esp_netif_config_t cfg_sta = {
-        .base  = &netif_cfg,
-        .stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
-    };
-    esp_netif_t * netif_sta = esp_netif_new(&cfg_sta);
-    assert(netif_sta);
-
-    ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_sta));
-    ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
-
-    if (!dhcp_at_slave)
-        ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif_sta));
-
-    // slave_sta_netif = netif_sta;
+	ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_sta));
+	ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
 }
 #endif
 
@@ -158,7 +151,7 @@ extern "C" void app_main()
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
 #ifdef CONFIG_SLAVE_LWIP_ENABLED
-    create_slave_sta_netif(true);
+    create_slave_sta_netif();
 #endif
 
     signaling_serializer_init();
@@ -206,6 +199,8 @@ extern "C" void app_main()
 #endif
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)

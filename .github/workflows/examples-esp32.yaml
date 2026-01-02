@@ -127,6 +127,10 @@ jobs:
                     - 'src/app/clusters/energy-evse-server/**'
                     - 'src/app/clusters/power-topology-server/**'
                     - 'src/app/clusters/water-heater-management-server/**'
+                  camera:
+                    - 'examples/camera-app/**'
+                    - 'src/app/clusters/camera-av-stream-management-server/**'
+                    - 'src/app/clusters/webrtc-transport-provider-server/**'
 
             - name: Build example All Clusters App(Target:ESP32, pigweed RPC, IPv6 Only)
               if: steps.changed_paths.outputs.pigweed == 'true'
@@ -148,6 +152,7 @@ jobs:
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
 
             - name: Build example Camera App
+              if: steps.changed_paths.outputs.camera == 'true'
               run: |
                 scripts/examples/esp_example.sh camera-app sdkconfig.defaults esp32c6
                 rm -rf examples/camera-app/esp32/{build,managed_components}
