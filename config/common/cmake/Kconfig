@@ -40,6 +40,12 @@ config CHIP_APP_LOG_LEVEL
 	  option only within the application. To set the logging level for the
 	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
 
+config MATTER_LOG_LEVEL
+	int "Logging level in Matter stack"
+	default 4
+	help
+	  Sets the logging level in Matter stack.
+
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
 	help
@@ -557,7 +563,8 @@ config CHIP_TASK_PRIORITY
 	default 1
 	help
 	  Set the thread priority for the Matter main task (CHIP event loop).
-	  This value is passed to K_PRIO_PREEMPT(). Lower values mean higher priority.
+	  Note: For Zephyr, this value is passed to K_PRIO_PREEMPT(). Lower values mean higher priority.
+	  For FreeRTOS, higher values mean higher priority.
 
 config CHIP_TASK_STACK_SIZE
 	int "Matter task stack size"

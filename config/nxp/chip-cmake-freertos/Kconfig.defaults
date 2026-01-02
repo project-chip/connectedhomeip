@@ -44,6 +44,9 @@ config CHIP_TASK_STACK_SIZE
 	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
 	default 10240
 
+config CHIP_TASK_PRIORITY
+	default 2
+
 config CHIP_DEVICE_HARDWARE_VERSION
 	default 1
 
