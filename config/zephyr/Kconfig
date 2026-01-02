@@ -16,6 +16,7 @@
 
 rsource "../common/cmake/Kconfig"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP
 	select CPP
 	imply REQUIRES_FULL_LIBCPP
@@ -39,24 +40,30 @@ config CHIP
 
 if CHIP
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_IPV4
 	imply NET_IPV4
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	imply REBOOT
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_LIB_SHELL
 	imply SHELL
 
 if NET_L2_OPENTHREAD
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ENABLE_DNSSD_SRP
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ENABLE_DNS_CLIENT
 	imply OPENTHREAD_DNS_CLIENT
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ENABLE_ICD_SUPPORT
 	imply OPENTHREAD_MTD_SED
 

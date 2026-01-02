@@ -19,6 +19,7 @@
 
 if CHIP
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
 	default y
 	select WIFI
@@ -71,6 +72,7 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ETHERNET
 	default n
 	depends on !CHIP_WIFI

@@ -263,7 +263,7 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
 	select WIFI
 	imply NET_STATISTICS
