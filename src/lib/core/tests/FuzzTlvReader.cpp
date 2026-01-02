@@ -15,7 +15,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
 {
     TLVReader reader;
     reader.Init(data, len);
-    chip::TLV::Utilities::Iterate(reader, FuzzIterator, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::TLV::Utilities::Iterate(reader, FuzzIterator, nullptr);
 
     return 0;
 }

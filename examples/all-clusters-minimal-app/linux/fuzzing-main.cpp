@@ -76,7 +76,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
 
     // Now process pending events until our sentinel is reached.
-    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+        [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     PlatformMgr().RunEventLoop();
     return 0;
 }
