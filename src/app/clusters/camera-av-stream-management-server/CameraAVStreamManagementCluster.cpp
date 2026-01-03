@@ -2171,10 +2171,8 @@ CameraAVStreamManagementCluster::HandleVideoStreamAllocate(CommandHandler & hand
 
         return std::nullopt;
     }
-    else
-    {
-        return status;
-    }
+
+    return status;
 }
 
 std::optional<DataModel::ActionReturnStatus>

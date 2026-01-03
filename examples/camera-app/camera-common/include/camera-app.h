@@ -57,7 +57,7 @@ private:
 
     // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
     void CreateAndInitializeCameraAVStreamMgmt();
-    void InitializeCameraAVStreamMgmt();
+    CHIP_ERROR InitializeCameraAVStreamMgmt();
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

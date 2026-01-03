@@ -101,87 +101,87 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
 }
 
-void CameraApp::InitializeCameraAVStreamMgmt()
+CHIP_ERROR CameraApp::InitializeCameraAVStreamMgmt()
 {
     // Set the attribute defaults
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetHDRModeEnabled(
-            mCameraDevice->GetCameraHALInterface().GetHDRMode());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSoftRecordingPrivacyModeEnabled(
-            mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSoftLivestreamPrivacyModeEnabled(
-            mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetSoftRecordingPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled()));
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetSoftLivestreamPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetHardPrivacyModeOn(
-            mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetHardPrivacyModeOn(mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetNightVision(
-            mCameraDevice->GetCameraHALInterface().GetNightVision());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision()));
     }
 
-    TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+    ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport()));
 
     if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerMuted(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerMuted());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerVolumeLevel(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerVolume());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerMaxLevel(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerMaxLevel());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetSpeakerMinLevel(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerMinLevel());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerMuted(mCameraDevice->GetCameraHALInterface().GetSpeakerMuted()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerVolumeLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerVolume()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerMaxLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMaxLevel()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerMinLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMinLevel()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetMicrophoneMuted(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneMuted());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetMicrophoneVolumeLevel(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneVolume());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetMicrophoneMaxLevel(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneMaxLevel());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetMicrophoneMinLevel(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneMinLevel());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneMuted(mCameraDevice->GetCameraHALInterface().GetMicrophoneMuted()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneVolumeLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneVolume()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneMaxLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMaxLevel()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneMinLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMinLevel()));
     }
 
     // Video and Snapshot features are already enabled.
     if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetLocalVideoRecordingEnabled(
-            mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetLocalSnapshotRecordingEnabled(
-            mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetLocalVideoRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled()));
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetLocalSnapshotRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetStatusLightEnabled(
-            mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetImageRotation(
-            mCameraDevice->GetCameraHALInterface().GetImageRotation());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetImageFlipVertical(
-            mCameraDevice->GetCameraHALInterface().GetImageFlipVertical());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().SetImageFlipHorizontal(
-            mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetImageRotation(mCameraDevice->GetCameraHALInterface().GetImageRotation()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetImageFlipVertical(mCameraDevice->GetCameraHALInterface().GetImageFlipVertical()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetImageFlipHorizontal(mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal()));
     }
 
-    TEMPORARY_RETURN_IGNORED mAVStreamMgmtServer.Cluster().Init();
+    ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().Init());
+
+    return CHIP_NO_ERROR;
 }
 
 void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
@@ -291,7 +291,12 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
                      err.Format());
     }
 
-    InitializeCameraAVStreamMgmt();
+    err = InitializeCameraAVStreamMgmt();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to initialize CameraAVStreamManagementServer on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
 }
 
 void CameraApp::InitCameraDeviceClusters()
