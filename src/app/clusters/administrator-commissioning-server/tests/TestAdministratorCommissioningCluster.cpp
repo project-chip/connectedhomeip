@@ -53,7 +53,6 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
 
     static void SetUpTestSuite()
     {
-        chip::DeviceLayer::PlatformMgr().Shutdown();
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
@@ -67,6 +66,8 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         serverInitParams.operationalKeystore       = &sTestOpKeystore;
         serverInitParams.persistentStorageDelegate = &sStorageDelegate;
         serverInitParams.operationalServicePort    = 0;
+        static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
+        serverInitParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
         (void) serverInitParams.InitializeStaticResourcesBeforeServerInit();
         serverInitParams.dataModelProvider = &sEmptyProvider;
         ASSERT_EQ(Server::GetInstance().Init(serverInitParams), CHIP_NO_ERROR);
