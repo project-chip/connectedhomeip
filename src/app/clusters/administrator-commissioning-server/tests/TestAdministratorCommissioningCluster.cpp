@@ -65,7 +65,6 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
         serverInitParams.opCertStore               = &sTestOpCertStore;
         serverInitParams.operationalKeystore       = &sTestOpKeystore;
         serverInitParams.persistentStorageDelegate = &sStorageDelegate;
-        serverInitParams.operationalServicePort    = 0;
         static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
         serverInitParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
         (void) serverInitParams.InitializeStaticResourcesBeforeServerInit();
@@ -282,10 +281,10 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
         ASSERT_FALSE(result.IsSuccess());
         EXPECT_TRUE(result.status.has_value());
         // On platforms where DNS-SD is disabled, the logic swallows the error and returns kPAKEParameterError
-        auto statusCode = result.status.value().GetStatusCode();
+        auto statusCode = result.status.value().GetStatusCode(); // NOLINT(bugprone-unchecked-optional-access)
         EXPECT_EQ(statusCode.GetStatus(), chip::Protocols::InteractionModel::Status::Failure);
         EXPECT_TRUE(statusCode.GetClusterSpecificCode().has_value());
-        EXPECT_EQ(statusCode.GetClusterSpecificCode().value(),
+        EXPECT_EQ(statusCode.GetClusterSpecificCode().value(), // NOLINT(bugprone-unchecked-optional-access)
                   to_underlying(AdministratorCommissioning::StatusCode::kPAKEParameterError));
     }
 }
