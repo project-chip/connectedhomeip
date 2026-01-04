@@ -20,7 +20,7 @@
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
@@ -71,8 +71,8 @@ struct AudioStream
     bool IsCompatible(const AudioStreamStruct & inputParams) const
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
-                audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
+                audioStreamParams.channelCount >= inputParams.channelCount &&
+                audioStreamParams.sampleRate >= inputParams.sampleRate && audioStreamParams.bitDepth >= inputParams.bitDepth);
     }
 };
 
@@ -83,8 +83,9 @@ struct SnapshotStream
     void * snapshotContext; // Platform-specific context object associated with
                             // snapshot stream;
 
-    bool IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs &
-                          inputParams) const
+    bool
+    IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs &
+                     inputParams) const
     {
         return (snapshotStreamParams.imageCodec == inputParams.imageCodec &&
                 snapshotStreamParams.frameRate <= inputParams.maxFrameRate &&
@@ -129,7 +130,7 @@ public:
     SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) = 0;
 
     // Getter for CameraAVStreamManagement Delegate
-    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() = 0;
 
     // Getter for CameraAVStreamManagement Controller
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
@@ -146,8 +147,6 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
-
-    virtual void HandlePushAvZoneTrigger(uint16_t zoneId) = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -187,7 +186,8 @@ public:
 
         // Allocate snapshot stream
         virtual CameraError AllocateSnapshotStream(
-            const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+            const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs &
+                args,
             uint16_t & outStreamID) = 0;
 
         // Start snapshot stream
@@ -389,7 +389,7 @@ public:
         UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
 
         // Remove a zone trigger
-        virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
+        virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
 
         class ZoneEventCallback
         {
