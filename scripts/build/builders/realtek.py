@@ -124,6 +124,7 @@ class RealtekBuilder(Builder):
         self.enable_rpc = enable_rpc
         self.enable_shell = enable_shell
         self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
+        self.rtk_matter_dir = os.path.join(self.ot_src_dir, 'third_party/Realtek/rtl87x2g_sdk/subsys/matter')
 
         if self.board == RealtekBoard.RTL87X2G:
             self.os_env = RtkOsUsed.ZEPHYR
@@ -135,7 +136,7 @@ class RealtekBuilder(Builder):
     def CmakeBuildFlags(self) -> str:
         flags = [
             "-DCMAKE_BUILD_TYPE=Release",
-            "-DCMAKE_TOOLCHAIN_FILE=src/bee4/arm-none-eabi.cmake",
+            f"-DCMAKE_TOOLCHAIN_FILE={self.ot_src_dir}/src/bee4/arm-none-eabi.cmake",
             "-DBUILD_TYPE=sdk",
             f"-DBUILD_TARGET={self.board.BoardName}",
             f"-DBUILD_BOARD_TARGET={self.board.BoardName}",
@@ -178,7 +179,7 @@ class RealtekBuilder(Builder):
         self._Execute(['bash', '-c', cmd])
         cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
             build_flags=self.CmakeBuildFlags(),
-            example_folder=self.ot_src_dir,
+            example_folder=self.rtk_matter_dir,
             out_folder=self.output_dir)
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
