@@ -60,7 +60,7 @@ LogProvider::~LogProvider()
         auto rv = fclose(f.second);
         if (rv != 0)
         {
-            ChipLogError(NotSpecified, "Error when closing file pointer: %p (%d)", f.second, errno);
+            ChipLogError(NotSpecified, "Error when closing file pointer: %d", errno);
         }
     }
     mFiles.clear();
