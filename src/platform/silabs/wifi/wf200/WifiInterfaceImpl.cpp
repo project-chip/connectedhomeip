@@ -733,7 +733,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
 {
     sl_status_t status = get_all_counters();
     VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
-                        ChipLogError(DeviceLayer, "Failed to get the couters : %ld", status));
+                        ChipLogError(DeviceLayer, "Failed to get the counters : %ld", status));
 
     info.beacon_lost_count = counters->body.count_miss_beacon;
     info.beacon_rx_count   = counters->body.count_rx_beacon;
