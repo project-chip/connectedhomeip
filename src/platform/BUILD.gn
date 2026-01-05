@@ -464,10 +464,7 @@ if (chip_device_platform != "none") {
   source_set("platform_error") {
     sources = [ "PlatformError.h" ]
 
-    public_deps = [
-      "${chip_root}/src/lib/core",
-    ]
-
+    public_deps = [ "${chip_root}/src/lib/core" ]
   }
   source_set("platform_base") {
     public_deps = [
