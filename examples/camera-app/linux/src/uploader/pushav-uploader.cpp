@@ -66,7 +66,7 @@ std::string DerCertToPem(const std::vector<uint8_t> & derData)
     X509 * cert             = d2i_X509(nullptr, &p, derData.size());
     if (!cert)
     {
-        ChipLogError(Camera, "Failed to parse DER certificate of size: %ld", derData.size());
+        ChipLogError(Camera, "Failed to parse DER certificate of size: %zu", derData.size());
         return "";
     }
 
@@ -104,7 +104,7 @@ std::string ConvertECDSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derDa
     EVP_PKEY * pkey = d2i_AutoPrivateKey(nullptr, &p, derData.size());
     if (!pkey)
     {
-        ChipLogError(Camera, "Failed to parse DER ECDSA private key of size: %ld", derData.size());
+        ChipLogError(Camera, "Failed to parse DER ECDSA private key of size: %zu", derData.size());
         return "";
     }
 
@@ -241,7 +241,7 @@ size_t PushAvUploadCb(void * ptr, size_t size, size_t nmemb, void * stream)
     }
     if ((size == 0) || (nmemb == 0) || ((size * nmemb) < 1))
     {
-        ChipLogError(Camera, "Zero buffer size = %ld nmemb = %ld %ld\n", size, nmemb, size * nmemb);
+        ChipLogError(Camera, "Zero buffer size = %zu nmemb = %zu %zu\n", size, nmemb, size * nmemb);
         return 0;
     }
     long remaining          = upload->mSize - upload->mBytesRead;
@@ -403,7 +403,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     }
     else
     {
-        ChipLogDetail(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
+        ChipLogDetail(Camera, "CURL uploaded file  %s size: %zu", data.first.c_str(), static_cast<size_t>(size));
     }
 
     if (extension != ".mpd")
