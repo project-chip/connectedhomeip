@@ -24,6 +24,21 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {} // namespace Clusters
+namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::ChangeToModeStatus val)
+{
+    using EnumType = RvcRunMode::ChangeToModeStatus;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kUnsupportedMode:
+    case EnumType::kGenericFailure:
+    case EnumType::kInvalidInMode:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+} // namespace Clusters
 } // namespace app
 } // namespace chip

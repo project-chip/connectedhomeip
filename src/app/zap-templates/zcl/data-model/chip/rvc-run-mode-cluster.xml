@@ -51,6 +51,15 @@ limitations under the License.
     <item value="0x4002" name="Mapping"/>
   </enum>
 
+  <enum name="ChangeToModeStatus" type="enum8">
+    <cluster code="0x0054"/>
+
+    <item name="Success"           value="0x00"/>
+    <item name="UnsupportedMode"   value="0x01"/>
+    <item name="GenericFailure"    value="0x02"/>
+    <item name="InvalidInMode"     value="0x03"/>
+  </enum>
+
   <cluster>
     <domain>Robots</domain>
     <name>RVC Run Mode</name>
@@ -95,8 +104,8 @@ limitations under the License.
       <description>
         This command is sent by the device on receipt of the ChangeToModeWithStatus command.
       </description>
-      <arg name="Status"     type="enum8"                   optional="false"/>
-      <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
+      <arg name="Status"     type="ChangeToModeStatus"      optional="false"/>
+      <arg name="StatusText" type="char_string" length="64" optional="true"/>
       <mandatoryConform/>
     </command>
   </cluster>

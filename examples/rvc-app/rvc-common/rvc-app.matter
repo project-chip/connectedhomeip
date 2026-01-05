@@ -1435,6 +1435,13 @@ cluster GroupKeyManagement = 63 {
 cluster RvcRunMode = 84 {
   revision 4;
 
+  enum ChangeToModeStatus : enum8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+    kInvalidInMode = 3;
+  }
+
   enum ModeTag : enum16 {
     kAuto = 0;
     kQuick = 1;
@@ -1490,8 +1497,8 @@ cluster RvcRunMode = 84 {
   }
 
   response struct ChangeToModeResponse = 1 {
-    enum8 status = 0;
-    optional char_string statusText = 1;
+    ChangeToModeStatus status = 0;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -1502,6 +1509,13 @@ cluster RvcRunMode = 84 {
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
   revision 5;
+
+  enum ChangeToModeStatus : enum8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+    kInvalidInMode = 3;
+  }
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1552,8 +1566,8 @@ cluster RvcCleanMode = 85 {
   }
 
   response struct ChangeToModeResponse = 1 {
-    enum8 status = 0;
-    optional char_string statusText = 1;
+    ChangeToModeStatus status = 0;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.

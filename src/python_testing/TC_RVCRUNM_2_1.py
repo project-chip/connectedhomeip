@@ -122,20 +122,13 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         # pick a value that's not on the list of supported modes
         invalid_mode = max(modes) + 1
 
-        from enum import Enum
-
-        class CommonCodes(Enum):
-            SUCCESS = 0x00
-            UNSUPPORTED_MODE = 0x01
-            GENERIC_FAILURE = 0x02
-            INVALID_IN_MODE = 0x03
-
         rvcRunCodes = [code.value for code in Clusters.RvcRunMode.Enums.StatusCode]
 
         self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode))
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
-        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
+        asserts.assert_true(ret.status == Clusters.Objects.RvcRunMode.Enums.ChangeToModeStatus.kSuccess,
+                            "Changing the mode to the current mode should be a no-op")
 
         can_test_mode_failure = self.check_pics("RVCRUNM.S.M.CAN_TEST_MODE_FAILURE")
         can_manually_control = self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")
@@ -160,8 +153,8 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
             ret = await self.send_change_to_mode_cmd(newMode=self.mode_fail)
             st = ret.status
             is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (
-                st == CommonCodes.INVALID_IN_MODE.value) or (st in rvcRunCodes) or is_mfg_code
+            is_err_code = (st == Clusters.Objects.RvcRunMode.Enums.ChangeToModeStatus.kGenericFailure) or (
+                st == Clusters.Objects.RvcRunMode.Enums.ChangeToModeStatus.kInvalidInMode) or (st in rvcRunCodes) or is_mfg_code
             asserts.assert_true(
                 is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.mode_fail))
             st_text_len = len(ret.statusText)
@@ -189,7 +182,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.print_step(11, "Send ChangeToMode command with NewMode set to %d" % (self.mode_ok))
 
         ret = await self.send_change_to_mode_cmd(newMode=self.mode_ok)
-        asserts.assert_true(ret.status == CommonCodes.SUCCESS.value,
+        asserts.assert_true(ret.status == Clusters.Objects.RvcRunMode.Enums.ChangeToModeStatus.kSuccess,
                             "Changing to mode %d must succeed due to the current state of the device" % (self.mode_ok))
 
         self.print_step(12, "Read CurrentMode attribute")
@@ -203,7 +196,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.print_step(13, "Send ChangeToMode command with NewMode set to %d" % (invalid_mode))
 
         ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
-        asserts.assert_true(ret.status == CommonCodes.UNSUPPORTED_MODE.value,
+        asserts.assert_true(ret.status == Clusters.Objects.RvcRunMode.Enums.ChangeToModeStatus.kUnsupportedMode,
                             "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode))
 
         self.print_step(14, "Read CurrentMode attribute")
