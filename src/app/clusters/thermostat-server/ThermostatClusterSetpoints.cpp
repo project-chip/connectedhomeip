@@ -249,19 +249,19 @@ DataModel::ActionReturnStatus Setpoints::RaiseLowerSetpoint(int16_t amount, Setp
             if (targetCoolSetpoint < mMinCoolSetpointLimit)
             {
                 targetCoolSetpoint = mMinCoolSetpointLimit;
-                int16_t diff       = targetCoolSetpoint - targetHeatSetpoint;
+                int16_t diff       = static_cast<int16_t>(targetCoolSetpoint - targetHeatSetpoint);
                 if (diff > mDeadBand)
                 {
-                    targetHeatSetpoint = targetCoolSetpoint - mDeadBand;
+                    targetHeatSetpoint = static_cast<int16_t>(targetCoolSetpoint - mDeadBand);
                 }
             }
             if (targetHeatSetpoint < mMinHeatSetpointLimit)
             {
                 targetHeatSetpoint = mMinHeatSetpointLimit;
-                int16_t diff       = targetCoolSetpoint - targetHeatSetpoint;
+                int16_t diff       = static_cast<int16_t>(targetCoolSetpoint - targetHeatSetpoint);
                 if (diff > mDeadBand)
                 {
-                    targetCoolSetpoint = targetHeatSetpoint + mDeadBand;
+                    targetCoolSetpoint = static_cast<int16_t>(targetHeatSetpoint + mDeadBand);
                 }
             }
         }
