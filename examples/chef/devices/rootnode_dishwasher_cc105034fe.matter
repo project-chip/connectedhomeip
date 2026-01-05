@@ -411,80 +411,75 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
+/** Attributes and commands for switching devices between 'On' and 'Off' states. */
+cluster OnOff = 6 {
+  revision 6;
+
+  enum DelayedAllOffEffectVariantEnum : enum8 {
+    kDelayedOffFastFade = 0;
+    kNoFade = 1;
+    kDelayedOffSlowFade = 2;
+  }
+
+  enum DyingLightEffectVariantEnum : enum8 {
+    kDyingLightFadeOff = 0;
+  }
+
+  enum EffectIdentifierEnum : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  enum StartUpOnOffEnum : enum8 {
+    kOff = 0;
+    kOn = 1;
+    kToggle = 2;
+  }
 
   bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
+    kLighting = 0x1;
+    kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
   }
 
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
+  bitmap OnOffControlBitmap : bitmap8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
-  readonly attribute NameSupportBitmap nameSupport = 0;
+  readonly attribute boolean onOff = 0;
+  readonly attribute optional boolean globalSceneControl = 16384;
+  attribute optional int16u onTime = 16385;
+  attribute optional int16u offWaitTime = 16386;
+  attribute access(write: manage) optional nullable StartUpOnOffEnum startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
+  request struct OffWithEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    enum8 effectVariant = 1;
   }
 
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
+  request struct OnWithTimedOffRequest {
+    OnOffControlBitmap onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
   }
 
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** The AddGroup command allows a client to add group membership in a particular group for the server endpoint. */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** The ViewGroup command allows a client to request that the server responds with a ViewGroupResponse command containing the name string for a particular group. */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** The GetGroupMembership command allows a client to inquire about the group membership of the server endpoint, in a number of ways. */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** The RemoveGroup command allows a client to request that the server removes the membership for the server endpoint, if any, in a particular group. */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** The RemoveAllGroups command allows a client to direct the server to remove all group associations for the server endpoint. */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** The AddGroupIfIdentifying command allows a client to add group membership in a particular group for the server endpoint, on condition that the endpoint is identifying itself. */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  command Off(): DefaultSuccess = 0;
+  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  command On(): DefaultSuccess = 1;
+  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  command Toggle(): DefaultSuccess = 2;
+  /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  /** This command allows the recall of the settings when the device was turned off. */
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
@@ -751,257 +746,41 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
-cluster PowerSource = 47 {
-  revision 3;
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
+cluster LocalizationConfiguration = 43 {
+  revision 1;
 
-  enum BatApprovedChemistryEnum : enum16 {
-    kUnspecified = 0;
-    kAlkaline = 1;
-    kLithiumCarbonFluoride = 2;
-    kLithiumChromiumOxide = 3;
-    kLithiumCopperOxide = 4;
-    kLithiumIronDisulfide = 5;
-    kLithiumManganeseDioxide = 6;
-    kLithiumThionylChloride = 7;
-    kMagnesium = 8;
-    kMercuryOxide = 9;
-    kNickelOxyhydride = 10;
-    kSilverOxide = 11;
-    kZincAir = 12;
-    kZincCarbon = 13;
-    kZincChloride = 14;
-    kZincManganeseDioxide = 15;
-    kLeadAcid = 16;
-    kLithiumCobaltOxide = 17;
-    kLithiumIon = 18;
-    kLithiumIonPolymer = 19;
-    kLithiumIronPhosphate = 20;
-    kLithiumSulfur = 21;
-    kLithiumTitanate = 22;
-    kNickelCadmium = 23;
-    kNickelHydrogen = 24;
-    kNickelIron = 25;
-    kNickelMetalHydride = 26;
-    kNickelZinc = 27;
-    kSilverZinc = 28;
-    kSodiumIon = 29;
-    kSodiumSulfur = 30;
-    kZincBromide = 31;
-    kZincCerium = 32;
-  }
+  attribute access(write: manage) char_string<35> activeLocale = 0;
+  readonly attribute char_string supportedLocales[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
 
-  enum BatChargeFaultEnum : enum8 {
-    kUnspecified = 0;
-    kAmbientTooHot = 1;
-    kAmbientTooCold = 2;
-    kBatteryTooHot = 3;
-    kBatteryTooCold = 4;
-    kBatteryAbsent = 5;
-    kBatteryOverVoltage = 6;
-    kBatteryUnderVoltage = 7;
-    kChargerOverVoltage = 8;
-    kChargerUnderVoltage = 9;
-    kSafetyTimeout = 10;
-  }
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit. */
+cluster UnitLocalization = 45 {
+  revision 2;
 
-  enum BatChargeLevelEnum : enum8 {
-    kOK = 0 [spec_name = "OK"];
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum BatChargeStateEnum : enum8 {
-    kUnknown = 0;
-    kIsCharging = 1;
-    kIsAtFullCharge = 2;
-    kIsNotCharging = 3;
-  }
-
-  enum BatCommonDesignationEnum : enum16 {
-    kUnspecified = 0;
-    kAAA = 1 [spec_name = "AAA"];
-    kAA = 2 [spec_name = "AA"];
-    kC = 3;
-    kD = 4;
-    k4v5 = 5;
-    k6v0 = 6;
-    k9v0 = 7;
-    k12AA = 8 [spec_name = "1_2AA"];
-    kAAAA = 9 [spec_name = "AAAA"];
-    kA = 10;
-    kB = 11;
-    kF = 12;
-    kN = 13;
-    kNo6 = 14;
-    kSubC = 15;
-    kA23 = 16;
-    kA27 = 17;
-    kBA5800 = 18 [spec_name = "BA5800"];
-    kDuplex = 19;
-    k4SR44 = 20 [spec_name = "4SR44"];
-    k523 = 21;
-    k531 = 22;
-    k15v0 = 23;
-    k22v5 = 24;
-    k30v0 = 25;
-    k45v0 = 26;
-    k67v5 = 27;
-    kJ = 28;
-    kCR123A = 29 [spec_name = "CR123A"];
-    kCR2 = 30 [spec_name = "CR2"];
-    k2CR5 = 31 [spec_name = "2CR5"];
-    kCRP2 = 32 [spec_name = "CR_P2"];
-    kCRV3 = 33 [spec_name = "CR_V3"];
-    kSR41 = 34 [spec_name = "SR41"];
-    kSR43 = 35 [spec_name = "SR43"];
-    kSR44 = 36 [spec_name = "SR44"];
-    kSR45 = 37 [spec_name = "SR45"];
-    kSR48 = 38 [spec_name = "SR48"];
-    kSR54 = 39 [spec_name = "SR54"];
-    kSR55 = 40 [spec_name = "SR55"];
-    kSR57 = 41 [spec_name = "SR57"];
-    kSR58 = 42 [spec_name = "SR58"];
-    kSR59 = 43 [spec_name = "SR59"];
-    kSR60 = 44 [spec_name = "SR60"];
-    kSR63 = 45 [spec_name = "SR63"];
-    kSR64 = 46 [spec_name = "SR64"];
-    kSR65 = 47 [spec_name = "SR65"];
-    kSR66 = 48 [spec_name = "SR66"];
-    kSR67 = 49 [spec_name = "SR67"];
-    kSR68 = 50 [spec_name = "SR68"];
-    kSR69 = 51 [spec_name = "SR69"];
-    kSR516 = 52 [spec_name = "SR516"];
-    kSR731 = 53 [spec_name = "SR731"];
-    kSR712 = 54 [spec_name = "SR712"];
-    kLR932 = 55 [spec_name = "LR932"];
-    kA5 = 56;
-    kA10 = 57;
-    kA13 = 58;
-    kA312 = 59;
-    kA675 = 60;
-    kAC41E = 61 [spec_name = "AC41E"];
-    k10180 = 62;
-    k10280 = 63;
-    k10440 = 64;
-    k14250 = 65;
-    k14430 = 66;
-    k14500 = 67;
-    k14650 = 68;
-    k15270 = 69;
-    k16340 = 70;
-    kRCR123A = 71 [spec_name = "RCR123A"];
-    k17500 = 72;
-    k17670 = 73;
-    k18350 = 74;
-    k18500 = 75;
-    k18650 = 76;
-    k19670 = 77;
-    k25500 = 78;
-    k26650 = 79;
-    k32600 = 80;
-  }
-
-  enum BatFaultEnum : enum8 {
-    kUnspecified = 0;
-    kOverTemp = 1;
-    kUnderTemp = 2;
-  }
-
-  enum BatReplaceabilityEnum : enum8 {
-    kUnspecified = 0;
-    kNotReplaceable = 1;
-    kUserReplaceable = 2;
-    kFactoryReplaceable = 3;
-  }
-
-  enum PowerSourceStatusEnum : enum8 {
-    kUnspecified = 0;
-    kActive = 1;
-    kStandby = 2;
-    kUnavailable = 3;
-  }
-
-  enum WiredCurrentTypeEnum : enum8 {
-    kAC = 0 [spec_name = "AC"];
-    kDC = 1 [spec_name = "DC"];
-  }
-
-  enum WiredFaultEnum : enum8 {
-    kUnspecified = 0;
-    kOverVoltage = 1;
-    kUnderVoltage = 2;
+  enum TempUnitEnum : enum8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
   }
 
   bitmap Feature : bitmap32 {
-    kWired = 0x1;
-    kBattery = 0x2;
-    kRechargeable = 0x4;
-    kReplaceable = 0x8;
+    kTemperatureUnit = 0x1;
   }
 
-  struct BatChargeFaultChangeType {
-    BatChargeFaultEnum current[] = 0;
-    BatChargeFaultEnum previous[] = 1;
-  }
-
-  struct BatFaultChangeType {
-    BatFaultEnum current[] = 0;
-    BatFaultEnum previous[] = 1;
-  }
-
-  struct WiredFaultChangeType {
-    WiredFaultEnum current[] = 0;
-    WiredFaultEnum previous[] = 1;
-  }
-
-  info event WiredFaultChange = 0 {
-    WiredFaultEnum current[] = 0;
-    WiredFaultEnum previous[] = 1;
-  }
-
-  info event BatFaultChange = 1 {
-    BatFaultEnum current[] = 0;
-    BatFaultEnum previous[] = 1;
-  }
-
-  info event BatChargeFaultChange = 2 {
-    BatChargeFaultEnum current[] = 0;
-    BatChargeFaultEnum previous[] = 1;
-  }
-
-  readonly attribute PowerSourceStatusEnum status = 0;
-  readonly attribute int8u order = 1;
-  readonly attribute char_string<60> description = 2;
-  readonly attribute optional nullable int32u wiredAssessedInputVoltage = 3;
-  readonly attribute optional nullable int16u wiredAssessedInputFrequency = 4;
-  readonly attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
-  readonly attribute optional nullable int32u wiredAssessedCurrent = 6;
-  readonly attribute optional int32u wiredNominalVoltage = 7;
-  readonly attribute optional int32u wiredMaximumCurrent = 8;
-  readonly attribute optional boolean wiredPresent = 9;
-  readonly attribute optional WiredFaultEnum activeWiredFaults[] = 10;
-  readonly attribute optional nullable int32u batVoltage = 11;
-  readonly attribute optional nullable int8u batPercentRemaining = 12;
-  readonly attribute optional nullable int32u batTimeRemaining = 13;
-  readonly attribute optional BatChargeLevelEnum batChargeLevel = 14;
-  readonly attribute optional boolean batReplacementNeeded = 15;
-  readonly attribute optional BatReplaceabilityEnum batReplaceability = 16;
-  readonly attribute optional boolean batPresent = 17;
-  readonly attribute optional BatFaultEnum activeBatFaults[] = 18;
-  readonly attribute optional char_string<60> batReplacementDescription = 19;
-  readonly attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
-  readonly attribute optional char_string<20> batANSIDesignation = 21;
-  readonly attribute optional char_string<20> batIECDesignation = 22;
-  readonly attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
-  readonly attribute optional int32u batCapacity = 24;
-  readonly attribute optional int8u batQuantity = 25;
-  readonly attribute optional BatChargeStateEnum batChargeState = 26;
-  readonly attribute optional nullable int32u batTimeToFullCharge = 27;
-  readonly attribute optional boolean batFunctionalWhileCharging = 28;
-  readonly attribute optional nullable int32u batChargingCurrent = 29;
-  readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
-  readonly attribute endpoint_no endpointList[] = 31;
+  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1289,52 +1068,6 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
-/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
-cluster DiagnosticLogs = 50 {
-  revision 1;
-
-  enum IntentEnum : enum8 {
-    kEndUserSupport = 0;
-    kNetworkDiag = 1;
-    kCrashLogs = 2;
-  }
-
-  enum StatusEnum : enum8 {
-    kSuccess = 0;
-    kExhausted = 1;
-    kNoLogs = 2;
-    kBusy = 3;
-    kDenied = 4;
-  }
-
-  enum TransferProtocolEnum : enum8 {
-    kResponsePayload = 0;
-    kBDX = 1 [spec_name = "BDX"];
-  }
-
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RetrieveLogsRequestRequest {
-    IntentEnum intent = 0;
-    TransferProtocolEnum requestedProtocol = 1;
-    optional char_string<32> transferFileDesignator = 2;
-  }
-
-  response struct RetrieveLogsResponse = 1 {
-    StatusEnum status = 0;
-    long_octet_string<1024> logContent = 1;
-    optional epoch_us UTCTimeStamp = 2;
-    optional systime_us timeSinceBoot = 3;
-  }
-
-  /** Reception of this command starts the process of retrieving diagnostic logs from a Node. */
-  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
-}
-
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
   revision 3;
@@ -1473,6 +1206,82 @@ cluster GeneralDiagnostics = 51 {
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** This command provides a means for certification tests or manufacturer's internal tests to validate particular command handling and encoding constraints by generating a response of a given size. */
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+}
+
+/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+cluster WiFiNetworkDiagnostics = 54 {
+  revision 1;
+
+  enum AssociationFailureCauseEnum : enum8 {
+    kUnknown = 0;
+    kAssociationFailed = 1;
+    kAuthenticationFailed = 2;
+    kSsidNotFound = 3;
+  }
+
+  enum ConnectionStatusEnum : enum8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum SecurityTypeEnum : enum8 {
+    kUnspecified = 0;
+    kNone = 1;
+    kWEP = 2 [spec_name = "WEP"];
+    kWPA = 3 [spec_name = "WPA"];
+    kWPA2 = 4 [spec_name = "WPA2"];
+    kWPA3 = 5 [spec_name = "WPA3"];
+  }
+
+  enum WiFiVersionEnum : enum8 {
+    kA = 0;
+    kB = 1;
+    kG = 2;
+    kN = 3;
+    kAc = 4;
+    kAx = 5;
+    kAh = 6;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+  }
+
+  info event Disconnection = 0 {
+    int16u reasonCode = 0;
+  }
+
+  info event AssociationFailure = 1 {
+    AssociationFailureCauseEnum associationFailureCause = 0;
+    int16u status = 1;
+  }
+
+  info event ConnectionStatus = 2 {
+    ConnectionStatusEnum connectionStatus = 0;
+  }
+
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityTypeEnum securityType = 1;
+  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
+  readonly attribute optional nullable int32u beaconLostCount = 5;
+  readonly attribute optional nullable int32u beaconRxCount = 6;
+  readonly attribute optional nullable int32u packetMulticastRxCount = 7;
+  readonly attribute optional nullable int32u packetMulticastTxCount = 8;
+  readonly attribute optional nullable int32u packetUnicastRxCount = 9;
+  readonly attribute optional nullable int32u packetUnicastTxCount = 10;
+  readonly attribute optional nullable int64u currentMaxRate = 11;
+  readonly attribute optional nullable int64u overrunCount = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** This command is used to reset the count attributes. */
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1749,16 +1558,40 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-/** Attributes and commands for selecting a mode from a list of supported options. */
-cluster RvcRunMode = 84 {
-  revision 4;
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+cluster TemperatureControl = 86 {
+  revision 1;
 
-  enum ChangeToModeStatus : enum8 {
-    kSuccess = 0;
-    kUnsupportedMode = 1;
-    kGenericFailure = 2;
-    kInvalidInMode = 3;
+  bitmap Feature : bitmap32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+    kTemperatureStep = 0x4;
   }
+
+  readonly attribute optional temperature temperatureSetpoint = 0;
+  readonly attribute optional temperature minTemperature = 1;
+  readonly attribute optional temperature maxTemperature = 2;
+  readonly attribute optional temperature step = 3;
+  readonly attribute optional int8u selectedTemperatureLevel = 4;
+  readonly attribute optional char_string supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    optional temperature targetTemperature = 0;
+    optional int8u targetTemperatureLevel = 1;
+  }
+
+  /** The SetTemperature command SHALL have the following data fields: */
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+cluster DishwasherMode = 89 {
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1771,24 +1604,9 @@ cluster RvcRunMode = 84 {
     kMax = 7;
     kNight = 8;
     kDay = 9;
-    kIdle = 16384;
-    kCleaning = 16385;
-    kMapping = 16386;
-  }
-
-  enum StatusCode : enum8 {
-    kStuck = 65;
-    kDustBinMissing = 66;
-    kDustBinFull = 67;
-    kWaterTankEmpty = 68;
-    kWaterTankMissing = 69;
-    kWaterTankLidOpen = 70;
-    kMopCleaningPadMissing = 71;
-    kBatteryLow = 72;
-  }
-
-  bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x100000;
+    kNormal = 16384;
+    kHeavy = 16385;
+    kLight = 16386;
   }
 
   shared struct ModeTagStruct {
@@ -1815,7 +1633,7 @@ cluster RvcRunMode = 84 {
   }
 
   response struct ChangeToModeResponse = 1 {
-    ChangeToModeStatus status = 0;
+    enum8 status = 0;
     optional char_string<64> statusText = 1;
   }
 
@@ -1824,77 +1642,56 @@ cluster RvcRunMode = 84 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** Attributes and commands for selecting a mode from a list of supported options. */
-cluster RvcCleanMode = 85 {
-  revision 5;
+/** Attributes and commands for configuring the Dishwasher alarm. */
+cluster DishwasherAlarm = 93 {
+  revision 1;
 
-  enum ChangeToModeStatus : enum8 {
-    kSuccess = 0;
-    kUnsupportedMode = 1;
-    kGenericFailure = 2;
-    kInvalidInMode = 3;
-  }
-
-  enum ModeTag : enum16 {
-    kAuto = 0;
-    kQuick = 1;
-    kQuiet = 2;
-    kLowNoise = 3;
-    kLowEnergy = 4;
-    kVacation = 5;
-    kMin = 6;
-    kMax = 7;
-    kNight = 8;
-    kDay = 9;
-    kDeepClean = 16384;
-    kVacuum = 16385;
-    kMop = 16386;
-    kVacuumThenMop = 16387;
-  }
-
-  enum StatusCode : enum8 {
-    kCleaningInProgress = 64;
+  bitmap AlarmBitmap : bitmap32 {
+    kInflowError = 0x1;
+    kDrainError = 0x2;
+    kDoorError = 0x4;
+    kTempTooLow = 0x8;
+    kTempTooHigh = 0x10;
+    kWaterLevelError = 0x20;
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x100000;
+    kReset = 0x1;
   }
 
-  shared struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
-    enum16 value = 1;
+  info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  shared struct ModeOptionStruct {
-    char_string<64> label = 0;
-    int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
-  }
-
-  readonly attribute ModeOptionStruct supportedModes[] = 0;
-  readonly attribute int8u currentMode = 1;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct ChangeToModeRequest {
-    int8u newMode = 0;
+  request struct ResetRequest {
+    AlarmBitmap alarms = 0;
   }
 
-  response struct ChangeToModeResponse = 1 {
-    ChangeToModeStatus status = 0;
-    optional char_string<64> statusText = 1;
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
-  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command resets active and latched alarms (if possible). */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
-/** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
-cluster RvcOperationalState = 97 {
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
+cluster OperationalState = 96 {
   revision 1;
 
   enum ErrorStateEnum : enum8 {
@@ -1902,21 +1699,6 @@ cluster RvcOperationalState = 97 {
     kUnableToStartOrResume = 1;
     kUnableToCompleteOperation = 2;
     kCommandInvalidInState = 3;
-    kFailedToFindChargingDock = 64;
-    kStuck = 65;
-    kDustBinMissing = 66;
-    kDustBinFull = 67;
-    kWaterTankEmpty = 68;
-    kWaterTankMissing = 69;
-    kWaterTankLidOpen = 70;
-    kMopCleaningPadMissing = 71;
-    kLowBattery = 72;
-    kCannotReachTargetArea = 73;
-    kDirtyWaterTankFull = 74;
-    kDirtyWaterTankMissing = 75;
-    kWheelsJammed = 76;
-    kBrushJammed = 77;
-    kNavigationSensorObscured = 78;
   }
 
   enum OperationalStateEnum : enum8 {
@@ -1924,13 +1706,6 @@ cluster RvcOperationalState = 97 {
     kRunning = 1;
     kPaused = 2;
     kError = 3;
-    kSeekingCharger = 64;
-    kCharging = 65;
-    kDocked = 66;
-    kEmptyingDustBin = 67;
-    kCleaningMop = 68;
-    kFillingWaterTank = 69;
-    kUpdatingMaps = 70;
   }
 
   shared struct ErrorStateStruct {
@@ -1958,7 +1733,7 @@ cluster RvcOperationalState = 97 {
   readonly attribute nullable int8u currentPhase = 1;
   readonly attribute optional nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute enum8 operationalState = 4;
+  readonly attribute OperationalStateEnum operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1972,10 +1747,12 @@ cluster RvcOperationalState = 97 {
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
+  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  command Stop(): OperationalCommandResponse = 1;
+  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  command Start(): OperationalCommandResponse = 2;
   /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
   command Resume(): OperationalCommandResponse = 3;
-  /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
-  command GoHome(): OperationalCommandResponse = 128;
 }
 
 endpoint 0 {
@@ -1987,6 +1764,9 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -1997,6 +1777,8 @@ endpoint 0 {
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2023,13 +1805,36 @@ endpoint 0 {
     callback attribute productLabel;
     callback attribute serialNumber;
     callback attribute localConfigDisabled;
+    callback attribute reachable;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     callback attribute configurationVersion;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+  }
+
+  server cluster UnitLocalization {
+    callback attribute temperatureUnit;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
@@ -2038,6 +1843,9 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2055,6 +1863,9 @@ endpoint 0 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2066,14 +1877,10 @@ endpoint 0 {
     handle command ReorderNetwork;
   }
 
-  server cluster DiagnosticLogs {
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-
-    handle command RetrieveLogsRequest;
-  }
-
   server cluster GeneralDiagnostics {
+    emits event HardwareFaultChange;
+    emits event RadioFaultChange;
+    emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
@@ -2081,6 +1888,9 @@ endpoint 0 {
     callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2088,10 +1898,36 @@ endpoint 0 {
     handle command TimeSnapshot;
   }
 
+  server cluster WiFiNetworkDiagnostics {
+    emits event Disconnection;
+    emits event AssociationFailure;
+    emits event ConnectionStatus;
+    callback attribute bssid;
+    callback attribute securityType;
+    callback attribute wiFiVersion;
+    callback attribute channelNumber;
+    callback attribute rssi;
+    callback attribute beaconLostCount;
+    callback attribute beaconRxCount;
+    callback attribute packetMulticastRxCount;
+    callback attribute packetMulticastTxCount;
+    callback attribute packetUnicastRxCount;
+    callback attribute packetUnicastTxCount;
+    callback attribute currentMaxRate;
+    callback attribute overrunCount;
+    ram      attribute featureMap default = 3;
+    callback attribute clusterRevision default = 1;
+
+    handle command ResetCounts;
+  }
+
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
 
@@ -2107,6 +1943,9 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2137,8 +1976,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_powersource = 17, version 1;
-  device type ma_robotic_vacuum_cleaner = 116, version 1;
+  device type ma_dishwasher = 117, version 2;
 
 
   server cluster Identify {
@@ -2154,20 +1992,17 @@ endpoint 1 {
     handle command TriggerEffect;
   }
 
-  server cluster Groups {
-    ram      attribute nameSupport;
+  server cluster OnOff {
+    ram      attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 6;
 
-    handle command AddGroup;
-    handle command ViewGroup;
-    handle command GetGroupMembership;
-    handle command RemoveGroup;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
+    handle command Off;
+    handle command On;
+    handle command Toggle;
   }
 
   server cluster Descriptor {
@@ -2182,46 +2017,49 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster PowerSource {
-    ram      attribute status;
-    persist  attribute order;
-    ram      attribute description;
-    ram      attribute batPercentRemaining default = 95;
-    ram      attribute batPresent default = 1;
-    ram      attribute batChargeState default = 4;
-    callback attribute endpointList;
+  server cluster TemperatureControl {
+    ram      attribute temperatureSetpoint default = 0;
+    ram      attribute minTemperature default = 4900;
+    ram      attribute maxTemperature default = 8200;
+    ram      attribute step default = 100;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 6;
-    callback attribute clusterRevision;
+    ram      attribute featureMap default = 5;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SetTemperature;
   }
 
-  server cluster RvcRunMode {
+  server cluster DishwasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
   }
 
-  server cluster RvcCleanMode {
-    callback attribute supportedModes;
-    callback attribute currentMode;
+  server cluster DishwasherAlarm {
+    emits event Notify;
+    ram      attribute mask default = 0;
+    ram      attribute latch default = 0x30;
+    ram      attribute state default = 0;
+    ram      attribute supported default = 0x3F;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
 
-    handle command ChangeToMode;
+    handle command Reset;
+    handle command ModifyEnabledAlarms;
   }
 
-  server cluster RvcOperationalState {
+  server cluster OperationalState {
     emits event OperationalError;
     emits event OperationCompletion;
     callback attribute phaseList;
@@ -2237,8 +2075,9 @@ endpoint 1 {
     callback attribute clusterRevision;
 
     handle command Pause;
+    handle command Stop;
+    handle command Start;
     handle command Resume;
-    handle command GoHome;
   }
 }
 
