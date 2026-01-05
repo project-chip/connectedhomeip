@@ -20,7 +20,7 @@ from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
-from matter.testing.conformance import ConformanceDecision, ConformanceException
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException
 from matter.testing.global_attribute_ids import is_standard_attribute_id
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
@@ -94,13 +94,14 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             spec_attributes = xml_clusters[cluster.id].attributes
             spec_accepted_commands = xml_clusters[cluster.id].accepted_commands
             spec_generated_commands = xml_clusters[cluster.id].generated_commands
+            info = ConformanceAssessmentData(feature_map, [], [])
             # Build just the lists - basic composition checks the wildcard against the lists, conformance just uses lists
             attributes = [id for id, a in spec_attributes.items() if a.conformance(
-                feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+                info).decision == ConformanceDecision.MANDATORY]
             accepted_commands = [id for id, c in spec_accepted_commands.items() if c.conformance(
-                feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+                info).decision == ConformanceDecision.MANDATORY]
             generated_commands = [id for id, c in spec_generated_commands.items() if c.conformance(
-                feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+                info).decision == ConformanceDecision.MANDATORY]
             attr = cluster.Attributes
 
             resp = {}

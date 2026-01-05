@@ -17,14 +17,15 @@
 from typing import Any, Optional
 
 import matter.clusters as Clusters
-from matter.testing.conformance import ConformanceDecision
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.spec_parsing import XmlCluster, XmlDeviceType
 from matter.tlv import uint
 
 
 def _is_mandatory(conformance, feature_map=0):
-    return conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY
+    info = ConformanceAssessmentData(feature_map, [], [])
+    return conformance(info).decision == ConformanceDecision.MANDATORY
 
 
 def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label: str) -> Optional[Clusters.ClusterObjects.ClusterObjectFieldDescriptor]:
@@ -42,16 +43,17 @@ def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int
     for mask in mandatory_features:
         feature_map |= mask
 
+    info = ConformanceAssessmentData(feature_map, [], [])
     mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items(
-    ) if a.conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+    ) if a.conformance(info).decision == ConformanceDecision.MANDATORY]
     mandatory_attributes.extend(additional_attributes)
 
     mandatory_accepted_commands = [id for id, c in xml_clusters[cluster_id].accepted_commands.items(
-    ) if c.conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+    ) if c.conformance(info).decision == ConformanceDecision.MANDATORY]
     mandatory_accepted_commands.extend(additional_commands)
 
     mandatory_generated_commands = [id for id, c in xml_clusters[cluster_id].generated_commands.items(
-    ) if c.conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+    ) if c.conformance(info).decision == ConformanceDecision.MANDATORY]
 
     revision = xml_clusters[cluster_id].revision
     if is_tlv_endpoint:

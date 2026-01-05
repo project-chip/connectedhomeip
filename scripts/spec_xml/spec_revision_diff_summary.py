@@ -22,7 +22,7 @@
 
 import click
 
-from matter.testing.conformance import ConformanceDecision
+from matter.testing.conformance import ConformanceDecision, MinimalConformance
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 
 
@@ -119,7 +119,7 @@ def diff_device_types(prior_revision: PrebuiltDataModelDirectory, new_revision: 
 
 
 def _get_provisional(items):
-    return [e.name for e in items if e.conformance(0, [], []).decision == ConformanceDecision.PROVISIONAL]
+    return [e.name for e in items if e.conformance(MinimalConformance()).decision == ConformanceDecision.PROVISIONAL]
 
 
 def get_all_provisional_clusters(new_revision: PrebuiltDataModelDirectory):

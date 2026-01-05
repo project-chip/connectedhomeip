@@ -23,6 +23,7 @@ from mobly import asserts
 
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
+from matter.testing.conformance import ConformanceAssessmentData
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
@@ -196,17 +197,20 @@ class TestConformanceSupport(MatterBaseTest):
             return feature_map
 
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_feature_choice_conformance(0, 1, self.clusters, make_feature_map(combo), [], [])
+            info = ConformanceAssessmentData(make_feature_map(combo), [], [])
+            problems = evaluate_feature_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_attributes(self):
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, 0, list(combo), [])
+            info = ConformanceAssessmentData(0, list(combo), [])
+            problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_commands(self):
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_command_choice_conformance(0, 1, self.clusters, 0, [], list(combo))
+            info = ConformanceAssessmentData(0, [], list(combo))
+            problems = evaluate_command_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
 
