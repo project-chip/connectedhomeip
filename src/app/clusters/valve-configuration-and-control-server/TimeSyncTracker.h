@@ -35,4 +35,4 @@ public:
     virtual bool IsValidUTCTime()             = 0;
 };
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::ValveConfigurationAndControl

@@ -338,7 +338,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandWithoutFault)
 
     Commands::Open::Type request;
     request.openDuration = Optional<uint32_t>::Missing();
-    request.targetLevel = Optional<Percent>::Missing();
+    request.targetLevel  = Optional<Percent>::Missing();
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
@@ -380,7 +380,7 @@ TEST_F(TestValveConfigurationAndControlCluster, CloseCommandWithoutFault)
     // First we need to send an Open command to change the status
     Commands::Open::Type openRequest;
     openRequest.openDuration = Optional<uint32_t>::Missing();
-    openRequest.targetLevel = Optional<Percent>::Missing();
+    openRequest.targetLevel  = Optional<Percent>::Missing();
 
     auto result = tester.Invoke(openRequest);
     ASSERT_TRUE(result.IsSuccess());

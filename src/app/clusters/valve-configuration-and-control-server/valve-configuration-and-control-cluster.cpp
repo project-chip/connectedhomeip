@@ -32,11 +32,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using chip::Protocols::InteractionModel::Status;
 
-ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(EndpointId endpoint,
-                                                                         BitFlags<ValveConfigurationAndControl::Feature> features,
-                                                                         OptionalAttributeSet optionalAttributeSet,
-                                                                         const StartupConfiguration & config,
-                                                                         ValveConfigurationAndControl::TimeSyncTracker * tsTracker) :
+ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(
+    EndpointId endpoint, BitFlags<ValveConfigurationAndControl::Feature> features, OptionalAttributeSet optionalAttributeSet,
+    const StartupConfiguration & config, ValveConfigurationAndControl::TimeSyncTracker * tsTracker) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
     mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker)
