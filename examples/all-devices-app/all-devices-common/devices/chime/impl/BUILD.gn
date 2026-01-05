@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  chip_malloc_sys_heap = false
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-  # Enable factory data support
-  chip_enable_factory_data = false
+source_set("logging") {
+  sources = [
+    "LoggingChimeDevice.cpp",
+    "LoggingChimeDevice.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
 }

@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
@@ -388,7 +389,10 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(fabric), Zcl, "Failure clearing TLS endpoints for fabric");
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr, ChipLogError(Zcl, "No data model provider on fabric removal."));
+
+    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*provider, fabric), Zcl, "Failure clearing TLS endpoints for fabric");
 
     UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
     VerifyOrReturn(globalData);
