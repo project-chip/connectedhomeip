@@ -236,7 +236,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
 {
     ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<DefaultOpenLevel::Id>();
-    const BitFlags<Feature> features;
+    const BitFlags<Feature> features{ Feature::kLevel };
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
