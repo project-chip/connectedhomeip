@@ -19,7 +19,6 @@
 #include <lib/core/CHIPEncoding.h>
 
 #include "ThermostatCluster.h"
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
@@ -101,7 +100,7 @@ void MatterThermostatClusterInitCallback(EndpointId endpointId)
 
 void MatterThermostatPluginServerInitCallback() {}
 
-void MatterThermostatClusterShutdownCallback(EndpointId endpointId)
+void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     chip::app::Clusters::Thermostat::IntegrationDelegate integrationDelegate;
 
@@ -112,7 +111,7 @@ void MatterThermostatClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT,
             .maxClusterInstanceCount   = kThermostatEndpointCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterThermostatClusterServerShutdownCallback(EndpointId endpointId) {}

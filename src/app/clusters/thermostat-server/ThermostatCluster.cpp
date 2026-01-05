@@ -80,9 +80,9 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ThermostatCluster::Shutdown()
+void ThermostatCluster::Shutdown(ClusterShutdownType type)
 {
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(type);
     TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
