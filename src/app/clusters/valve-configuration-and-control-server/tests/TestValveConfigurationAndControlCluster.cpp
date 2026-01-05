@@ -399,7 +399,7 @@ TEST_F(TestValveConfigurationAndControlCluster, CloseCommandWithoutFault)
     OpenDuration::TypeInfo::DecodableType openDuration;
     EXPECT_EQ(tester.ReadAttribute(OpenDuration::Id, openDuration), CHIP_NO_ERROR);
     EXPECT_EQ(defaultOpenDuration, openDuration);
-    // RemaniningDuration should be set to the same value as OpenDuration if read after setting it.
+    // RemainingDuration should be set to the same value as OpenDuration if read after setting it.
     RemainingDuration::TypeInfo::DecodableType remainingDuration;
     EXPECT_EQ(tester.ReadAttribute(RemainingDuration::Id, remainingDuration), CHIP_NO_ERROR);
     EXPECT_EQ(remainingDuration, openDuration);
@@ -419,7 +419,7 @@ TEST_F(TestValveConfigurationAndControlCluster, CloseCommandWithoutFault)
     // OpenDuration should be null
     EXPECT_EQ(tester.ReadAttribute(OpenDuration::Id, openDuration), CHIP_NO_ERROR);
     EXPECT_EQ(openDuration, DataModel::NullNullable);
-    // RemaniningDuration should be set to null.
+    // RemainingDuration should be set to null.
     EXPECT_EQ(tester.ReadAttribute(RemainingDuration::Id, remainingDuration), CHIP_NO_ERROR);
     EXPECT_EQ(remainingDuration, DataModel::NullNullable);
 }
