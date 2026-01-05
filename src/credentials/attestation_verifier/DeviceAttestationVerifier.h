@@ -275,10 +275,9 @@ public:
         AttestationInfo(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
                         const ByteSpan & attestationSignature, const ByteSpan & paiDer, const ByteSpan & dacDer,
                         const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId) :
-            attestationElementsBuffer(attestationElements),
-            attestationChallengeBuffer(attestationChallenge), attestationSignatureBuffer(attestationSignature),
-            paiDerBuffer(paiDer), dacDerBuffer(dacDer), attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId),
-            productId(remoteProductId)
+            attestationElementsBuffer(attestationElements), attestationChallengeBuffer(attestationChallenge),
+            attestationSignatureBuffer(attestationSignature), paiDerBuffer(paiDer), dacDerBuffer(dacDer),
+            attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId), productId(remoteProductId)
         {}
         const ByteSpan
             attestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
@@ -442,7 +441,7 @@ protected:
 
     // Defaults to true for now. Should be set to false after a notification period.
     // https://github.com/project-chip/connectedhomeip/issues/42460 to track.
-    const bool kEnableCdTestKeysForProvisionalCds = true;
+    static constexpr bool kEnableCdTestKeysForProvisionalCds = true;
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
