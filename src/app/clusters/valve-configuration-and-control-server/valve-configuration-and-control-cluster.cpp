@@ -36,7 +36,7 @@ ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(Endpoin
                                                                          BitFlags<ValveConfigurationAndControl::Feature> features,
                                                                          OptionalAttributeSet optionalAttributeSet,
                                                                          const StartupConfiguration & config,
-                                                                         TimeSyncTracker * tsTracker) :
+                                                                         ValveConfigurationAndControl::TimeSyncTracker * tsTracker) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
     mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker)
@@ -198,9 +198,6 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
 // Command Handlers
 std::optional<DataModel::ActionReturnStatus> ValveConfigurationAndControlCluster::HandleCloseCommand()
 {
-    // Cancel timer if running.
-    DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
-
     // Check if there is any Fault registered
     if (mValveFault.HasAny())
     {
@@ -234,6 +231,9 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
         SaveAndReportIfChanged(mTargetLevel, Percent(0), Attributes::TargetLevel::Id);
     }
 
+    // Cancel timer if running.
+    DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
+    
     if (mDelegate != nullptr)
     {
         err = mDelegate->HandleCloseValve();
@@ -349,7 +349,6 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
     else
     {
         LogErrorOnFailure(CloseValve());
-        DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
     }
 }
 

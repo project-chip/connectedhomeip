@@ -51,7 +51,7 @@ public:
 
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
                                         OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
-                                        TimeSyncTracker * tsTracker);
+                                        ValveConfigurationAndControl::TimeSyncTracker * tsTracker);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -114,6 +114,6 @@ private:
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault{ 0u };
     uint8_t mLevelStep{ kDefaultLevelStep };
     ValveConfigurationAndControl::Delegate * mDelegate;
-    TimeSyncTracker * mTsTracker;
+    ValveConfigurationAndControl::TimeSyncTracker * mTsTracker;
 };
 } // namespace chip::app::Clusters

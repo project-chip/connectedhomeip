@@ -17,7 +17,7 @@
 #pragma once
 #include <cstdint>
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::ValveConfigurationAndControl {
 
 /// Defines an interface to get the current status and availability
 /// of the TimeSynchronization cluster and UTC time.
