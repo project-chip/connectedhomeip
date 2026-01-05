@@ -26,6 +26,7 @@
 #include "AppTask.h"
 #include <AirQualityConfig.h>
 #include <air-quality-sensor-manager.h>
+#include <platform/PlatformError.h>
 
 #ifdef USE_AIR_QUALITY_SENSOR
 #include "AirQualitySensor.h"

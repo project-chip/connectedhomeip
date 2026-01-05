@@ -25,6 +25,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include <platform/PlatformError.h>
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 #include "Si70xxSensor.h"

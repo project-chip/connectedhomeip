@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <platform/PlatformError.h>
 #include "demo-ui.h"
 #include "lcd.h"
 
