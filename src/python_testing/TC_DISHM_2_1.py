@@ -225,7 +225,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
             else:
-                self.wait_for_usser_input(
+                self.wait_for_user_input(
                     prompt_msg=f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}, and press Enter when ready.")
 
         # TH reads from the DUT the CurrentMode attribute
