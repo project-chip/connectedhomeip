@@ -74,7 +74,13 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     }
     static void TearDownTestSuite()
     {
+
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+        Server::GetInstance().GetSecureSessionManager().ExpireAllSecureSessions();
+
         Server::GetInstance().Shutdown();
+
         sTestOpCertStore.Finish();
         sTestOpKeystore.Finish();
         chip::DeviceLayer::PlatformMgr().Shutdown();
