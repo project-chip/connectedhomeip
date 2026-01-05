@@ -459,6 +459,16 @@ source_set("platform_config_header") {
 }
 
 if (chip_device_platform != "none") {
+  # Minimal target for PlatformError.h to avoid circular dependencies
+  # PlatformError.h only needs CHIPError.h, which is available via lib/core
+  source_set("platform_error") {
+    sources = [ "PlatformError.h" ]
+
+    public_deps = [
+      "${chip_root}/src/lib/core",
+    ]
+
+  }
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",

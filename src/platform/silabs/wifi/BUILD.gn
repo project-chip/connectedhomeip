@@ -116,6 +116,7 @@ source_set("wifi-platform") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform:platform_error",
     "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
