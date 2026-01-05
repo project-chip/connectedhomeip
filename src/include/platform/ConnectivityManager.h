@@ -313,7 +313,7 @@ struct ConnectivityManager::WiFiPAFAdvertiseParam
 /**
  * Returns a reference to the public interface of the ConnectivityManager singleton object.
  *
- * chip applications should use this to access features of the ConnectivityManager object
+ * Applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
 extern ConnectivityManager & ConnectivityMgr();
@@ -321,7 +321,7 @@ extern ConnectivityManager & ConnectivityMgr();
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
- * chip applications can use this to gain access to features of the ConnectivityManager
+ * Applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the selected platform.
  */
 extern ConnectivityManagerImpl & ConnectivityMgrImpl();
