@@ -233,7 +233,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 
     // Cancel timer if running.
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
-    
+
     if (mDelegate != nullptr)
     {
         err = mDelegate->HandleCloseValve();
