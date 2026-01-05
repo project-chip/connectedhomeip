@@ -18,7 +18,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
 
     // Ignoring return value, because in general the data is garbage and won't decode properly.
     // We're just testing that the decoder does not crash on the fuzzer-generated inputs.
-    TEMPORARY_RETURN_IGNORED chip::base38Decode(base38EncodedString, decodedData);
+    RETURN_SAFELY_IGNORED chip::base38Decode(base38EncodedString, decodedData);
 
     return 0;
 }

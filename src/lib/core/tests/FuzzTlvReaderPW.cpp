@@ -27,7 +27,7 @@ void FuzzTlvReader(const std::vector<std::uint8_t> & bytes)
 {
     TLVReader reader;
     reader.Init(bytes.data(), bytes.size());
-    (void) chip::TLV::Utilities::Iterate(reader, FuzzIterator, nullptr);
+    RETURN_SAFELY_IGNORED chip::TLV::Utilities::Iterate(reader, FuzzIterator, nullptr);
 }
 // Fuzz tests are instantiated with the FUZZ_TEST macro
 FUZZ_TEST(TLVReader, FuzzTlvReader).WithDomains(Arbitrary<std::vector<std::uint8_t>>());
