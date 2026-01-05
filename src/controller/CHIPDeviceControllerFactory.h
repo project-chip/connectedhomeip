@@ -313,6 +313,7 @@ private:
     Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    app::DataModel::Provider * mDataModelProvider                       = nullptr;
     bool mEnableServerInteractions                                      = false;
 };
 
