@@ -321,7 +321,7 @@ bool PushAVTransport::HandleTriggerDetected()
         elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - mClipInfo.mActivationTime).count();
     }
 
-    ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected elapsed: %ld", elapsed);
+    ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected elapsed: %" PRId64, elapsed);
 
     if (!mRecorder->GetRecorderStatus())
     {
@@ -705,7 +705,7 @@ uint16_t PushAVTransport::GetPreRollLength()
 void PushAVTransport::StartNewSession(uint64_t newSessionID)
 {
     mClipInfo.mSessionNumber = newSessionID;
-    ChipLogProgress(Camera, "Session completed, New session started with session number [%ld]", mClipInfo.mSessionNumber);
+    ChipLogProgress(Camera, "Session completed, New session started with session number [%" PRIu64 "]", mClipInfo.mSessionNumber);
     mStreaming    = false;
     mCanSendVideo = false;
     mCanSendAudio = false;
