@@ -19468,6 +19468,13 @@ typedef NS_OPTIONS(uint32_t, MTRLaundryWasherControlsFeature) {
     MTRLaundryWasherControlsFeatureRinse MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x2,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRRVCRunModeChangeToModeStatus) {
+    MTRRVCRunModeChangeToModeStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRRVCRunModeChangeToModeStatusUnsupportedMode MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRRVCRunModeChangeToModeStatusGenericFailure MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRRVCRunModeChangeToModeStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint16_t, MTRRVCRunModeModeTag) {
     MTRRVCRunModeModeTagAuto MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRRVCRunModeModeTagQuick MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
@@ -19498,6 +19505,13 @@ typedef NS_ENUM(uint8_t, MTRRVCRunModeStatusCode) {
 typedef NS_OPTIONS(uint32_t, MTRRVCRunModeFeature) {
     MTRRVCRunModeFeatureDirectModeChange MTR_PROVISIONALLY_AVAILABLE = 0x100000,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+
+typedef NS_ENUM(uint8_t, MTRRVCCleanModeChangeToModeStatus) {
+    MTRRVCCleanModeChangeToModeStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRRVCCleanModeChangeToModeStatusUnsupportedMode MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRRVCCleanModeChangeToModeStatusGenericFailure MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRRVCCleanModeChangeToModeStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRRVCCleanModeModeTag) {
     MTRRVCCleanModeModeTagAuto MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
@@ -19533,6 +19547,13 @@ typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {
 typedef NS_OPTIONS(uint32_t, MTRRefrigeratorAlarmAlarmBitmap) {
     MTRRefrigeratorAlarmAlarmBitmapDoorOpen MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x1,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+typedef NS_ENUM(uint8_t, MTRDishwasherModeChangeToModeStatus) {
+    MTRDishwasherModeChangeToModeStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDishwasherModeChangeToModeStatusUnsupportedMode MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDishwasherModeChangeToModeStatusGenericFailure MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDishwasherModeChangeToModeStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRDishwasherModeModeTag) {
     MTRDishwasherModeModeTagAuto MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
