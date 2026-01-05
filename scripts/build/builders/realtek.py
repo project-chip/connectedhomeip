@@ -123,7 +123,7 @@ class RealtekBuilder(Builder):
         self.enable_cli = enable_cli
         self.enable_rpc = enable_rpc
         self.enable_shell = enable_shell
-        self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
+        self.ot_src_dir = os.path.join(self.root, 'third_party/openthread/ot-realtek')
         self.rtk_matter_dir = os.path.join(self.ot_src_dir, 'third_party/Realtek/rtl87x2g_sdk/subsys/matter')
 
         if self.board == RealtekBoard.RTL87X2G:
