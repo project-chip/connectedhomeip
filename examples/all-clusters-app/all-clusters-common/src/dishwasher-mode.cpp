@@ -44,7 +44,6 @@ void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Comma
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
-    gDishwasherModeInstance->UpdateCurrentMode(NewMode);
 }
 
 CHIP_ERROR DishwasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
