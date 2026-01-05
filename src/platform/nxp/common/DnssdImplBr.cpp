@@ -996,7 +996,7 @@ static void DispatchResolve(intptr_t context)
 
     if (IsResolveElementValid(pResolveContext))
     {
-        Dnssd::DnssdService & service  = pResolveContext->mMdnsService;
+        Dnssd::DnssdService & service = pResolveContext->mMdnsService;
         Span<Inet::IPAddress> ipAddrs;
 
         // Stop Address resolver, we have finished resolving the service
@@ -1120,7 +1120,7 @@ static mDnsQueryCtx * GetResolveElement(const char * aName, NameType aType)
     return pResolveContext;
 }
 
-static bool IsResolveElementValid(const mDnsQueryCtx *pResolveContext)
+static bool IsResolveElementValid(const mDnsQueryCtx * pResolveContext)
 {
     mDnsQueryCtx * pContextIterator = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
     while (pContextIterator)
