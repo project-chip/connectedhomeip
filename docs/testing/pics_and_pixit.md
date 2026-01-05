@@ -25,7 +25,7 @@ the following PICS codes would be defined
 | ANC.S.A0000   | Device implements ANC attribute 0x0000 on the ANC server cluster           |
 | ANC.S.A0001   | Device implements ANC attribute 0x0001 on the ANC server cluster           |
 | ANC.S.C00.Rsp | Device accepts ANC command 0x00 on the ANC server cluster                  |
-| ANC.S.C01.Rsp | Device accepts ANC command 0x00 on the ANC server cluster                  |
+| ANC.S.C01.Rsp | Device accepts ANC command 0x01 on the ANC server cluster                  |
 | ANC.S.C02.Tx  | Device generates ANC command response 0x02 on the ANC server cluster       |
 | ANC.S.E00     | Device generates ANC event 0x00 on the ANC server cluster                  |
 | ANC.C         | Device supports an ANC client                                              |
