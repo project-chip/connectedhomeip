@@ -1452,8 +1452,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                     LOGGER.info("Created restart flag file to signal app reboot and wrote reset to trigger factory reset (remove KVS file)")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
-                # Waiting a bit longer for the app to be ready and stable after reboot.
-                await asyncio.sleep(1)
 
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
