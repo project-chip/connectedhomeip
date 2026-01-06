@@ -18,6 +18,7 @@
 #include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
+#include "tls-client-management-instance.h"
 
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -59,6 +60,10 @@ void ApplicationInit()
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
+
+    // Initialize TLS Client Management delegate before server starts
+    // This must be called before ChipLinuxAppMainLoop() which initializes the server
+    InitializeTlsClientManagement();
 
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);

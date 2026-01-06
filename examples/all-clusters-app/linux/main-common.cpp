@@ -189,9 +189,6 @@ extern void MatterDishwasherAlarmServerInit();
 
 void ApplicationInit()
 {
-    // Initialize TLS Client Management cluster before server starts
-    Clusters::InitializeTlsClientManagement();
-
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
