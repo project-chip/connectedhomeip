@@ -21,7 +21,7 @@ from typing import Callable
 from mobly import asserts
 
 from matter.testing.conformance import (Choice, Conformance, ConformanceAssessmentData, ConformanceDecision, ConformanceException,
-                                        ConformanceParseParameters, deprecated, disallowed, mandatory, optional,
+                                        ConformanceParseParameters, MinimalConformance, deprecated, disallowed, mandatory, optional,
                                         parse_basic_callable_from_xml, parse_callable_from_xml, provisional, zigbee)
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
