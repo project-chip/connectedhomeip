@@ -185,7 +185,7 @@ void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
 
     // SL-TEMP: StartTimer requires the chip stack to be locked, since ScheduleKeyMapSave might be called from a non-locked context.
     PlatformMgr().LockChipStack();
-    SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(
         std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(SL_KVS_SAVE_DELAY_SECONDS)),
         KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
     PlatformMgr().UnlockChipStack();

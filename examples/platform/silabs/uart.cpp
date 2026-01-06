@@ -220,22 +220,6 @@ static void ensureNullTermination(UartTxStruct_t & bufferStruct)
 }
 #endif
 
-#if SLI_SI91X_MCU_INTERFACE
-static void ensureNullTermination(UartTxStruct_t & bufferStruct)
-{
-    if (bufferStruct.length > 0 && bufferStruct.length < MATTER_ARRAY_SIZE(bufferStruct.data) &&
-        bufferStruct.data[bufferStruct.length - 1] != '\0')
-    {
-        bufferStruct.data[bufferStruct.length] = '\0';
-    }
-    else
-    {
-        uint16_t nullPos           = (bufferStruct.length == 0) ? 0 : MATTER_ARRAY_SIZE(bufferStruct.data) - 1;
-        bufferStruct.data[nullPos] = '\0';
-    }
-}
-#endif
-
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
 {
     if (fifo == NULL || pDataBuffer == NULL)
