@@ -26,8 +26,6 @@
 
 #include <string>
 
-class OTAProviderExample;
-
 OTAProviderExample & GetOtaProviderExample();
 
 class OtaProviderAppCommandDelegate : public NamedPipeCommandDelegate
