@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import subprocess
+from typing import IO, Any
 
-from .runner import Executor, SubprocessInfo
+from .runner import Executor, LogPipe, SubprocessInfo
 
 
 class DarwinExecutor(Executor):
-    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
         # Try harder to avoid any stdout buffering in our tests
         wrapped = subproc.wrap_with('stdbuf', '-o0', '-i0')
-        return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
+        return super().run(wrapped, stdin, stdout, stderr)

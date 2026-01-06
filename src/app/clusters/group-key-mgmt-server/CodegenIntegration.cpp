@@ -70,7 +70,7 @@ void MatterGroupKeyManagementClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -81,7 +81,7 @@ void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGroupKeyManagementPluginServerInitCallback() {}

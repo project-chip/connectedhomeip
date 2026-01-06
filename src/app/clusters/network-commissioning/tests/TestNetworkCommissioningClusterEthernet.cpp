@@ -47,6 +47,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
 using chip::app::AttributeValueDecoder;
+using chip::app::ClusterShutdownType;
 using chip::app::DataModel::AttributeEntry;
 using chip::Testing::kAdminSubjectDescriptor;
 using chip::Testing::WriteOperation;
@@ -222,7 +223,7 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
         EXPECT_FALSE(value); // disabled
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     cluster.Deinit();
 
     ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
@@ -234,7 +235,7 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
         EXPECT_FALSE(value); // stays disabled
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     cluster.Deinit();
 }
 

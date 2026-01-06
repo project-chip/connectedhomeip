@@ -177,9 +177,16 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); }
+    void SetUp() override
+    {
+        // Enable optional attributes that are used in tests
+        basicInformationClusterInstance.OptionalAttributes()
+            .Set<Attributes::ManufacturingDate::Id>()
+            .Set<Attributes::LocalConfigDisabled::Id>();
+        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
+    }
 
-    void TearDown() override { basicInformationClusterInstance.Shutdown(); }
+    void TearDown() override { basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     chip::Testing::TestServerClusterContext testContext;
     static BasicInformationCluster & basicInformationClusterInstance;
@@ -204,7 +211,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    basicInformationClusterInstance.Shutdown();
+    basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
