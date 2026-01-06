@@ -104,8 +104,7 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 {
     mOutFd = open(mChipEventFifoPathOut.c_str(), O_WRONLY);
 
-    if (mOutFd == -1 || json.empty())
-        return;
+    VerifyOrReturn(mOutFd != -1 && !json.empty());
 
     if (write(mOutFd, json.c_str(), json.size()) < 0)
     {
