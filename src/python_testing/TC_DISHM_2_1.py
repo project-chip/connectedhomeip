@@ -137,7 +137,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
         failure_and_manual = can_test_mode_failure and can_manually_control
 
-        # Check if the list of supported modes is larger than 2
+        # Check if the list of supported modes is at least 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
 
         if failure_and_manual:
