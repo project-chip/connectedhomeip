@@ -154,7 +154,7 @@ void LightSwitchApp::AppTask::NotifyBoundDevice(intptr_t arg)
         break;
     }
 
-    error = chip::BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId,
+    error = Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId,
                                                                           data->clusterId,
                                                                           static_cast<void *>(data));
     if (CHIP_NO_ERROR != error) {
@@ -166,5 +166,5 @@ void LightSwitchApp::AppTask::NotifyBoundDevice(intptr_t arg)
 
 void LightSwitchApp::AppTask::NotifyBoundDeviceHandler(void)
 {
-    PlatformMgr().ScheduleWork(NotifyBoundDevice, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(NotifyBoundDevice, 0);
 }

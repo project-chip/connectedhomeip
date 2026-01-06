@@ -88,7 +88,6 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/main/DeviceCallbacks.cpp
     ${NXP_EXAMPLE_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
-    ${ALL_CLUSTERS_COMMON_DIR}/src/occupancy-sensing-stub.cpp
 )
 
 if(CONFIG_CHIP_ETHERNET)

@@ -40,14 +40,9 @@ public:
 	void AppMatter_RegisterCustomCliCommands(void) override;
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();
-	void OccupancyHandler(bool present);
-    static void OccupancyPresentTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 private:
     static AppTask sAppTask;
-	static void OccupancyEventHandler(const AppEvent & aEvent);
-	static void UpdateOccupancyPresentStateInternal(intptr_t arg);
-	static void UpdateOccupancyClearStateInternal(intptr_t arg);
 };
 } // namespace OccupancySensorApp
 

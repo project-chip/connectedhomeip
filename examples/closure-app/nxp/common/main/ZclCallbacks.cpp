@@ -22,9 +22,11 @@
 #include "CHIPDeviceManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CONFIG_DIAG_LOGS_DEMO
 #include <DiagnosticLogsProviderDelegateImpl.h>
@@ -55,3 +57,14 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
 #endif
+
+/* Forwards all attributes changes */
+void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Closure Control cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+}
+
+void MatterClosureDimensionClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Closure Dimension cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+}

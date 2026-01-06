@@ -164,11 +164,11 @@ void WindowCoveringManager::MoveTimerTimeoutCallback(chip::System::Layer * syste
 
     if (*moveType == WindowCoveringType::Lift)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCoveringManager::DriveCurrentLiftPosition);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCoveringManager::DriveCurrentLiftPosition);
     }
     else if (*moveType == WindowCoveringType::Tilt)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCoveringManager::DriveCurrentTiltPosition);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCoveringManager::DriveCurrentTiltPosition);
     }
 
     chip::Platform::Delete(moveType);
@@ -306,7 +306,7 @@ void WindowCoveringManager::SchedulePostAttributeChange(chip::EndpointId aEndpoi
     data->mEndpoint    = aEndpoint;
     data->mAttributeId = aAttributeId;
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
 }
 
 void WindowCoveringManager::DoPostAttributeChange(intptr_t aArg)

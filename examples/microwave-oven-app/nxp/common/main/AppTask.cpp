@@ -50,17 +50,17 @@ CHIP_ERROR cliOpState(int argc, char * argv[])
     if (!strcmp(argv[0], "stop"))
     {
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        onCliOpStateChanged(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED onCliOpStateChanged(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else if (!strcmp(argv[0], "run"))
     {
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        onCliOpStateChanged(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED onCliOpStateChanged(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (!strcmp(argv[0], "pause"))
     {
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        onCliOpStateChanged(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+        TEMPORARY_RETURN_IGNORED onCliOpStateChanged(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     }
     else if (!strcmp(argv[0], "error"))
     {

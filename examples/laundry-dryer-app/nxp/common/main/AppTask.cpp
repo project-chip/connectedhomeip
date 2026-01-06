@@ -65,19 +65,19 @@ CHIP_ERROR cliOpState(int argc, char * argv[])
     if (!strcmp(argv[0], "stop"))
     {
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
+        TEMPORARY_RETURN_IGNORED OperationalState::GetOperationalStateInstance()->SetOperationalState(
             to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else if (!strcmp(argv[0], "run"))
     {
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
+        TEMPORARY_RETURN_IGNORED OperationalState::GetOperationalStateInstance()->SetOperationalState(
             to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (!strcmp(argv[0], "pause"))
     {
         ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
+        TEMPORARY_RETURN_IGNORED OperationalState::GetOperationalStateInstance()->SetOperationalState(
             to_underlying(OperationalState::OperationalStateEnum::kPaused));
     }
     else if (!strcmp(argv[0], "error"))
@@ -109,8 +109,8 @@ CHIP_ERROR cliOpState(int argc, char * argv[])
             ChipLogError(Shell, "Invalid Error State to set");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(err);
-        OperationalState::GetOperationalStateInstance()->SetOperationalState(
+        TEMPORARY_RETURN_IGNORED OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(err);
+        TEMPORARY_RETURN_IGNORED OperationalState::GetOperationalStateInstance()->SetOperationalState(
             to_underlying(OperationalState::OperationalStateEnum::kError));
     }
     else
