@@ -29,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -45,7 +46,7 @@ static bool sSwitchOnOffState = false;
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
@@ -72,19 +73,19 @@ static void RegisterSwitchCommands()
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::OperationalDeviceProxy * peer_device,
+static void BoundDeviceChangedHandler(const Binding::TableEntry & binding, chip::OperationalDeviceProxy * peer_device,
                                       void * context)
 {
     using namespace chip;
     using namespace chip::app;
 
-    if (binding.type == MATTER_MULTICAST_BINDING)
+    if (binding.type == Binding::MATTER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding.type == MATTER_UNICAST_BINDING && binding.local == 1 &&
+    if (binding.type == Binding::MATTER_UNICAST_BINDING && binding.local == 1 &&
         binding.clusterId.value_or(Clusters::OnOff::Id) == Clusters::OnOff::Id)
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -98,13 +99,13 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
         if (sSwitchOnOffState)
         {
             Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
                                              binding.remote, onCommand, onSuccess, onFailure);
         }
         else
         {
             Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
                                              binding.remote, offCommand, onSuccess, onFailure);
         }
     }
@@ -116,7 +117,7 @@ static void BoundDeviceContextReleaseHandler(void * context)
 }
 
 
-static void ProcessOnOffUnicastBindingCommand(chip::CommandId commandId, const EmberBindingTableEntry & binding,
+static void ProcessOnOffUnicastBindingCommand(chip::CommandId commandId, const Binding::TableEntry & binding,
                                        Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -133,22 +134,22 @@ static void ProcessOnOffUnicastBindingCommand(chip::CommandId commandId, const E
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
         Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
         Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
         break;
     }
 }
 
-static void ProcessLevelControlUnicastBindingCommand(chip::CommandId commandId, const EmberBindingTableEntry & binding,
+static void ProcessLevelControlUnicastBindingCommand(chip::CommandId commandId, const Binding::TableEntry & binding,
                                        Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, void * context)
 {
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
@@ -169,7 +170,7 @@ static void ProcessLevelControlUnicastBindingCommand(chip::CommandId commandId, 
         {
             Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
             moveToLevelCommand.level = data->value;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToLevelCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToLevelCommand, onSuccess, onFailure);
         }
         break;
 
@@ -179,7 +180,7 @@ static void ProcessLevelControlUnicastBindingCommand(chip::CommandId commandId, 
     }
 }
 
-static void LightSwitchBoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::OperationalDeviceProxy * peer_device,
+static void LightSwitchBoundDeviceChangedHandler(const Binding::TableEntry & binding, chip::OperationalDeviceProxy * peer_device,
                                       void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
@@ -187,13 +188,13 @@ static void LightSwitchBoundDeviceChangedHandler(const EmberBindingTableEntry & 
 
     ChipLogProgress(NotSpecified, "BoundDeviceChangedHandler Enter");
 
-    if (binding.type == MATTER_MULTICAST_BINDING)
+    if (binding.type == Binding::MATTER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding.type == MATTER_UNICAST_BINDING)
+    if (binding.type == Binding::MATTER_UNICAST_BINDING)
     {
        switch (data->clusterId)
        {
@@ -222,11 +223,11 @@ static void LightSwitchBoundDeviceContextReleaseHandler(void * context)
 static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchBoundDeviceChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchBoundDeviceContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchBoundDeviceChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchBoundDeviceContextReleaseHandler);
 
 }
 
@@ -236,7 +237,7 @@ CHIP_ERROR InitBindingHandlers()
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
     // TODO: Fix initialization order issue in Matter server.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
 #endif

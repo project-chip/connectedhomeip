@@ -72,7 +72,7 @@ Status ChimeCommandDelegate::PlayChimeSound()
 
 void emberAfChimeClusterInitCallback(EndpointId endpoint)
 {
-    gChimeClusterServerInstance.Init();
+    TEMPORARY_RETURN_IGNORED gChimeClusterServerInstance.Init();
 }
 
 void emberAfChimeClusterShutdownCallback(EndpointId endpoint) {}
