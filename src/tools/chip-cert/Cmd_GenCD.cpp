@@ -691,7 +691,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gCDConfig.SetCMSSignatureWrong();
         }
-        else if (strcmp(arg, "provisional-cd) != 0") || strcmp(arg, "official-cd") != 0)
+        else if ((strcmp(arg, "provisional-cd") != 0) || (strcmp(arg, "official-cd") != 0))
         {
             // Set by the -t flag, do nothing
         }
