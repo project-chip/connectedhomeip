@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="8">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1994 1995 1996 1997 2086 2094 2095 2096 2097"/>
     <revision revision="2" summary="CCB 2328"/>
@@ -65,7 +65,8 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
     <revision revision="5" summary="New data model format and notation. Created plus clarified PositionAware and AbsolutePosition features. General cleanup of functionality."/>
     <revision revision="6" summary="Marked AbsolutePosition feature and associated elements provisional."/>
-    <revision revision="7" summary="Removed ABS feature and all associated elements from the cluster since it is disallowed by the Window Covering Device Type."/>
+    <revision revision="7" summary="Removed ABS feature and all associated elements from the cluster."/>
+    <revision revision="8" summary="Removed P quality."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0102" name="Window Covering"/>

@@ -57,13 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
     <revision revision="3" summary="New data model format and notation"/>
     <revision revision="4" summary="Remove nullable from PhysicalContact delay attributes and ability to not report transitions"/>
     <revision revision="5" summary="Rework to add modalities: radar-, ambient-sensing- and vision-based sensors; add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint); add new attribute for tuning the sensor&apos;s reporting; add event OccupancyChanged; add N quality for HoldTime and other timing attributes; describe how to accommodate legacy clients"/>
+    <revision revision="6" summary="Removed P quality"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0406" name="Occupancy Sensing"/>

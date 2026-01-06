@@ -143,6 +143,9 @@ Davis, CA 95616, USA
       <item value="0" name="JPEG" summary="JPEG image codec.">
         <mandatoryConform/>
       </item>
+      <item value="1" name="HEIC" summary="HEIC image codec.">
+        <optionalConform/>
+      </item>
     </enum>
     <enum name="TriStateAutoEnum">
       <item value="0" name="Off" summary="Off">

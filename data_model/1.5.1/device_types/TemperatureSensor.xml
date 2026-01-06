@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Added Thermostat User Interface Configuration cluster"/>
+    <revision revision="3" summary="Added Thermostat User Interface Configuration cluster and removed Zigbee related elements"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>

@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0553" name="WebRTC Transport Provider Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0553" name="WebRTC Transport Provider Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version of the WebRTC Transport Provider Cluster"/>
+    <revision revision="2" summary="Add multi stream support"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0553" name="WebRTC Transport Provider"/>
@@ -118,11 +119,11 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <optionalConform choice="a" more="true" min="1"/>
+        <disallowConform/>
       </field>
       <field id="3" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <optionalConform choice="a" more="true" min="1"/>
+        <disallowConform/>
       </field>
       <field id="4" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
@@ -147,6 +148,42 @@ Davis, CA 95616, USA
           <provisionalConform/>
           <optionalConform/>
         </otherwiseConform>
+      </field>
+      <field id="8" name="VideoStreams" type="list">
+        <entry type="VideoStreamID"/>
+        <otherwiseConform>
+          <optionalConform/>
+          <optionalConform choice="b" more="true" min="1">
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </optionalConform>
+        </otherwiseConform>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </countBetween>
+        </constraint>
+      </field>
+      <field id="9" name="AudioStreams" type="list">
+        <entry type="AudioStreamID"/>
+        <otherwiseConform>
+          <optionalConform/>
+          <optionalConform choice="b" more="true" min="1">
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </optionalConform>
+        </otherwiseConform>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </countBetween>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="SolicitOfferResponse" direction="responseFromServer">
@@ -194,11 +231,11 @@ Davis, CA 95616, USA
       </field>
       <field id="4" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <optionalConform choice="c" more="true" min="1"/>
+        <disallowConform/>
       </field>
       <field id="5" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <optionalConform choice="c" more="true" min="1"/>
+        <disallowConform/>
       </field>
       <field id="6" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
@@ -223,6 +260,54 @@ Davis, CA 95616, USA
           <provisionalConform/>
           <optionalConform/>
         </otherwiseConform>
+      </field>
+      <field id="10" name="VideoStreams" type="list">
+        <entry type="VideoStreamID"/>
+        <otherwiseConform>
+          <optionalConform/>
+          <optionalConform choice="d" more="true" min="1">
+            <andTerm>
+              <greaterOrEqualTerm>
+                <revision value="current"/>
+                <revision value="2"/>
+              </greaterOrEqualTerm>
+              <equalTerm>
+                <field name="WebRTCSessionID"/>
+                <literal value="null"/>
+              </equalTerm>
+            </andTerm>
+          </optionalConform>
+        </otherwiseConform>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </countBetween>
+        </constraint>
+      </field>
+      <field id="11" name="AudioStreams" type="list">
+        <entry type="AudioStreamID"/>
+        <otherwiseConform>
+          <optionalConform/>
+          <optionalConform choice="d" more="true" min="1">
+            <andTerm>
+              <greaterOrEqualTerm>
+                <revision value="current"/>
+                <revision value="2"/>
+              </greaterOrEqualTerm>
+              <equalTerm>
+                <field name="WebRTCSessionID"/>
+                <literal value="null"/>
+              </equalTerm>
+            </andTerm>
+          </optionalConform>
+        </otherwiseConform>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </countBetween>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="ProvideOfferResponse" direction="responseFromServer">

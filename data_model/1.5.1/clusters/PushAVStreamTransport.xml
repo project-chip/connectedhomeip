@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0555" name="Push AV Stream Transport Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0555" name="Push AV Stream Transport Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Add DoorbellPressed to TriggerActivationReason. Augment PushTransport events with Session numbers and Event context. Add multi-stream support."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0555" name="Push AV Stream Transport"/>
@@ -136,6 +137,12 @@ Davis, CA 95616, USA
       <item value="0x0B" name="InvalidTime" summary="Time sync has not occurred yet.">
         <mandatoryConform/>
       </item>
+      <item value="0x0C" name="InvalidPreRollLength" summary="The requested pre roll length is not compatible with the streams key frame interval.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x0D" name="DuplicateStreamValues" summary="The requested Streams info contained duplicate entries.">
+        <mandatoryConform/>
+      </item>
     </enum>
     <enum name="TransportStatusEnum">
       <item value="0" name="Active" summary="Push Transport can transport AV Streams">
@@ -166,7 +173,24 @@ Davis, CA 95616, USA
       <item value="2" name="Emergency" summary="Trigger has been activated for emergency reasons">
         <mandatoryConform/>
       </item>
+      <item value="3" name="DoorbellPressed" summary="Trigger has been activated by a doorbell press">
+        <mandatoryConform/>
+      </item>
     </enum>
+    <struct name="AudioStreamStruct">
+      <field id="0" name="AudioStreamName" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="AudioStreamID" type="AudioStreamID">
+        <mandatoryConform/>
+      </field>
+    </struct>
     <struct name="CMAFContainerOptionsStruct">
       <field id="0" name="CMAFInterface" type="CMAFInterfaceEnum">
         <mandatoryConform/>
@@ -198,10 +222,10 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="3" name="SessionGroup" type="uint8">
-        <mandatoryConform/>
+        <disallowConform/>
       </field>
       <field id="4" name="TrackName" type="string">
-        <mandatoryConform/>
+        <disallowConform/>
         <constraint>
           <lengthBetween>
             <from value="1"/>
@@ -300,11 +324,11 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <optionalConform choice="a" more="true" min="1"/>
+        <disallowConform/>
       </field>
       <field id="2" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <optionalConform choice="a" more="true" min="1"/>
+        <disallowConform/>
       </field>
       <field id="3" name="TLSEndpointID" type="TLSEndpointID">
         <mandatoryConform/>
@@ -335,6 +359,42 @@ Davis, CA 95616, USA
       </field>
       <field id="8" name="ExpiryTime" type="epoch-s">
         <optionalConform/>
+      </field>
+      <field id="9" name="VideoStreams" type="list">
+        <entry type="VideoStreamStruct"/>
+        <otherwiseConform>
+          <optionalConform/>
+          <optionalConform choice="a" more="true" min="1">
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </optionalConform>
+        </otherwiseConform>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </countBetween>
+        </constraint>
+      </field>
+      <field id="10" name="AudioStreams" type="list">
+        <entry type="AudioStreamStruct"/>
+        <otherwiseConform>
+          <optionalConform/>
+          <optionalConform choice="a" more="true" min="1">
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </optionalConform>
+        </otherwiseConform>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </countBetween>
+        </constraint>
       </field>
     </struct>
     <struct name="TransportTriggerOptionsStruct">
@@ -409,6 +469,20 @@ Davis, CA 95616, USA
             <to value="10"/>
           </between>
         </constraint>
+      </field>
+    </struct>
+    <struct name="VideoStreamStruct">
+      <field id="0" name="VideoStreamName" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
@@ -557,6 +631,28 @@ Davis, CA 95616, USA
           </equalTerm>
         </mandatoryConform>
       </field>
+      <field id="3" name="ContainerType" type="ContainerFormatEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="CMAFSessionNumber" type="uint64">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="ContainerType"/>
+            <enum name="ContainerFormatEnum" value="CMAF"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+      <field id="5" name="VendorSpecificContext" type="octstr">
+        <optionalConform>
+          <equalTerm>
+            <field name="ActivationReason"/>
+            <enum name="TriggerActivationReasonEnum" value="DoorbellPressed"/>
+          </equalTerm>
+        </optionalConform>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
     </event>
     <event id="0x01" name="PushTransportEnd" priority="info">
       <access readPrivilege="view"/>
@@ -569,6 +665,17 @@ Davis, CA 95616, USA
             <to value="65534"/>
           </between>
         </constraint>
+      </field>
+      <field id="1" name="ContainerType" type="ContainerFormatEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="CMAFSessionNumber" type="uint64">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="ContainerType"/>
+            <enum name="ContainerFormatEnum" value="CMAF"/>
+          </equalTerm>
+        </mandatoryConform>
       </field>
     </event>
   </events>

@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification superset="Doorbell" class="simple" scope="endpoint"/>
+  <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
     <deviceType id="0x0016" name="Root Node">
       <conditionRequirement name="TLSCertificatesCond">

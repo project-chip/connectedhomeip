@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0140" name="Intercom" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0140" name="Intercom" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Addition of Generic Switch"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
@@ -113,6 +114,9 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0554" name="WebRTC Transport Requestor" side="client">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0556" name="Chime" side="client">
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

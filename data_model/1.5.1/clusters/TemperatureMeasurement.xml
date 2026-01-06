@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0402" name="Temperature Measurement Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0402" name="Temperature Measurement Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2241 2370"/>
     <revision revision="3" summary="CCB 2823"/>
     <revision revision="4" summary="New data model format and notation"/>
+    <revision revision="5" summary="Removed P quality"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0402" name="Temperature Measurement"/>

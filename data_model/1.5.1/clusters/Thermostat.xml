@@ -67,7 +67,7 @@ Davis, CA 95616, USA
     <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
     <revision revision="7" summary="Update constraints on local temperature calibration and minimum setpoint deadband and introduced Presets and MatterScheduleConfiguration features"/>
     <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation."/>
-    <revision revision="9" summary="Removed AlarmMask attribute and AlarmCodeBitmap Type."/>
+    <revision revision="9" summary="Removed Zigbee related elements and P quality. Deprecated Setback feature and related elements."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0201" name="Thermostat"/>
@@ -93,11 +93,8 @@ Davis, CA 95616, USA
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="SCH" name="ScheduleConfiguration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
+    <feature bit="4" code="SB" name="Setback">
       <deprecateConform/>
-    </feature>
-    <feature bit="4" code="SB" name="Setback" summary="Supports configurable setback (or span)">
-      <optionalConform/>
     </feature>
     <feature bit="5" code="AUTO" name="AutoMode" summary="Supports a System Mode of Auto">
       <optionalConform/>
@@ -250,10 +247,7 @@ Davis, CA 95616, USA
       </item>
       <item value="1" name="Schedule" summary="Schedule/internal programming-initiated setpoint change">
         <optionalConform>
-          <orTerm>
-            <feature name="SCH"/>
-            <feature name="MSCH"/>
-          </orTerm>
+          <feature name="MSCH"/>
         </optionalConform>
       </item>
       <item value="2" name="External" summary="Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)">
@@ -379,20 +373,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
       <bitfield name="FanFail" bit="4" summary="Fan Failure">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="HVACSystemTypeBitmap">
-      <bitfield name="CoolingStage" from="0x00" to="0x01" summary="Stage of cooling the HVAC system is using.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingStage" from="0x02" to="0x03" summary="Stage of heating the HVAC system is using.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingIsHeatPump" bit="4" summary="Is the heating type Heat Pump.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingUsesFuel" bit="5" summary="Does the HVAC system use fuel.">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -741,37 +721,14 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <optionalConform>
-        <feature name="COOL"/>
-      </optionalConform>
-      <constraint>
-        <between>
-          <from value="0"/>
-          <to value="100"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <optionalConform>
-        <feature name="HEAT"/>
-      </optionalConform>
-      <constraint>
-        <between>
-          <from value="0"/>
-          <to value="100"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="HVACSystemTypeBitmap" default="0">
-      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality persistence="nonVolatile"/>
+    <attribute id="0x0007" name="PICoolingDemand">
       <deprecateConform/>
-      <constraint>
-        <desc/>
-      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="PIHeatingDemand">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0009" name="HVACSystemTypeConfiguration">
+      <deprecateConform/>
     </attribute>
     <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -923,30 +880,6 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeekEnum">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0021" name="NumberOfWeeklyTransitions" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0022" name="NumberOfDailyTransitions" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
-    </attribute>
     <attribute id="0x0023" name="TemperatureSetpointHold" type="TemperatureSetpointHoldEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
@@ -993,102 +926,23 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="SB"/>
-      </mandatoryConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="OccupiedSetbackMin"/>
-          </from>
-          <to>
-            <attribute name="OccupiedSetbackMax"/>
-          </to>
-        </between>
-      </constraint>
+    <attribute id="0x0034" name="OccupiedSetback">
+      <deprecateConform/>
     </attribute>
-    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="SB"/>
-      </mandatoryConform>
-      <constraint>
-        <max>
-          <attribute name="OccupiedSetbackMax"/>
-        </max>
-      </constraint>
+    <attribute id="0x0035" name="OccupiedSetbackMin">
+      <deprecateConform/>
     </attribute>
-    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="SB"/>
-      </mandatoryConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="OccupiedSetbackMin"/>
-          </from>
-          <to value="254"/>
-        </between>
-      </constraint>
+    <attribute id="0x0036" name="OccupiedSetbackMax">
+      <deprecateConform/>
     </attribute>
-    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="SB"/>
-          <feature name="OCC"/>
-        </andTerm>
-      </mandatoryConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="UnoccupiedSetbackMin"/>
-          </from>
-          <to>
-            <attribute name="UnoccupiedSetbackMax"/>
-          </to>
-        </between>
-      </constraint>
+    <attribute id="0x0037" name="UnoccupiedSetback">
+      <deprecateConform/>
     </attribute>
-    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="SB"/>
-          <feature name="OCC"/>
-        </andTerm>
-      </mandatoryConform>
-      <constraint>
-        <max>
-          <attribute name="UnoccupiedSetbackMax"/>
-        </max>
-      </constraint>
+    <attribute id="0x0038" name="UnoccupiedSetbackMin">
+      <deprecateConform/>
     </attribute>
-    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="fixed"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="SB"/>
-          <feature name="OCC"/>
-        </andTerm>
-      </mandatoryConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="UnoccupiedSetbackMin"/>
-          </from>
-          <to value="254"/>
-        </between>
-      </constraint>
+    <attribute id="0x0039" name="UnoccupiedSetbackMax">
+      <deprecateConform/>
     </attribute>
     <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="255">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -1282,85 +1136,6 @@ Davis, CA 95616, USA
       <field id="1" name="Amount" type="int8">
         <mandatoryConform/>
       </field>
-    </command>
-    <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
-      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="Transitions" type="list">
-        <entry type="WeeklyScheduleTransitionStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <maxCount value="10"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x01" name="SetWeeklySchedule" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
-      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="Transitions" type="list">
-        <entry type="WeeklyScheduleTransitionStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <maxCount value="10"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
-      <field id="0" name="DaysToReturn" type="ScheduleDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="ModeToReturn" type="ScheduleModeBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="SCH"/>
-      </mandatoryConform>
     </command>
     <command id="0x05" name="SetActiveScheduleRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>

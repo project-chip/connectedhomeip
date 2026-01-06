@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock Cluster" revision="9">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock Cluster" revision="10">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
     <revision revision="2" summary="CCB 2430"/>
@@ -68,6 +68,7 @@ Davis, CA 95616, USA
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
     <revision revision="8" summary="Removed LOG and NOT feature, fixed constraints on NumberOf*Schedules attributes. and added support for Aliro credential provisioning"/>
     <revision revision="9" summary="Removed AlarmMask attribute"/>
+    <revision revision="10" summary="Removed Zigbee related elements and P quality"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0101" name="Door Lock"/>
@@ -78,7 +79,10 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="1" code="RID" name="RFIDCredential" summary="Lock supports RFID credentials">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
       <otherwiseConform>
@@ -102,19 +106,15 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
-      <otherwiseConform>
-        <mandatoryConform>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PIN"/>
+          <feature name="RID"/>
+          <feature name="FGP"/>
+          <feature name="FACE"/>
           <feature name="ALIRO"/>
-        </mandatoryConform>
-        <optionalConform>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-            <feature name="FGP"/>
-            <feature name="FACE"/>
-          </orTerm>
-        </optionalConform>
-      </otherwiseConform>
+        </orTerm>
+      </mandatoryConform>
     </feature>
     <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
       <optionalConform/>
@@ -1114,188 +1114,6 @@ Davis, CA 95616, USA
         </optionalConform>
       </field>
     </command>
-    <command id="0x05" name="SetPINCode" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="PIN"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserStatus" type="UserStatusEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="UserType" type="UserTypeEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="PIN" type="octstr">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x06" name="GetPINCode" direction="commandToServer" response="GetPINCodeResponse">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="PIN"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x06" name="GetPINCodeResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="PIN"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserStatus" type="UserStatusEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="UserType" type="UserTypeEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="PINCode" type="octstr">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x07" name="ClearPINCode" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="PIN"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="PINSlotIndex" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <between>
-            <from value="1"/>
-            <to>
-              <attribute name="NumberOfPINUsersSupported"/>
-            </to>
-          </between>
-        </constraint>
-        <constraint>
-          <allowed value="0xFFFE"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x08" name="ClearAllPINCodes" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="PIN"/>
-        </andTerm>
-      </mandatoryConform>
-    </command>
-    <command id="0x09" name="SetUserStatus" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-            <feature name="FGP"/>
-          </orTerm>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserStatus" type="UserStatusEnum">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x0A" name="GetUserStatus" direction="commandToServer" response="GetUserStatusResponse">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-            <feature name="FGP"/>
-          </orTerm>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x0A" name="GetUserStatusResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <notTerm>
-          <feature name="USR"/>
-        </notTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserStatus" type="UserStatusEnum">
-        <mandatoryConform/>
-      </field>
-    </command>
     <command id="0x0B" name="SetWeekDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
@@ -1698,188 +1516,6 @@ Davis, CA 95616, USA
           <allowed value="0xFE"/>
         </constraint>
       </field>
-    </command>
-    <command id="0x14" name="SetUserType" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-            <feature name="FGP"/>
-          </orTerm>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserType" type="UserTypeEnum">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x15" name="GetUserType" direction="commandToServer" response="GetUserTypeResponse">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-            <feature name="FGP"/>
-          </orTerm>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x15" name="GetUserTypeResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <notTerm>
-          <feature name="USR"/>
-        </notTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserType" type="UserTypeEnum">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x16" name="SetRFIDCode" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="RID"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserStatus" type="UserStatusEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="UserType" type="UserTypeEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="RFIDCode" type="octstr">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x17" name="GetRFIDCode" direction="commandToServer" response="GetRFIDCodeResponse">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="RID"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x17" name="GetRFIDCodeResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="RID"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="UserStatus" type="UserStatusEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="UserType" type="UserTypeEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="RFIDCode" type="octstr">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x18" name="ClearRFIDCode" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="RID"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="RFIDSlotIndex" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <between>
-            <from value="1"/>
-            <to>
-              <attribute name="NumberOfRFIDUsersSupported"/>
-            </to>
-          </between>
-        </constraint>
-        <constraint>
-          <allowed value="0xFFFE"/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x19" name="ClearAllRFIDCodes" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="USR"/>
-          </notTerm>
-          <feature name="RID"/>
-        </andTerm>
-      </mandatoryConform>
     </command>
     <command id="0x1A" name="SetUser" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
