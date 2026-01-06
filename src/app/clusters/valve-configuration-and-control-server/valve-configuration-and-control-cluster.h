@@ -110,10 +110,10 @@ private:
     DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState;
     DataModel::Nullable<Percent> mCurrentLevel;
     DataModel::Nullable<Percent> mTargetLevel;
-    Percent mDefaultOpenLevel;
+    Percent mDefaultOpenLevel{ kDefaultOpenLevel };
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault;
-    uint8_t mLevelStep;
-    ValveConfigurationAndControl::Delegate * mDelegate;
-    ValveConfigurationAndControl::TimeSyncTracker * mTsTracker;
+    uint8_t mLevelStep{ kDefaultLevelStep };
+    ValveConfigurationAndControl::Delegate * mDelegate{ nullptr };
+    ValveConfigurationAndControl::TimeSyncTracker * mTsTracker{ nullptr};
 };
 } // namespace chip::app::Clusters
