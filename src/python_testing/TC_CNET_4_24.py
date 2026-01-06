@@ -243,32 +243,32 @@ class TC_CNET_4_24(MatterBaseTest):
                         is_commissioning=False),
             TestStep(1, "TH reads Networks attribute and removes all configured networks",
                         "Verify that DUT successfully removed all networks configured during commissioning"),
-            TestStep(2, "TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (invalid network), Breadcrumb = 1",
+            TestStep(2, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID, Breadcrumb = 1",
                         "Verify that DUT sends NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(3, "TH sends ConnectNetwork command with incorrect network ID, Breadcrumb = 2",
+            TestStep(3, "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is NOT kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(4, "TH reads LastNetworkingStatus (should be kNetworkNotFound or kOtherConnectionFailure)",
-                        "Verify LastNetworkingStatus is kNetworkNotFound (5) or kOtherConnectionFailure (7)"),
+            TestStep(4, "TH reads LastNetworkingStatus after Extended PAN ID connection failure",
+                        "Verify LastNetworkingStatus is kOtherConnectionFailure (7)"),
             TestStep(5, "TH reads Networks attribute",
-                        "Verify incorrect network ID is in the network list"),
-            TestStep(6, "TH sends RemoveNetwork command with incorrect network ID, Breadcrumb = 3",
+                        "Verify dataset with incorrect Extended PAN ID is in the network list"),
+            TestStep(6, "TH sends RemoveNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 3",
                         "Verify that DUT sends NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)"),
             TestStep(7, "TH reads Networks attribute",
                         "Verify Networks list is empty after removal"),
-            TestStep(8, "TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (valid format but wrong network), Breadcrumb = 4",
+            TestStep(8, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Name and Master Key, Breadcrumb = 4",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty\n"),
-            TestStep(9, "TH sends ConnectNetwork command with valid format but with modified Extended PAN ID and Breadcrumb = 5",
+            TestStep(9, "TH sends ConnectNetwork command with dataset containing incorrect Network Name and Master Key, Breadcrumb = 5",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is NOT kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(10, "TH reads LastNetworkingStatus (should be kOtherConnectionFailure)",
+            TestStep(10, "TH reads LastNetworkingStatus after Network Name/Master Key connection failure",
                          "Verify LastNetworkingStatus to be 'kOtherConnectionFailure'"),
             TestStep(11, "TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 6",
                          "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
@@ -300,33 +300,56 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
         # Create incorrect Thread operational datasets for testing
-        # First incorrect dataset: completely invalid/non-existent network (truncated/malformed)
-        incorrect_thread_dataset_1 = bytes.fromhex("1111111122222222")
-        logger.info(f" --- Incorrect Thread dataset 1 (invalid/truncated): {incorrect_thread_dataset_1.hex()}")
-
-        # Second incorrect dataset: valid format but with modified Extended PAN ID to create a non-existent network
-        incorrect_thread_dataset_2 = bytearray(correct_thread_dataset)
+        # First incorrect dataset: valid format but with modified Extended PAN ID to create a non-existent network
+        incorrect_thread_dataset_1 = bytearray(correct_thread_dataset)
 
         # Find and modify the Extended PAN ID TLV in the dataset
         # Extended PAN ID: Type=0x02, Length=0x08, Value=8 bytes
+        i = 0
+        while i < len(incorrect_thread_dataset_1) - 1:
+            tlv_type = incorrect_thread_dataset_1[i]
+            tlv_length = incorrect_thread_dataset_1[i + 1]
+
+            if tlv_type == 0x02:  # Extended PAN ID
+                # Modify the Extended PAN ID value to create a non-existent network
+                # XOR first 4 bytes to change them while maintaining valid format
+                for j in range(4):
+                    if i + 2 + j < len(incorrect_thread_dataset_1):
+                        incorrect_thread_dataset_1[i + 2 + j] ^= 0xAA
+                logger.info(f" --- Modified Extended PAN ID in dataset 1")
+                break
+
+            i += 2 + tlv_length
+
+        incorrect_thread_dataset_1 = bytes(incorrect_thread_dataset_1)
+        logger.info(f" --- Incorrect Thread dataset 1 (modified Extended PAN ID): {incorrect_thread_dataset_1.hex()}")
+
+        # Second incorrect dataset: valid format but with modified Network Name and Master Key
+        incorrect_thread_dataset_2 = bytearray(correct_thread_dataset)
+
+        # Find and modify Network Name (Type=0x03) and Master Key (Type=0x05) TLVs
         i = 0
         while i < len(incorrect_thread_dataset_2) - 1:
             tlv_type = incorrect_thread_dataset_2[i]
             tlv_length = incorrect_thread_dataset_2[i + 1]
 
-            if tlv_type == 0x02:  # Extended PAN ID
-                # Modify the Extended PAN ID value to create a non-existent network
-                # XOR the bytes to change them while maintaining valid format
-                for j in range(8):
+            if tlv_type == 0x03:  # Network Name
+                # Modify network name bytes
+                for j in range(min(tlv_length, 8)):
                     if i + 2 + j < len(incorrect_thread_dataset_2):
-                        incorrect_thread_dataset_2[i + 2 + j] ^= 0xFF
-                logger.info(f" --- Modified Extended PAN ID in dataset 2")
-                break
+                        incorrect_thread_dataset_2[i + 2 + j] ^= 0x55
+                logger.info(f" --- Modified Network Name in dataset 2")
+            elif tlv_type == 0x05:  # Master Key (Network Key)
+                # Modify master key bytes
+                for j in range(min(tlv_length, 8)):
+                    if i + 2 + j < len(incorrect_thread_dataset_2):
+                        incorrect_thread_dataset_2[i + 2 + j] ^= 0xCC
+                logger.info(f" --- Modified Master Key in dataset 2")
 
             i += 2 + tlv_length
 
         incorrect_thread_dataset_2 = bytes(incorrect_thread_dataset_2)
-        logger.info(f" --- Incorrect Thread dataset 2 (modified Extended PAN ID): {incorrect_thread_dataset_2.hex()}")
+        logger.info(f" --- Incorrect Thread dataset 2 (modified Network Name and Master Key): {incorrect_thread_dataset_2.hex()}")
 
         # Step 0: TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(0)
@@ -393,10 +416,10 @@ class TC_CNET_4_24(MatterBaseTest):
                              f"Expected empty network list after cleanup, but found {len(networks_after)} network(s)")
         logger.info(" --- All networks successfully removed. Ready for manual Thread configuration tests.")
 
-        # Step 2: TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (invalid network), Breadcrumb = 1
+        # Step 2: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID, Breadcrumb = 1
         self.step(2)
 
-        logger.info(" --- Step 2: Sending AddOrUpdateThreadNetwork with incorrect operational dataset (invalid network)")
+        logger.info(" --- Step 2: Sending AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateThreadNetwork(
@@ -407,10 +430,10 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_network_config_response(response)
 
-        # Step 3: TH sends ConnectNetwork command with incorrect network ID, Breadcrumb = 2
+        # Step 3: TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2
         self.step(3)
 
-        logger.info(" --- Step 3: Sending ConnectNetwork with incorrect network ID")
+        logger.info(" --- Step 3: Sending ConnectNetwork with dataset containing incorrect Extended PAN ID")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
@@ -420,34 +443,31 @@ class TC_CNET_4_24(MatterBaseTest):
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
         await self._validate_connect_network_response(response, expect_success=False)
-        logger.info(" --- Step 3: ConnectNetwork failed as expected with incorrect network ID")
+        logger.info(" --- Step 3: ConnectNetwork failed as expected with incorrect Extended PAN ID")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Step 4: TH reads LastNetworkingStatus (should be kNetworkNotFound or kOtherConnectionFailure)
+        # Step 4: TH reads LastNetworkingStatus after Extended PAN ID connection failure
         self.step(4)
 
-        expected_statuses = [
-            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
-            cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
-        ]
+        # When connection fails due to wrong Extended PAN ID, the DUT should return kOtherConnectionFailure
         await self._read_last_networking_status(
             endpoint,
-            valid_statuses=expected_statuses
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
         )
 
-        # Step 5: TH reads Networks attribute (verify incorrect network ID is stored)
+        # Step 5: TH reads Networks attribute (verify dataset with incorrect Extended PAN ID is stored)
         self.step(5)
 
         networks = await self._read_networks(endpoint)
         logger.info(f" --- Step 5: Networks attribute has {len(networks)} network(s)")
         network_ids = [net.networkID for net in networks]
         asserts.assert_in(incorrect_thread_dataset_1, network_ids,
-                          "Incorrect network ID not found in Networks attribute after failed connection attempt")
+                          "Dataset with incorrect Extended PAN ID not found in Networks attribute after failed connection attempt")
 
-        # Step 6: TH sends RemoveNetwork command with incorrect network ID, Breadcrumb = 3
+        # Step 6: TH sends RemoveNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 3
         self.step(6)
 
         response = await self.send_single_cmd(
@@ -468,10 +488,10 @@ class TC_CNET_4_24(MatterBaseTest):
         asserts.assert_equal(len(networks), 0,
                              f"Expected Networks list to be empty, but has {len(networks)} network(s)")
 
-        # Step 8: TH sends AddOrUpdateThreadNetwork with incorrect operational dataset (valid format but wrong network), Breadcrumb = 4
+        # Step 8: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Name and Master Key, Breadcrumb = 4
         self.step(8)
 
-        logger.info(" --- Step 8: Sending AddOrUpdateThreadNetwork with incorrect operational dataset (valid format but wrong network)")
+        logger.info(" --- Step 8: Sending AddOrUpdateThreadNetwork with valid format but incorrect Network Name and Master Key")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateThreadNetwork(
@@ -482,10 +502,10 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_network_config_response(response)
 
-        # Step 9: TH sends ConnectNetwork command with valid format but with modified Extended PAN ID and Breadcrumb = 5
+        # Step 9: TH sends ConnectNetwork command with dataset containing incorrect Network Name and Master Key, Breadcrumb = 5
         self.step(9)
 
-        logger.info(" --- Step 9: Sending ConnectNetwork with valid format but with modified Extended PAN ID")
+        logger.info(" --- Step 9: Sending ConnectNetwork with dataset containing incorrect Network Name and Master Key")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
@@ -496,16 +516,16 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_connect_network_response(response, expect_success=False)
         logger.info(
-            " --- ConnectNetwork failed as expected with modified Extended PAN ID")
+            " --- ConnectNetwork failed as expected with incorrect Network Name and Master Key")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Step 10: TH reads LastNetworkingStatus (should be kOtherConnectionFailure)
+        # Step 10: TH reads LastNetworkingStatus after Network Name/Master Key connection failure
         self.step(10)
 
-        # When connection fails due to wrong network, the DUT should return kOtherConnectionFailure
+        # When connection fails due to wrong Network Name/Master Key, the DUT should return kOtherConnectionFailure
         await self._read_last_networking_status(
             endpoint,
             expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
