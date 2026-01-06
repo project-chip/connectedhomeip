@@ -197,19 +197,19 @@ class TestConformanceSupport(MatterBaseTest):
             return feature_map
 
         for combo, expected_failures in self.all_id_combos:
-            info = ConformanceAssessmentData(make_feature_map(combo), [], [])
+            info = ConformanceAssessmentData(make_feature_map(combo), [], [], 1)
             problems = evaluate_feature_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_attributes(self):
         for combo, expected_failures in self.all_id_combos:
-            info = ConformanceAssessmentData(0, list(combo), [])
+            info = ConformanceAssessmentData(0, list(combo), [], 1)
             problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_commands(self):
         for combo, expected_failures in self.all_id_combos:
-            info = ConformanceAssessmentData(0, [], list(combo))
+            info = ConformanceAssessmentData(0, [], list(combo), 1)
             problems = evaluate_command_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 

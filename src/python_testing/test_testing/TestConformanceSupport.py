@@ -62,7 +62,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
         asserts.assert_equal(str(xml_callable), 'M')
 
@@ -71,7 +71,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
         asserts.assert_equal(str(xml_callable), 'O')
 
@@ -80,7 +80,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.DISALLOWED)
         asserts.assert_equal(str(xml_callable), 'X')
 
@@ -88,7 +88,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.DISALLOWED)
         asserts.assert_equal(str(xml_callable), 'D')
 
@@ -97,7 +97,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'P')
 
@@ -106,7 +106,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), 'Zigbee')
 
@@ -117,7 +117,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -130,7 +130,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -144,7 +144,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if self.has_attr1[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -157,7 +157,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if self.has_attr2[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -174,7 +174,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -187,7 +187,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -201,7 +201,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if self.has_attr1[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -214,7 +214,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if self.has_attr2[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -228,7 +228,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, c in enumerate(self.cmd_lists):
-            info = ConformanceAssessmentData(0, [], c)
+            info = ConformanceAssessmentData(0, [], c, 1)
             if self.has_cmd1[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -241,7 +241,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, c in enumerate(self.cmd_lists):
-            info = ConformanceAssessmentData(0, [], c)
+            info = ConformanceAssessmentData(0, [], c, 1)
             if self.has_cmd2[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -258,7 +258,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if not self.has_ab[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -273,7 +273,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if not self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -289,7 +289,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if not self.has_attr1[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -304,7 +304,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if not self.has_attr2[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -321,7 +321,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if not self.has_ab[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -336,7 +336,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if not self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -354,7 +354,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i] and self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -371,7 +371,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if self.has_attr1[i] and self.has_attr2[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -389,7 +389,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
             for j, a in enumerate(self.attribute_lists):
-                info = ConformanceAssessmentData(f, a, [])
+                info = ConformanceAssessmentData(f, a, [], 1)
                 if self.has_ab[i] and self.has_attr2[j]:
                     asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
                 else:
@@ -407,7 +407,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i] or self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -424,7 +424,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, a in enumerate(self.attribute_lists):
-            info = ConformanceAssessmentData(0, a, [])
+            info = ConformanceAssessmentData(0, a, [], 1)
             if self.has_attr1[i] or self.has_attr2[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -442,7 +442,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
             for j, a in enumerate(self.attribute_lists):
-                info = ConformanceAssessmentData(f, a, [])
+                info = ConformanceAssessmentData(f, a, [], 1)
                 if self.has_ab[i] or self.has_attr2[j]:
                     asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
                 else:
@@ -462,7 +462,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if not self.has_ab[i] and self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -482,7 +482,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i] or not self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -501,7 +501,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if not (self.has_ab[i] or self.has_cd[i]):
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
             else:
@@ -521,13 +521,13 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         # no features
-        info = ConformanceAssessmentData(0, [], [])
+        info = ConformanceAssessmentData(0, [], [], 1)
         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.NOT_APPLICABLE)
         # one feature
-        info = ConformanceAssessmentData(0x01, [], [])
+        info = ConformanceAssessmentData(0x01, [], [], 1)
         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.NOT_APPLICABLE)
         # all features
-        info = ConformanceAssessmentData(0x07, [], [])
+        info = ConformanceAssessmentData(0x07, [], [], 1)
         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
         asserts.assert_equal(str(xml_callable), '[AB & CD & EF]')
 
@@ -544,7 +544,7 @@ class TestConformanceSupport(MatterBaseTest):
         for i, f in enumerate(self.feature_maps):
             for j, a in enumerate(self.attribute_lists):
                 for k, c in enumerate(self.cmd_lists):
-                    info = ConformanceAssessmentData(f, a, c)
+                    info = ConformanceAssessmentData(f, a, c, 1)
                     if self.has_ab[i] and self.has_attr1[j] and self.has_cmd1[k]:
                         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
                     else:
@@ -563,13 +563,13 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         # no features
-        info = ConformanceAssessmentData(0x00, [], [])
+        info = ConformanceAssessmentData(0x00, [], [], 1)
         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.NOT_APPLICABLE)
         # one feature
-        info = ConformanceAssessmentData(0x01, [], [])
+        info = ConformanceAssessmentData(0x01, [], [], 1)
         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
         # all features
-        info = ConformanceAssessmentData(0x07, [], [])
+        info = ConformanceAssessmentData(0x07, [], [], 1)
         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
         asserts.assert_equal(str(xml_callable), '[AB | CD | EF]')
 
@@ -586,7 +586,7 @@ class TestConformanceSupport(MatterBaseTest):
         for i, f in enumerate(self.feature_maps):
             for j, a in enumerate(self.attribute_lists):
                 for k, c in enumerate(self.cmd_lists):
-                    info = ConformanceAssessmentData(f, a, c)
+                    info = ConformanceAssessmentData(f, a, c, 1)
                     if self.has_ab[i] or self.has_attr1[j] or self.has_cmd1[k]:
                         asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
                     else:
@@ -604,7 +604,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -623,7 +623,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             elif self.has_cd[i]:
@@ -647,7 +647,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for i, f in enumerate(self.feature_maps):
-            info = ConformanceAssessmentData(f, [], [])
+            info = ConformanceAssessmentData(f, [], [], 1)
             if self.has_ab[i] and not self.has_cd[i]:
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.MANDATORY)
             else:
@@ -799,7 +799,7 @@ class TestConformanceSupport(MatterBaseTest):
         return xml_callable
 
     def check_decision(self, more_expected: bool, conformance: Conformance, feature_map: uint, attr_list: list[uint], cmd_list: list[uint]):
-        info = ConformanceAssessmentData(feature_map, attr_list, cmd_list)
+        info = ConformanceAssessmentData(feature_map, attr_list, cmd_list, 1)
         decision = conformance(info)
         asserts.assert_true(decision.choice, 'Expected choice conformance on decision, but did not get one')
         asserts.assert_equal(decision.choice.marker, 'a', 'Unexpected conformance string returned')
@@ -868,7 +868,7 @@ class TestConformanceSupport(MatterBaseTest):
                    '</orTerm>'
                    '</optionalConform>')
             conformance = self.check_good_choice(xml, f'[AB | CD].{suffix}')
-            asserts.assert_equal(conformance(ConformanceAssessmentData(0, [], [])).decision,
+            asserts.assert_equal(conformance(ConformanceAssessmentData(0, [], [], 1)).decision,
                                  ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             self.check_decision(more, conformance, AB, [], [])
 
@@ -878,7 +878,7 @@ class TestConformanceSupport(MatterBaseTest):
                    '</notTerm>'
                    '</optionalConform>')
             conformance = self.check_good_choice(xml, f'[!attr1].{suffix}')
-            asserts.assert_equal(conformance(ConformanceAssessmentData(0, attr1, [])).decision,
+            asserts.assert_equal(conformance(ConformanceAssessmentData(0, attr1, [], 1)).decision,
                                  ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             self.check_decision(more, conformance, 0, [], [])
 
@@ -893,11 +893,11 @@ class TestConformanceSupport(MatterBaseTest):
             # with no features or attributes, this should end up as O.a, so there should be a choice
             self.check_decision(more, conformance, 0, [], [])
             # when we have this attribute, we should not have a choice
-            info = ConformanceAssessmentData(0, attr1, [])
+            info = ConformanceAssessmentData(0, attr1, [], 1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.MANDATORY, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, None, 'Unexpected choice in conformance')
             # when we have only this feature, we should not have a choice
-            info = ConformanceAssessmentData(AB, [], [])
+            info = ConformanceAssessmentData(AB, [], [], 1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.OPTIONAL, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, None, 'Unexpected choice in conformance')
 
@@ -914,13 +914,13 @@ class TestConformanceSupport(MatterBaseTest):
             conformance = self.check_good_choice(xml, f'attr1, [AB].{suffix}, [CD].b')
             asserts.assert_equal(conformance(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             # when we have this attribute, we should not have a choice
-            info = ConformanceAssessmentData(0, attr1, [])
+            info = ConformanceAssessmentData(0, attr1, [], 1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.MANDATORY, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, None, 'Unexpected choice in conformance')
             # When it's just AB, we should have a choice
             self.check_decision(more, conformance, AB, [], [])
             # When we have both the attribute and AB, we should not have a choice
-            info = ConformanceAssessmentData(0, attr1, [])
+            info = ConformanceAssessmentData(0, attr1, [], 1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.MANDATORY, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, None, 'Unexpected choice in conformance')
             # When we have AB and CD, we should be using the AB choice
@@ -928,7 +928,7 @@ class TestConformanceSupport(MatterBaseTest):
             ABCD = AB | CD
             self.check_decision(more, conformance, ABCD, [], [])
             # When we just have CD, we still have a choice, but the string should be b
-            info = ConformanceAssessmentData(CD, [], [])
+            info = ConformanceAssessmentData(CD, [], [], 1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.OPTIONAL, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, Choice('b', False), 'Unexpected choice in conformance')
 

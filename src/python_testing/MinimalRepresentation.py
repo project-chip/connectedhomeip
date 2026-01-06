@@ -64,7 +64,8 @@ class MinimalRepresentationChecker(DeviceConformanceTests):
                 all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] + \
                     cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
                 accepted_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID]
-                cluster_info = ConformanceAssessmentData(feature_map, attribute_list, all_command_list)
+                revision = cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]
+                cluster_info = ConformanceAssessmentData(feature_map, attribute_list, all_command_list, revision)
 
                 # All optional features
                 feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]

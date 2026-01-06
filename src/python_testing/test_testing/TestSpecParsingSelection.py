@@ -94,7 +94,7 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             spec_attributes = xml_clusters[cluster.id].attributes
             spec_accepted_commands = xml_clusters[cluster.id].accepted_commands
             spec_generated_commands = xml_clusters[cluster.id].generated_commands
-            info = ConformanceAssessmentData(feature_map, [], [])
+            info = ConformanceAssessmentData(feature_map, [], [], 1)
             # Build just the lists - basic composition checks the wildcard against the lists, conformance just uses lists
             attributes = [id for id, a in spec_attributes.items() if a.conformance(
                 info).decision == ConformanceDecision.MANDATORY]

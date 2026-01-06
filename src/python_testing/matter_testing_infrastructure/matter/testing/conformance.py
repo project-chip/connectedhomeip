@@ -126,6 +126,7 @@ class ConformanceAssessmentData:
     feature_map: uint
     attribute_list: list[uint]
     all_command_list: list[uint]
+    cluster_revision: uint
 
 
 @dataclass
@@ -134,6 +135,7 @@ class MinimalConformance(ConformanceAssessmentData):
         self.feature_map = uint(0)
         self.attribute_list = []
         self.all_command_list = []
+        self.cluster_revision = uint(1)
 
 
 def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional: bool):

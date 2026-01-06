@@ -161,7 +161,8 @@ class DeviceConformanceTests(BasicCompositionTests):
                 attribute_list = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
                 all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] + \
                     cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
-                cluster_info = ConformanceAssessmentData(feature_map, attribute_list, all_command_list)
+                revision = cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]
+                cluster_info = ConformanceAssessmentData(feature_map, attribute_list, all_command_list, revision)
 
                 # Feature conformance checking
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
@@ -435,7 +436,8 @@ class DeviceConformanceTests(BasicCompositionTests):
                     feature_map = endpoint[cluster][cluster.Attributes.FeatureMap]
                     attribute_list = endpoint[cluster][cluster.Attributes.AttributeList]
                     cmd_list = endpoint[cluster][cluster.Attributes.AcceptedCommandList]
-                    cluster_info = ConformanceAssessmentData(feature_map, attribute_list, cmd_list)
+                    revision = endpoint[cluster][cluster.Attributes.ClusterRevision]
+                    cluster_info = ConformanceAssessmentData(feature_map, attribute_list, cmd_list, revision)
 
                     check_feature_overrides(cluster_requirement, cluster_info)
                     check_attribute_overrides(cluster_requirement, cluster_info)

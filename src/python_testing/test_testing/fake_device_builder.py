@@ -23,8 +23,8 @@ from matter.testing.spec_parsing import XmlCluster, XmlDeviceType
 from matter.tlv import uint
 
 
-def _is_mandatory(conformance, feature_map=0):
-    info = ConformanceAssessmentData(feature_map, [], [])
+def _is_mandatory(conformance, feature_map=0, revision=1):
+    info = ConformanceAssessmentData(feature_map, [], [], revision)
     return conformance(info).decision == ConformanceDecision.MANDATORY
 
 
@@ -37,13 +37,15 @@ def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label:
 
 def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int, is_tlv_endpoint: bool = True, additional_features: list[uint] = [], additional_attributes: list[uint] = [], additional_commands: list[uint] = []) -> dict[int, Any]:
     attrs = {}
-    mandatory_features = [mask for mask, f in xml_clusters[cluster_id].features.items() if _is_mandatory(f.conformance)]
+    mandatory_features = [mask for mask, f in xml_clusters[cluster_id].features.items(
+    ) if _is_mandatory(f.conformance, revision=xml_clusters[cluster_id].revision)]
     mandatory_features.extend(additional_features)
     feature_map = 0
     for mask in mandatory_features:
         feature_map |= mask
 
-    info = ConformanceAssessmentData(feature_map, [], [])
+    revision = xml_clusters[cluster_id].revision
+    info = ConformanceAssessmentData(feature_map, [], [], revision)
     mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items(
     ) if a.conformance(info).decision == ConformanceDecision.MANDATORY]
     mandatory_attributes.extend(additional_attributes)
@@ -55,7 +57,6 @@ def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int
     mandatory_generated_commands = [id for id, c in xml_clusters[cluster_id].generated_commands.items(
     ) if c.conformance(info).decision == ConformanceDecision.MANDATORY]
 
-    revision = xml_clusters[cluster_id].revision
     if is_tlv_endpoint:
         for m in mandatory_attributes:
             # dummy versions - we're not using the values in this test
