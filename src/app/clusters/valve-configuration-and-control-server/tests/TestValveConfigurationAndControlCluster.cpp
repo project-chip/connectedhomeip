@@ -158,24 +158,6 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestDefaultOpenLevel)
 // With TimeSync feature (adds AutoCloseTime attribute)
 TEST_F(TestValveConfigurationAndControlCluster, AttributeTestTimeSync)
 {
-    ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
-    optionalAttributeSet.Set<ValveFault::Id>().Set<DefaultOpenLevel::Id>().Set<LevelStep::Id>();
-    const BitFlags<Feature> features{ Feature::kTimeSync, Feature::kLevel };
-    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
-                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
-    ASSERT_TRUE(
-        IsAttributesListEqualTo(valveCluster,
-                                { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, AutoCloseTime::kMetadataEntry,
-                                  RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
-                                  CurrentLevel::kMetadataEntry, TargetLevel::kMetadataEntry, DefaultOpenLevel::kMetadataEntry,
-                                  ValveFault::kMetadataEntry, LevelStep::kMetadataEntry }));
-}
-
-// With all the optional and feature attributes enabled.
-TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
-{
     const BitFlags<Feature> features{ Feature::kTimeSync };
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
@@ -190,6 +172,24 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
                                             CurrentState::kMetadataEntry,
                                             TargetState::kMetadataEntry,
                                         }));
+}
+
+// With all the optional and feature attributes enabled.
+TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
+{
+    ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
+    optionalAttributeSet.Set<ValveFault::Id>().Set<DefaultOpenLevel::Id>().Set<LevelStep::Id>();
+    const BitFlags<Feature> features{ Feature::kTimeSync, Feature::kLevel };
+    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
+                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ASSERT_TRUE(
+        IsAttributesListEqualTo(valveCluster,
+                                { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, AutoCloseTime::kMetadataEntry,
+                                  RemainingDuration::kMetadataEntry, CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
+                                  CurrentLevel::kMetadataEntry, TargetLevel::kMetadataEntry, DefaultOpenLevel::kMetadataEntry,
+                                  ValveFault::kMetadataEntry, LevelStep::kMetadataEntry }));
 }
 
 // Reading mandatory attributes
@@ -208,25 +208,31 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)
 
     uint16_t revision{};
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-    ASSERT_EQ(revision, kRevision);
+    EXPECT_EQ(revision, kRevision);
 
     uint32_t featureMap{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, features.Raw());
 
     OpenDuration::TypeInfo::DecodableType openDuration;
     ASSERT_EQ(tester.ReadAttribute(OpenDuration::Id, openDuration), CHIP_NO_ERROR);
+    EXPECT_EQ(openDuration, DataModel::NullNullable);
 
     DefaultOpenDuration::TypeInfo::DecodableType defaultOpenDuration;
     ASSERT_EQ(tester.ReadAttribute(DefaultOpenDuration::Id, defaultOpenDuration), CHIP_NO_ERROR);
+    EXPECT_EQ(defaultOpenDuration, DataModel::NullNullable);
 
     RemainingDuration::TypeInfo::DecodableType remainingDuration;
     ASSERT_EQ(tester.ReadAttribute(RemainingDuration::Id, remainingDuration), CHIP_NO_ERROR);
+    EXPECT_EQ(remainingDuration, DataModel::NullNullable);
 
     CurrentState::TypeInfo::DecodableType currentState;
     ASSERT_EQ(tester.ReadAttribute(CurrentState::Id, currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
 
     TargetState::TypeInfo::DecodableType targetState;
     ASSERT_EQ(tester.ReadAttribute(TargetState::Id, targetState), CHIP_NO_ERROR);
+    EXPECT_EQ(targetState, DataModel::NullNullable);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -248,9 +254,11 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
 
     uint16_t revision{};
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    EXPECT_EQ(revision, kRevision);
 
     chip::Percent defaultOpenLevel{};
     ASSERT_EQ(tester.ReadAttribute(DefaultOpenLevel::Id, defaultOpenLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(defaultOpenLevel, ValveConfigurationAndControlCluster::kDefaultOpenLevel);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -272,6 +280,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestValveFault)
 
     BitMask<ValveFaultBitmap> valveFault;
     ASSERT_EQ(tester.ReadAttribute(ValveFault::Id, valveFault), CHIP_NO_ERROR);
+    EXPECT_EQ(valveFault.Raw(), 0u);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -293,12 +302,15 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestLevel)
 
     CurrentLevel::TypeInfo::DecodableType currentLevel;
     ASSERT_EQ(tester.ReadAttribute(CurrentLevel::Id, currentLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(currentLevel, DataModel::NullNullable);
 
     TargetLevel::TypeInfo::DecodableType targetLevel;
     ASSERT_EQ(tester.ReadAttribute(TargetLevel::Id, targetLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(targetLevel, DataModel::NullNullable);
 
     uint8_t levelStep{};
     ASSERT_EQ(tester.ReadAttribute(LevelStep::Id, levelStep), CHIP_NO_ERROR);
+    EXPECT_EQ(levelStep, ValveConfigurationAndControlCluster::kDefaultLevelStep);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -319,6 +331,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
 
     AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
     ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
+    EXPECT_EQ(autoCloseTime, DataModel::NullNullable);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -361,6 +374,8 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandWithoutFault)
     RemainingDuration::TypeInfo::DecodableType remainingDuration;
     EXPECT_EQ(tester.ReadAttribute(RemainingDuration::Id, remainingDuration), CHIP_NO_ERROR);
     EXPECT_EQ(remainingDuration, openDuration);
+
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // Test Close command in a Level Valve with an InstantDelegate (instant change).
@@ -422,6 +437,8 @@ TEST_F(TestValveConfigurationAndControlCluster, CloseCommandWithoutFault)
     // RemainingDuration should be set to null.
     EXPECT_EQ(tester.ReadAttribute(RemainingDuration::Id, remainingDuration), CHIP_NO_ERROR);
     EXPECT_EQ(remainingDuration, DataModel::NullNullable);
+
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

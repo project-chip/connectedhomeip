@@ -102,17 +102,17 @@ private:
     // Attributes
     const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
-    DataModel::Nullable<uint32_t> mOpenDuration{ DataModel::NullNullable };
-    DataModel::Nullable<uint32_t> mDefaultOpenDuration{ DataModel::NullNullable };
-    DataModel::Nullable<uint64_t> mAutoCloseTime{ DataModel::NullNullable };
-    QuieterReportingAttribute<uint32_t> mRemainingDuration{ DataModel::NullNullable };
-    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mCurrentState{ DataModel::NullNullable };
-    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState{ DataModel::NullNullable };
-    DataModel::Nullable<Percent> mCurrentLevel{ DataModel::NullNullable };
-    DataModel::Nullable<Percent> mTargetLevel{ DataModel::NullNullable };
-    Percent mDefaultOpenLevel{ kDefaultOpenLevel };
-    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault{ 0u };
-    uint8_t mLevelStep{ kDefaultLevelStep };
+    DataModel::Nullable<uint32_t> mOpenDuration;
+    DataModel::Nullable<uint32_t> mDefaultOpenDuration;
+    DataModel::Nullable<uint64_t> mAutoCloseTime;
+    QuieterReportingAttribute<uint32_t> mRemainingDuration;
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mCurrentState;
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState;
+    DataModel::Nullable<Percent> mCurrentLevel;
+    DataModel::Nullable<Percent> mTargetLevel;
+    Percent mDefaultOpenLevel;
+    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault;
+    uint8_t mLevelStep;
     ValveConfigurationAndControl::Delegate * mDelegate;
     ValveConfigurationAndControl::TimeSyncTracker * mTsTracker;
 };
