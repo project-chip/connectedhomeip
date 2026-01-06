@@ -103,13 +103,11 @@ namespace Clusters {
 
 void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate)
 {
-    VerifyOrDie(!gClusterInstance.IsConstructed());
     gDelegate = &delegate;
 }
 
 void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTable & certificateTable)
 {
-    VerifyOrDie(!gClusterInstance.IsConstructed());
     gCertificateTable = &certificateTable;
 }
 
