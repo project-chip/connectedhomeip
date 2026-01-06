@@ -596,10 +596,10 @@ CHIP_ERROR WindowManager::Init()
     mCoverList[1].Init(WINDOW_COVER_ENDPOINT2);
 
     // Set unique TagList for endpoints 1 and 2 (both have Window Covering device type)
-    SetTagList(WINDOW_COVER_ENDPOINT1,
-               chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList));
-    SetTagList(WINDOW_COVER_ENDPOINT2,
-               chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList));
+    SuccessOrDie(SetTagList(WINDOW_COVER_ENDPOINT1,
+               chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList)));
+    SuccessOrDie(SetTagList(WINDOW_COVER_ENDPOINT2,
+               chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList)));
 
     // Initialize LEDs
     LEDWidget::InitGpio();
