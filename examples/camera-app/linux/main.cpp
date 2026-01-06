@@ -61,10 +61,6 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
-    // Initialize TLS Client Management delegate before server starts
-    // This must be called before ChipLinuxAppMainLoop() which initializes the server
-    InitializeTlsClientManagement();
-
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
 
@@ -81,6 +77,10 @@ void ApplicationShutdown()
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    // Initialize TLS Client Management delegate before server starts
+    // This must be called before ChipLinuxAppMainLoop() which initializes the server
+    InitializeTlsClientManagement();
 
     ChipLinuxAppMainLoop();
 
