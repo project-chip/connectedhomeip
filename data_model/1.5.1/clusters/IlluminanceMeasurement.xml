@@ -80,7 +80,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint>
         <allowed value="0"/>

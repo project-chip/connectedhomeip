@@ -687,7 +687,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LocalTemperature" type="temperature">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="OutdoorTemperature" type="temperature" default="null">
@@ -743,7 +743,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="PICoolingDemand" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <optionalConform>
         <feature name="COOL"/>
       </optionalConform>
@@ -756,7 +755,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <optionalConform>
         <feature name="HEAT"/>
       </optionalConform>
@@ -967,7 +965,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
       <constraint>
         <desc/>

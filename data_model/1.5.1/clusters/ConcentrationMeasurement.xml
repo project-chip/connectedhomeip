@@ -183,7 +183,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
@@ -219,7 +219,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="PeakMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
@@ -236,7 +236,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
@@ -246,7 +245,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="AverageMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
@@ -263,7 +262,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>

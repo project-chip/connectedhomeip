@@ -336,7 +336,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform>
         <andTerm>
           <feature name="LF"/>
@@ -346,7 +346,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="CurrentPositionTiltPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform>
         <andTerm>
           <feature name="TL"/>
@@ -356,7 +356,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="OperationalStatus" type="OperationalStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <mandatoryConform/>
       <constraint>
         <max value="63"/>
@@ -364,7 +363,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -374,7 +373,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -392,7 +391,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000E" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -405,7 +404,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -426,7 +425,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001A" name="SafetyStatus" type="SafetyStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <optionalConform/>
       <constraint>
         <desc/>

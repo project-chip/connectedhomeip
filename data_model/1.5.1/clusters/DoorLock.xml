@@ -719,7 +719,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LockState" type="LockStateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
       <constraint>
         <desc/>
@@ -738,7 +738,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="DoorState" type="DoorStateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="DPS"/>
       </mandatoryConform>
@@ -859,7 +859,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="Language" type="string" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
       <constraint>
         <maxLength value="3"/>
@@ -867,22 +866,18 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0022" name="LEDSettings" type="LEDSettingEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0023" name="AutoRelockTime" type="uint32" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0024" name="SoundVolume" type="SoundVolumeEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0025" name="OperatingMode" type="OperatingModeEnum">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <mandatoryConform/>
       <constraint>
         <desc/>
@@ -895,37 +890,30 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0027" name="DefaultConfigurationRegister" type="ConfigurationRegisterBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0028" name="EnableLocalProgramming" type="bool" default="true">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0029" name="EnableOneTouchLocking" type="bool" default="false">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x002A" name="EnableInsideStatusLED" type="bool" default="false">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x002B" name="EnablePrivacyModeButton" type="bool" default="false">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x002C" name="LocalProgrammingFeatures" type="LocalProgrammingFeaturesBitmap" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0030" name="WrongCodeEntryLimit" type="uint8">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PIN"/>
@@ -941,7 +929,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0031" name="UserCodeTemporaryDisableTime" type="uint8">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PIN"/>
@@ -957,7 +944,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="SendPINOverTheAir" type="bool" default="false">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <optionalConform>
         <andTerm>
           <notTerm>
@@ -969,7 +955,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0033" name="RequirePINforRemoteOperation" type="bool">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="COTA"/>
@@ -983,7 +968,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0035" name="ExpiringUserTimeout" type="uint16" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality reportable="true"/>
       <optionalConform>
         <feature name="USR"/>
       </optionalConform>
