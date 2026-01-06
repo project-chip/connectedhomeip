@@ -129,7 +129,7 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
 
     // SetEndpoint is only available on CertificateTableImpl.
     // Both the default and application-provided tables are expected to be CertificateTableImpl instances.
-    CertificateTableImpl * impl = dynamic_cast<CertificateTableImpl *>(gCertificateTable);
+    CertificateTableImpl * impl = static_cast<CertificateTableImpl *>(gCertificateTable);
     VerifyOrDie(impl != nullptr);
     LogErrorOnFailure(impl->SetEndpoint(endpointId));
 
