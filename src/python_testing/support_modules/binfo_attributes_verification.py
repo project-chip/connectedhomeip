@@ -165,12 +165,16 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             date_str = ret12[:8]
             try:
                 parsed_date = datetime.strptime(date_str, "%Y%m%d")
+
                 # Verify it's not a future date
                 asserts.assert_less_equal(parsed_date, datetime.now(), "ManufacturingDate should not be in the future")
+
                 # Verify it's also not before the first Matter release (Matter 1.0 released October 4, 2022)
-                # TODO: the current default value for manufacturing date appears to be 2020-01-01, need to verify this is acceptable before continuing with this validation
-                # first_matter_release = datetime(2022, 10, 4)
-                # asserts.assert_greater_equal(parsed_date, first_matter_release, "ManufacturingDate should not be before the first Matter release date (2022-10-04)")
+                # Allow 2020-01-01 as a valid date (SDK default value)
+                first_matter_release = datetime(2022, 10, 4)
+                sdk_default_date = datetime(2020, 1, 1)
+                is_valid_date = parsed_date >= first_matter_release or parsed_date == sdk_default_date
+                asserts.assert_true(is_valid_date, f"ManufacturingDate should not be before the first Matter release date (2022-10-04), except for SDK default value (2020-01-01)")
             except ValueError:
                 asserts.fail(f"ManufacturingDate '{date_str}' is not a valid date in YYYYMMDD format")
 
