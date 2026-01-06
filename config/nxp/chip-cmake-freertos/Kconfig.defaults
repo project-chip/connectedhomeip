@@ -56,6 +56,9 @@ config CHIP_TASK_STACK_SIZE
 config CHIP_USE_OT_ENDPOINT
 	default y if !HAVE_LWIP
 
+config CHIP_ENABLE_READ_CLIENT
+	default y
+
 config CHIP_DEVICE_HARDWARE_VERSION
 	default 1
 

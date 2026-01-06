@@ -40,6 +40,7 @@ matter_add_gn_arg_bool("chip_enable_icd_lit" CONFIG_CHIP_ICD_LIT_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_icd_dsls" CONFIG_CHIP_ICD_DSLS_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
+matter_add_gn_arg_bool("chip_enable_read_client" CONFIG_CHIP_ENABLE_READ_CLIENT)
 
 # Allows to set chip_stack_lock_tracking level
 # Required in case default value needs to be set to "none" for optimization

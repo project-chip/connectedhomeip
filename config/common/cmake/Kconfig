@@ -658,6 +658,13 @@ config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 	help
 	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
 
+config CHIP_ENABLE_READ_CLIENT
+	bool "Enable Read Client in the Interaction Model"
+	help
+	  Enable support for Read Client in the Interaction Model.
+	  This config can be disabled for device types that do not require Read Client functionality.
+	  Disabling this config can save flash and RAM space.
+
 # Build system options
 
 config CHIP_WITH_LWIP
