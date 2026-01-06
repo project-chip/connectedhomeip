@@ -655,10 +655,10 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'AB & !CD, P')
 
-    def test_conformance_greater(self):
+    def _test_conformance_arithmetic(self, term: str):
         # AB, [CD]
         xml = ('<mandatoryConform>'
-               '<greaterTerm>'
+               f'{term}'
                '<attribute name="attr1" />'
                '<literal value="1" />'
                '</greaterTerm>'
@@ -709,6 +709,9 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.fail("Incorrectly parsed greater term with feature value")
         except ConformanceException:
             pass
+
+    def test_conformance_greater(self):
+        self._test_conformance_arithmetic('<greaterTerm>')
 
     def test_basic_conformance(self):
         basic_test('<mandatoryConform />', mandatory)
