@@ -20,6 +20,8 @@
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
 
+#include <zephyr/storage/stream_flash.h>
+
 namespace chip {
 
 class OTADownloader;
@@ -51,6 +53,8 @@ private:
     OTADownloader * mDownloader    = nullptr;
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
+    struct stream_flash_ctx mStream;
+    static constexpr uint16_t kDeltaRebootDelayMs = 200;
 };
 
 } // namespace chip

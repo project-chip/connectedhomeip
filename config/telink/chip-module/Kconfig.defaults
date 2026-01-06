@@ -244,6 +244,13 @@ config RISCV_MTVEC_VECTORED_MODE
 config CHIP_OTA_REQUESTOR
     default y
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
