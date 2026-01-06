@@ -234,7 +234,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
         return Status::Failure;
     }
 
-    std::streamsize size = file.tellg();
+    std::streamsize size = static_cast<std::streamsize>(file.tellg());
     file.seekg(0, std::ios::beg);
 
     // Ensure space for image snapshot data in outImageSnapshot

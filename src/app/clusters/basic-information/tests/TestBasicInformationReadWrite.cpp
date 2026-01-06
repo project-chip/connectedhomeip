@@ -177,7 +177,14 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); }
+    void SetUp() override
+    {
+        // Enable optional attributes that are used in tests
+        basicInformationClusterInstance.OptionalAttributes()
+            .Set<Attributes::ManufacturingDate::Id>()
+            .Set<Attributes::LocalConfigDisabled::Id>();
+        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
+    }
 
     void TearDown() override { basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
