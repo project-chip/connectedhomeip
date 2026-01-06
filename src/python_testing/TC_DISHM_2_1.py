@@ -130,7 +130,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
         failure_and_manual = can_test_mode_failure and can_manually_control
 
-        # Check if the list of supported modes is larger than 2
+        # Check if the list of supported modes is at least 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
 
         if failure_and_manual:
@@ -178,7 +178,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(6)
-        if self.pics_guard(failure_and_manual):
+        if self.pics_guard(can_manually_control):
             old_current_mode_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
             # CurrentMode attribute value is an integer value
@@ -186,7 +186,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
         self.step(7)
-        if self.pics_guard(failure_and_manual):
+        if self.pics_guard(can_test_mode_failure):
             cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
             change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
@@ -209,19 +209,18 @@ class TC_DISHM_2_1(MatterBaseTest):
 
        # TH reads from the DUT the CurrentMode attribute
         self.step(8)
-        if self.pics_guard(failure_and_manual):
-            old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-            # CurrentMode attribute value is an integer value
-            is_valid_int_value(old_current_mode_dut_2)
+        # CurrentMode attribute value is an integer value
+        is_valid_int_value(old_current_mode_dut_2)
 
-            # old_current_mode_dut_2 is equal to old_current_mode_dut
-            asserts.assert_equal(old_current_mode_dut_2, old_current_mode_dut,
-                                 f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
+        # old_current_mode_dut_2 is equal to old_current_mode_dut
+        asserts.assert_equal(old_current_mode_dut_2, old_current_mode_dut,
+                             f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
 
         # Manually put the device in a state from which it will SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK
         self.step(9)
-        if self.pics_guard(failure_and_manual):
+        if self.pics_guard(can_manually_control):
             if self.is_ci:
                 self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
             else:
