@@ -71,7 +71,12 @@ Davis, CA 95616, USA
   <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <features>
     <feature bit="20" code="BIS" name="BridgedICDSupport" summary="Support bridged ICDs.">
-      <optionalConform/>
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="4"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -164,13 +169,19 @@ Davis, CA 95616, USA
       <field id="0" name="CaseSessionsPerFabric" type="uint16" default="3">
         <mandatoryConform/>
         <constraint>
-          <min value="3"/>
+          <between>
+            <from value="3"/>
+            <to value="1000"/>
+          </between>
         </constraint>
       </field>
       <field id="1" name="SubscriptionsPerFabric" type="uint16" default="3">
         <mandatoryConform/>
         <constraint>
-          <min value="3"/>
+          <between>
+            <from value="3"/>
+            <to value="1000"/>
+          </between>
         </constraint>
       </field>
     </struct>
@@ -325,7 +336,15 @@ Davis, CA 95616, USA
     <attribute id="0x0012" name="UniqueID" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="4"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
       <constraint>
         <maxLength value="32"/>
       </constraint>
@@ -338,7 +357,12 @@ Davis, CA 95616, USA
     <attribute id="0x0014" name="ProductAppearance" type="ProductAppearanceStruct" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <optionalConform/>
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="2"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </attribute>
     <attribute id="0x0015" name="SpecificationVersion" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
@@ -361,7 +385,12 @@ Davis, CA 95616, USA
       <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <provisionalConform/>
-        <optionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="5"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
       </otherwiseConform>
       <constraint>
         <min value="1"/>

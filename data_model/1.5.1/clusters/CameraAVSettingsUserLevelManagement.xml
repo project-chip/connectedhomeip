@@ -233,7 +233,7 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="-180"/>
-          <to value="179"/>
+          <to value="0"/>
         </between>
       </constraint>
     </attribute>
@@ -244,7 +244,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <from value="-179"/>
+          <from value="1"/>
           <to value="180"/>
         </between>
       </constraint>
@@ -257,7 +257,7 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="-180"/>
-          <to value="179"/>
+          <to value="0"/>
         </between>
       </constraint>
     </attribute>
@@ -268,7 +268,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <from value="-179"/>
+          <from value="1"/>
           <to value="180"/>
         </between>
       </constraint>

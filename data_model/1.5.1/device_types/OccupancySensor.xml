@@ -62,7 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation"/>
     <revision revision="3" summary="Restricting Groups client to Zigbee"/>
-    <revision revision="4" summary="Add Boolean State Configuration as optional cluster"/>
+    <revision revision="4" summary="Add Boolean State Configuration as optional cluster and remove Zigbee related elements"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>

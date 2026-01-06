@@ -62,7 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ability to be composed with a Thermostat for fan heaters"/>
     <revision revision="3" summary="Added On/Off cluster"/>
-    <revision revision="4" summary="Remove FanModeSequence element override"/>
+    <revision revision="4" summary="Moved FanModeSequence element requirement to Fan Control cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>

@@ -337,14 +337,34 @@ Davis, CA 95616, USA
     </field>
     <field id="4" name="VideoStreamID" type="VideoStreamID">
       <quality nullable="true"/>
-      <mandatoryConform/>
+      <disallowConform/>
     </field>
     <field id="5" name="AudioStreamID" type="AudioStreamID">
       <quality nullable="true"/>
-      <mandatoryConform/>
+      <disallowConform/>
     </field>
     <field id="6" name="MetadataEnabled" type="bool">
       <mandatoryConform/>
+    </field>
+    <field id="7" name="VideoStreams" type="list">
+      <entry type="VideoStreamID"/>
+      <optionalConform choice="a" more="true" min="1"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="16"/>
+        </countBetween>
+      </constraint>
+    </field>
+    <field id="8" name="AudioStreams" type="list">
+      <entry type="AudioStreamID"/>
+      <optionalConform choice="a" more="true" min="1"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="16"/>
+        </countBetween>
+      </constraint>
     </field>
     <access fabricScoped="true"/>
   </struct>
