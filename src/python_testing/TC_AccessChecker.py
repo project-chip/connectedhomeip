@@ -58,10 +58,12 @@ import matter.clusters as Clusters
 from matter.clusters.Attribute import ValueDecodeFailure
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster
 from matter.tlv import uint
 
@@ -111,7 +113,7 @@ def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
     return [cmd_id for cmd_id in all_cmds if is_known_cluster_cmd(cmd_id)]
 
 
-class AccessChecker(MatterBaseTest, BasicCompositionTests):
+class AccessChecker(BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         # TODO: Make this into a proper default in the class so we're not overriding the command lines
@@ -167,11 +169,23 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     attrs[cluster_id] = set()
                 if cluster_id not in cmds:
                     cmds[cluster_id] = set()
-                # discard MEI attributes as we do not have access information for them.
-                attrs[cluster_id].update(
-                    {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
-                cmds[cluster_id].update(
-                    {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
+
+                if GlobalAttributeIds.ATTRIBUTE_LIST_ID not in device_cluster_data:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster does not have the AttributeList attribute")
+                else:
+                    # discard MEI attributes as we do not have access information for them.
+                    attrs[cluster_id].update(
+                        {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
+
+                if GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID not in device_cluster_data:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster does not have the AcceptedCommandList attribute")
+                else:
+                    cmds[cluster_id].update(
+                        {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
 
         # Remove MEI clusters - we don't have information available to check these.
         all_clusters = [id for id in all_clusters if is_standard_cluster_id(id)]

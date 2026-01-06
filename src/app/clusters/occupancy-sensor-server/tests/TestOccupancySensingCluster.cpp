@@ -18,9 +18,9 @@
 #include <app/persistence/AttributePersistence.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/OccupancySensing/Attributes.h>
@@ -117,8 +117,11 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeAttribute)
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = 100 };
-    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(100, holdTimeLimitsConfig,
-                                                                                                     mMockTimerDelegate) };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(100, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithFeatures(BitFlags<Feature>(Feature::kPassiveInfrared, Feature::kUltrasonic,
+                                                                         Feature::kPhysicalContact))
+                                         .WithDeprecatedAttributes(true) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.IsHoldTimeEnabled());
     chip::Testing::ClusterTester tester(cluster);
@@ -381,8 +384,11 @@ TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
-    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
-        kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithFeatures(BitFlags<Feature>(Feature::kPassiveInfrared, Feature::kUltrasonic,
+                                                                         Feature::kPhysicalContact))
+                                         .WithDeprecatedAttributes(true) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 

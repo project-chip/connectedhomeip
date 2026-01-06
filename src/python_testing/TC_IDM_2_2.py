@@ -50,12 +50,14 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
+class TC_IDM_2_2(BasicCompositionTests):
     """Test case for IDM-2.2: Report Data Action from DUT to TH.
 
     This test verifies that the DUT correctly handles read requests and responds

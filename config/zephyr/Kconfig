@@ -14,9 +14,10 @@
 #   limitations under the License.
 #
 
-menuconfig CHIP
-	bool "Matter protocol stack"
-	default n
+rsource "../common/cmake/Kconfig"
+
+# See config/common/cmake/Kconfig for full definition
+config CHIP
 	select CPP
 	imply REQUIRES_FULL_LIBCPP
 	imply REQUIRES_FULL_LIBC
@@ -36,475 +37,37 @@ menuconfig CHIP
 	imply FLASH_MAP
 	imply NVS if !CHIP_NRF_PLATFORM
 	imply SETTINGS
-	help
-	  Enables Matter libraries required for the Matter protocol stack to work.
 
 if CHIP
 
-config CHIP_APP_LOG_LEVEL
-	int "Logging level in application"
-	default LOG_DEFAULT_LEVEL
-	depends on LOG
-	help
-	  Sets the logging level in the Matter application. Use this configuration
-	  option only within the application. To set the logging level for the
-	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
+# See config/common/cmake/Kconfig for full definition
+config CHIP_IPV4
+	imply NET_IPV4
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform CHIPPlatformConfig.h file.
+# See config/common/cmake/Kconfig for full definition
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	imply REBOOT
 
-# Device and firmware identifers
-
-config CHIP_DEVICE_VENDOR_ID
-	int "Device Vendor ID"
-	default 65521 # 0xFFF1
-	range 0 65535
-	help
-	  Provides the 16-bit numeric identifier of the device manufacturer,
-	  assigned by Connectivity Standards Alliance. The identifier is exposed as
-	  an attribute of the Basic Informationcluster, and included in the header
-	  of the generated Matter Over-the-air (OTA) update image.
-
-config CHIP_DEVICE_VENDOR_NAME
-	string "Device vendor name"
-	help
-	  Provides a human-readable name of the device manufacturer. The name is
-	  exposed as an attribute of the Basic Information cluster.
-
-config CHIP_DEVICE_PRODUCT_ID
-	int "Product ID"
-	default 32768 # 0x8000
-	range 0 65535
-	help
-	  Provides the 16-bit numeric identifier of the product, assigned by the
-	  device manufacturer. The identifier is exposed as an attribute of the
-	  Basic Information cluster, and included in the header of the generated
-	  Matter over-the-air (OTA) update image.
-
-config CHIP_DEVICE_PRODUCT_NAME
-	string "Product name"
-	default "not-specified"
-	help
-	  Provides a human-readable product name, such as the model number, assigned
-	  by the device manufacturer. The name is exposed as an attribute of the
-	  Basic Information cluster.
-
-config CHIP_DEVICE_HARDWARE_VERSION
-	int "Hardware version"
-	default 0
-	help
-	  Provides the 16-bit hardware version number, assigned by the device
-	  manufacturer. The number is exposed as an attribute of the Basic
-	  Information cluster.
-
-config CHIP_DEVICE_HARDWARE_VERSION_STRING
-	string "Hardware version string"
-	default "prerelease"
-	help
-	  Provides a human-readable representation of the hardware version number.
-	  This must be an ASCII string of a length between 1 and 64 characters. The
-	  hardware version string is exposed as an attribute of the Basic
-	  Information cluster.
-
-if "$(APPVERSION)"=""
-config CHIP_DEVICE_SOFTWARE_VERSION
-	int "Software version"
-	default 0
-	range 0 4294967295
-	help
-	  Provides the 32-bit software version number. The number is exposed as an
-	  attribute of the Basic Information cluster, and included in the header of
-	  the generated Matter Over-the-air (OTA) update image. The exact numbering
-	  scheme is up to the device manufacturer. However, when using the Matter
-	  OTA mechanism, only updates to higher versions than the current one are
-	  accepted.
-
-config CHIP_DEVICE_SOFTWARE_VERSION_STRING
-	string "Software version string"
-	default "prerelease"
-	help
-	  Provides a human-readable representation of the software version number.
-	  This must be an ASCII string of a length between 1 and 64 characters. The
-	  software version string is exposed as an attribute of the Basic
-	  Information cluster, and included in the header of the generated Matter
-	  over-the-air (OTA) update image.
-endif
-
-config CHIP_DEVICE_MANUFACTURING_DATE
-	string "Manufacturing date (ISO 8601 format)"
-	default "2022-01-01"
-	help
-	  Provides the device manufacturing date in the ISO 8601 format: YYYY-MM-DD.
-
-config CHIP_DEVICE_SERIAL_NUMBER
-	string "Device serial number"
-	default "11223344556677889900"
-	help
-	  Provides a human-readable representation of the device serial number that
-	  uniquely identifies the device. This must be an ASCII string of no more
-	  than 32 characters.
-
-config CHIP_DEVICE_ROTATING_DEVICE_UID
-	string "Rotating device ID unique ID (HEX format)"
-	default "91a9c12a7c80700a31ddcfa7fce63e44"
-	help
-	  Provides a unique identifier of the device. This ID is used to derive the
-	  rotating device identifier, which allows commissioners to discover the
-	  device in a privacy-preserving way. The identifier must be a string of at
-	  least 16 bytes encoded in HEX.
-
-config CHIP_DEVICE_TYPE
-	int "Primary device type"
-	default 65535
-	range 0 65535
-	help
-	  Provides the primary device type implemented by the node. This must be one
-	  of the device type identifiers defined in the Matter Device Library
-	  specification.
-
-config CHIP_DEVICE_DISCRIMINATOR
-	hex "Device pairing discriminator"
-	default 0xF00
-	help
-	  Provides a 12-bit identifier that is used to discover the device during
-	  the commissioning.
-
-config CHIP_DEVICE_SPAKE2_PASSCODE
-	int "SPAKE2+ passcode"
-	default 20202021
-	range 1 99999998
-	help
-	  Provides a pairing passcode. This is a 27-bit unsigned integer that serves
-	  as a proof of possession during the commissioning. The passcode must be
-	  a value between 1 and 99999998, excluding the following invalid passcodes:
-	  00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
-	  66666666, 77777777, 88888888, 99999999, 12345678, 87654321.
-
-config CHIP_DEVICE_SPAKE2_IT
-	int "SPAKE2+ iteration count"
-	default 1000
-	help
-	  Provides the SPAKE2+ iteration count, which is one of the input parameters
-	  for the PBKDF operation, used to generate the SPAKE2+ verifier.
-
-config CHIP_DEVICE_SPAKE2_SALT
-	string "SPAKE2+ salt (base64 format)"
-	default "U1BBS0UyUCBLZXkgU2FsdA=="
-	help
-	  Provides the SPAKE2+ salt, which is one of the input parameters for the
-	  PBKDF operation, used to generate the SPAKE2+ verifier. The salt must be
-	  of a length between 16 and 32 bytes and it should be randomly generated
-	  for each SPAKE2+ passcode.
-
-config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
-	string "SPAKE2+ verifier for testing purposes (base64 format)"
-	default "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=="
-	help
-	  Provides the SPAKE2+ verifier that was generated using the configured
-	  SPAKE2+ passcode, iteration count and salt. This configuration option can
-	  be used for development or testing purposes. The default value was
-	  generated using the following command:
-	  ./scripts/tools/spake2p/spake2p.py gen-verifier -i 1000 -s U1BBS0UyUCBLZXkgU2FsdA== -p 20202021
-
-config CHIP_DEVICE_ENABLE_KEY
-	string "Enable Key for triggering test actions (HEX format)"
-	default "00112233445566778899AABBCCDDEEFF"
-	help
-	  Provides the Enable Key, which is a 16-byte value encoded in HEX that
-	  must be provided in the TestEventTrigger command to trigger a requested
-	  test action. This value is used during certification tests, and should not
-	  be present on devices in production environment.
-
-config CHIP_DEVICE_PRODUCT_FINISH
-	string "Description of the product's external case finish method"
-	default "other"
-	help
-	  provides a description of the product's external case finish method.
-	  Possible values:
-	  other; matte; satin; polished; rugged; fabric
-
-config CHIP_DEVICE_PRODUCT_COLOR
-	string "Description of the product's primary color"
-	help
-	  provides a description of the product's primary color.
-	  Possible values:
-	  black; navy; green; teal; maroon; purple; olive; gray; blue; lime; 
-	  aqua; red; fuchsia; yellow; white; nickel; chrome; brass; cooper; 
-	  silver; gold.
-
-# Matter optional features and parameters
-
-config CHIP_ENABLE_PAIRING_AUTOSTART
-	bool "Open commissioning window on boot"
-	default n
-	help
-	  Opens the commissioning window automatically at application boot time if
-	  the node is not yet commissioned.
-
-config CHIP_OTA_REQUESTOR
-	bool "OTA Software Update Requestor"
-	help
-	  Enables over-the-air (OTA) Requestor role that allows the node to perform
-	  Device Firmware Upgrade by quering and downloading a new firmware image
-	  from a peer OTA Provider node.
-
-config CHIP_ROTATING_DEVICE_ID
-	bool "Generate rotating device ID"
-	help
-	  Enables the rotating device identifier that provides a non-trackable
-	  identifier. The identifier is unique per device and rotates at pre-defined
-	  moments.
-
-config CHIP_COMMISSIONABLE_DEVICE_TYPE
-	bool "Include device type subtype in commissionable node discovery record"
-	help
-	  Includes the device type subtype in the commissionable node discovery
-	  record. This allows a commissioner to find the node when looking for
-	  a specific device type.
-
-config CHIP_EXTENDED_DISCOVERY
-	bool "Extended discovery"
-	help
-	  Enables advertising of the commissionable node service even if the node
-	  does not have the commissioning window open.
-
-config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
-	int "Total operational time save interval (hours unit)"
-	default 10
-	range 1 4294967295
-	help
-	  Provides an interval in hours with which the node operational time is
-	  saved to the flash memory. The provided value is a trade-off between
-	  performing frequent saves to know the precise operational time (in case of
-	  device reboot) and maximizing the flash memory lifetime.
-
-config CHIP_CRYPTO_PSA
-	bool "Use PSA crypto API for cryptographic operations"
-	help
-	  Enables the implementation of the Matter cryptographic operations that is
-	  based on the PSA crypto API (instead of the default implementation, which
-	  is based on the legacy mbedTLS APIs).
-
-config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
-    bool "Use PSA AEAD single-part API"
-    depends on CHIP_CRYPTO_PSA
-    help
-      When enabled, the single-part AEAD API is used with a large buffer
-      allocated on the stack. Otherwise, the multipart API path is used.
-
-config CHIP_PERSISTENT_SUBSCRIPTIONS
-	bool "Persistent subscriptions"
-	help
-	  Persists Matter subscriptions on the publisher node. This feature allows
-	  a Matter node to faster get back to the previous operation after it went
-	  offline, for example, due to a power outage. That is, the node can use the
-	  persisted subscription information to quickly re-establish the previous
-	  subscriptions instead of waiting for the subscriber node to realize that
-	  the publisher is alive again.
-
-config CHIP_STATISTICS
-	bool "Resource usage statistics"
-	help
-	  Enables tracking the current and the top usage of critical resources used
-	  by the Matter stack, such as packet buffers, timers or exchange contexts.
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_LIB_SHELL
-	bool "Matter shell commands"
-	default n
 	imply SHELL
-	help
-	  Enables linking the application with the library that contains Matter
-	  shell commands.
 
-config CHIP_PROJECT_CONFIG
-	string "Project configuration file for Matter"
-	help
-	  Provides a path to the project configuration file for Matter. The path can
-	  be either absolute or relative to the application directory. If specified,
-	  Matter's generic configuration files will include the project
-	  configuration file that can be used to override any of Matter's default or
-	  platform-specific settings.
+if NET_L2_OPENTHREAD
 
-# Thread network features
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ENABLE_DNSSD_SRP
-	bool "OpenThread Service Registration Protocol"
-	default y
-	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
-	help
-	  Enables using the OpenThread SRP client for the Matter service
-	  advertising.
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ENABLE_DNS_CLIENT
-	bool "OpenThread DNS client"
-	default y
-	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_DNS_CLIENT
-	help
-	  Enables using the OpenThread DNS client for the Matter service discovery.
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ENABLE_ICD_SUPPORT
-	bool "Matter Intermittently Connected Devices support"
-	default n
-	imply OPENTHREAD_MTD_SED if NET_L2_OPENTHREAD
-	help
-	  Enables the Intermittently Connected Device (ICD) support in Matter.
+	imply OPENTHREAD_MTD_SED
 
-if CHIP_ENABLE_ICD_SUPPORT
-
-config CHIP_ICD_SLOW_POLL_INTERVAL
-	int "Intermittently Connected Device slow polling interval (ms)"
-	default 30000 if CHIP_ICD_LIT_SUPPORT
-	default 1000
-	help
-	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
-	  device is in the idle mode. It determines the fastest frequency at which the device will be able
-	  to receive the messages in the idle mode.
-
-config CHIP_ICD_SIT_SLOW_POLL_LIMIT
-	int "Intermittently Connected Device slow polling interval limit for device in SIT mode (ms)"
-	default 15000
-	range 0 15000
-	help
-	  Provides the limit for Intermittently Connected Device slow polling interval in milliseconds while the
-	  device is in the SIT mode. By spec, this value cannot exceed 15 s (spec 9.16.1.5). This value can be
-	  used for the LIT device, to limit the slow poll interval used while temporarily working in the SIT mode.
-
-config CHIP_ICD_FAST_POLLING_INTERVAL
-	int "Intermittently Connected Device fast polling interval (ms)"
-	default 200
-	help
-	  Provides the Intermittently Connected Device fast polling interval in milliseconds while the
-	  device is in the active mode. It determines the fastest frequency at which the device will be able
-	  to receive the messages in the active mode. The CHIP_ICD_FAST_POLLING_INTERVAL shall be smaller than
-	  CHIP_ICD_ACTIVE_MODE_DURATION.
-
-config CHIP_ICD_IDLE_MODE_DURATION
-	int "Intermittently Connected Device idle mode duration (s)"
-	default 300 if CHIP_ICD_LIT_SUPPORT
-	default 120
-	help
-	  Provides the Intermittently Connected Device idle mode duration in seconds.
-	  It determines the maximum amount of time the device can stay in the idle mode, which means the
-	  device may be unreachable and not able to receive messages.
-
-config CHIP_ICD_ACTIVE_MODE_DURATION
-	int "Intermittently Connected Device active mode duration (ms)"
-	default 300
-	help
-	  Provides the Intermittently Connected Device active mode duration in milliseconds.
-	  It determines the minimum amount of time the device shall stay in the active mode.
-
-config CHIP_ICD_ACTIVE_MODE_THRESHOLD
-	int "Intermittently Connected Device active mode threshold (ms)"
-	default 5000 if CHIP_ICD_LIT_SUPPORT
-	default 300
-	help
-	  Provides the Intermittently Connected Device active mode threshold in milliseconds.
-	  It determines the minimum amount of time the device shall stay in the active mode after the network activity.
-	  For LIT devices it cannot be set to a value smaller than 5000 ms.
-
-config CHIP_ICD_LIT_SUPPORT
-	bool "Intermittently Connected Device Long Idle Time support"
-	select CHIP_ICD_CHECK_IN_SUPPORT
-	select CHIP_ICD_UAT_SUPPORT
-	help
-	  Enables the Intermittently Connected Device Long Idle Time support in Matter.
-	  It also selects the ICD Check-In and UAT features support that are mandatory for LIT device.
-
-config CHIP_ICD_CHECK_IN_SUPPORT
-	bool "Intermittently Connected Device Check-In protocol support"
-	help
-	  Enables the Check-In protocol support in Matter. It allows an ICD device to notify the registered
-	  ICD clients that it is available for communication.
-
-config CHIP_ICD_UAT_SUPPORT
-	bool "Intermittently Connected Device User Active Mode Trigger support"
-	help
-	  Enables the User Active Mode Trigger (UAT) support in Matter. It allows the User to use application specific
-	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
-
-config CHIP_ICD_DSLS_SUPPORT
-	bool "Intermittently Connected Device Dynamic SIT LIT support"
-	depends on CHIP_ICD_LIT_SUPPORT
-	help
-	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
-	  SIT and LIT modes, as long as the requirements for these modes are met (e.g. device has at least one active ICD client).
-
-config CHIP_ICD_CLIENTS_PER_FABRIC
-	int "Intermittently Connected Device number of clients per fabric"
-	default 2
-	depends on CHIP_ICD_CHECK_IN_SUPPORT
-	help
-	  Provides the Intermittently Connected Device number of clients per fabric. It determines the maximum number
-	  of clients per fabric that can be registered to receive notification from a device if their subscription is lost.
-
-config CHIP_ICD_REPORT_ON_ACTIVE_MODE
-	bool "Intermittently Connected Device report on active mode"
-	help
-	  Enables an ICD to send data report to the subscribers on entering the active mode.
-
-endif # CHIP_ENABLE_ICD_SUPPORT
-
-config CHIP_THREAD_SSED
-	bool "Enable Thread Synchronized Sleepy End Device support"
-	depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_ICD_SUPPORT
-	help
-	  Enables the Thread Synchronized Sleepy End Device support in Matter.
-
-config CHIP_OPENTHREAD_CONFIG
-	string "Custom OpenThread configuration file"
-	depends on NET_L2_OPENTHREAD
-	help
-	  Provides a path to an OpenThread configuration file. The path can be
-	  either absolute or relative to the application directory. When this option
-	  is specified, it replaces the OpenThread configuration file supplied by
-	  Zephyr.
-
-# Wi-Fi network features
-
-config CHIP_ENABLE_WIFI_STATION
-    bool "Enable Wi-Fi Station mode"
-	depends on WIFI
-    help
-      Enable Wi-Fi station (client) mode for Matter-over-Wi-Fi devices.
-      This allows the device to connect to an existing Wi-Fi network.
-
-config CHIP_ENABLE_WIFI_AP
-    bool "Enable Wi-Fi Access Point mode"
-	depends on WIFI
-    help
-      Enable Wi-Fi Access Point mode for SoftAP commissioning.
-      This allows the device to create its own Wi-Fi network for onboarding.
-
-# Platform additions and configuration
-
-config CHIP_CERTIFICATION_DECLARATION_STORAGE
-	bool "Certification Declaration settings storage"
-	depends on CHIP_FACTORY_DATA
-	help
-	  Enables storing of the Certification Declaration in Zephyr settings
-	  instead of using the hardcoded value from firmware. This option also adds
-	  support for including new Certification Declaration into a firmware
-	  update image package that is sent as part of the OTA software update.
-
-if CHIP_CERTIFICATION_DECLARATION_STORAGE
-
-config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
-	int "Certification declaration OTA image ID"
-	default 205 #0xcd
-	help
-	  Provides the image ID of the Certification Declaration image for sending
-	  it as part of the OTA software update.
-
-endif
+endif # NET_L2_OPENTHREAD
 
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool "Erase NVS flash pages on factory reset"
@@ -549,13 +112,7 @@ config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
 	  Enables support for getting current heap high watermark and resetting 
 	  watermarks. 
 
-endif
-
-config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
-	bool "Enable thread-local storage for Matter System Layer"
-    default y
-    help
-      Enable use of thread-local storage (TLS) in the Matter System Layer.
+endif # CHIP_MALLOC_SYS_HEAP
 
 config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
 	bool "Use Zephyr socket extensions in Matter System Layer"
@@ -564,44 +121,41 @@ config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
 	  Enables the use of Zephyr socket extensions in the Matter System Layer
 	  socket implementation.
 
-config CHIP_TASK_PRIORITY
-	int "Matter task priority"
-	default 1
+config CHIP_CERTIFICATION_DECLARATION_STORAGE
+	bool "Certification Declaration settings storage"
+	depends on CHIP_FACTORY_DATA
 	help
-	  Set the Zephyr thread priority for the Matter main task (CHIP event loop).
-	  This value is passed to K_PRIO_PREEMPT(). Lower values mean higher priority.
+	  Enables storing of the Certification Declaration in Zephyr settings
+	  instead of using the hardcoded value from firmware. This option also adds
+	  support for including new Certification Declaration into a firmware
+	  update image package that is sent as part of the OTA software update.
 
-config CHIP_TASK_STACK_SIZE
-	int "Matter task stack size"
-	default 8192
-	help
-	  Set the stack size (in bytes) for the Matter main task (CHIP event loop).
+if CHIP_CERTIFICATION_DECLARATION_STORAGE
 
-config MAX_EVENT_QUEUE_SIZE
-	int "Maximum Matter event queue size"
-	default 100
+config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
+	int "Certification declaration OTA image ID"
+	default 205 #0xcd
 	help
-	  Set the maximum number of events that can be queued in the Matter event loop.
+	  Provides the image ID of the Certification Declaration image for sending
+	  it as part of the OTA software update.
 
-config CHIP_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-	int "MRP Local Active Retry Interval (ms)"
-	default 2000 if NET_L2_OPENTHREAD
-	default 300
-	help
-	  Sets the local active retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
+endif
 
-config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
-	int "MRP Local Idle Retry Interval (ms)"
-	default 2000 if NET_L2_OPENTHREAD
-	default 500
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool "Erase NVS flash pages on factory reset"
+	depends on SETTINGS_NVS
 	help
-	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
+	  Erases flash pages occupied by non-volatile storage when a factory reset
+	  is requested, instead of removing Matter-related settings only. Enabling
+	  this option provides a more robust factory reset mechanism and allows to
+	  regain the original storage performance if any firmware issue has brought
+	  it to an unexpected state. For this reason, set this option if the entire
+	  configuration is supposed to be cleared on a factory reset, including
+	  device-specific entries.
 
 module = MATTER
 module-str = Matter
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
-
-# Build system options
 
 config APP_LINK_WITH_CHIP
 	bool "Link application with Matter libraries"
@@ -609,24 +163,6 @@ config APP_LINK_WITH_CHIP
 	help
 	  Adds Matter directories to the 'app' target include paths and links the
 	  'app' target with Matter libraries.
-
-config CHIP_PW_RPC
-	bool "Pigweed RPC library"
-	default n
-	help
-	  Links the application with the libraries containing Pigweed RPC
-	  functionalities.
-
-config CHIP_BUILD_TESTS
-	bool "Build Matter unit tests"
-	default n
-	help
-	  Enables building Matter unit tests.
-
-config CHIP_OTA_IMAGE_BUILD
-	bool "Generate OTA image"
-	help
-	  Enables building Matter over-the-air (OTA) update image.
 
 if CHIP_OTA_IMAGE_BUILD
 
@@ -642,31 +178,6 @@ config CHIP_OTA_IMAGE_EXTRA_ARGS
 	  Provides optional arguments to the ota_image_tool.py script, used for
 	  building Matter OTA image.
 
-endif
+endif # CHIP_OTA_IMAGE_BUILD
 
-config CHIP_BLE_EXT_ADVERTISING
-	bool "Bluetooth LE extended advertising"
-	help
-	  Enable Bluetooth LE extended advertising, which allows the device to advertise
-	  Matter service over Bluetooth LE for a period of time longer than 15 minutes.
-	  If this config is true, 
-	  CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS define can be set up to 172800 seconds (48h).
-
-config CHIP_BLE_ADVERTISING_DURATION
-	int "Bluetooth LE advertising duration in minutes"
-	range 15 2880 if CHIP_BLE_EXT_ADVERTISING
-	range 0 15
-	default 15
-	help
-	  Specify how long the device will advertise Matter service over Bluetooth LE in minutes.
-	  If CHIP_BLE_EXT_ADVERTISING is set to false, the maximum duration time is 15 minutes, 
-	  else the maximum duration time can be extended to 2880 minutes (48h).
-
-endif
-
-if BT
-config CHIP_CUSTOM_BLE_ADV_DATA
-	bool "Use custom BLE advertising data"
-	help
-	  Customization of BLE advertising data at the application layer
-endif
+endif # CHIP

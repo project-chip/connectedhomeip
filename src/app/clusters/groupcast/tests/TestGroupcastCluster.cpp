@@ -17,11 +17,11 @@
 
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Groupcast/Enums.h>
 #include <clusters/Groupcast/Metadata.h>
@@ -115,7 +115,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.gracePeriod     = MakeOptional(0U);
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
-    chip::app::Testing::MockCommandHandler cmdHandler;
+    chip::Testing::MockCommandHandler cmdHandler;
     chip::Testing::ClusterTester tester(cluster);
     auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData);
     ASSERT_TRUE(result.status.has_value());

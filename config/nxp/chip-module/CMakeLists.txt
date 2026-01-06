@@ -17,7 +17,7 @@
 #
 #   @file
 #     CMake sub-project defining 'chip' target which represents CHIP library
-#     and other optional libraries like unit tests, built with 'nxp_zephyr'
+#     and other optional libraries like unit tests, built with 'zephyr'
 #     platform.
 #     Since CHIP doesn't provide native CMake support, ExternalProject
 #     module is used to build the required artifacts with GN meta-build
@@ -106,16 +106,13 @@ matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
 
-if (CONFIG_CHIP_FACTORY_DATA)
-    matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
-    matter_add_gn_arg_bool("chip_enable_factory_data"                           TRUE)
-elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
+if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
 endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
-elseif(CONFIG_WIFI_NXP OR CONFIG_CHIP_ETHERNET)
+elseif(CONFIG_CHIP_WIFI OR CONFIG_CHIP_ETHERNET)
     matter_add_gn_arg_string("chip_mdns" "minimal")
 else()
     matter_add_gn_arg_string("chip_mdns" "none")
