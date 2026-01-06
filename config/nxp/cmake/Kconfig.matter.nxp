@@ -16,18 +16,6 @@
 
 if CHIP
 
-config CHIP_NXP_PLATFORM
-	bool
-	default y
-	help
-	  States that the configuration uses Matter NXP platform,
-	  what can be used to conditionally deviate from Zephyr generic configuration
-	  for NXP platform related purposes.
-
-# See config/common/cmake/Kconfig for full definition
-config CHIP_DEVICE_VENDOR_NAME
-	default "NXP Semiconductors"
-
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
 	help
@@ -206,80 +194,5 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	  Enables the generation of a random Rotating device ID unique ID.
 
 endif #CHIP_FACTORY_DATA_BUILD
-
-config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
-	bool "Use Multiple BLE connections after commissioning"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-	help
-	  Enable app usage of Multiple BLE connections after commissioning.
-
-config CHIP_NXP_BLE_PAIRING
-	bool "Enable BLE Pairing"
-	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
-	help
-	  Enable BLE Pairing for Multiple BLE connections after commissioning.
-
-config CHIP_NXP_BLE_BONDING
-	bool "Enable BLE Bonding"
-	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
-	help
-	  Enable BLE Bonding for Multiple BLE connections after commissioning.
-
-config NXP_USE_SMU2_STATIC
-	bool "Use SMU2"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-	help
-	  Enable app usage of SMU2.
-
-config NXP_USE_SMU2_DYNAMIC
-	bool "Use SMU2"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-	help
-	  Enable app usage of extra SMU2 after commissioning.
-
-config NXP_USE_LOW_POWER
-	bool "Enable low power support"
-	help
-	  Enables low power support
-
-config NXP_USE_PLAIN_DAC_KEY
-	bool "Store DAC private key in plaintext"
-	help
-	  Store DAC private key in plaintext.
-
-config CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
-	int "Timeout (ms) for switching from fast to slow advertising"
-	default 30000
-	help
-	  The amount of time in miliseconds after which BLE should change its advertisements
-	  from fast interval to slow interval.
-
-config CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
-	int "BLE advertising timeout"
-	default 900000
-	help
-	  The amount of time in miliseconds after which BLE advertisement should be disabled, counting 
-	  from the moment of slow advertisement commencement.
-
-config CHIP_DEVICE_CONFIG_ENABLE_SED
-	bool "SED"
-	help
-		Enable Sleepy End Device configuration.
-
-if NET_L2_OPENTHREAD
-
-config CHIP_SECONDARY_NETWORK_IF
-	bool "Secondary Network Interface"
-	help
-	  Enable a secondary network commissioning interface.
-
-config CHIP_THREAD_NETWORK_ENDPOINT_ID
-	int "Thread Network Endpoint ID"
-	default 2 if CHIP_SECONDARY_NETWORK_IF
-	default 0
-	help
-	  Specify the endpoint ID of the Thread network.
-
-endif # NET_L2_OPENTHREAD
 
 endif # CHIP
