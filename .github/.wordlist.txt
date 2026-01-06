@@ -375,6 +375,8 @@ DCL
 DCMAKE
 DCONF
 DCONFIG
+deallocate
+deallocation
 debianutils
 debugText
 decrypt
@@ -395,6 +397,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+Depacketization
 deployable
 depottools
 deps
@@ -595,6 +598,7 @@ forkpty
 formatter
 formatters
 FOTA
+framerate
 FreeRTOS
 FreeRTOSConfig
 FRDM
@@ -774,6 +778,7 @@ JCM
 JDK
 jf
 jinja
+jitter
 JLink
 JLinkExe
 JLinkRTTClient
@@ -850,6 +855,7 @@ LightingState
 LinkSoftwareAndDocumentationPack
 linter
 linters
+Livestream
 lladdr
 LocalConfigDisabled
 localedef
@@ -964,6 +970,7 @@ MTR
 MTU
 Multiband
 Multicast
+multicasts
 multilib
 Multiprotocol
 multithreaded
@@ -1109,6 +1116,7 @@ PASE
 Passcode
 passRetained
 passwd
+Pausable
 PBKDF
 pbuf
 pbufs
@@ -1560,6 +1568,7 @@ UnitLocalization
 unittest
 unpair
 unprovisioned
+unregistration
 Unsecure
 Unselect
 untrusted
@@ -1600,6 +1609,7 @@ Verifier
 Verifiers
 VID
 vids
+viewport
 virtualenv
 visualstudio
 vlatest

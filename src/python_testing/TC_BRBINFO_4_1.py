@@ -73,10 +73,12 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import IcdAppServerSubprocess
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
 
 
@@ -95,7 +97,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     def _wait_for_active_changed_event(self, cb: EventSubscriptionHandler, event, timeout_s: int) -> int:
         """Waits for an ActiveChanged event and returns the promised active duration."""
         promised_active_duration_event_data = cb.wait_for_event_report(event, timeout_s)
-        logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
+        log.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
         return promised_active_duration_event_data.promisedActiveDuration
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
@@ -132,7 +134,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             f">>> pairing onnetwork 111 {setupPinCode} --icd-registration true")
 
     async def _send_keep_active_command(self, stay_active_duration_ms, timeout_ms, endpoint_id) -> int:
-        logging.info("Sending keep active command")
+        log.info("Sending keep active command")
         return await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=endpoint_id, payload=Clusters.Objects.BridgedDeviceBasicInformation.Commands.KeepActive(stayActiveDuration=stay_active_duration_ms, timeoutMs=timeout_ms))
 
     async def _get_dynamic_endpoint(self) -> int:
@@ -158,6 +160,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         self._active_change_event_subscription = None
+        self.dut_fsa_stdin = None
         self.th_icd_server = None
         self.storage = None
 
@@ -169,14 +172,14 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         if self.is_pics_sdk_ci_only:
             # Get the named pipe path for the DUT_FSA app input from the user params.
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_icd_server_port = 5543
         self.th_icd_server_discriminator = random.randint(0, 4095)
@@ -193,7 +196,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        logging.info("Commissioning of ICD to fabric one (TH)")
+        log.info("Commissioning of ICD to fabric one (TH)")
         self.icd_nodeid = 1111
 
         self.default_controller.EnableICDRegistration(self.default_controller.GenerateICDRegistrationParameters())
@@ -203,7 +206,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_icd_server_discriminator)
 
-        logging.info("Commissioning of ICD to fabric two (DUT)")
+        log.info("Commissioning of ICD to fabric two (DUT)")
         params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
         if not self.is_pics_sdk_ci_only:
@@ -229,6 +232,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         if self._active_change_event_subscription is not None:
             self._active_change_event_subscription.Shutdown()
             self._active_change_event_subscription = None
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_icd_server is not None:
             self.th_icd_server.terminate()
         if self.storage is not None:
@@ -248,10 +253,10 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         basic_info_attributes = basic_info_cluster.Attributes
 
         dynamic_endpoint_id = await self._get_dynamic_endpoint()
-        logging.info(f"Dynamic endpoint is {dynamic_endpoint_id}")
+        log.info(f"Dynamic endpoint is {dynamic_endpoint_id}")
 
         self.step("0")
-        logging.info("Ensuring DUT is commissioned to TH")
+        log.info("Ensuring DUT is commissioned to TH")
 
         # Confirms commissioning of DUT on TH as it reads its feature map
         await self.read_single_attribute_check_success(
@@ -261,7 +266,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             node_id=self.dut_node_id,
         )
 
-        logging.info("Ensuring ICD is commissioned to TH")
+        log.info("Ensuring ICD is commissioned to TH")
 
         self.step("1")
 
@@ -271,7 +276,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             attribute=icdm_attributes.IdleModeDuration,
             node_id=self.icd_nodeid,
         )
-        logging.info(f"IdleModeDurationS: {idle_mode_duration_s}")
+        log.info(f"IdleModeDurationS: {idle_mode_duration_s}")
 
         active_mode_duration_ms = await self.read_single_attribute_check_success(
             endpoint=_ROOT_ENDPOINT_ID,
@@ -279,7 +284,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             attribute=icdm_attributes.ActiveModeDuration,
             node_id=self.icd_nodeid,
         )
-        logging.info(f"ActiveModeDurationMs: {active_mode_duration_ms}")
+        log.info(f"ActiveModeDurationMs: {active_mode_duration_ms}")
 
         active_mode_threshold_ms = await self.read_single_attribute_check_success(
             endpoint=_ROOT_ENDPOINT_ID,
@@ -287,7 +292,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             attribute=icdm_attributes.ActiveModeThreshold,
             node_id=self.icd_nodeid,
         )
-        logging.info(f"ActiveModeThresholdMs: {active_mode_threshold_ms}")
+        log.info(f"ActiveModeThresholdMs: {active_mode_threshold_ms}")
 
         self.step("2")
         event = brb_info_cluster.Events.ActiveChanged
@@ -347,11 +352,11 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         # sends 3x keep active commands
         stay_active_duration_ms = 2000
         keep_active_timeout_ms = 60000
-        logging.info(f"Sending first KeepActiveCommand({stay_active_duration_ms})")
+        log.info(f"Sending first KeepActiveCommand({stay_active_duration_ms})")
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
-        logging.info(f"Sending second KeepActiveCommand({stay_active_duration_ms})")
+        log.info(f"Sending second KeepActiveCommand({stay_active_duration_ms})")
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
-        logging.info(f"Sending third KeepActiveCommand({stay_active_duration_ms})")
+        log.info(f"Sending third KeepActiveCommand({stay_active_duration_ms})")
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("10")

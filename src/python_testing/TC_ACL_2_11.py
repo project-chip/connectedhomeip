@@ -50,8 +50,12 @@ from matter.clusters.Objects import AccessControl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import arls_populated
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_11(MatterBaseTest):
@@ -195,7 +199,7 @@ class TC_ACL_2_11(MatterBaseTest):
                             "Result is not of type ReviewFabricRestrictionsResponse")
 
         self.step(7)
-        logging.info("Please follow instructions provided by the product maker to remove all ARL entries")
+        log.info("Please follow instructions provided by the product maker to remove all ARL entries")
         arru_cb.wait_for_event_report(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
 
         self.step(8)

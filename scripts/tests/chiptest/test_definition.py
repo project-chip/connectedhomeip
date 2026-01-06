@@ -21,12 +21,14 @@ import subprocess
 import tempfile
 import threading
 import time
-import typing
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
+from pathlib import Path
 
-from .runner import SubprocessInfo
+from .accessories import AppsRegister
+from .runner import LogPipe, Runner, SubprocessInfo
 
 log = logging.getLogger(__name__)
 
@@ -37,18 +39,18 @@ TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 
 
 class App:
-
-    def __init__(self, runner, subproc: SubprocessInfo):
-        self.process = None
-        self.outpipe = None
+    def __init__(self, runner: Runner, subproc: SubprocessInfo):
+        self.process: subprocess.Popen[bytes] | None = None
+        self.outpipe: LogPipe | None = None
         self.runner = runner
         self.subproc = subproc
         self.cv_stopped = threading.Condition()
         self.stopped = True
         self.lastLogIndex = 0
         self.kvsPathSet = {'/tmp/chip_kvs'}
-        self.options = None
+        self.options: dict[str, str] | None = None
         self.killed = False
+        self.setupCode: str | None = None
 
     def __repr__(self) -> str:
         return repr(self.subproc)
@@ -62,7 +64,7 @@ class App:
             return None
         return self.process.returncode
 
-    def start(self, options=None):
+    def start(self, options: dict[str, str] | None = None) -> bool:
         if not self.process:
             # Cache command line options to be used for reboots
             if options:
@@ -70,7 +72,7 @@ class App:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, _ = self.__startServer()
-            self.waitForAnyAdvertisement()
+            self.waitForApplicationUp()
             self.__updateSetUpCode()
             with self.cv_stopped:
                 self.stopped = False
@@ -78,7 +80,7 @@ class App:
             return True
         return False
 
-    def stop(self):
+    def stop(self) -> bool:
         if self.process:
             with self.cv_stopped:
                 self.stopped = True
@@ -86,11 +88,11 @@ class App:
             ok = self.__terminateProcess()
             if not ok:
                 # For now just raise an exception; no other way to get tests to fail in this situation.
-                raise Exception('Stopped subprocess terminated abnormally')
+                raise RuntimeError('Stopped subprocess terminated abnormally')
             return True
         return False
 
-    def factoryReset(self):
+    def factoryReset(self) -> bool:
         wasRunning = (not self.killed) and self.stop()
 
         for kvs in self.kvsPathSet:
@@ -102,19 +104,23 @@ class App:
 
         return True
 
-    def waitForAnyAdvertisement(self):
-        self.__waitFor("mDNS service published:", self.process, self.outpipe)
+    def waitForApplicationUp(self):
+        # Watch for both mDNS advertisement start as well as event loop start.
+        # These two messages can appear in any order depending on the implementation.
+        # Waiting for both makes the startup detection more robust.
+        assert self.process is not None and self.outpipe is not None, "waitForAnyAdvertisement can be called only after start()"
+        self.__waitFor(["mDNS service published:", "APP STATUS: Starting event loop"])
 
-    def waitForMessage(self, message, timeoutInSeconds=10):
-        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
+    def waitForMessage(self, message: str, timeoutInSeconds: float = 10):
+        self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
         return True
 
-    def kill(self):
+    def kill(self) -> bool:
         ok = self.__terminateProcess()
         self.killed = True
         return ok
 
-    def wait(self, timeout=None):
+    def wait(self, timeout: float | None = None) -> int:
         while True:
             # If the App was never started, AND was killed, exit immediately
             if self.killed:
@@ -133,7 +139,7 @@ class App:
                 while self.stopped:
                     self.cv_stopped.wait()
 
-    def __startServer(self):
+    def __startServer(self) -> tuple[subprocess.Popen[bytes], LogPipe, LogPipe]:
         subproc = self.subproc.with_args('--interface-id', '-1')
 
         if not self.options:
@@ -147,35 +153,46 @@ class App:
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
-        log.debug("Waiting for '%s'", waitForString)
+    def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: float = 10):
+        """
+        Wait for all provided pattern strings to appear in the process output pipe (capture log).
+        """
+        assert self.process is not None and self.outpipe is not None, "__waitFor can be called only after start()"
+        log.debug('Waiting for all patterns %r', patterns)
 
         start_time = time.monotonic()
-        ready, self.lastLogIndex = outpipe.CapturedLogContains(
-            waitForString, self.lastLogIndex)
-        if ready:
-            self.lastLogIndex += 1
 
-        while not ready:
-            if server_process.poll() is not None:
-                died_str = ("Server died while waiting for %s, returncode %d" %
-                            (waitForString, server_process.returncode))
+        def allPatternsFound() -> int | None:
+            assert self.outpipe is not None
+            lastLogIndex = self.lastLogIndex
+            for p in patterns:
+                found, index = self.outpipe.CapturedLogContains(p, self.lastLogIndex)
+                if not found:
+                    return None
+                lastLogIndex = max(lastLogIndex, index)
+
+            return lastLogIndex
+
+        lastLogIndex = allPatternsFound()
+        while lastLogIndex is None:
+            if self.process.poll() is not None:
+                died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
                 log.error(died_str)
-                raise Exception(died_str)
+                raise RuntimeError(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception('Timeout while waiting for %s' % waitForString)
+                raise TimeoutError(f'Timeout while waiting for {patterns!r}')
             time.sleep(0.1)
-            ready, self.lastLogIndex = outpipe.CapturedLogContains(
-                waitForString, self.lastLogIndex)
-            if ready:
-                self.lastLogIndex += 1
 
-        log.debug("Success waiting for: '%s'", waitForString)
+            lastLogIndex = allPatternsFound()
+
+        self.lastLogIndex = lastLogIndex + 1
+        log.debug('Success waiting for: %r', patterns)
 
     def __updateSetUpCode(self):
+        assert self.outpipe is not None, "__updateSetUpCode needs to happen after __startServer"
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
         if not qrLine:
-            raise Exception("Unable to find QR code")
+            raise RuntimeError("Unable to find QR code")
         self.setupCode = qrLine.group(1)
 
     def __terminateProcess(self):
@@ -198,6 +215,7 @@ class App:
                 self.process.wait(10)
             self.process = None
             self.outpipe = None
+            self.lastLogIndex = 0
         return True
 
 
@@ -219,25 +237,25 @@ class TestTarget(Enum):
 
 @dataclass
 class ApplicationPaths:
-    chip_tool: SubprocessInfo
-    all_clusters_app: SubprocessInfo
-    lock_app: SubprocessInfo
-    fabric_bridge_app: SubprocessInfo
-    ota_provider_app: SubprocessInfo
-    ota_requestor_app: SubprocessInfo
-    tv_app: SubprocessInfo
-    bridge_app: SubprocessInfo
-    lit_icd_app: SubprocessInfo
-    microwave_oven_app: SubprocessInfo
-    matter_repl_yaml_tester_cmd: SubprocessInfo
-    chip_tool_with_python_cmd: SubprocessInfo
-    rvc_app: SubprocessInfo
-    network_manager_app: SubprocessInfo
-    energy_gateway_app: SubprocessInfo
-    energy_management_app: SubprocessInfo
-    closure_app: SubprocessInfo
+    chip_tool: SubprocessInfo | None
+    all_clusters_app: SubprocessInfo | None
+    lock_app: SubprocessInfo | None
+    fabric_bridge_app: SubprocessInfo | None
+    ota_provider_app: SubprocessInfo | None
+    ota_requestor_app: SubprocessInfo | None
+    tv_app: SubprocessInfo | None
+    bridge_app: SubprocessInfo | None
+    lit_icd_app: SubprocessInfo | None
+    microwave_oven_app: SubprocessInfo | None
+    matter_repl_yaml_tester_cmd: SubprocessInfo | None
+    chip_tool_with_python_cmd: SubprocessInfo | None
+    rvc_app: SubprocessInfo | None
+    network_manager_app: SubprocessInfo | None
+    energy_gateway_app: SubprocessInfo | None
+    energy_management_app: SubprocessInfo | None
+    closure_app: SubprocessInfo | None
 
-    def items(self):
+    def items(self) -> list[SubprocessInfo | None]:
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
                 self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
                 self.tv_app, self.bridge_app, self.lit_icd_app,
@@ -245,7 +263,7 @@ class ApplicationPaths:
                 self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app,
                 self.energy_gateway_app, self.energy_management_app, self.closure_app]
 
-    def items_with_key(self):
+    def items_with_key(self) -> list[tuple[SubprocessInfo | None, str]]:
         """
         Returns all path items and also the corresponding "Application Key" which
         is the typical application name.
@@ -269,7 +287,9 @@ class ApplicationPaths:
             (
                 # This path varies, however it is a fixed python tool so it may be ok
                 self.chip_tool_with_python_cmd,
-                self.chip_tool_with_python_cmd.path.name,
+                (self.chip_tool_with_python_cmd.path.name
+                 if self.chip_tool_with_python_cmd is not None
+                 else "chiptool.py"),
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
@@ -291,11 +311,11 @@ class ExecutionCapture:
     Keeps track of output lines in a process, to help debug failures.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.lock = threading.Lock()
-        self.captures = []
+        self.captures: list[CaptureLine] = []
 
-    def Log(self, source, line):
+    def Log(self, source: str, line: str):
         with self.lock:
             self.captures.append(CaptureLine(
                 when=datetime.now(),
@@ -318,7 +338,7 @@ class ExecutionCapture:
         log.error("================ CAPTURED LOG END ====================")
 
 
-class TestTag(Enum):
+class TestTag(StrEnum):
     MANUAL = auto()          # requires manual input. Generally not run automatically
     SLOW = auto()            # test uses Sleep and is generally slow (>=10s is a typical threshold)
     FLAKY = auto()           # test is considered flaky (usually a bug/time dependent issue)
@@ -331,7 +351,7 @@ class TestTag(Enum):
         for (k, v) in TestTag.__members__.items():
             if self == v:
                 return k
-        raise Exception("Unknown tag: %r" % self)
+        raise KeyError(f"Unknown tag: {self!r}")
 
 
 class TestRunTime(Enum):
@@ -345,7 +365,7 @@ class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
-    tags: typing.Set[TestTag] = field(default_factory=set)
+    tags: set[TestTag] = field(default_factory=set)
 
     @property
     def is_manual(self) -> bool:
@@ -363,11 +383,11 @@ class TestDefinition:
         """Get a human readable list of tags applied to this test"""
         return ", ".join([t.to_s() for t in self.tags])
 
-    def Run(self, runner, apps_register, apps: ApplicationPaths, pics_file: str,
-            timeout_seconds: typing.Optional[int], dry_run=False,
+    def Run(self, runner: Runner, apps_register: AppsRegister, apps: ApplicationPaths,
+            pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
-            ble_controller_app: typing.Optional[int] = None,
-            ble_controller_tool: typing.Optional[int] = None):
+            ble_controller_app: int | None = None,
+            ble_controller_tool: int | None = None):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -405,8 +425,7 @@ class TestDefinition:
             elif self.target == TestTarget.CLOSURE:
                 target_app = apps.closure_app
             else:
-                raise Exception("Unknown test target - "
-                                "don't know which application to run")
+                raise ValueError("Unknown test target - don't know which application to run")
 
             if not dry_run:
                 for command, key in apps.items_with_key():
@@ -456,18 +475,25 @@ class TestDefinition:
             else:
                 app = apps_register.get('default')
                 app.start()
+                assert app.setupCode is not None, "Setup code should have been set in app.start()"
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
+                assert apps.matter_repl_yaml_tester_cmd is not None, \
+                    "Matter REPL YAML tester should have been set for selected test runtime"
                 python_cmd = apps.matter_repl_yaml_tester_cmd.with_args(
-                    '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
+                    '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", str(pics_file))
 
                 if dry_run:
-                    log.info(shlex.join(python_cmd))
+                    log.info(shlex.join(python_cmd.to_cmd()))
                 else:
                     runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
-            else:
+            else:  # CHIP_TOOL_PYTHON
+                assert apps.chip_tool is not None, \
+                    "Chip tool should have been set for selected test runtime"
+                assert apps.chip_tool_with_python_cmd is not None, \
+                    "Chip tool with Python should have been set for selected test runtime"
                 pairing_server_args = []
 
                 if ble_controller_tool is not None:
@@ -480,7 +506,7 @@ class TestDefinition:
                 if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                     pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
-                test_cmd = apps.chip_tool_with_python_cmd.with_args('tests', self.run_name, '--PICS', pics_file)
+                test_cmd = apps.chip_tool_with_python_cmd.with_args('tests', self.run_name, '--PICS', str(pics_file))
 
                 interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
 
@@ -495,8 +521,8 @@ class TestDefinition:
                 test_cmd = test_cmd.with_args(*server_args)
 
                 if dry_run:
-                    log.info(shlex.join(pairing_cmd))
-                    log.info(shlex.join(test_cmd))
+                    log.info(shlex.join(pairing_cmd.to_cmd()))
+                    log.info(shlex.join(test_cmd.to_cmd()))
                 else:
                     runner.RunSubprocess(pairing_cmd,
                                          name='PAIR', dependencies=[apps_register])
@@ -505,15 +531,15 @@ class TestDefinition:
                         name='TEST', dependencies=[apps_register],
                         timeout_seconds=timeout_seconds)
 
-        except Exception:
+        except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
             loggedCapturedLogs = True
             raise
         finally:
-            ok = apps_register.killAll()
-            apps_register.factoryResetAll()
-            apps_register.removeAll()
+            ok = apps_register.kill_all()
+            apps_register.factory_reset_all()
+            apps_register.remove_all()
             if tool_storage_dir is not None:
                 shutil.rmtree(tool_storage_dir, ignore_errors=True)
             # If loggedCapturedLogs then we are already throwing, so no need to
@@ -521,4 +547,4 @@ class TestDefinition:
             if not ok and not loggedCapturedLogs:
                 log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
                 runner.capture_delegate.LogContents()
-                raise Exception('Subprocess terminated abnormally')
+                raise RuntimeError('Subprocess terminated abnormally')

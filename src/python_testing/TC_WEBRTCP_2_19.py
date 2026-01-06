@@ -44,10 +44,12 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
@@ -115,7 +117,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(2)
         # Send SolicitOffer command with valid stream IDs
-        logger.info("Sending SolicitOffer command")
+        log.info("Sending SolicitOffer command")
 
         resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
             cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
@@ -132,14 +134,14 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         session_id = resp.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        logger.info(f"DUT allocated WebRTC session ID: {session_id}")
+        log.info(f"DUT allocated WebRTC session ID: {session_id}")
 
         # Register the session ID with the WebRTC manager so it can handle incoming commands
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(3)
         # Wait for incoming Offer command from DUT on WebRTC Requestor cluster
-        logger.info(f"Waiting for Offer command from DUT for session {session_id}")
+        log.info(f"Waiting for Offer command from DUT for session {session_id}")
 
         # Wait for the Offer command from the DUT
         offer_sessionId, offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=30)
@@ -147,23 +149,23 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
         # Verify the Offer command contains the same session ID
         asserts.assert_equal(offer_sessionId, session_id,
                              f"Offer session ID {offer_sessionId} does not match expected {session_id}")
-        logger.info(f"Received Offer command for session {session_id}")
+        log.info(f"Received Offer command for session {session_id}")
 
         # Verify the Offer contains valid SDP content
         asserts.assert_true(len(offer_sdp) > 0, "SDP offer is empty")
-        logger.info(f"Received SDP offer with length: {len(offer_sdp)} bytes")
+        log.info(f"Received SDP offer with length: {len(offer_sdp)} bytes")
         webrtc_peer.set_remote_offer(offer_sdp)
 
         self.step(4)
         # Send ProvideAnswer command with invalid WebRTCSessionID
-        logger.info("Sending ProvideAnswer command with invalid WebRTCSessionID")
+        log.info("Sending ProvideAnswer command with invalid WebRTCSessionID")
 
         # Create a valid SDP answer in response to the received offer
         local_answer = await webrtc_peer.get_local_description_with_ice_candidates()
 
         # Use an invalid session ID (e.g., session_id + 1000 to ensure it doesn't exist)
         invalid_session_id = session_id + 1000
-        logger.info(f"Using invalid session ID: {invalid_session_id}")
+        log.info(f"Using invalid session ID: {invalid_session_id}")
 
         # Send the ProvideAnswer command with invalid session ID and expect NOT_FOUND
         try:
@@ -176,11 +178,11 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Expected NOT_FOUND status, got {e.status}")
-            logger.info(f"Correctly received NOT_FOUND error for invalid session ID {invalid_session_id}")
+            log.info(f"Correctly received NOT_FOUND error for invalid session ID {invalid_session_id}")
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session
-        logger.info(f"Sending EndSession command for session {session_id}")
+        log.info(f"Sending EndSession command for session {session_id}")
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -190,11 +192,11 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
         )
 
-        logger.info(f"Successfully ended WebRTC session {session_id}")
+        log.info(f"Successfully ended WebRTC session {session_id}")
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
-        logger.info("Deallocating Audio and Video streams")
+        log.info("Deallocating Audio and Video streams")
 
         # Deallocate audio stream
         await self.send_single_cmd(
@@ -203,7 +205,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        logger.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -212,7 +214,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        logger.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info(f"Successfully deallocated video stream {video_stream_id}")
 
         # Clean up
         await webrtc_manager.close_all()

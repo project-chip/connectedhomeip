@@ -68,7 +68,11 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
@@ -90,7 +94,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5543
         self.th_server_discriminator = random.randint(0, 4095)
@@ -107,7 +111,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        logging.info("Commissioning from separate fabric")
+        log.info("Commissioning from separate fabric")
         # Create a second controller on a new fabric to communicate to the server
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
@@ -119,7 +123,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             setupPinCode=self.th_server_passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_server_discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -173,7 +177,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             # Check if any of the device types is an AGGREGATOR
             if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
                 dut_commissioning_control_endpoint = endpoint
-                logging.info(f"Aggregator endpoint found: {dut_commissioning_control_endpoint}")
+                log.info(f"Aggregator endpoint found: {dut_commissioning_control_endpoint}")
                 break
 
         asserts.assert_not_equal(dut_commissioning_control_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with test.")

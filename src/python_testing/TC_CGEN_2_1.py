@@ -37,7 +37,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CGEN_2_1(MatterBaseTest):
@@ -71,11 +75,11 @@ class TC_CGEN_2_1(MatterBaseTest):
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.Breadcrumb)
         matter_asserts.assert_valid_uint64(breadcrumb, "Breadcrumb must be uint64")
-        logging.info(f"Breadcrumb initial value: {breadcrumb}")
+        log.info(f"Breadcrumb initial value: {breadcrumb}")
 
         self.step("3")
         await self.write_single_attribute(attributes.Breadcrumb(1), expect_success=True)
-        logging.info("Breadcrumb set to 1")
+        log.info("Breadcrumb set to 1")
 
         self.step("4")
         breadcrumb_val = await self.read_single_attribute_check_success(
@@ -89,7 +93,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         matter_asserts.assert_valid_enum(
             reg_cfg, "RegulatoryConfig must be a valid RegulatoryLocationTypeEnum",
             Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
-        logging.info(f"RegulatoryConfig value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg).name}")
+        log.info(f"RegulatoryConfig value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg).name}")
 
         self.step("6")
         loc_cap = await self.read_single_attribute_check_success(
@@ -97,12 +101,12 @@ class TC_CGEN_2_1(MatterBaseTest):
         matter_asserts.assert_valid_enum(
             loc_cap, "LocationCapability must be a valid RegulatoryLocationTypeEnum",
             Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
-        logging.info(f"LocationCapability value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap).name}")
+        log.info(f"LocationCapability value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap).name}")
 
         self.step("7")
         basic_info = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.BasicCommissioningInfo)
-        logging.info(f"BasicCommissioningInfo: {basic_info}")
+        log.info(f"BasicCommissioningInfo: {basic_info}")
 
         failsafe = basic_info.failSafeExpiryLengthSeconds
         max_cumulative = basic_info.maxCumulativeFailsafeSeconds

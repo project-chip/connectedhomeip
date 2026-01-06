@@ -121,7 +121,7 @@ void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -135,7 +135,7 @@ void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGeneralCommissioningPluginServerInitCallback() {}

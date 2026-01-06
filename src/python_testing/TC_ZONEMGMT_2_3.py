@@ -41,9 +41,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_ZONEMGMT_2_3(MatterBaseTest):
@@ -92,7 +94,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         self.twoDCartSupported = aFeatureMap & cluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         self.userDefinedSupported = aFeatureMap & cluster.Bitmaps.Feature.kUserDefined
         self.focusZonesSupported = aFeatureMap & cluster.Bitmaps.Feature.kFocusZones
@@ -119,7 +121,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            logger.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
             asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -135,7 +137,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             zonesAfterCreate = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zonesAfterCreate}")
+            log.info(f"Rx'd Zones: {zonesAfterCreate}")
 
             matchingZone = next(
                 (z for z in zonesAfterCreate if z.zoneID == zoneID1), None)
@@ -169,7 +171,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             zonesAfterUpdate = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zonesAfterUpdate}")
+            log.info(f"Rx'd Zones: {zonesAfterUpdate}")
 
             matchingZone = next(
                 (z for z in zonesAfterUpdate if z.zoneID == zoneID1), None)
@@ -188,7 +190,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             zones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zones}")
+            log.info(f"Rx'd Zones: {zones}")
             newZoneId = 0
             # Get the max zoneId
             for zone in zones:
@@ -224,12 +226,12 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             zones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zones}")
+            log.info(f"Rx'd Zones: {zones}")
             matchingZone = next(
                 (z for z in zones if z.zoneSource == enums.ZoneSourceEnum.kMfg), None)
             if matchingZone is not None:
                 self.step("4")
-                logger.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
+                log.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
 
                 try:
                     # use previously crafted zone in step 3
@@ -246,7 +248,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                     )
                     pass
             else:
-                logger.info("No Mfg Zone found")
+                log.info("No Mfg Zone found")
                 self.skip_step("4")
 
             self.step("5")
@@ -254,7 +256,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             twoDCartesianMax = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoDCartesianMax
             )
-            logger.info(f"Rx'd TwoDCartesianMax: {twoDCartesianMax}")
+            log.info(f"Rx'd TwoDCartesianMax: {twoDCartesianMax}")
 
             # Form the Create request with one vertex exceeding TwoDCartesianMax and send
             zoneVertices = [
@@ -297,7 +299,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            logger.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
             asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -313,7 +315,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             zonesAfterCreate = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zonesAfterCreate}")
+            log.info(f"Rx'd Zones: {zonesAfterCreate}")
 
             matchingZone = next(
                 (z for z in zonesAfterCreate if z.zoneID == zoneID2), None)
@@ -504,7 +506,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                 pass
 
         else:
-            logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            log.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("2")
             self.skip_step("2a")
             self.skip_step("3")
@@ -518,10 +520,10 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        logger.info(f"Rx'd Zones: {zones}")
+        log.info(f"Rx'd Zones: {zones}")
         for zone in zones:
             try:
-                logger.info(f"Removing zone with Id : {zone.zoneID}")
+                log.info(f"Removing zone with Id : {zone.zoneID}")
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zone.zoneID))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")

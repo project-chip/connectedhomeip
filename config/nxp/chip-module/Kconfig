@@ -30,16 +30,6 @@ config CHIP_NXP_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
 
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
-
 config CHIP_MALLOC_SYS_HEAP
 	default y if !ARCH_POSIX
 
@@ -203,23 +193,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 
 endif
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/nxp/CHIPPlatformConfig.h file.
-
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n
-	depends on NET_IPV4
-	help
-	  If disabled, it allows to build NXP SDK application
-	  with IPv4 support independently of the Matter stack still
-	  running over IPv6.
-
 config CHIP_OTA_REQUESTOR
 	bool
 	select BOOTLOADER_MCUBOOT
@@ -229,41 +202,3 @@ config BOOTLOADER_MCUBOOT
 	select IMG_MANAGER
 	select STREAM_FLASH
 	select STREAM_FLASH_ERASE
-
-config CHIP_OTA_REQUESTOR_BUFFER_SIZE
-	int "OTA Requestor image buffer size"
-	default 256
-	depends on CHIP_OTA_REQUESTOR
-	help
-	  Configures the size of the buffer used by OTA Requestor when downloading
-	  and writing a new firmware image to flash.
-
-config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-	bool "Auto-reboot when firmware update is applied"
-	default y
-	depends on CHIP_OTA_REQUESTOR
-	imply REBOOT
-	help
-	  Reboots the device automatically after downloading a new firmware update
-	  to swap the old and the new firmware images. The reboot happens only when
-	  a user consents to apply the firmware update.
-
-choice CHIP_OTA_REQUEST_UPGRADE_TYPE
-	prompt "Type of the upgrade to apply on new images"
-	default CHIP_OTA_REQUEST_UPGRADE_TEST
-	depends on CHIP_OTA_REQUESTOR
-
-	config CHIP_OTA_REQUEST_UPGRADE_PERMANENT
-		bool "Mark the image as permanent"
-		help
-		  The upgrade will be permanent on the next reboot.
-		  No coming back to the old image.
-
-	config CHIP_OTA_REQUEST_UPGRADE_TEST
-		bool "Mark the image as a test"
-		help
-		  The upgrade will be marked as a test.
-		  Image will be run on the next reboot, if confirmed it
-		  becomes permanent, otherwise the new image is reverted.
-
-endchoice

@@ -46,8 +46,12 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, TypedAttributePath
 from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 '''
 Category:
@@ -215,7 +219,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
         if Clusters.IcdManagement.id in ep0_servers:
             # Read the IdleModeDuration attribute value from the DUT
-            logging.info(
+            log.info(
                 "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min)")
 
             idleModeDuration = await self.get_idle_mode_duration_sec(CR1)
@@ -229,7 +233,7 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_greater_equal(subscription_max_interval_publisher_limit_sec, 1,
                                      "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC must be at least 1")
 
-        logging.info(
+        log.info(
             f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {subscription_max_interval_publisher_limit_sec} seconds")
 
         # *** Step 2 ***

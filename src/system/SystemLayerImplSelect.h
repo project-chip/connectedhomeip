@@ -49,23 +49,24 @@
 namespace chip {
 namespace System {
 
-class LayerImplSelect : public LayerSocketsLoop
+class LayerImplSelect : public LayerSelectLoop
 {
 public:
     LayerImplSelect() = default;
     ~LayerImplSelect() override { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
-    CHIP_ERROR Init() override;
+    CriticalFailure Init() override;
     void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
     Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
-    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // LayerSocket overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
     CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data) override;
@@ -75,8 +76,9 @@ public:
     CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token) override;
     CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut) override;
     SocketWatchToken InvalidSocketWatchToken() override { return reinterpret_cast<SocketWatchToken>(nullptr); }
+#endif
 
-    // LayerSocketLoop overrides.
+    // LayerSelectLoop overrides.
     void Signal() override;
     void EventLoopBegins() override {}
     void PrepareEvents() override;
@@ -98,6 +100,7 @@ public:
     bool IsSelectResultValid() const { return mSelectResult >= 0; }
 
 protected:
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
@@ -118,6 +121,7 @@ protected:
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
+#endif
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;

@@ -30,6 +30,20 @@
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device occupancy-sensor --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
@@ -41,7 +55,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_OCC_2_3(MatterBaseTest):
@@ -89,13 +107,13 @@ class TC_OCC_2_3(MatterBaseTest):
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
         has_no_legacy_features = ((not has_feature_pir) and (not has_feature_ultrasonic) and (not has_feature_contact))
 
-        logging.info(
+        log.info(
             f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         self.step(3)
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         if attributes.HoldTime.attribute_id not in attribute_list:
-            logging.info("No HoldTime attribute supports. Terminate this test case")
+            log.info("No HoldTime attribute supports. Terminate this test case")
             self.mark_all_remaining_steps_skipped(4)
             return
         holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)

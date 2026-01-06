@@ -96,8 +96,8 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
 
 PushAVClipRecorder::~PushAVClipRecorder()
 {
-    ChipLogDetail(Camera, "PushAVClipRecorder destructor called for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
-                  mClipInfo.mTrackName.c_str());
+    ChipLogDetail(Camera, "PushAVClipRecorder destructor called for sessionID: %" PRIu64 " Track name: %s",
+                  mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
     Stop();
     if (mWorkerThread.joinable())
     {
@@ -119,7 +119,8 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         {
             if (!std::filesystem::create_directories(p, ec))
             {
-                ChipLogError(Camera, "Failed to create directory: %s", p.c_str());
+                ChipLogError(Camera, "Failed to create directory: %s, error code: %d (%s)", p.c_str(), ec.value(),
+                             ec.message().c_str());
                 return false;
             }
             // Set permissions to file: (owner rwx, group rx)
@@ -130,23 +131,49 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         }
         else if (!std::filesystem::is_directory(p, ec))
         {
-            ChipLogError(Camera, "Path is not a directory: %s", p.c_str());
+            ChipLogError(Camera, "Path is not a directory: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
             return false;
         }
 
         auto perms = std::filesystem::status(p, ec).permissions();
         if ((perms & std::filesystem::perms::owner_write) == std::filesystem::perms::none)
         {
-            ChipLogError(Camera, "Directory is not writable: %s", p.c_str());
+            ChipLogError(Camera, "Directory is not writable: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
             return false;
         }
         return true;
     };
 
     // Ensure base directory exists
-    if (!ensure(basePath))
+
+    std::string basePathStr = basePath.string();
+    std::string pathExists;
+    pathExists.reserve(basePathStr.length());
+
+    size_t startIndex = (basePathStr[0] == '/') ? 1 : 0;
+
+    for (size_t i = startIndex; i < basePathStr.length(); ++i)
     {
-        return false;
+        if (basePathStr[i] == '/' || i == basePathStr.length() - 1)
+        {
+            // Include the current character if it's the last character and not a slash
+            size_t endPos = (basePathStr[i] == '/' && i != basePathStr.length() - 1) ? i : i + 1;
+
+            // Build the path incrementally
+            pathExists = basePathStr.substr(0, endPos);
+
+            // Skip empty paths (can happen with consecutive slashes)
+            if (pathExists.empty() || pathExists.back() == '/')
+            {
+                continue;
+            }
+
+            if (!ensure(pathExists))
+            {
+                ChipLogError(Camera, "Failed to ensure directory exists: %s", pathExists.c_str());
+                return false;
+            }
+        }
     }
 
     // Clean up previous session directory if it exists
@@ -255,7 +282,7 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
         {
             mFoundFirstIFramePts = mVideoInfo.mVideoPts;
             packet->flags        = AV_PKT_FLAG_KEY;
-            ChipLogProgress(Camera, "Found I-frame at PTS: %ld", mVideoInfo.mVideoPts);
+            ChipLogProgress(Camera, "Found I-frame at PTS: %" PRId64, mVideoInfo.mVideoPts);
         }
 
         if (mClipInfo.mHasVideo && mFoundFirstIFramePts < 0)
@@ -307,7 +334,7 @@ void PushAVClipRecorder::Start()
 
     SetRecorderStatus(true);
     mWorkerThread = std::thread(&PushAVClipRecorder::StartClipRecording, this);
-    ChipLogProgress(Camera, "Recording started for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
+    ChipLogProgress(Camera, "Recording started for sessionID: %" PRIu64 " Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
 
@@ -358,7 +385,7 @@ void PushAVClipRecorder::Stop()
         ChipLogError(Camera, "Error recording is not running");
     }
     mDeinitializeRecorder = true;
-    ChipLogProgress(Camera, "Recording stopped for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
+    ChipLogProgress(Camera, "Recording stopped for sessionID: %" PRIu64 " Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
 
@@ -472,7 +499,7 @@ int PushAVClipRecorder::StartClipRecording()
             lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty() || !GetRecorderStatus() || mDeinitializeRecorder; });
         if (!GetRecorderStatus() || mDeinitializeRecorder)
         {
-            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %lu Track name: %s",
+            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %" PRIu64 " Track name: %s",
                             mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
             break; // Exit loop
         }
@@ -669,8 +696,6 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         mMetadataSet = true;
     }
 
-    AVRational outputTimeBase = useVideo ? mVideoInfo.mVideoTimeBase : mAudioInfo.mAudioTimeBase;
-
     if (pkt->pts == AV_NOPTS_VALUE && pkt->dts == AV_NOPTS_VALUE)
     {
         ChipLogError(Camera, "Warning packet has no valid timestamps\n");
@@ -684,14 +709,11 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         mCurrentClipStartPts = currentPts;
     }
 
-    pkt->pts      = av_rescale_q(pkt->pts, mClipInfo.mInputTimeBase, outputTimeBase);
-    pkt->dts      = av_rescale_q(pkt->dts, mClipInfo.mInputTimeBase, outputTimeBase);
-    pkt->duration = av_rescale_q(pkt->duration, mClipInfo.mInputTimeBase, outputTimeBase);
-    pkt->pos      = -1;
+    pkt->pos = -1;
 
     if (pkt->pts < 0)
     {
-        ChipLogError(Camera, "Warning Negative PTS detected: %ld", pkt->pts);
+        ChipLogError(Camera, "Warning Negative PTS detected: %" PRId64, pkt->pts);
         pkt->pts = (pkt->dts != AV_NOPTS_VALUE) ? pkt->dts : 0;
     }
     if (av_interleaved_write_frame(mFormatContext, pkt) < 0)
@@ -841,14 +863,36 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
     // Final duration has to be (clipDuration + preRollLen) seconds
     const int64_t remainingDuration = mClipInfo.mInitialDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000);
-    const int64_t clipDuration      = (remainingDuration > 0) ? remainingDuration * AV_TIME_BASE_Q.den : 0;
+    int64_t clipDuration            = 0;
+
+    if (remainingDuration <= 0)
+    {
+        ChipLogError(Camera,
+                     "Invalid remaining duration: %" PRId64 " for sessionID: %" PRIu64 " Track name: %s - stopping recording",
+                     remainingDuration, mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
+        reason = 1; // Set reason to trigger existing stop logic
+    }
+    else
+    {
+        const auto & timeBase = mClipInfo.mHasVideo ? mVideoInfo.mVideoTimeBase : mAudioInfo.mAudioTimeBase;
+        if (timeBase.num == 0)
+        {
+            ChipLogError(Camera, "Invalid timebase (num=0) for %s stream in sessionID: %" PRIu64 " Track name: %s",
+                         mClipInfo.mHasVideo ? "video" : "audio", mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
+        }
+        else
+        {
+            clipDuration = (remainingDuration * timeBase.den) / timeBase.num;
+        }
+    }
+
     // Pre-calculate common path components
     std::filesystem::path basePath = std::filesystem::path(mClipInfo.mOutputPath) /
         ("session_" + std::to_string(mClipInfo.mSessionNumber)) / mClipInfo.mTrackName;
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
-        ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %lu Track name: %s, Reason: %s",
+        ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %" PRIu64 " Track name: %s, Reason: %s",
                       mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(),
                       (reason == 0) ? "End of clip reached" : "Error occurred");
         Stop();
@@ -889,7 +933,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         if (!mUploadedInitSegment)
         {
             std::filesystem::path init_path = basePath / (mClipInfo.mTrackName + ".init");
-            ChipLogProgress(Camera, "Recorder:Init segment upload ready [%s]", init_path.c_str());
             if (std::filesystem::exists(init_path) && !std::filesystem::exists(init_path.string() + ".tmp"))
             {
                 CheckAndUploadFile(init_path.string());
@@ -901,7 +944,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
 bool PushAVClipRecorder::CheckAndUploadFile(std::string filename)
 {
-    ChipLogProgress(Camera, "Recorder:File upload ready [%s] to [%s]", filename.c_str(), mClipInfo.mUrl.c_str());
     mUploader->AddUploadData(filename, mClipInfo.mUrl);
     return true;
 }

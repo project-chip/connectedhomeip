@@ -70,8 +70,11 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CCTRL_2_3(MatterBaseTest):
@@ -91,7 +94,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5543
         self.th_server_discriminator = random.randint(0, 4095)
@@ -108,7 +111,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        logging.info("Commissioning from separate fabric")
+        log.info("Commissioning from separate fabric")
 
         # Create a second controller on a new fabric to communicate to the server
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -121,7 +124,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
             setupPinCode=self.th_server_passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_server_discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
         if self.th_server is not None:

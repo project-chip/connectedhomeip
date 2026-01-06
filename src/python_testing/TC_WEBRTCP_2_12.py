@@ -43,10 +43,12 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
@@ -108,7 +110,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(2)
         # Send multiple SolicitOffer commands to exhaust the DUT's capacity
-        logger.info("Starting to send SolicitOffer commands to exhaust DUT capacity")
+        log.info("Starting to send SolicitOffer commands to exhaust DUT capacity")
 
         # Get the maximum concurrent WebRTC sessions from user or use default for CI
         prompt_msg = (
@@ -125,14 +127,14 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
             try:
                 max_attempts = int(user_input.strip())
                 asserts.assert_true(max_attempts > 0, "Maximum concurrent sessions must be greater than 0")
-                logger.info(f"Using user-specified max_attempts={max_attempts}")
+                log.info(f"Using user-specified max_attempts={max_attempts}")
             except ValueError:
                 asserts.fail(f"Invalid input '{user_input}'. Please enter a valid number.")
 
         # Try to allocate multiple sessions to reach the DUT's capacity limit
 
         for attempt in range(max_attempts):
-            logger.info(f"Attempt {attempt + 1}: Sending SolicitOffer command")
+            log.info(f"Attempt {attempt + 1}: Sending SolicitOffer command")
             resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
                 cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                     streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
@@ -147,12 +149,12 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
                                  "Incorrect response type")
             session_id = resp.webRTCSessionID
             asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-            logger.info(f"Created session {session_id} in attempt {attempt + 1}")
+            log.info(f"Created session {session_id} in attempt {attempt + 1}")
             webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(3)
         # Send an additional SolicitOffer command when DUT capacity is exhausted
-        logger.info("Sending additional SolicitOffer command to trigger resource exhaustion")
+        log.info("Sending additional SolicitOffer command to trigger resource exhaustion")
 
         # The resource exhaustion happens internally in the DUT, but it still creates a session
         # and then sends an End command with OutOfResources reason.
@@ -171,12 +173,12 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         session_id = resp.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        logger.info(f"DUT allocated session {session_id} despite resource exhaustion")
+        log.info(f"DUT allocated session {session_id} despite resource exhaustion")
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(4)
         # Wait for DUT to send End command with reason OutOfResources
-        logger.info("Waiting for DUT to send End command with OutOfResources reason")
+        log.info("Waiting for DUT to send End command with OutOfResources reason")
 
         # Wait for the End command from the DUT
         end_sessionId, reason = await webrtc_peer.get_remote_end()
@@ -186,7 +188,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(reason, kOutOfResourcesReason,
                              f"Expected OutOfResources reason ({kOutOfResourcesReason}), got {reason}")
 
-        logger.info(f"Successfully received End command for session {end_sessionId} with OutOfResources reason {reason}")
+        log.info(f"Successfully received End command for session {end_sessionId} with OutOfResources reason {reason}")
 
         await webrtc_manager.close_all()
 

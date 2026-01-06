@@ -41,10 +41,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import is_valid_uint_value
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class Uint8Type(int):
@@ -140,7 +142,7 @@ class TC_FAN_2_1(MatterBaseTest):
         self.step(2)
         feature_map = await self.read_setting(attribute.FeatureMap)
         supports_auto = bool(feature_map & feature.kAuto)
-        logging.info(f"[FC] DUT supports Auto FanMode feature: {supports_auto}")
+        log.info(f"[FC] DUT supports Auto FanMode feature: {supports_auto}")
 
         # *** STEP 3 ***
         # TH reads from the DUT the FanModeSequence attribute

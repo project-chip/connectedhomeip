@@ -38,8 +38,8 @@ config CHIP_NRF_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
-	bool "Share onboarding payload in NFC tag"
 	default n
 	imply NFC_T2T_NRFXLIB
 	imply NFC_NDEF
@@ -47,8 +47,6 @@ config CHIP_NFC_ONBOARDING_PAYLOAD
 	imply NFC_NDEF_RECORD
 	imply NFC_NDEF_URI_REC
 	imply NFC_NDEF_URI_MSG
-	help
-	  Enables sharing the onboarding payload in the NFC tag.
 
 choice CHIP_BOOTLOADER
 	prompt "Bootloader implementation for Matter purposes"
@@ -95,34 +93,6 @@ config CHIP_OTA_REQUESTOR
 	imply IMG_MANAGER
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
-
-config CHIP_OTA_REQUESTOR_BUFFER_SIZE
-	int "OTA Requestor image buffer size"
-	default 1024
-	depends on CHIP_OTA_REQUESTOR
-	help
-	  Configures the size of the buffer used by OTA Requestor when downloading
-	  and writing a new firmware image to flash.
-
-config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-	bool "Auto-reboot when firmware update is applied"
-	default y
-	depends on CHIP_OTA_REQUESTOR
-	imply REBOOT
-	help
-	  Reboots the device automatically after downloading a new firmware update
-	  to swap the old and the new firmware images. The reboot happens only when
-	  a user consents to apply the firmware update.
-
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
 
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
@@ -299,23 +269,6 @@ endif # CHIP_FACTORY_DATA_BUILD
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
-
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/nrfconnect/CHIPPlatformConfig.h file.
-
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n
-	depends on NET_IPV4
-	help
-	  If disabled, it allows to build nRF Connect SDK application
-	  with IPv4 support independently of the Matter stack still
-	  running over IPv6.
 
 config CHIP_ENABLE_READ_CLIENT
 	bool "Enable Read Client in the Interaction Model"

@@ -19,7 +19,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TestCheckSoftwareVersion(MatterBaseTest):
@@ -27,7 +31,7 @@ class TestCheckSoftwareVersion(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        logging.info("This log has started")
+        log.info("This log has started")
 
     @async_test_body
     async def test_ota_image_version(self):

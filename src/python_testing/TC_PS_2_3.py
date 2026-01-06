@@ -40,8 +40,12 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_PS_2_3(MatterBaseTest):
@@ -66,7 +70,7 @@ class TC_PS_2_3(MatterBaseTest):
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(3)
-        logging.info("This test will now wait for 30 seconds.")
+        log.info("This test will now wait for 30 seconds.")
         await asyncio.sleep(30)
 
         counts = sub_handler.attribute_report_counts
