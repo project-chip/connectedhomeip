@@ -94,9 +94,6 @@ public:
     // with that name, with different semantics.
     void Deinit();
 
-    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
-    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
-
     // BaseDriver::NetworkStatusChangeCallback
     void OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
                                   Optional<int32_t> aConnectStatus) override;
@@ -188,8 +185,13 @@ public:
 
 private:
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     void OnCommissioningComplete();
     void OnFailSafeTimerExpired();
+
+    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
+    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
+
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     void SendNonConcurrentConnectNetworkResponse();
 #endif
