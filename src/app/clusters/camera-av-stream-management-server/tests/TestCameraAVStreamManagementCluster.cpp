@@ -137,32 +137,42 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
+    TestCameraAVStreamManagementCluster() :
+        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
+        mServer(mMockDelegate, kTestEndpointId,
+                chip::BitFlags<CameraAvStreamManagement::Feature>(
+                    CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
+                    CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
+                    CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy),
+                chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
+                    CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
+                    CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
+                    CameraAvStreamManagement::OptionalAttribute::kImageRotation,
+                    CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
+                    CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
+                    CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
+                    CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
+                1, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {}),
+        mClusterTester(mServer)
+    {}
+
+    void SetUp() override
+    {
+        ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    }
+
     std::vector<VideoStreamStruct> mVideoStreams;
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
+    MockCameraAVStreamManagementDelegate mMockDelegate;
+    CameraAvStreamManagement::CameraAVStreamManagementCluster mServer;
+    ClusterTester mClusterTester;
 };
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
 {
-    MockCameraAVStreamManagementDelegate mockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
-    CameraAvStreamManagement::CameraAVStreamManagementCluster server(
-        mockDelegate, kTestEndpointId,
-        chip::BitFlags<CameraAvStreamManagement::Feature>(
-            CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
-            CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
-            CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy),
-        chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
-            CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
-            CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
-            CameraAvStreamManagement::OptionalAttribute::kImageRotation,
-            CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
-            CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
-            CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
-            CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-        0, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {});
-
     ASSERT_TRUE(
-        Testing::IsAttributesListEqualTo(server,
+        Testing::IsAttributesListEqualTo(mServer,
                                          {
                                              CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::kMetadataEntry,
@@ -204,25 +214,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
 
 TEST_F(TestCameraAVStreamManagementCluster, TestCommands)
 {
-    MockCameraAVStreamManagementDelegate mockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
-    CameraAvStreamManagement::CameraAVStreamManagementCluster server(
-        mockDelegate, kTestEndpointId,
-        chip::BitFlags<CameraAvStreamManagement::Feature>(CameraAvStreamManagement::Feature::kVideo,
-                                                          CameraAvStreamManagement::Feature::kAudio,
-                                                          CameraAvStreamManagement::Feature::kSnapshot),
-        chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
-            CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
-            CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum,
-            CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
-            CameraAvStreamManagement::OptionalAttribute::kImageRotation,
-            CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
-            CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
-            CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
-            CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-        0, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {});
-
     ASSERT_TRUE(
-        Testing::IsAcceptedCommandsListEqualTo(server,
+        Testing::IsAcceptedCommandsListEqualTo(mServer,
                                                {
                                                    CameraAvStreamManagement::Commands::VideoStreamAllocate::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::VideoStreamDeallocate::kMetadataEntry,
@@ -237,23 +230,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCommands)
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadClusterRevisionAttribute)
 {
-    MockCameraAVStreamManagementDelegate mockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
-    CameraAvStreamManagement::CameraAVStreamManagementCluster server(
-        mockDelegate, kTestEndpointId,
-        chip::BitFlags<CameraAvStreamManagement::Feature>(CameraAvStreamManagement::Feature::kVideo,
-                                                          CameraAvStreamManagement::Feature::kAudio,
-                                                          CameraAvStreamManagement::Feature::kSnapshot),
-        chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
-            CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
-            CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum,
-            CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
-            CameraAvStreamManagement::OptionalAttribute::kImageRotation,
-            CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
-            CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
-            CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
-            CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-        0, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {});
-
     // Create a mock attribute request for ClusterRevision
     chip::app::DataModel::ReadAttributeRequest request;
     request.path.mEndpointId  = kTestEndpointId;
@@ -275,71 +251,43 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadClusterRevisionAttribute)
                                              0 /* dataVersion */);
 
     // Test reading cluster revision
-    auto status = server.ReadAttribute(request, encoder);
+    auto status = mServer.ReadAttribute(request, encoder);
     EXPECT_TRUE(status.IsSuccess());
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMaxConcurrentEncoders)
 {
-    uint8_t selectedChime = 1;
-    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxConcurrentEncoders::Id, selectedChime), CHIP_NO_ERROR);
-    EXPECT_EQ(selectedChime, 0);
+    uint8_t maxConcurrentEncoders = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxConcurrentEncoders::Id, maxConcurrentEncoders), CHIP_NO_ERROR);
+    EXPECT_EQ(maxConcurrentEncoders, 1);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamAllocate)
 {
-    MockCameraAVStreamManagementDelegate mockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
-    CameraAvStreamManagement::CameraAVStreamManagementCluster server(
-        mockDelegate, kTestEndpointId,
-        chip::BitFlags<CameraAvStreamManagement::Feature>(CameraAvStreamManagement::Feature::kSnapshot),
-        chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(),
-        0, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {});
-
-    ClusterTester clusterTester(server);
-
     Commands::SnapshotStreamAllocate::Type request;
-    //chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Type request;
-    auto result = clusterTester.Invoke(Commands::SnapshotStreamAllocate::Id, request);
-     EXPECT_TRUE(result.IsSuccess());
-     EXPECT_TRUE(result.response.has_value());
-    // TODO: Need a way to invoke the command and check the response
-    // This requires a command invocation framework within the test.
-    // For now, this test just sets up the request.
+    auto result = mClusterTester.Invoke<Commands::SnapshotStreamAllocate::Type, Commands::SnapshotStreamAllocateResponse::DecodableType>(request);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value());
+    // EXPECT_EQ(result.response.value().streamID, SomeExpectedID); // TODO: Enhance mock to return an ID
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModify)
 {
-    MockCameraAVStreamManagementDelegate mockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
-    CameraAvStreamManagement::CameraAVStreamManagementCluster server(
-        mockDelegate, kTestEndpointId,
-        chip::BitFlags<CameraAvStreamManagement::Feature>(CameraAvStreamManagement::Feature::kSnapshot),
-        chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(),
-        0, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {});
-
-    ClusterTester clusterTester(server);
     Commands::SnapshotStreamModify::Type request;
     request.snapshotStreamID = 1; // Assuming a stream ID
     request.watermarkEnabled.SetValue(true);
     request.OSDEnabled.SetValue(true);
 
-    auto result = clusterTester.Invoke(Commands::SnapshotStreamModify::Id, request);
+    auto result = mClusterTester.Invoke<Commands::SnapshotStreamModify::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocate)
 {
-    MockCameraAVStreamManagementDelegate mockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
-    CameraAvStreamManagement::CameraAVStreamManagementCluster server(
-        mockDelegate, kTestEndpointId,
-        chip::BitFlags<CameraAvStreamManagement::Feature>(CameraAvStreamManagement::Feature::kSnapshot),
-        chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(),
-        0, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {});
-
-    ClusterTester clusterTester(server);
-    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Type request;
+    Commands::SnapshotStreamDeallocate::Type request;
     request.snapshotStreamID = 1; // Assuming a stream ID
 
-    auto result = clusterTester.Invoke(Commands::SnapshotStreamDeallocate::Id, request);
+    auto result = mClusterTester.Invoke<Commands::SnapshotStreamDeallocate::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
 }
 
