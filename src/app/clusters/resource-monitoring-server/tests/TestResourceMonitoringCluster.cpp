@@ -107,7 +107,10 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
     TestResourceMonitoringCluster() :
         activatedCarbonFilterMonitoring(kEndpointId, ActivatedCarbonFilterMonitoring::Id, kResourceMonitoringFeatureMap,
-                                        OptionalAttributeSet(), ResourceMonitoring::DegradationDirectionEnum::kDown, true)
+                                        ResourceMonitoringCluster::OptionalAttributeSet()
+                                            .Set<Attributes::InPlaceIndicator::Id>()
+                                            .Set<Attributes::LastChangedTime::Id>(),
+                                        ResourceMonitoring::DegradationDirectionEnum::kDown, true)
     {}
 };
 } // namespace
@@ -124,6 +127,8 @@ TEST_F(TestResourceMonitoringCluster, AttributeTest)
         { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,
           ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry,
           ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::kMetadataEntry,
           ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry }));
 }
 

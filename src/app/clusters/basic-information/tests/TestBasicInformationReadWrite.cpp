@@ -236,6 +236,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     using namespace chip::app::Clusters::BasicInformation;
 
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.Set<Attributes::ManufacturingDate::Id>();
     BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -407,6 +408,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
     bool readValue{};
 
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.Set<Attributes::LocalConfigDisabled::Id>();
     BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);

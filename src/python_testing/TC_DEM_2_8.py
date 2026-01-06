@@ -49,7 +49,9 @@ from TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
