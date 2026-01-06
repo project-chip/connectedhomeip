@@ -42,11 +42,12 @@
 import logging
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main, matchers
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ log = logging.getLogger(__name__)
 # --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>
 
 
-class TC_IDM_1_4(MatterBaseTest):
+class TC_IDM_1_4(IDMBaseTest):
 
     def steps_TC_IDM_1_4(self) -> list[TestStep]:
         return [TestStep(1, "Get remote node's MaxPathsPerInvoke", is_commissioning=True),

@@ -34,20 +34,19 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import copy
 import logging
 import time
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath
 from matter.exceptions import ChipStackError
-from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_asserts import is_valid_uint_value
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +66,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 '''
 
 
-class TC_IDM_4_2(MatterBaseTest):
+class TC_IDM_4_2(IDMBaseTest):
 
     def steps_TC_IDM_4_2(self):
         return [TestStep("precondition", "Commissioning already done.", is_commissioning=True),
@@ -99,79 +98,6 @@ class TC_IDM_4_2(MatterBaseTest):
                 TestStep(14, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.",
                          "Verify that the Subscription does not succeed and the DUT sends back a Status Response Action with the INVALID_ACTION Status Code")
                 ]
-
-    ROOT_NODE_ENDPOINT_ID = 0
-
-    async def get_descriptor_server_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        return await self.read_single_attribute_check_success(
-            endpoint=ep,
-            dev_ctrl=ctrl,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList
-        )
-
-    async def get_descriptor_parts_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        return await self.read_single_attribute_check_success(
-            endpoint=ep,
-            dev_ctrl=ctrl,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.PartsList
-        )
-
-    async def get_idle_mode_duration_sec(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        return await self.read_single_attribute_check_success(
-            endpoint=ep,
-            dev_ctrl=ctrl,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.IdleModeDuration
-        )
-
-    @staticmethod
-    def verify_attribute_exists(sub, cluster, attribute, ep=ROOT_NODE_ENDPOINT_ID):
-        sub_attrs = sub
-        if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
-            sub_attrs = sub.GetAttributes()
-
-        asserts.assert_true(ep in sub_attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in sub_attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in sub_attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
-
-    @staticmethod
-    def get_typed_attribute_path(attribute, ep=ROOT_NODE_ENDPOINT_ID):
-        return TypedAttributePath(
-            Path=AttributePath.from_attribute(
-                EndpointId=ep,
-                Attribute=attribute
-            )
-        )
-
-    async def write_dut_acl(self, ctrl, acl, ep=ROOT_NODE_ENDPOINT_ID):
-        result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
-        asserts.assert_equal(result[ep].Status, Status.Success, "ACL write failed")
-
-    async def get_dut_acl(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        sub = await ctrl.ReadAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
-            keepSubscriptions=False,
-            fabricFiltered=True
-        )
-
-        return sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-
-    async def add_ace_to_dut_acl(self, ctrl, ace, dut_acl_original):
-        dut_acl = copy.deepcopy(dut_acl_original)
-        dut_acl.append(ace)
-        await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
-
-    @staticmethod
-    def is_valid_uint32_value(var):
-        return isinstance(var, int) and 0 <= var <= 0xFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint16_value(var):
-        return isinstance(var, int) and 0 <= var <= 0xFFFF
 
     @async_test_body
     async def test_TC_IDM_4_2(self):
@@ -261,12 +187,12 @@ class TC_IDM_4_2(MatterBaseTest):
         )
 
         # Verify subscriptionId is of uint32 type
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1.subscriptionId), "subscriptionId is not of uint32 type.")
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step1.subscriptionId, 32), "subscriptionId is not of uint32 type.")
 
         # Verify MaxInterval is of uint32 type
         sub_cr1_step1_intervals = sub_cr1_step1.GetReportingIntervalsSeconds()
         sub_cr1_step1_min_interval_floor_sec, sub_cr1_step1_max_interval_ceiling_sec = sub_cr1_step1_intervals
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1_max_interval_ceiling_sec),
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step1_max_interval_ceiling_sec, 32),
                             "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
@@ -304,12 +230,12 @@ class TC_IDM_4_2(MatterBaseTest):
         )
 
         # Verify subscriptionId is of uint32 type
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step2.subscriptionId), "subscriptionId is not of uint32 type.")
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step2.subscriptionId, 32), "subscriptionId is not of uint32 type.")
 
         # Verify MaxInterval is of uint32 type
         sub_cr1_step2_intervals = sub_cr1_step2.GetReportingIntervalsSeconds()
         sub_cr1_step2_min_interval_floor_sec, sub_cr1_step2_max_interval_ceiling_sec = sub_cr1_step2_intervals
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step2_max_interval_ceiling_sec),
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step2_max_interval_ceiling_sec, 32),
                             "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
@@ -604,7 +530,7 @@ class TC_IDM_4_2(MatterBaseTest):
         cluster_revision_attr_value = sub_cr1_step11.GetAttribute(cluster_rev_attr_typed_path)
 
         # Verify ClusterRevision is of uint16 type
-        asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+        asserts.assert_true(is_valid_uint_value(cluster_revision_attr_value, 16), "ClusterRevision is not of uint16 type.")
 
         # Verify valid ClusterRevision value
         asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")
@@ -647,7 +573,7 @@ class TC_IDM_4_2(MatterBaseTest):
         cluster_revision_attr_value = sub_cr1_step12.GetAttribute(cluster_rev_attr_typed_path)
 
         # Verify ClusterRevision is of uint16 type
-        asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+        asserts.assert_true(is_valid_uint_value(cluster_revision_attr_value, 16), "ClusterRevision is not of uint16 type.")
 
         sub_cr1_step12.Shutdown()
 
