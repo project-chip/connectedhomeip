@@ -17,9 +17,9 @@
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BooleanState/Attributes.h>
@@ -42,7 +42,7 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(booleanState.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { booleanState.Shutdown(); }
+    void TearDown() override { booleanState.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestBooleanStateCluster() : booleanState(kRootEndpointId) {}
 

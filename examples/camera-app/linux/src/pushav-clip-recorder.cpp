@@ -96,8 +96,8 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
 
 PushAVClipRecorder::~PushAVClipRecorder()
 {
-    ChipLogDetail(Camera, "PushAVClipRecorder destructor called for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
-                  mClipInfo.mTrackName.c_str());
+    ChipLogDetail(Camera, "PushAVClipRecorder destructor called for sessionID: %" PRIu64 " Track name: %s",
+                  mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
     Stop();
     if (mWorkerThread.joinable())
     {
@@ -282,7 +282,7 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
         {
             mFoundFirstIFramePts = mVideoInfo.mVideoPts;
             packet->flags        = AV_PKT_FLAG_KEY;
-            ChipLogProgress(Camera, "Found I-frame at PTS: %ld", mVideoInfo.mVideoPts);
+            ChipLogProgress(Camera, "Found I-frame at PTS: %" PRId64, mVideoInfo.mVideoPts);
         }
 
         if (mClipInfo.mHasVideo && mFoundFirstIFramePts < 0)
@@ -334,7 +334,7 @@ void PushAVClipRecorder::Start()
 
     SetRecorderStatus(true);
     mWorkerThread = std::thread(&PushAVClipRecorder::StartClipRecording, this);
-    ChipLogProgress(Camera, "Recording started for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
+    ChipLogProgress(Camera, "Recording started for sessionID: %" PRIu64 " Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
 
@@ -385,7 +385,7 @@ void PushAVClipRecorder::Stop()
         ChipLogError(Camera, "Error recording is not running");
     }
     mDeinitializeRecorder = true;
-    ChipLogProgress(Camera, "Recording stopped for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
+    ChipLogProgress(Camera, "Recording stopped for sessionID: %" PRIu64 " Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
 
@@ -499,7 +499,7 @@ int PushAVClipRecorder::StartClipRecording()
             lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty() || !GetRecorderStatus() || mDeinitializeRecorder; });
         if (!GetRecorderStatus() || mDeinitializeRecorder)
         {
-            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %lu Track name: %s",
+            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %" PRIu64 " Track name: %s",
                             mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
             break; // Exit loop
         }
@@ -713,7 +713,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
 
     if (pkt->pts < 0)
     {
-        ChipLogError(Camera, "Warning Negative PTS detected: %ld", pkt->pts);
+        ChipLogError(Camera, "Warning Negative PTS detected: %" PRId64, pkt->pts);
         pkt->pts = (pkt->dts != AV_NOPTS_VALUE) ? pkt->dts : 0;
     }
     if (av_interleaved_write_frame(mFormatContext, pkt) < 0)
@@ -867,7 +867,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
     if (remainingDuration <= 0)
     {
-        ChipLogError(Camera, "Invalid remaining duration: %ld for sessionID: %lu Track name: %s - stopping recording",
+        ChipLogError(Camera,
+                     "Invalid remaining duration: %" PRId64 " for sessionID: %" PRIu64 " Track name: %s - stopping recording",
                      remainingDuration, mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
         reason = 1; // Set reason to trigger existing stop logic
     }
@@ -876,7 +877,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         const auto & timeBase = mClipInfo.mHasVideo ? mVideoInfo.mVideoTimeBase : mAudioInfo.mAudioTimeBase;
         if (timeBase.num == 0)
         {
-            ChipLogError(Camera, "Invalid timebase (num=0) for %s stream in sessionID: %lu Track name: %s",
+            ChipLogError(Camera, "Invalid timebase (num=0) for %s stream in sessionID: %" PRIu64 " Track name: %s",
                          mClipInfo.mHasVideo ? "video" : "audio", mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
         }
         else
@@ -891,7 +892,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
-        ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %lu Track name: %s, Reason: %s",
+        ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %" PRIu64 " Track name: %s, Reason: %s",
                       mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(),
                       (reason == 0) ? "End of clip reached" : "Error occurred");
         Stop();

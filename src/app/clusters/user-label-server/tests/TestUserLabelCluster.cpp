@@ -16,10 +16,10 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
@@ -75,7 +75,7 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void TearDown() override
     {
-        userLabel.Shutdown();
+        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
         DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 

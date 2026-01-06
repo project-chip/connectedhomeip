@@ -19,14 +19,14 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -47,6 +47,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
 using chip::app::AttributeValueDecoder;
+using chip::app::ClusterShutdownType;
 using chip::app::DataModel::AttributeEntry;
 using chip::Testing::kAdminSubjectDescriptor;
 using chip::Testing::WriteOperation;
@@ -222,7 +223,7 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
         EXPECT_FALSE(value); // disabled
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     cluster.Deinit();
 
     ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
@@ -234,7 +235,7 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
         EXPECT_FALSE(value); // stays disabled
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     cluster.Deinit();
 }
 
