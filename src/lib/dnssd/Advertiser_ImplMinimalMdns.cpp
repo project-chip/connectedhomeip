@@ -39,6 +39,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/StringBuilder.h>
+#include <minmdns/MinMdnsConfig.h>
 
 namespace chip {
 namespace Dnssd {
