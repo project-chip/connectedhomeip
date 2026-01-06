@@ -66,9 +66,6 @@ matter_add_gn_arg_bool("nxp_use_plain_dac_key" CONFIG_NXP_USE_PLAIN_DAC_KEY)
 matter_add_gn_arg_bool("nxp_use_smu2_dynamic" CONFIG_NXP_USE_SMU2_DYNAMIC)
 matter_add_gn_arg_bool("nxp_use_smu2_static" CONFIG_NXP_USE_SMU2_STATIC)
 
-matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_CHIP_OPENTHREAD_FTD)
-matter_add_gn_arg_bool("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OT_ENDPOINT)
-
 # Remove default spec config from the build
 matter_add_gn_arg_list("default_configs_specs" " ")
 

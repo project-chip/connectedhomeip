@@ -452,6 +452,17 @@ config CHIP_THREAD_NETWORK_ENDPOINT_ID
 	help
 	  Specify the endpoint ID of the Thread network.
 
+config CHIP_OPENTHREAD_FTD
+	bool "Enable OpenThread Full Thread Device (FTD) support"
+	default y
+	help
+	  Configure the platform as an OpenThread Full Thread Device (FTD).
+
+config CHIP_USE_OT_ENDPOINT
+	bool "Use OpenThread TCP/UDP stack directly"
+	help
+	  Use OpenThread TCP/UDP stack directly
+
 endif # NET_L2_OPENTHREAD
 
 config CHIP_ENABLE_ICD_SUPPORT
