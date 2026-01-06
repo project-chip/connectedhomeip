@@ -22,7 +22,8 @@ from support_modules.product_appearance import ProductAppearanceBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import TestStep, default_matter_test_main
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_BRBINFO_3_1(ProductAppearanceBase):

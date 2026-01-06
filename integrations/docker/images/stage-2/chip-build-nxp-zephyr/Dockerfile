@@ -12,7 +12,7 @@ WORKDIR /opt/nxp-zephyr
 RUN set -x \
     && ZEPHYR_SDK_VERSION=0.17.4 \
     && NXP_ZSDK_VERSION=nxp-v4.3.0 \
-    && wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64.tar.xz | tar -xJ \
+    && wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz | tar -xJ \
     && zephyr-sdk-${ZEPHYR_SDK_VERSION}/setup.sh -t arm-zephyr-eabi \
     && pip3 install --break-system-packages -U --no-cache-dir west \
     && west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr ${NXP_ZSDK_VERSION} \

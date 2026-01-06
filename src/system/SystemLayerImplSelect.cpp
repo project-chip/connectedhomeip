@@ -58,10 +58,12 @@ CriticalFailure LayerImplSelect::Init()
 
     RegisterPOSIXErrorFormatter();
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
     {
         w.Clear();
     }
+#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
@@ -91,10 +93,12 @@ void LayerImplSelect::Shutdown()
     }
     mTimerPool.ReleaseAll();
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
     {
         w.DisableAndClear();
     }
+#endif
 #else
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
@@ -300,6 +304,7 @@ CriticalFailure LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, 
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
     // Find a free slot.
@@ -488,6 +493,7 @@ SocketEvents LayerImplSelect::SocketEventsFromFDs(int socket, const fd_set & rea
 
     return res;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 enum : intptr_t
 {
@@ -560,6 +566,7 @@ void LayerImplSelect::PrepareEvents()
     mMaxFd = mWakeEvent.GetReadFD();
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
     {
         if (w.mFD != kInvalidFd)
@@ -578,6 +585,7 @@ void LayerImplSelect::PrepareEvents()
             }
         }
     }
+#endif
 }
 
 void LayerImplSelect::WaitForEvents()
@@ -617,6 +625,7 @@ void LayerImplSelect::HandleEvents()
         mTimerPool.Invoke(timer);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Process socket events, if any
     if (mSelectResult > 0)
     {
@@ -632,6 +641,7 @@ void LayerImplSelect::HandleEvents()
             }
         }
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // Call HandleEvents for active loop handlers
     auto loopIter = mLoopHandlers.begin();
@@ -684,6 +694,7 @@ void LayerImplSelect::HandleLibEvIoWatcher(EV_P_ struct ev_io * i, int revents)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 void LayerImplSelect::SocketWatch::Clear()
 {
     mFD = kInvalidFd;
@@ -705,6 +716,7 @@ void LayerImplSelect::SocketWatch::DisableAndClear()
     Clear();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace System
 } // namespace chip
