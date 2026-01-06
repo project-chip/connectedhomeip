@@ -318,7 +318,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="PumpStatus" type="PumpStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <optionalConform/>
       <constraint>
         <desc/>
@@ -342,7 +341,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="Capacity" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0014" name="Speed" type="uint16" default="null">

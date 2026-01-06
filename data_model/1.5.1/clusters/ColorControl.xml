@@ -244,7 +244,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="CurrentHue" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <quality persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
@@ -254,7 +254,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="CurrentSaturation" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
@@ -272,7 +272,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="CurrentX" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
@@ -282,7 +282,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentY" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
@@ -303,7 +303,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>

@@ -174,7 +174,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentFrequency" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" reportable="true" quieterReporting="true"/>
+      <quality scene="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
