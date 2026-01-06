@@ -15,6 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
 declare_args() {
   # Makes unicast queries use a separate UDP endpoint that have an ephemeral port
   #
@@ -43,7 +45,10 @@ declare_args() {
   chip_minmdns_default_policy = "default"
 }
 
-config("config") {
+buildconfig_header("buildconfig") {
+  header = "MinMdnsConfig.h"
+  header_dir = "minmdns"
+
   defines = []
 
   if (chip_use_ephemeral_port_for_mdns_unicast_query) {
@@ -145,6 +150,7 @@ static_library("minimal_mdns") {
 
   public_deps = [
     ":address_policy",
+    ":buildconfig",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
@@ -157,8 +163,6 @@ static_library("minimal_mdns") {
   } else if (chip_minmdns_default_policy == "libnl") {
     public_deps += [ ":libnl_policy" ]
   }
-
-  public_configs = [ ":config" ]
 
   cflags = [ "-Wconversion" ]
 }

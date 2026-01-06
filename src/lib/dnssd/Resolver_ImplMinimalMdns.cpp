@@ -29,6 +29,7 @@
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <minmdns/MinMdnsConfig.h>
 #include <tracing/macros.h>
 
 // MDNS servers will receive all broadcast packets over the network.

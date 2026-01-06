@@ -20,6 +20,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
+#include <minmdns/MinMdnsConfig.h>
 
 namespace mdns {
 namespace Minimal {

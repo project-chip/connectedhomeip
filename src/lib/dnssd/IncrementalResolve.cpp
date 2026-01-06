@@ -22,6 +22,7 @@
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
+#include <minmdns/MinMdnsConfig.h>
 #include <tracing/macros.h>
 
 namespace chip {
