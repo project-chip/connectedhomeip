@@ -45,6 +45,10 @@ matter_add_gn_arg_bool("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA
 # Required for freeRTOS build in case default value needs to be set to "none" for optimization
 matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
 
+if(CONFIG_NET_L2_OPENTHREAD)
+    matter_add_gn_arg("chip_device_config_thread_network_endpoint_id" ${CONFIG_CHIP_THREAD_NETWORK_ENDPOINT_ID})
+endif()
+
 if(CONFIG_DEBUG)
     matter_add_gn_arg_bool("optimize_debug" true)
     matter_add_gn_arg_string("optimize_debug_level" "0")
