@@ -206,8 +206,8 @@ TlsClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
 
     if (status.IsSuccess())
     {
-        ConcreteCommandPath responsePath(mPath.mEndpointId, TlsClientManagement::Id, Commands::ProvisionEndpointResponse::Id);
-        commandHandler.AddResponse(responsePath, response);
+        ConcreteCommandPath requestPath(mPath.mEndpointId, TlsClientManagement::Id, Commands::ProvisionEndpoint::Id);
+        commandHandler.AddResponse(requestPath, response);
         NotifyAttributeChanged(TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
         return std::nullopt;
     }
@@ -229,8 +229,8 @@ TlsClientManagementCluster::HandleFindEndpoint(CommandHandler & commandHandler, 
         mDelegate.FindProvisionedEndpointByID(endpointId, fabric, req.endpointID, [&](auto & endpoint) -> CHIP_ERROR {
             Commands::FindEndpointResponse::Type response;
             response.endpoint = endpoint;
-            ConcreteCommandPath responsePath(mPath.mEndpointId, TlsClientManagement::Id, Commands::FindEndpointResponse::Id);
-            commandHandler.AddResponse(responsePath, response);
+            ConcreteCommandPath requestPath(mPath.mEndpointId, TlsClientManagement::Id, Commands::FindEndpoint::Id);
+            commandHandler.AddResponse(requestPath, response);
             return CHIP_NO_ERROR;
         });
 
