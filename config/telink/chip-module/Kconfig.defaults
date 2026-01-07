@@ -389,9 +389,8 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-    bool "Enable Telink Wi-Fi support"
     default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     select WIFI_W91
     select WIFI
