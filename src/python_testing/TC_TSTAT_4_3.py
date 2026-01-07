@@ -186,7 +186,6 @@ class TC_TSTAT_4_3(MatterBaseTest):
                     if len(possiblePresetHandles) > 0:
                         preset_handle = possiblePresetHandles[0]
                         # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
-   
                         await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                                           preset_handle=preset_handle,
                                                                           effective_time=currentUTC,
@@ -216,12 +215,11 @@ class TC_TSTAT_4_3(MatterBaseTest):
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp ExpirationInMinutes is set to 30 minutes.
+            existing_handles = {p.presetHandle for p in supported_presets}
             counter = 0
-            existing_handles = {preset.presetHandle for preset in supported_presets}
             while True:
-                candidate_handle = f"{counter}".encode('ascii')
-                if candidate_handle not in existing_handles:
-                    new_preset_handle = candidate_handle
+                new_preset_handle = f"test-handle-{counter}".encode('ascii')
+                if new_preset_handle not in existing_handles:
                     break
                 counter += 1
             currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
