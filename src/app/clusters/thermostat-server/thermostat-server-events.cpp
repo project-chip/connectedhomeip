@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "app/clusters/thermostat-server/thermostat-server.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
 #include "app/EventLogging.h"
 
