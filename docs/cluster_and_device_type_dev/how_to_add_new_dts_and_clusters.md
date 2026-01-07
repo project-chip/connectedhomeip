@@ -151,7 +151,7 @@ related SDK tests.
                section.
             2. Add an `XYZ Mode` entry to the
                `CommandHandlerInterfaceOnlyClusters` or, if a "code-driven"
-               approach is used,`CodeDrivenClusters` section.
+               approach is used, `CodeDrivenClusters` section.
         8. In
            [src/app/util/util.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/util.cpp),
            in the `// Cluster Init Functions...` section, add a void
