@@ -766,7 +766,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             # Sets OccupiedHeatingSetpoint to default value
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
-            self.flush_events(events_callback)
+            if hasEventsFeature:
+                self.flush_events(events_callback)
 
             # Sends SetpointRaise Command Heat Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
@@ -784,7 +785,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             # Sets OccupiedHeatingSetpoint to default value
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
-            self.flush_events(events_callback)
+            if hasEventsFeature:
+                self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Heat Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30), endpoint=endpoint)
@@ -800,7 +802,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasCoolingFeature):
 
-            self.flush_events(events_callback)
+            if hasEventsFeature:
+                self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Cool Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
@@ -819,7 +822,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             # Sets OccupiedCoolingSetpoint to default value
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(OccupiedCoolingSetpointValue), endpoint_id=endpoint)
 
-            self.flush_events(events_callback)
+            if hasEventsFeature:
+                self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Cool Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30), endpoint=endpoint)
@@ -842,7 +846,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
-            self.flush_events(events_callback)
+            if hasEventsFeature:
+                self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Heat & Cool
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30), endpoint=endpoint)
@@ -872,7 +877,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
-            self.flush_events(events_callback)
+            if hasEventsFeature:
+                self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Heat & Cool
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30), endpoint=endpoint)
