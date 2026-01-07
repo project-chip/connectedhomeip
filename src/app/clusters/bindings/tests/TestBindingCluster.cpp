@@ -16,14 +16,14 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/bindings/BindingCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/Binding/Enums.h>
 #include <clusters/Binding/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 
 namespace {
 
@@ -33,6 +33,7 @@ using namespace chip::app::Clusters::Binding;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestBindingCluster : public ::testing::Test
@@ -45,14 +46,10 @@ TEST_F(TestBindingCluster, TestAttributes)
 {
     BindingCluster cluster(1);
 
-    ReadOnlyBufferBuilder<AttributeEntry> builder;
-    ASSERT_EQ(cluster.Attributes({ 1, Binding::Id }, builder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.AppendElements({ Binding::Attributes::Binding::kMetadataEntry }), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-    ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Binding::Attributes::Binding::kMetadataEntry,
+                                        }));
 }
 
 } // namespace

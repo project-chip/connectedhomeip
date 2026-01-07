@@ -23,8 +23,9 @@ from mobly import asserts
 
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
 
 FEATURE_TEMPLATE = '''\

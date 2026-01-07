@@ -89,6 +89,22 @@ source_set("inet_zephyr_socket") {
   public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
+# Standalone inet argument parser - include this explicitly in targets that need it.
+# Provides ParseIPAddress for command-line parsing utilities.
+source_set("inet_arg_parser") {
+  sources = [
+    "InetArgParser.cpp",
+    "InetArgParser.h",
+  ]
+
+  public_deps = [
+    ":inet",
+    "${chip_root}/src/lib/support:arg_parser",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 static_library("inet") {
   output_name = "libInetLayer"
 
@@ -108,8 +124,6 @@ static_library("inet") {
     "IPPrefix.cpp",
     "IPPrefix.h",
     "Inet.h",
-    "InetArgParser.cpp",
-    "InetArgParser.h",
     "InetError.cpp",
     "InetError.h",
     "InetInterface.cpp",

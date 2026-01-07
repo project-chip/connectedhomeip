@@ -22,8 +22,9 @@ from importlib.abc import Traversable
 from jinja2 import Template
 from mobly import asserts
 
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import NamespacePathLocation, ProblemNotice, ProblemSeverity
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
                                          parse_namespace)
 
