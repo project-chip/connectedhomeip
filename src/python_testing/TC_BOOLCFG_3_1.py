@@ -25,6 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -38,7 +39,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
@@ -56,74 +57,64 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
     def steps_TC_BOOLCFG_3_1(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "Verify SENSLVL feature is supported"),
-            TestStep("2c", "Read AttributeList attribute"),
-            TestStep(3, "Read SupportedSensitivityLevels attribute"),
-            TestStep(4, "Read DefaultSensitivityLevel attribute, if supported"),
-            TestStep(5, "Read CurrentSensitivityLevel attribute"),
-            TestStep(6, "TH loops through the number of supported sensitivity levels"),
-            TestStep(7, "Write CurrentSensitivityLevel attribute to non-default value"),
-            TestStep(8, "Write CurrentSensitivityLevel attribute to default value"),
-            TestStep(9, "Write CurrentSensitivityLevel attribute to 10"),
-            TestStep(10, "Write CurrentSensitivityLevel attribute to 255"),
-            TestStep(11, "Write CurrentSensitivityLevel attribute to the initial current value"),
+            TestStep(2, "Read AttributeList attribute", "DUT replies with the AttributeList attribute"),
+            TestStep(3, "Read SupportedSensitivityLevels attribute", "DUT response is success"),
+            TestStep(4, "Read DefaultSensitivityLevel attribute, if supported", "DUT response is success"),
+            TestStep(5, "Read CurrentSensitivityLevel attribute", "DUT response is success"),
+            TestStep(6, "TH loops through the number of supported sensitivity levels",
+                     "DUT response is success for all write interactions"),
+            TestStep(7, "Write CurrentSensitivityLevel attribute to non-default value", "DUT response is success"),
+            TestStep(8, "Write CurrentSensitivityLevel attribute to default value", "DUT response is success"),
+            TestStep(9, "Write CurrentSensitivityLevel attribute to max number of level (one above SupportedSensitivityLevels)",
+                     "DUT response is contraint error"),
+            TestStep(10, "Write CurrentSensitivityLevel attribute to 255", "DUT response is constraint error"),
+            TestStep(11, "Write CurrentSensitivityLevel attribute to the initial current value", "DUT response is success"),
         ]
 
     def pics_TC_BOOLCFG_3_1(self) -> list[str]:
         return [
-            "BOOLCFG.S",
+            "BOOLCFG.S.F03",
         ]
 
-    @property
-    def default_endpoint(self) -> int:
-        return 1
-
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.BooleanStateConfiguration, Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel))
     async def test_TC_BOOLCFG_3_1(self):
 
         endpoint = self.get_endpoint()
-
-        self.step(1)
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
-        self.step("2a")
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        is_sens_level_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel
+        # Commissioning
+        self.step(1)
 
-        self.step("2b")
-        if not is_sens_level_feature_supported:
-            log.info("SENS feature not supported, skipping test case")
-
-            # Skipping all remainig steps
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                log.info("Test step skipped")
-
-            return
-        log.info("Test step skipped")
-
-        self.step("2c")
+        # Read AttributeList attribute
+        self.step(2)
         attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
+        # Read SupportedSensitivityLevels attribute
         self.step(3)
         numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
+        asserts.assert_greater_equal(numberOfSupportedLevels, 2,
+                                     "SupportedSensitivityLevels must be greater or equal than 2 when SENSLVL feature is supported")
 
+        # Read DefaultSensitivityLevel attribute"
         self.step(4)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
             default_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultSensitivityLevel)
         else:
-            log.info("Test step skipped")
+            log.info("DefaultSensitivityLevel not present in AttributeList, step 4 skipped")
+            self.mark_current_step_skipped()
 
+        # Read CurrentSensitivityLevel attribute
         self.step(5)
         current_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
 
+        # TH loops through the number of supported sensitivity levels
         self.step(6)
         for sens_level in range(numberOfSupportedLevels):
             log.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(sens_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
+        # Write CurrentSensitivityLevel attribute to non-default value
         self.step(7)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
             selected_non_default_level = choice([i for i in range(numberOfSupportedLevels) if i not in [default_level]])
@@ -131,22 +122,26 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
+        # Write CurrentSensitivityLevel attribute to default value
         self.step(8)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
             log.info(f"Write default sensitivity level ({default_level}) to CurrentSensitivityLevel)")
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
+        # Write CurrentSensitivityLevel attribute to max number of level (one above SupportedSensitivityLevels)
         self.step(9)
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(numberOfSupportedLevels))])
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
 
+        # Write CurrentSensitivityLevel attribute to 255
         self.step(10)
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(255))])
         asserts.assert_equal(result[0].Status, Status.ConstraintError,
                              "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
 
+        # Write CurrentSensitivityLevel attribute to the initial current value
         self.step(11)
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(current_level))])
         asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
