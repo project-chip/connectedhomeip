@@ -19,7 +19,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
@@ -107,23 +106,23 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
     TestResourceMonitoringCluster() :
         activatedCarbonFilterMonitoring(kEndpointId, ActivatedCarbonFilterMonitoring::Id, kResourceMonitoringFeatureMap,
-                                        OptionalAttributeSet(), ResourceMonitoring::DegradationDirectionEnum::kDown, true)
+                                        ResourceMonitoringCluster::OptionalAttributeSet()
+                                            .Set<Attributes::InPlaceIndicator::Id>()
+                                            .Set<Attributes::LastChangedTime::Id>(),
+                                        ResourceMonitoring::DegradationDirectionEnum::kDown, true)
     {}
 };
 } // namespace
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(activatedCarbonFilterMonitoring.Attributes(ConcreteClusterPath(kRootEndpointId, ActivatedCarbonFilterMonitoring::Id),
-                                                         attributes),
-              CHIP_NO_ERROR);
-
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(
         activatedCarbonFilterMonitoring,
         { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,
           ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry,
           ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::kMetadataEntry,
           ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry }));
 }
 
