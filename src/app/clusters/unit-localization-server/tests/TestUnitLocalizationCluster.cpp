@@ -16,13 +16,10 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/unit-localization-server/unit-localization-server.h>
-
-#include <app/ConcreteClusterPath.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -44,8 +41,6 @@ struct TestUnitLocalizationCluster : public ::testing::Test
 
 TEST_F(TestUnitLocalizationCluster, AttributeTest)
 {
-    ConcreteClusterPath clusterPath(kRootEndpointId, UnitLocalization::Id);
-
     UnitLocalizationCluster cluster{};
 
     // Test attributes listing with no features enabled

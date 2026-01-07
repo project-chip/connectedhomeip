@@ -54,7 +54,7 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpoi
 
 void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId);
 
-void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId);
+void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
 

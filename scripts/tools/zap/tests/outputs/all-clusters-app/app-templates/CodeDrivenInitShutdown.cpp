@@ -144,7 +144,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::UnitLocalization::Id:
-        MatterUnitLocalizationClusterShutdownCallback(endpoint);
+        MatterUnitLocalizationClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterShutdownCallback(endpoint, shutdownType);

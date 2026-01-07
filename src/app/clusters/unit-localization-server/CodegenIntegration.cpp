@@ -18,6 +18,7 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
+#include <app/util/af-types.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters::UnitLocalization;
@@ -28,13 +29,18 @@ UnitLocalizationServer & UnitLocalizationServer::Instance()
     return mInstance;
 }
 
-void MatterUnitLocalizationPluginServerInitCallback()
+void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 {
     LogErrorOnFailure(UnitLocalizationServer::Instance().Init());
     AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
 }
 
-void MatterUnitLocalizationPluginServerShutdownCallback()
+void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationServer::Instance());
+}
+
+void MatterUnitLocalizationPluginServerInitCallback()
+{
+
 }
