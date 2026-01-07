@@ -113,14 +113,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         else:
             log.info("Provider process not found. Unable to terminate.")
 
-    def terminate_provider(self):
-        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
-            logger.info("Terminating existing OTA Provider")
-            self.current_provider_app_proc.terminate()
-            self.current_provider_app_proc = None
-        else:
-            logger.info("Provider process not found. Unable to terminate.")
-
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
                                     provider_node_id: int,
@@ -338,3 +330,24 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
+
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+
+        Args:
+            controller (ChipDeviceCtrl): The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeId=requestor_node_id
+        )
+        log.info('Cleanup - DefaultOTAProviders cleared')
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
