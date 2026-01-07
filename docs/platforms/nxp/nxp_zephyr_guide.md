@@ -52,12 +52,12 @@ Prerequisites:
 -   Follow instruction from [BUILDING.md](../../guides/BUILDING.md) to setup the
     Matter environment
 -   Follow instruction from
-    [Getting Started Guide](https://docs.zephyrproject.org/4.1.0/develop/getting_started/index.html)
+    [Getting Started Guide](https://docs.zephyrproject.org/4.3.0/develop/getting_started/index.html)
     to setup a Zephyr workspace, however, the west init command to use is as
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.1.0
+$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.3.0
 ```
 
 > **Note**: While some of NXP platforms are supported in Zephyr upstream, we
@@ -65,7 +65,7 @@ $ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp
 > not upstream yet. While you can decide to use nxp-zsdk top of tree, we
 > recommend using a proper release tag delivered by NXP. This will ensure a
 > certain level of quality of the nxp-zsdk in use. Currently, we highly
-> recommend using the `nxp-v4.1.0` tag, based on Zephyr 4.1 release. Reach to
+> recommend using the `nxp-v4.3.0` tag, based on Zephyr 4.3 release. Reach to
 > your NXP contact for more details.
 
 Steps to build the example:

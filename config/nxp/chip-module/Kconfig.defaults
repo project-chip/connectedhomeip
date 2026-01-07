@@ -412,9 +412,6 @@ endif
 config MBEDTLS
 	default y
 
-config MBEDTLS_CFG_FILE
-	default "config-tls-generic.h"
-
 config MBEDTLS_PSA_KEY_SLOT_COUNT
     default 64
 
@@ -445,7 +442,7 @@ config MBEDTLS_CIPHER_AES_ENABLED
 config MBEDTLS_CIPHER_CCM_ENABLED
 	default y
 
-config MBEDTLS_CTR_DRBG_ENABLED
+config MBEDTLS_CTR_DRBG_C
 	default y
 
 config MBEDTLS_CIPHER_MODE_CBC_ENABLED
@@ -530,5 +527,10 @@ config FLASH_SHELL
 	default n
 
 endif # SHELL
+
+choice POSIX_AEP_CHOICE
+	prompt "POSIX Subprofile"
+	default POSIX_AEP_CHOICE_NONE
+endchoice
 
 endif
