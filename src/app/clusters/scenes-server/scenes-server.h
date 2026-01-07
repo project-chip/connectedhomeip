@@ -15,5 +15,6 @@
  *    limitations under the License.
  */
 #pragma once
-
+// Note: This file exists for backwards compatibility only.
+// New code should use ScenesManagementCluster.h directly.
 #include <app/clusters/scenes-server/CodegenIntegration.h>
