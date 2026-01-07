@@ -179,7 +179,6 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 # the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
                 activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
                 log.info(f"Active Preset Handlers: {activePresetHandle}")
-    
                 possiblePresetHandles = [
                     preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
                 if len(possiblePresetHandles) > 0:
@@ -207,7 +206,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
                     # see #26521
                     code = e.status
                 # Verify that the Time Synchronization command returns SUCCESS otherwise fail the test.
-                asserts.assert_equal(code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions feature needs UTCTime.")
+                asserts.assert_equal(
+                    code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions feature needs UTCTime.")
         else:
             log.info("Thermostat has UTC time set.")
             self.skip_step("4a")
@@ -363,11 +363,11 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # the ThermostatSuggestionNotFollowingReason is set to OngoingHold and the ActivePresetHandle attribute is not updated to the PresetHandle field of the CurrentThermostatSuggestion attribute.
             # TODO: For now the ReEvaluateCurrentSuggestion API is in the delegate and we can't check whether a hold is set on the Thermostat. However as part of #39949, this will be addressed and the test
             # can be uncommented.
-            #asserts.assert_equal(thermostatSuggestionNotFollowingReason,
-                                 #cluster.Bitmaps.ThermostatSuggestionNotFollowingReasonBitmap.kOngoingHold,
-                                 #"ThermostatSuggestionNotFollowingReason attribute should be equal to OngoingHold.")
-            #asserts.assert_not_equal(activePresetHandle, presetHandle,
-                                     #"ActivePresetHandle attribute should not be equal to the PresetHandle in the CurrentThermostatSuggestion attribute.")
+            # asserts.assert_equal(thermostatSuggestionNotFollowingReason,
+            # cluster.Bitmaps.ThermostatSuggestionNotFollowingReasonBitmap.kOngoingHold,
+            # "ThermostatSuggestionNotFollowingReason attribute should be equal to OngoingHold.")
+            # asserts.assert_not_equal(activePresetHandle, presetHandle,
+            # "ActivePresetHandle attribute should not be equal to the PresetHandle in the CurrentThermostatSuggestion attribute.")
 
         self.step("7b")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
@@ -585,7 +585,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 10 since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
-            currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds()) + int(timedelta(hours=25).total_seconds())
+            currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+                              ).total_seconds()) + int(timedelta(hours=25).total_seconds())
             expirationInMinutes = 30
             # Verify that the AddThermostatSuggestion command returns INVALID_COMMAND.
             addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
