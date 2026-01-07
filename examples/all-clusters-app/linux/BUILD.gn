@@ -49,7 +49,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/push-av-stream-transport-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
