@@ -1026,13 +1026,13 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, is_subprocess: Optional[bool] = False):
+    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, ip_env_var: Optional[str] = None):
         """
         Read an out-of-band command from a Matter app.
         Args:
             app_pipe_out (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441_out or /tmp/chip_rvc_fifo_11111_out). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe-out,  arg --app-pipe-out has his own file exists check.
-            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test needs to read the pipe from a subprocess (i.e. Otaprovider) and LINUX_DUT_IP environment variable is not needed as the pipe is set locally
+            ip_env_var (Optional[str]): is an optional argument. Name of the environment variable containing the DUT IP.
 
         This method uses the following environment variables:
 
@@ -1058,10 +1058,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
 
-        dut_ip = None
-
-        if not is_subprocess:
-            dut_ip = os.getenv('LINUX_DUT_IP')
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
 
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
@@ -1100,14 +1097,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             cmd_list = ["ssh", f"{dut_uname}@{dut_ip}", f"cat {app_pipe_out}"]
             return subprocess.check_output(cmd_list)
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, is_subprocess: Optional[bool] = False):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
-            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test needs to write the pipe from a subprocess (i.e. Otaprovider) and LINUX_DUT_IP environment variable is not needed as the pipe is set locally
+            ip_env_var: Optional[str]: is an optional argument. Name of the environment variable containing the DUT IP.
 
         This method uses the following environment variables:
 
@@ -1137,10 +1134,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise TypeError("The command must be passed as a dictionary value")
 
         command = json.dumps(command_dict)
-        dut_ip = None
 
-        if not is_subprocess:
-            dut_ip = os.getenv('LINUX_DUT_IP')
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
 
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
