@@ -179,15 +179,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
  */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetTiltMin(int16_t aTiltMin)
 {
-    if (!HasFeature(Feature::kMechanicalTilt))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    if ((aTiltMin < kTiltMinMinValue) || (aTiltMin > kTiltMinMaxValue))
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
+    VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError((aTiltMin >= kTiltMinMinValue) && (aTiltMin <= kTiltMinMaxValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (aTiltMin != mTiltMin)
     {
@@ -200,15 +193,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetTiltMin(int16_t aTiltMin
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetTiltMax(int16_t aTiltMax)
 {
-    if (!HasFeature(Feature::kMechanicalTilt))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    if ((aTiltMax > kTiltMaxMaxValue) || (aTiltMax < kTiltMaxMinValue))
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
+    VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError((aTiltMax <= kTiltMaxMaxValue) && (aTiltMax >= kTiltMaxMinValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (aTiltMax != mTiltMax)
     {
@@ -221,15 +207,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetTiltMax(int16_t aTiltMax
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetPanMin(int16_t aPanMin)
 {
-    if (!HasFeature(Feature::kMechanicalPan))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    if ((aPanMin < kPanMinMinValue) || (aPanMin > kPanMinMaxValue))
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
+    VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError((aPanMin >= kPanMinMinValue) && (aPanMin <= kPanMinMaxValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (aPanMin != mPanMin)
     {
@@ -242,15 +221,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetPanMin(int16_t aPanMin)
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetPanMax(int16_t aPanMax)
 {
-    if (!HasFeature(Feature::kMechanicalPan))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    if ((aPanMax > kPanMaxMaxValue) || (aPanMax < kPanMaxMinValue))
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
+    VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError((aPanMax <= kPanMaxMaxValue) && (aPanMax >= kPanMaxMinValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (aPanMax != mPanMax)
     {
@@ -263,15 +235,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetPanMax(int16_t aPanMax)
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetZoomMax(uint8_t aZoomMax)
 {
-    if (!HasFeature(Feature::kMechanicalZoom))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    if ((aZoomMax > kZoomMaxMaxValue) || (aZoomMax < kZoomMaxMinValue))
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
+    VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError((aZoomMax <= kZoomMaxMaxValue) && (aZoomMax >= kZoomMaxMinValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (aZoomMax != mZoomMax)
     {
@@ -535,79 +500,58 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     //
     if (pan.HasValue())
     {
-        if (!HasFeature(Feature::kMechanicalPan))
-        {
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), Status::InvalidCommand, 
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Pan not supported although pan value provided",
-                         mEndpointId);
-            return Status::InvalidCommand;
-        }
+                         mEndpointId));
+
         int16_t panValue = pan.Value();
-        if ((panValue > mPanMax) || (panValue < mPanMin))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Pan value out of range", mEndpointId);
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError((panValue <= mPanMax) && (panValue >= mPanMin), Status::ConstraintError, 
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Pan value out of range", mEndpointId));
+
         hasAtLeastOneValue = true;
     }
 
     if (tilt.HasValue())
     {
-        if (!HasFeature(Feature::kMechanicalTilt))
-        {
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), Status::InvalidCommand,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Tilt not supported although tilt value provided",
-                         mEndpointId);
-            return Status::InvalidCommand;
-        }
+                         mEndpointId));
+
         int16_t tiltValue = tilt.Value();
-        if ((tiltValue > mTiltMax) || (tiltValue < mTiltMin))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Tilt value out of range", mEndpointId);
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError((tiltValue <= mTiltMax) && (tiltValue >= mTiltMin), Status::ConstraintError, 
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Tilt value out of range", mEndpointId));
+
         hasAtLeastOneValue = true;
     }
 
     if (zoom.HasValue())
     {
-        if (!HasFeature(Feature::kMechanicalZoom))
-        {
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), Status::InvalidCommand,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Zoom not supported although zoom value provided",
-                         mEndpointId);
-            return Status::InvalidCommand;
-        }
+                         mEndpointId));
+
         uint8_t zoomValue = zoom.Value();
 
-        if ((zoomValue > mZoomMax) || (zoomValue < kZoomMinValue))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Zoom value out of range", mEndpointId);
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError((zoomValue <= mZoomMax) && (zoomValue >= kZoomMinValue), Status::ConstraintError,
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Zoom value out of range", mEndpointId));
+
         hasAtLeastOneValue = true;
     }
 
     // Was a value received in the command
-    if (!hasAtLeastOneValue)
-    {
+    VerifyOrReturnError(hasAtLeastOneValue, Status::InvalidCommand, 
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: MPTZSetPosition command contains no actionable fields",
-                     mEndpointId);
-        return Status::InvalidCommand;
-    }
+                     mEndpointId));
 
     // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
     // any of the PTZ values which may not be possible for other reasons
     //
-    if (IsMoving())
-    {
+    VerifyOrReturnError(!IsMoving(), Status::Busy, 
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
-                     mEndpointId);
-        return Status::Busy;
-    }
+                     mEndpointId));
 
-    if (!mDelegate->CanChangeMPTZ())
-    {
-        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ change", mEndpointId);
-        return Status::Busy;
-    }
+    VerifyOrReturnError(mDelegate->CanChangeMPTZ(), Status::Busy,
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ change", mEndpointId));
 
     Status status = mDelegate->MPTZSetPosition(pan, tilt, zoom, this);
 
@@ -647,18 +591,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     //
     if (panDelta.HasValue())
     {
-        if (!HasFeature(Feature::kMechanicalPan))
-        {
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), Status::InvalidCommand,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Pan not supported although panDelta value provided",
-                         mEndpointId);
-            return Status::InvalidCommand;
-        }
+                         mEndpointId));
+
         int16_t panDeltaValue = panDelta.Value();
-        if (panDeltaValue > (mPanMax - mPanMin) || panDeltaValue < -(mPanMax - mPanMin))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: PanDelta value received is out of range.", mEndpointId);
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError((panDeltaValue <= (mPanMax - mPanMin) && panDeltaValue >= -(mPanMax - mPanMin)), Status::ConstraintError,
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: PanDelta value received is out of range.", mEndpointId));
 
         // If we're here, then we'll also have an existing Pan value in MPTZPosition
         // Note that newPan is always between -180 and 180; and the panDeltaValue is constrained to -360 to 360 by the
@@ -681,19 +620,14 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     if (tiltDelta.HasValue())
     {
-        if (!HasFeature(Feature::kMechanicalTilt))
-        {
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), Status::InvalidCommand, 
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Tilt not supported although tiltDelta value provided",
-                         mEndpointId);
-            return Status::InvalidCommand;
-        }
+                         mEndpointId));
+
         int16_t tiltDeltaValue = tiltDelta.Value();
-        if (tiltDeltaValue > (mTiltMax - mTiltMin) || tiltDeltaValue < -(mTiltMax - mTiltMin))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: TiltDelta value received is out of range.", mEndpointId);
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError((tiltDeltaValue <= (mTiltMax - mTiltMin) && tiltDeltaValue >= -(mTiltMax - mTiltMin)), Status::ConstraintError,
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: TiltDelta value received is out of range.", mEndpointId));
 
         // If we're here, then we'll also have an existing Tilt value in MPTZPosition
         // Note that newTilt is always between -180 and 180; and the tiltDeltaValue is constrained to -360 to 360 by the
@@ -716,19 +650,14 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     if (zoomDelta.HasValue())
     {
-        if (!HasFeature(Feature::kMechanicalZoom))
-        {
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), Status::InvalidCommand, 
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Zoom not supported although zoomDelta value provided",
-                         mEndpointId);
-            return Status::InvalidCommand;
-        }
+                         mEndpointId));
+
         int8_t zoomDeltaValue = zoomDelta.Value();
-        if (zoomDeltaValue > (mZoomMax - 1) || zoomDeltaValue < -(mZoomMax - 1))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: ZoomDelta value received is out of range.", mEndpointId);
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError((zoomDeltaValue <= (mZoomMax - 1) && zoomDeltaValue >= -(mZoomMax - 1)), Status::ConstraintError,
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: ZoomDelta value received is out of range.", mEndpointId));
 
         // If we're here, then we'll also have an existing Zoom value in MPTZPosition. The zoom values are constrained such that
         // we won't overflow newZoomValue
@@ -750,29 +679,20 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     }
 
     // Was a value received in the command
-    if (!hasAtLeastOneValue)
-    {
+    VerifyOrReturnError(hasAtLeastOneValue, Status::InvalidCommand,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: MPTZRelativeMove command contains no actionable fields",
-                     mEndpointId);
-        return Status::InvalidCommand;
-    }
+                     mEndpointId));
 
     // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
     // any of the PTZ values which may not be possible for other reasons
     //
-    if (IsMoving())
-    {
+    VerifyOrReturnError(!IsMoving(), Status::Busy,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
-                     mEndpointId);
-        return Status::Busy;
-    }
+                     mEndpointId));
 
-    if (!mDelegate->CanChangeMPTZ())
-    {
+    VerifyOrReturnError(mDelegate->CanChangeMPTZ(), Status::Busy,
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ relative value change",
-                      mEndpointId);
-        return Status::Busy;
-    }
+                      mEndpointId));
 
     Status status = mDelegate->MPTZRelativeMove(newPan, newTilt, newZoom, this);
 
@@ -800,18 +720,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     // Verify the provided presetID is within spec limits
     //
-    if ((preset > mMaxPresets) || (preset < 1))
-    {
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset provided is out of range. Preset: %d", mEndpointId, preset);
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError((preset <= mMaxPresets) && (preset >= 1), Status::ConstraintError,
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset provided is out of range. Preset: %d", mEndpointId, preset));
+
     // Do we have any presets?
     //
-    if (mMptzPresetHelpers.empty())
-    {
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: No stored presets, MoveToPreset not possible", mEndpointId);
-        return Status::NotFound;
-    }
+    VerifyOrReturnError(!mMptzPresetHelpers.empty(), Status::NotFound,
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: No stored presets, MoveToPreset not possible", mEndpointId));
 
     // We have presets, check that the received ID is a valid preset ID
     //
@@ -819,29 +734,20 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
         [preset](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == preset; });
 
-    if (it == mMptzPresetHelpers.end())
-    {
+    VerifyOrReturnError(it != mMptzPresetHelpers.end(), Status::NotFound,
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: No matching presets, MoveToPreset not possible for provided preset: %d",
-                     mEndpointId, preset);
-        return Status::NotFound;
-    }
+                     mEndpointId, preset));
 
     // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
     // any of the PTZ values which may not be possible for other reasons
     //
-    if (IsMoving())
-    {
+    VerifyOrReturnError(!IsMoving(), Status::Busy,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
-                     mEndpointId);
-        return Status::Busy;
-    }
+                     mEndpointId));
 
-    if (!mDelegate->CanChangeMPTZ())
-    {
-        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process move to MPTZ preset", mEndpointId);
-        return Status::Busy;
-    }
+    VerifyOrReturnError(mDelegate->CanChangeMPTZ(), Status::Busy,
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process move to MPTZ preset", mEndpointId));
 
     auto presetValues = it->GetMptzPosition();
 
@@ -878,12 +784,9 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     //
     if (preset.HasValue())
     {
-        if ((preset.Value() > mMaxPresets) || (preset.Value() < 1))
-        {
+        VerifyOrReturnError((preset.Value() <= mMaxPresets) && (preset.Value() >= 1), Status::ConstraintError,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Provided preset ID is out of range. Preset: %d", mEndpointId,
-                         preset.Value());
-            return Status::ConstraintError;
-        }
+                         preset.Value()));
         presetToUse = preset.Value();
     }
 
@@ -904,13 +807,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     {
         // Make sure that the vector will not exceed the max size
         //
-        if (mMptzPresetHelpers.size() == mMaxPresets)
-        {
+        VerifyOrReturnError(mMptzPresetHelpers.size() != mMaxPresets, Status::ResourceExhausted,
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: No more space for additional presets, MPTZSavePreset not possible",
-                         mEndpointId);
-            return Status::ResourceExhausted;
-        }
+                         mEndpointId));
     }
 
     // Call the delegate, make sure that it is ok to save a new preset, given the current
@@ -967,12 +867,9 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     // Verify the provided presetID is within spec limits
     //
-    if ((presetToRemove > mMaxPresets) || (presetToRemove < 1))
-    {
+    VerifyOrReturnError((presetToRemove <= mMaxPresets) && (presetToRemove >= 1), Status::ConstraintError,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset to remove is out of range. Preset: %d", mEndpointId,
-                     presetToRemove);
-        return Status::ConstraintError;
-    }
+                     presetToRemove));
 
     // Is the provided ID known to us?
     //
@@ -981,13 +878,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
                                return mptzph.GetPresetID() == presetToRemove;
                            });
 
-    if (it == mMptzPresetHelpers.end())
-    {
+    VerifyOrReturnError(it != mMptzPresetHelpers.end(), Status::NotFound,
         ChipLogError(Zcl,
                      "CameraAVSettingsUserLevelMgmt[ep=%d]: No matching presets, RemovePreset not possible for provided preset: %d",
-                     mEndpointId, presetToRemove);
-        return Status::NotFound;
-    }
+                     mEndpointId, presetToRemove));
 
     // Call the delegate to ensure that it is ok to remove the preset indicated.
     //
@@ -1016,12 +910,9 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // Is this a video stream ID of which we have already been informed?
     // If not, fail.
     //
-    if (!KnownVideoStreamID(videoStreamID))
-    {
+    VerifyOrReturnError(KnownVideoStreamID(videoStreamID), Status::NotFound,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d", mEndpointId,
-                     videoStreamID);
-        return Status::NotFound;
-    }
+                     videoStreamID));
 
     // Call the delegate
     Status status = mDelegate->DPTZSetViewport(videoStreamID, viewport);
@@ -1050,23 +941,17 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     if (zoomDelta.HasValue())
     {
         int8_t zoomDeltaValue = zoomDelta.Value();
-        if (zoomDeltaValue < -100 || zoomDeltaValue > 100)
-        {
+        VerifyOrReturnError(zoomDeltaValue >= -100 && zoomDeltaValue <= 100, Status::ConstraintError,
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Provided Digital Zoom Delta is out of range. Provided Zoom: %d",
-                         mEndpointId, zoomDeltaValue);
-            return Status::ConstraintError;
-        }
+                         mEndpointId, zoomDeltaValue));
     }
     // Is this a video stream ID of which we have already been informed via DPTZSetViewport. We can't relative move on a
     // viewport that hasn't already been set, hence we fail if the provided id is not found.
     //
-    if (!KnownVideoStreamID(videoStreamID))
-    {
+    VerifyOrReturnError(KnownVideoStreamID(videoStreamID), Status::NotFound,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. Unknown Video Stream ID provided. ID=%d.", mEndpointId,
-                     videoStreamID);
-        return Status::NotFound;
-    }
+                     videoStreamID));
 
     // Create a viewport and call the delegate; on success update our Stream Viewport with that which was set
     Globals::Structs::ViewportStruct::Type viewport;
