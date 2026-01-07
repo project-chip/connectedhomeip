@@ -114,16 +114,12 @@ class TC_TSTAT_2_2(MatterBaseTest):
                                    attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
                                    system_mode: Clusters.Thermostat.Enums.SystemModeEnum,
                                    occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
-                                   endpoint: Optional[int] = None,
-                                   dev_ctrl: ChipDeviceCtrl = None) -> Status:
+                                   endpoint: Optional[int] = None) -> None:
 
         event_data = events_callback.wait_for_event_report(cluster.Events.SetpointChange)
 
         asserts.assert_equal(system_mode, event_data.systemMode)
         asserts.assert_equal(occupancy, event_data.occupancy)
-
-        if dev_ctrl is None:
-            dev_ctrl = self.default_controller
 
         setpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
         asserts.assert_equal(setpoint, event_data.currentSetpoint)
@@ -275,7 +271,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             asserts.assert_equal(val, MinCoolSetpointLimitValue + ((MaxCoolSetpointLimitValue - MinCoolSetpointLimitValue) // 2))
 
             if hasEventsFeature:
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint, dev_ctrl=self.default_controller)
+                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         self.step("2b")
 
@@ -295,7 +291,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(MaxCoolSetpointLimitValue), endpoint_id=endpoint)
 
             if hasEventsFeature:
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint, dev_ctrl=self.default_controller)
+                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
             if self.pics_guard(hasAutoModeFeature):
                 # Test Harness Writes If TSTAT.S.F05(AUTO) LowerLimit = Max(MinCoolSetpointLimit, (OccupiedHeatingSetpoint + MinSetpointDeadBand)) to OccupiedCoolingSetpoint attribute when Auto is enabled
@@ -307,7 +303,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         self.step("2d")
         if self.pics_guard(hasCoolingFeature) and await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
-            await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint, dev_ctrl=self.default_controller)
+            await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         self.step("3a")
 
