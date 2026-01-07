@@ -49,6 +49,17 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
+#include <ota-provider-common/OTAProviderExample.h>
+
+namespace {
+    OTAProviderExample gOtaProvider;
+}
+    
+OTAProviderExample & GetOtaProviderExample()
+{
+    return gOtaProvider;
+}
+
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kOtaHeaderMaxSize   = 1024;

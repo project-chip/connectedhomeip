@@ -25,13 +25,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-extern OTAProviderExample gOtaProvider;
-
-OTAProviderExample & GetOtaProviderExample()
-{
-    return gOtaProvider;
-}
-
 OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate)
 {
     Json::Reader reader;
