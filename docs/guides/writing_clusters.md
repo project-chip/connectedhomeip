@@ -363,9 +363,6 @@ implementation.
 6. **Update ZAP Configuration:** To prevent the Ember framework from allocating
    memory for your cluster's attributes (which are now managed by your
    `ClusterLogic`), you must:
-    - In `src/app/common/templates/config-data.yaml`, consider adding your
-      cluster to `CommandHandlerInterfaceOnlyClusters` if it does not need Ember
-      command dispatch.
     - In `src/app/zap-templates/zcl/zcl.json` and
       `zcl-with-test-extensions.json`, add all non-list attributes of your
       cluster to `attributeAccessInterfaceAttributes`. This marks them as
