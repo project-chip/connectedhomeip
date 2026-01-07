@@ -21,7 +21,7 @@
 
 #include <CommissionableInit.h>
 
-#include "../../providers/AllClustersExampleDeviceInfoProviderImpl.h" // nogncheck
+#include "../../providers/AllClustersExampleDeviceInfoProviderImpl.h"
 
 using namespace chip;
 using namespace chip::DeviceLayer;

@@ -197,6 +197,7 @@ if (enable_fuzz_test_targets) {
     public_deps = [
       ":chip-all-clusters-common",
       "${chip_root}/examples/platform/linux:app-main",
+      "${chip_root}/examples/providers:all_clusters_device_info_provider",
     ]
   }
 }
