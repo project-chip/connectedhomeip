@@ -6541,6 +6541,22 @@ PICS:
           "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
       id: TSTAT.S.A0052
 
+    - label:
+          "Does the device implement the MaxThermostatSuggestions attribute?"
+      id: TSTAT.S.A0053
+
+    - label:
+          "Does the device implement the ThermostatSuggestions attribute?"
+      id: TSTAT.S.A0054
+
+    - label:
+          "Does the device implement the CurrentThermostatSuggestion attribute?"
+      id: TSTAT.S.A0055
+
+    - label:
+          "Does the device implement the ThermostatSuggestionNotFollowingReason attribute?"
+      id: TSTAT.S.A0056
+
     #
     # server / commandsReceived
     #
