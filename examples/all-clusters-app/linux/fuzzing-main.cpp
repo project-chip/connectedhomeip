@@ -21,14 +21,17 @@
 
 #include <CommissionableInit.h>
 
+#include "../../providers/AllClustersExampleDeviceInfoProviderImpl.h" // nogncheck
+
 using namespace chip;
 using namespace chip::DeviceLayer;
 
 namespace {
 
 LinuxCommissionableDataProvider gCommissionableDataProvider;
+chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
-}
+} // namespace
 
 void CleanShutdown()
 {
@@ -53,6 +56,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
         VerifyOrDie(chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider,
                                                                    LinuxDeviceOptions::GetInstance()) == CHIP_NO_ERROR);
         SetCommissionableDataProvider(&gCommissionableDataProvider);
+
+        DeviceLayer::SetDeviceInfoProvider(&gAllClustersExampleDeviceInfoProvider);
 
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
         static chip::CommonCaseDeviceServerInitParams initParams;

@@ -136,6 +136,7 @@ if (is_libfuzzer) {
     deps = [
       ":chip-all-clusters-common",
       "${chip_root}/examples/platform/linux:app-main",
+      "${chip_root}/examples/providers:all_clusters_device_info_provider",
     ]
 
     cflags = [ "-Wconversion" ]
