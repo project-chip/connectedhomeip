@@ -48,7 +48,7 @@ from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main 
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
