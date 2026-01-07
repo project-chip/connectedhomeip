@@ -201,8 +201,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
             events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Thermostat)
             await events_callback.start(self.default_controller,
-                                    self.dut_node_id,
-                                   endpoint=endpoint)
+                                        self.dut_node_id,
+                                        endpoint=endpoint)
 
         ControlSequenceOfOperation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
 
