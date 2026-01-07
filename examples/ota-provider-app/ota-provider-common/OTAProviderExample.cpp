@@ -54,7 +54,7 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 namespace {
     OTAProviderExample gOtaProvider;
 }
-    
+
 OTAProviderExample & GetOtaProviderExample()
 {
     return gOtaProvider;
