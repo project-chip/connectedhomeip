@@ -367,7 +367,7 @@ using chip::Shell::shell_command_t;
 Engine sShellBridgeSubCommands;
 
 // Find device index by endpoint ID
-static CHIP_ERROR FindDeviceByEndpoint(EndpointId endpointId, uint16_t &index)
+static CHIP_ERROR FindDeviceByEndpoint(EndpointId endpointId, uint16_t & index)
 {
     for (size_t i = 0; i < kMaxBridgedDevices; i++)
     {
@@ -456,7 +456,7 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
     {
         if (gDevices[i] == nullptr)
         {
-            gDevices[i]      = newDevice;
+            gDevices[i]             = newDevice;
             gBridgedDataVersions[i] = newDataVersions;
             gBridgedDeviceCount++;
             slotFound = true;
@@ -505,13 +505,13 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
     }
 
     const char * name = gDevices[index]->GetName();
-    err = RemoveDeviceEndpoint(gDevices[index]);
+    err               = RemoveDeviceEndpoint(gDevices[index]);
     if (err == CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "Removed '%s' from endpoint %ld", name, endpointId);
         delete gDevices[index];
         delete[] gBridgedDataVersions[index];
-        gDevices[index]      = nullptr;
+        gDevices[index]             = nullptr;
         gBridgedDataVersions[index] = nullptr;
         gBridgedDeviceCount--;
     }
@@ -615,7 +615,7 @@ static CHIP_ERROR BridgeRemoveAllHandler(int argc, char ** argv)
                 ESP_LOGI(TAG, "  Removed '%s'", name);
                 delete gDevices[i];
                 delete[] gBridgedDataVersions[i];
-                gDevices[i]      = nullptr;
+                gDevices[i]             = nullptr;
                 gBridgedDataVersions[i] = nullptr;
                 removedCount++;
             }
