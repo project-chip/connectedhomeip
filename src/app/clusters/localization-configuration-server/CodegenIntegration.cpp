@@ -54,6 +54,7 @@ public:
             ChipLogError(AppServer, "Failed to get active locale on endpoint %u: 0x%02x", endpointId, to_underlying(status));
         }
 
+        VerifyOrDie(DeviceLayer::GetDeviceInfoProvider() != nullptr);
         gServer.Create(*DeviceLayer::GetDeviceInfoProvider(), activeLocale);
         return gServer.Registration();
     }
