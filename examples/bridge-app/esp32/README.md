@@ -36,7 +36,7 @@ bridged devices:
 | `bridge list`                  | List all bridged devices       |
 | `bridge toggle [endpoint]`     | Toggle device(s) on/off        |
 | `bridge max`                   | Show endpoint limits           |
-| `bridge remove_all`             | Remove all bridged devices     |
+| `bridge remove_all`            | Remove all bridged devices     |
 
 ### Adding Devices
 
