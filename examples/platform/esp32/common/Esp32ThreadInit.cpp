@@ -97,10 +97,11 @@ void ESPOpenThreadInit()
     }
 #elif CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CONFIG_PM_ENABLE
-    esp_pm_config_t pm_config = { .max_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
-                                  .min_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
+    esp_pm_config_t pm_config = {
+        .max_freq_mhz       = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
+        .min_freq_mhz       = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
 #if CONFIG_FREERTOS_USE_TICKLESS_IDLE
-                                  .light_sleep_enable = true
+        .light_sleep_enable = true
 #endif // CONFIG_FREERTOS_USE_TICKLESS_IDLE
     };
     esp_pm_configure(&pm_config);
