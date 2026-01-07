@@ -235,6 +235,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR.AsInteger():
         desc = "Invalid device descriptor";
         break;
+    case CHIP_ERROR_UNSPPORTED_DNSSD_SERVICE_NAME.AsInteger():
+        desc = "The DNSSD service name is not a a supported/recognized type.";
+        break;
     case CHIP_ERROR_INVALID_PASE_PARAMETER.AsInteger():
         desc = "Invalid PASE parameter";
         break;

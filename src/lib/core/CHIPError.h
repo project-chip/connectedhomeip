@@ -957,7 +957,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR                   CHIP_CORE_ERROR(0x33)
 
-// AVAILABLE: 0x34
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_TYPE
+ *
+ *  @brief
+ *    The DNSSD service name is not a a supported/recognized type.
+ *
+ */
+#define CHIP_ERROR_UNSPPORTED_DNSSD_SERVICE_NAME               CHIP_CORE_ERROR(0x34)
+
 // AVAILABLE: 0x35
 // AVAILABLE: 0x36
 // AVAILABLE: 0x37
