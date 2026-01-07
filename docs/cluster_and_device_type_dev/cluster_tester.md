@@ -5,7 +5,8 @@ Matter clusters implementing the `ServerClusterInterface`. It abstracts away the
 complexity of TLV encoding/decoding, path construction, and memory management
 for data views.
 
-**Header Location:** `src/app/server-cluster/testing/ClusterTester.h`
+**Header Location:**
+[`src/app/server-cluster/testing/ClusterTester.h`](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/testing/ClusterTester.h)
 
 ## Why use ClusterTester?
 
@@ -79,8 +80,10 @@ Key Management**), the `ClusterTester` integrates with `FabricTestFixture`.
 
 ### Setup with Fabric Context
 
-When testing fabric-scoped clusters, pass the `FabricTestFixture` to the tester
-and set the active Fabric Index.
+When testing fabric-scoped clusters, you need to manage the `FabricTestFixture`
+within your test class. You do not strictly need to pass the fixture to the
+`ClusterTester` constructor, but you **must** set the active fabric index on the
+tester before performing operations.
 
 ```cpp
 class TestGroupKeyManagementCluster : public ::testing::Test
@@ -89,8 +92,8 @@ class TestGroupKeyManagementCluster : public ::testing::Test
     FabricTestFixture fabricHelper{ &mTestContext.StorageDelegate() };
     GroupKeyManagementCluster mCluster{ fabricHelper.GetFabricTable() };
 
-    // Initialize tester with both cluster and fabric helper
-    ClusterTester tester{ mCluster, &fabricHelper };
+    // Initialize tester with just the cluster
+    ClusterTester tester{ mCluster};
 
     void SetUp() override
     {
@@ -162,58 +165,74 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteCommand)
 
 ---
 
-## API Reference
+## Key Behaviors & Testing Scenarios
 
-### `ReadAttribute`
+Refer to the
+[ClusterTester.h header](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/testing/ClusterTester.h)
+for the full class definition. This section highlights specific internal
+behaviors that simplify testing.
 
-Reads an attribute value from the cluster.
+### Memory Management (Reads)
 
--   **Signature**:
-    `ActionReturnStatus ReadAttribute(AttributeId attr_id, T & out)`
--   **Behavior**:
--   Constructs a read path.
--   Reads and decodes the TLV.
--   **Crucial**: If `T` contains views (e.g., `Span` or `List`), the internal
-    TLV buffer remains allocated within the `ClusterTester` instance. You can
-    safely iterate over the list immediately.
+When using `ReadAttribute`, `ClusterTester` automatically manages the underlying
+TLV data for you.
 
-### `WriteAttribute`
+-   **Views & Lists**: If you read a type that contains views (like `CharSpan`,
+    `ByteSpan`, or `DecodableList`), the tester buffers the TLV data internally.
+-   **Lifetime Safety**: This data remains valid for the lifetime of the
+    `ClusterTester` instance, allowing you to safely iterate over lists or
+    inspect spans without worrying about the buffer being deallocated
+    immediately after the read call.
 
-Writes a value to the cluster.
+### Fabric Scoping (Writes)
 
--   **Signature**:
-    `ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)`
--   **Behavior**:
--   Detects if `T` is fabric-scoped.
--   Uses `EncodeForWrite` if fabric-scoped, or standard `Encode` otherwise.
--   Uses the subject descriptor from the current `SetFabricIndex`.
+`WriteAttribute` abstracts away the complexity of fabric-sensitive writes.
 
-### `Invoke`
+-   **Auto-Encoding**: It uses C++ introspection to detect if a struct is
+    fabric-scoped. If so, it automatically uses `EncodeForWrite`; otherwise, it
+    uses standard `Encode`.
+-   **Subject Descriptor**: It automatically applies the Access Control subject
+    descriptor corresponding to the fabric index set via `SetFabricIndex()`.
 
-Invokes a command.
+### Command Results (Invoke)
 
--   **Signature**:
-    `InvokeResult<ResponseType> Invoke(const RequestType & request)`
--   **Returns**: An `InvokeResult` struct containing:
--   `status`: The `ActionReturnStatus` (success/failure).
--   `response`: An `std::optional<ResponseType>` containing the decoded response
-    struct (if the command returns data).
+The `Invoke` wrapper simplifies the distinction between Status responses and
+Data responses.
 
-### `GetDirtyList` & `GetNextGeneratedEvent`
+-   **Unified Result**: It returns an `InvokeResult` that acts as a single
+    container for both success/failure status and the decoded response payload
+    (if the command returns data).
+-   **Synchronous execution**: The helper is designed for unit tests where
+    command execution is expected to be synchronous.
 
-Accessors for inspecting the `TestServerClusterContext`.
+### Testing Side Effects (Events & Reporting)
 
--   **Usage**: Useful for verifying that a command or write caused a side effect
-    (like marking an attribute dirty for reporting or emitting an event).
+Often a test needs to verify that a command or write caused a side effect, such
+as emitting an event or marking an attribute as "dirty" (ready for reporting).
+
+**Verifying Event Generation:**
 
 ```cpp
-// Check if an attribute was marked dirty
-auto & dirtyList = tester.GetDirtyList();
+// 1. Perform action (e.g. write attribute)
+tester.WriteAttribute(MyAttribute::Id, newValue);
 
-// Check if an event was generated
+// 2. Check the event generator from the underlying context
 auto event = tester.GetNextGeneratedEvent();
-if(event.has_value()) {
+if (event.has_value()) {
    // Decode event data...
 }
+
+```
+
+**Verifying Dirty Attributes:**
+
+```cpp
+// 1. Perform action
+tester.Invoke(myCommand);
+
+// 2. Inspect the dirty list
+auto & dirtyList = tester.GetDirtyList();
+bool markedDirty = std::any_of(dirtyList.begin(), dirtyList.end(),
+    [](const auto & path){ return path.mAttributeId == MyAttribute::Id; });
 
 ```
