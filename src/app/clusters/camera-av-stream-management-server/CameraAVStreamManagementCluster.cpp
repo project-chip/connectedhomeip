@@ -1877,10 +1877,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::VideoStreamAllocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Video Stream", mPath.mEndpointId);
 
-        if (!HasFeature(Feature::kVideo))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::VideoStreamAllocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleVideoStreamAllocate(*aHandler, aRequest.path, commandData);
@@ -1888,12 +1884,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
 
     case Commands::VideoStreamModify::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Modifying Video Stream", mPath.mEndpointId);
-
-        // VideoStreamModify should have either the WMARK or OSD feature supported
-        if (!HasFeature(Feature::kVideo) || (!HasFeature(Feature::kWatermark) && !HasFeature(Feature::kOnScreenDisplay)))
-        {
-            return Status::UnsupportedCommand;
-        }
 
         Commands::VideoStreamModify::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
@@ -1903,10 +1893,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::VideoStreamDeallocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Video Stream", mPath.mEndpointId);
 
-        if (!HasFeature(Feature::kVideo))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::VideoStreamDeallocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleVideoStreamDeallocate(commandData);
@@ -1915,10 +1901,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::AudioStreamAllocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Audio Stream", mPath.mEndpointId);
 
-        if (!HasFeature(Feature::kAudio))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::AudioStreamAllocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleAudioStreamAllocate(*aHandler, aRequest.path, commandData);
@@ -1927,10 +1909,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::AudioStreamDeallocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Audio Stream", mPath.mEndpointId);
 
-        if (!HasFeature(Feature::kAudio))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::AudioStreamDeallocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleAudioStreamDeallocate(commandData);
@@ -1939,10 +1917,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::SnapshotStreamAllocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Snapshot Stream", mPath.mEndpointId);
 
-        if (!HasFeature(Feature::kSnapshot))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::SnapshotStreamAllocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleSnapshotStreamAllocate(*aHandler, aRequest.path, commandData);
@@ -1951,12 +1925,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::SnapshotStreamModify::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Modifying Snapshot Stream", mPath.mEndpointId);
 
-        // SnapshotStreamModify should have either the WMARK or OSD feature supported
-        if (!HasFeature(Feature::kSnapshot) || (!HasFeature(Feature::kWatermark) && !HasFeature(Feature::kOnScreenDisplay)))
-        {
-            return Status::UnsupportedCommand;
-        }
-
         Commands::SnapshotStreamModify::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleSnapshotStreamModify(commandData);
@@ -1964,11 +1932,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
 
     case Commands::SnapshotStreamDeallocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Snapshot Stream", mPath.mEndpointId);
-
-        if (!HasFeature(Feature::kSnapshot))
-        {
-            return Status::UnsupportedCommand;
-        }
 
         Commands::SnapshotStreamDeallocate::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
@@ -1986,10 +1949,6 @@ CameraAVStreamManagementCluster::InvokeCommand(const DataModel::InvokeRequest & 
     case Commands::CaptureSnapshot::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Capture Snapshot image", mPath.mEndpointId);
 
-        if (!HasFeature(Feature::kSnapshot))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::CaptureSnapshot::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleCaptureSnapshot(*aHandler, aRequest.path, commandData);
