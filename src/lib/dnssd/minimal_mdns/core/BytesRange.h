@@ -51,7 +51,7 @@ public:
         return BytesRange(static_cast<const uint8_t *>(buff), static_cast<const uint8_t *>(buff) + len);
     }
 
-    constexpr chip::ByteSpan AsByteSpan() const { return { mStart, Size() }; }
+    chip::ByteSpan AsByteSpan() const { return { mStart, Size() }; }
 
 private:
     const uint8_t * mStart = nullptr;
