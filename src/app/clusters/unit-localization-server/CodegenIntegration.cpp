@@ -40,7 +40,4 @@ void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, 
     AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationServer::Instance());
 }
 
-void MatterUnitLocalizationPluginServerInitCallback()
-{
-
-}
+void MatterUnitLocalizationPluginServerInitCallback() {}
