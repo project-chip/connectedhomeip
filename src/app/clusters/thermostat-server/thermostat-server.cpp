@@ -852,17 +852,16 @@ void ThermostatAttrAccess::GenerateEvents(const ConcreteAttributePath & attribut
                               OccupiedHeatingSetpoint::Get);
         break;
     case OccupiedCoolingSetpoint::Id:
-        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool,
-                              chip::Optional<chip::BitMask<OccupancyBitmap>>(OccupancyBitmap::kOccupied),
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, MakeOptional(OccupancyBitmap::kOccupied),
                               OccupiedCoolingSetpoint::Get);
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, MakeOptional(BitMask<OccupancyBitmap>(0)),
                               UnoccupiedHeatingSetpoint::Get);
 
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, MakeOptional(BitMask<OccupancyBitmap>(0)),
                               UnoccupiedCoolingSetpoint::Get);
 
         break;
