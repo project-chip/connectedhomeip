@@ -1001,8 +1001,8 @@ TEST_F(TestOccupancySensingCluster, TestShutdownCancelsTimer)
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
-    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
-                                         .WithHoldTime(kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+        kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // 1. Set occupancy to true, then false to start the timer.
