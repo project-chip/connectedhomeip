@@ -40,6 +40,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import TestStep
 from matter.testing.runner import default_matter_test_main
 
+
 class TC_BINFO_2_1(BasicInformationAttributesVerificationBase):
     def desc_TC_BINFO_2_1(self) -> str:
         return "[TC-BINFO-2.1] Attributes [DUT-Server]"
