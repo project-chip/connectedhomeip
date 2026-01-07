@@ -20,17 +20,20 @@
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <lib/support/ReadOnlyBuffer.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::Testing;
+
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -104,29 +107,17 @@ struct TestChimeCluster : public ::testing::Test
 
 TEST_F(TestChimeCluster, TestAttributesList)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> listBuilder;
-    EXPECT_EQ(mCluster.Attributes(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedListBuilder;
-    AttributeListBuilder attributeListBuilder(expectedListBuilder);
-    EXPECT_EQ(attributeListBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(EqualAttributeSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+    std::vector<DataModel::AttributeEntry> mandatoryAttributes(Chime::Attributes::kMandatoryMetadata.begin(),
+                                                               Chime::Attributes::kMandatoryMetadata.end());
+    EXPECT_TRUE(IsAttributesListEqualTo(mCluster, mandatoryAttributes));
 }
 
 TEST_F(TestChimeCluster, TestAcceptedCommands)
 {
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> listBuilder;
-    EXPECT_EQ(mCluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
-
-    static constexpr DataModel::AcceptedCommandEntry kExpectedCommands[] = {
-        Chime::Commands::PlayChimeSound::kMetadataEntry,
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedListBuilder;
-    EXPECT_EQ(expectedListBuilder.ReferenceExisting(kExpectedCommands), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(EqualAcceptedCommandSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(mCluster,
+                                              {
+                                                  Chime::Commands::PlayChimeSound::kMetadataEntry,
+                                              }));
 }
 
 TEST_F(TestChimeCluster, TestDelegateErrors)

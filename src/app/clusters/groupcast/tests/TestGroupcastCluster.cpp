@@ -17,12 +17,13 @@
 
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/Groupcast/Enums.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -36,6 +37,8 @@ namespace {
 
 using namespace chip;
 using namespace chip::app::Clusters::Groupcast;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
@@ -52,17 +55,11 @@ TEST_F(TestGroupcastCluster, TestAttributes)
     app::Clusters::GroupcastCluster cluster(BitFlags<Feature>{ Feature::kSender });
     // Attributes
     {
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, app::Clusters::Groupcast::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Attributes::Membership::kMetadataEntry,
-                      Attributes::MaxMembershipCount::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Membership::kMetadataEntry,
+                                                Attributes::MaxMembershipCount::kMetadataEntry,
+                                            }));
     }
 
     // Read attributes for expected values
@@ -82,19 +79,14 @@ TEST_F(TestGroupcastCluster, TestAttributes)
 TEST_F(TestGroupcastCluster, TestAcceptedCommands)
 {
     app::Clusters::GroupcastCluster cluster(BitFlags<Feature>{ Feature::kListener });
-    ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-    ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, app::Clusters::Groupcast::Id }, builder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.AppendElements({
-                  Commands::JoinGroup::kMetadataEntry,
-                  Commands::LeaveGroup::kMetadataEntry,
-                  Commands::UpdateGroupKey::kMetadataEntry,
-                  Commands::ExpireGracePeriod::kMetadataEntry,
-                  Commands::ConfigureAuxiliaryACL::kMetadataEntry,
-              }),
-              CHIP_NO_ERROR);
-    ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  Commands::JoinGroup::kMetadataEntry,
+                                                  Commands::LeaveGroup::kMetadataEntry,
+                                                  Commands::UpdateGroupKey::kMetadataEntry,
+                                                  Commands::ExpireGracePeriod::kMetadataEntry,
+                                                  Commands::ConfigureAuxiliaryACL::kMetadataEntry,
+                                              }));
 }
 
 TEST_F(TestGroupcastCluster, TestJoinGroupCommand)

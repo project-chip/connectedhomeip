@@ -49,6 +49,27 @@ public:
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
     }
 
+    /// Nullable
+    /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
+    ///
+    /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
+    ///
+    /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
+    /// reason for the load failure).
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
+    bool LoadNativeEndianValue(const ConcreteAttributePath & path, DataModel::Nullable<T> & value,
+                               const DataModel::Nullable<T> & valueOnLoadFailure)
+    {
+        typename NumericAttributeTraits<T>::StorageType storageReadValue;
+        typename NumericAttributeTraits<T>::StorageType storageDefaultValue;
+
+        NullableToStorage(valueOnLoadFailure, storageDefaultValue);
+        bool success = InternalRawLoadNativeEndianValue(path, &storageReadValue, &storageDefaultValue, sizeof(T));
+        StorageToNullable(storageReadValue, value);
+
+        return success;
+    }
+
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - validate that the decoded value is different from the current one
@@ -62,6 +83,26 @@ public:
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
+    }
+
+    /// Nullable type handling
+    /// Performs all the steps of:
+    ///   - decode the given raw data
+    ///   - validate that the decoded value is different from the current one
+    ///   - write to storage
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
+                                                                  AttributeValueDecoder & decoder, DataModel::Nullable<T> & value)
+    {
+        DataModel::Nullable<T> decodedValue{};
+        ReturnErrorOnFailure(decoder.Decode(decodedValue));
+        VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        value = decodedValue;
+
+        typename NumericAttributeTraits<T>::StorageType storageValue;
+        NullableToStorage(value, storageValue);
+
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
     }
 
     // Specialization for enums
@@ -79,6 +120,29 @@ public:
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
+    }
+
+    // Nullable
+    // Specialization for enums
+    // - decode the given data
+    // - verifies that it is a valid enum value
+    // - validate that the decoded value is different from the current one
+    // - writes to storage
+    template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
+                                                                  AttributeValueDecoder & decoder, DataModel::Nullable<T> & value)
+    {
+        DataModel::Nullable<T> decodedValue{};
+        ReturnErrorOnFailure(decoder.Decode(decodedValue));
+        VerifyOrReturnError(decodedValue.IsNull() || decodedValue.Value() != T::kUnknownEnumValue,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        value = decodedValue;
+
+        typename NumericAttributeTraits<T>::StorageType storageValue;
+        NullableToStorage(value, storageValue);
+
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
     }
 
     /// Load the given string from concrete storage.

@@ -18,11 +18,11 @@
 #include <app/persistence/AttributePersistence.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
 #include <lib/support/TimerDelegateMock.h>
@@ -32,6 +32,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
 using namespace chip::Testing;
+
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -117,8 +119,11 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeAttribute)
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = 100 };
-    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(100, holdTimeLimitsConfig,
-                                                                                                     mMockTimerDelegate) };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(100, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithFeatures(BitFlags<Feature>(Feature::kPassiveInfrared, Feature::kUltrasonic,
+                                                                         Feature::kPhysicalContact))
+                                         .WithDeprecatedAttributes(true) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.IsHoldTimeEnabled());
     chip::Testing::ClusterTester tester(cluster);
@@ -381,8 +386,11 @@ TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
-    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
-        kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithFeatures(BitFlags<Feature>(Feature::kPassiveInfrared, Feature::kUltrasonic,
+                                                                         Feature::kPhysicalContact))
+                                         .WithDeprecatedAttributes(true) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -485,19 +493,12 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListMandatoryOnly)
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-    const DataModel::AttributeEntry expectedAttributes[] = {
-        Attributes::Occupancy::kMetadataEntry,
-        Attributes::OccupancySensorType::kMetadataEntry,
-        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    EXPECT_EQ(listBuilder.Append(Span(expectedAttributes), {}), CHIP_NO_ERROR);
-    EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::Occupancy::kMetadataEntry,
+                                            Attributes::OccupancySensorType::kMetadataEntry,
+                                            Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestOccupancySensingCluster, TestAttributeListWithOptionalAttributes)
@@ -511,24 +512,14 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithOptionalAttributes)
         kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-    const DataModel::AttributeEntry expectedMandatoryAttributes[] = {
-        Attributes::Occupancy::kMetadataEntry,
-        Attributes::OccupancySensorType::kMetadataEntry,
-        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
-    };
-
-    const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-        { true, Attributes::HoldTime::kMetadataEntry },
-        { true, Attributes::HoldTimeLimits::kMetadataEntry },
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-    EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::Occupancy::kMetadataEntry,
+                                            Attributes::OccupancySensorType::kMetadataEntry,
+                                            Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                            Attributes::HoldTime::kMetadataEntry,
+                                            Attributes::HoldTimeLimits::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptionalAttributes)
@@ -539,12 +530,6 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptional
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
 
-    const DataModel::AttributeEntry expectedMandatoryAttributes[] = {
-        Attributes::Occupancy::kMetadataEntry,
-        Attributes::OccupancySensorType::kMetadataEntry,
-        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
-    };
-
     // Test case 1: Only PassiveInfrared feature enabled
     {
         OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
@@ -552,19 +537,15 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptional
                                              .WithFeatures(Feature::kPassiveInfrared) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-            { true, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                                Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry,
+                                            }));
     }
 
     // Test case 2: Only Ultrasonic feature enabled
@@ -574,19 +555,15 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptional
                                              .WithFeatures(Feature::kUltrasonic) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-            { true, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                                Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                            }));
     }
 
     // Test case 3: Only PhysicalContact feature enabled
@@ -596,19 +573,15 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptional
                                              .WithFeatures(Feature::kPhysicalContact) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-            { true, Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                                Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                            }));
     }
 
     // Test case 4: PassiveInfrared and Ultrasonic features enabled
@@ -618,20 +591,16 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithFeatureSpecificOptional
                                              .WithFeatures(BitFlags<Feature>(Feature::kPassiveInfrared, Feature::kUltrasonic)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-            { true, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-            { true, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                                Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry,
+                                                Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                            }));
     }
 }
 
@@ -983,12 +952,6 @@ TEST_F(TestOccupancySensingCluster, TestDeprecatedAttributesVisibility)
                                                                                    .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kHoldTime };
 
-    const DataModel::AttributeEntry expectedMandatoryAttributes[] = {
-        Attributes::Occupancy::kMetadataEntry,
-        Attributes::OccupancySensorType::kMetadataEntry,
-        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
-    };
-
     // Test Case 1: Deprecated attributes enabled (default)
     {
         OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
@@ -998,21 +961,17 @@ TEST_F(TestOccupancySensingCluster, TestDeprecatedAttributesVisibility)
                                              .WithDeprecatedAttributes(true) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-            { true, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-            { true, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-            { true, Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                                Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry,
+                                                Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                                Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry,
+                                            }));
     }
 
     // Test Case 2: Deprecated attributes disabled
@@ -1024,18 +983,14 @@ TEST_F(TestOccupancySensingCluster, TestDeprecatedAttributesVisibility)
                                              .WithDeprecatedAttributes(false) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
-            { true, Attributes::HoldTime::kMetadataEntry },
-            { true, Attributes::HoldTimeLimits::kMetadataEntry },
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Occupancy::kMetadataEntry,
+                                                Attributes::OccupancySensorType::kMetadataEntry,
+                                                Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+                                                Attributes::HoldTime::kMetadataEntry,
+                                                Attributes::HoldTimeLimits::kMetadataEntry,
+                                            }));
     }
 }
 
