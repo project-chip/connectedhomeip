@@ -61,7 +61,7 @@ code will have parallels in any new adaptation.
 `platform/Linux/StorageBackend.cpp`
 
 -   Provides services to PosixConfig
--   Controls datastore used to store KV pairs (filesystem, database, etc.)
+-   Controls datastore used to store KV pairs (file system, database, etc.)
 -   Controls locations within a particular data store (for example file system
     paths)
 -   Controls the data format (.ini, .json, etc.)

@@ -37,6 +37,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+static ChipLinuxStorage gChipLinuxDataStorage;
 static ChipLinuxStorage gChipLinuxFactoryStorage;
 static ChipLinuxStorage gChipLinuxConfigStorage;
 static ChipLinuxStorage gChipLinuxCountersStorage;
@@ -48,6 +49,9 @@ const char PosixConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
 const char PosixConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char PosixConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 const char PosixConfig::kConfigNamespace_ChipKVS[]      = "chip-kvs";
+
+// Keys stored in the Chip-KVS namespace
+const PosixConfig::Key PosixConfig::kConfigKey_KVS = { kConfigNamespace_ChipKVS, "default" };
 
 // Keys stored in the Chip-factory namespace
 const PosixConfig::Key PosixConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
@@ -86,6 +90,9 @@ const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfi
 
 ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 {
+    if (strcmp(key.Namespace, kConfigNamespace_ChipKVS) == 0)
+        return &gChipLinuxDataStorage;
+
     if (strcmp(key.Namespace, kConfigNamespace_ChipFactory) == 0)
         return &gChipLinuxFactoryStorage;
 
@@ -100,8 +107,10 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    return PersistedStorage::KeyValueStoreMgrImpl().Init(
-        chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation().c_str());
+    std::string fn = chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation();
+    fn += "/";
+    fn += CHIP_DEFAULT_DATA_FILENAME;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(fn.c_str());
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)

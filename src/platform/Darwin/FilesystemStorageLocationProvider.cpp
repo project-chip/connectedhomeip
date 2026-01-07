@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
@@ -15,28 +14,32 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-#include <string>
+#include "FilesystemStorageLocationProvider.h"
+#include "FilesystemStorageLocationProviderImpl.h"
 
 namespace chip {
 namespace DeviceLayer {
 
-class FilesystemStorageLocationProvider
+namespace {
+FilesystemStorageLocationProvider * sInstance = nullptr;
+}
+
+void SetFilesystemStorageLocationProvider(FilesystemStorageLocationProvider * newInstance)
 {
+    if (newInstance != nullptr)
+    {
+        sInstance = newInstance;
+    }
+}
 
-public:
-    FilesystemStorageLocationProvider()          = default;
-    virtual ~FilesystemStorageLocationProvider() = default;
-
-    virtual std::string GetFactoryDataLocation(void) const  = 0;
-    virtual std::string GetConfigDataLocation(void) const   = 0;
-    virtual std::string GetCountersDataLocation(void) const = 0;
-    virtual std::string GetKVSDataLocation(void) const      = 0;
-};
-
-void SetFilesystemStorageLocationProvider(FilesystemStorageLocationProvider * sInstance);
-FilesystemStorageLocationProvider & GetFilesystemStorageLocationProvider(void);
+FilesystemStorageLocationProvider & GetFilesystemStorageLocationProvider(void)
+{
+    if (sInstance != nullptr)
+    {
+        return *sInstance;
+    }
+    return DefaultFilesystemStorageLocationProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip
