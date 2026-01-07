@@ -18,7 +18,6 @@ source_set("camera-av-stream-management-server") {
   sources = [
     "CameraAVStreamManagementCluster.cpp",
     "CameraAVStreamManagementCluster.h",
-    "CodegenIntegration.cpp",
   ]
 
   deps = [

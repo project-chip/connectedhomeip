@@ -103,6 +103,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
 CHIP_ERROR CameraApp::InitializeCameraAVStreamMgmt()
 {
+    VerifyOrReturnError(mAVStreamMgmtServer.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
     // Set the attribute defaults
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
     {
@@ -179,9 +181,7 @@ CHIP_ERROR CameraApp::InitializeCameraAVStreamMgmt()
             mAVStreamMgmtServer.Cluster().SetImageFlipHorizontal(mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal()));
     }
 
-    ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().Init());
-
-    return CHIP_NO_ERROR;
+    return mAVStreamMgmtServer.Cluster().Init();
 }
 
 void CameraApp::CreateAndInitializeCameraAVStreamMgmt()

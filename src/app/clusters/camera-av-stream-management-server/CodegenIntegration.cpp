@@ -18,12 +18,6 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-void MatterCameraAvStreamManagementPluginServerInitCallback()
-{
-    ChipLogProgress(Zcl, "Initializing Camera AVStream Management cluster.");
-}
+void MatterCameraAvStreamManagementPluginServerInitCallback() {}
 
-void MatterCameraAvStreamManagementPluginServerShutdownCallback()
-{
-    ChipLogProgress(Zcl, "Shutdown Camera AVStream Management cluster.");
-}
+void MatterCameraAvStreamManagementPluginServerShutdownCallback() {}
