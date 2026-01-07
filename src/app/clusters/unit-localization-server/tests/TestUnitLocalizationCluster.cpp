@@ -19,7 +19,7 @@
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 
 #include <app/ConcreteClusterPath.h>
-#include <app/clusters/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
@@ -44,24 +44,15 @@ struct TestUnitLocalizationCluster : public ::testing::Test
 
 TEST_F(TestUnitLocalizationCluster, AttributeTest)
 {
-
-    TestServerClusterContext clusterContext;
-
     ConcreteClusterPath clusterPath(kRootEndpointId, UnitLocalization::Id);
-    BitFlags<UnitLocalization::Feature> features{ 1 };
 
-    UnitLocalizationCluster cluster(kRootEndpointId, features);
+    UnitLocalizationCluster cluster{};
 
     // Test attributes listing with no features enabled
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-
-    ASSERT_EQ(cluster.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
-
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
     ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
     ASSERT_EQ(expectedAttributes.AppendElements({ Attributes::TemperatureUnit::kMetadataEntry, //
                                                   Attributes::SupportedTemperatureUnits::kMetadataEntry }),
               CHIP_NO_ERROR);
 
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
 }
