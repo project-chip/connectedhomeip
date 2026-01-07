@@ -20,6 +20,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <lib/support/Span.h>
+
 namespace mdns {
 namespace Minimal {
 
@@ -27,7 +29,7 @@ namespace Minimal {
 class BytesRange
 {
 public:
-    BytesRange() {}
+    BytesRange() = default;
     BytesRange(const uint8_t * start, const uint8_t * end) : mStart(start), mEnd(end)
     {
         // negative ranges are not allowed
@@ -37,17 +39,19 @@ public:
         }
     }
 
-    const uint8_t * Start() const { return mStart; }
-    const uint8_t * End() const { return mEnd; }
+    constexpr const uint8_t * Start() const { return mStart; }
+    constexpr const uint8_t * End() const { return mEnd; }
 
     bool Contains(const uint8_t * p) const { return ((p >= mStart) && (p < mEnd)); }
 
-    size_t Size() const { return static_cast<size_t>(mEnd - mStart); }
+    constexpr size_t Size() const { return static_cast<size_t>(mEnd - mStart); }
 
     inline static BytesRange BufferWithSize(const void * buff, size_t len)
     {
         return BytesRange(static_cast<const uint8_t *>(buff), static_cast<const uint8_t *>(buff) + len);
     }
+
+    constexpr chip::ByteSpan AsByteSpan() const { return {mStart, Size()}; }
 
 private:
     const uint8_t * mStart = nullptr;

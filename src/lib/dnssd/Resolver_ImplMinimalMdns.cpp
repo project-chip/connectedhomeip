@@ -218,6 +218,7 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
             if (err != CHIP_ERROR_UNSPPORTED_DNSSD_SERVICE_NAME)
             {
                 ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogByteSpan(Discovery, data.GetData().AsByteSpan());
             }
         }
 

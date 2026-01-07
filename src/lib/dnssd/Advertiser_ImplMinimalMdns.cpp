@@ -336,7 +336,7 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
         ChipLogError(Discovery, "Failed to parse mDNS query");
 #if CHIP_MINMDNS_HIGH_VERBOSITY
         ChipLogDetail(Discovery, "Invalid packet content:");
-        ChipLogByteSpan(Discovery, chip::ByteSpan(data.Start(), data.Size()));
+        ChipLogByteSpan(Discovery, data.AsByteSpan());
 #endif // CHIP_MINMDNS_HIGH_VERBOSITY
     }
     mCurrentSource = nullptr;

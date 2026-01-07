@@ -49,7 +49,7 @@ public:
     // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
     // and that's not allowed in constexpr functions.
 
-    Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
+    constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
     {
         VerifyOrDie(databuf != nullptr || datalen == 0); // not constexpr on some platforms
     }
