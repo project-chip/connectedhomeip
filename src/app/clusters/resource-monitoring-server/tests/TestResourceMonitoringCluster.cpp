@@ -19,7 +19,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
@@ -117,11 +116,6 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(activatedCarbonFilterMonitoring.Attributes(ConcreteClusterPath(kRootEndpointId, ActivatedCarbonFilterMonitoring::Id),
-                                                         attributes),
-              CHIP_NO_ERROR);
-
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(
         activatedCarbonFilterMonitoring,
         { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,
