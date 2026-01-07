@@ -105,7 +105,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             TestStep("2b", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",
                      "Verify that the read returned a list of presets with count >=2."),
             TestStep("3", "TH checks if the Thermostat does not have a valid UTC time.",
-                     "Verify if the Thermostat does not have a valid UTC time and set the timeNotSet variable to true"),
+                     "Verify if the Thermostat does not have a valid UTC time and set the skipSettingTime variable to true"),
             TestStep("4a", "If skipSettingTime is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.",
                      "Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE."),
             TestStep("4b", "If skipSettingTime is False, TH sends Time Synchronization command to DUT using a time source.",
@@ -120,7 +120,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                      "Verify that the TemperatureSetpointHold is set to SetpointHoldOn and TemperatureSetpointHoldDuration is set to 0. Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a distinct value in the UniqueID field. Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse. Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command, the ThermostatSuggestionNotFollowingReason is set to OngoingHold and the ActivePresetHandle attribute is not updated to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
             TestStep("7b", "TH sets TemperatureSetpointHold to SetpointHoldOff after 2 seconds. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.",
                      "Verify that the TemperatureSetpointHold is set to SetpointHoldOff. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is updated to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
-            TestStep("7c", "TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute to clean up the test",
+            TestStep("7c", "TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute to clean up the test.",
                      "Verify that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute."),
             TestStep("8a", "TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.",
                      "Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a value in the UniqueID field. Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse. Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
@@ -209,7 +209,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                     # see #26521
                     code = e.status
                 # Verify that the Time Synchronization command returns SUCCESS otherwise fail the test.
-                asserts.assert_equal(code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions fetaure needs UTCTime.")
+                asserts.assert_equal(code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions feature needs UTCTime.")
         else:
             log.info("Thermostat has UTC time set.")
             self.skip_step("4a")
@@ -471,7 +471,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
                                                                  uniqueID=currentThermostatSuggestion.uniqueID,
                                                                  expected_status=Status.Success)
-            # Verify that that RemoveThermostatSuggestion command returns SUCCESS, the entry with the relevant UniqueID is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null.
+            # Verify that the RemoveThermostatSuggestion command returns SUCCESS and the entry with the relevant UniqueID is removed from the ThermostatSuggestions attribute.
             thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
             asserts.assert_equal(len(thermostatSuggestions), 0,
                                  "ThermostatSuggestions should not have any entries after the relevant entry was removed by UniqueID.")
