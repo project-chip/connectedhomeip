@@ -19,6 +19,7 @@
 #include "AppMain.h"
 #include "AppOptions.h"
 #include "binding-handler.h"
+#include "tls-client-management-instance.h"
 
 // Network commissioning
 namespace {
@@ -30,6 +31,10 @@ int main(int argc, char * argv[])
     VerifyOrDie(
         ChipLinuxAppInit(argc, argv, AppOptions::GetOptions(), chip::MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
     VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
+
+    // Initialize TLS Client Management delegate before server starts
+    // This must be called before ChipLinuxAppMainLoop() which initializes the server
+    chip::app::Clusters::InitializeTlsClientManagement();
 
     ChipLinuxAppMainLoop();
 
