@@ -218,7 +218,7 @@ attribute to allow applications to interact with cluster state.
         whenever practical. This avoids lifetime and ownership concerns.
 
     -   **Avoid returning pointers or references:** Returning pointers or
-        references to internal cluster data creates lifetime risks—if the
+        references to internal cluster data create lifetime risks—if the
         underlying memory is deallocated while the caller still holds the
         pointer, use-after-free bugs can occur. If you must return a pointer or
         reference, clearly document that the returned value is only valid for
