@@ -214,6 +214,16 @@ attribute to allow applications to interact with cluster state.
     `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`). Applications need
     these to read the current cluster state.
 
+    -   **Return by value (preferred):** Getters should return copies of data
+        whenever practical. This avoids lifetime and ownership concerns.
+
+    -   **Avoid returning pointers or references:** Returning pointers or
+        references to internal cluster data creates lifetime risks—if the
+        underlying memory is deallocated while the caller still holds the
+        pointer, use-after-free bugs can occur. If you must return a pointer or
+        reference, clearly document that the returned value is only valid for
+        immediate use and must not be stored.
+
 -   **Setter Methods:** Provide methods to modify all non-fixed (mutable)
     attributes in spec-compliant ways. For simple attributes, this may be a
     straightforward setter (e.g., `SetCurrentSensitivityLevel()`). However, spec
