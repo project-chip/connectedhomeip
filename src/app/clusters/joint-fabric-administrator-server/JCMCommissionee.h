@@ -57,7 +57,7 @@ public:
         mInfo.adminEndpointId = endpointId;
         mAccessingFabricIndex = mCommandHandle.Get()->GetAccessingFabricIndex();
         // Extract the session from the exchange before going async.
-        // GetExchangeContext() must not be be called once we cross the async boundary,
+        // GetExchangeContext() must not be called once we cross the async boundary,
         // since the exchange is not guaranteed to remain valid.
         Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
         VerifyOrDie(exchangeContext != nullptr);
