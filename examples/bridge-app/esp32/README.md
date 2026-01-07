@@ -29,14 +29,14 @@ On/Off Light to Matter controllers.
 After flashing and commissioning the bridge, use these shell commands to manage
 bridged devices:
 
-| Command | Description |
-|---------|-------------|
+| Command                        | Description                    |
+| ------------------------------ | ------------------------------ |
 | `bridge add [name] [location]` | Add a new bridged light device |
-| `bridge remove <endpoint>` | Remove a device by endpoint ID |
-| `bridge list` | List all bridged devices |
-| `bridge toggle [endpoint]` | Toggle device(s) on/off |
-| `bridge max` | Show endpoint limits |
-| `bridge removeall` | Remove all bridged devices |
+| `bridge remove <endpoint>`     | Remove a device by endpoint ID |
+| `bridge list`                  | List all bridged devices       |
+| `bridge toggle [endpoint]`     | Toggle device(s) on/off        |
+| `bridge max`                   | Show endpoint limits           |
+| `bridge removeall`             | Remove all bridged devices     |
 
 ### Adding Devices
 
@@ -67,6 +67,7 @@ bridge list
 ```
 
 Output example:
+
 ```
 Bridged devices (2/16):
   "Kitchen Light" @ Kitchen (endpoint 3, ON)
