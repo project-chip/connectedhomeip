@@ -52,7 +52,7 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 #include <ota-provider-common/OTAProviderExample.h>
 
 namespace {
-    OTAProviderExample gOtaProvider;
+OTAProviderExample gOtaProvider;
 }
 
 OTAProviderExample & GetOtaProviderExample()
