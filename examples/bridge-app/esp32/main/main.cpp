@@ -451,6 +451,7 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
     }
 
     // Find first empty slot in our tracking array
+    bool slotFound = false;
     for (size_t i = 0; i < kMaxBridgedDevices; i++)
     {
         if (gBridgedDevices[i] == nullptr)
@@ -458,8 +459,19 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
             gBridgedDevices[i]      = newDevice;
             gBridgedDataVersions[i] = newDataVersions;
             gBridgedDeviceCount++;
+            slotFound = true;
             break;
         }
+    }
+
+    if (!slotFound)
+    {
+        // This shouldn't happen if gBridgedDeviceCount is accurate, but handle it gracefully
+        ESP_LOGE(TAG, "Internal error: no slot found despite count check. Cleaning up.");
+        RemoveDeviceEndpoint(newDevice);
+        delete newDevice;
+        delete[] newDataVersions;
+        return CHIP_ERROR_INTERNAL;
     }
 
     ESP_LOGI(TAG, "Added '%s' @ %s (endpoint %d) [%zu/%zu]", name, location, newDevice->GetEndpointId(), gBridgedDeviceCount,
@@ -478,9 +490,9 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
 
     char * end;
     long endpointId = strtol(argv[0], &end, 10);
-    if (end == argv[0] || *end != '\0' || endpointId < 0)
+    if (end == argv[0] || *end != '\0' || endpointId < 0 || endpointId > 0xFFFF)
     {
-        ESP_LOGE(TAG, "Invalid endpoint ID: %s", argv[0]);
+        ESP_LOGE(TAG, "Invalid endpoint ID: %s (must be 0-65535)", argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -541,9 +553,9 @@ static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
         // Toggle specific device by endpoint: bridge toggle <endpoint>
         char * end;
         long endpointId = strtol(argv[0], &end, 10);
-        if (end == argv[0] || *end != '\0' || endpointId < 0)
+        if (end == argv[0] || *end != '\0' || endpointId < 0 || endpointId > 0xFFFF)
         {
-            ESP_LOGE(TAG, "Invalid endpoint ID: %s", argv[0]);
+            ESP_LOGE(TAG, "Invalid endpoint ID: %s (must be 0-65535)", argv[0]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -611,7 +623,7 @@ static CHIP_ERROR BridgeRemoveAllHandler(int argc, char ** argv)
             }
         }
     }
-    gBridgedDeviceCount = 0;
+    gBridgedDeviceCount = gBridgedDeviceCount - removedCount;
 
     ESP_LOGI(TAG, "Removed %d devices total", removedCount);
     return CHIP_NO_ERROR;
@@ -667,11 +679,11 @@ static void InitServer(intptr_t context)
     emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
 
     // Bridge starts with no bridged devices - use shell commands to add them:
-    //   bridge add <id> [name] [location]
-    //   bridge remove <id>
+    //   bridge add [name] [location]
+    //   bridge remove <endpoint>
     //   bridge list
     //   bridge max
-    ESP_LOGI(TAG, "Bridge ready. Use 'bridge add <id>' to add devices. Max devices: %zu", kMaxBridgedDevices);
+    ESP_LOGI(TAG, "Bridge ready. Use 'bridge add [name] [location]' to add devices. Max devices: %zu", kMaxBridgedDevices);
 }
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
