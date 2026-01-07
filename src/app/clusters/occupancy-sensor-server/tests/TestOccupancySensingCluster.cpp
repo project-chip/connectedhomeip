@@ -994,4 +994,28 @@ TEST_F(TestOccupancySensingCluster, TestDeprecatedAttributesVisibility)
     }
 }
 
+TEST_F(TestOccupancySensingCluster, TestShutdownCancelsTimer)
+{
+    chip::Testing::TestServerClusterContext context;
+    constexpr uint16_t kHoldTime                                               = 100;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                   .holdTimeMax     = 200,
+                                                                                   .holdTimeDefault = kHoldTime };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+        kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // 1. Set occupancy to true, then false to start the timer.
+    cluster.SetOccupancy(true);
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(cluster.IsOccupied());
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 2. Shutdown the cluster.
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // 3. Verify that the timer is cancelled.
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+}
+
 } // namespace
