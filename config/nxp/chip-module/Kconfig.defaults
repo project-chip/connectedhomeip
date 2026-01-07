@@ -20,6 +20,10 @@
 
 if CHIP
 
+# See config/common/cmake/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "NXP Semiconductors"
+
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
 
