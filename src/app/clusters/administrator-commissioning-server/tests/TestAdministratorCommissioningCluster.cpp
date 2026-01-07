@@ -19,12 +19,20 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AdministratorCommissioning/Metadata.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 namespace {
 
@@ -35,12 +43,57 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 
-// initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestAdministratorCommissioningCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider sTestCommissionableDataProvider;
+    static chip::Credentials::PersistentStorageOpCertStore sTestOpCertStore;
+    static chip::PersistentStorageOperationalKeystore sTestOpKeystore;
+    static chip::TestPersistentStorageDelegate sStorageDelegate;
+    static chip::Testing::EmptyProvider sEmptyProvider;
+
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+
+        SetCommissionableDataProvider(&sTestCommissionableDataProvider);
+
+        ASSERT_EQ(sTestOpCertStore.Init(&sStorageDelegate), CHIP_NO_ERROR);
+        ASSERT_EQ(sTestOpKeystore.Init(&sStorageDelegate), CHIP_NO_ERROR);
+
+        static chip::CommonCaseDeviceServerInitParams serverInitParams;
+        serverInitParams.opCertStore               = &sTestOpCertStore;
+        serverInitParams.operationalKeystore       = &sTestOpKeystore;
+        serverInitParams.persistentStorageDelegate = &sStorageDelegate;
+        static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
+        serverInitParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
+        (void) serverInitParams.InitializeStaticResourcesBeforeServerInit();
+        serverInitParams.dataModelProvider = &sEmptyProvider;
+        ASSERT_EQ(Server::GetInstance().Init(serverInitParams), CHIP_NO_ERROR);
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    }
+    static void TearDownTestSuite()
+    {
+
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+        Server::GetInstance().GetSecureSessionManager().ExpireAllSecureSessions();
+
+        Server::GetInstance().Shutdown();
+
+        sTestOpCertStore.Finish();
+        sTestOpKeystore.Finish();
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+    }
 };
+
+chip::DeviceLayer::TestOnlyCommissionableDataProvider TestAdministratorCommissioningCluster::sTestCommissionableDataProvider;
+chip::Credentials::PersistentStorageOpCertStore TestAdministratorCommissioningCluster::sTestOpCertStore;
+chip::PersistentStorageOperationalKeystore TestAdministratorCommissioningCluster::sTestOpKeystore;
+chip::TestPersistentStorageDelegate TestAdministratorCommissioningCluster::sStorageDelegate;
+chip::Testing::EmptyProvider TestAdministratorCommissioningCluster::sEmptyProvider;
+
+const chip::FabricIndex kTestFabricIndex = chip::Testing::kTestFabricIndex;
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
@@ -135,4 +188,110 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
     }
 }
 
+TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
+{
+    AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+    chip::Testing::ClusterTester tester(cluster);
+
+    {
+        Attributes::FeatureMap::TypeInfo::Type feature = 1;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
+        ASSERT_EQ(feature, 0u);
+    }
+
+    {
+        uint16_t revision = 0;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+        ASSERT_EQ(revision, 1u);
+    }
+
+    {
+        Attributes::WindowStatus::TypeInfo::Type winStatus =
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen;
+        auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+        ASSERT_TRUE(status.IsSuccess());
+        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+    }
+
+    {
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        adminFabric.SetNonNull(1);
+        ASSERT_EQ(tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric), CHIP_NO_ERROR);
+        ASSERT_TRUE(adminFabric.IsNull());
+    }
+
+    {
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        // adminVendor.SetNonNull(1);
+        ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
+        ASSERT_TRUE(adminVendor.IsNull());
+    }
+}
+
+TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
+{
+    AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+    chip::Testing::ClusterTester tester(cluster);
+
+    Attributes::WindowStatus::TypeInfo::DecodableType winStatus =
+        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen;
+    auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+    ASSERT_TRUE(status.IsSuccess());
+    EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+
+    Commands::OpenCommissioningWindow::Type request;
+    request.commissioningTimeout = 900;
+    uint16_t originDiscriminator = 0;
+    EXPECT_EQ(sTestCommissionableDataProvider.GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
+    request.discriminator = static_cast<uint16_t>(originDiscriminator + 1);
+    chip::Crypto::Spake2pVerifier verifier{};
+    request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
+    request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
+    static const uint8_t kSalt[] = {
+        0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20, 0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74
+    };
+    request.salt = chip::ByteSpan(kSalt);
+
+    auto & fabricTable          = Server::GetInstance().GetFabricTable();
+    FabricIndex testFabricIndex = kTestFabricIndex;
+    ASSERT_EQ(fabricTable.AddNewFabricForTest(chip::TestCerts::GetRootACertAsset().mCert, chip::TestCerts::GetIAA1CertAsset().mCert,
+                                              chip::TestCerts::GetNodeA1CertAsset().mCert,
+                                              chip::TestCerts::GetNodeA1CertAsset().mKey, &testFabricIndex),
+              CHIP_NO_ERROR);
+    ASSERT_NE(testFabricIndex, chip::kUndefinedFabricIndex);
+    tester.SetFabricIndex(testFabricIndex);
+
+    auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
+
+    if (chip::Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        ASSERT_TRUE(result.IsSuccess());
+
+        status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+        ASSERT_TRUE(status.IsSuccess());
+        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
+
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminFabric.IsNull());
+
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        adminVendor.SetNonNull(static_cast<chip::VendorId>(1));
+        status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminVendor.IsNull());
+    }
+    else
+    {
+        ASSERT_FALSE(result.IsSuccess());
+        EXPECT_TRUE(result.status.has_value());
+        // On platforms where DNS-SD is disabled, the logic swallows the error and returns kPAKEParameterError
+        auto statusCode = result.status.value().GetStatusCode(); // NOLINT(bugprone-unchecked-optional-access)
+        EXPECT_EQ(statusCode.GetStatus(), chip::Protocols::InteractionModel::Status::Failure);
+        EXPECT_TRUE(statusCode.GetClusterSpecificCode().has_value());
+        EXPECT_EQ(statusCode.GetClusterSpecificCode().value(), // NOLINT(bugprone-unchecked-optional-access)
+                  to_underlying(AdministratorCommissioning::StatusCode::kPAKEParameterError));
+    }
+}
 } // namespace
