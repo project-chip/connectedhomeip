@@ -15,12 +15,21 @@
 name: Build example - NuttX
 
 on:
-  push:
-    branches:
-      - master
-      - 'v*-branch'
-  pull_request:
-  merge_group:
+  # NuttX disabled: it maintains an out-of-source build that cannot be fixed by SDK updates.
+  #
+  # In particular the build is NOT valid:
+  #   https://github.com/apache/nuttx-apps/blob/f000ed733fc749004cbf0922fbf036abedbe91cf/netutils/connectedhomeip/CMakeLists.txt#L175
+  #
+  # adds `src/app/util/mock` as standard includes, which essentially overrides real light example builds.
+  #
+  # Will need re-enabling once NuttX integrations are more stable and SDK CI can be fixed without requiring upstream NuttX changes.
+  #
+  # push:
+  #   branches:
+  #     - master
+  #     - 'v*-branch'
+  # pull_request:
+  # merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -38,7 +47,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-nuttx:174
+      image: ghcr.io/project-chip/chip-build-nuttx:177
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:

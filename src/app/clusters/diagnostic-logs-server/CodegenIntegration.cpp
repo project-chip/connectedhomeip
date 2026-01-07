@@ -19,6 +19,7 @@
 #include "CodegenIntegration.h"
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/Global.h>
@@ -51,9 +52,9 @@ void MatterDiagnosticLogsClusterInitCallback(EndpointId endpoint)
     (void) CodegenDataModelProvider::Instance().Registry().Register(ClusterRegistration());
 }
 
-void MatterDiagnosticLogsClusterShutdownCallback(EndpointId endpointId)
+void MatterDiagnosticLogsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType)
 {
-    // We implement the cluster as a singleton on the root endpoint.
+    // We implement the cluster as a singleton on the root endpoint. Shutdown is always "normal" (no full removal)
     VerifyOrReturn(endpointId == kRootEndpointId);
     TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get());
 }

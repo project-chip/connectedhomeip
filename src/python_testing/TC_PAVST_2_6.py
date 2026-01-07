@@ -46,11 +46,12 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
@@ -260,7 +261,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "DUT responds with SUCCESS status code.")
         # TH verifies that a PushTransportBegin Event was received.
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
         self.step(7)

@@ -7,7 +7,9 @@ AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Right
 AlignOperands:   false
-AlignTrailingComments: true
+AlignTrailingComments:
+  Kind: Always      # Equivalent to true
+  OverEmptyLines: 0 # Align even if there are 2 blank lines between code
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false

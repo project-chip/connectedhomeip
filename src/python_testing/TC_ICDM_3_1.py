@@ -50,9 +50,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 kRootEndpointId = 0
 
@@ -102,7 +104,7 @@ class TC_ICDM_3_1(MatterBaseTest):
         return "[TC-ICDM-3.1] Register/Unregister Clients with DUT as Server"
 
     def steps_TC_ICDM_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the FeatureMap. If the CIP feature is not supported on the cluster, skip all remaining steps"),
             TestStep("2a", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster."),
@@ -122,14 +124,12 @@ class TC_ICDM_3_1(MatterBaseTest):
             TestStep(15, "TH reads from the DUT the RegisteredClients attribute."),
             TestStep(16, "TH sends UnregisterClient command with the CheckInNodeID from Step 6."),
         ]
-        return steps
 
     def pics_TC_ICDM_3_1(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
         ]
-        return pics
 
     #
     # ICDM 3.1 Test Body
@@ -149,7 +149,7 @@ class TC_ICDM_3_1(MatterBaseTest):
             self.step(1)
             featureMap = await self._read_icdm_attribute_expect_success(attributes.FeatureMap)
             if featureMap & features.kCheckInProtocolSupport == 0:
-                logging.info('CheckInProtocolSupport feature (ICDM.S.F00) is not supported, skipping test.')
+                log.info('CheckInProtocolSupport feature (ICDM.S.F00) is not supported, skipping test.')
                 self.mark_all_remaining_steps_skipped("2a")
                 return
 

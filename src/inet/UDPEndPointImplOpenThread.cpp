@@ -103,10 +103,16 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 
     // TODO: add thread-safe reference counting for UDP endpoints
     auto * buf = std::move(payload).UnsafeRelease();
-    CHIP_ERROR err =
-        ep->GetSystemLayer().ScheduleLambda([ep, buf] { ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf)); });
+
+    ep->Ref();
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, buf] {
+        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf));
+        ep->Unref();
+    });
+
     if (err != CHIP_NO_ERROR)
     {
+        ep->Unref();
         // Make sure we properly clean up buf and ep, since our lambda will not
         // run.
         payload = System::PacketBufferHandle::Adopt(buf);
@@ -265,19 +271,6 @@ void UDPEndPointImplOT::CloseImpl()
     if (otUdpIsOpen(mOTInstance, &mSocket))
     {
         otUdpClose(mOTInstance, &mSocket);
-
-        // In case that there is a UDPEndPointImplOT::handleUdpReceive event
-        // pending in the event queue (SystemLayer::ScheduleLambda), we
-        // schedule a Unref call to the end of the queue, to ensure that the
-        // queued pointer to UDPEndPointImplOT is not dangling.
-        Ref();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Unref(); });
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
-            // There is nothing we can do here, accept the chance of racing
-            Unref();
-        }
     }
     UnlockOpenThread();
 }

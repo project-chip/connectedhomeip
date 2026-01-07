@@ -51,7 +51,9 @@ import signal
 from mobly import asserts
 
 from matter import ChipDeviceCtrl
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_DA_1_9(MatterBaseTest):
@@ -99,10 +101,9 @@ class TC_DA_1_9(MatterBaseTest):
         return "[TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]"
 
     def pics_TC_DA_1_9(self) -> list[str]:
-        pics = [
+        return [
             "MCORE.ROLE.COMMISSIONER",
         ]
-        return pics
 
     def steps_TC_DA_1_9(self) -> list[TestStep]:
         return [

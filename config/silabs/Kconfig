@@ -35,39 +35,11 @@ config CHIP_OTA_REQUESTOR
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
 
-config CHIP_OTA_REQUESTOR_BUFFER_SIZE
-	int "OTA Requestor image buffer size"
-	default 1024
-	depends on CHIP_OTA_REQUESTOR
-	help
-	  Configures the size of the buffer used by OTA Requestor when downloading
-	  and writing a new firmware image to flash.
-
-config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-	bool "Auto-reboot when firmware update is applied"
-	default y
-	depends on CHIP_OTA_REQUESTOR
-	imply REBOOT
-	help
-	  Reboots the device automatically after downloading a new firmware update
-	  to swap the old and the new firmware images. The reboot happens only when
-	  a user consents to apply the firmware update.
-
 config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
 	depends on SIGN_IMAGES
 	select DFU_MULTI_IMAGE_PACKAGE_BUILD
-
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
 
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
@@ -213,14 +185,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/silabs/CHIPPlatformConfig.h file.
-
 config CHIP_OPENTHREAD_JOINER_ENABLED
 	bool "Specify whether the Thread Joiner functionality is used when it is enabled"
 	default n
@@ -299,11 +263,8 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	bool "Enable Silicon Labs Wi-Fi support"
-	default y if BOARD_SIWX917_RB4338A
-	default y if BOARD_SIWX917_RB4342A
 	select WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME

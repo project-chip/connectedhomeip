@@ -80,10 +80,9 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     if dry_run:
         log.info("Executing: %s", shlex.join(cmd))
         return ''
-    else:
-        ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
-        log.info(ret)
-        return ret
+    ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
+    log.info(ret)
+    return ret
 
 
 @click.command()
@@ -94,7 +93,7 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     help='Path to the location of the scraper tool')
 @click.option(
     '--spec-root',
-    required=True,
+    required=False,  # Required when --skip-scrape is not set. Checked in main().
     type=str,
     help='Path to the spec root')
 @click.option(
@@ -115,7 +114,13 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     is_flag=True,
     default=False,
 )
-def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape):
+@click.option(
+    '--pre-1-2',
+    help='Flag to set when generating spec for pre 1.2 spec versions',
+    is_flag=True,
+    default=False,
+)
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape, pre_1_2):
     '''
     This script is used to generate the data model XML files found in the SDK
     data_model directory.
@@ -151,7 +156,10 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         if not scraper:
             log.error("Missing --scraper option. It is required when --skip-scrape is not used.")
             return
-        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
+        if not spec_root:
+            log.error('Missing --spec-root option. It is required when --skip-scrape is not used.')
+            return
+        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre_1_2)
         if not dry_run:
             dump_versions(scraper, spec_root, output_dir)
     if not dry_run:
@@ -159,19 +167,11 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         dump_json_ids(output_dir)
         dump_ids_from_data_model_dirs()
         # Update all the files in the python wheels
-        generate_data_model_xmls_gni.generate_gni_file()
+        generate_data_model_xmls_gni.generate_dm_gni_file()
 
 
-def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    log.info("Generating main spec to get file include list - this may take a few minutes")
-    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    log.info("Generating cluster spec to get file include list - this may take a few minutes")
-    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    log.info("Generating device type library to get file include list - this may take a few minutes")
-    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
-    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
-
-    cluster_files = main_out + cluster_out
+def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre_1_2):
+    log.info('Scraping main spec - this may take several seconds')
     cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
     if include_in_progress == 'All':
         cmd.extend(['-a', 'in-progress'])
@@ -179,11 +179,26 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
         for d in CURRENT_IN_PROGRESS_DEFINES:
             cmd.extend(['-a'])
             cmd.extend([d])
-
     if dry_run:
         log.info("Executing: %s", shlex.join(cmd))
         return
     subprocess.run(cmd, check=True)
+
+    # Versions prior to 1.2 do not support file exclusion based on the pdf make
+    if pre_1_2:
+        return
+
+    log.info('Generating main spec to get file include list - this may take a few minutes')
+    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
+    log.info("Generating cluster spec to get file include list - this may take a few minutes")
+    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
+    log.info("Generating device type library to get file include list - this may take a few minutes")
+    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
+    log.info("Generating namespaces to get file include list - this may take a few minutes")
+    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
+
+    cluster_files = main_out + cluster_out
+
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
@@ -479,7 +494,7 @@ def dump_ids_from_data_model_dirs():
             hashes += f'{"-" * pics_code_len}|'
 
         version_len: dict[str, int] = {}
-        for dir in supported.keys():
+        for dir in supported:
             tag_path = os.path.join(paths.get_data_model_path(), dir, 'spec_tag')
             try:
                 with open(tag_path, "r") as tag_file:
@@ -500,7 +515,7 @@ def dump_ids_from_data_model_dirs():
             if pics_codes is not None:
                 line += f'{pics_codes[id]:<{pics_code_len}}|'
 
-            for dir in supported.keys():
+            for dir in supported:
                 try:
                     line += f'{supported[dir][id]:<{version_len[dir]}}|'
                 except KeyError:

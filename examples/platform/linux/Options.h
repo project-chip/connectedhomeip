@@ -25,6 +25,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -79,6 +80,7 @@ struct LinuxDeviceOptions
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     const char * app_pipe               = "";
+    const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     bool traceStreamDecodeEnabled = false;
@@ -108,6 +110,7 @@ struct LinuxDeviceOptions
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
+    std::optional<chip::System::Clock::Seconds32> shortIdleModeDurationS;
 #endif
     chip::Optional<std::string> vendorName;
     chip::Optional<std::string> productName;

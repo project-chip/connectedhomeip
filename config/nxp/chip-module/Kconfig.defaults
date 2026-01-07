@@ -20,8 +20,35 @@
 
 if CHIP
 
+# See config/common/cmake/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "NXP Semiconductors"
+
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
+
+config CHIP_ENABLE_WIFI_STATION
+    default y if CHIP_WIFI
+
+config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
+	default n
+
+config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
+	default n
+
+config CHIP_TASK_PRIORITY
+	default 5
+
+config MAX_EVENT_QUEUE_SIZE
+	default 64
+
+config CHIP_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+	default 800 if NET_L2_OPENTHREAD
+	default 2000
+
+config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
+	default 800 if NET_L2_OPENTHREAD
+	default 2000
 
 if CHIP_FACTORY_DATA
 
@@ -226,6 +253,13 @@ config HCI_NXP_ENABLE_AUTO_SLEEP
 config CHIP_OTA_REQUESTOR
 	default n
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config CHIP_DEVICE_SOFTWARE_VERSION
 	default 1
 
@@ -378,9 +412,6 @@ endif
 config MBEDTLS
 	default y
 
-config MBEDTLS_CFG_FILE
-	default "config-tls-generic.h"
-
 config MBEDTLS_PSA_KEY_SLOT_COUNT
     default 64
 
@@ -411,7 +442,7 @@ config MBEDTLS_CIPHER_AES_ENABLED
 config MBEDTLS_CIPHER_CCM_ENABLED
 	default y
 
-config MBEDTLS_CTR_DRBG_ENABLED
+config MBEDTLS_CTR_DRBG_C
 	default y
 
 config MBEDTLS_CIPHER_MODE_CBC_ENABLED
@@ -496,5 +527,10 @@ config FLASH_SHELL
 	default n
 
 endif # SHELL
+
+choice POSIX_AEP_CHOICE
+	prompt "POSIX Subprofile"
+	default POSIX_AEP_CHOICE_NONE
+endchoice
 
 endif

@@ -39,7 +39,9 @@
 from modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 cluster_lwm_mode = Clusters.LaundryWasherMode
 
@@ -55,18 +57,16 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         return "[TC-LWM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_LWM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute.")
         ]
-        return steps
 
     def pics_TC_LWM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "LWM.S"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

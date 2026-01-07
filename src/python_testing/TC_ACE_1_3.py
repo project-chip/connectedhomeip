@@ -40,7 +40,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 def acl_subject(cat: int) -> int:
@@ -70,7 +74,7 @@ class TC_ACE_1_3(MatterBaseTest):
         return "[TC-ACE-1.3] Subjects"
 
     def steps_TC_ACE_1_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH0 writes ACL all view on PIXIT.ACE.TESTENDPOINT"),
             TestStep(3, "TH1 reads EP0 descriptor - expect SUCCESS"),
@@ -130,7 +134,6 @@ class TC_ACE_1_3(MatterBaseTest):
             TestStep(57, "TH3 reads EP0 descriptor - expect UNSUPPORTED_ACCESS"),
             TestStep(58, "TH0 writes ACL back to default")
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACE_1_3(self):
@@ -143,7 +146,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat2v1 = cat2_id | 0x0001
         cat2v2 = cat2_id | 0x0002
         cat2v3 = cat2_id | 0x0003
-        logging.info('cat1v1 0x%x', cat1v1)
+        log.info('cat1v1 0x%x', cat1v1)
 
         self.step(1)
 

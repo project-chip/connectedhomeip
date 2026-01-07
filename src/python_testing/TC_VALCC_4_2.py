@@ -39,7 +39,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_VALCC_4_2(MatterBaseTest):
@@ -51,7 +53,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         return "[TC-VALCC-4.2] DefaultOpenDuration functionality with DUT as Server"
 
     def steps_TC_VALCC_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read DefaultOpenDuration attribute"),
             TestStep("2b", "Write DefaultOpenDuration attribute"),
@@ -65,13 +67,11 @@ class TC_VALCC_4_2(MatterBaseTest):
             TestStep(10, "Read RemainingDuration attribute"),
             TestStep(11, "Write DefaultOpenDuration back to original value")
         ]
-        return steps
 
     def pics_TC_VALCC_4_2(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

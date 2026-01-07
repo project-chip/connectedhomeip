@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import queue
 import typing
 from datetime import datetime, timedelta, timezone
@@ -45,16 +46,17 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_11(MatterBaseTest):
     async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
     async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
@@ -105,10 +107,8 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         self.print_step(1, "Send SetUTCCommand")
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
-        try:
+        with contextlib.suppress(InteractionModelError):
             await self.send_set_utc_cmd(utc_time_in_matter_epoch())
-        except InteractionModelError:
-            pass
 
         self.print_step(2, "Send SetTimeZone command")
         tz = [tz_struct(offset=7200, validAt=0)]

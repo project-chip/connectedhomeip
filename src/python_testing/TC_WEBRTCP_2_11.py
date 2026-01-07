@@ -44,8 +44,12 @@ from test_plan_support import commission_if_required
 
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
+
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
@@ -53,7 +57,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
 
     def steps_TC_WEBRTCP_2_11(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -73,10 +77,9 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
                 "Offer command WebRTCSessionID matches the allocated session ID.",
             ),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_11(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -84,7 +87,6 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_timeout(self) -> int:
@@ -139,7 +141,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
         offer_sessionId, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=30)
 
         elapsed_time = time.time() - start_time
-        logging.info(f"Received Offer command after {elapsed_time:.2f} seconds")
+        log.info(f"Received Offer command after {elapsed_time:.2f} seconds")
         asserts.assert_less(elapsed_time, 30.0, f"Offer command should be received within 30 seconds, but took {elapsed_time:.2f}s")
 
         self.step(4)
@@ -148,7 +150,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
                              f"Offer command WebRTCSessionID {offer_sessionId} should match allocated session ID {session_id}")
         asserts.assert_true(len(remote_offer_sdp) > 0, "Offer command should contain non-empty SDP string")
 
-        logging.info(
+        log.info(
             f"Successfully validated deferred Offer command timing: received in {elapsed_time:.2f}s with correct session ID {session_id}")
 
         # Clean up - End the session

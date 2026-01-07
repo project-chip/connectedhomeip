@@ -43,7 +43,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 # ModeSelect attribute IDs
 current_mode_attribute_id = 0x00000003
@@ -60,7 +62,7 @@ class TC_MOD_2_3(MatterBaseTest):
         return ["MOD.S", "S.S"]
 
     def steps_TC_MOD_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH"),
             TestStep("0b", "TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster by writing the GroupKeyMap attribute with two entries as follows: * List item 1: - FabricIndex: 1 - GroupId: 0x0001 - GroupKeySetId: 0x01a1"),
@@ -81,7 +83,6 @@ class TC_MOD_2_3(MatterBaseTest):
             TestStep("7b", "After a few seconds, TH reads the _CurrentMode attribute_ from DUT. Value has to be the same as _M~Initial~_ from step 3."),
 
         ]
-        return steps
 
     @async_test_body
     async def setup_test(self):

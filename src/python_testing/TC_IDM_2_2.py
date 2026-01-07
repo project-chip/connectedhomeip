@@ -50,10 +50,14 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
-class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
+class TC_IDM_2_2(BasicCompositionTests):
     """Test case for IDM-2.2: Report Data Action from DUT to TH.
 
     This test verifies that the DUT correctly handles read requests and responds
@@ -221,7 +225,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # Verify that returned attributes match the AttributeList
             # DataVersion is excluded as it is metadata and not a real attribute
             if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard:
-                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster].keys()
+                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster]
                                          if x != Clusters.Attribute.DataVersion])
                 attr_list = sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList])
                 asserts.assert_equal(
@@ -237,7 +241,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                           read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint].keys()])
+        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
         server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
         asserts.assert_equal(
             returned_cluster_ids,
@@ -245,7 +249,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
         for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys()
+            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
                              if a != Clusters.Attribute.DataVersion]
             asserts.assert_equal(
                 sorted(attribute_ids),
@@ -270,12 +274,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Get all standard clusters supported on all endpoints
         supported_cluster_ids = set()
         for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys(
-            ) if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
+            supported_cluster_ids.update({
+                cluster.id for cluster in endpoint_clusters
+                if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
+            })
 
         # Get all possible standard clusters
-        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys(
-        ) if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
+        all_standard_cluster_ids = {
+            cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
+            if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
+        }
 
         # Find unsupported clusters
         unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
@@ -295,7 +303,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Test the unsupported cluster on all available endpoints
         # It should return UnsupportedCluster error from all endpoints
-        for endpoint_id in self.endpoints.keys():
+        for endpoint_id in self.endpoints:
             result = await self.read_single_attribute_expect_error(
                 endpoint=endpoint_id,
                 cluster=unsupported_cluster,
@@ -303,7 +311,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
-            logging.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
+            log.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
 
     async def _read_unsupported_attribute(self):
         """
@@ -324,7 +332,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 ]
                 if unsupported:
                     unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
-                    logging.info(
+                    log.info(
                         f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
                     # Only request this single attribute
                     result = await self.read_single_attribute_expect_error(
@@ -335,7 +343,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
-                    logging.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
+                    log.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
                     return
 
         # If we get here, we got problems as there should always be at least one unsupported attribute
@@ -358,7 +366,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
-        logging.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
+        log.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
         return results
 
     async def _read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -393,7 +401,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/data_model/Interaction-Model.adoc#101-status-code-table
             asserts.assert_equal(e.err, 0x580,
                                  "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
-            return None
+            return
 
     async def _read_limited_access(self, endpoint, cluster_id):
         """Test reading all attributes from all clusters at an endpoint with limited access.
@@ -431,7 +439,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-            logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            log.info(f"Granted TH2 View access to only cluster {cluster_id}")
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
@@ -444,7 +452,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
             # Verify only the allowed cluster is returned
             returned_clusters = list(read_request.attributes[endpoint].keys())
-            logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            log.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
 
             # The allowed cluster should be present
             allowed_cluster_obj = None
@@ -468,9 +476,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 await self.default_controller.WriteAttribute(
                     self.dut_node_id,
                     [(self.endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
-                logging.info("Restored original ACL")
+                log.info("Restored original ACL")
             except Exception as e:
-                logging.error(f"Failed to restore original ACL: {e}")
+                log.error(f"Failed to restore original ACL: {e}")
 
             # Removes TH2 controller
             TH2.Shutdown()
@@ -549,7 +557,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.verify_all_endpoints_clusters(read_request)
 
     def steps_TC_IDM_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint, AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]], On receipt of this message, DUT should send a report data action with the attribute value to the DUT.",
                      "On the TH verify the received report data message has the right attribute values.", is_commissioning=True),
             TestStep(2, "TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint, AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]], On receipt of this message, DUT should send a report data action with the attribute value to the DUT.",
@@ -593,7 +601,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             TestStep(21, "TH sends a Read Request Message to read all events and attributes from the DUT.",
                      "Verify that the DUT sends back data of all attributes and events that the TH has access to."),
         ]
-        return steps
 
     # Update the test method to call functions directly with explicit parameters
     @async_test_body
@@ -673,7 +680,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Check if BasicInformation cluster exists before running steps 14-17
         # If it doesn't exist (e.g., non-commissionable node), skip these steps
         if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
-            logging.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
+            log.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
             self.skip_step(14)
             self.skip_step(15)
             self.skip_step(16)
@@ -758,7 +765,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Check if BasicInformation cluster exists before running step 20
         # If it doesn't exist (e.g., non-commissionable node), skip this step
         if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
-            logging.info("BasicInformation cluster not found on endpoint - skipping step 20")
+            log.info("BasicInformation cluster not found on endpoint - skipping step 20")
             self.skip_step(20)
         else:
             self.step(20)

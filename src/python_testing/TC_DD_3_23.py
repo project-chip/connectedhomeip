@@ -20,10 +20,12 @@ import logging
 from mobly import asserts
 
 from matter.setup_payload import SetupPayload
+from matter.testing.decorators import async_test_body
 from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DD_3_23(MatterBaseTest):
@@ -42,7 +44,7 @@ class TC_DD_3_23(MatterBaseTest):
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
         nfc_tag_data = connect_read_nfc_tag_data(self.user_params.get("NFC_Reader_index", 0))
-        logger.info(f"NFC Tag data : '{nfc_tag_data}'")
+        log.info(f"NFC Tag data : '{nfc_tag_data}'")
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
 
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins

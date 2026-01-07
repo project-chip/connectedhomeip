@@ -38,7 +38,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_VALCC_3_4(MatterBaseTest):
@@ -50,7 +54,7 @@ class TC_VALCC_3_4(MatterBaseTest):
         return "[TC-VALCC-3.4] LevelStep behavior with DUT as Server"
 
     def steps_TC_VALCC_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read AttributeList attribute"),
             TestStep(3, "Verify LevelStep is supported"),
@@ -58,13 +62,11 @@ class TC_VALCC_3_4(MatterBaseTest):
             TestStep(5, "Verify the supported level values using Open Command"),
             TestStep(6, "Send Close command"),
         ]
-        return steps
 
     def pics_TC_VALCC_3_4(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -83,17 +85,16 @@ class TC_VALCC_3_4(MatterBaseTest):
 
         self.step(3)
         if attributes.LevelStep.attribute_id not in attribute_list:
-            logging.info("LevelStep not supported skipping test case")
+            log.info("LevelStep not supported skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
                 self.step(step.test_plan_number)
-                logging.info("Test step skipped")
+                log.info("Test step skipped")
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        log.info("Test step skipped")
 
         self.step(4)
         levelStep = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.LevelStep)

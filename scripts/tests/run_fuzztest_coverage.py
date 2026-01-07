@@ -98,12 +98,11 @@ def get_fuzz_test_cases(context):
         if output:
             return re.findall(r'test:\s*(\S+)', output)
 
-        else:
-            log.info("No FUZZ_TESTs (TestCases) found in '%s'", context.fuzz_test_binary_path)
-            raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
+        log.info("No FUZZ_TESTs (TestCases) found in '%s'", context.fuzz_test_binary_path)
+        raise ValueError(f"FuzzTest Binary outputted the following error: \n{result.stderr}\n")
 
     except Exception as e:
-        raise Exception(f"Error executing {context.fuzz_test_binary_path}: {e}")
+        raise RuntimeError(f"Error executing {context.fuzz_test_binary_path}: {e}")
 
 
 def check_if_coverage_tools_detected():
@@ -113,8 +112,8 @@ def check_if_coverage_tools_detected():
             missing.append(tool)
 
     if missing:
-        raise Exception("Following required coverage packages not found: " + ", ".join(missing) +
-                        "\nPlease either install them or source the correct environment")
+        raise RuntimeError("Following required coverage packages not found: " + ", ".join(missing) +
+                           "\nPlease either install them or source the correct environment")
 
 
 def run_fuzz_test(context):
@@ -234,9 +233,10 @@ def generate_coverage_report(context, output_dir_arg):
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except FileNotFoundError:
         log.error("genhtml not found. Please install lcov to generate the HTML coverage report")
-        return
+        return None
 
     log.info("Coverage report Generated.")
+    return None
 
 
 def run_script_in_interactive_mode():
@@ -258,8 +258,7 @@ def run_script_in_interactive_mode():
 
         if 1 <= fuzz_choice <= len(fuzz_tests):
             break
-        else:
-            log.error("Invalid choice for fuzz test binary. Please try again")
+        log.error("Invalid choice for fuzz test binary. Please try again")
 
     selected_fuzz = fuzz_tests[fuzz_choice - 1]
     context = FuzzTestContext(
@@ -291,12 +290,11 @@ def run_script_in_interactive_mode():
             context.selected_fuzz_test_case = test_cases[choice - 1]
             break
 
-        elif choice == 0:
+        if choice == 0:
             context.run_mode = FuzzTestMode.UNIT_TEST_MODE
             break
 
-        else:
-            log.info("Invalid choice. Please try again")
+        log.info("Invalid choice. Please try again")
 
     return context
 

@@ -38,6 +38,20 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device occupancy-sensor --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -45,7 +59,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_OCC_2_1(MatterBaseTest):
@@ -57,7 +75,7 @@ class TC_OCC_2_1(MatterBaseTest):
         return "[TC-OCC-2.1] Attributes with DUT as Server"
 
     def steps_TC_OCC_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read Occupancy attribute."),
             TestStep(3, "Read OccupancySensorType attribute."),
@@ -74,13 +92,11 @@ class TC_OCC_2_1(MatterBaseTest):
             TestStep(14, "Read PhysicalContactUnoccupiedToOccupiedDelay attribute, if supported"),
             TestStep(15, "Read PhysicalContactUnoccupiedToOccupiedThreshold attribute, if supported")
         ]
-        return steps
 
     def pics_TC_OCC_2_1(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_2_1(self):
@@ -97,7 +113,7 @@ class TC_OCC_2_1(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        logging.info(
+        log.info(
             f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
@@ -142,7 +158,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_greater_equal(hold_time_limits_dut.holdTimeDefault,
                                          hold_time_limits_dut.holdTimeMin, "HoldTimeDefault is less than HoldTimeMin.")
         else:
-            logging.info("HoldTimeLimits not supported. Test step skipped")
+            log.info("HoldTimeLimits not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(6)
@@ -157,7 +173,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_greater_equal(hold_time_dut, hold_time_limits_dut.holdTimeMin,
                                          "HoldTime attribute is less than HoldTimeMin.")
         else:
-            logging.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
+            log.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
             self.mark_all_remaining_steps_skipped(7)
             return
 
@@ -174,11 +190,11 @@ class TC_OCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(pir_otou_delay_dut, 0xFFFE, "PIROccupiedToUnoccupiedDelay is not in valid range")
                 asserts.assert_greater_equal(pir_otou_delay_dut, 0, "PIROccupiedToUnoccupiedDelay is not in valid range")
             else:
-                logging.info("PIROccupiedToUnoccupiedDelay conformance failed")
+                log.info("PIROccupiedToUnoccupiedDelay conformance failed")
                 asserts.fail(
                     f"PIROccupiedToUnoccupiedDelay conformance is incorrect: {has_feature_pir}, {has_feature_ultrasonic}, {has_feature_contact}")
         else:
-            logging.info("PIROccupiedToUnoccupiedDelay not supported. Test step skipped")
+            log.info("PIROccupiedToUnoccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(8)
@@ -190,7 +206,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_less_equal(pir_utoo_delay_dut, 0xFFFE, "PIRUnoccupiedToOccupiedDelay is not in valid range")
             asserts.assert_greater_equal(pir_utoo_delay_dut, 0, "PIRUnoccupiedToOccupiedDelay is not in valid range")
         else:
-            logging.info("PIRUnoccupiedToOccupiedDelay not supported. Test step skipped")
+            log.info("PIRUnoccupiedToOccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(9)
@@ -202,7 +218,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_less_equal(pir_utoo_threshold_dut, 0xFE, "PIRUnoccupiedToOccupiedThreshold is not in valid range")
             asserts.assert_greater_equal(pir_utoo_threshold_dut, 0, "PIRUnoccupiedToOccupiedThreshold is not in valid range")
         else:
-            logging.info("PIRUnoccupiedToOccupiedThreshold not supported. Test step skipped")
+            log.info("PIRUnoccupiedToOccupiedThreshold not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(10)
@@ -218,7 +234,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_greater_equal(ultrasonic_otou_delay_dut, 0, "UltrasonicOccupiedToUnoccupiedDelay is not in valid range")
 
         else:
-            logging.info("UltrasonicOccupiedToUnoccupiedDelay not supported. Test step skipped")
+            log.info("UltrasonicOccupiedToUnoccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(11)
@@ -232,7 +248,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                       "UltrasonicUnoccupiedToOccupiedDelay is not in valid range")
             asserts.assert_greater_equal(ultrasonic_utoo_delay_dut, 0, "UltrasonicUnoccupiedToOccupiedDelay is not in valid range")
         else:
-            logging.info("UltrasonicUnoccupiedToOccupiedDelay not supported. Test step skipped")
+            log.info("UltrasonicUnoccupiedToOccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(12)
@@ -248,7 +264,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                          "UltrasonicUnoccupiedToOccupiedThreshold is not in valid range")
 
         else:
-            logging.info("UltrasonicUnoccupiedToOccupiedThreshold not supported. Test step skipped")
+            log.info("UltrasonicUnoccupiedToOccupiedThreshold not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(13)
@@ -264,7 +280,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                          "PhysicalContactOccupiedToUnoccupiedDelay is not in valid range")
 
         else:
-            logging.info("PhysicalContactOccupiedToUnoccupiedDelay not supported. Test step skipped")
+            log.info("PhysicalContactOccupiedToUnoccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(14)
@@ -280,7 +296,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                          "PhysicalContactUnoccupiedToOccupiedDelay is not in valid range")
 
         else:
-            logging.info("PhysicalContactUnoccupiedToOccupiedDelay not supported. Test step skipped")
+            log.info("PhysicalContactUnoccupiedToOccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
 
         self.step(15)
@@ -296,7 +312,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                          "PhysicalContactUnoccupiedToOccupiedThreshold is not in valid range")
 
         else:
-            logging.info("PhysicalContactUnoccupiedToOccupiedThreshold not supported. Test step skipped")
+            log.info("PhysicalContactUnoccupiedToOccupiedThreshold not supported. Test step skipped")
             self.mark_current_step_skipped()
 
 

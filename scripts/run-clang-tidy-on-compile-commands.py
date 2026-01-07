@@ -165,7 +165,7 @@ class ClangTidyEntry:
                 for line in err.decode("utf-8").split("\n"):
                     line = line.strip()
 
-                    if any((s in line for s in skip_strings)):
+                    if any(s in line for s in skip_strings):
                         continue
 
                     if not line:
@@ -252,7 +252,8 @@ class ClangTidyRunner:
             log.info("  Chose: '%s'", self.gcc_sysroot)
 
     def AddDatabase(self, compile_commands_json):
-        database = json.load(open(compile_commands_json))
+        with open(compile_commands_json) as f:
+            database = json.load(f)
 
         for entry in database:
             item = ClangTidyEntry(entry, self.gcc_sysroot)
@@ -274,10 +275,9 @@ class ClangTidyRunner:
             # file over and over again, like 'append override' can result in the
             # same override being appended multiple times.
             already_seen = set()
-            for name in glob.iglob(
-                os.path.join(self.fixes_temporary_file_dir.name, "*.yaml")
-            ):
-                content = yaml.safe_load(open(name, "r"))
+            for name in glob.iglob(os.path.join(self.fixes_temporary_file_dir.name, "*.yaml")):
+                with open(name) as f:
+                    content = yaml.safe_load(f)
                 if not content:
                     continue
                 diagnostics = content.get("Diagnostics", [])
@@ -470,7 +470,7 @@ def main(
 
     if file_list_file:
         acceptable = set()
-        with open(file_list_file, "rt") as f:
+        with open(file_list_file) as f:
             for file_name in f.readlines():
                 acceptable.add(Path(file_name.strip()).resolve().as_posix())
 
@@ -506,8 +506,8 @@ def cmd_fix(context):
 
         if runner.state.failures:
             fixes_yaml = os.path.join(tmpdir, "fixes.yaml")
-            with open(fixes_yaml, "w") as out:
-                out.write(open(runner.fixes_file, "r").read())
+            with open(runner.fixes_file) as f_in, open(fixes_yaml, "w") as f_out:
+                f_out.write(f_in.read())
 
             log.info("Applying fixes in '%s'", tmpdir)
             subprocess.check_call(["clang-apply-replacements", tmpdir])

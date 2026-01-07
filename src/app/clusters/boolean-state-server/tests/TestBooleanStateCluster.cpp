@@ -14,14 +14,15 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/BooleanState/Attributes.h>
 #include <clusters/BooleanState/Metadata.h>
 
@@ -30,7 +31,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanState;
 using namespace chip::app::Clusters::BooleanState::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -42,11 +44,11 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(booleanState.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { booleanState.Shutdown(); }
+    void TearDown() override { booleanState.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestBooleanStateCluster() : booleanState(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     BooleanStateCluster booleanState;
 };
 
@@ -54,13 +56,10 @@ struct TestBooleanStateCluster : public ::testing::Test
 
 TEST_F(TestBooleanStateCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(booleanState.Attributes(ConcreteClusterPath(kRootEndpointId, BooleanState::Id), attributes), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(BooleanState::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(booleanState,
+                                        {
+                                            BooleanState::Attributes::StateValue::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestBooleanStateCluster, ReadAttributeTest)

@@ -47,10 +47,12 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
@@ -66,7 +68,7 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S", "EEVSE.S.F03"]
 
     def steps_TC_EEVSE_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -77,8 +79,6 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("5", "TH checks its subscription to RFID from DUT has yielded one new event within 5 seconds",
                      "Verify the data of the RFID event received by TH contains a UID with a maximum of 10 bytes."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EEVSE_2_9(self):
@@ -108,7 +108,7 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
             uid is not NullValue and len(uid) <= 10,
             f"RFID event received with UID: {uid}")
 
-        logger.info(f"RFID event received with UID: 0x{bytes(uid).hex()}")
+        log.info(f"RFID event received with UID: 0x{bytes(uid).hex()}")
 
 
 if __name__ == "__main__":

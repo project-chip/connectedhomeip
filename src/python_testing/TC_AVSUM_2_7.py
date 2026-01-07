@@ -41,7 +41,9 @@ from TC_AVSUMTestBase import AVSUMTestBase
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
@@ -50,7 +52,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.7] DPTZSetViewport command validation"
 
     def steps_TC_AVSUM_2_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the viewport and sensorparms from the device. Ensure the viewport is less than or equal to the sensor size"),
             TestStep(3, "Create a viewport smaller than the supported minimum"),
@@ -68,13 +70,11 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
             TestStep(15, "Send a VideoStreamDeallocate command to AVStreamManagement to de-allocate the video stream allocated in step 5. Verify success"),
             TestStep(16, "Read the DPTZStreams attribute, verify that the response does not contain any entry with the allocated stream ID from step 5"),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_7(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S", "AVSUM.S.F00", "AVSM.S"
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kDigitalPTZ) and

@@ -26,7 +26,6 @@ Both classes allow tests to start and manage subscriptions, queue received updat
 block until epected reports are received or fail on timeouts
 """
 
-import asyncio
 import inspect
 import logging
 import queue
@@ -109,6 +108,10 @@ class EventSubscriptionHandler:
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
+    def cancel(self):
+        """This cancels a subscription."""
+        self._subscription.Shutdown()
+
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
@@ -157,8 +160,7 @@ class EventSubscriptionHandler:
             if event.Header.EventId == event_type.event_id:
                 LOGGER.info(f"Event {event_type.__name__} received: {event}")
                 return event.Data
-            else:
-                LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
+            LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
 
     def get_last_event(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) event only."""
@@ -257,14 +259,9 @@ class AttributeSubscriptionHandler:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    async def cancel(self):
+    def cancel(self):
         """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
-        try:
-            self._subscription.Shutdown()
-            await asyncio.sleep(5)
-        except asyncio.CancelledError:
-            pass
+        self._subscription.Shutdown()
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
@@ -297,7 +294,7 @@ class AttributeSubscriptionHandler:
                     self._attribute_report_counts[path.AttributeType] += 1
                     self._attribute_reports[path.AttributeType].append(value)
 
-    def wait_for_attribute_report(self):
+    def wait_for_attribute_report(self, timeout_sec: float = 10):
         """
         Blocks and waits for a single attribute report to arrive in the queue.
 
@@ -305,7 +302,7 @@ class AttributeSubscriptionHandler:
         """
 
         try:
-            item = self._q.get(block=True, timeout=10)
+            item = self._q.get(block=True, timeout=timeout_sec)
             attribute_value = item.value
             LOGGER.info(
                 f"[AttributeSubscriptionHandler] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")

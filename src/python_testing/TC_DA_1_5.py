@@ -50,7 +50,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
 
@@ -99,11 +101,11 @@ class TC_DA_1_5(MatterBaseTest):
         vendor1 = None
         vendor2 = None
         vendor3 = None
-        if 3 in decoded.keys():
+        if 3 in decoded:
             vendor1 = decoded[3]
-        if 4 in decoded.keys():
+        if 4 in decoded:
             vendor2 = decoded[4]
-        if 5 in decoded.keys():
+        if 5 in decoded:
             vendor3 = decoded[5]
 
         # Verify that length of nocsr_elements is <= 900

@@ -42,8 +42,10 @@
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_DGSW_2_2(MatterBaseTest):
@@ -77,7 +79,7 @@ class TC_DGSW_2_2(MatterBaseTest):
         return ["DGSW.S.E00"]
 
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH subscribes to the SoftwareDiagnostics cluster in the DUT to receive SoftwareFault events. "
                      "The DUT is triggered to emit a SoftwareFault event. Wait for the SoftwareFault event to arrive.",
@@ -86,7 +88,6 @@ class TC_DGSW_2_2(MatterBaseTest):
                      "Name field shall be set to vendor specific name strings that last software fault occurred."
                      "FaultRecording field shall be set by a vendor specific payload in octstr format."),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
     async def test_TC_DGSW_2_2(self):

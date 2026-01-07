@@ -44,13 +44,17 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
+
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm there is an active WebRTC sessions exist in DUT"),
             TestStep(
@@ -85,8 +89,6 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-
-        return steps
 
     def desc_TC_WEBRTC_1_2(self) -> str:
         return "[TC-WEBRTC-1.2] Validate that providing an existing WebRTC session ID with an SDP Offer successfully triggers the re-offer flow"
@@ -169,7 +171,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
 
         self.step(6)
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only:

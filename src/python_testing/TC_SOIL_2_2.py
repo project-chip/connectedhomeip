@@ -40,8 +40,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_SOIL_2_2(MatterBaseTest):
@@ -53,7 +57,7 @@ class TC_SOIL_2_2(MatterBaseTest):
         return "[TC-SOIL-2.2] Primary functionality with DUT as Server"
 
     def steps_TC_SOIL_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Set up a subscription wildcard subscription, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false"),
 
@@ -63,13 +67,11 @@ class TC_SOIL_2_2(MatterBaseTest):
             TestStep(6, "After a few seconds, read SoilMoistureMeasuredValue attribute"),
             TestStep(7, "Verify that the DUT sends at least one attribute report for SoilMoistureMeasuredValue"),
         ]
-        return steps
 
     def pics_TC_SOIL_2_2(self) -> list[str]:
-        pics = [
+        return [
             "SOIL.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.SoilMeasurement))
     async def test_TC_SOIL_2_2(self):
@@ -91,7 +93,7 @@ class TC_SOIL_2_2(MatterBaseTest):
 
         if self.is_pics_sdk_ci_only:
             # Set the initial soil moisture to the min_bound value, since it inits as null.
-            logging.info(f"Simulated soil moisture value: {min_bound}")
+            log.info(f"Simulated soil moisture value: {min_bound}")
             self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": min_bound, "EndpointId": endpoint})
 
         self.step(4)
@@ -103,7 +105,7 @@ class TC_SOIL_2_2(MatterBaseTest):
         self.step(5)
         if self.is_pics_sdk_ci_only:
             # Simulate a change in soil moisture, changing to max_bound.
-            logging.info(f"Simulated soil moisture value: {max_bound}")
+            log.info(f"Simulated soil moisture value: {max_bound}")
             self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": max_bound, "EndpointId": endpoint})
 
         else:

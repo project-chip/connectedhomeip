@@ -48,10 +48,12 @@ from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 
@@ -71,7 +73,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
 
     def steps_TC_SETRF_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      "DUT is commissioned to TH.", is_commissioning=True),
             TestStep("2", "Set up a subscription to the Commodity Tariff cluster attributes: MinIntervalFloor: 0, MaxIntervalCeiling: 10",
@@ -410,8 +412,6 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                      Subscription successfully removed."""),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_SETRF_3_1(self):
         """Implementation of test case TC_SETRF_3_1."""
@@ -537,7 +537,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             self.step("20")
 
             if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+                log.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
 
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             DefaultRandomizationTypeValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
@@ -558,7 +558,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             self.step("21")
 
             if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+                log.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
 
             # TH reads DefaultRandomizationOffset attribute, expects a int16
             DefaultRandomizationOffsetValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
@@ -683,7 +683,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             self.step("41")
 
             if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+                log.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
 
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             await self.check_default_randomization_type_attribute(
@@ -704,7 +704,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             self.step("42")
 
             if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+                log.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
 
             await self.check_default_randomization_offset_attribute(
                 endpoint, subscription_handler.attribute_reports[cluster.Attributes.DefaultRandomizationOffset][0].value)
@@ -725,7 +725,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
 
         self.step("44")
         # TH removes the subscription to Commodity Tariff cluster attributes
-        await subscription_handler.cancel()
+        subscription_handler.cancel()
 
 
 if __name__ == "__main__":

@@ -20,11 +20,13 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_valid_uint8
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET = "1111111122222222"
 
@@ -62,14 +64,14 @@ class TC_CNET_4_16(MatterBaseTest):
         asserts.assert_is_not_none(
             networkID, "Failed to read LastNetworkID attribute. Returned None. Ensure DUT is commissioned to Thread network.")
 
-        logger.info(f" --- NetworkID: {networkID.hex()}")
+        log.info(f" --- NetworkID: {networkID.hex()}")
         asserts.assert_in(networkID.hex(), thread_1st.hex(),
                           f"NetworkID: {networkID.hex()} not in {thread_1st.hex()}")
 
         # Precondition 3: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
         maxNetworksValue = 0
         maxNetworksValue = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.MaxNetworks)
-        logger.info(f" --- maxNetworksValue: {maxNetworksValue}")
+        log.info(f" --- maxNetworksValue: {maxNetworksValue}")
         assert_valid_uint8(maxNetworksValue, "MaxNetworksValue range")
         asserts.assert_greater_equal(maxNetworksValue, 1, "MaxNetworksValue not greater or equal to 1")
 
@@ -94,7 +96,7 @@ class TC_CNET_4_16(MatterBaseTest):
         if len(networkList) != 0:
             cmd = cnet.Commands.RemoveNetwork(networkID=thread_2nd, breadcrumb=1)
             res = await self.send_single_cmd(cmd=cmd)
-            logger.info(f" --- NetworkingStatus on RemoveNetwork: {res.networkingStatus}")
+            log.info(f" --- NetworkingStatus on RemoveNetwork: {res.networkingStatus}")
             # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
             asserts.assert_true(isinstance(res, cnet.Commands.NetworkConfigResponse),
                                 f"{res} must be of type NetworkConfigResponse")
@@ -111,7 +113,7 @@ class TC_CNET_4_16(MatterBaseTest):
 
         cmd = cnet.Commands.ConnectNetwork(networkID=thread_2nd, breadcrumb=1)
         res = await self.send_single_cmd(cmd=cmd)
-        logger.info(f" --- NetworkingStatus on ConnectNetwork: {res.networkingStatus}")
+        log.info(f" --- NetworkingStatus on ConnectNetwork: {res.networkingStatus}")
         # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
         asserts.assert_true(isinstance(res, cnet.Commands.ConnectNetworkResponse), f"{res} must be of type ConnectNetworkResponse")
         asserts.assert_equal(res.networkingStatus,

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "pushav-uploader.h"
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 
 #include <algorithm>
 #include <atomic>
@@ -76,24 +76,23 @@ public:
      */
     struct ClipInfoStruct
     {
-        bool mHasVideo;                                       ///< Video recording enabled flag
-        bool mHasAudio;                                       ///< Audio recording enabled flag
-        uint64_t mSessionNumber;                              ///< Session number for unique clip identification
-        uint8_t mSessionGroup;                                ///< Session group for grouping multiple transports
-        uint32_t mMaxClipDurationS;                           ///< Maximum clip duration in seconds
-        uint16_t mInitialDurationS;                           ///< Initial clip duration in seconds
-        uint16_t mAugmentationDurationS;                      ///< Duration increment on motion detect
-        uint16_t mChunkDurationMs;                            ///< Chunk duration  milliseconds
-        uint16_t mSegmentDurationMs;                          ///< Segment duration in milliseconds
-        uint16_t mBlindDurationS;                             ///< Duration without recording after motion stop
-        uint16_t mPreRollLengthMs;                            ///< Pre-roll length in milliseconds
-        uint16_t mElapsedTimeS;                               ///< Elapsed time since recording start in seconds
-        std::string mOutputPath;                              ///< Base output directory path
-        std::string mTrackName;                               ///< Track name for segmented files
-        AVRational mInputTimeBase;                            ///< Input time base
-        std::string mUrl;                                     ///< URL for uploading clips;
-        int mTriggerType;                                     ///< Recording trigger type
-        std::chrono::steady_clock::time_point activationTime; ///< Time when the recording started
+        bool mHasVideo;                                        ///< Video recording enabled flag
+        bool mHasAudio;                                        ///< Audio recording enabled flag
+        uint64_t mSessionNumber;                               ///< Session number for unique clip identification
+        uint8_t mSessionGroup;                                 ///< Session group for grouping multiple transports
+        uint32_t mMaxClipDurationS;                            ///< Maximum clip duration in seconds
+        uint16_t mInitialDurationS;                            ///< Initial clip duration in seconds
+        uint16_t mAugmentationDurationS;                       ///< Duration increment on motion detect
+        uint16_t mChunkDurationMs;                             ///< Chunk duration  milliseconds
+        uint16_t mSegmentDurationMs;                           ///< Segment duration in milliseconds
+        uint16_t mBlindDurationS;                              ///< Duration without recording after motion stop
+        uint16_t mPreRollLengthMs;                             ///< Pre-roll length in milliseconds
+        uint16_t mElapsedTimeS;                                ///< Elapsed time since recording start in seconds
+        std::string mOutputPath;                               ///< Base output directory path
+        std::string mTrackName;                                ///< Track name for segmented files
+        std::string mUrl;                                      ///< URL for uploading clips;
+        int mTriggerType;                                      ///< Recording trigger type
+        std::chrono::steady_clock::time_point mActivationTime; ///< Time when the recording started
     };
 
     /**
