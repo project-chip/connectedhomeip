@@ -1818,27 +1818,27 @@ CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClust
 {
     if (HasFeature(Feature::kAudio))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::AudioStreamAllocate::kMetadataEntry }));
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::AudioStreamDeallocate::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements(
+            { Commands::AudioStreamAllocate::kMetadataEntry, Commands::AudioStreamDeallocate::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kVideo))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::VideoStreamAllocate::kMetadataEntry }));
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::VideoStreamDeallocate::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements(
+            { Commands::VideoStreamAllocate::kMetadataEntry, Commands::VideoStreamDeallocate::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kVideo) && (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay)))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::VideoStreamModify::kMetadataEntry }));
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamModify::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements(
+            { Commands::VideoStreamModify::kMetadataEntry, Commands::SnapshotStreamModify::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kSnapshot))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamAllocate::kMetadataEntry }));
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamDeallocate::kMetadataEntry }));
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::CaptureSnapshot::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamAllocate::kMetadataEntry,
+                                                      Commands::SnapshotStreamDeallocate::kMetadataEntry,
+                                                      Commands::CaptureSnapshot::kMetadataEntry }));
     }
 
     ReturnErrorOnFailure(builder.AppendElements({ Commands::SetStreamPriorities::kMetadataEntry }));
@@ -1861,8 +1861,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::GeneratedCommands(const ConcreteClus
 
     if (HasFeature(Feature::kSnapshot))
     {
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamAllocateResponse::Id }));
-        ReturnErrorOnFailure(builder.AppendElements({ Commands::CaptureSnapshotResponse::Id }));
+        ReturnErrorOnFailure(
+            builder.AppendElements({ Commands::SnapshotStreamAllocateResponse::Id, Commands::CaptureSnapshotResponse::Id }));
     }
 
     return CHIP_NO_ERROR;
