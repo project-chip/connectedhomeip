@@ -186,6 +186,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 }
                 else if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
+                    gDevices[index] = nullptr;
                     return -1;
                 }
                 // Handle wrap condition
@@ -490,7 +491,7 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
 
     char * end;
     chip::EndpointId endpointId = strtoul(argv[0], &end, 10);
-    if (end == argv[0] || *end != '\0' || endpointId < 0 || endpointId > 0xFFFF)
+    if (end == argv[0] || *end != '\0' || endpointId > 0xFFFF)
     {
         ESP_LOGE(TAG, "Invalid endpoint ID: %s (must be 0-65535)", argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -508,7 +509,7 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
     err               = RemoveDeviceEndpoint(gDevices[index]);
     if (err == CHIP_NO_ERROR)
     {
-        ESP_LOGI(TAG, "Removed '%s' from endpoint %ld", name, endpointId);
+        ESP_LOGI(TAG, "Removed '%s' from endpoint %u", name, endpointId);
         delete gDevices[index];
         delete[] gBridgedDataVersions[index];
         gDevices[index]             = nullptr;
@@ -554,7 +555,7 @@ static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
         // Perform OnOff::Toggle on the bridged endpoint: bridge toggle <endpoint>
         char * end;
         chip::EndpointId endpointId = strtoul(argv[0], &end, 10);
-        if (end == argv[0] || *end != '\0' || endpointId < 0 || endpointId > 0xFFFF)
+        if (end == argv[0] || *end != '\0' || endpointId > 0xFFFF)
         {
             ESP_LOGE(TAG, "Invalid endpoint ID: %s (must be 0-65535)", argv[0]);
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -625,7 +626,7 @@ static CHIP_ERROR BridgeRemoveAllHandler(int argc, char ** argv)
             }
         }
     }
-    gBridgedDeviceCount = gBridgedDeviceCount - removedCount;
+    gBridgedDeviceCount -= removedCount;
 
     ESP_LOGI(TAG, "Removed %d devices total", removedCount);
     return CHIP_NO_ERROR;
@@ -730,7 +731,6 @@ extern "C" void app_main()
 
     // bridge will have own database named gDevices.
     // Clear database
-    memset(gDevices, 0, sizeof(gDevices));
     memset(gDevices, 0, sizeof(gDevices));
     memset(gBridgedDataVersions, 0, sizeof(gBridgedDataVersions));
     gBridgedDeviceCount = 0;
