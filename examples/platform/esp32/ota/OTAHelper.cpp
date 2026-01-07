@@ -30,6 +30,12 @@
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#include "esp_check.h"
+#include "esp_rcp_ota.h"
+#include "esp_rcp_update.h"
+#endif
+
 using namespace chip::DeviceLayer;
 using namespace chip;
 
@@ -48,6 +54,75 @@ OTAImageProcessorImpl gImageProcessor;
 chip::Optional<bool> gRequestorCanConsent;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+class OTARcpProcessorImpl : public OTAImageProcessorImpl::OTARcpProcessorDelegate
+{
+public:
+    esp_err_t OnOtaRcpPrepareDownload() override;
+    esp_err_t OnOtaRcpProcessBlock(const uint8_t * buffer, size_t bufLen, size_t & rcpOtaReceivedLen) override;
+    esp_err_t OnOtaRcpFinalize() override;
+    esp_err_t OnOtaRcpAbort() override;
+
+private:
+    void ResetRcpOtaState()
+    {
+        mRcpOtaHandle          = 0;
+        mBrFirmwareSize        = 0;
+        mRcpFirmwareDownloaded = false;
+    }
+    esp_rcp_ota_handle_t mRcpOtaHandle;
+    bool mRcpFirmwareDownloaded;
+    uint32_t mBrFirmwareSize;
+};
+
+esp_err_t OTARcpProcessorImpl::OnOtaRcpPrepareDownload()
+{
+    ResetRcpOtaState();
+    return esp_rcp_ota_begin(&mRcpOtaHandle);
+}
+
+esp_err_t OTARcpProcessorImpl::OnOtaRcpProcessBlock(const uint8_t * buffer, size_t bufLen, size_t & rcpOtaReceivedLen)
+{
+    esp_err_t err = ESP_OK;
+
+    if (!mRcpFirmwareDownloaded)
+    {
+        err = esp_rcp_ota_receive(mRcpOtaHandle, buffer, bufLen, &rcpOtaReceivedLen);
+
+        if (esp_rcp_ota_get_state(mRcpOtaHandle) == ESP_RCP_OTA_STATE_FINISHED)
+        {
+            mBrFirmwareSize        = esp_rcp_ota_get_subfile_size(mRcpOtaHandle, FILETAG_HOST_FIRMWARE);
+            mRcpFirmwareDownloaded = true;
+        }
+    }
+    else if (mBrFirmwareSize > 0)
+    {
+        rcpOtaReceivedLen = 0;
+    }
+    else
+    {
+        err = ESP_FAIL;
+    }
+
+    return err;
+}
+
+esp_err_t OTARcpProcessorImpl::OnOtaRcpFinalize()
+{
+    esp_err_t err = esp_rcp_ota_end(mRcpOtaHandle);
+    ResetRcpOtaState();
+    return err;
+}
+
+esp_err_t OTARcpProcessorImpl::OnOtaRcpAbort()
+{
+    esp_err_t err = esp_rcp_ota_abort(mRcpOtaHandle);
+    ResetRcpOtaState();
+    return err;
+}
+
+OTARcpProcessorImpl gOtaRcpDelegate;
+#endif
 
 // WARNING: This is just an example for using key for decrypting the encrypted OTA image
 // Please do not use it as is for production use cases
@@ -73,6 +148,9 @@ void OTAHelpers::InitOTARequestor()
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
         TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
         gImageProcessor.SetOTADownloader(&gDownloader);
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+        gImageProcessor.SetOtaRcpDelegate(&gOtaRcpDelegate);
+#endif
         gDownloader.SetImageProcessorDelegate(&gImageProcessor);
         gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 

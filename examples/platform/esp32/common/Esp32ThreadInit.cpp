@@ -23,6 +23,10 @@
 #endif // CONFIG_OPENTHREAD_ENABLED
 #ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
 #include <esp_spiffs.h>
+#ifdef CONFIG_AUTO_UPDATE_RCP
+#include <esp_ot_rcp_update.h>
+#include <esp_rcp_update.h>
+#endif
 #endif
 
 #include <esp_log.h>
@@ -52,7 +56,8 @@ void ESPOpenThreadInit()
         return;
     }
     esp_rcp_update_config_t rcp_update_config = ESP_OPENTHREAD_RCP_UPDATE_CONFIG();
-    openthread_init_br_rcp(&rcp_update_config);
+    esp_rcp_update_init(&rcp_update_config);
+    esp_ot_register_rcp_handler();
 #endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
     set_openthread_platform_config(&config);
 
@@ -61,6 +66,29 @@ void ESPOpenThreadInit()
         ESP_LOGE(TAG, "Failed to initialize Thread stack");
         return;
     }
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
+    // TODO: This is a workaround to update the RCP if the Thread is enabled.
+    bool thread_was_enabled = ThreadStackMgr().IsThreadEnabled();
+    if (thread_was_enabled)
+    {
+        if (ThreadStackMgr().SetThreadEnabled(false) != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to disable Thread before updating RCP");
+            return;
+        }
+    }
+
+    esp_ot_update_rcp_if_different();
+
+    if (thread_was_enabled)
+    {
+        if (ThreadStackMgr().SetThreadEnabled(true) != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to enable Thread after updating RCP");
+            return;
+        }
+    }
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     if (ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router) != CHIP_NO_ERROR)
     {
@@ -69,11 +97,10 @@ void ESPOpenThreadInit()
     }
 #elif CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CONFIG_PM_ENABLE
-    esp_pm_config_t pm_config = {
-        .max_freq_mhz       = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
-        .min_freq_mhz       = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
+    esp_pm_config_t pm_config = { .max_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
+                                  .min_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
 #if CONFIG_FREERTOS_USE_TICKLESS_IDLE
-        .light_sleep_enable = true
+                                  .light_sleep_enable = true
 #endif // CONFIG_FREERTOS_USE_TICKLESS_IDLE
     };
     esp_pm_configure(&pm_config);

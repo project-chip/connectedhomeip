@@ -1,0 +1,6 @@
+## IDF Component Manager Manifest File
+dependencies:
+    espressif/esp_rcp_update:
+        version: "~1.6.0"
+        rules:
+            - if: "idf_version >=5.0"
