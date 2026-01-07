@@ -190,7 +190,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         hasEventsFeature = False
 
         feat_should_be_there = await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPresets)
-        asserts.assert_true(feat_should_be_there, True)
+        asserts.assert_true(feat_should_be_there, "Presets feature is required for this test")
 
         self.step("1a")
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
