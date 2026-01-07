@@ -46,10 +46,12 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, ValueDecodeFailure
 from matter.interaction_model import Status
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import (AttributeSubscriptionHandler, EventSubscriptionHandler,
                                                       WildcardAttributeSubscriptionHandler)
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
