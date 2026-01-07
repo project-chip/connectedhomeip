@@ -194,7 +194,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
         self.step(7)
-        if self.pics_guard(can_test_mode_failure):
+        if self.pics_guard(failure_and_manual):
             cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
             change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
