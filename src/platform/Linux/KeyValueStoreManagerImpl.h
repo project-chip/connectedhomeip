@@ -24,6 +24,7 @@
 #pragma once
 
 #include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/Linux/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,14 +37,18 @@ public:
      * @brief
      * Initalize the KVS, must be called before using.
      */
-    CHIP_ERROR Init(const char * file) { return mStorage.Init(file); }
+    CHIP_ERROR Init(const char * file) { return ChipLinuxStorageDelegate()->Init(file); }
 
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0);
     CHIP_ERROR _Delete(const char * key);
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-    DeviceLayer::Internal::ChipLinuxStorage mStorage;
+    static DeviceLayer::Internal::ChipLinuxStorage * ChipLinuxStorageDelegate()
+    {
+        return DeviceLayer::Internal::PosixConfig::GetStorageForNamespace(DeviceLayer::Internal::PosixConfig::kConfigKey_KVS);
+    }
+    // DeviceLayer::Internal::ChipLinuxStorage mStorage;
 
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
