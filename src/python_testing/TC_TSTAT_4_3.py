@@ -197,16 +197,17 @@ class TC_TSTAT_4_3(MatterBaseTest):
             self.step("4b")
             if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
                 # If skipSettingTime is False, TH sends Time Synchronization command to DUT using a time source.
+                   code = -1
                 try:
                     th_utc = utc_time_in_matter_epoch()
                     await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=th_utc, granularity=time_cluster.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=0)
+                    code = 0
                 except InteractionModelError as e:
                     # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
                     # see #26521
                     code = e.status
-
                 # Verify that the Time Synchronization command returns SUCCESS otherwise fail the test.
-                asserts.assert_equal(code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions feature needs UTCTime.")
+                asserts.assert_equal(code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions fetaure needs UTCTime.")
         else:
             log.info("Thermostat has UTC time set.")
             self.skip_step("4a")
