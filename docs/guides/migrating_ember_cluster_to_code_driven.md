@@ -175,7 +175,7 @@ project's Slack channel.
 
 -   [ ] **3.3: Update ZAP Configuration:**
     -   [ ] In `src/app/common/templates/config-data.yaml`, add the cluster to
-            the `CodeDrivenClusters` array.
+            the `CodeDrivenClusters` array and remove it from `CommandHandlerInterfaceOnlyClusters` if it exists there.
     -   [ ] In `src/app/zap-templates/zcl/zcl.json` and
             `zcl-with-test-extensions.json`, add all non-list attributes to the
             `attributeAccessInterfaceAttributes` list.
