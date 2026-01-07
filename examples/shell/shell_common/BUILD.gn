@@ -72,10 +72,15 @@ static_library("shell_common") {
     include_dirs =
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
-    public_deps +=
-        [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
+    public_deps += [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common",
+      "${chip_root}/src/app/clusters/boolean-state-server",
+    ]
 
-    deps = [ "${chip_root}/src/app:attribute-persistence" ]
+    deps = [
+      "${chip_root}/src/app:attribute-persistence",
+      "${chip_root}/src/lib/support:arg_parser",
+    ]
   }
 
   public_configs = [ ":shell_common_config" ]

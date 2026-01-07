@@ -26,6 +26,10 @@ if(NOT DEFINED EXAMPLE_NXP_PLATFORM_DIR)
     get_filename_component(EXAMPLE_NXP_PLATFORM_DIR ${CHIP_ROOT}/examples/platform/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME} REALPATH)
 endif()
 
+# Enable default ZCL path to be passed to the zapgen command for all examples.
+# This is only used if the ZCL_PATH argument is not provided in the chip_configure_data_model().
+set(CHIP_ENABLE_ZCL_ARG ON)
+
 if (CONFIG_CHIP_APP_COMMON)
     target_sources(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/source/AppTaskBase.cpp
@@ -40,10 +44,6 @@ if (CONFIG_CHIP_APP_COMMON)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_manager/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/include
-    )
-    target_compile_definitions(app
-        PRIVATE
-        APP_QUEUE_TICKS_TO_WAIT=${CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT}
     )
 
     if (CONFIG_APP_FREERTOS_OS)
@@ -76,11 +76,16 @@ if (CONFIG_CHIP_APP_BLE_MANAGER)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
     )
-    if (CONFIG_CHIP_APP_BLE_MANAGER_CUSTOM)
+
+    if (CONFIG_CHIP_APP_BLE_MANAGER_CUSTOM_BLE_ZEPHYR)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
         )
-    else()
+    elseif(CONFIG_CHIP_APP_BLE_MANAGER_CUSTOM_NXP_BLE_HOST)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/NXPHostBLEApplicationManager.cpp
+        )
+    elseif(CONFIG_CHIP_APP_BLE_MANAGER_EMPTY)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
         )
@@ -97,6 +102,13 @@ if (CONFIG_DIAG_LOGS_DEMO)
     )
 endif()
 
+if(CONFIG_CHIP_SE05X)
+    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
+    if(se_index EQUAL -1)
+        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
+    endif()
+endif()
+
 if (CONFIG_CHIP_APP_FACTORY_DATA)
     if (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_PLATFORM)
         target_sources(app PRIVATE
@@ -108,9 +120,17 @@ if (CONFIG_CHIP_APP_FACTORY_DATA)
             )
         endif()
     elseif (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_COMMON)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
-        )
+        if (CONFIG_CHIP_SE05X)
+            target_sources(app PRIVATE
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/rw61x_factory_data/AppFactoryDataDefaultImpl.cpp
+            )
+            target_include_directories(app PRIVATE
+                ${CHIP_ROOT}/examples)
+        else ()
+            target_sources(app PRIVATE
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+            )
+        endif()
     endif()
 endif()
 
@@ -201,13 +221,22 @@ if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/include
     )
-    if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_S200)
+
+    if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_S50)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreS50.cpp
+        )
+    elseif (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_S200)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreS200.cpp
         )
     elseif (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_EMPTY)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreEmpty.cpp
+        )
+    elseif (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_SE05X)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreSE05X.cpp
         )
     endif()
 endif()
@@ -226,15 +255,16 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
         )
-    elseif (CONFIG_CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE)
+    elseif (CONFIG_CHIP_APP_OTA_REQUESTOR_INITIATOR_EMPTY_SELF_TEST)
         target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorEmptySelfTest.cpp
         )
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)
         target_sources(app PRIVATE
-            # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/ota/OtaUtils.cpp
+            # Use the example provided by mcxw71 platform until a common solution is proposed.
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/ota/OtaUtils.cpp
         )
     endif()
 endif()
@@ -259,8 +289,8 @@ if (CONFIG_CHIP_APP_UI_FEEDBACK)
             )
         else()
             target_sources(app PRIVATE
-                # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/util/LedOnOff.cpp
+                # Use the example provided by mcxw71 platform until a common solution is proposed.
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/util/LedOnOff.cpp
             )
         endif()
     endif()
@@ -274,3 +304,11 @@ if (CONFIG_CHIP_APP_WIFI_CONNECT)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/wifi_connect/source/WifiConnect.cpp
     )
 endif()
+
+# Use MCUX post-build function to convert the executable to binary format
+mcux_convert_binary(
+    BINARY ${APPLICATION_BINARY_DIR}/app.bin
+    TARGET app
+    TOOLCHAINS ${CONFIG_TOOLCHAIN}
+    EXTRA_ARGS "${CONFIG_REMOVE_SECTIONS_FROM_BIN}"
+)

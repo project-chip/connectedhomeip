@@ -55,9 +55,11 @@
 import json
 from typing import Any
 
-from chip.testing.conversions import bytes_from_hex
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.conversions import bytes_from_hex
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 
 class TestFrameworkArgParsing(MatterBaseTest):

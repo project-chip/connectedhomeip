@@ -28,7 +28,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 namespace internal {
 
@@ -45,7 +45,7 @@ constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id
         .attributeId   = id,
         .size          = 4,
         .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
-        .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE,
+        .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE,
     };
 }
 
@@ -56,7 +56,8 @@ struct MockAttributeConfig
     MockAttributeConfig(AttributeId aId) : id(aId), attributeMetaData(internal::DefaultAttributeMetadata(aId)) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeMetadata metadata) : id(aId), attributeMetaData(metadata) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeType type,
-                        EmberAfAttributeMask mask = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE) :
+                        EmberAfAttributeMask mask = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE |
+                            MATTER_ATTRIBUTE_FLAG_NULLABLE) :
         id(aId),
         attributeMetaData(internal::DefaultAttributeMetadata(aId))
     {
@@ -154,5 +155,5 @@ struct MockNodeConfig
     const std::vector<MockEndpointConfig> endpoints;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

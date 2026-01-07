@@ -33,6 +33,7 @@
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
@@ -112,7 +113,7 @@ uint8_t AttributeInstruction::sInstructionId = 0;
 
 using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
-using TestClusterStateCache = chip::Test::AppContext;
+using TestClusterStateCache = chip::Testing::AppContext;
 
 class ForwardedDataCallbackValidator final
 {
@@ -259,7 +260,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             }
 
             uint32_t writtenLength = writer.GetLengthWritten();
-            writer.Finalize(handle);
+            EXPECT_SUCCESS(writer.Finalize(handle));
             TLV::ScopedBufferTLVReader reader;
             reader.Init(std::move(handle), writtenLength);
             EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
@@ -569,6 +570,66 @@ void RunAndValidateSequence(AttributeInstructionListType list)
 
     DataSeriesGenerator generator(&cache.GetBufferedCallback(), list);
     generator.Generate(dataCallbackValidator);
+
+    // Check that iteration of the ClusterStateCache does the right thing.
+    //
+    // The basic idea is that we make a copy of our instruction list, iterate
+    // the cache in some way and remove instructions matching the observed paths
+    // from the copy.  Then we test whether all the things we expected to be
+    // removed got removed.
+    auto newInstructionRemovalFunction = [](AttributeInstructionListType & listToRemoveFrom) {
+        return [&listToRemoveFrom](const ConcreteAttributePath & path) {
+            size_t sizeBeforeErase = listToRemoveFrom.size();
+            // Remove all instructions matching the path; there might have been
+            // multiple such instructions, but the path can be present in the
+            // cache only once.
+            listToRemoveFrom.erase(std::remove_if(listToRemoveFrom.begin(), listToRemoveFrom.end(),
+                                                  [&path](const AttributeInstruction & instruction) {
+                                                      return instruction.GetAttributePath() == path;
+                                                  }),
+                                   listToRemoveFrom.end());
+
+            // We should have had an instruction for this path.
+            EXPECT_NE(listToRemoveFrom.size(), sizeBeforeErase);
+
+            return CHIP_NO_ERROR;
+        };
+    };
+
+    if (!list.empty())
+    {
+        AttributeInstructionListType listCopy(list);
+        ConcreteClusterPath clusterPath = listCopy[0].GetAttributePath();
+        EXPECT_SUCCESS(
+            cache.ForEachAttribute(clusterPath.mEndpointId, clusterPath.mClusterId, newInstructionRemovalFunction(listCopy)));
+
+        // Should have removed all instructions matching this cluster instance.
+        for (auto & instruction : listCopy)
+        {
+            EXPECT_FALSE(clusterPath == instruction.GetAttributePath());
+        }
+    }
+
+    if (!list.empty())
+    {
+        AttributeInstructionListType listCopy(list);
+        ClusterId cluster = listCopy[0].GetAttributePath().mClusterId;
+        EXPECT_SUCCESS(cache.ForEachAttribute(cluster, newInstructionRemovalFunction(listCopy)));
+
+        // Should have removed all instructions matching this cluster id.
+        for (auto & instruction : listCopy)
+        {
+            EXPECT_NE(instruction.GetAttributePath().mClusterId, cluster);
+        }
+    }
+
+    {
+        AttributeInstructionListType listCopy(list);
+        EXPECT_SUCCESS(cache.ForEachAttribute(newInstructionRemovalFunction(listCopy)));
+
+        // We should have had things in the cache for all our instructions.
+        EXPECT_EQ(listCopy.size(), 0u);
+    }
 
     // Now verify that we would do the right thing when encoding our data
     // versions.

@@ -37,9 +37,10 @@ jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        
         strategy:
             matrix:
+                os: [ macos-26 ]
                 options: # We don't need a full matrix
                     - flavor: macos-release
                       arguments: -sdk macosx -configuration Release
@@ -49,9 +50,10 @@ jobs:
                       arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
                       arguments: -sdk watchos -configuration Debug
+        runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -67,16 +69,22 @@ jobs:
                   # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
                   scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Build
-              working-directory: src/darwin/Framework
-              run: xcodebuild -target "Matter" ${{ matrix.options.arguments }}
+              working-directory: src/darwin
+              run: xcodebuild -scheme "Matter Framework" -derivedDataPath ./Framework/build ${{ matrix.options.arguments }}
+            - name: Build CHIPTool
+              if: ${{ matrix.options.flavor == 'ios-release' }}
+              working-directory: src/darwin
+              # Use the same derivedDataPath as the framework build, so we don't have to build the framework again and can use the one we already built.
+              run: xcodebuild -scheme "CHIP Tool App" -derivedDataPath ./Framework/build ${{ matrix.options.arguments }} CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
         needs: [framework] # serialize to avoid running to many parallel macos runners
-        runs-on: macos-13
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: [ macos-26 ]
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
@@ -89,7 +97,7 @@ jobs:
                       defines: ENABLE_LEAK_DETECTION=1
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -105,12 +113,12 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
-
+                  echo "Quiet work in progress - artifacts 'darwin-tests.log' and 'darwin-tests-err.log' will be output."
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" \
-                    -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
-                    -sdk macosx ${{ matrix.options.arguments }} \
-                    GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
-                    > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
+                  -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
+                  -sdk macosx ${{ matrix.options.arguments }} \
+                  GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
+                  > /tmp/darwin/framework-tests/darwin-tests.log 2> /tmp/darwin/framework-tests/darwin-tests-err.log
             - name: Generate Summary
               if: always()
               working-directory: /tmp
@@ -124,7 +132,7 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: failure() && !env.ACT
               with:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}

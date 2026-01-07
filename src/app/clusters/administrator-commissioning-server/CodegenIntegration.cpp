@@ -16,10 +16,9 @@
  */
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/static-cluster-config/AdministratorCommissioning.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/attribute-storage.h>
+#include <app/util/config.h> // REQUIRED for ifdefs for commands
 
 using namespace chip;
 using namespace chip::app;
@@ -29,7 +28,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-// AdministraotrCommissioningCluster implementation is specifically implemented
+// AdministratorCommissioningCluster implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
 // So either:
 //   - we have a fixed config and it is endpoint 0 OR
@@ -49,45 +48,67 @@ using ClusterImpl = AdministratorCommissioningWithBasicCommissioningWindowCluste
 using ClusterImpl = AdministratorCommissioningCluster;
 #endif
 
+// Exactly one instance allocated: implementation here supports root-node functionality and does not support
+// generic functionality (e.g. for multi fabric)
 LazyRegisteredServerCluster<ClusterImpl> gServer;
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap));
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+};
 
 } // namespace
 
-void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    // The implementation of the server we use here is only for the RootNode (i.e. endpoint 0)
+    // singleton. Other uses (e.g. fabric sync) will need their own implementations and would be added
+    // separately.
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
-    uint32_t rawFeatureMap;
-    if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-    {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpointId);
-        rawFeatureMap = 0;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(rawFeatureMap));
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Admin Commissioning register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = AdministratorCommissioning::Id,
+            .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
+        },
+        integrationDelegate);
 }
 
-void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Admin Commissioning unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+
+    // unregister a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = AdministratorCommissioning::Id,
+            .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
+        },
+        integrationDelegate, shutdownType);
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback() {}

@@ -186,7 +186,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
@@ -286,13 +286,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = PosixConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     err = PosixConfig::FactoryResetCounters();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to factory reset counters: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset counters: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

@@ -35,22 +35,38 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import queue
-import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import SimpleEventCallback
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):
-    def wait_for_trusted_time_souce_event(self, timeout):
+    def wait_for_trusted_time_souce_event(self, timeout, cb):
+        """
+        Waits for the MissingTrustedTimeSource event and validates its type.
+
+        This function blocks for up to timeout seconds, waiting for the MissingTrustedTimeSource event to be received.
+
+        Parameters:
+            timeout (float): Seconds to wait for the event.
+            cb (EventSubscriptionHandler): The event callback object from which the event is pulled.
+
+        Raises:
+            AssertionError: If no event is received before timeout or if the event type is incorrect.
+        """
+
         try:
-            ret = self.q.get(block=True, timeout=timeout)
-            asserts.assert_true(type_matches(received_value=ret.Data,
+            ret = cb.get_event_from_queue(block=True, timeout=timeout)
+            asserts.assert_true(matchers.is_type(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.MissingTrustedTimeSource), "Incorrect type received for event")
         except queue.Empty:
             asserts.fail("Did not receive MissingTrustedTimeSouce event")
@@ -67,7 +83,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(1, "TH1 opens a commissioning window")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(2, "Commission to TH2")
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -88,17 +104,16 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(5, "TH1 subscribeds to the MissingTrustedTimeSource event")
         event = Clusters.TimeSynchronization.Events.MissingTrustedTimeSource
-        self.q = queue.Queue()
-        cb = SimpleEventCallback("MissingTrustedTimeSource", event.cluster_id, event.event_id, self.q)
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(6, "TH1 removes the TH2 fabric")
         await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_idx))
 
         self.print_step(7, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.wait_for_trusted_time_souce_event(5, cb)
 
         self.print_step(8, "TH1 sends a SetTrusteTimeSource command")
         tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(
@@ -106,13 +121,13 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(trustedTimeSource=tts))
 
         self.print_step(9, "TH1 waits 5 seconds")
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.print_step(10, "TH1 sends the SetTrustedTimeSource command with TrustedTimeSource set to NULL")
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(NullValue))
 
         self.print_step(11, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.wait_for_trusted_time_souce_event(5, cb)
 
 
 if __name__ == "__main__":

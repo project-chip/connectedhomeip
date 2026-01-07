@@ -46,6 +46,7 @@ extern "C" {
 #endif
 
 #include "chipOBleProfile.h"
+#include <AppoBLE_interface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,9 +57,6 @@ using namespace chip::Ble;
 // Internal Events for RTOS application
 #define ICALL_EVT ICALL_MSG_EVENT_ID  // Event_Id_31
 #define QUEUE_EVT UTIL_QUEUE_EVENT_ID // Event_Id_30
-
-// Application events
-#define BLEManagerIMPL_STATE_UPDATE_EVT (0)
 
 // 500ms interval
 #define BLEMANAGERIMPL_ADV_INT_SLOW (800)
@@ -74,22 +72,28 @@ using namespace chip::Ble;
 #define CHIPOBLE_DEVICE_DESC_LENGTH (4)
 
 // How often to read current current RPA (in ms)
-#define READ_RPA_EVT_PERIOD 3000
+#define BLEMGR_RPA_CB_UPDATE_PERIOD 3000
 
 // 15 Minute Advertisement CHIP Timeout period
 #define ADV_TIMEOUT (900000)
 
-#define STATE_CHANGE_EVT 0
-#define CHAR_CHANGE_EVT 1
-#define CHIPOBLE_CHAR_CHANGE_EVT 2
-#define BLEManagerIMPL_CHIPOBLE_TX_IND_EVT 3
-#define ADV_EVT 4
-#define PAIR_STATE_EVT 5
-#define PASSCODE_EVT 6
-#define READ_RPA_EVT 7
-#define SEND_PARAM_UPDATE_EVT 8
-#define BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT 9
-#define CONN_EVT 10
+typedef enum BleMgr_events
+{
+    BLEMGR_ADV_STATE_UPDATE,
+    BLEMGR_ADV_CB_UPDATE,
+    BLEMGR_PAIR_STATE_CB_UPDATE,
+    BLEMGR_PASSCODE_CB_UPDATE,
+    BLEMGR_RPA_CB_UPDATE,
+    BLEMGR_CONN_PARAM_CB_UPDATE,
+    BLEMGR_CHIPOBLE_CONN_CLOSE,
+    BLEMGR_CHIPOBLE_CHAR_CHANGE,
+    BLEMGR_APPOBLE_ADV_API_ADD,
+    BLEMGR_APPOBLE_ADV_API_REMOVE,
+    BLEMGR_APPOBLE_CHAR_WRITE_REQ,
+    BLEMGR_APPOBLE_CHAR_READ_REQ,
+    BLEMGR_APPOBLE_CUSTOM_API_REQ,
+    END_OF_BLE_MGR_RESERVE = 200, /* Start index of AppoBLE Optional Message Events */
+} BleMgr_events_t;
 
 // For storing the active connections
 #define RSSI_TRACK_CHNLS 1 // Max possible channels can be GAP_BONDINGS_MAX
@@ -118,14 +122,6 @@ typedef struct
     uint16_t len;        //  data length
     uint16_t connHandle; // Active connection which received the write
 } CHIPoBLEProfChgEvt_t;
-
-// App event passed from stack modules. This type is defined by the application
-// since it can queue events to itself however it wants.
-typedef struct
-{
-    uint8_t event; // event type
-    void * pData;  // pointer to message
-} QueuedEvt_t;
 
 // Container to store advertising event data when passing from advertising
 // callback to app event. See the respective event in GapAdvScan_Event_IDs
@@ -166,6 +162,13 @@ typedef struct
     bool isAutoPHYEnable; // Flag to indicate auto phy change
     uint16_t mtu;
     ClockEventData_t * pParamUpdateEventData;
+    /*
+    MatteroBLE Service Mode states:
+    1. Disabled on startup
+    2. Enabled once central initiates connection to peripheral AND subscribes to MatteroBLE characteristic
+    3. Disabled once MatteroBLE characteristic is unsubscribed from
+*/
+    ConnectivityManager::CHIPoBLEServiceMode mServiceMode;
 } ConnRec_t;
 
 // Container to store passcode data when passing from gapbondmgr callback
@@ -193,17 +196,85 @@ typedef struct
 /**
  * Concrete implementation of the BLEManager singleton object for CC13XX_26XX.
  */
-class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
-
+class BLEManagerImpl final : public BLEManager,
+                             public AppoBLE_interface,
+                             private BleLayer,
+                             private BlePlatformDelegate,
+                             private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
+    friend AppoBLE_interface;
 
 public:
+/* AppoBLE */
+#define MAX_NUM_ADV_SETS 2
+
+    enum class AdvFlags : uint16_t
+    {
+        kAdvertisingEnabled       = 0x0001, /* App enabled CHIPoBLE advertising */
+        kFastAdvertisingEnabled   = 0x0002, /* App enabled Fast CHIPoBLE advertising */
+        kAdvertising              = 0x0004, /* TI BLE stack actively advertising */
+        kAdvSetInitialized        = 0x0010, /* TI BLE Stack Advertisement Initialization complete */
+        kAdvertisingRefreshNeeded = 0x0020, /* Advertising settings changed and it should be restarted */
+    };
+
+    typedef struct
+    {
+        uint8_t advHandle;
+        uint16_t advProps;
+        BitFlags<AdvFlags> advState;
+        uint32_t slowAdvIntMin;
+        uint32_t slowAdvIntMax;
+        uint32_t fastAdvIntMin;
+        uint32_t fastAdvIntMax;
+    } AdvSet_t;
+
     // ===== Platform-specific members that may be accessed directly by the application.
 
+    AdvSet_t mAdvSetArray[MAX_NUM_ADV_SETS];
+    uint32_t pairingPasscode = B_APP_DEFAULT_PASSCODE;
+// Helpers
+#ifdef TI_APPOBLE_ENABLE
+    bStatus_t EnqueueAppoBLEMsg(uint32_t event, void * pData);
+    uint8_t SendAppoBLEAdvApi(AppoBLE_api_type_t api, AppoBLEAdvApi_msg * msg);
+    void SetAppoBLEPairingPassCode(uint32_t passcode);
+    void Generic_charValueChangeCB(uint8_t * servUUID, uint8_t * charUUID, uint8_t len, uint8_t connHandle);
+    bool SendGenericFxnReq(pfnCallInBleMgrCtx_t FxnPtr, void * arg);
+#endif
 private:
+    uint8_t RemoveAdvSet(uint8_t inputAdvIndex);
+
+    uint8_t AddUpdateAdvSet(uint8_t inputAdvIndex, GapAdv_params_t advParams, const uint8_t * advData, uint8_t advDataLen,
+                            const uint8_t * scanRspData, uint8_t scanRspDataLen, GapAdv_eventMaskFlags_t evtMask);
+    BLE_CONNECTION_OBJECT GetConnection(uint8_t connIndex);
+
+    uint8_t SetAdvInterval(uint8_t advIndex, uint32_t intervalMax, uint32_t intervalMin);
+
+    CHIP_ERROR AddUpdateMatteroBLEAdv(void);
+    void UpdateAdvInterval(uint8_t advIndex);
+
+    uint8_t getAdvIndex(uint8_t advHandle);
+
+    bool isAdvertisingEnabled(uint8_t advIndex);
+    uint8_t setAdvertisingEnabled(bool val, uint8_t advIndex);
+    bool isAdvertising(uint8_t advIndex);
+    CHIP_ERROR setAdvertisingMode(BLEAdvertisingMode mode, uint8_t advIndex);
+
+    uint8_t setAdvertisingInterval(uint8_t advIndex, uint32_t intervalMax, uint32_t intervalMin);
+    ConnectivityManager::CHIPoBLEServiceMode getMatteroBLEServiceMode(BLE_CONNECTION_OBJECT conId);
+
+    uint8_t getDeviceName(char * buf, size_t bufSize);
+    uint8_t setDeviceName(const char * deviceName);
+
+    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId, uint8_t * srcBuf,
+                        uint16_t srcBufLen);
+
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                          uint8_t * srcBuf, uint16_t srcBufLen);
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId, uint8_t * const dstBuf,
+                         uint16_t dstBufLen);
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
@@ -267,15 +338,15 @@ private:
     };
 
     BitFlags<Flags> mFlags;
-    CHIPoBLEServiceMode mServiceMode;
+
     char mDeviceName[GAP_DEVICE_NAME_LEN];
 
-    ConnRec_t connList[LL_MAX_NUM_BLE_CONNS];
+    ConnRec_t connList[MAX_NUM_BLE_CONNS];
     // List to store connection handles for queued param updates
     List_List paramUpdateList;
 
     // Advertising handles
-    uint8_t advHandleLegacy;
+    uint8_t matterAdvIndex;
     // Address mode
     GAP_Addr_Modes_t addrMode = DEFAULT_ADDRESS_MODE;
     // Current Random Private Address
@@ -287,20 +358,20 @@ private:
     ClockP_Struct clkRpaRead;
     ClockP_Struct clkAdvTimeout;
     // Memory to pass RPA read event ID to clock handler
-    ClockEventData_t argRpaRead = { .event = READ_RPA_EVT };
+    ClockEventData_t argRpaRead = { .event = BLEMGR_RPA_CB_UPDATE };
 
     // ===== Private BLE Stack Helper functions.
     void ConfigureAdvertisements(void);
     void EventHandler_init(void);
     void InitPHYRSSIArray(void);
     CHIP_ERROR CreateEventHandler(void);
-    uint8_t ProcessStackEvent(ICall_Hdr * pMsg);
-    void ProcessEvtHdrMsg(QueuedEvt_t * pMsg);
+    uint8_t ProcessBLEStackEvent(ICall_Hdr * pMsg);
+    void ProcessBleMgrEvt(GenericQueuedEvt_t * pMsg);
     void ProcessGapMessage(gapEventHdr_t * pMsg);
     uint8_t ProcessGATTMsg(gattMsgEvent_t * pMsg);
     void ProcessAdvEvent(GapAdvEventData_t * pEventData);
     CHIP_ERROR ProcessParamUpdate(uint16_t connHandle);
-    status_t EnqueueEvtHdrMsg(uint8_t event, void * pData);
+    status_t EnqueueBLEMgrMsg(uint32_t event, void * pData);
     uint8_t AddBLEConn(uint16_t connHandle);
     uint8_t RemoveBLEConn(uint16_t connHandle);
     uint8_t GetBLEConnIndex(uint16_t connHandle) const;

@@ -29,10 +29,10 @@ that is used to display the test easily in the test harness.
 
 The following shows a test step sending a simple command with no arguments.
 
-```
-    - label: "This label gets printed"
-      cluster: "On/Off"
-      command: "On"
+```yaml
+- label: "This label gets printed"
+  cluster: "On/Off"
+  command: "On"
 ```
 
 -   label - label to print before performing the test step
@@ -46,21 +46,21 @@ also be overwritten in the individual test steps.
 
 The following shows how to send a command with arguments:
 
-```
-    - label: "This label gets printed before the test step"
-      command: "MoveToColor"
-      arguments:
-          values:
-              - name: "ColorX"
-                value: 32768
-              - name: "ColorY"
-                value: 19660
-              - name: "TransitionTime"
-                value: 0
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
+```yaml
+- label: "This label gets printed before the test step"
+  command: "MoveToColor"
+  arguments:
+      values:
+          - name: "ColorX"
+            value: 32768
+          - name: "ColorY"
+            value: 19660
+          - name: "TransitionTime"
+            value: 0
+          - name: "OptionsMask"
+            value: 0
+          - name: "OptionsOverride"
+            value: 0
 ```
 
 -   label - label to print before performing the test step
@@ -82,7 +82,7 @@ a special command that requires an additional "attribute" tag.
 The following YAML would appear as a test step, and shows how to read an
 attribute.
 
-```
+```yaml
 - label: "TH reads the ClusterRevision from DUT"
   command: "readAttribute"
   attribute: "ClusterRevision"
@@ -91,12 +91,12 @@ attribute.
 The following YAML would appear as a test step and shows how to write an
 attribute. Commands to write attributes always require an argument: tag.
 
-```
+```yaml
 - label: "Write example attribute"
   command: "writeAttribute"
   attribute: "ExampleAttribute"
   arguments:
-    value: 1
+      value: 1
 ```
 
 #### Parsing Responses
@@ -108,14 +108,14 @@ sub-tags.
 The following shows a simple response parsing with two (somewhat redundant)
 checks.
 
-```
+```yaml
 - label: "TH reads the ClusterRevision from DUT"
   command: "readAttribute"
   attribute: "ClusterRevision"
   response:
-    value: 1
-    constraints:
-      minValue: 1
+      value: 1
+      constraints:
+          minValue: 1
 ```
 
 The following tags can be used to parse the response
@@ -137,13 +137,11 @@ structs: `{field1:value, field2:value}`
 
 lists of structs:
 
-```
+```yaml
 [
+    { field1:value, field2:value, optionalfield:value },
 
-{field1:value, field2:value, optionalfield:value},
-
-{field1:value, field2:value},
-
+    { field1:value, field2:value },
 ]
 ```
 
@@ -162,40 +160,40 @@ Some of the more common functionality is shown below:
 Establishing a connection to the DUT. This is the first step in nearly every
 test.
 
-```
-    - label: "Establish a connection to the DUT"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+```yaml
+- label: "Establish a connection to the DUT"
+  cluster: "DelayCommands"
+  command: "WaitForCommissionee"
+  arguments:
+      values:
+          - name: "nodeId"
+            value: nodeId
 ```
 
 Wait for a user action:
 
-```
-    - label: "Do a simple user prompt message. Expect 'y' to pass."
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+```yaml
+- label: "Do a simple user prompt message. Expect 'y' to pass."
+  cluster: "LogCommands"
+  command: "UserPrompt"
+  arguments:
+      values:
+          - name: "message"
+            value: "Please enter 'y' for success"
+          - name: "expectedValue"
+            value: "y"
 ```
 
 Wait for a time:
 
-```
-    - label: "Wait for 5S"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
+```yaml
+- label: "Wait for 5S"
+  cluster: "DelayCommands"
+  command: "WaitForMs"
+  arguments:
+      values:
+          - name: "ms"
+            value: 5000
 ```
 
 A full description of the available pseudo-clusters and their commands is
@@ -211,7 +209,7 @@ in the test harness.
 To declare config variables in the config section, use a label with the desired
 name, then provide the type and defaultValue tags as sub-tags.
 
-```
+```yaml
 config:
     nodeId: 0x12344321
     cluster: "Unit Testing"
@@ -223,37 +221,37 @@ config:
 
 Variables can also be saved from responses:
 
-```
-    - label: "Send Test Add Arguments Command"
-      command: "TestAddArguments"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 3
-              - name: "arg2"
-                value: 17
-      response:
-          values:
-              - name: "returnValue"
-                saveAs: TestAddArgumentDefaultValue
-                value: 20
+```yaml
+- label: "Send Test Add Arguments Command"
+  command: "TestAddArguments"
+  arguments:
+      values:
+          - name: "arg1"
+            value: 3
+          - name: "arg2"
+            value: 17
+  response:
+      values:
+          - name: "returnValue"
+            saveAs: TestAddArgumentDefaultValue
+            value: 20
 ```
 
 Variables can then be used in later steps:
 
-```
-    - label: "Send Test Add Arguments Command"
-      command: "TestAddArguments"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 3
-              - name: "arg2"
-                value: 17
-      response:
-          values:
-              - name: "returnValue"
-                value: TestAddArgumentDefaultValue
+```yaml
+- label: "Send Test Add Arguments Command"
+  command: "TestAddArguments"
+  arguments:
+      values:
+          - name: "arg1"
+            value: 3
+          - name: "arg2"
+            value: 17
+  response:
+      values:
+          - name: "returnValue"
+            value: TestAddArgumentDefaultValue
 ```
 
 Tags where variables can be used are noted in the
@@ -273,11 +271,32 @@ the test harness. Note that full-test gating is not currently implemented in the
 local runner or in the CI.
 
 Some test steps need to be gated on values from earlier in the test. In these
-cases, PICS cannot be used. Instead, the runIf: tag can be used. This tag
+cases, PICS cannot be used. Instead, the `runIf` tag can be used. This tag
 requires a boolean value. To convert values to booleans, the TestEqualities
 function can be use. See
 [TestEqualities](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/TestEqualities.yaml)
 for an example of how to use this pseudo-cluster.
+
+In addition to the `PICS` and `runIf` tags, there are the `minRevision` and
+`maxRevision` tags which use the step's `cluster`'s `ClusterRevision` attribute
+to determine if a step should be skipped because it only applies to older or
+newer versions. A step will be skipped if the cluster's `ClusterRevision`
+attribute is < `minRevision` (if present), or > `maxRevision` (if present).
+
+Here is an example of only checking for the value of a given attribute if
+`ClusterRevision` >= 3 using `minRevision`.
+
+```yaml
+- label: "Verify the minimum-to-support Max Paths Per Invoke value"
+  command: "readAttribute"
+  attribute: "MaxPathsPerInvoke"
+  minRevision:
+      3 # Attribute was added in revision 3, so this step applies
+      # to revision >= 3.
+  response:
+      constraints:
+          minValue: 1
+```
 
 #### Setting step timeouts
 
@@ -317,13 +336,13 @@ before using any YAML runner script.
 
 First activate the matter environment using either
 
-```
+```shell
 . ./scripts/bootstrap.sh
 ```
 
 or
 
-```
+```shell
 . ./scripts/activate.sh
 ```
 
@@ -332,16 +351,15 @@ subsequent setups as it is faster.
 
 Next build the python wheels and create a venv
 
-```
+```shell
 ./scripts/build_python.sh -i out/python_env
 source out/python_env/bin/activate
 ```
 
 Compile chip-tool:
 
-```
+```shell
 ./scripts/build/build_examples.py --target linux-x64-chip-tool build
-
 ```
 
 NOTE: use the target appropriate to your system
@@ -350,7 +368,7 @@ NOTE: use the target appropriate to your system
 can be used to run tests against a commissioned DUT (commissioned by chip-tool).
 To commission a DUT using chip-tool use the pairing command. For example:
 
-```
+```shell
 ./out/linux-x64-chip-tool/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
 ```
 
@@ -359,25 +377,23 @@ MT:-24J0AFN00KA0648G00 is the QR code.
 
 The chiptool.py tool can then be used to run the tests. For example:
 
-```
+```shell
 ./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
-
 ```
 
 NOTE: substitute the appropriate test name and chip-tool path as appropriate.
 
 A list of available tests can be generated using:
 
-```
+```shell
 ./scripts/tests/chipyaml/chiptool.py list
 ```
 
 Config variables can be passed to chiptool.py after the script by separating
 with --
 
-```
+```shell
 ./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
-
 ```
 
 Each test defines a default endpoint to target. Root node cluster tests run

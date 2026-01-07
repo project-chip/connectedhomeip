@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace AvailableEndpoints {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace AvailableEndpoints
@@ -19,6 +23,10 @@ inline constexpr AttributeId Id = 0x00000000;
 namespace ActiveEndpoints {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace ActiveEndpoints
+
+namespace ElectricalCircuitNodes {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ElectricalCircuitNodes
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

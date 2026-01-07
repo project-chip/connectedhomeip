@@ -72,7 +72,7 @@ void SetTestEventTrigger_PriceUpdate()
     newPrice.SetNonNull(newPriceStruct);
 
     CommodityPriceInstance * inst = GetCommodityPriceInstance();
-    inst->SetCurrentPrice(newPrice);
+    TEMPORARY_RETURN_IGNORED inst->SetCurrentPrice(newPrice);
 }
 
 void SetTestEventTrigger_ForecastUpdate()
@@ -138,7 +138,7 @@ void SetTestEventTrigger_ForecastUpdate()
     DataModel::List<Structs::CommodityPriceStruct::Type> forecastList(
         Span<Structs::CommodityPriceStruct::Type>(sForecastEntries, kForecastSize));
 
-    inst->SetForecast(forecastList); // Should now be safe: all memory lives long enough
+    TEMPORARY_RETURN_IGNORED inst->SetForecast(forecastList); // Should now be safe: all memory lives long enough
 }
 
 bool HandleCommodityPriceTestEventTrigger(uint64_t eventTrigger)

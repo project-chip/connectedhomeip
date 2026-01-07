@@ -48,6 +48,13 @@ overrides:
     status: success
     explanation: "PR has been fast tracked, bypassing reviews"
 
+  ############################################################
+  #  Approved by matter-sdk-maintainers
+  ############################################################
+  - if: "'sdk-maintainer-approved' in labels and len(groups.approved.include('sdk-maintainers')) >= 1"
+    status: success
+    explanation: "Approved by SDK maintainer and label is set."
+
 ############################################################
 #  Notifications
 ############################################################
@@ -100,6 +107,14 @@ groups:
       - files.include('*')
     reviewers:
       teams: [reviewers-comcast]
+    reviews:
+      request: 0 # Do not auto-add
+  shared-reviewers-cablelabs:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-cablelabs]
     reviews:
       request: 0 # Do not auto-add
   shared-reviewers-dyson:
@@ -250,6 +265,15 @@ groups:
       - files.include('*')
     reviewers:
       teams: [reviewers-velux]
+    reviews:
+      request: 0 # Do not auto-add
+
+  sdk-maintainers:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [matter-sdk-maintainers]
     reviews:
       request: 0 # Do not auto-add
 

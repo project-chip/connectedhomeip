@@ -39,13 +39,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:140
+            image: ghcr.io/project-chip/chip-build-telink:177
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 050e732c8ba66ece6058aac1591508e0e3510729"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 86fb5f1142c99e04abc923f4c0aa5fafb2ea9ace"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -99,15 +99,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) All Clusters Minimal App
+            - name: Build example Telink (B92) All Clusters Minimal App with NFC onboarding payload
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal-nfc-payload' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9528a all-clusters-minimal-app \
-                    out/telink-tlsr9528a-all-clusters-minimal/zephyr/zephyr.elf \
+                    out/telink-tlsr9528a-all-clusters-minimal-nfc-payload/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -245,15 +245,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) Lock App with DFU
+            - name: Build example Telink (B92) Lock App with DFU over BLE SMP
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu-smp' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a lock-app-dfu \
-                    out/telink-tlsr9528a-lock-dfu/zephyr/zephyr.elf \
+                    telink tlsr9528a lock-app-dfu-smp \
+                    out/telink-tlsr9528a-lock-dfu-smp/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -343,15 +343,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B91) Thermostat App
+            - name: Build example Telink (W91) Thermostat App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-thermostat' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d thermostat \
-                    out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \
+                    telink tlsr9118bdk40d thermostat \
+                    out/telink-tlsr9118bdk40d-thermostat/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -386,13 +386,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:140
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:177
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -405,7 +405,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 5a53841781b3be928f599e8fcc1f4ad80c83523b"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 0b56f3a0b56d720ba5b4c1108ccda4ccc19c1932"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -540,12 +540,12 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) Lock App with DFU
+            - name: Build example Telink (B92) Lock App with DFU over BLE SMP
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu-smp' build"
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
@@ -610,12 +610,12 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B91) Thermostat App
+            - name: Build example Telink (w91) Thermostat App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-thermostat' build"
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*

@@ -37,22 +37,25 @@
 #       --app-pipe /tmp/refalm_2_2_fifo
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import typing
 from dataclasses import dataclass
-from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipUtility
-from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing import matter_asserts
-from chip.testing.event_attribute_reporting import EventChangeCallback
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.tlv import uint
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter import ChipUtility
+from matter.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing import matter_asserts
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+from matter.tlv import uint
+
+log = logging.getLogger(__name__)
 
 # TODO(#37217)  Refactor using generic method.
 # Implement fake commands for the RefrigeratorAlarm Cluster
@@ -102,14 +105,13 @@ class TC_REFALM_2_2(MatterBaseTest):
 
     def pics_TC_REFALM_2_2(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "REFALM.S"
         ]
-        return pics
 
     def steps_TC_REFALM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep(2, "Ensure that the door on the DUT is closed"),
             TestStep(3, "TH reads from the DUT the State attribute",
@@ -131,14 +133,12 @@ class TC_REFALM_2_2(MatterBaseTest):
                      "Receive a Notify event with the State attribute bit 0 set to 0."),
         ]
 
-        return steps
-
     async def _get_command_status(self, cmd: ClusterCommand):
-        """Return the status of the executed command. By default the status is 0x0 unless a different 
+        """Return the status of the executed command. By default the status is 0x0 unless a different
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
         except InteractionModelError as uc:
             cmd_status = uc.status
         return cmd_status
@@ -167,10 +167,10 @@ class TC_REFALM_2_2(MatterBaseTest):
             attribute=Clusters.RefrigeratorAlarm.Attributes.State
         )
 
-    def _wait_thresshold(self):
+    async def _wait_thresshold(self):
         """Wait the defined time at the PIXIT.REFALM.AlarmThreshold to trigger it."""
-        logger.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
-        sleep(self.refalm_threshold_seconds)
+        log.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
+        await asyncio.sleep(self.refalm_threshold_seconds)
 
     def _send_open_door_command(self):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint,
@@ -181,12 +181,16 @@ class TC_REFALM_2_2(MatterBaseTest):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
         self.write_to_app_pipe(command_dict)
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_REFALM_2_2(self):
         """Run the test steps."""
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.RefrigeratorAlarm
-        logger.info(f"Default endpoint {self.endpoint}")
+        log.info(f"Default endpoint {self.endpoint}")
         # Commision the device.
         # Read required variables.
         self.step(1)
@@ -201,7 +205,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(3)
         # reads the state attribute , must be a bitMap32 ( list wich values are 32 bits)
         device_state = await self._read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        log.info(f"The device state is {device_state}")
         matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 0)
 
@@ -211,12 +215,12 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # wait  PIXIT.REFALM.AlarmThreshold (1s)
         self.step(5)
-        self._wait_thresshold()
+        await self._wait_thresshold()
 
         # # read the status
         self.step(6)
         device_state = await self._read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        log.info(f"The device state is {device_state}")
         matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 1)
 
@@ -227,7 +231,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read from the state attr
         self.step(8)
         device_status = await self._read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        log.info(f"The device state is {device_state}")
         asserts.assert_equal(device_status, 0)
         matter_asserts.assert_valid_uint32(device_state, "State")
 
@@ -243,28 +247,28 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # Subscribe to Notify Event
         self.step(11)
-        event_callback = EventChangeCallback(Clusters.RefrigeratorAlarm)
+        event_callback = EventSubscriptionHandler(expected_cluster=Clusters.RefrigeratorAlarm)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
-                                   self.get_endpoint(1))
+                                   self.get_endpoint())
 
         self.step(12)
         # repeat step 4 and 5
-        logger.info("Manually open the door on the DUT")
+        log.info("Manually open the door on the DUT")
         self._ask_for_open_door()
-        logger.info("Wait for the time defined in PIXIT.REFALM.AlarmThreshold")
-        self._wait_thresshold()
+        log.info("Wait for the time defined in PIXIT.REFALM.AlarmThreshold")
+        await self._wait_thresshold()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.state, 1, "Unexpected value for State returned")
 
         self.step(13)
-        logger.info("Ensure that the door on the DUT is closed")
+        log.info("Ensure that the door on the DUT is closed")
         self._ask_for_closed_door()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.state, 0, "Unexpected value for State returned")
 
 

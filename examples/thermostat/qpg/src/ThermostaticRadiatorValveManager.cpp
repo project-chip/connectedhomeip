@@ -134,7 +134,7 @@ void ThermostaticRadiatorValveManager::StartNormalOperation(void)
     // start periodic timer
     if (mThermostaticRadiatorValve_action == TRV_OFF_ACTION)
     {
-        ChipLogProgress(NotSpecified, "Start Normal Operation");
+        ChipLogDetail(NotSpecified, "Start Normal Operation");
         // update ThermostaticRadiatorValve status right away and start timer
         UpdateThermostaticRadiatorValveStatus();
 
@@ -160,7 +160,7 @@ void ThermostaticRadiatorValveManager::StopNormalOperation(void)
 
 void ThermostaticRadiatorValveManager::StartTimer(uint32_t aTimeoutMs)
 {
-    ChipLogProgress(NotSpecified, "ThermostaticRadiatorValveTimer start timer with %lu", aTimeoutMs);
+    ChipLogDetail(NotSpecified, "ThermostaticRadiatorValveTimer start timer with %lu", aTimeoutMs);
 
     if (xTimerIsTimerActive(sThermostaticRadiatorValveTimer))
     {
@@ -209,7 +209,7 @@ void ThermostaticRadiatorValveManager::PeriodicTimerEventHandler(AppEvent * aEve
 {
     ThermostaticRadiatorValveManager * thermostaticRadiatorValve =
         static_cast<ThermostaticRadiatorValveManager *>(aEvent->TimerEvent.Context);
-    ChipLogProgress(NotSpecified, "PeriodicTimerEventHandler");
+    ChipLogDetail(NotSpecified, "PeriodicTimerEventHandler");
 
     // periodically check the temperature and update thermostaticRadiatorValve status
     thermostaticRadiatorValve->UpdateThermostaticRadiatorValveStatus();
@@ -251,7 +251,7 @@ void ThermostaticRadiatorValveManager::UpdateThermostaticRadiatorValveStatus(voi
     int16_t coolingSetpoint;
     ThermostaticRadiatorValveManager::SystemMode_t systemMode;
 
-    ChipLogProgress(NotSpecified, "UpdateThermostaticRadiatorValveStatus");
+    ChipLogDetail(NotSpecified, "UpdateThermostaticRadiatorValveStatus");
     mThermostaticRadiatorValve_action = TRV_IDLE_ACTION;
 
     // read temperature value and attributes
@@ -316,7 +316,7 @@ void ThermostaticRadiatorValveManager::DisplayTemperature(void)
     int localTemperature;
     ThermostaticRadiatorValveManager::TempDisplayMode_t displaymode;
 
-    ChipLogProgress(NotSpecified, "DisplayTemperature");
+    ChipLogDetail(NotSpecified, "DisplayTemperature:");
 
     localTemperature = GetLocalTemperature();
     displaymode      = GetTemperatureDisplayMode();
@@ -340,12 +340,12 @@ void ThermostaticRadiatorValveManager::DisplayTemperature(void)
 
 void ThermostaticRadiatorValveManager::UpdateLocalTemperature(int16_t aLocalTemperature)
 {
-    SystemLayer().ScheduleLambda([aLocalTemperature] {
-        ChipLogProgress(NotSpecified, "UpdateLocalTemperature with value (0.01 degC) %u", aLocalTemperature);
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aLocalTemperature] {
+        ChipLogDetail(NotSpecified, "UpdateLocalTemperature with value (0.01 degC) %u", aLocalTemperature);
         if (Protocols::InteractionModel::Status::Success !=
             Thermostat::Attributes::LocalTemperature::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aLocalTemperature))
         {
-            ChipLogProgress(NotSpecified, "UpdateLocalTemperature failure");
+            ChipLogError(NotSpecified, "UpdateLocalTemperature failure");
         }
     });
 }
@@ -356,15 +356,15 @@ uint8_t ThermostaticRadiatorValveManager::GetPICoolingDemand(void)
 
     Thermostat::Attributes::PICoolingDemand::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetPICoolingDemand - %d", value);
+    ChipLogDetail(NotSpecified, "GetPICoolingDemand - %d", value);
     return value;
 }
 
 void ThermostaticRadiatorValveManager::SetPICoolingDemand(uint8_t aPI)
 {
-    SystemLayer().ScheduleLambda([aPI] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aPI] {
         Thermostat::Attributes::PICoolingDemand::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aPI);
-        ChipLogError(NotSpecified, "SetPICoolingDemand - %d", aPI);
+        ChipLogDetail(NotSpecified, "SetPICoolingDemand - %d", aPI);
     });
 }
 
@@ -374,15 +374,15 @@ uint8_t ThermostaticRadiatorValveManager::GetPIHeatingDemand(void)
 
     Thermostat::Attributes::PIHeatingDemand::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetPIHeatingDemand - %d", value);
+    ChipLogDetail(NotSpecified, "GetPIHeatingDemand - %d", value);
     return value;
 }
 
 void ThermostaticRadiatorValveManager::SetPIHeatingDemand(uint8_t aPI)
 {
-    SystemLayer().ScheduleLambda([aPI] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aPI] {
         Thermostat::Attributes::PIHeatingDemand::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aPI);
-        ChipLogError(NotSpecified, "SetPIHeatingDemand - %d", aPI);
+        ChipLogDetail(NotSpecified, "SetPIHeatingDemand - %d", aPI);
     });
 }
 
@@ -392,17 +392,17 @@ int16_t ThermostaticRadiatorValveManager::GetOccupiedCoolingSetpoint(void)
 
     Thermostat::Attributes::OccupiedCoolingSetpoint::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetOccupiedCoolingSetpoint (0.01 degC) - %d", value);
+    ChipLogDetail(NotSpecified, "GetOccupiedCoolingSetpoint (0.01 degC) - %d", value);
 
     return value;
 }
 
 void ThermostaticRadiatorValveManager::SetOccupiedCoolingSetpoint(int16_t aSetpoint)
 {
-    SystemLayer().ScheduleLambda([aSetpoint] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aSetpoint] {
         Thermostat::Attributes::OccupiedCoolingSetpoint::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aSetpoint);
 
-        ChipLogError(NotSpecified, "SetOccupiedCoolingSetpoint - %d", aSetpoint);
+        ChipLogDetail(NotSpecified, "SetOccupiedCoolingSetpoint - %d", aSetpoint);
     });
 }
 
@@ -412,17 +412,17 @@ int16_t ThermostaticRadiatorValveManager::GetOccupiedHeatingSetpoint(void)
 
     Thermostat::Attributes::OccupiedHeatingSetpoint::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetOccupiedHeatingSetpoint (0.01 degC) - %d", value);
+    ChipLogDetail(NotSpecified, "GetOccupiedHeatingSetpoint (0.01 degC) - %d", value);
 
     return value;
 }
 
 void ThermostaticRadiatorValveManager::SetOccupiedHeatingSetpoint(int16_t aSetpoint)
 {
-    SystemLayer().ScheduleLambda([aSetpoint] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aSetpoint] {
         Thermostat::Attributes::OccupiedHeatingSetpoint::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aSetpoint);
 
-        ChipLogError(NotSpecified, "SetOccupiedHeatingSetpoint - status %d", aSetpoint);
+        ChipLogDetail(NotSpecified, "SetOccupiedHeatingSetpoint - status %d", aSetpoint);
     });
 }
 
@@ -432,17 +432,17 @@ ThermostaticRadiatorValveManager::Operation_t ThermostaticRadiatorValveManager::
 
     Thermostat::Attributes::ControlSequenceOfOperation::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetControlSequenceOfOperation - %d", (uint8_t) value);
+    ChipLogDetail(NotSpecified, "GetControlSequenceOfOperation - %d", (uint8_t) value);
 
     return value;
 }
 
 void ThermostaticRadiatorValveManager::SetControlSequenceOfOperation(ThermostaticRadiatorValveManager::Operation_t aOperation)
 {
-    SystemLayer().ScheduleLambda([aOperation] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aOperation] {
         Thermostat::Attributes::ControlSequenceOfOperation::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aOperation);
 
-        ChipLogError(NotSpecified, "SetControlSequenceOfOperation value %d", (int) aOperation);
+        ChipLogDetail(NotSpecified, "SetControlSequenceOfOperation value %d", (int) aOperation);
     });
 }
 
@@ -452,17 +452,17 @@ ThermostaticRadiatorValveManager::SystemMode_t ThermostaticRadiatorValveManager:
 
     Thermostat::Attributes::SystemMode::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetSystemMode -  %d", (uint8_t) value);
+    ChipLogProgress(NotSpecified, "GetSystemMode -  %d", (uint8_t) value);
 
     return (ThermostaticRadiatorValveManager::SystemMode_t) value;
 }
 
 void ThermostaticRadiatorValveManager::SetSystemMode(ThermostaticRadiatorValveManager::SystemMode_t aSystemMode)
 {
-    SystemLayer().ScheduleLambda([aSystemMode] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aSystemMode] {
         Thermostat::Attributes::SystemMode::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aSystemMode);
 
-        ChipLogError(NotSpecified, "SetSystemMode value %d", (uint8_t) aSystemMode);
+        ChipLogProgress(NotSpecified, "SetSystemMode value %d", (uint8_t) aSystemMode);
     });
 }
 
@@ -472,17 +472,17 @@ ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveMan
 
     ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
-    ChipLogError(NotSpecified, "GetTemperatureDisplayMode -  %d", (uint8_t) value);
+    ChipLogDetail(NotSpecified, "GetTemperatureDisplayMode -  %d", (uint8_t) value);
 
     return value;
 }
 
 void ThermostaticRadiatorValveManager::SetTemperatureDisplayMode(ThermostaticRadiatorValveManager::TempDisplayMode_t aMode)
 {
-    SystemLayer().ScheduleLambda([aMode] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aMode] {
         ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aMode);
 
-        ChipLogError(NotSpecified, "SetTemperatureDisplayMode value %d", (uint8_t) aMode);
+        ChipLogDetail(NotSpecified, "SetTemperatureDisplayMode value %d", (uint8_t) aMode);
     });
 }
 

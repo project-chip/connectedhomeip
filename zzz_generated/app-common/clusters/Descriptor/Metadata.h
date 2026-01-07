@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace Descriptor {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace DeviceTypeList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DeviceTypeList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -48,10 +50,19 @@ namespace EndpointUniqueID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(EndpointUniqueID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace EndpointUniqueID
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    DeviceTypeList::kMetadataEntry,
+    ServerList::kMetadataEntry,
+    ClientList::kMetadataEntry,
+    PartsList::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app

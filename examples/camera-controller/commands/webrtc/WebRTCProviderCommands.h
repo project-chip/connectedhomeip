@@ -19,6 +19,7 @@
 #pragma once
 
 #include <commands/common/CHIPCommand.h>
+#include <device-manager/DeviceManager.h>
 
 namespace webrtc {
 
@@ -46,8 +47,10 @@ class ProvideOfferCommand : public CHIPCommand
 public:
     ProvideOfferCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("provide-offer", credIssuerCommands)
     {
-        AddArgument("webrtc-session-id", 0, UINT16_MAX, &mWebRTCSessionId);
         AddArgument("stream-usage", 0, UINT8_MAX, &mStreamUsage);
+        AddArgument("webrtc-session-id", 0, UINT16_MAX, &mWebRTCSessionId);
+        AddArgument("video-stream-id", 0, UINT16_MAX, &mVideoStreamId);
+        AddArgument("audio-stream-id", 0, UINT16_MAX, &mAudioStreamId);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -57,7 +60,9 @@ public:
 
 private:
     uint8_t mStreamUsage = 0;
-    chip::Optional<uint8_t> mWebRTCSessionId;
+    chip::Optional<uint16_t> mWebRTCSessionId;
+    chip::Optional<uint16_t> mVideoStreamId;
+    chip::Optional<uint16_t> mAudioStreamId;
 };
 
 class SolicitOfferCommand : public CHIPCommand
@@ -66,6 +71,8 @@ public:
     SolicitOfferCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("solicit-offer", credIssuerCommands)
     {
         AddArgument("stream-usage", 0, UINT8_MAX, &mStreamUsage);
+        AddArgument("video-stream-id", 0, UINT16_MAX, &mVideoStreamId);
+        AddArgument("audio-stream-id", 0, UINT16_MAX, &mAudioStreamId);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -75,6 +82,27 @@ public:
 
 private:
     uint8_t mStreamUsage = 0;
+    chip::Optional<uint16_t> mVideoStreamId;
+    chip::Optional<uint16_t> mAudioStreamId;
+};
+
+class EstablishSessionCommand : public CHIPCommand
+{
+public:
+    EstablishSessionCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("establish-session", credIssuerCommands)
+    {
+        AddArgument("node-id", 0, UINT64_MAX, &mPeerNodeId);
+        AddArgument("offer-type", 0, 1, &mOfferType, "WebRTC offer type: 0=ProvideOffer (default), 1=SolicitOffer");
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(5); }
+
+private:
+    chip::NodeId mPeerNodeId = chip::kUndefinedNodeId;
+    chip::Optional<uint8_t> mOfferType;
 };
 
 } // namespace webrtc

@@ -1,4 +1,4 @@
-# Requirements for running chip-repl in jupyterlab
+# Requirements for running matter-repl in jupyterlab
 # Once installed, start with
 #
 # jupyter-lab
@@ -6,7 +6,7 @@
 # --------------------------------------
 # %reset -f
 # import importlib.util
-# spec = importlib.util.find_spec('chip.ChipReplStartup')
+# spec = importlib.util.find_spec('matter.ReplStartup')
 # %run {spec.origin}
 # --------------------------------------
 #

@@ -31,7 +31,7 @@ public:
         return Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster();
     }
 
-    const app::DataModel::Nullable<FabricIndex> & GetOpenerFabricIndex()
+    const app::DataModel::Nullable<FabricIndex> & GetAdminFabricIndex()
     {
         return Server::GetInstance().GetCommissioningWindowManager().GetOpenerFabricIndex();
     }

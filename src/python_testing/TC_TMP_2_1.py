@@ -31,10 +31,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_TMP_2_1(MatterBaseTest):
@@ -104,11 +107,10 @@ class TC_TMP_2_1(MatterBaseTest):
                 measured_value, max_bound, "Measured value is greater than max bound")
 
         self.step(7)
-        if await self.attribute_guard(self.get_endpoint(), attr.Tolerance):
+        if self.pics_guard("TMP.S.A0003"):
             tolerance = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.Tolerance)
             asserts.assert_greater_equal(tolerance, 0, "Tolerance is less than 0")
-            asserts.assert_less_equal(
-                tolerance, 2048, "Tolerance is greater than 2048")
+            asserts.assert_less_equal(tolerance, 2048, "Tolerance is greater than 2048")
 
 
 if __name__ == "__main__":

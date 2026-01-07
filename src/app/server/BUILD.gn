@@ -51,6 +51,7 @@ source_set("joint_fabric") {
   ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
     "${chip_root}/zzz_generated/app-common/clusters/JointFabricAdministrator",
     "${chip_root}/zzz_generated/app-common/clusters/JointFabricDatastore",

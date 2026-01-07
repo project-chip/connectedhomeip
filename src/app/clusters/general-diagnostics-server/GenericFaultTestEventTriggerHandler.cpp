@@ -18,7 +18,7 @@
 
 #include "GenericFaultTestEventTriggerHandler.h"
 
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace ::chip::DeviceLayer;
@@ -42,7 +42,7 @@ CHIP_ERROR GenericFaultTestEventTriggerHandler::HandleEventTrigger(uint64_t even
         ReturnErrorOnFailure(hwFaultsCurrent.add(to_underlying(HardwareFaultEnum::kPowerSource)));
         ReturnErrorOnFailure(hwFaultsCurrent.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
 
-        app::Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(hwFaultsPrevious, hwFaultsCurrent);
+        app::Clusters::GeneralDiagnostics::GlobalNotifyHardwareFaultsDetect(hwFaultsPrevious, hwFaultsCurrent);
 
         // Radio faults injection
         GeneralFaults<kMaxRadioFaults> radioFaultsPrevious;
@@ -57,7 +57,7 @@ CHIP_ERROR GenericFaultTestEventTriggerHandler::HandleEventTrigger(uint64_t even
         ReturnErrorOnFailure(radioFaultsCurrent.add(to_underlying(RadioFaultEnum::kThreadFault)));
         ReturnErrorOnFailure(radioFaultsCurrent.add(to_underlying(RadioFaultEnum::kNFCFault)));
 
-        app::Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(radioFaultsPrevious, radioFaultsCurrent);
+        app::Clusters::GeneralDiagnostics::GlobalNotifyRadioFaultsDetect(radioFaultsPrevious, radioFaultsCurrent);
 
         GeneralFaults<kMaxNetworkFaults> networkFaultsPrevious;
         GeneralFaults<kMaxNetworkFaults> networkFaultsCurrent;
@@ -71,7 +71,7 @@ CHIP_ERROR GenericFaultTestEventTriggerHandler::HandleEventTrigger(uint64_t even
         ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
         ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 
-        app::Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
+        app::Clusters::GeneralDiagnostics::GlobalNotifyNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
     }
 
     return CHIP_ERROR_INVALID_ARGUMENT;

@@ -32,24 +32,12 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-CHIP_ERROR InitLwIPCoreLock(void);
-}
-
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen);
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-
-    CHIP_ERROR err;
-
-    // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-
-    SuccessOrExit(err);
-
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     // TODO Wi-Fi Initialzation currently done through the example app needs to be moved into here.
@@ -58,7 +46,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    CHIP_ERROR err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     err = System::Clock::InitClock_RealTime();
     SuccessOrExit(err);

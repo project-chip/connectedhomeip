@@ -17,9 +17,10 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-table.h>
+#include <app/util/generic-callbacks.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Global.h>
 #include <lib/core/Optional.h>
@@ -72,6 +73,34 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // No-op: Descriptor and OTA do not need this, and our client-defined
     // clusters dont use it.
 }
+void MatterDescriptorClusterInitCallback(EndpointId endpointId);
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // For OTA we don't use the functions in CodegenIntegration
+    // because we use the gOtaProviderServer and the functions defined here.
+    switch (clusterId) {
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterInitCallback(endpoint);
+        break;
+    }
+}
+
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId, MatterClusterShutdownType shutdownType)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // For OTA we don't use the functions in CodegenIntegration
+    // because we use the gOtaProviderServer and the functions defined here.
+    switch (clusterId) {
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    }
+}
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
     const EmberAfWriteDataInput & input)
@@ -89,6 +118,13 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
 
     // All of our attributes are handled via AttributeAccessInterface, so this
     // should be unreached.
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength)
+{
+    // Only here so linking succeeds; should never be called, because all our cluster implementations
+    // are done via AttributeAccessInterface or ServerClusterInterface.
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 

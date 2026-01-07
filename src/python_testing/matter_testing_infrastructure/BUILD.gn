@@ -15,53 +15,82 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import(
+    "//src/python_testing/matter_testing_infrastructure/credential_files.gni")
 import("//src/python_testing/matter_testing_infrastructure/data_model_xmls.gni")
 import("$dir_pw_build/python.gni")
 import("$dir_pw_build/python_dist.gni")
 import("$dir_pw_build/zip.gni")
 
-pw_python_package("chip-testing-module") {
+pw_python_package("matter-testing-module") {
   generate_setup = {
     metadata = {
-      name = "chip-testing-module"
+      name = "matter-testing-module"
       version = "1.4.0"
-      author = "Project CHIP Authors"
-      license_expression = "Apache-2.0"  # Consistent license format
+      description = "Testing support for Matter SDK"
       url = "https://github.com/project-chip/connectedhomeip"
+      classifiers = [
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+      ]
     }
   }
 
   inputs = [ "env_test.yaml" ]
 
   sources = [
-    "chip/testing/__init__.py",
-    "chip/testing/apps.py",
-    "chip/testing/basic_composition.py",
-    "chip/testing/choice_conformance.py",
-    "chip/testing/commissioning.py",
-    "chip/testing/conformance.py",
-    "chip/testing/conversions.py",
-    "chip/testing/decorators.py",
-    "chip/testing/event_attribute_reporting.py",
-    "chip/testing/global_attribute_ids.py",
-    "chip/testing/global_stash.py",
-    "chip/testing/matchers.py",
-    "chip/testing/matter_asserts.py",
-    "chip/testing/matter_testing.py",
-    "chip/testing/metadata.py",
-    "chip/testing/pics.py",
-    "chip/testing/problem_notices.py",
-    "chip/testing/runner.py",
-    "chip/testing/spec_parsing.py",
-    "chip/testing/taglist_and_topology_test.py",
-    "chip/testing/tasks.py",
-    "chip/testing/timeoperations.py",
+    "matter/testing/__init__.py",
+    "matter/testing/apps.py",
+    "matter/testing/basic_composition.py",
+    "matter/testing/choice_conformance.py",
+    "matter/testing/commissioning.py",
+    "matter/testing/conformance.py",
+    "matter/testing/conversions.py",
+    "matter/testing/credentials.py",
+    "matter/testing/decorators.py",
+    "matter/testing/defaults.py",
+    "matter/testing/event_attribute_reporting.py",
+    "matter/testing/global_attribute_ids.py",
+    "matter/testing/global_stash.py",
+    "matter/testing/matchers.py",
+    "matter/testing/matter_asserts.py",
+    "matter/testing/matter_nfc_interaction.py",
+    "matter/testing/matter_stack_state.py",
+    "matter/testing/matter_test_config.py",
+    "matter/testing/matter_testing.py",
+    "matter/testing/metadata.py",
+    "matter/testing/pics.py",
+    "matter/testing/problem_notices.py",
+    "matter/testing/runner.py",
+    "matter/testing/spec_parsing.py",
+    "matter/testing/taglist_and_topology_test.py",
+    "matter/testing/tasks.py",
+    "matter/testing/timeoperations.py",
   ]
   tests = [
-    "chip/testing/test_metadata.py",
-    "chip/testing/test_tasks.py",
-    "chip/testing/test_matter_asserts.py",
+    "matter/testing/test_metadata.py",
+    "matter/testing/test_tasks.py",
+    "matter/testing/test_matter_asserts.py",
   ]
+}
+
+pw_zip("data_model_zip_1_1") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_1) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.1/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_1.zip"
+}
+
+pw_zip("data_model_zip_1_2") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_2) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.2/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_2.zip"
 }
 
 pw_zip("data_model_zip_1_3") {
@@ -100,27 +129,64 @@ pw_zip("data_model_zip_1_4_2") {
   output = "${root_out_dir}/data_model/zip_1_4_2.zip"
 }
 
-pw_python_distribution("chip-testing") {
-  packages = [ ":chip-testing-module" ]
+pw_zip("data_model_zip_1_5") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_5) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.5/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_5.zip"
+}
+
+pw_zip("credential_zip_development") {
+  inputs = []
+  foreach(file, credentials_development) {
+    zip_path = rebase_path(file, "${chip_root}/credentials/development/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/credentials/zip_development.zip"
+}
+
+pw_zip("credential_zip_production") {
+  inputs = []
+  foreach(file, credentials_production) {
+    zip_path = rebase_path(file, "${chip_root}/credentials/production/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/credentials/zip_production.zip"
+}
+
+pw_python_distribution("matter-testing") {
+  packages = [ ":matter-testing-module" ]
 
   generate_setup_cfg = {
-    name = "chip-testing"
+    name = "matter-testing"
     version = "1.4.2"
     include_default_pyproject_file = true
     include_extra_files_in_package_data = true
   }
 
   public_deps = [
+    ":credential_zip_development",
+    ":credential_zip_production",
+    ":data_model_zip_1_1",
+    ":data_model_zip_1_2",
     ":data_model_zip_1_3",
     ":data_model_zip_1_4",
     ":data_model_zip_1_4_1",
     ":data_model_zip_1_4_2",
+    ":data_model_zip_1_5",
   ]
 
   extra_files = [
-    "${root_out_dir}/data_model/zip_1_3.zip > chip/testing/data_model/1.3/allfiles.zip",
-    "${root_out_dir}/data_model/zip_1_4.zip > chip/testing/data_model/1.4/allfiles.zip",
-    "${root_out_dir}/data_model/zip_1_4_1.zip > chip/testing/data_model/1.4.1/allfiles.zip",
-    "${root_out_dir}/data_model/zip_1_4_2.zip > chip/testing/data_model/1.4.2/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_1.zip > matter/testing/data_model/1.1/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_2.zip > matter/testing/data_model/1.2/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_3.zip > matter/testing/data_model/1.3/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_4.zip > matter/testing/data_model/1.4/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_4_1.zip > matter/testing/data_model/1.4.1/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_4_2.zip > matter/testing/data_model/1.4.2/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_5.zip > matter/testing/data_model/1.5/allfiles.zip",
+    "${root_out_dir}/credentials/zip_development.zip > matter/testing/credentials/development/allfiles.zip",
+    "${root_out_dir}/credentials/zip_production.zip > matter/testing/credentials/production/allfiles.zip",
   ]
 }

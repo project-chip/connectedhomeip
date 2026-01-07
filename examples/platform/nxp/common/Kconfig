@@ -49,19 +49,52 @@ if CHIP_APP_BLE_MANAGER
     choice CHIP_APP_BLE_MANAGER_SELECTION
         prompt "Select Application BLE Manager"
         
-        config CHIP_APP_BLE_MANAGER_CUSTOM
-            bool "App Custom BLE Manager"
+        config CHIP_APP_BLE_MANAGER_CUSTOM_BLE_ZEPHYR
+            bool "App Custom BLE Manager Zephyr"
             depends on CHIP_CUSTOM_BLE_ADV_DATA && CHIP_DEVICE_USE_ZEPHYR_BLE
             help
-                Enable application custom BLE manager.
-        
+                Enable application custom Zephyr BLE manager.
+
+        config CHIP_APP_BLE_MANAGER_CUSTOM_NXP_BLE_HOST
+            bool "App Custom BLE Manager MCXW7x"
+            depends on CHIP_NXP_MULTIPLE_BLE_CONNECTIONS && !CHIP_DEVICE_USE_ZEPHYR_BLE
+            help
+                Enable application custom MCXW7x BLE manager.
+
         config CHIP_APP_BLE_MANAGER_EMPTY
             bool "App BLE Manager Empty"
             help
                 Enable application BLE manager empty implementation.
 
+        config CHIP_APP_BLE_MANAGER_CUSTOM_EXTERNAL
+            bool "App Custom BLE Manager External"
+            default n
+            help
+                Enable application custom externally linked (e.g from mcuxsdk-examples-matter) BLE manager.
+
     endchoice # CHIP_APP_BLE_MANAGER
+
 endif # CHIP_APP_BLE_MANAGER
+
+config CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
+    bool "Enable customization of GATT service on MCXW platform"
+    default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+    help
+        Enable customization of GATT service on MCXW platform
+
+if CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
+config CHIP_APP_EXTRA_GATT_DB_HEADER
+    string "Extra application Gatt db header"
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_db.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
+        Set path to extra application Gatt db header.
+
+config CHIP_APP_EXTRA_GATT_UUID_HEADER
+    string "Extra application Gatt UUID header"
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_uuid128.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
+        Set path to extra application Gatt UUID header.
+endif
 
 config DIAG_LOGS_DEMO
 	bool "Diagnostic log demo"
@@ -78,7 +111,7 @@ config CHIP_APP_FACTORY_DATA
 if CHIP_APP_FACTORY_DATA
     choice CHIP_APP_FACTORY_DATA_IMPL_SELECTION
         prompt "Select AppFactoryData Implementation"
-        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_RT1060
+        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_RT1060
         default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA || CHIP_ENABLE_EL2GO_FACTORY_DATA
         default CHIP_APP_FACTORY_DATA_IMPL_COMMON
 
@@ -109,7 +142,7 @@ config CHIP_APP_LOW_POWER
 
 config CHIP_APP_BUTTON
     bool "App Button"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     default n
     help
         Enable the application Button implementation.
@@ -117,7 +150,7 @@ config CHIP_APP_BUTTON
 choice CHIP_APP_BUTTON_REGISTRATION_SELECTION
     prompt "App Button Registration Implementation Selection"
     default CHIP_APP_BUTTON_REGISTRATION_EMPTY if !CHIP_APP_BUTTON
-    default CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     default CHIP_APP_BUTTON_REGISTRATION_APP_ONLY if CHIP_NXP_PLATFORM_RW61X
 
     config CHIP_APP_BUTTON_REGISTRATION_EMPTY
@@ -148,7 +181,7 @@ endchoice # CHIP_APP_BUTTON_REGISTRATION_SELECTION
 if  CHIP_APP_BUTTON
     config CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
         bool "App button handle is not predefined within the SDK"
-        default n if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default n if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
         default y
         help
             App button handle is not predefined within the SDK
@@ -164,7 +197,7 @@ if  CHIP_APP_BUTTON
             Enable application custom button behavior.
 
     config CHIP_APP_BUTTON_BLE
-        bool "App Button BLE" 
+        bool "App Button BLE"
         select CHIP_APP_BUTTON_WITH_TIMER
         help
             Enable application custom button behavior for BLE.
@@ -186,7 +219,14 @@ config CHIP_APP_OPERATIONAL_KEYSTORE
 if CHIP_APP_OPERATIONAL_KEYSTORE
     choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
         prompt "Select Operation Keystore Implementation"
-        default CHIP_APP_OPERATIONAL_KEYSTORE_S200
+        default CHIP_APP_OPERATIONAL_KEYSTORE_SE05X if CHIP_SE05X
+        default CHIP_APP_OPERATIONAL_KEYSTORE_S200 if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default CHIP_APP_OPERATIONAL_KEYSTORE_S50 if CHIP_NXP_PLATFORM_RW61X
+
+        config CHIP_APP_OPERATIONAL_KEYSTORE_S50
+            bool "Operation Keystore S50"
+            help
+                Enable application Operational keystore S50 implementation.
 
         config CHIP_APP_OPERATIONAL_KEYSTORE_S200
             bool "Operation Keystore S200"
@@ -198,7 +238,18 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
             help
                 Enable application Operational keystore empty implementation.
 
+        config CHIP_APP_OPERATIONAL_KEYSTORE_SE05X
+            bool "Operation Keystore SE05X"
+            help
+                Enable application Operational keystore SE05X implementation.
+
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+
+    config PRIVATE_ECC_KEY_BLOB_SIZE
+        int "Operational private ECC key blob size"
+        default 120 if CHIP_APP_OPERATIONAL_KEYSTORE_S200
+        default 48 if CHIP_APP_OPERATIONAL_KEYSTORE_S50
+
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
 
 config CHIP_APP_OTA_REQUESTOR
@@ -211,11 +262,11 @@ if CHIP_APP_OTA_REQUESTOR
     choice CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
         prompt "Select OTA Requestor Initiator"
 
-        config CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE
-            bool "OTA Requestor Initiator Multi-Image"
-            depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        config CHIP_APP_OTA_REQUESTOR_INITIATOR_EMPTY_SELF_TEST
+            bool "OTA Requestor Initiator Empty Self Test"
+            depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
             help
-                Enable OTA Requestor Initiator for multiple image OTA SW update.
+                Enable OTA Requestor Initiator with an empty self test function for OTA SW update.
 
         config CHIP_APP_OTA_REQUESTOR_INITIATOR_FREERTOS
             bool "OTA Requestor Initiator FreeRTOS"
@@ -228,16 +279,22 @@ if CHIP_APP_OTA_REQUESTOR
             depends on !APP_FREERTOS_OS
             help
                 Enable OTA Requestor Initiator for Zephyr OS application.
-    
+
     endchoice # CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
 
     config CHIP_APP_PLATFORM_OTA_UTILS
         bool "Platform OTA Utils"
-        default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
         help
             Use platform OtaUtils.cpp file.
 
 endif # CHIP_APP_OTA_REQUESTOR
+
+config CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
+	bool "Registration of simple test event trigger delegate"
+	default y if CHIP_ENABLE_ICD_SUPPORT
+	help
+	  Enable registration of a simple test event trigger delegate, ONLY enable it for matter certification testing.
 
 config CHIP_APP_RPC
     bool "App RPC"
@@ -246,14 +303,14 @@ config CHIP_APP_RPC
 
 config ENABLE_FEEDBACK
 	bool "Enable the app feedback component"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     depends on !NXP_USE_LOW_POWER
 	help
 		"Enable the app feedback component"
 
 config CHIP_APP_UI_FEEDBACK
     bool "App UI Feedback"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     help
         Enable application user interface feedback.
 
@@ -289,7 +346,7 @@ endif # CHIP_APP_WIFI_CONNECT_AT_BOOT
 
 config CHIP_APP_PLATFORM_LED_ON_OFF
     bool "App platform Led On Off Implementation"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     depends on CHIP_APP_UI_FEEDBACK
     help
         Enable platform LedOnOff Implementation.
@@ -328,6 +385,7 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
 
 config APP_TASK_STACK_SIZE
     int "App Task Stack Size"
+    default 9000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
     default 6144
     help
         Set the stack size for the application task in bytes.

@@ -18,50 +18,96 @@ on:
   push:
     branches: [ master ]
     paths:
+      - 'src/controller/python/matter/ChipDeviceCtrl.py'
       - 'src/python_testing/matter_testing_infrastructure/**/*.py'
+      - 'scripts/tests/chipyaml/paths_finder.py'
+      - 'scripts/tests/chiptest/**/*.py'
+      - 'scripts/tests/run_test_suite.py'
   pull_request:
     paths:
+      - 'src/controller/python/matter/ChipDeviceCtrl.py'
       - 'src/python_testing/matter_testing_infrastructure/**/*.py'
+      - 'scripts/tests/chipyaml/paths_finder.py'
+      - 'scripts/tests/chiptest/**/*.py'
+      - 'scripts/tests/run_test_suite.py'
 
 jobs:
   mypy-check:
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
-    
+
     container:
-      image: ghcr.io/project-chip/chip-build:140
+      image: ghcr.io/project-chip/chip-build:177
       options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-    
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@v5
+
       - name: Checkout submodules & Bootstrap
         uses: ./.github/actions/checkout-submodules-and-bootstrap
         with:
           platform: linux
-      
+
       - name: Build Python environment
         run: |
           scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
-      
+
+      - name: Run mypy validation (ChipDeviceCtrl.py)
+        shell: bash
+        run: |
+          set +e
+
+          OUTPUT=$(./scripts/run_in_python_env.sh out/venv "mypy --follow-imports=skip src/controller/python/matter/ChipDeviceCtrl.py" 2>&1)
+          STATUS=$?
+
+          echo "$OUTPUT"
+
+          ERRORS=$(echo "$OUTPUT" | grep -c '^src/controller/python/matter/ChipDeviceCtrl.py:[0-9]\+: error:')
+
+          if [ "$STATUS" -eq 0 ]; then
+            echo "No mypy errors found in ChipDeviceCtrl.py"
+            exit 0
+          elif [ "$ERRORS" -gt 0 ]; then
+            echo "Mypy found $ERRORS error(s) in ChipDeviceCtrl.py"
+            echo "$OUTPUT" | grep '^src/controller/python/matter/ChipDeviceCtrl.py:[0-9]\+: error:'
+            exit 1
+          else
+            echo "Mypy exited with error but no errors in ChipDeviceCtrl.py"
+            exit 0
+          fi
+
+      - name: Run mypy validation (MatterJsonTlv.py)
+        run: |
+          ./scripts/run_in_python_env.sh out/venv "mypy --follow-imports=skip \
+            src/controller/python/matter/MatterTlvJson.py"
+
       - name: Run mypy validation
         run: |
           # List the directory to debug the file structure
-          ls -la src/python_testing/matter_testing_infrastructure/chip/testing/
-          
+          ls -la src/python_testing/matter_testing_infrastructure/matter/testing/
+
           # TODO: Expand this list to include more files once they are mypy-compatible
           # Eventually we should just check all files in the chip/testing directory
-          
-          ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
-            src/python_testing/matter_testing_infrastructure/chip/testing/apps.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/tasks.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/taglist_and_topology_test.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/pics.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/choice_conformance.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/commissioning.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/decorators.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/basic_composition.py"
-          
+
+          ./scripts/run_in_python_env.sh out/venv "mypy \
+            src/python_testing/matter_testing_infrastructure/matter/testing/apps.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/tasks.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/taglist_and_topology_test.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/pics.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/runner.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/choice_conformance.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/commissioning.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/decorators.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/conformance.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/metadata.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py \
+            scripts/tests/chipyaml/paths_finder.py \
+            scripts/tests/chiptest/ \
+            scripts/tests/run_test_suite.py \
+          "
+
           # Print a reminder about expanding coverage
-          echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!" 
+          echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!"

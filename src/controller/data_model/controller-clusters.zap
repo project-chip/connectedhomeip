@@ -3008,15 +3008,8 @@
           "define": "COMMODITY_TARIFF_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
-            {
-              "name": "GetTariffComponent",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
             {
               "name": "GetTariffComponentResponse",
               "code": 0,
@@ -3026,8 +3019,8 @@
               "isEnabled": 1
             },
             {
-              "name": "GetDayEntry",
-              "code": 1,
+              "name": "GetTariffComponent",
+              "code": 0,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -3039,6 +3032,14 @@
               "mfgCode": null,
               "source": "server",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetDayEntry",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ]
@@ -3312,7 +3313,8 @@
           "mfgCode": null,
           "define": "COMMODITY_METERING_CLUSTER",
           "side": "client",
-          "enabled": 1
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Unit Testing",

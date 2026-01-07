@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace AccessControl {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 13;
+
 namespace Acl {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Acl
@@ -39,6 +43,10 @@ inline constexpr AttributeId Id = 0x00000005;
 namespace Arl {
 inline constexpr AttributeId Id = 0x00000006;
 } // namespace Arl
+
+namespace AuxiliaryACL {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace AuxiliaryACL
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

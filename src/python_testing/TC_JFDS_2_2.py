@@ -39,13 +39,18 @@ import random
 import tempfile
 from configparser import ConfigParser
 
-import chip.clusters as Clusters
-from chip import CertificateAuthority
-# from chip.interaction_model import InteractionModelError
-from chip.storage import PersistentStorage
-from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import CertificateAuthority
+# from matter.interaction_model import InteractionModelError
+from matter.storage import VolatileTemporaryPersistentStorage
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_JFDS_2_2(MatterBaseTest):
@@ -74,7 +79,7 @@ class TC_JFDS_2_2(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
         #####################################################################################################################################
         #
@@ -109,7 +114,8 @@ class TC_JFDS_2_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -170,7 +176,8 @@ class TC_JFDS_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_JFDS_2_2(self):
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
@@ -182,7 +189,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
         _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         step1_groupKeySetListLength = len(_groupKetSetList)
@@ -210,7 +217,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         self.step("3")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
         _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         asserts.assert_greater_equal(len(_groupKetSetList), step1_groupKeySetListLength,
@@ -238,7 +245,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         # self.step("5")
         # response = await devCtrlEcoA.ReadAttribute(
-        #     nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+        #     nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
         #     returnClusterObject=True)
         # _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
 
@@ -255,7 +262,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         self.step("7")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
         _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         for _item in _groupKetSetList:
@@ -280,6 +287,9 @@ class TC_JFDS_2_2(MatterBaseTest):
         #                       str(e), f'Expected CONSTRANT_ERROR error, but got {str(e)}')
         # else:
         #     asserts.assert_true(False, 'Expected InteractionModelError with CONSTRANT_ERROR, but no exception occurred!')
+
+        # Shutdown the Python Controllers started at the beginning of this script
+        devCtrlEcoA.Shutdown()
 
 
 if __name__ == "__main__":

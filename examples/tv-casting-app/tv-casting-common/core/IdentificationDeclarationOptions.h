@@ -61,6 +61,11 @@ public:
      * Flag to indicate when the Commissionee user has decided to exit the commissioning process.
      */
     bool mCancelPasscode = false;
+    /**
+     * Feature: Coordinate Passcode Dialogs
+     * Field to indicate the length of the passcode displayed by the client.
+     */
+    uint8_t mPasscodeLength = 0;
 
     /**
      * Commissionee's (random) DNS-SD instance name. This field is mandatory and will be auto generated if not provided by the
@@ -92,6 +97,7 @@ public:
         mCommissionerPasscode      = false;
         mCommissionerPasscodeReady = false;
         mCancelPasscode            = false;
+        mPasscodeLength            = 0;
         mTargetAppInfos.clear();
     }
 
@@ -113,6 +119,11 @@ public:
         id.SetCdUponPasscodeDialog(mCdUponPasscodeDialog);
         id.SetCancelPasscode(mCancelPasscode);
         id.SetCommissionerPasscode(mCommissionerPasscode);
+        if (!mCommissionerPasscode)
+        {
+            // only makes sense to have a length when the client is displaying the passcode
+            id.SetPasscodeLength(mPasscodeLength);
+        }
         if (mCommissionerPasscodeReady)
         {
             id.SetCommissionerPasscodeReady(true);
@@ -157,6 +168,8 @@ public:
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCancelPasscode:            %s",
                       mCancelPasscode ? "true" : "false");
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissioneeInstanceName:  %s", mCommissioneeInstanceName);
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mPasscodeLength:            %d",
+                      static_cast<uint16_t>(mPasscodeLength));
 
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::TargetAppInfos list:");
         for (size_t i = 0; i < mTargetAppInfos.size(); i++)

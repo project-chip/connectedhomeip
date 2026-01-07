@@ -36,7 +36,7 @@ namespace chip {
 namespace DeviceLayer {
 
 #define CHIP_FACTORY_DATA_ERROR(e)                                                                                                 \
-    ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 2) | e, __FILE__, __LINE__)
+    CHIP_GENERIC_ERROR(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 2) | e)
 
 #define CHIP_FACTORY_DATA_SHA_CHECK CHIP_FACTORY_DATA_ERROR(0x01)
 #define CHIP_FACTORY_DATA_HEADER_READ CHIP_FACTORY_DATA_ERROR(0x02)
@@ -195,7 +195,6 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
     CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
     CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
-    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
 
 protected:
     // Use when factory data are encrypted using aes key

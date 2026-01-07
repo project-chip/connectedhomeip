@@ -85,6 +85,46 @@ source_set("safeint") {
   sources = [ "SafeInt.h" ]
 }
 
+# Standalone source set for arg parsing functionality. This uses POSIX functions
+# like strcasecmp that are not available on embedded platforms, so it must remain
+# separate from the main support library and only be compiled when explicitly
+# depended on (typically by command-line tools).
+source_set("arg_parser") {
+  sources = [
+    "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
+  ]
+
+  public_deps = [
+    ":memory",
+    ":safeint",
+    ":support",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
+    "${nlassert_root}:nlassert",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("numeric-primitives") {
+  sources = [
+    "attribute-storage-null-handling.h",
+    "odd-sized-integers.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 source_set("memory") {
   sources = [
     "CHIPMem.cpp",
@@ -172,11 +212,32 @@ source_set("testing") {
 }
 
 source_set("type-traits") {
-  sources = [ "TypeTraits.h" ]
+  sources = [
+    "CompileTimeString.h",
+    "FunctionTraits.h",
+    "TypeTraits.h",
+  ]
 }
 
 source_set("static-support") {
   sources = [ "static_support_smart_ptr.h" ]
+}
+
+source_set("timer-delegate") {
+  sources = [ "TimerDelegate.h" ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("timer-delegate-mock") {
+  sources = [ "TimerDelegateMock.h" ]
+  public_deps = [
+    ":timer-delegate",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 static_library("support") {
@@ -196,8 +257,6 @@ static_library("support") {
     "BytesCircularBuffer.h",
     "BytesToHex.cpp",
     "BytesToHex.h",
-    "CHIPArgParser.cpp",
-    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
     "CommonIterator.h",
@@ -211,7 +270,6 @@ static_library("support") {
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
-    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
     "IntrusiveList.h",
@@ -233,6 +291,7 @@ static_library("support") {
     "ReadOnlyBuffer.cpp",
     "ReadOnlyBuffer.h",
     "ReferenceCountedHandle.h",
+    "ReferenceCountedPtr.h",
     "SafePointerCast.h",
     "SafeString.h",
     "Scoped.h",
@@ -240,6 +299,7 @@ static_library("support") {
     "SetupDiscriminator.h",
     "SortUtils.h",
     "SpanSearchValue.h",
+    "SplitLambda.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",

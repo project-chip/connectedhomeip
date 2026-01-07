@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace TimeSynchronization {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace UTCTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UTCTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -73,10 +75,16 @@ namespace SupportsDNSResolve {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportsDNSResolve::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SupportsDNSResolve
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    UTCTime::kMetadataEntry,
+    Granularity::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SetUTCTime {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetUTCTime::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);
@@ -101,6 +109,25 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetDefaultNTP::I
 } // namespace SetDefaultNTP
 
 } // namespace Commands
+
+namespace Events {
+namespace DSTTableEmpty {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DSTTableEmpty
+namespace DSTStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DSTStatus
+namespace TimeZoneStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TimeZoneStatus
+namespace TimeFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TimeFailure
+namespace MissingTrustedTimeSource {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MissingTrustedTimeSource
+
+} // namespace Events
 } // namespace TimeSynchronization
 } // namespace Clusters
 } // namespace app

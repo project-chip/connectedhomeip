@@ -189,7 +189,7 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
                 mWantedNetwork.Erase();
                 memcpy(mWantedNetwork.ssid, ssid.data(), ssid.size());
                 mWantedNetwork.ssidLen = ssid.size();
-                ChipLogProgress(DeviceLayer, "Directed Scanning, looking for: %.*s", static_cast<int>(ssid.size()), ssid.data());
+                ChipLogProgress(DeviceLayer, "Directed Scanning, looking for: %s", NullTerminated(ssid).c_str());
             }
             else
             {
@@ -314,7 +314,7 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t le
     // Contrary to other handlers, offload accumulating of the scan results from the CHIP thread to the caller's thread
     const wifi_scan_result * scanResult = reinterpret_cast<const wifi_scan_result *>(data.get());
 
-    ChipLogDetail(DeviceLayer, "Found SSID: %.*s", scanResult->ssid_length, scanResult->ssid);
+    ChipLogDetail(DeviceLayer, "Found SSID: %s", NullTerminated(scanResult->ssid, scanResult->ssid_length).c_str());
 
     if (Instance().mDirectedScanning)
     {
@@ -328,7 +328,7 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t le
         // In case there are many networks with the same SSID choose the one with the best RSSI
         if (scanResult->rssi > Instance().mWiFiParams.mRssi)
         {
-            Instance().ClearStationProvisioningData();
+            TEMPORARY_RETURN_IGNORED Instance().ClearStationProvisioningData();
             Instance().mWiFiParams.mParams.ssid_length = static_cast<uint8_t>(Instance().mWantedNetwork.ssidLen);
             Instance().mWiFiParams.mParams.ssid        = Instance().mWantedNetwork.ssid;
             // Fallback to the WIFI_SECURITY_TYPE_PSK if the security is unknown
@@ -400,7 +400,7 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
                 auto currentTimeout = Instance().CalculateNextRecoveryTime();
                 ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
                                 currentTimeout.count());
-                DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
+                TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
                 return;
             }
 
@@ -470,11 +470,11 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
             CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Cannot post event [error: %s]", ErrorStr(error));
+                ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
             }
         }
         // cleanup the provisioning data as it is configured per each connect request
-        Instance().ClearStationProvisioningData();
+        TEMPORARY_RETURN_IGNORED Instance().ClearStationProvisioningData();
     });
 
     if (CHIP_NO_ERROR == err)
@@ -557,7 +557,7 @@ void WiFiManager::Recover(System::Layer *, void *)
         return;
     }
 
-    Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+    TEMPORARY_RETURN_IGNORED Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
 }
 
 void WiFiManager::ResetRecoveryTime()

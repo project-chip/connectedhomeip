@@ -46,21 +46,6 @@ static_library("helpers") {
   ]
 }
 
-source_set("binding-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.h",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/binding-table.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
@@ -88,10 +73,10 @@ source_set("thread-network-directory-test-srcs") {
 }
 
 source_set("time-sync-data-provider-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
-
   public_deps = [
+    "${chip_root}/src/app/clusters/time-synchronization-server:time-sync-data-provider",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/persistence:persistence",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -122,19 +107,16 @@ source_set("actions-cluster-test-srcs") {
 }
 
 source_set("scenes-table-test-srcs") {
+  # Tests currently validate/use capping logic from codegen, so we add codegen support
+  # and mock data models.
   sources = [
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/storage:fabric-table",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
@@ -157,11 +139,17 @@ source_set("thread-border-router-management-test-srcs") {
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+
+    # Sources needed because codegen integration of general commissioning provides general commissioning instance
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -258,7 +246,6 @@ chip_test_suite("tests") {
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
-    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
     "TestClosureControlClusterLogic.cpp",
@@ -284,7 +271,6 @@ chip_test_suite("tests") {
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
-    "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
@@ -303,7 +289,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":app-test-stubs",
-    ":binding-test-srcs",
     ":closure-control-test-srcs",
     ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
@@ -317,6 +302,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/tests:helpers",
@@ -332,6 +318,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
@@ -339,6 +326,7 @@ chip_test_suite("tests") {
       ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 
@@ -351,10 +339,7 @@ chip_test_suite("tests") {
     ]
   } else if (!chip_fake_platform) {
     test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [
-      ":thread-border-router-management-test-srcs",
-      "${chip_root}/src/app/clusters/general-commissioning-server:test-only-temporary-coupling",
-    ]
+    public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
 
   if (!chip_fake_platform) {
@@ -381,8 +366,7 @@ chip_test_suite("tests") {
   # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
   # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
   # but it's not set up to deal with the timestamps being that low.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
 }

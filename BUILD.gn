@@ -24,6 +24,11 @@ import("$dir_pw_build/python.gni")
 import("$dir_pw_build/python_dist.gni")
 import("$dir_pw_build/python_venv.gni")
 
+declare_args() {
+  # Value to passed to the c/c++ compiler wrapper.
+  cc_wrapper = ""
+}
+
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
@@ -95,7 +100,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "//examples/chef",
       "//examples/common/pigweed/rpc_console/py:chip_rpc",
       "//integrations/mobly:chip_mobly",
-      "//src/python_testing/matter_testing_infrastructure:chip-testing",
+      "//src/python_testing/matter_testing_infrastructure:matter-testing",
     ]
   }
 
@@ -127,8 +132,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/scripts/py_matter_yamltests:matter-yamltests.wheel",
-        "${chip_root}/src/controller/python:chip-repl",
-        "${chip_root}/src/python_testing/matter_testing_infrastructure:chip-testing.wheel",
+        "${chip_root}/src/controller/python:matter-repl",
+        "${chip_root}/src/python_testing/matter_testing_infrastructure:matter-testing.wheel",
         "${chip_root}/src/python_testing/post_certification_tests:matter-post-certification-tests.wheel",
       ]
     }
@@ -239,7 +244,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
-        data_deps += [ "${chip_root}/src/controller/python:chip-repl" ]
+        data_deps += [ "${chip_root}/src/controller/python:matter-repl" ]
       }
 
       write_runtime_deps = "${root_out_dir}/certification.runtime_deps"
@@ -261,7 +266,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_idl:matter-idl.tests",
         "//scripts/py_matter_yamltests:matter-yamltests.tests",
         "//src:tests_run",
-        "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
+        "//src/python_testing/matter_testing_infrastructure:matter-testing.tests",
 
         # Platform test group locations.
         "//src/platform/silabs/tests:silabs_platform_tests_run",
@@ -397,9 +402,25 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_rvc_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux OTA Provider app example.
+    enable_linux_ota_provider_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Air Purifier app example.
+    enable_linux_air_purifier_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # TODO: #37983: Add darwin support for libdatachannel and then add host_os == "mac" here.
     # Build the Linux Camera app example.
     enable_linux_camera_app_build = enable_default_builds && host_os == "linux"
+
+    # Build the Linux Closure app example.
+    enable_linux_closure_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Water Leak Detector app example.
+    enable_linux_water_leak_detector_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
@@ -744,6 +765,43 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":linux_rvc_app" ]
+  }
+
+  if (enable_linux_ota_provider_app_build) {
+    group("linux_ota_provider_app") {
+      deps = [
+        "${chip_root}/examples/ota-provider-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_ota_provider_app" ]
+  }
+
+  if (enable_linux_air_purifier_app_build) {
+    group("linux_air_purifier_app") {
+      deps = [
+        "${chip_root}/examples/air-purifier-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_air_purifier_app" ]
+  }
+
+  if (enable_linux_closure_app_build) {
+    group("linux_closure_app") {
+      deps =
+          [ "${chip_root}/examples/closure-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_closure_app" ]
+  }
+
+  if (enable_linux_water_leak_detector_app_build) {
+    group("linux_water_leak_detector_app") {
+      deps = [ "${chip_root}/examples/water-leak-detector-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_water_leak_detector_app" ]
   }
 
   if (enable_linux_camera_app_build) {

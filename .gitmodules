@@ -10,6 +10,7 @@
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
 	branch = mbedtls-2.28
+	excluded-platforms = esp32
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
@@ -50,7 +51,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,infineon,qpg,cc32xx,realtek
+	platforms = ameba,cc13xx_26xx,bouffalolab,infineon,qpg,cc32xx,realtek
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -78,21 +79,6 @@
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
 	platforms = infineon
-[submodule "third_party/mbed-os/repo"]
-	path = third_party/mbed-os/repo
-	url = https://github.com/ARMmbed/mbed-os.git
-	branch = master
-	platforms = mbed
-[submodule "third_party/mbed-os-posix-socket/repo"]
-	path = third_party/mbed-os-posix-socket/repo
-	url = https://github.com/ARMmbed/mbed-os-posix-socket.git
-	branch  = main
-	platforms = mbed
-[submodule "mbed-os-cypress-capsense-button"]
-	path = third_party/mbed-os-cypress-capsense-button/repo
-	url = https://github.com/ARMmbed/mbed-os-cypress-capsense-button.git
-	branch = main
-	platforms = mbed
 [submodule "p6/abstraction-rtos"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/abstraction-rtos
 	url = https://github.com/Infineon/abstraction-rtos
@@ -172,10 +158,6 @@
 [submodule "third_party/jsoncpp/repo"]
 	path = third_party/jsoncpp/repo
 	url = https://github.com/open-source-parsers/jsoncpp.git
-[submodule "third_party/mbed-mcu-boot/repo"]
-	path = third_party/mbed-mcu-boot/repo
-	url = https://github.com/ATmobica/mcuboot.git
-	platforms = mbed
 [submodule "p6/serial-flash"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
@@ -211,11 +193,6 @@
 	url = https://github.com/SiliconLabs/simplicity_sdk.git
 	branch = v2025.6.0
 	platforms = silabs
-[submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
-	path = third_party/silabs/wiseconnect-wifi-bt-sdk
-	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
-	branch = 2.12.0
-	platforms = silabs
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
@@ -228,6 +205,7 @@
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
 	branch = master
+	excluded-platforms = esp32
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
@@ -243,11 +221,6 @@
 	url = https://github.com/matter-mtk/genio-matter-lwip.git
 	branch = main
 	platforms = genio
-[submodule "open-iot-sdk"]
-	path = third_party/open-iot-sdk/sdk
-	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
-	branch = main
-	platforms = openiotsdk
 [submodule "bouffalolab_sdk"]
 	path = third_party/bouffalolab/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
@@ -256,6 +229,7 @@
 [submodule "third_party/libwebsockets/repo"]
 	path = third_party/libwebsockets/repo
 	url = https://github.com/warmcat/libwebsockets
+	branch = v4.4-stable
 	platforms = linux,darwin,tizen
 [submodule "third_party/imgui/repo"]
 	path = third_party/imgui/repo
@@ -328,7 +302,7 @@
 [submodule "third_party/lwip/repo"]
 	path = third_party/lwip/repo
 	url = https://github.com/lwip-tcpip/lwip.git
-	excluded-platforms = darwin
+	excluded-platforms = darwin,esp32
 [submodule "third_party/abseil-cpp/src"]
 	path = third_party/abseil-cpp/src
 	url = https://github.com/abseil/abseil-cpp.git
@@ -344,13 +318,23 @@
 [submodule "third_party/libdatachannel/repo"]
 	path = third_party/libdatachannel/repo
 	url = https://github.com/paullouisageneau/libdatachannel.git
-	platforms = linux
+	platforms = linux,darwin
 	recursive = true
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
-	branch = matter_support
+	branch = rtk_matter_support
 	platforms = realtek
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo
 	url = https://github.com/nxp-imx/libtrustymatter
+[submodule "third_party/imx-secure-enclave/repo"]
+	path = third_party/imx-secure-enclave/repo
+	url = https://github.com/nxp-imx/imx-secure-enclave.git
+	branch = lf-6.12.49_2.2.0
+	platforms = linux
+[submodule "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"]
+	path = third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo
+	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
+	platforms = esp32
+	recursive = true

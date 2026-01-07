@@ -15,21 +15,24 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import queue
-import time
 from dataclasses import dataclass
 from typing import Any
 
-import chip.clusters as Clusters
 import psutil
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback
-from chip.testing.matter_testing import TestStep
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import TestStep
+
+log = logging.getLogger(__name__)
 
 
 def get_pid(name):
@@ -69,7 +72,7 @@ class EventSpecificChangeCallback:
         """This is the subscription callback when an event is received.
            It checks the if the event is the expected one and then posts it into the queue for later processing."""
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster_id and res.Header.EventId == self._expected_event.event_id:
-            logging.info(
+            log.info(
                 f'Got subscription report for event {self._expected_event.event_id} on cluster {self._expected_cluster_id}: {res.Data}')
             self._q.put(res)
 
@@ -133,16 +136,15 @@ class TC_OPSTATE_BASE():
         for device in device_type_list:
             found = next((mydevice for mydevice in mandatedevicetypes if mydevice["devicetype"] == device.deviceType), None)
             if found is not None:
-                logging.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
+                log.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
                 if found["revision"] <= device.revision:
-                    logging.info("Revision matches")
+                    log.info("Revision matches")
                     return True
-                else:
-                    logging.info("Revision does not match")
+                log.info("Revision does not match")
         return False
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
-        logging.info(f"##### Command {cmd}")
+        log.info(f"##### Command {cmd}")
 
         try:
             return await self.send_single_cmd(cmd=cmd,
@@ -162,11 +164,11 @@ class TC_OPSTATE_BASE():
                              f"Command response ({ret.commandResponseState}) mismatched from expectation for {cmd} on {endpoint}")
 
     async def read_expect_success(self, endpoint, attribute):
-        logging.info(f"##### Read {attribute}")
+        log.info(f"##### Read {attribute}")
         attr_value = await self.read_single_attribute_check_success(endpoint=endpoint,
                                                                     cluster=self.test_info.cluster,
                                                                     attribute=attribute)
-        logging.info(f"## {attribute}: {attr_value}")
+        log.info(f"## {attribute}: {attr_value}")
 
         return attr_value
 
@@ -194,8 +196,8 @@ class TC_OPSTATE_BASE():
         attr_value.sort()
         expected_contains.sort()
 
-        logging.info("## Current value: [%s]" % attr_value)
-        logging.info("## Expected value: [%s]" % expected_contains)
+        log.info("## Current value: [%s]" % attr_value)
+        log.info("## Expected value: [%s]" % expected_contains)
 
         for item in expected_contains:
             if item not in attr_value:
@@ -207,14 +209,13 @@ class TC_OPSTATE_BASE():
     ############################
 
     def STEPS_TC_OPSTATE_BASE_1_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
-                 TestStep(3, "TH reads from the DUT the FeatureMap attribute"),
-                 TestStep(4, "TH reads from the DUT the AttributeList attribute"),
-                 TestStep(5, "TH reads from the DUT the AcceptedCommandList attribute"),
-                 TestStep(6, "TH reads from the DUT the GeneratedCommandList attribute")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
+                TestStep(3, "TH reads from the DUT the FeatureMap attribute"),
+                TestStep(4, "TH reads from the DUT the AttributeList attribute"),
+                TestStep(5, "TH reads from the DUT the AcceptedCommandList attribute"),
+                TestStep(6, "TH reads from the DUT the GeneratedCommandList attribute")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_1_1(self, endpoint=1, cluster_revision=1, feature_map=0):
         cluster = self.test_info.cluster
@@ -301,31 +302,30 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.1
     ############################
     def STEPS_TC_OPSTATE_BASE_2_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "TH reads from the DUT the PhaseList attribute"),
-                 TestStep(3, "TH reads from the DUT the CurrentPhase attribute"),
-                 TestStep(4, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(5, "TH reads from the DUT the OperationalStateList attribute"),
-                 TestStep(6, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep("6a", "Manually put the device in the Stopped(0x00) operational state"),
-                 TestStep("6b", "TH reads from the DUT the OperationalState attribute"),
-                 TestStep("6c", "Manually put the device in the Running(0x01) operational state"),
-                 TestStep("6d", "TH reads from the DUT the OperationalState attribute"),
-                 TestStep("6e", "Manually put the device in the Paused(0x02) operational state"),
-                 TestStep("6f", "TH reads from the DUT the OperationalState attribute"),
-                 TestStep("6g", "Manually put the device in the Error(0x03) operational state"),
-                 TestStep("6h", "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(7, "TH reads from the DUT the OperationalError attribute"),
-                 TestStep("7a", "Manually put the device in the NoError(0x00) error state"),
-                 TestStep("7b", "TH reads from the DUT the OperationalError attribute"),
-                 TestStep("7c", "Manually put the device in the UnableToStartOrResume(0x01) error state"),
-                 TestStep("7d", "TH reads from the DUT the OperationalError attribute"),
-                 TestStep("7e", "Manually put the device in the UnableToCompleteOperation(0x02) error state"),
-                 TestStep("7f", "TH reads from the DUT the OperationalError attribute"),
-                 TestStep("7g", "Manually put the device in the CommandInvalidInState(0x03) error state"),
-                 TestStep("7h", "TH reads from the DUT the OperationalError attribute")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "TH reads from the DUT the PhaseList attribute"),
+                TestStep(3, "TH reads from the DUT the CurrentPhase attribute"),
+                TestStep(4, "TH reads from the DUT the CountdownTime attribute"),
+                TestStep(5, "TH reads from the DUT the OperationalStateList attribute"),
+                TestStep(6, "TH reads from the DUT the OperationalState attribute"),
+                TestStep("6a", "Manually put the device in the Stopped(0x00) operational state"),
+                TestStep("6b", "TH reads from the DUT the OperationalState attribute"),
+                TestStep("6c", "Manually put the device in the Running(0x01) operational state"),
+                TestStep("6d", "TH reads from the DUT the OperationalState attribute"),
+                TestStep("6e", "Manually put the device in the Paused(0x02) operational state"),
+                TestStep("6f", "TH reads from the DUT the OperationalState attribute"),
+                TestStep("6g", "Manually put the device in the Error(0x03) operational state"),
+                TestStep("6h", "TH reads from the DUT the OperationalState attribute"),
+                TestStep(7, "TH reads from the DUT the OperationalError attribute"),
+                TestStep("7a", "Manually put the device in the NoError(0x00) error state"),
+                TestStep("7b", "TH reads from the DUT the OperationalError attribute"),
+                TestStep("7c", "Manually put the device in the UnableToStartOrResume(0x01) error state"),
+                TestStep("7d", "TH reads from the DUT the OperationalError attribute"),
+                TestStep("7e", "Manually put the device in the UnableToCompleteOperation(0x02) error state"),
+                TestStep("7f", "TH reads from the DUT the OperationalError attribute"),
+                TestStep("7g", "Manually put the device in the CommandInvalidInState(0x03) error state"),
+                TestStep("7h", "TH reads from the DUT the OperationalError attribute")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -536,25 +536,24 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.2
     ############################
     def STEPS_TC_OPSTATE_BASE_2_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Start Command"),
-                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
-                 TestStep(4, "TH sends Start command to the DUT"),
-                 TestStep(5, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(6, "TH reads from the DUT the OperationalError attribute"),
-                 TestStep(7, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(8, "TH reads from the DUT the PhaseList attribute"),
-                 TestStep(9, "TH reads from the DUT the CurrentPhase attribute"),
-                 TestStep(10, "TH waits for {PIXIT.WAITTIME.COUNTDOWN}"),
-                 TestStep(11, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(12, "TH sends Start command to the DUT"),
-                 TestStep(13, "TH sends Stop command to the DUT"),
-                 TestStep(14, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(15, "TH sends Stop command to the DUT"),
-                 TestStep(16, "Manually put the DUT into a state wherein it cannot receive a Start Command"),
-                 TestStep(17, "TH sends Start command to the DUT")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "Manually put the DUT into a state wherein it can receive a Start Command"),
+                TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
+                TestStep(4, "TH sends Start command to the DUT"),
+                TestStep(5, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(6, "TH reads from the DUT the OperationalError attribute"),
+                TestStep(7, "TH reads from the DUT the CountdownTime attribute"),
+                TestStep(8, "TH reads from the DUT the PhaseList attribute"),
+                TestStep(9, "TH reads from the DUT the CurrentPhase attribute"),
+                TestStep(10, "TH waits for {PIXIT.WAITTIME.COUNTDOWN}"),
+                TestStep(11, "TH reads from the DUT the CountdownTime attribute"),
+                TestStep(12, "TH sends Start command to the DUT"),
+                TestStep(13, "TH sends Stop command to the DUT"),
+                TestStep(14, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(15, "TH sends Stop command to the DUT"),
+                TestStep(16, "Manually put the DUT into a state wherein it cannot receive a Start Command"),
+                TestStep(17, "TH sends Start command to the DUT")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_2_2(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -660,7 +659,7 @@ class TC_OPSTATE_BASE():
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CountdownTime):
-            time.sleep(wait_time)
+            await asyncio.sleep(wait_time)
 
         # STEP 11: TH reads from the DUT the CountdownTime attribute
         self.step(11)
@@ -669,8 +668,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
-                logging.info(f" -> New countdown time: {countdown_time}")
+                log.info(f" -> Initial countdown time: {initial_countdown_time}")
+                log.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_less_equal(countdown_time, (initial_countdown_time - wait_time),
                                           f"The countdown time shall have decreased at least {wait_time:.1f} since start command")
 
@@ -722,26 +721,25 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.3
     ############################
     def STEPS_TC_OPSTATE_BASE_2_3(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Pause Command"),
-                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
-                 TestStep(4, "TH sends Pause command to the DUT"),
-                 TestStep(5, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(6, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(7, "TH waits for {PIXIT.WAITTIME.COUNTDOWN}"),
-                 TestStep(8, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(9, "TH sends Pause command to the DUT"),
-                 TestStep(10, "TH sends Resume command to the DUT"),
-                 TestStep(11, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(12, "TH sends Resume command to the DUT"),
-                 TestStep(13, "Manually put the device in the Stopped(0x00) operational state"),
-                 TestStep(14, "TH sends Pause command to the DUT"),
-                 TestStep(15, "TH sends Resume command to the DUT"),
-                 TestStep(16, "Manually put the device in the Error(0x03) operational state"),
-                 TestStep(17, "TH sends Pause command to the DUT"),
-                 TestStep(18, "TH sends Resume command to the DUT")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "Manually put the DUT into a state wherein it can receive a Pause Command"),
+                TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
+                TestStep(4, "TH sends Pause command to the DUT"),
+                TestStep(5, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(6, "TH reads from the DUT the CountdownTime attribute"),
+                TestStep(7, "TH waits for {PIXIT.WAITTIME.COUNTDOWN}"),
+                TestStep(8, "TH reads from the DUT the CountdownTime attribute"),
+                TestStep(9, "TH sends Pause command to the DUT"),
+                TestStep(10, "TH sends Resume command to the DUT"),
+                TestStep(11, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(12, "TH sends Resume command to the DUT"),
+                TestStep(13, "Manually put the device in the Stopped(0x00) operational state"),
+                TestStep(14, "TH sends Pause command to the DUT"),
+                TestStep(15, "TH sends Resume command to the DUT"),
+                TestStep(16, "Manually put the device in the Error(0x03) operational state"),
+                TestStep(17, "TH sends Pause command to the DUT"),
+                TestStep(18, "TH sends Resume command to the DUT")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_2_3(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -808,13 +806,13 @@ class TC_OPSTATE_BASE():
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
-                logging.info(f" -> Initial ountdown time: {initial_countdown_time}")
+                log.info(f" -> Initial ountdown time: {initial_countdown_time}")
                 asserts.assert_true(0 <= initial_countdown_time <= 259200,
                                     f"CountdownTime({initial_countdown_time}) must be between 0 and 259200")
 
         # STEP 7: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(7)
-        time.sleep(wait_time)
+        await asyncio.sleep(wait_time)
 
         # STEP 8: TH reads from the DUT the CountdownTime attribute
         self.step(8)
@@ -823,8 +821,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
-                logging.info(f" -> New countdown time: {countdown_time}")
+                log.info(f" -> Initial countdown time: {initial_countdown_time}")
+                log.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_equal(countdown_time, initial_countdown_time,
                                      "The countdown time shall be equal since pause command")
 
@@ -902,12 +900,11 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.4
     ############################
     def STEPS_TC_OPSTATE_BASE_2_4(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Set up a subscription to the OperationalError event"),
-                 TestStep(3, "At the DUT take the vendor defined action to generate an OperationalError event"),
-                 TestStep(4, "TH reads from the DUT the OperationalState attribute")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "Set up a subscription to the OperationalError event"),
+                TestStep(3, "At the DUT take the vendor defined action to generate an OperationalError event"),
+                TestStep(4, "TH reads from the DUT the OperationalState attribute")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_2_4(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -930,7 +927,7 @@ class TC_OPSTATE_BASE():
             # STEP 2: Set up a subscription to the OperationalError event
             self.step(2)
             # Subscribe to Events and when they are sent push them to a queue for checking later
-            events_callback = EventChangeCallback(cluster)
+            events_callback = EventSubscriptionHandler(expected_cluster=cluster)
             await events_callback.start(self.default_controller,
                                         self.dut_node_id,
                                         endpoint)
@@ -970,35 +967,34 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.5
     ############################
     def STEPS_TC_OPSTATE_BASE_2_5(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "TH reads the DeviceTypeList from the Descriptor Cluster"),
-                 TestStep(3, "If any device is in the set that mandates the OperationCompletion event, set istestmandated to True"),
-                 TestStep(4, "If the test is mandated, but the event is not in the PICS, fail the test case"),
-                 TestStep(5, "If the test is not mandated, and the event is not in the PICS, skip all remaining steps"),
-                 TestStep(6, "Set up a subscription to the OperationCompletion event"),
-                 TestStep(7, "Manually put the DUT into a state wherein it can receive a Start Command"),
-                 TestStep(8, "TH sends Start command to the DUT"),
-                 TestStep(9, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(10, "If the CountdownTime is not null, TH reads from the DUT the OperationalState attribute,",
-                          "otherwise skip all remaining steps"),
-                 TestStep(11, "TH waits for initial-countdown-time"),
-                 TestStep(12, "TH sends Stop command to the DUT"),
-                 TestStep(13, "TH waits for OperationCompletion event"),
-                 TestStep(14, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(15, "Restart DUT"),
-                 TestStep(16, "TH waits for {PIXIT.WAITTIME.REBOOT}"),
-                 TestStep(17, "TH sends Start command to the DUT"),
-                 TestStep(18, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(19, "TH sends Pause command to the DUT"),
-                 TestStep(20, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(21, "TH waits for half of initial-countdown-time"),
-                 TestStep(22, "TH sends Resume command to the DUT"),
-                 TestStep(23, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(24, "TH waits for initial-countdown-time"),
-                 TestStep(25, "TH sends Stop command to the DUT"),
-                 TestStep(26, "TH waits for OperationCompletion event")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "TH reads the DeviceTypeList from the Descriptor Cluster"),
+                TestStep(3, "If any device is in the set that mandates the OperationCompletion event, set istestmandated to True"),
+                TestStep(4, "If the test is mandated, but the event is not in the PICS, fail the test case"),
+                TestStep(5, "If the test is not mandated, and the event is not in the PICS, skip all remaining steps"),
+                TestStep(6, "Set up a subscription to the OperationCompletion event"),
+                TestStep(7, "Manually put the DUT into a state wherein it can receive a Start Command"),
+                TestStep(8, "TH sends Start command to the DUT"),
+                TestStep(9, "TH reads from the DUT the CountdownTime attribute"),
+                TestStep(10, "If the CountdownTime is not null, TH reads from the DUT the OperationalState attribute,",
+                         "otherwise skip all remaining steps"),
+                TestStep(11, "TH waits for initial-countdown-time"),
+                TestStep(12, "TH sends Stop command to the DUT"),
+                TestStep(13, "TH waits for OperationCompletion event"),
+                TestStep(14, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(15, "Restart DUT"),
+                TestStep(16, "TH waits for {PIXIT.WAITTIME.REBOOT}"),
+                TestStep(17, "TH sends Start command to the DUT"),
+                TestStep(18, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(19, "TH sends Pause command to the DUT"),
+                TestStep(20, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(21, "TH waits for half of initial-countdown-time"),
+                TestStep(22, "TH sends Resume command to the DUT"),
+                TestStep(23, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(24, "TH waits for initial-countdown-time"),
+                TestStep(25, "TH sends Stop command to the DUT"),
+                TestStep(26, "TH waits for OperationCompletion event")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_2_5(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -1097,8 +1093,8 @@ class TC_OPSTATE_BASE():
 
         # STEP 11: TH waits for initial-countdown-time
         self.step(11)
-        logging.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
-        time.sleep(initial_countdown_time)
+        log.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
+        await asyncio.sleep(initial_countdown_time)
 
         # STEP 12: TH sends Stop command to the DUT
         self.step(12)
@@ -1144,7 +1140,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 16: TH waits for {PIXIT.WAITTIME.REBOOT}
         self.step(16)
-        time.sleep(wait_time_reboot)
+        await asyncio.sleep(wait_time_reboot)
 
         # STEP 17: TH sends Start command to the DUT
         self.step(17)
@@ -1174,7 +1170,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 21: TH waits for half of initial-countdown-time
         self.step(21)
-        time.sleep((initial_countdown_time / 2))
+        await asyncio.sleep((initial_countdown_time / 2))
 
         # STEP 22: TH sends Resume command to the DUT
         self.step(22)
@@ -1191,7 +1187,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 24: TH waits for initial-countdown-time
         self.step(24)
-        time.sleep(initial_countdown_time)
+        await asyncio.sleep(initial_countdown_time)
 
         # STEP 25: TH sends Stop command to the DUT
         self.step(25)
@@ -1207,40 +1203,51 @@ class TC_OPSTATE_BASE():
         asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
                              f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
 
+        # A delta for approximate time compares: time deltas cannot be accurate in comparisons, depending
+        # on network delay or in CI we may run into concurrency issues
+        approx_delta_seconds = 3.0
+
         if event_data.totalOperationalTime is not NullValue:
             expected_value = (1.5 * initial_countdown_time)
 
-            asserts.assert_less_equal(expected_value, event_data.totalOperationalTime,
-                                      f"The total operation time shall be at least {expected_value:.1f}")
+            # Need some fuzziness. Test plan says:
+            #   TotalOperationalTime is approximately 1.5 times the initial-countdown-time or null
+            # however "approximately" does not seem clearly defined
+            asserts.assert_almost_equal(expected_value, event_data.totalOperationalTime,
+                                        delta=approx_delta_seconds,
+                                        msg=f"The total operation time shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
+        # Need some fuzziness. Test plan says:
+        #   PausedTime is 0.5 times the initial-countdown-time
+        # however given time/sleeps, this is highly unlikely to be always accurate, especially in CI
         expected_value = (0.5 * initial_countdown_time)
-        asserts.assert_less_equal(expected_value, event_data.pausedTime,
-                                  f"Paused time ({event_data.pausedTime}) shall be at least {expected_value:.1f}")
+        asserts.assert_almost_equal(expected_value, event_data.pausedTime,
+                                    delta=approx_delta_seconds,
+                                    msg=f"Paused time ({event_data.pausedTime}) shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
     ############################
     #   TEST CASE 2.6 - Optional Reports with DUT as Server
     ############################
     def steps_TC_OPSTATE_BASE_2_6(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Subscribe to CountdownTime attribute"),
-                 TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
-                             "the initial value of the CountdownTime is greater than 30, "
-                             "and it will begin counting down the CountdownTime attribute. "
-                             "Test harness reads the CountdownTime attribute."),
-                 TestStep(4, "Test harness reads the CountdownTime attribute."),
-                 TestStep(5, "Over a period of 30 seconds, TH counts all report transactions with an attribute "
-                             "report for the CountdownTime attribute in numberOfReportsReceived"),
-                 TestStep(6, "Test harness reads the CountdownTime attribute."),
-                 TestStep(7, "Until the current operation finishes, TH counts all report transactions with "
-                             "an attribute report for the CountdownTime attribute in numberOfReportsReceived and saves up to 5 such reports."),
-                 TestStep(8, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
-                             "the initial value of the CountdownTime is greater than 30, and it will begin counting down the CountdownTime attribute."
-                             "Test harness reads the CountdownTime attribute."),
-                 TestStep(9, "TH reads from the DUT the OperationalState attribute"),
-                 TestStep(10, "Test harness reads the CountdownTime attribute."),
-                 TestStep(11, "Manually put the device in the Paused(0x02) operational state")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "Subscribe to CountdownTime attribute"),
+                TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
+                         "the initial value of the CountdownTime is greater than 30, "
+                         "and it will begin counting down the CountdownTime attribute. "
+                         "Test harness reads the CountdownTime attribute."),
+                TestStep(4, "Test harness reads the CountdownTime attribute."),
+                TestStep(5, "Over a period of 30 seconds, TH counts all report transactions with an attribute "
+                         "report for the CountdownTime attribute in numberOfReportsReceived"),
+                TestStep(6, "Test harness reads the CountdownTime attribute."),
+                TestStep(7, "Until the current operation finishes, TH counts all report transactions with "
+                         "an attribute report for the CountdownTime attribute in numberOfReportsReceived and saves up to 5 such reports."),
+                TestStep(8, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
+                         "the initial value of the CountdownTime is greater than 30, and it will begin counting down the CountdownTime attribute."
+                         "Test harness reads the CountdownTime attribute."),
+                TestStep(9, "TH reads from the DUT the OperationalState attribute"),
+                TestStep(10, "Test harness reads the CountdownTime attribute."),
+                TestStep(11, "Manually put the device in the Paused(0x02) operational state")
+                ]
 
     async def TEST_TC_OPSTATE_BASE_2_6(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -1254,7 +1261,7 @@ class TC_OPSTATE_BASE():
         # Note that this does a subscribe-all instead of subscribing only to the CountdownTime attribute.
         # To-Do: Update the TP to subscribe-all.
         self.step(2)
-        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
@@ -1263,7 +1270,7 @@ class TC_OPSTATE_BASE():
                                              device=self.device,
                                              operation="Start",
                                              msg="Put DUT in running state")
-            time.sleep(1)
+            await asyncio.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
@@ -1277,8 +1284,8 @@ class TC_OPSTATE_BASE():
         countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         if countdownTime is not NullValue:
             self.step(5)
-            logging.info('Test will now collect data for 10 seconds')
-            time.sleep(10)
+            log.info('Test will now collect data for 10 seconds')
+            await asyncio.sleep(10)
 
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             sub_handler.reset()
@@ -1296,7 +1303,7 @@ class TC_OPSTATE_BASE():
             self.step(7)
             wait_count = 0
             while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
-                time.sleep(1)
+                await asyncio.sleep(1)
                 wait_count = wait_count + 1
                 attr_value = await self.read_expect_success(
                     endpoint=endpoint,
@@ -1314,7 +1321,7 @@ class TC_OPSTATE_BASE():
                                              device=self.device,
                                              operation="Start",
                                              msg="Put DUT in running state")
-            time.sleep(1)
+            await asyncio.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
@@ -1337,7 +1344,7 @@ class TC_OPSTATE_BASE():
                                              device=self.device,
                                              operation="Pause",
                                              msg="Put DUT in paused state")
-            time.sleep(1)
+            await asyncio.sleep(1)
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:

@@ -83,3 +83,18 @@ leak:nw_parameters_create_secure_udp
 leak:nw_path_create_evaluator_for_listener
 leak:nw_listener_handle_new_path_on_queue
 leak:nw_endpoint_create_host
+
+# ignore thread-local storage leaks
+# macOS 14
+leak:_instantiateTLVs
+# macOS 15
+leak:dyld::ThreadLocalVariables::instantiateVariable
+
+# TLS in ErrorStr (using thread local storage for error formatting)
+leak:chip::ErrorStr
+
+# ignore (maybe false-positive?) leaks in macOS key value store init
+leak:KeyValueStoreManagerImpl::Init
+
+# ignore float to string conversion bigalloc pooling
+leak:__Balloc_D2A

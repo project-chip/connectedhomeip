@@ -28,6 +28,7 @@
 #include <system/SystemError.h>
 
 #include <lib/core/ErrorStr.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/DLLUtil.h>
 
 #include <lib/core/CHIPConfig.h>
@@ -54,16 +55,24 @@ namespace Internal {
  *
  *  @return The mapped POSIX network or OS error.
  */
-DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, std::source_location location)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+    return (aError == 0 ? CHIP_NO_ERROR
+                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), location));
 }
-
+#elif CHIP_CONFIG_ERROR_SOURCE
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int line)
 {
     return (aError == 0 ? CHIP_NO_ERROR
                         : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), file, line));
 }
+#else
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
+{
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+}
+#endif
 } // namespace Internal
 
 /**
@@ -77,7 +86,41 @@ DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int 
 DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 {
     const int lError = static_cast<int>(aError.GetValue());
-    return strerror(lError);
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    static thread_local char errBuf[128];
+#else
+    static char errBuf[128];
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+
+    // Use thread-safe strerror_r when available
+#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+    // GNU version returns char*
+    const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
+    if (s != nullptr)
+    {
+        if (s != errBuf)
+        {
+            chip::Platform::CopyString(errBuf, sizeof(errBuf), s);
+        }
+        return errBuf;
+    }
+#elif defined(_POSIX_C_SOURCE)
+    // POSIX version returns int (0 on success)
+    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
+    {
+        return errBuf;
+    }
+#else
+    // Fallback for platforms without strerror_r
+    const char * s = strerror(lError);
+    if (s != nullptr)
+    {
+        chip::Platform::CopyString(errBuf, sizeof(errBuf), s);
+        return errBuf;
+    }
+#endif
+
+    return "Unknown POSIX error";
 }
 
 /**
@@ -86,8 +129,13 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 void RegisterPOSIXErrorFormatter()
 {
     static ErrorFormatter sPOSIXErrorFormatter = { FormatPOSIXError, nullptr };
-
+    static bool sRegistered                    = false;
+    if (sRegistered)
+    {
+        return;
+    }
     RegisterErrorFormatter(&sPOSIXErrorFormatter);
+    sRegistered = true;
 }
 
 /**
@@ -129,7 +177,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
  */
 DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 {
-    return Internal::MapErrorPOSIX(-aError);
+    return Internal::MapErrorPOSIX(-aError CHIP_ERROR_SOURCE_LOCATION_NULL);
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

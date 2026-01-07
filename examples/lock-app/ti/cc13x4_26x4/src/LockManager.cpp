@@ -143,31 +143,36 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    KeyValueStoreMgr().Get(LockUser, reinterpret_cast<void *>(&mLockUsers),
-                           sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(LockUser, reinterpret_cast<void *>(&mLockUsers),
+                                                    sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), &outLen);
 
-    KeyValueStoreMgr().Get(Credential, reinterpret_cast<void *>(&mLockCredentials),
-                           sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mLockCredentials), &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(
+        Credential, reinterpret_cast<void *>(&mLockCredentials),
+        sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mLockCredentials), &outLen);
 
-    KeyValueStoreMgr().Get(LockUserName, reinterpret_cast<void *>(mUserNames), sizeof(mUserNames), &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(LockUserName, reinterpret_cast<void *>(mUserNames), sizeof(mUserNames),
+                                                    &outLen);
 
-    KeyValueStoreMgr().Get(CredentialData, reinterpret_cast<void *>(mCredentialData), sizeof(mCredentialData), &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(CredentialData, reinterpret_cast<void *>(mCredentialData),
+                                                    sizeof(mCredentialData), &outLen);
 
-    KeyValueStoreMgr().Get(UserCredentials, reinterpret_cast<void *>(mCredentials),
-                           sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser, &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(
+        UserCredentials, reinterpret_cast<void *>(mCredentials),
+        sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser, &outLen);
 
-    KeyValueStoreMgr().Get(WeekDaySchedules, reinterpret_cast<void *>(mWeekdaySchedule),
-                           sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                               LockParams.numberOfUsers,
-                           &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(WeekDaySchedules, reinterpret_cast<void *>(mWeekdaySchedule),
+                                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) *
+                                                        LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers,
+                                                    &outLen);
 
-    KeyValueStoreMgr().Get(YearDaySchedules, reinterpret_cast<void *>(mYeardaySchedule),
-                           sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                               LockParams.numberOfUsers,
-                           &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(YearDaySchedules, reinterpret_cast<void *>(mYeardaySchedule),
+                                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) *
+                                                        LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers,
+                                                    &outLen);
 
-    KeyValueStoreMgr().Get(HolidaySchedules, reinterpret_cast<void *>(&(mHolidaySchedule)),
-                           sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, &outLen);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Get(
+        HolidaySchedules, reinterpret_cast<void *>(&(mHolidaySchedule)),
+        sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, &outLen);
 
     return true;
 }
@@ -325,11 +330,10 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
-                  user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
-                  user.lastModifiedBy);
+                  endpointId, NullTerminated(user.userName).c_str(), user.credentials.size(), user.userUniqueId,
+                  to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
     return true;
 }
@@ -385,13 +389,14 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
-    KeyValueStoreMgr().Put(LockUser, reinterpret_cast<const void *>(&mLockUsers),
-                           sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(LockUser, reinterpret_cast<const void *>(&mLockUsers),
+                                                    sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
-    KeyValueStoreMgr().Put(UserCredentials, reinterpret_cast<const void *>(mCredentials),
-                           sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(UserCredentials, reinterpret_cast<const void *>(mCredentials),
+                                                    sizeof(CredentialStruct) * LockParams.numberOfUsers *
+                                                        LockParams.numberOfCredentialsPerUser);
 
-    KeyValueStoreMgr().Put(LockUserName, reinterpret_cast<const void *>(mUserNames), sizeof(mUserNames));
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(LockUserName, reinterpret_cast<const void *>(mUserNames), sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -471,10 +476,12 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
-    KeyValueStoreMgr().Put(Credential, reinterpret_cast<const void *>(&mLockCredentials),
-                           sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(Credential, reinterpret_cast<const void *>(&mLockCredentials),
+                                                    sizeof(EmberAfPluginDoorLockCredentialInfo) *
+                                                        LockParams.numberOfCredentialsPerUser);
 
-    KeyValueStoreMgr().Put(CredentialData, reinterpret_cast<const void *>(&mCredentialData), sizeof(mCredentialData));
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(CredentialData, reinterpret_cast<const void *>(&mCredentialData),
+                                                    sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -529,9 +536,9 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    KeyValueStoreMgr().Put(WeekDaySchedules, reinterpret_cast<const void *>(mWeekdaySchedule),
-                           sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                               LockParams.numberOfUsers);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(WeekDaySchedules, reinterpret_cast<const void *>(mWeekdaySchedule),
+                                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) *
+                                                        LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -578,9 +585,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    KeyValueStoreMgr().Put(YearDaySchedules, reinterpret_cast<const void *>(mYeardaySchedule),
-                           sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                               LockParams.numberOfUsers);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(YearDaySchedules, reinterpret_cast<const void *>(mYeardaySchedule),
+                                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) *
+                                                        LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -622,8 +629,9 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    KeyValueStoreMgr().Put(HolidaySchedules, reinterpret_cast<const void *>(&(mHolidaySchedule)),
-                           sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(HolidaySchedules, reinterpret_cast<const void *>(&(mHolidaySchedule)),
+                                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) *
+                                                        LockParams.numberOfHolidaySchedules);
 
     return DlStatus::kSuccess;
 }

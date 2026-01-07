@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/static-cluster-config/OtaSoftwareUpdateProvider.h>
 #include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 #include <cstdint>
 
@@ -33,52 +33,54 @@ static constexpr size_t kOtaProviderMaxClusterCount = kOtaProviderFixedClusterCo
 
 LazyRegisteredServerCluster<OtaProviderServer> gServers[kOtaProviderMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id, kOtaProviderFixedClusterCount);
-
-    if (arrayIndex >= kOtaProviderMaxClusterCount)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
-        return false;
+        gServers[clusterInstanceIndex].Create(endpointId);
+        return gServers[clusterInstanceIndex].Registration();
     }
-    return true;
-}
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+};
 
 } // namespace
 
-void emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
-    gServers[arrayIndex].Create(endpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
+        },
+        integrationDelegate);
 }
 
-void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-    gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
+        },
+        integrationDelegate, shutdownType);
 }
 
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback() {}
@@ -92,12 +94,19 @@ namespace OTAProvider {
 
 void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
-    gServers[arrayIndex].Cluster().SetDelegate(delegate);
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * interface = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = OtaSoftwareUpdateProvider::Id,
+            .fixedClusterInstanceCount = kOtaProviderFixedClusterCount,
+            .maxClusterInstanceCount   = kOtaProviderMaxClusterCount,
+        },
+        integrationDelegate);
+    VerifyOrReturn(interface != nullptr);
+
+    static_cast<OtaProviderServer *>(interface)->SetDelegate(delegate);
 }
 
 } // namespace OTAProvider

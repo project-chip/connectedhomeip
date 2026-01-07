@@ -3,9 +3,9 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} AS build
 
 # Compatible Nordic Connect SDK revision and required tools versions
-ARG NCS_REVISION=v3.0.0
-ARG JLINK_VERSION="JLink_Linux_V818_x86_64"
-ARG WEST_VERSION=1.2.0
+ARG NCS_REVISION=v3.1.0
+ARG JLINK_VERSION="JLink_Linux_V842_x86_64"
+ARG WEST_VERSION=1.4.0
 ARG CMAKE_VERSION=3.25.0
 
 # Requirements to clone SDKs
@@ -82,4 +82,4 @@ RUN set -x \
     && : # last line
 
 ENV ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=${NRF5_TOOLS_ROOT}/zephyr-sdk/toolchains/latest/opt/zephyr-sdk
+ENV ZEPHYR_SDK_INSTALL_DIR=${NRF5_TOOLS_ROOT}/zephyr-sdk/toolchains/latest

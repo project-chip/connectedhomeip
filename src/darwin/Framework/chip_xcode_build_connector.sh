@@ -110,6 +110,7 @@ declare -a args=(
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
+    'chip_enable_nfc_based_commissioning=true'
     'chip_enable_python_modules=false'
     'chip_device_config_enable_dynamic_mrp_config=true'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages

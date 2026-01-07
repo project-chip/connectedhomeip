@@ -39,12 +39,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventChangeCallback
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 cluster = Clusters.ElectricalGridConditions
 
@@ -61,7 +64,7 @@ class TC_EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         return ["EGC.S"]
 
     def steps_TC_EGC_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "Set up a subscription to all ElectricalGridConditions cluster events"),
@@ -74,7 +77,6 @@ class TC_EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
                      """Verify that the DUT response contains a ElectricalGridConditionsStruct value.
                         Verify that the value matches the NewCurrentConditions from step 4."""),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalGridConditions))
     async def test_TC_EGC_2_2(self):
@@ -85,7 +87,7 @@ class TC_EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        events_callback = EventChangeCallback(cluster)
+        events_callback = EventSubscriptionHandler(expected_cluster=cluster)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     endpoint)

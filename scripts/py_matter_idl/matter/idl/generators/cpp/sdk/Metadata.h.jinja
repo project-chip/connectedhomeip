@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace {{cluster.name}} {
 inline constexpr uint32_t kRevision = {{cluster.revision}};
 
 namespace Attributes {
+
 {% for attribute in cluster.attributes | reject("global_attribute") -%}
 namespace {{attribute.definition.name | upfirst}} {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(
@@ -39,9 +41,17 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(
 } // namespace {{attribute.definition.name | upfirst}}
 {% endfor %}
 
+{%- set mandatoryAttributeList = cluster.attributes | reject("global_attribute") | reject("is_optional") | list -%}
+constexpr std::array<DataModel::AttributeEntry, {{ mandatoryAttributeList | length }}> kMandatoryMetadata = {
+  {% for attribute in mandatoryAttributeList -%}
+  {{attribute.definition.name | upfirst}}::kMetadataEntry, 
+  {% endfor %}
+};
+
 } // namespace Attributes
 
 namespace Commands {
+
 {% for command in cluster.commands -%}
 namespace {{command.name | upfirst}} {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
@@ -52,6 +62,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
 } // namespace {{command.name | upfirst}}
 {% endfor %}
 } // namespace Commands
+
+namespace Events {
+{% for event in cluster.events -%}
+namespace {{event.name | upfirst}} {
+inline constexpr DataModel::EventEntry kMetadataEntry{
+    {{ event.readacl | as_privilege }}
+};
+} // namespace {{event.name | upfirst}}
+{% endfor %}
+} // namespace Events
 } // namespace {{cluster.name}}
 } // namespace Clusters
 } // namespace app

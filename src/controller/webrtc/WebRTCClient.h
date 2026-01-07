@@ -16,7 +16,6 @@
  */
 
 #pragma once
-#include <controller/webrtc/WebRTCTransportProviderClient.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <rtc/rtc.hpp>
@@ -24,6 +23,18 @@
 
 namespace chip {
 namespace webrtc {
+
+constexpr int kVideoH264PayloadType     = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
+constexpr int kVideoBitRate             = 3000;
+const std::string kVideoMid             = "video";
+constexpr const char * kStreamDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamDestPort = 5000;
+
+// Constants for Audio
+constexpr int kAudioBitRate             = 64000;
+constexpr int kOpusPayloadType          = 111;
+constexpr uint16_t kAudioStreamDestPort = 5001;
+const std::string kAudioMid             = "audio";
 
 class WebRTCClient
 {
@@ -40,40 +51,41 @@ public:
     void OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback);
     void OnIceCandidate(std::function<void(const std::string &, const std::string &)> callback);
     void OnGatheringComplete(std::function<void()> callback);
-    void OnStateChange(std::function<void(int)> callback);
+    void OnStateChange(std::function<void(const char *)> callback);
 
-    const char * GetLocalDescription();
-    int GetPeerConnectionState();
+    /* Call to fetch the local session description string. This is used by the
+     * Python binding layer to get the local SDP string with ice candidates
+     * Should be called after setting local/remote SDP and GatheringComplete.
+     */
+    const char * GetLocalSessionDescriptionInternal();
+
+    const char * GetPeerConnectionState();
     void Disconnect();
-
-    void WebRTCProviderClientInit(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
-    PyChipError SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
-                            size_t length);
-    void WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
-                                           OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                           OnCommandSenderDoneCallback onCommandSenderDoneCallback);
 
 private:
     rtc::PeerConnection * mPeerConnection;
     std::function<void(const std::string &, const std::string &)> mLocalDescriptionCallback;
     std::function<void(const std::string &, const std::string &)> mIceCandidateCallback;
     std::function<void()> mGatheringCompleteCallback;
-    std::function<void(int)> mStateChangeCallback;
+    std::function<void(const char *)> mStateChangeCallback;
 
     std::string mLocalDescription;
 
     // Local vector to store the ICE Candidate strings coming from the WebRTC stack
     std::vector<std::string> mLocalCandidates;
 
-    std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> mVideoTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     // UDP socket for stream forwarding
-    int mRTPSocket = -1;
+    int mVideoRTPSocket = -1;
+    int mAudioRTPSocket = -1;
+
+    void addVideoTrack(std::string mid = kVideoMid, int payloadType = kVideoH264PayloadType);
+    void addAudioTrack(std::string mid = kAudioMid, int payloadType = kOpusPayloadType);
 
     // Close and reset the UDP socket
     void CloseRTPSocket();
-
-    std::unique_ptr<WebRTCTransportProviderClient> mTransportProviderClient;
 };
 
 } // namespace webrtc

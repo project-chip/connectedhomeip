@@ -20,10 +20,15 @@ import random
 import string
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CNET_4_4(MatterBaseTest):
@@ -42,9 +47,9 @@ class TC_CNET_4_4(MatterBaseTest):
         return '[TC-CNET-4.4] [Wi-Fi] Verification for ScanNetworks command [DUT-Server]'
 
     def pics_TC_CNET_4_4(self):
-        return ['CNET.S']
+        return ['CNET.S.F00']
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_4(self):
         # Commissioning is already done
         self.step("precondition")
@@ -53,11 +58,7 @@ class TC_CNET_4_4(MatterBaseTest):
         attr = cnet.Attributes
 
         self.step(1)
-        feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
-        if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
-            logging.info('Device does not support WiFi on endpoint, skipping remaining steps')
-            self.mark_all_remaining_steps_skipped(2)
-            return
+        # Already done with decorators
 
         self.step(2)
         supported_wifi_bands = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.SupportedWiFiBands)
@@ -76,9 +77,9 @@ class TC_CNET_4_4(MatterBaseTest):
             ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
             cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
             scan_results = await self.send_single_cmd(cmd=cmd)
-            asserts.assert_true(type_matches(scan_results, cnet.Commands.ScanNetworksResponse),
+            asserts.assert_true(matchers.is_type(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
-            logging.info(f"Scan results: {scan_results}")
+            log.info(f"Scan results: {scan_results}")
 
             if scan_results.debugText:
                 debug_text_len = len(scan_results.debug_text)
@@ -98,7 +99,7 @@ class TC_CNET_4_4(MatterBaseTest):
                 asserts.assert_less_equal(len(network.ssid), 32, f"Returned SSID {network.ssid} is too long")
                 if ssid_to_scan is not None:
                     asserts.assert_equal(network.ssid, ssid_to_scan, "Unexpected SSID returned in directed scan")
-                asserts.assert_true(type_matches(network.bssid, bytes), "Incorrect type for BSSID")
+                asserts.assert_true(matchers.is_type(network.bssid, bytes), "Incorrect type for BSSID")
                 asserts.assert_equal(len(network.bssid), 6, "Unexpected length of BSSID")
                 # TODO: this is inherited from the old test plan, but we should match the channel to the supported band. This range is unreasonably large.
                 asserts.assert_less_equal(network.channel, 65535, "Unexpected channel value")

@@ -77,7 +77,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
 #endif
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Factory data init failed with: %s", ErrorStr(error));
+        ChipLogError(DeviceLayer, "Factory data init failed with: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
 #if !CHIP_USE_PLAIN_DAC_KEY
@@ -150,7 +150,7 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_Sign(uint8_t * digest, Crypto::P256ECDSA
     VerifyOrExit(res == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
     res = sss_sscp_asymmetric_sign_digest(&asyc, digest, Crypto::kP256_PrivateKey_Length, signature.Bytes(), &signatureSize);
     VerifyOrExit(res == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
-    signature.SetLength(signatureSize);
+    error = signature.SetLength(signatureSize);
 
 exit:
     sss_sscp_asymmetric_context_free(&asyc);

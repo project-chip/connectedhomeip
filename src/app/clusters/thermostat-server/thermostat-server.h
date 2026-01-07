@@ -219,6 +219,14 @@ private:
     emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                   const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
 
+    friend bool emberAfThermostatClusterAddThermostatSuggestionCallback(
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
+
+    friend bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+
     struct AtomicWriteSession
     {
         AtomicWriteState state = AtomicWriteState::Closed;

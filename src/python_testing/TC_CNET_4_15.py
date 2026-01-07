@@ -19,9 +19,14 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CNET_4_15(MatterBaseTest):
@@ -41,7 +46,7 @@ class TC_CNET_4_15(MatterBaseTest):
         return '[TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in LastNetworkingStatus field validation [DUT-Server]'
 
     def pics_TC_CNET_4_15(self):
-        return ['CNET.S.F00(WI)']
+        return ['CNET.S.F00']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
@@ -60,7 +65,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log response structure
-        logging.info(f"ArmFailSafe response: {send_arm}")
+        log.info(f"ArmFailSafe response: {send_arm}")
         # Verify that DUT sends ArmFailSafeResponse command with success status
         asserts.assert_equal(
             send_arm.errorCode,
@@ -74,7 +79,7 @@ class TC_CNET_4_15(MatterBaseTest):
         # Use a random SSID that is unlikely to exist, to avoid requiring testers to set a PIXIT flag
         network_id = b"NON_EXISTENT_SSID_12345"
 
-        logging.info(f"Attempting to remove network with ID: {network_id}")
+        log.info(f"Attempting to remove network with ID: {network_id}")
 
         read_networks = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
@@ -82,7 +87,7 @@ class TC_CNET_4_15(MatterBaseTest):
             endpoint=0,
             attribute=cnet.Attributes.Networks
         )
-        logging.info(f"Current networks on device: {read_networks}")
+        log.info(f"Current networks on device: {read_networks}")
 
         send_remove = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
@@ -91,7 +96,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log complete response object structure for debugging
-        logging.info(f"RemoveNetwork complete response object: {vars(send_remove)}")
+        log.info(f"RemoveNetwork complete response object: {vars(send_remove)}")
 
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
@@ -110,7 +115,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log complete response object structure for debugging
-        logging.info(f"ConnectNetwork complete response object: {vars(send_connect)}")
+        log.info(f"ConnectNetwork complete response object: {vars(send_connect)}")
 
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(

@@ -51,6 +51,7 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
 )
 
 target_sources(app
@@ -67,6 +68,16 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
+if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
+    )
+else()
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
+    )
+endif()
+
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
@@ -74,6 +85,13 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     )
     target_include_directories(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/include/
+    )
+endif()
+
+if (CONFIG_CHIP_FACTORY_DATA)
+    target_sources(app PRIVATE
+        ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
+        ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
     )
 endif()
 

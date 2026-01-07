@@ -34,6 +34,7 @@
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/TextOnlyLogging.h>
@@ -190,10 +191,10 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
             // Parse the status response so we can log it properly.
-            StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+            TEMPORARY_RETURN_IGNORED StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
         }
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         Close();
         return CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
@@ -213,7 +214,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
         Close();
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -259,7 +260,8 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
     if (mDataModelProvider != nullptr)
     {
-        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
+        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -269,7 +271,8 @@ void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool
     {
         mDataModelProvider->ListAttributeWriteNotification(aPath,
                                                            writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteSuccess
-                                                                              : DataModel::ListWriteOperation::kListWriteFailure);
+                                                                              : DataModel::ListWriteOperation::kListWriteFailure,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -587,7 +590,7 @@ exit:
     // The DeliverFinalListWriteEndForGroupWrite above will deliver the successful state of the list write and clear the
     // mProcessingAttributePath making the following call no-op. So we call it again after the exit label to deliver a failure state
     // to the clusters. Ignore the error code since we need to deliver other more important failures.
-    DeliverFinalListWriteEndForGroupWrite(false);
+    TEMPORARY_RETURN_IGNORED DeliverFinalListWriteEndForGroupWrite(false);
     return err;
 }
 
@@ -616,7 +619,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeRequestParser.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeRequestParser.PrettyPrint();
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
@@ -762,15 +765,16 @@ void WriteHandler::MoveToState(const State aTargetState)
 }
 
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                              const ConcreteAttributePath & aPath)
+                                                              const ConcreteDataAttributePath & aPath)
 {
 
     // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
     // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
     // leak information if we do fail existence checks.
-    // SPEC-DIVERGENCE: For non-concrete paths, the spec mandates only one ACL check AFTER the existence check.
-    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
-    // existence check. In practice, this divergence is not observable.
+    // SPEC-DIVERGENCE: For non-concrete paths, the spec mandates only one ACL check (the one after the existence check), unlike the
+    // concrete path case, when there is one ACL check before existence check and a second one after. However, because this code is
+    // also used in the group path case, we end up performing an ADDITIONAL ACL check before the existence check. In practice, this
+    // divergence is not observable.
     Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, Access::Privilege::kView);
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
@@ -781,11 +785,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
-        // Global lists are not in metadata and not writable. Return the correct error code according to the spec
-        Status attributeErrorStatus =
-            IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
-
-        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::UnsupportedAttribute);
     }
 
     // Allow writes on writable attributes only
@@ -795,9 +795,36 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     writeAccessStatus = CheckWriteAccess(aSubject, aPath, *attributeEntry->GetWritePrivilege());
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
-    // validate that timed write is enforced
+    // SPEC:
+    //   If the path indicates specific attribute data that requires a Timed Write
+    //   transaction to write and this action is not part of a Timed Write transaction,
+    //   an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
+
+    // SPEC:
+    //   Else if the attribute in the path indicates a fabric-scoped list and there is no accessing
+    //   fabric, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code,
+    //   with the Path field indicating only the path to the attribute.
+    if (attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kListAttribute) &&
+        attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kFabricScoped))
+    {
+        VerifyOrReturnError(aSubject.fabricIndex != kUndefinedFabricIndex, Status::UnsupportedAccess);
+    }
+
+    // SPEC:
+    //   Else if the DataVersion field of the AttributeDataIB is present and does not match the
+    //   data version of the indicated cluster instance, an AttributeStatusIB SHALL be generated
+    //   with the DATA_VERSION_MISMATCH Status Code.
+    if (aPath.mDataVersion.HasValue())
+    {
+        DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
+        std::optional<DataModel::ServerClusterEntry> cluster_entry = clusterFinder.Find(aPath);
+
+        // path is valid based on above checks (we have an attribute entry)
+        VerifyOrDie(cluster_entry.has_value());
+        VerifyOrReturnValue(cluster_entry->dataVersion == aPath.mDataVersion.Value(), Status::DataVersionMismatch);
+    }
 
     return Status::Success;
 }

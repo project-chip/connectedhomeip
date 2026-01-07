@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "JFADatastoreSync.h"
 #include "JFAManager.h"
 #include "rpc/RpcServer.h"
 #include <AppMain.h>
@@ -25,22 +26,65 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 #include <string>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::DeviceLayer;
+
+namespace {
+
+class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+{
+public:
+    void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
+
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductURL(buf, bufSize); }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetSerialNumber(buf, bufSize); }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
+    {
+        return mDefaultProvider->GetManufacturingDate(year, month, day);
+    }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
+    {
+        return mDefaultProvider->GetHardwareVersion(hardwareVersion);
+    }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
+    {
+        return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
+    }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
+    {
+        return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
+    }
+    CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode) override { return JFAMgr().GetJointFabricMode(jointFabricMode); }
+
+private:
+    DeviceInstanceInfoProvider * mDefaultProvider;
+};
+
+ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+
+} // namespace
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {}
 
-void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
 
-    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    if (event->Type == DeviceEventType::kCommissioningComplete)
     {
         JFAMgr().HandleCommissioningCompleteEvent();
     }
@@ -48,10 +92,19 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 
 void ApplicationInit()
 {
-    JFAMgr().Init(Server::GetInstance());
-    Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+    auto * defaultProvider = GetDeviceInstanceInfoProvider();
+    if (defaultProvider != &gExampleDeviceInstanceInfoProvider)
+    {
+        gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
+        SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
+    }
 
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    SuccessOrDie(JFAMgr().Init(Server::GetInstance()));
+    SuccessOrDie(JFADSync().Init(Server::GetInstance()));
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetJointFabricDatastore().SetDelegate(&JFADSync());
+
+    SuccessOrDie(PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 }
 
 void ApplicationShutdown() {}

@@ -59,7 +59,7 @@ namespace {} // namespace
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 
-#define CHECK(f, rv)                                                                                                               \
+#define CHECK_FOR_SCARD_SUCCESS(f, rv)                                                                                             \
     if (SCARD_S_SUCCESS != rv)                                                                                                     \
     {                                                                                                                              \
         ChipLogError(DeviceLayer, "%s : %s", f, pcsc_stringify_error(rv));                                                         \
@@ -383,7 +383,7 @@ public:
     void ProcessError(const char * msg)
     {
         ChipLogError(DeviceLayer, "%s", msg);
-        SendOnNfcTagError();
+        TEMPORARY_RETURN_IGNORED SendOnNfcTagError();
     }
 
     void NotifyResponse(uint8_t * response, uint32_t responseLen)
@@ -391,7 +391,7 @@ public:
 
         System::PacketBufferHandle buffer =
             System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(response), static_cast<size_t>(responseLen));
-        SendOnNfcTagResponse(std::move(buffer));
+        TEMPORARY_RETURN_IGNORED SendOnNfcTagResponse(std::move(buffer));
     }
 
     void ResetChainedResponseBuffer(void) { mChainedResponseLength = 0; }
@@ -505,16 +505,7 @@ NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 
 CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 {
-    // Creates an Application Context to the PC/SC Resource Manager.
-    long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
-    CHECK("SCardEstablishContext", result)
-
-    lastTagInstanceUsed = nullptr;
-
-    // Start the NFC processing thread
-    mThreadRunning = true;
-    mNfcThread     = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
-
+    // NFC processing Thread will be started with the first request to do NFC-based commissioning
     return CHIP_NO_ERROR;
 }
 
@@ -535,6 +526,26 @@ void NFCCommissioningManagerImpl::_Shutdown()
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 
+CHIP_ERROR NFCCommissioningManagerImpl::EnsureProcessingThreadStarted()
+{
+    if (mThreadRunning)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Creates an Application Context to the PC/SC Resource Manager.
+    long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
+    CHECK_FOR_SCARD_SUCCESS("SCardEstablishContext", result)
+
+    lastTagInstanceUsed = nullptr;
+
+    // Start the NFC processing thread
+    mThreadRunning = true;
+    mNfcThread     = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
+
+    return CHIP_NO_ERROR;
+}
+
 void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 {
     mNFCBase = nfcBase;
@@ -543,6 +554,13 @@ void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & address)
 {
     bool canSendToPeer = false;
+
+    CHIP_ERROR err = EnsureProcessingThreadStarted();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to start NFCProcessing Thread: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
@@ -566,7 +584,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
         // We don't have yet a cardHandle for this nfcShortId
 
         // Scan all the readers and tags
-        ScanAllReaders(nfcShortId);
+        TEMPORARY_RETURN_IGNORED ScanAllReaders(nfcShortId);
 
         // and check if we now have a TagInstance corresponding to this nfcShortId
         tagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
@@ -592,6 +610,8 @@ void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> mes
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
+
+    ReturnErrorOnFailure(EnsureProcessingThreadStarted());
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
@@ -675,7 +695,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     DWORD dwReaders;
 
     result = SCardListReaders(hPcscContext, NULL, NULL, &dwReaders);
-    CHECK("SCardListReaders", result)
+    CHECK_FOR_SCARD_SUCCESS("SCardListReaders", result)
 
     // dwReaders now contains "mszReaders" data size
     // Allocate a buffer where we will store "mszReaders" multi-string.
@@ -687,7 +707,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     }
 
     result = SCardListReaders(hPcscContext, NULL, mszReaders, &dwReaders);
-    CHECK("SCardListReaders", result)
+    CHECK_FOR_SCARD_SUCCESS("SCardListReaders", result)
 
     // "mszReaders" contains a multi-string with list of readers.
     // Each reader name is separated by a null character ('\0') and ended by a double null character
@@ -701,7 +721,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     {
         if (*reader != '\0')
         {
-            ScanReader(nfcShortId, reader);
+            TEMPORARY_RETURN_IGNORED ScanReader(nfcShortId, reader);
 
             // Move the pointer to the next substring
             reader += strlen(reader) + 1;

@@ -39,11 +39,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_EEM_2_4(MatterBaseTest, EnergyReportingBaseTestHelper):
@@ -57,7 +60,7 @@ class TC_EEM_2_4(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EEM.S", "EEM.S.F03", "EEM.S.F00"]
 
     def steps_TC_EEM_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -72,8 +75,6 @@ class TC_EEM_2_4(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EEM_2_4(self):
 
@@ -87,13 +88,13 @@ class TC_EEM_2_4(MatterBaseTest, EnergyReportingBaseTestHelper):
         await self.send_test_event_trigger_start_fake_1kw_load_2s()
 
         self.step("4")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("4a")
         periodic_energy_imported = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")
 
         self.step("5")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("5a")
         periodic_energy_imported_2 = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")

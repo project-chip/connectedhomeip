@@ -76,6 +76,8 @@ template("chip_data_model") {
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
+      "zap-generated/CodeDrivenInitShutdown.cpp",
+      "zap-generated/CodeDrivenCallback.h",
     ]
 
     if (!chip_build_controller_dynamic_server) {
@@ -142,6 +144,7 @@ template("chip_data_model") {
     deps = [
       ":${_data_model_name}_codegen_generate",
       "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/app/common:metadata",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
@@ -160,6 +163,7 @@ template("chip_data_model") {
         "${chip_root}/src/app/common:cluster-objects",
         "${chip_root}/src/app/common:enums",
         "${chip_root}/src/app/common:ids",
+        "${chip_root}/src/app/common:metadata",
         "${chip_root}/src/lib/core",
         "${chip_root}/src/lib/support",
       ]
@@ -178,31 +182,25 @@ template("chip_data_model") {
     if (!defined(sources)) {
       sources = []
     }
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
 
     if (!defined(is_server)) {
       is_server = false
     }
 
     sources += [
-      "${_app_root}/clusters/basic-information/basic-information.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
-      "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneTable.h",
-      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
-      "${_app_root}/clusters/scenes-server/scenes-server.h",
-      "${_app_root}/util/binding-table.cpp",
-      "${_app_root}/util/binding-table.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/privilege-storage.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
     sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
@@ -257,7 +255,9 @@ template("chip_data_model") {
 
     _app_config_dependent_sources = []
     foreach(cluster, _cluster_sources) {
-      deps += [ "${_app_root}/clusters/${cluster}" ]
+      # Clusters are public deps to allow applications to depend on cluster APIs, (e.g. delegates / providers)
+      # without having to manually re-state the dependencies computed here from the zap file.
+      public_deps += [ "${_app_root}/clusters/${cluster}" ]
 
       # app_config_dependent_sources paths are relative to the target
       # accumulate them here so that we can "rebase_path" later on
@@ -289,6 +289,7 @@ template("chip_data_model") {
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/data-model-provider",
       "${chip_root}/src/app/persistence",
       "${chip_root}/src/app/persistence:default",
       "${chip_root}/src/app/server",

@@ -35,9 +35,12 @@
 # === END CI TEST ARGUMENTS ===
 
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_BRBINFO_3_2(MatterBaseTest):
@@ -49,27 +52,30 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         return "[TC-BRBINFO-3.2] Attributes with DUT as Server"
 
     def steps_TC_BRBINFO_3_2(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
+        return [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "TH reads ConfigurationVersion and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
-            TestStep(2, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
-            TestStep(3, "TH reads ConfigurationVersion from the DUT",
+            TestStep(2, "On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
+            TestStep(3, "TH reads ConfigurationVersion from the DUT (same endpoint as in step 1)",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
         ]
-        return steps
 
     def pics_TC_BRBINFO_3_2(self) -> list[str]:
-        pics = [
+        return [
             "BRBINFO.S",
             "BRBINFO.S.A.A0018",
             "BRBINFO.S.M.DeviceConfigurationChange",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 3
 
     @async_test_body
     async def test_TC_BRBINFO_3_2(self):
-
-        endpoint = self.get_endpoint(default=3)
+        self.step(0)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.BridgedDeviceBasicInformation.Attributes
 
@@ -83,7 +89,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
             self.write_to_app_pipe(command_dict)
         else:
             self.wait_for_user_input(
-                prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
+                prompt_msg="On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode), then continue")
 
         self.step(3)
         newConfigurationVersion = await self.read_brbinfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)

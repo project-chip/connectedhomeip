@@ -26,12 +26,22 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
+
+namespace Testing {
+
+class AutoCommissionerTestAccess;
+
+} // namespace Testing
+
 namespace Controller {
 
 class DeviceCommissioner;
 
 class AutoCommissioner : public CommissioningDelegate
 {
+
+    friend class chip::Testing::AutoCommissionerTestAccess;
+
 public:
     AutoCommissioner();
     ~AutoCommissioner() override;
@@ -49,6 +59,7 @@ public:
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
 protected:
+    virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
     CHIP_ERROR PerformStep(CommissioningStage nextStage);
@@ -77,12 +88,10 @@ private:
     CHIP_ERROR VerifyICDRegistrationInfo(const CommissioningParameters & params);
 
     // Helper function to determine whether next stage should be kWiFiNetworkSetup,
-    // kThreadNetworkSetup or kCleanup, depending whether network information has
-    // been provided that matches the thread/wifi endpoint of the target.
+    // kThreadNetworkSetup, kRequestWiFiCredentials, kRequestThreadCredentials, or
+    // kCleanup, depending on whether network information has been provided that matches
+    // the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
-
-    // Helper function to allocate memory for a scopedMemoryBuffer and populate it with the data from the input span
-    CHIP_ERROR AllocateMemoryAndCopySpan(Platform::ScopedMemoryBufferWithSize<uint8_t> & scopedBuffer, ByteSpan span);
 
     // Helper function to determine if a scan attempt should be made given the
     // scan attempt commissioning params and the corresponding network endpoint of
@@ -95,21 +104,46 @@ private:
                  mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId));
     };
 
-    // Helper function to Determine whether secondary network interface is supported.
-    // Only true if information is provided for both networks, and the target has endpoint
-    // for wifi and thread.
+    // Helper function to determine whether secondary network interface is supported.
+    // Only true if the target has endpoints for both Wi-Fi and Thread, we can
+    // still talk to it after the first attempt to put it on the network, and
+    // either we have credentials for both network types or we have credentials
+    // for either network type (in which case we will prompt for the credentials).
     bool IsSecondaryNetworkSupported() const
     {
-        return ((mParams.GetSupportsConcurrentConnection().ValueOr(false) && mParams.GetWiFiCredentials().HasValue() &&
-                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) &&
-                mParams.GetThreadOperationalDataset().HasValue() &&
-                mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId);
+        return ((mParams.GetSupportsConcurrentConnection().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId &&
+                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId) &&
+                mParams.GetWiFiCredentials().HasValue() == mParams.GetThreadOperationalDataset().HasValue());
     }
 
-    void TrySecondaryNetwork() { mTryingSecondaryNetwork = true; }
-    bool TryingSecondaryNetwork() const { return mTryingSecondaryNetwork; }
-    void ResetTryingSecondaryNetwork() { mTryingSecondaryNetwork = false; }
-    bool mTryingSecondaryNetwork = false;
+    bool IsSomeNetworkSupported() const
+    {
+        return mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId ||
+            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId;
+    }
+
+    // TryingPrimaryNetwork() and TryingSecondaryNetwork() will only be true if
+    // we decided that a secondary network is supported by our combination of
+    // commissioner and commissionee.
+    enum class NetworkAttemptType : uint8_t
+    {
+        // We will only try one network type.
+        kSingle,
+        // We will try two network types and we are trying the primary right now.
+        kPrimary,
+        // We tried the primary and if failed and we are trying the secondary
+        // now.
+        kSecondary,
+    };
+
+    void TryPrimaryNetwork() { mTryingNetworkType = NetworkAttemptType::kPrimary; }
+    bool TryingPrimaryNetwork() const { return mTryingNetworkType == NetworkAttemptType::kPrimary; }
+    void TrySecondaryNetwork() { mTryingNetworkType = NetworkAttemptType::kSecondary; }
+    bool TryingSecondaryNetwork() const { return mTryingNetworkType == NetworkAttemptType::kSecondary; }
+    void ResetNetworkAttemptType() { mTryingNetworkType = NetworkAttemptType::kSingle; }
+
+    NetworkAttemptType mTryingNetworkType = NetworkAttemptType::kSingle;
 
     bool mStopCommissioning = false;
 
@@ -137,6 +171,7 @@ private:
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
 
     static constexpr size_t kMaxDefaultNtpSize = 128;
+
     char mDefaultNtp[kMaxDefaultNtpSize];
 
     uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
@@ -162,12 +197,6 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminRCAC;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminICAC;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminNOC;
-#endif
 };
 } // namespace Controller
 } // namespace chip

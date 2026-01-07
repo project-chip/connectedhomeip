@@ -175,12 +175,13 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        ReturnErrorOnFailure(serializedKey.SetLength(keySize));
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIssuerKeypairStorage, ErrorStr(err));
+        ChipLogProgress(Controller, "Couldn't get %s from storage: %" CHIP_ERROR_FORMAT,
+                        kOperationalCredentialsIssuerKeypairStorage, err.Format());
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mRootIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mRootIssuer.Serialize(serializedKey));
@@ -201,13 +202,13 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        ReturnErrorOnFailure(serializedKey.SetLength(keySize));
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIntermediateIssuerKeypairStorage,
-                        ErrorStr(err));
+        ChipLogProgress(Controller, "Couldn't get %s from storage: %" CHIP_ERROR_FORMAT,
+                        kOperationalCredentialsIntermediateIssuerKeypairStorage, err.Format());
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
@@ -369,7 +370,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
 
     ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
-    reader.ExitContainer(containerType);
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));

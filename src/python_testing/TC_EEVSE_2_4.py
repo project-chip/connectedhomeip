@@ -40,16 +40,16 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import time
+import asyncio
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventChangeCallback
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
@@ -64,7 +64,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -117,15 +117,13 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EEVSE_2_4(self):
         self.step("1")
         # Commission DUT - already done
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventChangeCallback(Clusters.EnergyEvse)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     self.get_endpoint())
@@ -137,7 +135,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_basic()
 
         # After a few seconds...
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("3a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)

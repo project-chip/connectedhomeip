@@ -68,7 +68,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="FLW" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="MeasuredValue" type="uint16" default="null">
+    <attribute id="0x0000" name="MeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform/>

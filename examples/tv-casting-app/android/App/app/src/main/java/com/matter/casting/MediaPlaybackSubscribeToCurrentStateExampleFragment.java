@@ -27,7 +27,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import chip.devicecontroller.ChipClusters;
-import com.R;
+import com.chip.casting.R;
 import com.matter.casting.core.CastingApp;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.core.Endpoint;

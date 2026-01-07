@@ -33,11 +33,14 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_CADMIN_1_25(MatterBaseTest):
@@ -46,8 +49,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabrics
+        return await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
 
     def steps_TC_CADMIN_1_25(self) -> list[TestStep]:
         return [
@@ -117,7 +119,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(2)
         # TH_CR1 subscribes to WindowStatus attribute on DUT_CE
-        th1_window_status_accumulator = ClusterAttributeChangeAccumulator(
+        th1_window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await th1_window_status_accumulator.start(
@@ -127,7 +129,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(3)
         # TH_CR1 subscribes to AdminFabricIndex attribute on DUT_CE
-        th1_admin_fabric_index_accumulator = ClusterAttributeChangeAccumulator(
+        th1_admin_fabric_index_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th1_admin_fabric_index_accumulator.start(
@@ -137,7 +139,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(4)
         # TH_CR1 subscribes to AdminVendorId attribute on DUT_CE
-        th1_admin_vendor_id_accumulator = ClusterAttributeChangeAccumulator(
+        th1_admin_vendor_id_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th1_admin_vendor_id_accumulator.start(
@@ -157,7 +159,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         # TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(7)
@@ -209,7 +211,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         null_match = AttributeMatcher.from_callable(
             "Attribute is null",
-            lambda report: str(type(report.value)).find('chip.clusters.Types.Nullable') >= 0)
+            lambda report: str(type(report.value)).find('matter.clusters.Types.Nullable') >= 0)
 
         th1_window_status_accumulator.await_all_expected_report_matches([window_status_0_match], timeout_sec=10)
         th1_admin_fabric_index_accumulator.await_all_expected_report_matches([null_match], timeout_sec=10)
@@ -222,7 +224,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(10)
         # TH_CR2 subscribes to WindowStatus attribute on DUT_CE
-        th2_window_status_accumulator = ClusterAttributeChangeAccumulator(
+        th2_window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await th2_window_status_accumulator.start(
@@ -232,7 +234,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(11)
         # TH_CR2 subscribes to AdminFabricIndex attribute on DUT_CE
-        th2_admin_fabric_index_accumulator = ClusterAttributeChangeAccumulator(
+        th2_admin_fabric_index_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th2_admin_fabric_index_accumulator.start(
@@ -242,7 +244,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(12)
         # TH_CR2 subscribes to AdminVendorId attribute on DUT_CE
-        th2_admin_vendor_id_accumulator = ClusterAttributeChangeAccumulator(
+        th2_admin_vendor_id_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th2_admin_vendor_id_accumulator.start(
@@ -253,7 +255,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(13)
         # TH_CR1 sends an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`
         await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(14)
@@ -297,7 +299,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(16)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.step(17)
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
@@ -324,7 +326,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(19)
         # TH_CR2 opens a commissioning window on DUT_CE using ECM with commissioning timeout of `max_window_duration`
         await self.th2.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(20)
@@ -364,7 +366,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(22)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.step(23)
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0
@@ -393,7 +395,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(25)
         # TH_CR2 send an OpenCommissioningWindow command to DUT_CE using ECM with a commissioning timeout of `max_window_duration`
         await self.th2.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(26)
@@ -426,13 +428,13 @@ class TC_CADMIN_1_25(MatterBaseTest):
         # Before expiration of `max_window_duration` set in step 25,
         # TH_CR1 sends RemoveFabric command to DUT_CE with FabricIndex set to the fabric index of TH_CR2's fabric
         th2_idx = await self.th2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(29)
         # Verify TH_CR1 receives subscription notifications which show AdminFabricIndex value to be null
@@ -462,7 +464,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(32)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.step(33)
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminVendorId to be null

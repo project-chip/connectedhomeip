@@ -132,14 +132,18 @@ class Field:
     is_list: bool = False
     qualities: FieldQuality = FieldQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
     @property
-    def is_optional(self):
-        return FieldQuality.OPTIONAL & self.qualities
+    def is_optional(self) -> bool:
+        return FieldQuality.OPTIONAL in self.qualities
 
     @property
-    def is_nullable(self):
-        return FieldQuality.NULLABLE & self.qualities
+    def is_nullable(self) -> bool:
+        return FieldQuality.NULLABLE in self.qualities
 
 
 @dataclass
@@ -152,20 +156,20 @@ class Attribute:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
-    def is_readable(self):
-        return AttributeQuality.READABLE & self.qualities
+    def is_readable(self) -> bool:
+        return AttributeQuality.READABLE in self.qualities
 
     @property
-    def is_writable(self):
-        return AttributeQuality.WRITABLE & self.qualities
+    def is_writable(self) -> bool:
+        return AttributeQuality.WRITABLE in self.qualities
 
     @property
-    def is_subscribable(self):
-        return not (AttributeQuality.NOSUBSCRIBE & self.qualities)
+    def is_subscribable(self) -> bool:
+        return AttributeQuality.NOSUBSCRIBE not in self.qualities
 
     @property
-    def requires_timed_write(self):
-        return AttributeQuality.TIMED_WRITE & self.qualities
+    def requires_timed_write(self) -> bool:
+        return AttributeQuality.TIMED_WRITE in self.qualities
 
 
 @dataclass
@@ -178,6 +182,10 @@ class Struct:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -191,9 +199,12 @@ class Event:
     description: Optional[str] = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+
     @property
-    def is_fabric_sensitive(self):
-        return EventQuality.FABRIC_SENSITIVE & self.qualities
+    def is_fabric_sensitive(self) -> bool:
+        return EventQuality.FABRIC_SENSITIVE in self.qualities
 
 
 @dataclass
@@ -203,6 +214,10 @@ class ConstantEntry:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     # If set, shows the specification name including spaces and special characters.
     specification_name: Optional[str] = None
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -213,6 +228,10 @@ class Enum:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -223,6 +242,10 @@ class Bitmap:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -240,8 +263,8 @@ class Command:
     parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
     @property
-    def is_timed_invoke(self):
-        return CommandQuality.TIMED_INVOKE & self.qualities
+    def is_timed_invoke(self) -> bool:
+        return CommandQuality.TIMED_INVOKE in self.qualities
 
 
 @dataclass

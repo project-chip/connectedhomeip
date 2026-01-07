@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace UnitTesting {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Boolean {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Boolean::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -382,7 +384,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NullableRangeRestricte
 } // namespace NullableRangeRestrictedInt16s
 namespace WriteOnlyInt8u {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WriteOnlyInt8u::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+                                                          std::nullopt, Access::Privilege::kOperate);
 } // namespace WriteOnlyInt8u
 namespace NullableGlobalEnum {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NullableGlobalEnum::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -396,10 +398,99 @@ namespace MeiInt8u {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeiInt8u::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace MeiInt8u
+constexpr std::array<DataModel::AttributeEntry, 85> kMandatoryMetadata = {
+    Boolean::kMetadataEntry,
+    Bitmap8::kMetadataEntry,
+    Bitmap16::kMetadataEntry,
+    Bitmap32::kMetadataEntry,
+    Bitmap64::kMetadataEntry,
+    Int8u::kMetadataEntry,
+    Int16u::kMetadataEntry,
+    Int24u::kMetadataEntry,
+    Int32u::kMetadataEntry,
+    Int40u::kMetadataEntry,
+    Int48u::kMetadataEntry,
+    Int56u::kMetadataEntry,
+    Int64u::kMetadataEntry,
+    Int8s::kMetadataEntry,
+    Int16s::kMetadataEntry,
+    Int24s::kMetadataEntry,
+    Int32s::kMetadataEntry,
+    Int40s::kMetadataEntry,
+    Int48s::kMetadataEntry,
+    Int56s::kMetadataEntry,
+    Int64s::kMetadataEntry,
+    Enum8::kMetadataEntry,
+    Enum16::kMetadataEntry,
+    FloatSingle::kMetadataEntry,
+    FloatDouble::kMetadataEntry,
+    OctetString::kMetadataEntry,
+    ListInt8u::kMetadataEntry,
+    ListOctetString::kMetadataEntry,
+    ListStructOctetString::kMetadataEntry,
+    LongOctetString::kMetadataEntry,
+    CharString::kMetadataEntry,
+    LongCharString::kMetadataEntry,
+    EpochUs::kMetadataEntry,
+    EpochS::kMetadataEntry,
+    VendorId::kMetadataEntry,
+    ListNullablesAndOptionalsStruct::kMetadataEntry,
+    EnumAttr::kMetadataEntry,
+    StructAttr::kMetadataEntry,
+    RangeRestrictedInt8u::kMetadataEntry,
+    RangeRestrictedInt8s::kMetadataEntry,
+    RangeRestrictedInt16u::kMetadataEntry,
+    RangeRestrictedInt16s::kMetadataEntry,
+    ListLongOctetString::kMetadataEntry,
+    ListFabricScoped::kMetadataEntry,
+    TimedWriteBoolean::kMetadataEntry,
+    GeneralErrorBoolean::kMetadataEntry,
+    ClusterErrorBoolean::kMetadataEntry,
+    GlobalEnum::kMetadataEntry,
+    GlobalStruct::kMetadataEntry,
+    NullableBoolean::kMetadataEntry,
+    NullableBitmap8::kMetadataEntry,
+    NullableBitmap16::kMetadataEntry,
+    NullableBitmap32::kMetadataEntry,
+    NullableBitmap64::kMetadataEntry,
+    NullableInt8u::kMetadataEntry,
+    NullableInt16u::kMetadataEntry,
+    NullableInt24u::kMetadataEntry,
+    NullableInt32u::kMetadataEntry,
+    NullableInt40u::kMetadataEntry,
+    NullableInt48u::kMetadataEntry,
+    NullableInt56u::kMetadataEntry,
+    NullableInt64u::kMetadataEntry,
+    NullableInt8s::kMetadataEntry,
+    NullableInt16s::kMetadataEntry,
+    NullableInt24s::kMetadataEntry,
+    NullableInt32s::kMetadataEntry,
+    NullableInt40s::kMetadataEntry,
+    NullableInt48s::kMetadataEntry,
+    NullableInt56s::kMetadataEntry,
+    NullableInt64s::kMetadataEntry,
+    NullableEnum8::kMetadataEntry,
+    NullableEnum16::kMetadataEntry,
+    NullableFloatSingle::kMetadataEntry,
+    NullableFloatDouble::kMetadataEntry,
+    NullableOctetString::kMetadataEntry,
+    NullableCharString::kMetadataEntry,
+    NullableEnumAttr::kMetadataEntry,
+    NullableStruct::kMetadataEntry,
+    NullableRangeRestrictedInt8u::kMetadataEntry,
+    NullableRangeRestrictedInt8s::kMetadataEntry,
+    NullableRangeRestrictedInt16u::kMetadataEntry,
+    NullableRangeRestrictedInt16s::kMetadataEntry,
+    NullableGlobalEnum::kMetadataEntry,
+    NullableGlobalStruct::kMetadataEntry,
+    MeiInt8u::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Test {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Test::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -520,6 +611,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace TestDifferentVendorMeiRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace TestEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestEvent
+namespace TestFabricScopedEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestDifferentVendorMeiEvent
+
+} // namespace Events
 } // namespace UnitTesting
 } // namespace Clusters
 } // namespace app

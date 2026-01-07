@@ -23,8 +23,8 @@
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>
@@ -356,7 +356,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
             return Status::InvalidDataType;
         }
 
-        if (metadata->IsReadOnly())
+        if (!metadata->IsWritable())
         {
             ChipLogProgress(Zcl, "WRITE ERR: attr not writable");
             return Status::UnsupportedWrite;

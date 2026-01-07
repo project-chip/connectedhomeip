@@ -18,8 +18,9 @@
 
 #include "NetworkCommissioningCluster.h"
 
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
 namespace app {
@@ -44,11 +45,19 @@ public:
     /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
-    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
-    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
-    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
+    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
+    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
+    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
 
 private:
+    // Does the tracking via the public general commissioning cluster (if available)
+    class CodegenGeneralCommissioningBreadcrumbTracker : public BreadCrumbTracker
+    {
+    public:
+        void SetBreadCrumb(uint64_t value) override;
+    };
+
+    CodegenGeneralCommissioningBreadcrumbTracker mTracker;
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
 

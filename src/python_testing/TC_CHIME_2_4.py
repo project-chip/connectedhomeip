@@ -33,12 +33,33 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device chime
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+import logging
+
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
+
+import matter.clusters as Clusters
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
@@ -47,26 +68,31 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         return "[TC-CHIME-2.4] Verify functionality of the PlayChimeSound command"
 
     def steps_TC_CHIME_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Write the value of False to the Enabled attribute."),
             TestStep(3, "Invoke the PlayChimeSound command. Verify a success response, and no chime is played."),
             TestStep(4, "Write the value of True to the Enabled attribute."),
             TestStep(5, "Invoke the PlayChimeSound command. Verify a success response, and a chime is played."),
+            TestStep(6, "Ensure that the SelectedChime is the longest chime available on the DUT"),
+            TestStep(7, "Invoke PlayChimeSound three (3) times in rapid succession. Ensure success responses. Ensure no more than two were audible"),
+            TestStep(8, "If there is more than one chime sound supported, proceed to step 9, otherwise end the test case"),
+            TestStep(9, "Invoke PlayChimeSound on the DUT. Verify success"),
+            TestStep(10, "Write a new supported chime sound to SelectedChime"),
+            TestStep(11, "Obtain manual verification that the chime sound from step 9 is complete"),
+            TestStep(12, "Invoke PlayChimeSound on the DUT. Verify that a different sound from the one played in step 9 is heard"),
         ]
-        return steps
 
     def pics_TC_CHIME_2_4(self) -> list[str]:
-        pics = [
+        return [
             "CHIME.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_4(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         self.step(1)  # Already done, immediately go to step 2
@@ -80,7 +106,11 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             user_response = self.wait_for_user_input(prompt_msg="A chime sound should not have been played, is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
-            asserts.assert_equal(user_response.lower(), "y")
+            if user_response is not None:
+                log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no chime sound")
+                asserts.assert_equal(user_response.lower(), "y")
+            else:
+                log.info("CHIME 2_4: No response received for no chime sound played user prompt")
 
         self.step(4)
         await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)
@@ -91,7 +121,100 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             user_response = self.wait_for_user_input(prompt_msg="A chime sound should have been played, is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
-            asserts.assert_equal(user_response.lower(), "y")
+            if user_response is not None:
+                log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of chime sound")
+                asserts.assert_equal(user_response.lower(), "y")
+            else:
+                log.info("CHIME 2_4: No response received for chime sound played user prompt")
+
+        self.step(6)
+        # Use the current selected chime when in CI
+        longestChimeDurationChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
+
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg="Please enter the ChimeID of the longest duration chime",
+                                                     prompt_msg_placeholder=str(longestChimeDurationChime),
+                                                     default_value=str(longestChimeDurationChime))
+
+            if user_response is not None:
+                chosenChimeID = int(user_response)
+                # Make sure the selected ID is valid
+                myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
+                found_id = False
+                for chime in myChimeSounds:
+                    if chime.chimeID == chosenChimeID:
+                        found_id = True
+                        break
+
+                if not found_id:
+                    asserts.assert_fail(f"Unknown ChimeID selected: {chosenChimeID}")
+                else:
+                    log.info(f"CHIME 2_4: selected chime id for longest chime: {chosenChimeID}")
+
+                longestChimeDurationChime = chosenChimeID
+            else:
+                log.info("CHIME 2_4: No response received for longest ChimeID user prompt")
+
+        await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, longestChimeDurationChime)
+
+        self.step(7)
+        if not self.is_ci:
+            self.wait_for_user_input(prompt_msg="About to play multiple chimes on the DUT. Hit ENTER once ready.")
+
+        await self.send_play_chime_sound_command(endpoint)
+        await self.send_play_chime_sound_command(endpoint)
+        await self.send_play_chime_sound_command(endpoint)
+
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg="No more than two chime sounds should have been played, is this correct? Enter 'y' or 'n'",
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
+            if user_response is not None:
+                log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no more than two chime sounds")
+                asserts.assert_equal(user_response.lower(), "y")
+            else:
+                log.info("CHIME 2_4: No response received for no more than two chime sounds played user prompt")
+
+        self.step(8)
+        myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
+        if len(myChimeSounds) > 1:
+
+            if not self.is_ci:
+                self.wait_for_user_input(prompt_msg="About to play a single chime on the DUT. Hit ENTER once ready.")
+
+            self.step(9)
+            await self.send_play_chime_sound_command(endpoint)
+
+            self.step(10)
+            newSelectedChime = longestChimeDurationChime
+            for chime in myChimeSounds:
+                if chime.chimeID != longestChimeDurationChime:
+                    newSelectedChime = chime.chimeID
+                    break
+
+            await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, newSelectedChime)
+
+            self.step(11)
+            if not self.is_ci:
+                self.wait_for_user_input(prompt_msg="Hit ENTER once the chime has completed playing.")
+
+            self.step(12)
+            await self.send_play_chime_sound_command(endpoint)
+            if not self.is_ci:
+                user_response = self.wait_for_user_input(prompt_msg="A different chime sound should have just been played, is this correct? Enter 'y' or 'n'",
+                                                         prompt_msg_placeholder="y",
+                                                         default_value="y")
+                if user_response is not None:
+                    log.info(f"CHIME 2_4: response '{user_response}' received on confirmation of different chime sound")
+                    asserts.assert_equal(user_response.lower(), "y")
+                else:
+                    log.info("CHIME 2_4: No response received for different chime sound played user prompt")
+
+        else:
+            self.skip_step(9)
+            self.skip_step(10)
+            self.skip_step(11)
+            self.skip_step(12)
 
 
 if __name__ == "__main__":

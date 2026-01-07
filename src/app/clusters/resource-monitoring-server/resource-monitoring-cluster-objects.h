@@ -24,6 +24,9 @@
 #include <cstdint>
 #include <utility>
 
+// Including the Metadata from a concrete implementation
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -94,13 +97,13 @@ public:
                              chip::CharSpan aProductIdentifierValue)
     {
         SetProductIdentifierType(aProductIdentifierType);
-        SetProductIdentifierValue(aProductIdentifierValue);
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aProductIdentifierValue);
     }
 
     ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
     {
         SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
-        SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
         return *this;
     }
 
@@ -146,7 +149,9 @@ public:
 namespace Attributes {
 
 namespace Condition {
-static constexpr AttributeId Id = 0x00000000;
+static constexpr AttributeId Id                           = 0x00000000;
+static constexpr DataModel::AttributeEntry kMetadataEntry = ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = chip::Percent;
@@ -160,6 +165,9 @@ struct TypeInfo
 
 namespace DegradationDirection {
 static constexpr AttributeId Id = 0x00000001;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = DegradationDirectionEnum;
@@ -173,6 +181,9 @@ struct TypeInfo
 
 namespace ChangeIndication {
 static constexpr AttributeId Id = 0x00000002;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = ChangeIndicationEnum;
@@ -186,6 +197,9 @@ struct TypeInfo
 
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = bool;
@@ -199,6 +213,9 @@ struct TypeInfo
 
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<uint32_t>;
@@ -212,7 +229,10 @@ struct TypeInfo
 
 namespace ReplacementProductList {
 static constexpr AttributeId Id = 0x00000005;
-}
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry;
+
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -255,7 +275,10 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 
 namespace Commands {
 namespace ResetCondition {
-static constexpr CommandId Id = 0x00000000;
+// Getting these from a concrete implementation, Less error-prone if XML ever changes
+static constexpr CommandId Id = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Commands::ResetCondition::kMetadataEntry;
 
 struct DecodableType
 {

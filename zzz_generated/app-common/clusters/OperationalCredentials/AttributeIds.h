@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace OperationalCredentials {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace NOCs {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace NOCs

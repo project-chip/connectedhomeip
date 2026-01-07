@@ -34,12 +34,17 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+from matter.testing.timeoperations import utc_time_in_matter_epoch
+
+log = logging.getLogger(__name__)
 
 
 class TC_VALCC_4_4(MatterBaseTest):
@@ -51,7 +56,7 @@ class TC_VALCC_4_4(MatterBaseTest):
         return "[TC-VALCC-4.4] AutoCloseTime functionality with (synchronized time) DUT as Server"
 
     def steps_TC_VALCC_4_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Verify TimeSync feature is supported"),
@@ -70,18 +75,20 @@ class TC_VALCC_4_4(MatterBaseTest):
             TestStep(13, "Send Close command"),
             TestStep(14, "Read AutoCloseTime attribute"),
         ]
-        return steps
 
     def pics_TC_VALCC_4_4(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_VALCC_4_4(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -93,17 +100,16 @@ class TC_VALCC_4_4(MatterBaseTest):
 
         self.step("2b")
         if not is_ts_feature_supported:
-            logging.info("TimeSync feature not supported skipping test case")
+            log.info("TimeSync feature not supported skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
                 self.step(step.test_plan_number)
-                logging.info("Test step skipped")
+                log.info("Test step skipped")
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        log.info("Test step skipped")
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
@@ -119,7 +125,7 @@ class TC_VALCC_4_4(MatterBaseTest):
                 pass
 
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(4)
         try:
@@ -163,7 +169,7 @@ class TC_VALCC_4_4(MatterBaseTest):
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
             asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(10)
         try:

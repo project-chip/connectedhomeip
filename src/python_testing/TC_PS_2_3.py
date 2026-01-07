@@ -34,13 +34,18 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
-import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_PS_2_3(MatterBaseTest):
@@ -61,12 +66,12 @@ class TC_PS_2_3(MatterBaseTest):
 
         self.step(2)
         ps = Clusters.PowerSource
-        sub_handler = ClusterAttributeChangeAccumulator(ps)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=ps)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(3)
-        logging.info("This test will now wait for 30 seconds.")
-        time.sleep(30)
+        log.info("This test will now wait for 30 seconds.")
+        await asyncio.sleep(30)
 
         counts = sub_handler.attribute_report_counts
         asserts.assert_less_equal(counts[ps.Attributes.BatTimeToFullCharge], 4, "Too many reports for BatTimeToFullCharge")

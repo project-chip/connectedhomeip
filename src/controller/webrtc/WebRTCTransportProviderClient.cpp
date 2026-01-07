@@ -30,7 +30,7 @@ using namespace chip::app;
 using WebRTCSessionStruct                              = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
 
-void WebRTCTransportProviderClient::Init(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+void WebRTCTransportProviderClient::Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     mPeerId     = ScopedNodeId(nodeId, fabricIndex);
     mEndpointId = static_cast<EndpointId>(endpoint);
@@ -81,7 +81,7 @@ void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client
     CHIP_ERROR error = status.ToChipError();
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Camera, "Response Failure: %s", ErrorStr(error));
+        ChipLogError(Camera, "Response Failure: %" CHIP_ERROR_FORMAT, error.Format());
         this->OnError(client, error);
         return;
     }
@@ -179,7 +179,7 @@ void WebRTCTransportProviderClient::OnDeviceConnected(void * context, chip::Mess
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected: context is null"));
 
     ChipLogProgress(Camera, "CASE session established, sending WebRTCTransportProvider command...");
-    self->SendCommandForType(exchangeMgr, sessionHandle, self->mCommandType);
+    TEMPORARY_RETURN_IGNORED self->SendCommandForType(exchangeMgr, sessionHandle, self->mCommandType);
 }
 
 void WebRTCTransportProviderClient::OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
@@ -195,12 +195,11 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     ChipLogProgress(Camera, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
     TLV::TLVReader data;
     data.Init(payload, length);
-    data.Next();
+    CHIP_ERROR error = data.Next();
 
     Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType value;
-    CHIP_ERROR error = value.Decode(data, mPeerId.GetFabricIndex());
-    VerifyOrReturnError(error == CHIP_NO_ERROR, error,
-                        ChipLogError(Camera, "Failed to decode command payload value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
+    error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
+    ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
     if (mState != State::Idle)
     {
@@ -252,12 +251,11 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
 
     TLV::TLVReader data;
     data.Init(payload, length);
-    data.Next();
+    CHIP_ERROR error = data.Next();
 
     Clusters::WebRTCTransportProvider::Commands::SolicitOffer::DecodableType value;
-    CHIP_ERROR error = value.Decode(data, mPeerId.GetFabricIndex());
-    VerifyOrReturnError(error == CHIP_NO_ERROR, error,
-                        ChipLogError(Camera, "Failed to decode command payload value. Error: %" CHIP_ERROR_FORMAT, error.Format()));
+    error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
+    ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
     // Store the command type
     mCommandType = CommandType::kSolicitOffer;

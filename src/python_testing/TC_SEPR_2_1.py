@@ -43,13 +43,16 @@
 """Define Matter test case TC_SEPR_2_1."""
 
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 cluster = Clusters.CommodityPrice
 
@@ -63,14 +66,13 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     def pics_TC_SEPR_2_1(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "SEPR.S"
         ]
-        return pics
 
     def steps_TC_SEPR_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the TariffUnit attribute.",
@@ -82,8 +84,6 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
             TestStep("5", "TH reads from the DUT the PriceForecast attribute.",
                      "Verify that the DUT response contains a list of CommodityPriceStruct entries"),
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_1(self):

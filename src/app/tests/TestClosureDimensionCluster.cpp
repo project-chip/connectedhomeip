@@ -1711,6 +1711,30 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangePositi
               Status::InvalidInState);
 }
 
+// HandleSetTarget command should return Success when only LT feature is enabled and latch is changed.
+TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangeLatchWhenOnlyLatchFeatureEnabled)
+{
+
+    conformance.FeatureMap().Set(Feature::kMotionLatching);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    GenericDimensionStateStruct setCurrentStateStruct(NullOptional, Optional<bool>(true), NullOptional);
+    currentState.SetNonNull(setCurrentStateStruct);
+    EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+
+    BitFlags<LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(false), NullOptional), Status::Success);
+    DataModel::Nullable<GenericDimensionStateStruct> target;
+    EXPECT_EQ(logic->GetTargetState(target), CHIP_NO_ERROR);
+    EXPECT_EQ(target.Value().latch.Value(), false);
+}
+
 // HandleSetTarget command should return Success when CurrentState is latched and only speed is changed.
 TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangeSpeedWhenLatched)
 {
@@ -2403,3 +2427,10 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValu
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// Mock callback functions
+__attribute__((unused)) void
+MatterClosureDimensionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    // Mock implementation - no-op for tests
+}

@@ -44,7 +44,7 @@ class TimerAndMockClock : public Clock::Internal::MockClock, public Layer
 {
 public:
     // System Layer overrides
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+    CriticalFailure Init() override { return CHIP_NO_ERROR; }
     void Shutdown() override { Clear(); }
     void Clear()
     {
@@ -53,7 +53,7 @@ public:
     }
     bool IsInitialized() const override { return true; }
 
-    CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
+    CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
     {
         Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
         TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
@@ -80,9 +80,10 @@ public:
     {
         return mTimerList.GetRemainingTime(onComplete, appState);
     }
-    CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CriticalFailure ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // Clock overrides
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void SetMonotonic(Clock::Milliseconds64 timestamp)
     {
         MockClock::SetMonotonic(timestamp);
@@ -96,6 +97,7 @@ public:
         }
     }
 
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void AdvanceMonotonic(Clock::Milliseconds64 increment) { SetMonotonic(GetMonotonicMilliseconds64() + increment); }
 
 private:
@@ -105,6 +107,13 @@ private:
 
 } // namespace System
 } // namespace chip
+
+// Mock callback functions
+__attribute__((unused)) void
+MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    // Mock implementation - no-op for tests
+}
 
 namespace {
 
@@ -801,6 +810,116 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSpeedPositioningAn
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSecureStateWithPositioningFeature)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), NullOptional,
+                                   NullOptional, DataModel::MakeNullable(true)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
+
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(readValue.IsNull());
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSecureStateWithMotionLatchingFeature)
+{
+    conformance.FeatureMap().Set(Feature::kMotionLatching);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(NullOptional, Optional(false), NullOptional, DataModel::MakeNullable(true)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
+
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(readValue.IsNull());
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidSecureStateWithPositioningFeature)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), NullOptional, NullOptional,
+                                   DataModel::MakeNullable(true)));
+    EXPECT_NE(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
+
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(readValue.IsNull());
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kFullyClosed);
+    EXPECT_FALSE(readValue.Value().latch.HasValue());
+    EXPECT_FALSE(readValue.Value().speed.HasValue());
+    EXPECT_EQ(readValue.Value().secureState.Value(), true);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidSecureStateWithMotionLatchingFeature)
+{
+    conformance.FeatureMap().Set(Feature::kMotionLatching);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(NullOptional, Optional(true), NullOptional, DataModel::MakeNullable(true)));
+    EXPECT_NE(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
+
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(readValue.IsNull());
+    EXPECT_FALSE(readValue.Value().position.HasValue());
+    EXPECT_EQ(readValue.Value().latch.Value().Value(), true);
+    EXPECT_FALSE(readValue.Value().speed.HasValue());
+    EXPECT_EQ(readValue.Value().secureState.Value(), true);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidSecureStateWithPositioningAndMotionLatchingFeature)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(false),
+                                   NullOptional, DataModel::MakeNullable(false)));
+    EXPECT_NE(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
+
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(readValue.IsNull());
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kPartiallyOpened);
+    EXPECT_EQ(readValue.Value().latch.Value().Value(), false);
+    EXPECT_FALSE(readValue.Value().speed.HasValue());
+    EXPECT_EQ(readValue.Value().secureState.Value(), false);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidPositioningAndSpeed)

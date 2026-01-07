@@ -16,8 +16,6 @@
 
 import os
 
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory
-
 
 def get_chip_root():
     """
@@ -27,24 +25,16 @@ def get_chip_root():
     chip_root = os.getenv('PW_PROJECT_ROOT')
     if chip_root:
         return chip_root
-    else:
-        try:
-            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-        except Exception as e:
-            raise EnvironmentError(
-                "Unable to determine CHIP root directory. Please ensure the environment is activated."
-            ) from e
+    try:
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    except Exception as e:
+        raise EnvironmentError(
+            "Unable to determine CHIP root directory. Please ensure the environment is activated."
+        ) from e
 
 
-def get_data_model_path(dir: PrebuiltDataModelDirectory):
-    """
-    Returns the path to the data model directory for a given branch.
-    """
-    chip_root = get_chip_root()
-    data_model_path = os.path.join(chip_root, 'data_model', dir.dirname)
-    if not os.path.exists(data_model_path):
-        raise FileNotFoundError(f"Data model path for branch {dir.dirname} does not exist: {data_model_path}")
-    return data_model_path
+def get_data_model_path():
+    return os.path.join(get_chip_root(), 'data_model')
 
 
 def get_spec_xml_output_path():
@@ -83,16 +73,3 @@ def get_python_testing_path():
     if not os.path.exists(python_testing_path):
         raise FileNotFoundError(f"Python testing directory does not exist: {python_testing_path}")
     return python_testing_path
-
-
-def get_in_progress_defines():
-    """
-    Returns a list of defines that are currently in progress.
-    This can be updated dynamically as needed.
-    """
-    return [
-        'aliro', 'atomicwrites', 'battery-storage', 'device-location', 'e2e-jf',
-        'energy-calendar', 'energy-drlc', 'energy-management', 'heat-pump', 'hrap-1',
-        'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
-        'service-area-cluster', 'solar-power', 'tcp', 'water-heater', 'wifiSetup'
-    ]

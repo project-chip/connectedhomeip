@@ -37,29 +37,31 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
-class MOD_1_2(MatterBaseTest):
+class TC_MOD_1_2(MatterBaseTest):
     """Proposal test for Mode Select Cluster attributes as a server."""
 
-    def desc_MOD_1_2(self) -> str:
+    def desc_TC_MOD_1_2(self) -> str:
         return "80.2.1. [TC-MOD-1.2] Cluster attributes with DUT as Server"
 
-    def pics_MOD_1_2(self):
+    def pics_TC_MOD_1_2(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "MOD.S"
         ]
-        return pics
 
-    def steps_MOD_1_2(self) -> list[TestStep]:
-        steps = [
+    def steps_TC_MOD_1_2(self) -> list[TestStep]:
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
             TestStep(3, "TH reads the CurrentMode attribute from the DUT"),
@@ -68,7 +70,6 @@ class MOD_1_2(MatterBaseTest):
             TestStep(6, "TH reads the Description attribute from the DUT"),
             TestStep(7, "TH reads the StandardNamespace attribute from the DUT")
         ]
-        return steps
 
     def _verify_supported_mode(self, supported_mode):
         """Verify supported mode.
@@ -88,7 +89,7 @@ class MOD_1_2(MatterBaseTest):
         self._log_attribute("Semantic tags", supported_mode.semanticTags)
 
         if isinstance(supported_mode.semanticTags, list) and len(supported_mode.semanticTags) > 0:
-            logger.info(
+            log.info(
                 "SupportedMode.semanticTags contains values, verifying attributes for manufacturedcode and value are not longer than 16bits int")
             for semantictag in supported_mode.semanticTags:
                 asserts.assert_true(semantictag.mfgCode >= 0 and semantictag.mfgCode <= 0xFFFF,
@@ -97,12 +98,16 @@ class MOD_1_2(MatterBaseTest):
                                     "Element semantictag.Value is greater than 16 bits")
 
     def _log_attribute(self, name, value):
-        logger.info(f"{name} attribute with value: {value} with type: {type(value)}")
+        log.info(f"{name} attribute with value: {value} with type: {type(value)}")
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
-    async def test_MOD_1_2(self):
+    async def test_TC_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
 
         # Commision device
         # In the test plan step 1 is defined as a precondition.
@@ -113,12 +118,12 @@ class MOD_1_2(MatterBaseTest):
         # Verify if semantic tags has elements in list , and if there are values assert the values
         self.step(2)
         supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.SupportedModes)
-        logger.info(f"Supported modes {supported_modes}")
+        log.info(f"Supported modes {supported_modes}")
         # List must not be empty
         asserts.assert_true(len(supported_modes) > 0, "Supported modes can not be empty.")
         supported_modes_values = []
         for supported_mode in supported_modes:
-            logger.info(
+            log.info(
                 f"Label {supported_mode} with type {type(supported_mode)} and {supported_mode.label} and {supported_mode.mode} and {supported_mode.semanticTags}")
             # Verify the struct values
             self._verify_supported_mode(supported_mode=supported_mode)
@@ -127,7 +132,7 @@ class MOD_1_2(MatterBaseTest):
         # Verify mode numbers are unique
         asserts.assert_equal(len(supported_modes_values), len(set(supported_modes_values)),
                              f"Duplicate value found for supported mode values :{supported_modes_values}.")
-        logger.info(f"Supported modes values {supported_modes_values}")
+        log.info(f"Supported modes values {supported_modes_values}")
 
         # Currentmode attribute check must be int and must be in the supported modes values.
         self.step(3)

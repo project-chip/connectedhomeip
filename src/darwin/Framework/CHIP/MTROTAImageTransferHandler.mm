@@ -19,6 +19,9 @@
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
 
@@ -28,6 +31,7 @@
 using namespace chip;
 using namespace chip::bdx;
 using namespace chip::app;
+using namespace chip::Tracing::DarwinFramework;
 
 constexpr uint16_t kMaxBdxBlockSize = 1024;
 
@@ -199,6 +203,11 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
+    mNumBytesProcessed = 0;
+
+    MATTER_LOG_METRIC_BEGIN(kMetricOTATransfer);
+    MATTER_LOG_METRIC(kMetricOTATransferOffset, uint32_t(mTransfer.GetStartOffset()));
+
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
     auto completionHandler = ^(NSError * _Nullable error) {
@@ -284,8 +293,24 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
         return;
     }
 
+    auto * device = [MTRDevice deviceWithNodeID:nodeId controller:controller];
+
+    MATTER_LOG_METRIC(kMetricOTADeviceVendorID, device.vendorID.unsignedIntValue);
+    MATTER_LOG_METRIC(kMetricOTADeviceProductID, device.productID.unsignedIntValue);
+    MATTER_LOG_METRIC(kMetricOTADeviceUsesThread, mIsPeerNodeAKnownThreadDevice);
+    MATTER_LOG_METRIC(kMetricOTATNumBytesProcessed, uint32_t(mNumBytesProcessed));
+    MATTER_LOG_METRIC_END(kMetricOTATransfer, error);
+
+    // Always collect the metrics to avoid unbounded growth of the stats in the collector
+    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
     auto nsError = [MTRError errorForCHIPErrorCode:error];
-    if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
+    if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:metrics:error:)]) {
+        dispatch_async(delegateQueue, ^{
+            [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId controller:controller
+                                                         metrics:metrics
+                                                           error:nsError];
+        });
+    } else if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
         dispatch_async(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
                                                       controller:controller
@@ -330,6 +355,9 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
     auto respondWithBlock = ^(NSData * _Nullable data, BOOL isEOF) {
+        if (data) {
+            mNumBytesProcessed += data.length;
+        }
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
@@ -341,6 +369,20 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
                 }
 
                 if (data == nil) {
+                    MTR_LOG_ERROR("Nil OTA data block when updating " ChipLogFormatScopedNodeId,
+                        ChipLogValueScopedNodeId(strongWrapper.otaImageTransferHandler->mPeer));
+                    NotifyEventHandled(eventType, CHIP_ERROR_INCORRECT_STATE);
+                    return;
+                }
+
+                if (data.length != blockSize.unsignedLongLongValue && !isEOF) {
+                    // "Transfer of OTA Software Update images" in the spec says:
+                    //
+                    // Actual Block Size used over all transports SHALL be the negotiated Maximum
+                    // Block Size for every block except the last one, which may be of any size less
+                    // or equal to the Maximum Block Size (including zero).
+                    MTR_LOG_ERROR("Invalid OTA block size %lu for non-final block when updating " ChipLogFormatScopedNodeId ".  Expected block of size %@",
+                        static_cast<unsigned long>(data.length), ChipLogValueScopedNodeId(strongWrapper.otaImageTransferHandler->mPeer), blockSize);
                     NotifyEventHandled(eventType, CHIP_ERROR_INCORRECT_STATE);
                     return;
                 }
@@ -493,13 +535,12 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err;
 
     // If we receive a ReceiveInit message, then we prepare for transfer.
     //
     // If init succeeds, or is not needed, we send the message to the AsyncTransferFacilitator for processing.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-        err = Init(ec);
+        CHIP_ERROR err = Init(ec);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
@@ -507,6 +548,5 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     }
 
     // Send the message to the AsyncFacilitator to drive the BDX session state machine.
-    AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
-    return err;
+    return AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }

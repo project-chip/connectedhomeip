@@ -29,6 +29,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/joint-fabric-administrator-server/JCMCommissionee.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -44,7 +45,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
+
 #include <lib/support/logging/CHIPLogging.h>
+#include <optional>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <string.h>
@@ -83,6 +87,14 @@ private:
     void HandleAddICAC(HandlerContext & ctx, const Commands::AddICAC::DecodableType & commandData);
     void HandleTransferAnchorRequest(HandlerContext & ctx, const Commands::TransferAnchorRequest::DecodableType & commandData);
     void HandleTransferAnchorComplete(HandlerContext & ctx, const Commands::TransferAnchorComplete::DecodableType & commandData);
+
+    static void OnTrustVerificationCompletion(CHIP_ERROR err);
+
+    // Cleans up asynchronous resources used in HandleAnnounceJointFabricAdministrator
+    void CleanupAnnounceJFA();
+
+    std::optional<CommandHandler::Handle> mActiveCommandHandle;
+    std::optional<JCMCommissionee> mActiveCommissionee;
 };
 
 JointFabricAdministratorGlobalInstance gJointFabricAdministratorGlobalInstance;
@@ -93,9 +105,6 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::Read(const ConcreteReadAttrib
 
     switch (aPath.mAttributeId)
     {
-    case JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id: {
-        return ReadAdministratorFabricIndex(aEncoder);
-    }
     default:
         break;
     }
@@ -147,25 +156,115 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
                                                         const Commands::OpenJointCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenJointCommissioningWindow", "JointFabricAdministrator");
+    auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
+    auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
+    auto & discriminator      = commandData.discriminator;
+    auto & iterations         = commandData.iterations;
+    auto & salt               = commandData.salt;
+
+    using namespace chip::app::Clusters::JointFabricAdministrator;
+
+    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
+    Status globalStatus             = Status::Success;
+    Spake2pVerifier verifier;
+
     ChipLogProgress(Zcl, "Received command to open joint commissioning window");
+
+    FabricIndex fabricIndex       = ctx.mCommandHandler.GetAccessingFabricIndex();
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCodeEnum::kBusy));
+
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCodeEnum::kBusy));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+
+    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
+
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(commissionMgr.OpenJointCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
+                                                            fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
+                 status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    ChipLogProgress(Zcl, "Commissioning window is now open");
+
+exit:
+    if (status.HasValue())
+    {
+        ChipLogError(Zcl, "Failed to open joint commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
+        TEMPORARY_RETURN_IGNORED ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, to_underlying(status.Value()));
+    }
+    else
+    {
+        if (globalStatus != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to open joint commissioning window. Global status " ChipLogFormatIMStatus,
+                         ChipLogValueIMStatus(globalStatus));
+        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, globalStatus);
+    }
 }
 
 void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministrator(
     HandlerContext & ctx, const Commands::AnnounceJointFabricAdministrator::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("AnnounceJointFabricAdministrator", "JointFabricAdministrator");
-    ChipLogProgress(JointFabric, "emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback: %u",
-                    commandData.endpointID);
+    ChipLogProgress(JointFabric, "Received an AnnounceJointFabricAdministrator command with endpointID=%u", commandData.endpointID);
 
-    auto nonDefaultStatus = Status::Success;
-    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
+    std::optional<Status> globalStatus = std::nullopt;
+    ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
 
-    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
+    auto onComplete = [this, cachedPath](const CHIP_ERROR & err) {
+        if (mActiveCommandHandle.has_value())
+        {
+            auto * commandHandler = mActiveCommandHandle.value().Get();
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
+                commandHandler->AddStatus(cachedPath, Status::Success);
+            }
+            else
+            {
+                ChipLogError(JointFabric, "Failed to verify trust against commissioning fabric administrator");
+                commandHandler->AddStatus(cachedPath, Status::Failure);
+            }
+        }
 
-    /* TODO: execute Fabric Table Vendor ID Verification */
+        // TODO: Potential edge case: if TrustVerification is interrupted such that this callback isn't invoked,
+        // CleanupAnnounceJFA wouldn't run and HandleAnnounceJointFabricAdministrator will permanently return Status::Busy.
+        CleanupAnnounceJFA();
+    };
 
+    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, globalStatus = Status::ConstraintError);
+
+    // If we have an active commissionee, that means another AnnounceJointFabricAdministrator command is already being serviced.
+    // Respond that the server is busy.
+    VerifyOrExit(!mActiveCommissionee.has_value() && !mActiveCommandHandle.has_value(), globalStatus = Status::Busy);
+
+    mActiveCommandHandle.emplace(&ctx.mCommandHandler);
+    mActiveCommissionee.emplace(mActiveCommandHandle.value(), commandData.endpointID, std::move(onComplete));
+
+    mActiveCommissionee->VerifyTrustAgainstCommissionerAdmin();
+
+    return;
 exit:
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+    if (globalStatus.has_value())
+    {
+        ChipLogProgress(JointFabric, "Failed to handle AnnounceJointFabricAdministrator");
+        ctx.mCommandHandler.AddStatus(cachedPath, globalStatus.value());
+    }
+}
+
+void JointFabricAdministratorGlobalInstance::CleanupAnnounceJFA()
+{
+    mActiveCommissionee.reset();
+    mActiveCommandHandle.reset();
 }
 
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,

@@ -78,9 +78,6 @@ declare_args() {
   # Enable short error strings.
   chip_config_short_error_str = false
 
-  # Enable argument parser.
-  chip_config_enable_arg_parser = true
-
   # Memory management style: malloc, simple, platform.
   chip_config_memory_management = "malloc"
 
@@ -134,7 +131,7 @@ declare_args() {
 
 if (chip_target_style == "") {
   if (current_os != "freertos" && current_os != "zephyr" &&
-      current_os != "mbed" && current_os != "cmsis-rtos") {
+      current_os != "cmsis-rtos") {
     chip_target_style = "unix"
   } else {
     chip_target_style = "embedded"

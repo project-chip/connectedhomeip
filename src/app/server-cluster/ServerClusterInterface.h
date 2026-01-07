@@ -32,10 +32,17 @@
 namespace chip {
 namespace app {
 
-/// Handles cluster interactions for a specific cluster id.
+/// Defines how a cluster is being shut down, so that its
+/// cleanup behavior can be more controlled.
+enum class ClusterShutdownType
+{
+    kClusterShutdown, // normal shutdown, generally assume timer and delegate cleanup
+    kPermanentRemove, // permanent removal, can consider persistent storage cleanup
+};
+
+/// Handles cluster interactions for a specific set of cluster instances
 ///
-/// A `ServerClusterInterface` instance is associated with a single endpointId and represents
-/// a cluster that exists at a given `endpointId/clusterId` path.
+/// A `ServerClusterInterface` instance may be associated with multiple `endpointId/clusterId` paths.
 ///
 /// Provides metadata as well as interaction processing (attribute read/write and command handling).
 class ServerClusterInterface
@@ -55,7 +62,7 @@ public:
     virtual CHIP_ERROR Startup(ServerClusterContext & context) = 0;
 
     /// A shutdown will always be paired with a corresponding Startup.
-    virtual void Shutdown() = 0;
+    virtual void Shutdown(ClusterShutdownType shutdownType) = 0;
 
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
 
@@ -98,7 +105,9 @@ public:
     ///
     /// Precondition:
     ///   - `path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) {}
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                                FabricIndex accessingFabric)
+    {}
 
     /// Reads the value of an existing attribute.
     ///

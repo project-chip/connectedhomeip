@@ -6,6 +6,8 @@
 -   [Testing the example](#testing-the-example)
 -   [Matter Shell](#testing-the-example-application-with-matter-cli-enabled)
 
+<a name="introduction"></a>
+
 ## Introduction
 
 This guide provides step-by-step instructions for working with CHIP applications
@@ -18,6 +20,8 @@ The NXP examples are based on
 and provide a prototype application that demonstrates device commissioning and
 different cluster control.
 
+<a name="supported-platforms"></a>
+
 ### Supported platforms
 
 Matter example applications are supported on the following NXP platforms :
@@ -27,6 +31,10 @@ Matter example applications are supported on the following NXP platforms :
 | RW61x        | [Matter NXP Guide for RW61x platform](./nxp_rw61x_guide.md)   |
 | RT1170       | [Matter NXP Guide for RT1170 platform](./nxp_rt1170_guide.md) |
 | RT1060       | [Matter NXP Guide for RT1060 platform](./nxp_rt1060_guide.md) |
+| MCXW71       | [Matter NXP Guide for MCXW71 platform](./nxp_mcxw71_guide.md) |
+| MCXW72       | [Matter NXP Guide for MCXW72 platform](./nxp_mcxw72_guide.md) |
+
+<a name="building"></a>
 
 ## Building
 
@@ -60,7 +68,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shal
 
 -   Step 2 : Activate Matter environment :
 
-If you are setting the Matter environment for the first time, or your local
+If you are setting up the Matter environment for the first time, or your local
 environment is out of date, run the following script :
 
 ```
@@ -97,8 +105,8 @@ export the path as follows :
 user@ubuntu:~/Desktop/git/connectedhomeip$ export ARMGCC_DIR=/path/to/connectedhomeip/.environment/cipd/packages/arm
 ```
 
-> Note : Steps 1 to 3 can be skipped if your environment is up to date. Steps 4
-> and 5 should be repeated in each new terminal session to ensure the
+> Note : Steps 1 and 3 can be skipped if your environment is up to date. Steps
+> 2, 4 and 5 should be repeated in each new terminal session to ensure the
 > environment is correctly configured.
 
 ### Build the application
@@ -113,6 +121,8 @@ CHIP NXP examples support building with two different build systems :
 
 > Please refer to the platform [dedicated readme](#supported-platforms) to check
 > which build system(s) is supported by the platform.
+
+<a name="cmake-build-system"></a>
 
 #### CMake build system
 
@@ -153,29 +163,39 @@ Additional arguments that can be passed in the `west build` command line :
 > configuration supported, please refer to the
 > [dedicated readme](#supported-platforms) for the platform you are targeting.
 
+<a name="build-config-files"></a>
+
 ##### Available project configuration files and platform compatibility
 
-| Configuration File                         | Description                                            | Supported platforms   |
-| ------------------------------------------ | ------------------------------------------------------ | --------------------- |
-| `prj_wifi.conf`                            | Wi-Fi                                                  | RW61x, RT1060, RT1170 |
-| `prj_wifi_fdata.conf`                      | Wi-Fi, factory data                                    | RW61x, RT1060, RT1170 |
-| `prj_wifi_ota_fdata.conf`                  | Wi-Fi, factory data, OTA                               | RW61x, RT1060, RT1170 |
-| `prj_wifi_ota_fdata_v2.conf`               | Wi-Fi, factory data, OTA, with SW v2                   | RW61x, RT1060, RT1170 |
-| `prj_wifi_ota.conf`                        | Wi-Fi, OTA                                             | RW61x, RT1060, RT1170 |
-| `prj_wifi_ota_v2.conf`                     | Wi-Fi, OTA, SW v2                                      | RW61x, RT1060, RT1170 |
-| `prj_wifi_onnetwork.conf`                  | Wi-Fi onnetwork without BLE                            | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd.conf`                      | Thread FTD                                             | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd_ota.conf`                  | Thread FTD, OTA                                        | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd_ota_fdata.conf`            | Thread FTD, OTA, factory data                          | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd_wifi_br_ota.conf`          | Wi-Fi + Thread Border Router, OTA                      | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd_wifi_br_ota_fdata.conf`    | Wi-Fi + Thread Border Router, OTA, factory data        | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd_wifi_br_ota_fdata_v2.conf` | Wi-Fi + Thread Border Router, OTA SW v2 , factory data | RW61x, RT1060, RT1170 |
-| `prj_thread_ftd_wifi_br_ota_v2.conf`       | Wi-Fi + Thread Border Router, OTA with SW v2           | RW61x, RT1060, RT1170 |
-| `prj_eth.conf`                             | Ethernet                                               | RW61x `frdm`          |
-| `prj_eth_fdata.conf`                       | Ethernet, factory data                                 | RW61x `frdm`          |
-| `prj_eth_ota.conf`                         | Ethernet, OTA                                          | RW61x `frdm`          |
-| `prj_eth_ota_fdata.conf`                   | Ethernet, factory data, OTA                            | RW61x `frdm`          |
-| `prj_eth_ota_fdata_v2.conf`                | Ethernet, factory data, OTA, SW v2                     | RW61x `frdm`          |
+| Configuration File                         | Description                                            | Supported platforms                   |
+| ------------------------------------------ | ------------------------------------------------------ | ------------------------------------- |
+| `prj_wifi.conf`                            | Wi-Fi                                                  | RW61x, RT1060, RT1170                 |
+| `prj_wifi_fdata.conf`                      | Wi-Fi, factory data                                    | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota_fdata.conf`                  | Wi-Fi, factory data, OTA                               | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota_fdata_v2.conf`               | Wi-Fi, factory data, OTA, with SW v2                   | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota.conf`                        | Wi-Fi, OTA                                             | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota_v2.conf`                     | Wi-Fi, OTA, SW v2                                      | RW61x, RT1060, RT1170                 |
+| `prj_wifi_onnetwork.conf`                  | Wi-Fi onnetwork without BLE                            | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd.conf`                      | Thread FTD                                             | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_fdata.conf`                | Thread FTD, factory data                               | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_ota.conf`                  | Thread FTD, OTA                                        | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_ota_fdata.conf`            | Thread FTD, OTA, factory data                          | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_wifi_br_ota.conf`          | Wi-Fi + Thread Border Router, OTA                      | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd_wifi_br_ota_fdata.conf`    | Wi-Fi + Thread Border Router, OTA, factory data        | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd_wifi_br_ota_fdata_v2.conf` | Wi-Fi + Thread Border Router, OTA SW v2 , factory data | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd_wifi_br_ota_v2.conf`       | Wi-Fi + Thread Border Router, OTA with SW v2           | RW61x, RT1060, RT1170                 |
+| `prj_thread_mtd.conf`                      | Thread MTD                                             | MCXW71, MCXW72                        |
+| `prj_thread_mtd_fdata.conf`                | Thread MTD, factory data                               | MCXW71, MCXW72                        |
+| `prj_thread_mtd_low_power.conf`            | Thread MTD operating in low power mode                 | MCXW71, MCXW72                        |
+| `prj_thread_mtd_low_power_lit.conf`        | Thread MTD, low power ICD LIT                          | MCXW71, MCXW72                        |
+| `prj_thread_mtd_fdata_low_power.conf`      | Thread MTD, factory data, low power                    | MCXW71, MCXW72                        |
+| `prj_thread_mtd_ota_low_power.conf`        | Thread MTD, OTA, low power                             | MCXW71, MCXW72                        |
+| `prj_thread_mtd_ota_fdata.conf`            | Thread MTD, OTA, factory data                          | MCXW71, MCXW72                        |
+| `prj_eth.conf`                             | Ethernet                                               | RW61x `frdm`                          |
+| `prj_eth_fdata.conf`                       | Ethernet, factory data                                 | RW61x `frdm`                          |
+| `prj_eth_ota.conf`                         | Ethernet, OTA                                          | RW61x `frdm`                          |
+| `prj_eth_ota_fdata.conf`                   | Ethernet, factory data, OTA                            | RW61x `frdm`                          |
+| `prj_eth_ota_fdata_v2.conf`                | Ethernet, factory data, OTA, SW v2                     | RW61x `frdm`                          |
 
 The build output can be found under the `build_dir` specified in the
 `west build` command, the binary can be found under the following name :
@@ -197,6 +217,23 @@ It is also supported to provide Kconfig symbols in the build command line with
 `-DCONFIG_<symbol>=<value>`. For example, adding to the build command line
 `-DCONFIG_CHIP_DEVICE_DISCRIMINATOR=3841` will set the discriminator Kconfig
 `CONFIG_CHIP_DEVICE_DISCRIMINATOR` to `3841`.
+
+###### CMake Build with Secure Element
+
+-   Build the example with below kconfig options to offload crypto operations to
+    SE05x using CMAKE configuration :
+
+```
+-DCONFIG_CHIP_SE05X=y
+```
+
+To enable secure channel protocol use kconfig `-DCONFIG_SE05X_SCP03` Example :
+
+```
+ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
+```
+
+Refer [SE05x](./nxp_se05x_guide.md) for more details on configurations of SE05x.
 
 #### GN build system
 
@@ -227,11 +264,15 @@ _gn gen_ command when building an application.
 > For more information about platform-specific GN options, please refer to the
 > platform [dedicated readme](#supported-platforms).
 
+<a name="flashing-and-debugging"></a>
+
 ## Flashing and debugging
 
 For flashing and debugging the example application, follow detailed instructions
-form the [dedicated readme](#supported-platforms) to the platform you are
+from the [dedicated readme](#supported-platforms) to the platform you are
 targeting.
+
+<a name="testing-the-example"></a>
 
 ## Testing the example
 
@@ -297,7 +338,7 @@ The Matter CLI can be enabled with the NXP CHIP application.
 For more information about the Matter CLI default commands, you can refer to the
 dedicated [ReadMe](../../../examples/shell/README.md).
 
-The NXP application supports additional commands :
+The NXP applications support additional commands :
 
 ```
 > help

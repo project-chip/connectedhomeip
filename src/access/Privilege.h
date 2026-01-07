@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstdint>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace Access {
@@ -45,6 +46,29 @@ constexpr uint8_t kAllPrivilegeBits =             //
     static_cast<uint8_t>(Privilege::kOperate) |   //
     static_cast<uint8_t>(Privilege::kManage) |    //
     static_cast<uint8_t>(Privilege::kAdminister);
+
+/*
+ * Checks if a Privilege enum class value is valid.
+ *
+ * A valid privilege must:
+ * 1. Not be zero (zero doesn't map to any defined privilege)
+ * 2. Contain only bits that match defined privileges (see kAllPrivilegeBits)
+ * 3. Have exactly one bit set (it must be a single privilege, not a combination)
+ *
+ */
+constexpr bool IsValidPrivilege(Access::Privilege privilege)
+{
+    uint8_t privilegeValue = to_underlying(privilege);
+
+    return (privilegeValue != 0) && ((privilegeValue & kAllPrivilegeBits) == privilegeValue) &&
+        ((privilegeValue & (privilegeValue - 1)) == 0);
+}
+
+static_assert(IsValidPrivilege(Privilege::kView));
+static_assert(IsValidPrivilege(Privilege::kProxyView));
+static_assert(IsValidPrivilege(Privilege::kOperate));
+static_assert(IsValidPrivilege(Privilege::kManage));
+static_assert(IsValidPrivilege(Privilege::kAdminister));
 
 } // namespace Access
 } // namespace chip

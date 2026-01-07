@@ -96,7 +96,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     size_t byte_count;
     err = CYW30739Config::ReadConfigValueBin(entry->GetValueConfigKey(), value, value_size, byte_count);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "%s ReadConfigValueBin %s", __func__, ErrorStr(err));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "%s ReadConfigValueBin %" CHIP_ERROR_FORMAT, __func__, err.Format());
                  err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     if (read_bytes_size != nullptr)

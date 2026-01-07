@@ -23,9 +23,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 static_library("chip_webrtc") {
   sources = [
-    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.cpp",
-    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h",
-    "${chip_root}/src/controller/python/chip/native/PyChipError.h",
+    "${chip_root}/src/controller/python/matter/native/PyChipError.h",
     "WebRTCClient.cpp",
     "WebRTCClient.h",
     "WebRTCTransportProviderClient.cpp",
@@ -40,9 +38,13 @@ static_library("chip_webrtc") {
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 
+  public_deps = [ "${chip_root}/src/data-model-providers/codegen:headers" ]
+
   deps = [
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server:webrtc-transport-requestor-server",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/controller/webrtc/access_control",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/libdatachannel:libdatachannel",
@@ -52,4 +54,7 @@ static_library("chip_webrtc") {
     "ssl",
     "crypto",
   ]
+
+  # suppress known `libdatachannel` int conversion issues
+  cflags = [ "-Wno-implicit-int-conversion" ]
 }

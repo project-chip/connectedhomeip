@@ -36,6 +36,7 @@
 #ifdef BOARD_ENABLE_I2C
 #include "wiced_hal_i2c.h"
 #endif
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
@@ -236,7 +237,16 @@ void CYW30739MatterConfig::InitApp(void)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
-    // Init Matter Server
+    /*
+     * Init Matter Server. A general diagnostics cluster instance is instantiated here because the
+     * GenericEventManagementTestEventTriggerHandler needs to use the fault detect functions that are
+     * part of the cluster. The EventManagementTestEventTriggerHandler is based upon
+     * GenericEventManagementTestEventTriggerHandler, and so creating an instance of it here allows
+     * this to work and replace the old global instance call to the cluster
+     */
+    const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
+    static Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
+    sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR

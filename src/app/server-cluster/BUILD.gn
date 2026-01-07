@@ -15,9 +15,14 @@ import("//build_overrides/chip.gni")
 
 source_set("server-cluster") {
   sources = [
+    "AttributeListBuilder.cpp",
+    "AttributeListBuilder.h",
     "DefaultServerCluster.cpp",
     "DefaultServerCluster.h",
+    "OptionalAttributeSet.h",
     "ServerClusterContext.h",
+    "ServerClusterExtension.cpp",
+    "ServerClusterExtension.h",
     "ServerClusterInterface.cpp",
     "ServerClusterInterface.h",
   ]
@@ -27,11 +32,28 @@ source_set("server-cluster") {
     "${chip_root}/src/app:command-handler-interface",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("registry") {
+  sources = [
+    "ServerClusterInterfaceRegistry.cpp",
+    "ServerClusterInterfaceRegistry.h",
+    "SingleEndpointServerClusterRegistry.cpp",
+    "SingleEndpointServerClusterRegistry.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]

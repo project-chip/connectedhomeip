@@ -143,6 +143,7 @@
 #if ENABLE_SE05X_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
+#include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
 
 extern CHIP_ERROR se05x_close_session(void);
 
@@ -399,7 +400,7 @@ public:
     }
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
     Get the freq_list from args.
     Format:
@@ -451,6 +452,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
+
+    if (se05x_host_gpio_init() != 0)
+    {
+        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_init function");
+        ChipLogError(NotSpecified, "SE05x - Crypto operations offloaded to secure element will fail");
+    }
+    else
+    {
+        ChipLogDetail(Crypto, "SE05x - Turn OFF secure Element");
+        if (se05x_host_gpio_set_value(0) != 0)
+        {
+            ChipLogError(NotSpecified, "SE05x - Failed to set the GPIO connected to SE05x to low");
+        }
+    }
 
     err = Platform::MemoryInit();
     SuccessOrExit(err);
@@ -571,7 +586,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
         ChipLogProgress(WiFiPAF, "WiFi-PAF: initialzing");
@@ -638,7 +653,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
         uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
         Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
-        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+        app::TermsAndConditionsManager::GetInstance().Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
@@ -851,6 +866,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // Close SE05x session
     se05x_close_session();
+
+    ChipLogDetail(Crypto, "SE05x - De-initialize GPIO after Session Close");
+    if (se05x_host_gpio_deinit() != 0)
+    {
+        ChipLogError(NotSpecified, "SE05x - Failed to de-initialize GPIO connected to SE05x");
+    }
 
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
