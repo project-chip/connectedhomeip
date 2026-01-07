@@ -19,8 +19,8 @@
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 
 #include <app/ConcreteClusterPath.h>
-#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -54,5 +54,4 @@ TEST_F(TestUnitLocalizationCluster, AttributeTest)
     ASSERT_EQ(expectedAttributes.AppendElements({ Attributes::TemperatureUnit::kMetadataEntry, //
                                                   Attributes::SupportedTemperatureUnits::kMetadataEntry }),
               CHIP_NO_ERROR);
-
 }
