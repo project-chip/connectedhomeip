@@ -188,3 +188,4 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
+    - { name: TC_SU_2_8.py, duration: 1.5 minutes }

@@ -61,6 +61,8 @@ from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+
 
 class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
     """
