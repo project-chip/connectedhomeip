@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.event_attribute_reporting import EventChangeCallback
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 from mobly import asserts
@@ -109,7 +109,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         ]
 
     async def check_setpoint_event(self,
-                                   events_callback: EventChangeCallback,
+                                   events_callback: EventSubscriptionHandler,
                                    attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
                                    system_mode: Clusters.Thermostat.Enums.SystemModeEnum,
                                    occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
@@ -127,7 +127,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         setpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
         asserts.assert_equal(setpoint, event_data.currentSetpoint)
 
-    def flush_events(self, events_callback: EventChangeCallback, wait_sec: float = 0.5):
+    def flush_events(self, events_callback: EventSubscriptionHandler, wait_sec: float = 0.5):
         time.sleep(wait_sec)
         events_callback.flush_events()
 
@@ -198,10 +198,11 @@ class TC_TSTAT_2_2(MatterBaseTest):
         self.step("1a")
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             hasEventsFeature = True
-            events_callback = EventChangeCallback(cluster)
+
+            events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Thermostat)
             await events_callback.start(self.default_controller,
-                                        self.dut_node_id,
-                                        endpoint=endpoint)
+                                    self.dut_node_id,
+                                   endpoint=endpoint)
 
         ControlSequenceOfOperation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
 
