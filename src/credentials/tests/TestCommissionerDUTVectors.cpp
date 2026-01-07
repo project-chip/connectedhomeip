@@ -188,7 +188,7 @@ void RunCommissionerDUTVectorsTest(bool allowTestKeys)
             isSuccessCase = true;
         }
 
-        // Every example in the SDK uses test keys because we don't have official signers. Expect they will all fails if we disallow
+        // Every example in the SDK uses test keys because we don't have official signers. Expect they will all fail if we disallow
         // test keys
         if (isSuccessCase && allowTestKeys)
         {
