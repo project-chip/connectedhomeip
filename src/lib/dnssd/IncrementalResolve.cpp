@@ -208,7 +208,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, mTargetHostName.Get());
         break;
     default:
-        return CHIP_ERROR_UNSPPORTED_DNSSD_SERVICE_NAME;
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
     }
 
     inactiveReset.Disarm();
