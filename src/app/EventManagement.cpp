@@ -470,13 +470,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
 
     mBytesWritten += writer.GetLengthWritten();
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "Log event with error %" CHIP_ERROR_FORMAT, err.Format());
-        writer = checkpoint;
-    }
-    else if (opts.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY)
+    if (opts.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY)
     {
         aEventNumber = mLastEventNumber;
         VendEventNumber();
@@ -491,6 +485,13 @@ exit:
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
         err = mpEventReporter->NewEventGenerated(opts.mPath, mBytesWritten);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(EventLogging, "Log event with error %" CHIP_ERROR_FORMAT, err.Format());
+        writer = checkpoint;
     }
 
     return err;
