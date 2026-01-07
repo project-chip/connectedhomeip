@@ -49,12 +49,12 @@ public:
                                          std::vector<AudioStreamStruct> * audioStreams,
                                          std::vector<SnapshotStreamStruct> * snapshotStreams) :
         mAllocatedVideoStreams(videoStreams),
-        mAllocatedAudioStreams(audioStreams),
-        mAllocatedSnapshotStreams(snapshotStreams)
+        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams)
     {}
 
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
+        outStreamID = 1;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -73,6 +73,7 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
+        outStreamID = 1;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -84,6 +85,7 @@ public:
     Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                uint16_t & outStreamID) override
     {
+        outStreamID = 1;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -125,6 +127,8 @@ public:
 
     const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const override { return *mAllocatedAudioStreams; }
 
+    const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return *mAllocatedSnapshotStreams; }
+
 private:
     std::vector<VideoStreamStruct> * mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> * mAllocatedAudioStreams;
@@ -136,6 +140,46 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    static VideoSensorParamsStruct & GetVideoSensorParams()
+    {
+        static VideoSensorParamsStruct videoSensorParams = { 1920, 1080, 120,
+                                                             chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
+        return videoSensorParams;
+    }
+
+    static std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints()
+    {
+        static std::vector<RateDistortionTradeOffStruct> rateDistTradeOffs = {
+            { VideoCodecEnum::kH264, { 640, 480 }, 10000 /* bitrate */ }
+        };
+        return rateDistTradeOffs;
+    }
+
+    static AudioCapabilitiesStruct & GetAudioCapabilities()
+    {
+        static std::array<AudioCodecEnum, 2> audioCodecs = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
+        static std::array<uint32_t, 2> sampleRates       = { 48000, 32000 }; // Sample rates in Hz
+        static std::array<uint8_t, 2> bitDepths          = { 24, 32 };
+        static AudioCapabilitiesStruct audioCapabilities = { 2, chip::Span<AudioCodecEnum>(audioCodecs),
+                                                             chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
+        return audioCapabilities;
+    }
+
+    static std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities()
+    {
+        static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {
+            { { 640, 480 }, 30, ImageCodecEnum::kJpeg, false, chip::MakeOptional(static_cast<bool>(false)) },
+            { { 1280, 720 }, 30, ImageCodecEnum::kJpeg, true, chip::MakeOptional(static_cast<bool>(true)) },
+        };
+        return snapshotCapabilities;
+    }
+
+    static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
+    {
+        static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+        return supportedStreamUsage;
+    }
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
@@ -152,14 +196,13 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
                     CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
                     CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
                     CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-                1, 0, {}, false, {}, {}, 0, {}, {}, TwoWayTalkSupportTypeEnum::kFullDuplex, {}, 0, {}, {}),
+                1, 248832000 /*1920*1080*120 */, GetVideoSensorParams(), false, { 640, 480 }, GetRateDistortionTradeOffPoints(),
+                4096, GetAudioCapabilities(), GetAudioCapabilities(), TwoWayTalkSupportTypeEnum::kFullDuplex,
+                GetSnapshotCapabilities(), 128000000, GetSupportedStreamUsages(), GetSupportedStreamUsages()),
         mClusterTester(mServer)
     {}
 
-    void SetUp() override
-    {
-        ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    }
+    void SetUp() override { ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
     std::vector<VideoStreamStruct> mVideoStreams;
     std::vector<AudioStreamStruct> mAudioStreams;
@@ -212,7 +255,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
                                          }));
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestCommands)
+TEST_F(TestCameraAVStreamManagementCluster, TestAcceptedCommands)
 {
     ASSERT_TRUE(
         Testing::IsAcceptedCommandsListEqualTo(mServer,
@@ -262,33 +305,64 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadMaxConcurrentEncoders)
     EXPECT_EQ(maxConcurrentEncoders, 1);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamAllocate)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadMaxEncodedPixelRate)
 {
-    Commands::SnapshotStreamAllocate::Type request;
-    auto result = mClusterTester.Invoke<Commands::SnapshotStreamAllocate::Type, Commands::SnapshotStreamAllocateResponse::DecodableType>(request);
-    EXPECT_TRUE(result.IsSuccess());
-    EXPECT_TRUE(result.response.has_value());
-    // EXPECT_EQ(result.response.value().streamID, SomeExpectedID); // TODO: Enhance mock to return an ID
+    uint32_t maxEncodedPixelRate = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxEncodedPixelRate::Id, maxEncodedPixelRate), CHIP_NO_ERROR);
+    EXPECT_EQ(maxEncodedPixelRate, static_cast<uint32_t>(248832000));
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModify)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadVideoSensorParams)
 {
-    Commands::SnapshotStreamModify::Type request;
-    request.snapshotStreamID = 1; // Assuming a stream ID
-    request.watermarkEnabled.SetValue(true);
-    request.OSDEnabled.SetValue(true);
-
-    auto result = mClusterTester.Invoke<Commands::SnapshotStreamModify::Type>(request);
-    EXPECT_TRUE(result.IsSuccess());
+    Attributes::VideoSensorParams::TypeInfo::Type videoSensorParams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::VideoSensorParams::Id, videoSensorParams), CHIP_NO_ERROR);
+    EXPECT_EQ(videoSensorParams.sensorWidth, 1920);
+    EXPECT_EQ(videoSensorParams.sensorHeight, 1080);
+    EXPECT_EQ(videoSensorParams.maxFPS, 120);
+    EXPECT_TRUE(videoSensorParams.maxHDRFPS.HasValue());
+    EXPECT_EQ(videoSensorParams.maxHDRFPS.Value(), 30);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocate)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadMinViewportResolution)
 {
-    Commands::SnapshotStreamDeallocate::Type request;
-    request.snapshotStreamID = 1; // Assuming a stream ID
+    Attributes::MinViewportResolution::TypeInfo::Type minViewportResolution;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MinViewportResolution::Id, minViewportResolution), CHIP_NO_ERROR);
+    EXPECT_EQ(minViewportResolution.width, 640);
+    EXPECT_EQ(minViewportResolution.height, 480);
+}
 
-    auto result = mClusterTester.Invoke<Commands::SnapshotStreamDeallocate::Type>(request);
-    EXPECT_TRUE(result.IsSuccess());
+TEST_F(TestCameraAVStreamManagementCluster, TestReadRateDistortionTradeOffPoints)
+{
+    // Create a mock attribute request
+    chip::app::DataModel::ReadAttributeRequest request;
+    request.path.mEndpointId  = kTestEndpointId;
+    request.path.mClusterId   = CameraAvStreamManagement::Id;
+    request.path.mAttributeId = Attributes::RateDistortionTradeOffPoints::Id;
+
+    // Create a buffer for encoding
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
+    ASSERT_TRUE(buffer.Alloc(1024));
+
+    // Create AttributeReportIBs::Builder for the encoder
+    chip::app::AttributeReportIBs::Builder attributeReportIBsBuilder;
+    chip::TLV::TLVWriter reportWriter;
+    reportWriter.Init(buffer.Get(), buffer.AllocatedSize());
+    CHIP_ERROR err = attributeReportIBsBuilder.Init(&reportWriter);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Access::SubjectDescriptor{}, request.path,
+                                             0 /* dataVersion */);
+
+    // Read the attribute
+    auto status = mServer.ReadAttribute(request, encoder);
+    EXPECT_TRUE(status.IsSuccess());
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestReadMaxContentBufferSize)
+{
+    uint32_t maxContentBufferSize = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxContentBufferSize::Id, maxContentBufferSize), CHIP_NO_ERROR);
+    EXPECT_EQ(maxContentBufferSize, 4096u);
 }
 
 } // namespace

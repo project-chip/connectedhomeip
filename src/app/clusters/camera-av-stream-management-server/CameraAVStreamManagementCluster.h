@@ -627,15 +627,18 @@ public:
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
     /**
-     * Called during the processing of an AllocateVideoStream request. The
-     * handler of the request iterates through the currently allocated video
+     * Called during the processing of an AllocateVideoStream request to find
+     * an existing stream that can be reused given the requested stream args.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     * Returns std::nullopt if there is no such stream, else the id of the stream
+     * that can be reused.
+     * The handler of the request iterates through the currently allocated video
      * streams to check if the allocation request parameters fall within the
      * ranges of an allocated stream so that the latter can be reused.
      * If a match is found, the function returns the StreamID of the reusable
      * stream.
-     *
-     * @param requestedArgs    parameters in the allocation request
-     *
      */
     std::optional<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
 
@@ -651,15 +654,18 @@ public:
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
     /**
-     * Called during the processing of an AllocateSnapshotStream request. The
-     * handler of the request iterates through the currently allocated snapshot
+     * Called during the processing of an AllocateSnapshotStream request to find
+     * an existing stream that can be reused given the requested stream args.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     * Returns std::nullopt if there is no such stream, else the id of the stream
+     * that can be reused.
+     * The handler of the request iterates through the currently allocated snapshot
      * streams to check if the allocation request parameters fall within the
      * ranges of an allocated stream so that the latter can be reused.
      * If a match is found, the function returns the StreamID of the reusable
      * stream.
-     *
-     * @param requestedArgs    parameters in the allocation request
-     *
      */
     std::optional<uint16_t>
     GetReusableSnapshotStreamId(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
