@@ -392,7 +392,7 @@ config NXP_USE_SMU2_STATIC
 	  Enable app usage of SMU2.
 
 config NXP_USE_SMU2_DYNAMIC
-	bool "Use SMU2"
+	bool "Use extra SMU2 after commissioning"
 	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of extra SMU2 after commissioning.

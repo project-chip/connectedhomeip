@@ -542,20 +542,20 @@ config CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
 	int "Timeout (ms) for switching from fast to slow advertising"
 	default 30000
 	help
-	  The amount of time in miliseconds after which BLE should change its advertisements
+	  The amount of time in milliseconds after which BLE should change its advertisements
 	  from fast interval to slow interval.
 
 config CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
 	int "BLE advertising timeout"
 	default 900000
 	help
-	  The amount of time in miliseconds after which BLE advertisement should be disabled, counting 
+	  The amount of time in milliseconds after which BLE advertisement should be disabled, counting
 	  from the moment of slow advertisement commencement.
 
 config CHIP_DEVICE_CONFIG_ENABLE_SED
-	bool "SED"
+	bool "Enable Sleepy End Device (SED) support"
 	help
-		Enable Sleepy End Device configuration.
+	  Enable Sleepy End Device configuration.
 
 config CHIP_THREAD_SSED
 	bool "Enable Thread Synchronized Sleepy End Device support"
