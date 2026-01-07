@@ -96,6 +96,9 @@ declare_args() {
 
   # Enable Multi-PAN support for Matter over Thread devices
   sl_openthread_multi_pan_enable = false
+
+  # Enable a Watchdog with debug features to catch software hangs
+  sl_matter_debug_watchdog_enable = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -623,6 +626,12 @@ template("efr32_sdk") {
       }
     }
 
+    if (sl_matter_debug_watchdog_enable) {
+      defines += [ "SL_MATTER_DEBUG_WATCHDOG_ENABLE=1" ]
+    } else {
+      defines += [ "SL_MATTER_DEBUG_WATCHDOG_ENABLE=0" ]
+    }
+
     if (chip_build_libshell) {  # matter shell
       defines += [
         "ENABLE_CHIP_SHELL",
@@ -738,6 +747,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_gpio.c",
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_system.c",
+      "${efr32_sdk_root}/platform/peripheral/src/sl_hal_wdog.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",

@@ -108,6 +108,8 @@ extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
 #endif
 
 #if HARD_FAULT_LOG_ENABLE
+volatile uint32_t faultId = 0; // Variable to identify the fault handler
+
 /**
  * Log register contents to UART when a hard fault occurs.
  */
@@ -127,21 +129,22 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     [[maybe_unused]] uint32_t pc    = sp[6];
     [[maybe_unused]] uint32_t psr   = sp[7];
 
-    ChipLogError(NotSpecified, "HardFault:");
-    ChipLogError(NotSpecified, "SCB->CFSR   0x%08lx", cfsr);
-    ChipLogError(NotSpecified, "SCB->HFSR   0x%08lx", hfsr);
-    ChipLogError(NotSpecified, "SCB->MMFAR  0x%08lx", mmfar);
-    ChipLogError(NotSpecified, "SCB->BFAR   0x%08lx", bfar);
-    ChipLogError(NotSpecified, "SCB->BFAR   0x%08lx", bfar);
-    ChipLogError(NotSpecified, "SP          0x%08lx", (uint32_t) sp);
-    ChipLogError(NotSpecified, "R0          0x%08lx", r0);
-    ChipLogError(NotSpecified, "R1          0x%08lx", r1);
-    ChipLogError(NotSpecified, "R2          0x%08lx", r2);
-    ChipLogError(NotSpecified, "R3          0x%08lx", r3);
-    ChipLogError(NotSpecified, "R12         0x%08lx", r12);
-    ChipLogError(NotSpecified, "LR          0x%08lx", lr);
-    ChipLogError(NotSpecified, "PC          0x%08lx", pc);
-    ChipLogError(NotSpecified, "PSR         0x%08lx", psr);
+    SILABS_UART_FLUSH();
+    ChipLogError(NotSpecified, "HardFault:  0x%08lx\r\n", faultId);
+    ChipLogError(NotSpecified, "SCB->CFSR   0x%08lx\r\n", cfsr);
+    ChipLogError(NotSpecified, "SCB->HFSR   0x%08lx\r\n", hfsr);
+    ChipLogError(NotSpecified, "SCB->MMFAR  0x%08lx\r\n", mmfar);
+    ChipLogError(NotSpecified, "SCB->BFAR   0x%08lx\r\n", bfar);
+    ChipLogError(NotSpecified, "SP          0x%08lx\r\n", (uint32_t) sp);
+    SILABS_UART_FLUSH();
+    ChipLogError(NotSpecified, "R0          0x%08lx\r\n", r0);
+    ChipLogError(NotSpecified, "R1          0x%08lx\r\n", r1);
+    ChipLogError(NotSpecified, "R2          0x%08lx\r\n", r2);
+    ChipLogError(NotSpecified, "R3          0x%08lx\r\n", r3);
+    ChipLogError(NotSpecified, "R12         0x%08lx\r\n", r12);
+    ChipLogError(NotSpecified, "LR          0x%08lx\r\n", lr);
+    ChipLogError(NotSpecified, "PC          0x%08lx\r\n", pc);
+    ChipLogError(NotSpecified, "PSR         0x%08lx\r\n", psr);
     SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
 
@@ -167,28 +170,34 @@ extern "C" __attribute__((naked)) void LogFault_Handler(void)
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 extern "C" __attribute__((naked)) void HardFault_Handler(void)
 {
+    faultId = 0x48415244; // 'HARD'
     __asm volatile("b LogFault_Handler");
 }
 extern "C" __attribute__((naked)) void mpu_fault_handler(void)
 {
+    faultId = 0x4D505546; // 'MPUF'
     __asm volatile("b LogFault_Handler");
 }
 extern "C" __attribute__((naked)) void BusFault_Handler(void)
 {
+    faultId = 0x42555346; // 'BUSF'
     __asm volatile("b LogFault_Handler");
 }
 extern "C" __attribute__((naked)) void UsageFault_Handler(void)
 {
+    faultId = 0x55534654; // 'USFT'
     __asm volatile("b LogFault_Handler");
 }
 #if (__CORTEX_M >= 23U)
 extern "C" __attribute__((naked)) void SecureFault_Handler(void)
 {
+    faultId = 0x53464354; // 'SFCT'
     __asm volatile("b LogFault_Handler");
 }
 #endif // (__CORTEX_M >= 23U)
 extern "C" __attribute__((naked)) void DebugMon_Handler(void)
 {
+    faultId = 0x44424D4E; // 'DBMN'
     __asm volatile("b LogFault_Handler");
 }
 #endif // !SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
@@ -312,4 +321,10 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
     chipAbort();
 }
 #endif // !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
+
+extern "C" void WDOG0_IRQHandler(void)
+{
+    faultId = 0x57444F47; // 'WDOG'
+    __asm volatile("b LogFault_Handler");
+}
 #endif // HARD_FAULT_LOG_ENABLE

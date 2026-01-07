@@ -15,14 +15,18 @@
  *    limitations under the License.
  */
 
+#include "sl_clock_manager.h"
+#include "sl_hal_wdog.h"
 #include <em_device.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #if defined(_SILICON_LABS_32B_SERIES_2)
+#include "em_cmu.h"
 #include "em_msc.h"
 #include "em_rmu.h"
 #elif defined(_SILICON_LABS_32B_SERIES_3)
 #include "sl_hal_emu.h"
+#include "sl_hal_wdog.h"
 #include "sl_se_manager.h"
 #include "sl_se_manager_types.h"
 #include <sl_se_manager_extmem.h>
@@ -301,6 +305,35 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     return 0;
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
+void SilabsPlatform::WatchdogInit()
+{
+    // Initialize WDOG with default configuration
+    sl_hal_wdog_init_t wdogInit = SL_HAL_WDOG_INIT_DEFAULT;
+    wdogInit.reset_disable      = true;               // For debug, do not trigger a system reset on timeout
+    wdogInit.period_select      = SL_WDOG_PERIOD_16k; // Set timeout period
+
+    //  Initialize WDOG with our configuration
+    sl_clock_manager_enable_bus_clock(SL_BUS_CLOCK_WDOG0);
+    sl_hal_wdog_init(WDOG0, &wdogInit);
+
+    // Enable Watchdog Timeout interrupt
+    sl_hal_wdog_clear_interrupts(WDOG0, WDOG_IF_TOUT);
+    sl_hal_wdog_enable_interrupts(WDOG0, WDOG_IF_TOUT);
+
+    // Enable NVIC interrupt for WDOG
+    sl_interrupt_manager_clear_irq_pending(WDOG0_IRQn);
+    sl_interrupt_manager_enable_irq(WDOG0_IRQn);
+
+    sl_hal_wdog_enable(WDOG0);
+}
+
+void SilabsPlatform::WatchdogFeed()
+{
+    sl_hal_wdog_feed(WDOG0);
+}
+#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 
 } // namespace Silabs
 } // namespace DeviceLayer
