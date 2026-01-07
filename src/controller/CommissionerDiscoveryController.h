@@ -473,5 +473,3 @@ protected:
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

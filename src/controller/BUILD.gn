@@ -28,6 +28,20 @@ source_set("delegates") {
   sources = [ "OperationalCredentialsDelegate.h" ]
 }
 
+source_set("commissioner-discovery-controller") {
+  sources = [
+    "CommissionerDiscoveryController.cpp",
+    "CommissionerDiscoveryController.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
+  ]
+}
+
 source_set("interactions") {
   sources = [
     "CHIPCluster.h",
@@ -82,7 +96,6 @@ static_library("controller") {
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
-      "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "SetUpCodePairer.cpp",
