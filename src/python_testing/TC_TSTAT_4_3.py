@@ -43,7 +43,6 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -176,34 +175,33 @@ class TC_TSTAT_4_3(MatterBaseTest):
             self.step("4a")
             if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
 
-                    # If skipSettingTime is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle,
-                    # the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
-                    activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-                    log.info(f"Active Preset Handlers: {activePresetHandle}")
-
-                    possiblePresetHandles = [
-                        preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-                    if len(possiblePresetHandles) > 0:
-                        preset_handle = possiblePresetHandles[0]
-                        # Calculate the current UTC timestamp for use as the EffectiveTime.
-                        effective_time = utc_time_in_matter_epoch()
-                        # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
-                        await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                          preset_handle=preset_handle,
-                                                                          effective_time=effective_time,
-                                                                          expiration_in_minutes=30,
-                                                                          expected_status=Status.InvalidInState)
-                    else:
-                        log.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
+                # If skipSettingTime is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle,
+                # the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
+                activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+                log.info(f"Active Preset Handlers: {activePresetHandle}")
+    
+                possiblePresetHandles = [
+                    preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+                if len(possiblePresetHandles) > 0:
+                    preset_handle = possiblePresetHandles[0]
+                    # Calculate the current UTC timestamp for use as the EffectiveTime.
+                    effective_time = utc_time_in_matter_epoch()
+                    # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
+                    await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                      preset_handle=preset_handle,
+                                                                      effective_time=effective_time,
+                                                                      expiration_in_minutes=30,
+                                                                      expected_status=Status.InvalidInState)
+                else:
+                    log.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
 
             self.step("4b")
             if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
                 # If skipSettingTime is False, TH sends Time Synchronization command to DUT using a time source.
-                   code = -1
                 try:
+                    code = 0
                     th_utc = utc_time_in_matter_epoch()
                     await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=th_utc, granularity=time_cluster.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=0)
-                    code = 0
                 except InteractionModelError as e:
                     # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
                     # see #26521
@@ -223,7 +221,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             max_handle_length = max((len(h) for h in existing_handles), default=32)
             counter = 0
             while True:
-                new_preset_handle_str = f"test-handle-{counter}"
+                new_preset_handle_str = f"{counter}"
                 new_preset_handle = new_preset_handle_str.encode("ascii")
                 if len(new_preset_handle) > max_handle_length:
                     asserts.fail(
