@@ -9,6 +9,7 @@ guides to get started.
 ---
 
 -   [Introduction](#introduction)
+-   [Usage Guide](#usage-guide)
 -   [Dynamic Endpoints](#dynamic-endpoints)
 -   [Cluster control](#cluster-control)
 
@@ -16,15 +17,85 @@ guides to get started.
 
 ## Introduction
 
-A prototype application that demonstrates dynamic endpoint with device
-commissioning and cluster control. It adds the non-chip device as endpoints on a
-bridge(Matter device). In this example four light devices supporting on-off
-cluster have been added as endpoints
+A prototype application that demonstrates a Matter bridge with dynamic endpoint
+management. The bridge allows you to add and remove non-Matter devices as
+endpoints at runtime using shell commands. Each bridged device appears as an
+On/Off Light to Matter controllers.
 
-1. Light1 at endpoint 3
-2. Light2 at endpoint 7
-3. Light3 at endpoint 5
-4. Light4 at endpoint 6
+## Usage Guide
+
+### Shell Commands
+
+After flashing and commissioning the bridge, use these shell commands to manage
+bridged devices:
+
+| Command | Description |
+|---------|-------------|
+| `bridge add [name] [location]` | Add a new bridged light device |
+| `bridge remove <endpoint>` | Remove a device by endpoint ID |
+| `bridge list` | List all bridged devices |
+| `bridge toggle [endpoint]` | Toggle device(s) on/off |
+| `bridge max` | Show endpoint limits |
+| `bridge removeall` | Remove all bridged devices |
+
+### Adding Devices
+
+Add bridged devices with optional name and location:
+
+```
+bridge add                     # Adds "Light 1" in "Room"
+bridge add "Kitchen Light"     # Adds with custom name
+bridge add "Lamp" "Bedroom"    # Adds with name and location
+```
+
+Each device is assigned a unique endpoint ID automatically.
+
+### Removing Devices
+
+Remove a device by its endpoint ID:
+
+```
+bridge remove 3
+```
+
+### Listing Devices
+
+View all bridged devices:
+
+```
+bridge list
+```
+
+Output example:
+```
+Bridged devices (2/16):
+  "Kitchen Light" @ Kitchen (endpoint 3, ON)
+  "Bedroom Lamp" @ Bedroom (endpoint 4, OFF)
+```
+
+### Toggling Devices
+
+Toggle a specific device or all devices:
+
+```
+bridge toggle 3      # Toggle device at endpoint 3
+bridge toggle        # Toggle all devices
+```
+
+### Controlling from Matter Controller
+
+After commissioning, use chip-tool to control bridged devices:
+
+```bash
+# Turn on device at endpoint 3
+chip-tool onoff on <node-id> 3
+
+# Turn off device at endpoint 3
+chip-tool onoff off <node-id> 3
+
+# Toggle device at endpoint 3
+chip-tool onoff toggle <node-id> 3
+```
 
 ## Dynamic Endpoints
 

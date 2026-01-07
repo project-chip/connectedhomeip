@@ -90,9 +90,8 @@ static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
 
-// Dynamic device storage - all bridged devices are created at runtime
+// Dynamic device storage - data versions for bridged devices (devices tracked in gDevices)
 static constexpr size_t kMaxBridgedDevices = CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-static Device * gBridgedDevices[kMaxBridgedDevices];
 static DataVersion * gBridgedDataVersions[kMaxBridgedDevices];
 static size_t gBridgedDeviceCount = 0;
 
@@ -368,16 +367,17 @@ using chip::Shell::shell_command_t;
 Engine sShellBridgeSubCommands;
 
 // Find device index by endpoint ID
-static int FindDeviceByEndpoint(EndpointId endpointId)
+static CHIP_ERROR FindDeviceByEndpoint(EndpointId endpointId, uint16_t &index)
 {
     for (size_t i = 0; i < kMaxBridgedDevices; i++)
     {
-        if (gBridgedDevices[i] != nullptr && gBridgedDevices[i]->GetEndpointId() == endpointId)
+        if (gDevices[i] != nullptr && gDevices[i]->GetEndpointId() == endpointId)
         {
-            return static_cast<int>(i);
+            index = static_cast<uint16_t>(i);
+            return CHIP_NO_ERROR;
         }
     }
-    return -1;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 static CHIP_ERROR BridgeHelpHandler(int argc, char ** argv)
@@ -399,7 +399,7 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
     // Check if we have room for more devices
     if (gBridgedDeviceCount >= kMaxBridgedDevices)
     {
-        ESP_LOGE(TAG, "Max bridged devices reached (%zu). Cannot add more.", kMaxBridgedDevices);
+        ESP_LOGE(TAG, "Max bridged devices reached (%u). Cannot add more.", kMaxBridgedDevices);
         return CHIP_ERROR_NO_MEMORY;
     }
 
@@ -412,21 +412,21 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
     }
     else
     {
-        snprintf(defaultName, sizeof(defaultName), "Light %zu", gBridgedDeviceCount + 1);
+        snprintf(defaultName, sizeof(defaultName), "Light %u", gBridgedDeviceCount + 1);
         name = defaultName;
     }
 
     const char * location = (argc >= 2) ? argv[1] : "Room";
 
     // Allocate new device and data versions
-    Device * newDevice = new Device(name, location);
+    Device * newDevice = new (std::nothrow) Device(name, location);
     if (newDevice == nullptr)
     {
         ESP_LOGE(TAG, "Failed to allocate memory for new device");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    DataVersion * newDataVersions = new DataVersion[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+    DataVersion * newDataVersions = new (std::nothrow) DataVersion[MATTER_ARRAY_SIZE(bridgedLightClusters)];
     if (newDataVersions == nullptr)
     {
         delete newDevice;
@@ -454,9 +454,9 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
     bool slotFound = false;
     for (size_t i = 0; i < kMaxBridgedDevices; i++)
     {
-        if (gBridgedDevices[i] == nullptr)
+        if (gDevices[i] == nullptr)
         {
-            gBridgedDevices[i]      = newDevice;
+            gDevices[i]      = newDevice;
             gBridgedDataVersions[i] = newDataVersions;
             gBridgedDeviceCount++;
             slotFound = true;
@@ -474,7 +474,7 @@ static CHIP_ERROR BridgeAddHandler(int argc, char ** argv)
         return CHIP_ERROR_INTERNAL;
     }
 
-    ESP_LOGI(TAG, "Added '%s' @ %s (endpoint %d) [%zu/%zu]", name, location, newDevice->GetEndpointId(), gBridgedDeviceCount,
+    ESP_LOGI(TAG, "Added '%s' @ %s (endpoint %d) [%u/%u]", name, location, newDevice->GetEndpointId(), gBridgedDeviceCount,
              kMaxBridgedDevices);
 
     return CHIP_NO_ERROR;
@@ -489,29 +489,30 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
     }
 
     char * end;
-    long endpointId = strtol(argv[0], &end, 10);
+    chip::EndpointId endpointId = strtoul(argv[0], &end, 10);
     if (end == argv[0] || *end != '\0' || endpointId < 0 || endpointId > 0xFFFF)
     {
         ESP_LOGE(TAG, "Invalid endpoint ID: %s (must be 0-65535)", argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    int idx = FindDeviceByEndpoint(static_cast<EndpointId>(endpointId));
-    if (idx < 0)
+    uint16_t index;
+    CHIP_ERROR err = FindDeviceByEndpoint(endpointId, index);
+    if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "No device at endpoint %ld", endpointId);
-        return CHIP_ERROR_NOT_FOUND;
+        ESP_LOGE(TAG, "No device at endpoint %u", endpointId);
+        return err;
     }
 
-    const char * name = gBridgedDevices[idx]->GetName();
-    CHIP_ERROR err    = RemoveDeviceEndpoint(gBridgedDevices[idx]);
+    const char * name = gDevices[index]->GetName();
+    err = RemoveDeviceEndpoint(gDevices[index]);
     if (err == CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "Removed '%s' from endpoint %ld", name, endpointId);
-        delete gBridgedDevices[idx];
-        delete[] gBridgedDataVersions[idx];
-        gBridgedDevices[idx]      = nullptr;
-        gBridgedDataVersions[idx] = nullptr;
+        delete gDevices[index];
+        delete[] gBridgedDataVersions[index];
+        gDevices[index]      = nullptr;
+        gBridgedDataVersions[index] = nullptr;
         gBridgedDeviceCount--;
     }
     else
@@ -525,7 +526,7 @@ static CHIP_ERROR BridgeRemoveHandler(int argc, char ** argv)
 
 static CHIP_ERROR BridgeListHandler(int argc, char ** argv)
 {
-    ESP_LOGI(TAG, "Bridged devices (%zu/%zu):", gBridgedDeviceCount, kMaxBridgedDevices);
+    ESP_LOGI(TAG, "Bridged devices (%u/%u):", gBridgedDeviceCount, kMaxBridgedDevices);
 
     if (gBridgedDeviceCount == 0)
     {
@@ -535,10 +536,10 @@ static CHIP_ERROR BridgeListHandler(int argc, char ** argv)
     {
         for (size_t i = 0; i < kMaxBridgedDevices; i++)
         {
-            if (gBridgedDevices[i] != nullptr)
+            if (gDevices[i] != nullptr)
             {
-                ESP_LOGI(TAG, "  \"%s\" @ %s (endpoint %d, %s)", gBridgedDevices[i]->GetName(), gBridgedDevices[i]->GetLocation(),
-                         gBridgedDevices[i]->GetEndpointId(), gBridgedDevices[i]->IsOn() ? "ON" : "OFF");
+                ESP_LOGI(TAG, "  \"%s\" @ %s (endpoint %d, %s)", gDevices[i]->GetName(), gDevices[i]->GetLocation(),
+                         gDevices[i]->GetEndpointId(), gDevices[i]->IsOn() ? "ON" : "OFF");
             }
         }
     }
@@ -550,25 +551,26 @@ static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
 {
     if (argc == 1)
     {
-        // Toggle specific device by endpoint: bridge toggle <endpoint>
+        // Perform OnOff::Toggle on the bridged endpoint: bridge toggle <endpoint>
         char * end;
-        long endpointId = strtol(argv[0], &end, 10);
+        chip::EndpointId endpointId = strtoul(argv[0], &end, 10);
         if (end == argv[0] || *end != '\0' || endpointId < 0 || endpointId > 0xFFFF)
         {
             ESP_LOGE(TAG, "Invalid endpoint ID: %s (must be 0-65535)", argv[0]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        int idx = FindDeviceByEndpoint(static_cast<EndpointId>(endpointId));
-        if (idx < 0)
+        uint16_t index;
+        CHIP_ERROR err = FindDeviceByEndpoint(endpointId, index);
+        if (err != CHIP_NO_ERROR)
         {
-            ESP_LOGE(TAG, "No device at endpoint %ld", endpointId);
-            return CHIP_ERROR_NOT_FOUND;
+            ESP_LOGE(TAG, "No device at endpoint %u", endpointId);
+            return err;
         }
 
-        gBridgedDevices[idx]->SetOnOff(!gBridgedDevices[idx]->IsOn());
-        ESP_LOGI(TAG, "Toggled '%s' (endpoint %ld): now %s", gBridgedDevices[idx]->GetName(), endpointId,
-                 gBridgedDevices[idx]->IsOn() ? "ON" : "OFF");
+        gDevices[index]->SetOnOff(!gDevices[index]->IsOn());
+        ESP_LOGI(TAG, "Toggled '%s' (endpoint %u): now %s", gDevices[index]->GetName(), endpointId,
+                 gDevices[index]->IsOn() ? "ON" : "OFF");
     }
     else
     {
@@ -576,10 +578,10 @@ static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
         ESP_LOGI(TAG, "Toggling all devices:");
         for (size_t i = 0; i < kMaxBridgedDevices; i++)
         {
-            if (gBridgedDevices[i] != nullptr)
+            if (gDevices[i] != nullptr)
             {
-                gBridgedDevices[i]->SetOnOff(!gBridgedDevices[i]->IsOn());
-                ESP_LOGI(TAG, "  '%s': now %s", gBridgedDevices[i]->GetName(), gBridgedDevices[i]->IsOn() ? "ON" : "OFF");
+                gDevices[i]->SetOnOff(!gDevices[i]->IsOn());
+                ESP_LOGI(TAG, "  '%s': now %s", gDevices[i]->GetName(), gDevices[i]->IsOn() ? "ON" : "OFF");
             }
         }
     }
@@ -590,9 +592,9 @@ static CHIP_ERROR BridgeToggleHandler(int argc, char ** argv)
 static CHIP_ERROR BridgeMaxHandler(int argc, char ** argv)
 {
     ESP_LOGI(TAG, "Bridge endpoint limits:");
-    ESP_LOGI(TAG, "  Max bridged devices: %zu", kMaxBridgedDevices);
-    ESP_LOGI(TAG, "  Current devices: %zu", gBridgedDeviceCount);
-    ESP_LOGI(TAG, "  Available slots: %zu", kMaxBridgedDevices - gBridgedDeviceCount);
+    ESP_LOGI(TAG, "  Max bridged devices: %u", kMaxBridgedDevices);
+    ESP_LOGI(TAG, "  Current devices: %u", gBridgedDeviceCount);
+    ESP_LOGI(TAG, "  Available slots: %u", kMaxBridgedDevices - gBridgedDeviceCount);
 
     return CHIP_NO_ERROR;
 }
@@ -600,20 +602,20 @@ static CHIP_ERROR BridgeMaxHandler(int argc, char ** argv)
 static CHIP_ERROR BridgeRemoveAllHandler(int argc, char ** argv)
 {
     ESP_LOGI(TAG, "Removing all bridged devices...");
-    int removedCount = 0;
+    size_t removedCount = 0;
 
     for (size_t i = 0; i < kMaxBridgedDevices; i++)
     {
-        if (gBridgedDevices[i] != nullptr)
+        if (gDevices[i] != nullptr)
         {
-            const char * name = gBridgedDevices[i]->GetName();
-            CHIP_ERROR err    = RemoveDeviceEndpoint(gBridgedDevices[i]);
+            const char * name = gDevices[i]->GetName();
+            CHIP_ERROR err    = RemoveDeviceEndpoint(gDevices[i]);
             if (err == CHIP_NO_ERROR)
             {
                 ESP_LOGI(TAG, "  Removed '%s'", name);
-                delete gBridgedDevices[i];
+                delete gDevices[i];
                 delete[] gBridgedDataVersions[i];
-                gBridgedDevices[i]      = nullptr;
+                gDevices[i]      = nullptr;
                 gBridgedDataVersions[i] = nullptr;
                 removedCount++;
             }
@@ -683,7 +685,7 @@ static void InitServer(intptr_t context)
     //   bridge remove <endpoint>
     //   bridge list
     //   bridge max
-    ESP_LOGI(TAG, "Bridge ready. Use 'bridge add [name] [location]' to add devices. Max devices: %zu", kMaxBridgedDevices);
+    ESP_LOGI(TAG, "Bridge ready. Use 'bridge add [name] [location]' to add devices. Max devices: %u", kMaxBridgedDevices);
 }
 
 void emberAfActionsClusterInitCallback(EndpointId endpoint)
@@ -729,7 +731,7 @@ extern "C" void app_main()
     // bridge will have own database named gDevices.
     // Clear database
     memset(gDevices, 0, sizeof(gDevices));
-    memset(gBridgedDevices, 0, sizeof(gBridgedDevices));
+    memset(gDevices, 0, sizeof(gDevices));
     memset(gBridgedDataVersions, 0, sizeof(gBridgedDataVersions));
     gBridgedDeviceCount = 0;
 
