@@ -21,7 +21,7 @@
 
 #include <CommissionableInit.h>
 
-#include "../../providers/AllClustersExampleDeviceInfoProviderImpl.h"
+#include <providers/AllClustersExampleDeviceInfoProviderImpl.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
