@@ -227,13 +227,6 @@ config THREAD_DEVICE_TYPE
 	help
 		Thread device type registered with the connectivity manager
 
-config CHIP_OTA_IMAGE_PROCESSOR_HEADER
-	string "Header for OTA image processor implementation"
-	default "platform/nxp/common/ota/OTAImageProcessorImpl.h"
-	help
-		Header for OTA image processor implementation.
-		(Macro value is in quotes.)
-
 config CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
 	bool "Use Posted Operations in Idle task for OTA Image Processing"
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170

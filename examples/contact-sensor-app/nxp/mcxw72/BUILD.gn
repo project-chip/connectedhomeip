@@ -173,7 +173,6 @@ mcxw72_executable("contact_sensor_app") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"" ]
     include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
     sources += [
       "${common_example_dir}/../mcxw71/ota/OtaUtils.cpp",
