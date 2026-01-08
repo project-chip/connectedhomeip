@@ -28,6 +28,9 @@
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <platform/DefaultTimerDelegate.h>
+#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
+#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -318,6 +321,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+    // Set the TestEventTriggerDelegate for GeneralDiagnostics cluster dependency injection
+#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+    chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
+#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
     // SetDataModelProvider() initializes and starts the provider, which in turn
     // triggers the initialization of cluster implementations. This callsite is
