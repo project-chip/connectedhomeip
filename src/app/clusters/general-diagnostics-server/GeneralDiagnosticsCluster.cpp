@@ -38,15 +38,14 @@ namespace {
 // Max decodable count allowed is 2048.
 constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
 
-bool IsTestEventTriggerEnabled()
+bool IsTestEventTriggerEnabled(TestEventTriggerDelegate * testEventTriggerDelegate)
 {
-    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
-    if (triggerDelegate == nullptr)
+    if (testEventTriggerDelegate == nullptr)
     {
         return false;
     }
     uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
-    return !triggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData));
+    return !testEventTriggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData));
 }
 
 bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
@@ -61,7 +60,7 @@ bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
     return true;
 }
 
-TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey, TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
@@ -73,14 +72,12 @@ TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
         return nullptr;
     }
 
-    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
-
-    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
+    if (testEventTriggerDelegate == nullptr || !testEventTriggerDelegate->DoesEnableKeyMatch(enableKey))
     {
         return nullptr;
     }
 
-    return triggerDelegate;
+    return testEventTriggerDelegate;
 }
 
 template <typename T>
@@ -119,9 +116,10 @@ CHIP_ERROR EncodeListOfValues(const T & valueList, CHIP_ERROR readError, Attribu
     return readError;
 }
 
-DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
+DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData,
+                                                     TestEventTriggerDelegate * testEventTriggerDelegate)
 {
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey, testEventTriggerDelegate);
     if (triggerDelegate == nullptr)
     {
         return Status::ConstraintError;
@@ -182,7 +180,8 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
 
 std::optional<DataModel::ActionReturnStatus>
 HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                         const Commands::PayloadTestRequest::DecodableType & commandData)
+                         const Commands::PayloadTestRequest::DecodableType & commandData,
+                         TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
@@ -190,7 +189,7 @@ HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & c
     }
 
     // Ensure Test Event triggers are enabled and key matches.
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey, testEventTriggerDelegate);
     if (triggerDelegate == nullptr)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -275,7 +274,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeValue(value, err, encoder);
     }
     case GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id: {
-        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
+        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled(mTestEventTriggerDelegate);
         return encoder.Encode(isTestEventTriggersEnabled);
     }
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
@@ -319,7 +318,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
         GeneralDiagnostics::Commands::TestEventTrigger::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTestEventTrigger(request_data);
+        return HandleTestEventTrigger(request_data, mTestEventTriggerDelegate);
     }
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
@@ -473,7 +472,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
     case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
         GeneralDiagnostics::Commands::TestEventTrigger::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTestEventTrigger(request_data);
+        return HandleTestEventTrigger(request_data, mTestEventTriggerDelegate);
     }
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
@@ -489,7 +488,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));
-            return HandlePayloadTestRequest(*handler, request.path, request_data);
+            return HandlePayloadTestRequest(*handler, request.path, request_data, mTestEventTriggerDelegate);
         }
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }

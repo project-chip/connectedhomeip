@@ -15,17 +15,26 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 
 namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
 void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                                   const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+
+/// Set the TestEventTriggerDelegate for dependency injection.
+/// This should be called before MatterGeneralDiagnosticsClusterInitCallback.
+void SetTestEventTriggerDelegate(TestEventTriggerDelegate * delegate);
+
+/// Get the TestEventTriggerDelegate that was set via SetTestEventTriggerDelegate.
+/// Returns nullptr if not set.
+TestEventTriggerDelegate * GetTestEventTriggerDelegate();
 } // namespace chip::app::Clusters::GeneralDiagnostics

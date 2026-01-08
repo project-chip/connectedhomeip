@@ -101,7 +101,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
 
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance());
+                                      InteractionModelEngine::GetInstance(), nullptr);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -110,7 +110,8 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     };
 
     GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(
-        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(), functionsConfig);
+        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(), nullptr,
+        functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -124,7 +125,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster without enabling any feature flags
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                          InteractionModelEngine::GetInstance());
+                                          InteractionModelEngine::GetInstance(), nullptr);
 
         // Check required accepted commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -197,7 +198,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance());
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance(), nullptr);
 
         // Check mandatory commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -256,7 +257,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance());
+                                      InteractionModelEngine::GetInstance(), nullptr);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -279,7 +280,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
         .enablePayloadSnapshot = false,
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                                      InteractionModelEngine::GetInstance(), functionsConfig);
+                                                      InteractionModelEngine::GetInstance(), nullptr, functionsConfig);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -301,7 +302,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance());
+                                      InteractionModelEngine::GetInstance(), nullptr);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
