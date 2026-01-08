@@ -121,7 +121,7 @@ public:
 
     /// Removes the data persisted for this cluster
     ///
-    /// Can only be called while started up (i.e. after Startup() and before Shudown()).
+    /// Can only be called while started up (i.e. after Startup() and before Shutdown()).
     CHIP_ERROR ClearPersistentData();
 
     // Integration methods for other cluster integrations
