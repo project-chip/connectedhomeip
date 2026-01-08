@@ -339,7 +339,7 @@ config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 440 if PM
+    default 480 if PM
     default 608
 
 config OPENTHREAD_SLAAC
