@@ -58,6 +58,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/chime-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
+      "${chip_root}/src/app/clusters/electrical-grid-conditions-server/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
