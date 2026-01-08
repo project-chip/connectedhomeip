@@ -276,7 +276,7 @@ void ScenesManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, F
     ScopedSceneTable sceneTable(mSceneTableProvider);
     VerifyOrReturn(sceneTable);
     // The implementation of SceneTable::RemoveFabric() must not call back into the FabricTable
-    TEMPORARY_RETURN_IGNORED sceneTable->RemoveFabric(fabricIndex);
+    LogErrorOnFailure(sceneTable->RemoveFabric(fabricIndex));
     mFabricSceneInfo.ClearSceneInfoStruct(fabricIndex);
 }
 
@@ -633,7 +633,7 @@ AddSceneResponse::Type ScenesManagementCluster::HandleAddScene(FabricIndex fabri
 
         if (!tempEFS.IsEmpty())
         {
-            TEMPORARY_RETURN_IGNORED storageData.mExtensionFieldSets.InsertFieldSet(tempEFS);
+            LogErrorOnFailure(storageData.mExtensionFieldSets.InsertFieldSet(tempEFS));
         }
     }
     SuccessOrReturnWithFailureStatus(fieldSetIter.GetStatus(), response);
@@ -713,7 +713,7 @@ ViewSceneResponse::Type ScenesManagementCluster::HandleViewScene(
     {
         // gets data from the field in the scene
         ExtensionFieldSet tempField;
-        TEMPORARY_RETURN_IGNORED scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(tempField, i);
+        SuccessOrReturnWithFailureStatus(scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(tempField, i), response);
         ByteSpan efsSpan(tempField.mBytesBuffer, tempField.mUsedBytes);
 
         // This should only find one handle per cluster
