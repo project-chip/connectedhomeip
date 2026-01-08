@@ -228,9 +228,9 @@ public:
 
     // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
     // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
-    void Shutdown() override
+    void Shutdown(ClusterShutdownType shutdownType) override
     {
-        DefaultServerCluster::Shutdown();
+        DefaultServerCluster::Shutdown(shutdownType);
         mLogic.Shutdown();
     }
 

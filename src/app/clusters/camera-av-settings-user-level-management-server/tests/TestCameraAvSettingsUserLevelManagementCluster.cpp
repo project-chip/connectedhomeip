@@ -16,12 +16,14 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/CommandHandler.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
+#include <app/InteractionModelEngine.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Attributes.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Commands.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
@@ -29,7 +31,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 namespace {
 
@@ -37,13 +38,16 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+
+using namespace Protocols::InteractionModel;
+
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 static constexpr chip::EndpointId kTestEndpointId = 1;
 
 // Minimal mock delegate for testing
-class MockCameraAvSettingsUserLevelManagementDelegate : public Delegate
+class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
     void ShutdownApp() {}
@@ -101,7 +105,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestAttributes)
     const uint8_t testMaxPresets = 5;
 
     CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(mockDelegate);
+    server.SetDelegate(&mockDelegate);
 
     ASSERT_TRUE(IsAttributesListEqualTo(server, { 
                                                     CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::kMetadataEntry,
@@ -129,7 +133,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestCommands)
     const uint8_t testMaxPresets = 5;
 
     CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(mockDelegate);
+    server.SetDelegate(&mockDelegate);
 
     ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server,
                                               {
