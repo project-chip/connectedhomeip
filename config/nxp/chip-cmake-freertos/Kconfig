@@ -201,14 +201,6 @@ config CHIP_SE05X_DEVICE_ATTESTATION
 
 endif # CHIP_SE05X
 
-# App specific
-
-config LOW_POWER
-	bool "Should be replaced by CONFIG_NXP_USE_LOW_POWER. Keep it for backwards compatibility"
-	default y if NXP_USE_LOW_POWER
-	help
-		Will be deprecated once application files replace CONFIG_LOW_POWER with CONFIG_NXP_USE_LOW_POWER
-
 choice THREAD_DEVICE_TYPE_SELECTION
 	prompt "Thread device type selection based on ConnectivityManager::ThreadDeviceType enum"
 	default ROUTER if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060

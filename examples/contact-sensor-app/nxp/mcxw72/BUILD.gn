@@ -120,7 +120,7 @@ mcxw72_executable("contact_sensor_app") {
   }
 
   if (nxp_use_low_power) {
-    defines += [ "CONFIG_LOW_POWER=1" ]
+    defines += [ "CONFIG_NXP_USE_LOW_POWER=1" ]
   } else {
     defines += [
       "CONFIG_ENABLE_FEEDBACK=1",

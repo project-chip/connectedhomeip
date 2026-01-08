@@ -80,7 +80,7 @@
 #include "DiagnosticLogsDemo.h"
 #endif
 
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
 #include "LowPower.h"
 #include "PWR_Interface.h"
 #endif
@@ -233,7 +233,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     /* Init Chip memory management before the stack */
     TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     TEMPORARY_RETURN_IGNORED chip::NXP::App::LowPower::Init();
 #endif
 
@@ -441,14 +441,14 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 
 void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
 {
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     PWR_DisallowDeviceToSleep();
 #endif
 }
 
 void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
 {
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     PWR_AllowDeviceToSleep();
 #endif
 }
