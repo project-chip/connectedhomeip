@@ -20,33 +20,80 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/ReadOnlyBuffer.h>
-
-#include <clusters/UnitLocalization/ClusterId.h>
-#include <clusters/UnitLocalization/Enums.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/UnitLocalization/Metadata.h>
+#include <clusters/UnitLocalization/Attributes.h>
+
+#include <iostream>
 
 using namespace chip::Testing;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
+using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
 struct TestUnitLocalizationCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestUnitLocalizationCluster, AttributeTest)
+// Tests a cluster without Features enabled, not really useful by itself but possible.
+TEST_F(TestUnitLocalizationCluster, AttributeNoFeatures)
 {
-    UnitLocalizationCluster cluster{};
+    UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, {} };
+    // This cluster doesn't have any unique Mandatory attribute.
+    ASSERT_TRUE(IsAttributesListEqualTo(unitLocalizationCluster, {}));
+}
 
-    // Test attributes listing with no features enabled
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
-    ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedAttributes.AppendElements({ Attributes::TemperatureUnit::kMetadataEntry, //
-                                                  Attributes::SupportedTemperatureUnits::kMetadataEntry }),
-              CHIP_NO_ERROR);
+// Tests a cluster with the TemperatureUnit attribute enabled.
+TEST_F(TestUnitLocalizationCluster, AttributesTemperatureFeature)
+{
+    const BitFlags<Feature> features{ Feature::kTemperatureUnit };
+    UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, features };
+    
+    ASSERT_TRUE(IsAttributesListEqualTo(unitLocalizationCluster, {
+        TemperatureUnit::kMetadataEntry,
+        SupportedTemperatureUnits::kMetadataEntry
+    }));
+}
+
+TEST_F(TestUnitLocalizationCluster, ReadMandatoryAttributes)
+{
+    UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, {} };
+
+    ClusterTester tester(unitLocalizationCluster);
+    uint16_t clusterRevision;
+    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, kRevision);
+
+    uint32_t featureMap = 1;
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
+}
+
+TEST_F(TestUnitLocalizationCluster, ReadSupportedTemperatureUnits)
+{
+    const BitFlags<Feature> features{ Feature::kTemperatureUnit };
+    UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, features };
+
+    // Set supported units as Fahrenheit and Celsius
+    TempUnitEnum supportedUnits[2] = { TempUnitEnum::kCelsius, TempUnitEnum::kFahrenheit };
+    DataModel::List<TempUnitEnum> unitsList(supportedUnits);
+    ASSERT_EQ(unitLocalizationCluster.SetSupportedTemperatureUnits(unitsList), CHIP_NO_ERROR);
+
+    // Read attribute
+    ClusterTester tester(unitLocalizationCluster);
+    SupportedTemperatureUnits::TypeInfo::DecodableType supportedTempUnits{};
+    ASSERT_EQ(tester.ReadAttribute(SupportedTemperatureUnits::Id, supportedTempUnits), CHIP_NO_ERROR);
+
+    // Verify that the values are stored properly
+    auto it = supportedTempUnits.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue(), TempUnitEnum::kCelsius);
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue(), TempUnitEnum::kFahrenheit);
+    ASSERT_FALSE(it.Next());
 }

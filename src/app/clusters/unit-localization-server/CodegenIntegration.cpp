@@ -16,28 +16,77 @@
  *    limitations under the License.
  */
 
-#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
-#include <app/util/af-types.h>
+#include <app/static-cluster-config/UnitLocalization.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <clusters/UnitLocalization/Ids.h>
 
+using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
+
+LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
 
 UnitLocalizationServer & UnitLocalizationServer::Instance()
 {
-    static UnitLocalizationServer mInstance;
-    return mInstance;
+    return gServer.Cluster();
 }
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
+    {
+        const BitFlags<UnitLocalization::Feature> featureMap{ rawFeatureMap };
+        gServer.Create(endpointId, featureMap);
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+};
 
 void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 {
-    LogErrorOnFailure(UnitLocalizationServer::Instance().Init());
-    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
+    // This cluster should only exist in Root endpoint.
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
+    IntegrationDelegate integrationDelegate;
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = kRootEndpointId,
+            .clusterId                 = UnitLocalization::Id,
+            .fixedClusterInstanceCount = UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
+        },
+        integrationDelegate);
 }
 
 void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationServer::Instance());
+    // This cluster should only exist in Root endpoint.
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
+    IntegrationDelegate integrationDelegate;
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = kRootEndpointId,
+            .clusterId                 = ::Id,
+            .fixedClusterInstanceCount = UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1,
+        },
+        integrationDelegate, shutdownType);
 }
 
 void MatterUnitLocalizationPluginServerInitCallback() {}

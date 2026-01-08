@@ -17,6 +17,10 @@
  */
 #pragma once
 
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/UnitLocalization/Metadata.h>
+
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -33,17 +37,18 @@ namespace UnitLocalization {
 inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
 inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
 
-class UnitLocalizationCluster : public AttributeAccessInterface
+class UnitLocalizationCluster : public DefaultServerCluster
 {
 public:
-    UnitLocalizationCluster() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
+    UnitLocalizationCluster(EndpointId endpointId, const BitFlags<UnitLocalization::Feature> features) : DefaultServerCluster({endpointId, UnitLocalization::Id }), mFeatures(features) {}
 
-    // Register for the UnitLocalization cluster on all endpoints.
-    CHIP_ERROR Init();
-    CHIP_ERROR Startup();
-
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    // ServerClusterInterface
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units);
     const DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
@@ -57,6 +62,7 @@ private:
     TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = { TempUnitEnum::kFahrenheit, TempUnitEnum::kCelsius,
                                                                   TempUnitEnum::kKelvin };
     TempUnitEnum mTemperatureUnit                             = TempUnitEnum::kCelsius;
+    const BitFlags<UnitLocalization::Feature> mFeatures;
 };
 
 } // namespace UnitLocalization
