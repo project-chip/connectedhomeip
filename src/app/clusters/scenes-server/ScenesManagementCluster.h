@@ -49,7 +49,7 @@ class ScenesManagementCluster : public DefaultServerCluster, public FabricTable:
 public:
     // NOTE: this is not great as this means the cluster itself uses fixed storage/sizes
     //       This could be refactored to use more template-defined parameters to get code
-    //       more generic. At this time, we keep this as historidically this is what code
+    //       more generic. At this time, we keep this as historically this is what code
     //       looked like and we tried to avoid large refactors when writing clusters.
     static constexpr uint8_t kScenesServerMaxFabricCount = CHIP_CONFIG_MAX_FABRICS;
 
