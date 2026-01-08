@@ -1636,6 +1636,7 @@ TEST_F(TestScenesManagementCluster, DuplicateFieldSets)
     ExpectCommandStatus(view_response, Status::Success);
     ASSERT_TRUE(view_response.response.has_value());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto & data = *view_response.response;
     ASSERT_TRUE(data.extensionFieldSetStructs.HasValue());
     auto responseEfsList = data.extensionFieldSetStructs.Value();
