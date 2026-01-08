@@ -20,7 +20,7 @@ The split mode consists of two separate firmware images:
 
 ### 1. **matter_camera** (ESP32-C6)
 
--   **Role**: Matter camera with KVS signaling integration
+-   **Role**: Matter camera with WebRTC signaling integration
 -   **Responsibilities**:
     -   WebRTC signaling
     -   Bridge communication with media adapter
