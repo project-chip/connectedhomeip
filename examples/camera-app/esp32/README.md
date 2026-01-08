@@ -18,7 +18,7 @@ for optimal power efficiency.
 
 The split mode consists of two separate firmware images:
 
-### 1. **esp32_camera** (ESP32-C6)
+### 1. **matter_camera** (ESP32-C6)
 
 -   **Role**: Matter camera with KVS signaling integration
 -   **Responsibilities**:
@@ -83,7 +83,7 @@ The split mode consists of two separate firmware images:
 ⚠️ **Important**: This requires **TWO separate firmware flashes** on the same
 ESP32-P4 Function EV Board.
 
-#### Step 1: Flash esp32_camera (ESP32-C6)
+#### Step 1: Flash matter_camera (ESP32-C6)
 
 This handles AWS KVS signaling and Matter integration.
 
@@ -93,8 +93,17 @@ idf.py build
 idf.py -p [PORT] flash monitor
 ```
 
-**Note**: ESP32-C6 does not have an onboard UART port. You will need to use
-ESP-Prog or any other JTAG.
+*__NOTE__*:
+- ESP32-C6 does not have an onboard UART port. You will need to use [ESP-Prog](https://docs.espressif.com/projects/esp-iot-solution/en/latest/hw-reference/ESP-Prog_guide.html) board or any other JTAG.
+- Use following Pin Connections:
+
+| ESP32-C6 (J2/Prog-C6) | ESP-Prog |
+|----------|----------|
+| IO0      | IO9      |
+| TX0      | TXD0     |
+| RX0      | RXD0     |
+| EN       | EN       |
+| GND      | GND      |
 
 #### Step 2: Flash media_adapter (ESP32-P4)
 
