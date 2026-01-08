@@ -40,7 +40,9 @@ from TC_AVSUMTestBase import AVSUMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
@@ -49,7 +51,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.6] MPTZRemovePreset command validation"
 
     def steps_TC_AVSUM_2_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
@@ -63,13 +65,11 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
             TestStep(11, "Read MPTZPresets, verify this is empty."),
             TestStep(12, "Repeat step 10, sending a MPTZRemovePreset command for a PresetID of MaxPresets. Verify failure."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_6(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S", "AVSUM.S.F04"
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))

@@ -14,9 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/bindings/binding-cluster.h>
+#include <app/clusters/bindings/BindingCluster.h>
 #include <app/static-cluster-config/Binding.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
 #include <cstdint>
@@ -68,7 +69,7 @@ void MatterBindingClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBindingClusterShutdownCallback(EndpointId endpointId)
+void MatterBindingClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -79,7 +80,7 @@ void MatterBindingClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kBindingFixedClusterCount,
             .maxClusterInstanceCount   = kBindingMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterBindingPluginServerInitCallback() {}

@@ -32,6 +32,7 @@
 #include <system/SystemConfig.h>
 
 #include <lib/core/CHIPCallback.h>
+#include <lib/core/CriticalFailure.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -40,8 +41,8 @@
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <lib/support/IntrusiveList.h>
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -64,7 +65,7 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  * - Layer: Core timer methods.
  *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
- *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
+ *     - LayerSelectLoop: Adds methods for event-loop-based implementations.
  *
  * Threading notes:
  *
@@ -82,7 +83,7 @@ public:
     /**
      * Initialize the Layer.
      */
-    virtual CHIP_ERROR Init() = 0;
+    virtual CriticalFailure Init() = 0;
 
     /**
      * Shut down the Layer.
@@ -116,7 +117,7 @@ public:
      *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
      *   @return Other Value indicating timer failed to start.
      */
-    virtual CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
+    virtual CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
      * @brief
@@ -196,7 +197,7 @@ public:
      * @retval CHIP_ERROR_NO_MEMORY         If the SystemLayer cannot allocate a new timer.
      * @retval CHIP_NO_ERROR                On success.
      */
-    virtual CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
+    virtual CriticalFailure ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
      * @brief
@@ -211,7 +212,7 @@ public:
      * @retval other Platform-specific errors generated indicating the reason for failure.
      */
     template <typename Lambda>
-    CHIP_ERROR ScheduleLambda(const Lambda & lambda)
+    CriticalFailure ScheduleLambda(const Lambda & lambda)
     {
         static_assert(std::is_invocable_v<Lambda>, "lambda argument must be an invocable with no arguments");
         LambdaBridge bridge;
@@ -220,7 +221,7 @@ public:
     }
 
 private:
-    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && bridge);
+    CriticalFailure ScheduleLambdaBridge(LambdaBridge && bridge);
 
     // Not copyable
     Layer(const Layer &)             = delete;
@@ -288,21 +289,22 @@ public:
      */
     virtual SocketWatchToken InvalidSocketWatchToken() = 0;
 };
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-class LayerSocketsLoop;
+class LayerSelectLoop;
 
 /**
- * EventLoopHandlers can be registered with a LayerSocketsLoop instance to enable
+ * EventLoopHandlers can be registered with a LayerSelectLoop instance to enable
  * participation of those handlers in the processing cycle of the event loop. This makes
  * it possible to implement adapters that allow components utilizing a third-party event
  * loop API to participate in the Matter event loop, instead of having to run an entirely
  * separate event loop on another thread.
  *
  * Specifically, the `PrepareEvents` and `HandleEvents` methods of registered event loop
- * handlers will be called from the LayerSocketsLoop methods of the same names.
+ * handlers will be called from the LayerSelectLoop methods of the same names.
  *
- * @see LayerSocketsLoop::PrepareEvents
- * @see LayerSocketsLoop::HandleEvents
+ * @see LayerSelectLoop::PrepareEvents
+ * @see LayerSelectLoop::HandleEvents
  */
 class EventLoopHandler : public chip::IntrusiveListNodeBase<>
 {
@@ -321,13 +323,18 @@ public:
     virtual void HandleEvents() = 0;
 
 private:
-    // mState is provided exclusively for use by the LayerSocketsLoop implementation
-    // sub-class and can be accessed by it via the LayerSocketsLoop::LoopHandlerState() helper.
-    friend class LayerSocketsLoop;
+    // mState is provided exclusively for use by the LayerSelectLoop implementation
+    // sub-class and can be accessed by it via the LayerSelectLoop::LoopHandlerState() helper.
+    friend class LayerSelectLoop;
     intptr_t mState = 0;
 };
 
-class LayerSocketsLoop : public LayerSockets
+class LayerSelectLoop :
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    public LayerSockets
+#else
+    public Layer
+#endif
 {
 public:
     virtual void Signal()          = 0;
@@ -350,8 +357,6 @@ protected:
     decltype(EventLoopHandler::mState) & LoopHandlerState(EventLoopHandler & handler) { return handler.mState; }
 };
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 class LayerDispatch :
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -372,8 +377,8 @@ public:
      *
      * @note This method is thread-safe and can be called from any dispatch queue.
      */
-    virtual CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block)                     = 0;
-    virtual CHIP_ERROR StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) = 0;
+    virtual CriticalFailure ScheduleWorkWithBlock(dispatch_block_t block)                     = 0;
+    virtual CriticalFailure StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) = 0;
 };
 #endif
 

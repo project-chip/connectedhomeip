@@ -323,7 +323,7 @@
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
-	branch = matter_support
+	branch = rtk_matter_support
 	platforms = realtek
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo
@@ -331,7 +331,7 @@
 [submodule "third_party/imx-secure-enclave/repo"]
 	path = third_party/imx-secure-enclave/repo
 	url = https://github.com/nxp-imx/imx-secure-enclave.git
-	branch = lf-6.12.34_2.1.0
+	branch = lf-6.12.49_2.2.0
 	platforms = linux
 [submodule "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"]
 	path = third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo

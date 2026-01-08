@@ -148,7 +148,7 @@ def build_tests(yaml_data, context: ProgramArguments) -> List[GeneratorTest]:
 
 class TestGenerators(unittest.TestCase):
     def test_generators(self):
-        with open(os.path.join(TESTS_DIR, "available_tests.yaml"), 'rt') as stream:
+        with open(os.path.join(TESTS_DIR, "available_tests.yaml")) as stream:
             yaml_data = yaml.safe_load(stream)
 
         global PROGRAM_ARGUMENTS

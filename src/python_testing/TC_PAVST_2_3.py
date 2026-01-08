@@ -47,9 +47,11 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
@@ -241,20 +243,20 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.Zones
         )
-        logger.info(f"aZones: {aZones}")
+        log.info(f"aZones: {aZones}")
 
         self.step(9)
         aMaxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.MaxZones
         )
-        logger.info(f"aMaxZones: {aMaxZones}")
+        log.info(f"aMaxZones: {aMaxZones}")
 
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=tlscluster, attribute=tlscluster.Attributes.ProvisionedEndpoints
             )
-            logger.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
+            log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
 
         self.step(11)
         if self.pics_guard(self.check_pics("PAVST.S")):

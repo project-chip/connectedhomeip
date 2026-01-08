@@ -43,10 +43,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_ZONEMGMT_2_4(MatterBaseTest):
@@ -132,7 +134,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         self.twoDCartSupported = aFeatureMap & cluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         self.userDefinedSupported = aFeatureMap & cluster.Bitmaps.Feature.kUserDefined
         self.focusZonesSupported = aFeatureMap & cluster.Bitmaps.Feature.kFocusZones
@@ -159,7 +161,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            logger.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
             asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -175,7 +177,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             zonesAfterCreate = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zonesAfterCreate}")
+            log.info(f"Rx'd Zones: {zonesAfterCreate}")
 
             matchingZone = next(
                 (z for z in zonesAfterCreate if z.zoneID == zoneID1), None)
@@ -187,7 +189,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             asserts.assert_equal(matchingZone.twoDCartesianZone.vertices, zoneVertices,
                                  "ZoneVertices of created Zone are mismatched")
         else:
-            logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            log.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("2")
 
         self.step("2a")
@@ -195,7 +197,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         triggersBeforeCreate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Triggers
         )
-        logger.info(f"Rx'd Triggers: {triggersBeforeCreate}")
+        log.info(f"Rx'd Triggers: {triggersBeforeCreate}")
 
         # Check that zoneID1 trigger did not exist before
         matchingTrigger = next(
@@ -216,7 +218,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         zoneTrigger = cluster.Structs.ZoneTriggerControlStruct(
             zoneID=zoneID1, initialDuration=initDuration, augmentationDuration=augDuration, maxDuration=maxDuration, blindDuration=blindDuration, sensitivity=sensitivity)
         try:
-            logger.info(f"Create/Update Trigger with ID = {zoneID1}")
+            log.info(f"Create/Update Trigger with ID = {zoneID1}")
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.CreateOrUpdateTrigger(trigger=zoneTrigger))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to create zone trigger")
@@ -225,7 +227,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         triggersAfterCreate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Triggers
         )
-        logger.info(f"Rx'd Triggers: {triggersAfterCreate}")
+        log.info(f"Rx'd Triggers: {triggersAfterCreate}")
 
         matchingTrigger = next(
             (t for t in triggersAfterCreate if t.zoneID == zoneID1), None)
@@ -236,7 +238,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         triggers = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Triggers
         )
-        logger.info(f"Rx'd Triggers: {triggers}")
+        log.info(f"Rx'd Triggers: {triggers}")
 
         asserts.assert_is(type(triggers), list)
         for t in triggers:
@@ -356,7 +358,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
         event = event_listener.wait_for_event_expect_no_report(timeout_sec=event_delay_seconds)
-        logger.info(f"Successfully timed out without receiving any ZoneTriggered event during blind duration for zone: {zoneID1}")
+        log.info(f"Successfully timed out without receiving any ZoneTriggered event during blind duration for zone: {zoneID1}")
 
         self.step("6")
 
@@ -364,7 +366,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        logger.info(f"Rx'd Zones: {zones}")
+        log.info(f"Rx'd Zones: {zones}")
         maxZoneId = 0
         # Get the max zoneId
         for zone in zones:
@@ -406,7 +408,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            logger.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            log.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
             asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -417,7 +419,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
             zonesAfterCreate = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zonesAfterCreate}")
+            log.info(f"Rx'd Zones: {zonesAfterCreate}")
 
             matchingZone = next(
                 (z for z in zonesAfterCreate if z.zoneID == zoneID4), None)
@@ -446,7 +448,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
                 pass
 
         else:
-            logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            log.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("7")
             self.skip_step("7a")
 
@@ -468,7 +470,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
             zones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Zones
             )
-            logger.info(f"Rx'd Zones: {zones}")
+            log.info(f"Rx'd Zones: {zones}")
             maxZoneId = 0
             # Get the max zoneId
             for zone in zones:
@@ -492,7 +494,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
             self.step("8b")
 
             try:
-                logger.info(f"Removing trigger with Id : {zoneID1}")
+                log.info(f"Removing trigger with Id : {zoneID1}")
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveTrigger(zoneID=zoneID1))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")
@@ -500,13 +502,13 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
 
             self.step("8c")
             try:
-                logger.info(f"Removing zone with Id : {zoneID1}")
+                log.info(f"Removing zone with Id : {zoneID1}")
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zoneID1))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")
                 pass
         else:
-            logging.info("ZoneID1 not created. Test steps skipped")
+            log.info("ZoneID1 not created. Test steps skipped")
             self.skip_step("8")
             self.skip_step("8a")
             self.skip_step("8b")
@@ -516,12 +518,12 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        logger.info(f"Rx'd Zones: {zones}")
+        log.info(f"Rx'd Zones: {zones}")
         matchingZone = next(
             (z for z in zones if z.zoneSource == enums.ZoneSourceEnum.kMfg), None)
         if matchingZone is not None:
             self.step("9")
-            logger.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
+            log.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
 
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=matchingZone.zoneID))
@@ -534,7 +536,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
                 )
                 pass
         else:
-            logger.info("No Mfg Zone found")
+            log.info("No Mfg Zone found")
             self.skip_step("9")
 
         self.step("10")
@@ -542,7 +544,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        logger.info(f"Rx'd Zones: {zones}")
+        log.info(f"Rx'd Zones: {zones}")
         maxZoneId = 0
         # Get the max zoneId
         for zone in zones:
@@ -565,7 +567,7 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
         # Clean up all zones
         for zone in zones:
             try:
-                logger.info(f"Removing zone with Id : {zone.zoneID}")
+                log.info(f"Removing zone with Id : {zone.zoneID}")
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zone.zoneID))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned when trying to remove zone")

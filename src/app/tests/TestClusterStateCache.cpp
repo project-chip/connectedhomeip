@@ -113,7 +113,7 @@ uint8_t AttributeInstruction::sInstructionId = 0;
 
 using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
-using TestClusterStateCache = chip::Test::AppContext;
+using TestClusterStateCache = chip::Testing::AppContext;
 
 class ForwardedDataCallbackValidator final
 {

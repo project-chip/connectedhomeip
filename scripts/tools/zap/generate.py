@@ -97,7 +97,8 @@ def detectZclFile(zapFile):
     path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
     if zapFile:
-        data = json.load(open(zapFile))
+        with open(zapFile) as f:
+            data = json.load(f)
         for package in data["package"]:
             if package["type"] != "zcl-properties":
                 continue
@@ -357,7 +358,7 @@ def main():
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.
         with tempfile.TemporaryDirectory(prefix='zap') as temp_dir:
-            old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
+            old_temp = os.environ.get("TEMP")
             os.environ['TEMP'] = temp_dir
 
             runGeneration(cmdLineArgs)

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/descriptor/descriptor-cluster.h>
+#include <app/clusters/descriptor/DescriptorCluster.h>
 
 #if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #include <app/static-cluster-config/Descriptor.h>
@@ -23,6 +23,7 @@
 
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/core/CHIPConfig.h>
 
@@ -119,7 +120,7 @@ void MatterDescriptorClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterDescriptorClusterShutdownCallback(EndpointId endpointId)
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -130,7 +131,7 @@ void MatterDescriptorClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kDescriptorFixedClusterCount,
             .maxClusterInstanceCount   = kDescriptorMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterDescriptorPluginServerInitCallback() {}

@@ -28,7 +28,7 @@ class DefaultTimerDelegate : public TimerDelegate
 {
 public:
     using Timeout = System::Clock::Timeout;
-    CHIP_ERROR StartTimer(TimerContext * context, Timeout aTimeout) override;
+    CriticalFailure StartTimer(TimerContext * context, Timeout aTimeout) override;
     void CancelTimer(TimerContext * context) override;
     bool IsTimerActive(TimerContext * context) override;
     System::Clock::Timestamp GetCurrentMonotonicTimestamp() override;

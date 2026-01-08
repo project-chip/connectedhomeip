@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import binascii
+import contextlib
 import re
 
 '''Fixes certain value formats known to exist in YAML tests
@@ -58,10 +59,8 @@ def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     and we would fail at runtime.
     '''
     if type(value) is str:
-        try:
+        with contextlib.suppress(ValueError):
             value = int(value)
-        except ValueError:
-            pass
     return value
 
 
@@ -145,7 +144,7 @@ def add_yaml_support_for_scientific_notation_without_dot(loader):
 def try_update_yaml_node_id_test_runner_state(tests, config):
     default_identity = 'alpha'
     identities = {
-        default_identity: None if 'nodeId' not in config else config['nodeId']}
+        default_identity: config.get('nodeId', None)}
 
     for test in tests:
         if not test.is_enabled:

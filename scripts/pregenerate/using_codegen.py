@@ -105,10 +105,7 @@ class CodegenCppAppPregenerator:
             return False
 
         # we should not be checked for these, but verify just in case
-        if '/tests/' in idl.relative_path:
-            return False
-
-        return True
+        return '/tests/' not in idl.relative_path
 
     def CreateTarget(self, idl: InputIdlFile, runner):
         return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-app", runner=runner)

@@ -729,10 +729,19 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     if (LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.HasValue() ||
-        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue() ||
+        LinuxDeviceOptions::GetInstance().shortIdleModeDurationS.has_value())
     {
-        err = Server::GetInstance().GetICDManager().SetModeDurations(LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs,
-                                                                     LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs);
+        // Convert icdIdleModeDurationMs to seconds for SetModeDurations api
+        std::optional<System::Clock::Seconds32> tmpIdleModeDuration = std::nullopt;
+        if (LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+            tmpIdleModeDuration = std::chrono::duration_cast<System::Clock::Seconds32>(
+                LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value());
+
+        err = Server::GetInstance().GetICDManager().SetModeDurations(
+            LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.std_optional(), tmpIdleModeDuration,
+            LinuxDeviceOptions::GetInstance().shortIdleModeDurationS);
+
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Invalid arguments to set ICD mode durations");
@@ -775,13 +784,24 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
+struct LinuxCommonCaseDeviceServerInitParams final : public chip::CommonCaseDeviceServerInitParams
+{
+    LinuxCommonCaseDeviceServerInitParams()
+    {
+        SuccessOrDie(InitializeStaticResourcesBeforeServerInit());
+        dataModelProvider = app::CodegenDataModelProviderInstance(persistentStorageDelegate);
+    }
+};
+
+chip::CommonCaseDeviceServerInitParams & ChipLinuxDefaultServerInitParams()
+{
+    static LinuxCommonCaseDeviceServerInitParams sInitParams;
+    return sInitParams;
+}
+
+void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplementation * impl)
 {
     gMainLoopImplementation = impl;
-
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
@@ -1018,6 +1038,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     sigaction(SIGTERM, &sa, nullptr);
 #endif
 
+    // This message is used as a marker for when the application process has started.
+    // See: scripts/tests/chiptest/test_definition.py
+    // TODO: A cleaner and more generic mechanism needs to be developed as a follow-up.
+    // Currently other places (OTA, TV) also scrape logs for information and a better way should be
+    // possible.
+    ChipLogProgress(DeviceLayer, "===== APP STATUS: Starting event loop =====");
     if (impl != nullptr)
     {
         impl->RunMainLoop();

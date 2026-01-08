@@ -30,7 +30,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/SceneTable.h>
+#include <app/clusters/scenes-server/SceneTable.h> // nogncheck
 #endif
 
 /**********************************************************

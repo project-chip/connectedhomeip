@@ -43,7 +43,9 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +58,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
@@ -68,13 +70,12 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
                      "DUT's HardPrivacyModeOn attribute becomes FALSE"),
             TestStep(5, "TH sends the SolicitOffer command with the same valid parameters"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_7(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -83,7 +84,6 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F01",          # Video Data Output feature
             "AVSM.S.A0015",        # HardPrivacyModeOn attribute
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

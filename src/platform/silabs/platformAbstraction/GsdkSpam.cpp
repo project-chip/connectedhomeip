@@ -41,7 +41,7 @@ extern "C" {
 #define SL_SIMPLE_LED_INSTANCE(x) (&sl_simple_rgb_pwm_led_rgb_led0)
 #define SL_SIMPLE_LED_COUNT 1
 #define SL_LED_INIT_INTANCES() sl_simple_rgb_pwm_led_init_instances();
-#define SL_LED_GET_STATE(x) (x->led_common.context->state)
+#define SL_LED_GET_STATE(x) sl_led_get_state(&(x->led_common))
 #define SL_LED_TURN_ON(x) sl_led_turn_on(&(x->led_common))
 #define SL_LED_TURN_OFF(x) sl_led_turn_off(&(x->led_common))
 #define SL_LED_TOGGLE(x) sl_led_toggle(&(x->led_common))

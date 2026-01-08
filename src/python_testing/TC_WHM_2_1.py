@@ -45,7 +45,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_WHM_2_1(MatterBaseTest):
@@ -55,7 +59,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.endpoint = 0
 
     def steps_TC_WHM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
@@ -71,7 +75,6 @@ class TC_WHM_2_1(MatterBaseTest):
             TestStep(13, "Send ChangeToMode command with NewMode set to an invalid mode"),
             TestStep(14, "Read CurrentMode attribute"),
         ]
-        return steps
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WaterHeaterMode
@@ -105,7 +108,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        logging.info(f"SupportedModes: {supported_modes}")
+        log.info(f"SupportedModes: {supported_modes}")
 
         asserts.assert_greater_equal(len(supported_modes), 2,
                                      "SupportedModes must have at least two entries!")
@@ -114,7 +117,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {old_current_mode}")
+        log.info(f"CurrentMode: {old_current_mode}")
 
         # pick a value that's not on the list of supported modes
         modes = [m.mode for m in supported_modes]
@@ -123,7 +126,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(4)
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
-        logging.info(f"ret.status {ret.status}")
+        log.info(f"ret.status {ret.status}")
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 
@@ -139,7 +142,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {old_current_mode}")
+        log.info(f"CurrentMode: {old_current_mode}")
 
         self.step(11)
 
@@ -151,7 +154,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {current_mode}")
+        log.info(f"CurrentMode: {current_mode}")
 
         asserts.assert_true(current_mode == ModeManual,
                             "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
@@ -159,7 +162,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(13)
 
         ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
-        logging.info(f"ret {ret}")
+        log.info(f"ret {ret}")
         asserts.assert_true(ret.status == Status.Failure,
                             f"Attempt to change to invalid mode {invalid_mode} didn't fail as expected")
 
@@ -167,7 +170,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {current_mode}")
+        log.info(f"CurrentMode: {current_mode}")
 
         asserts.assert_true(current_mode == ModeManual,
                             "CurrentMode changed after failed ChangeToMode command!")

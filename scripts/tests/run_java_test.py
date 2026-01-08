@@ -54,7 +54,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip*", shell=True)
         if retcode != 0:
-            raise Exception("Failed to remove /tmp/chip* for factory reset.")
+            raise RuntimeError("Failed to remove /tmp/chip* for factory reset.")
 
         # Remove native app KVS if that was used
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
@@ -63,7 +63,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
             print("Trying to remove KVS path %s" % kvs_path_to_remove)
             if retcode != 0:
-                raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
+                raise RuntimeError(f"Failed to remove {kvs_path_to_remove} for factory reset.")
 
     coloredlogs.install(level='INFO')
 
@@ -87,31 +87,28 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             index = app_args.index('--crash_log')
             fileName = app_args[index + 1]
             log.info("Crash Log FileName: '%s'", fileName)
-            f = open(fileName, 'w')
-            for i in range(1, 1000):
-                data = "%d\n" % i
-                f.write(data)
-            f.close()
+            with open(fileName, 'w') as f:
+                for i in range(1, 1000):
+                    data = "%d\n" % i
+                    f.write(data)
 
         if '--network_diagnostics_log' in app_args:
             index = app_args.index('--network_diagnostics_log')
             fileName = app_args[index + 1]
             log.info("Network Diag Log FileName: '%s'", fileName)
-            f = open(fileName, 'w')
-            for i in range(1, 500):
-                data = "%d\n" % i
-                f.write(data)
-            f.close()
+            with open(fileName, 'w') as f:
+                for i in range(1, 500):
+                    data = "%d\n" % i
+                    f.write(data)
 
         if '--end_user_support_log' in app_args:
             index = app_args.index('--end_user_support_log')
             fileName = app_args[index + 1]
             log.info("EndUser Support Log FileName: '%s'", fileName)
-            f = open(fileName, 'w')
-            for i in range(1, 10):
-                data = "%d\n" % i
-                f.write(data)
-            f.close()
+            with open(fileName, 'w') as f:
+                for i in range(1, 10):
+                    data = "%d\n" % i
+                    f.write(data)
 
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)

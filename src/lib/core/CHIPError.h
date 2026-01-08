@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -957,7 +957,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR                   CHIP_CORE_ERROR(0x33)
 
-// AVAILABLE: 0x34
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME
+ *
+ *  @brief
+ *    The DNSSD service name is not a supported/recognized type.
+ *
+ */
+#define CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME               CHIP_CORE_ERROR(0x34)
+
 // AVAILABLE: 0x35
 // AVAILABLE: 0x36
 // AVAILABLE: 0x37

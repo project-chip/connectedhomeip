@@ -111,26 +111,26 @@ class IMTest:
             log.info("Testing pairing onnetwork-long-im-invoke")
             code = self.TestCmdOnnetworkLongImInvoke(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-invoke failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-im-invoke failed with error {code}")
         elif self.command_name == 'onnetwork-long-im-extendable-invoke':
             log.info("Testing pairing onnetwork-long-im-extendable-invoke")
             code = self.TestCmdOnnetworkLongImExtendableInvoke(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-extendable-invoke failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-im-extendable-invoke failed with error {code}")
         elif self.command_name == 'onnetwork-long-im-write':
             log.info("Testing pairing onnetwork-long-im-write")
             code = self.TestCmdOnnetworkLongImWrite(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-write failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-im-write failed with error {code}")
         elif self.command_name == 'onnetwork-long-im-read':
             log.info("Testing pairing onnetwork-long-im-read")
             code = self.TestCmdOnnetworkLongImRead(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-read failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-im-read failed with error {code}")
         elif self.command_name == 'onnetwork-long-im-subscribe':
             log.info("Testing pairing onnetwork-long-im-subscribe")
             code = self.TestCmdOnnetworkLongImSubscribe(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-subscribe failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-im-subscribe failed with error {code}")
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

@@ -15,9 +15,11 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <stdlib.h>
+
+#include <cstdlib>
 
 using namespace chip;
 using namespace chip::scenes;
@@ -98,8 +100,9 @@ using FabricSceneData =
 
 template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>;
 
-CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate & storage)
+CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel)
 {
+    mDataModel = &dataModel;
     return FabricTableImpl::Init(storage);
 }
 
@@ -107,6 +110,7 @@ void DefaultSceneTableImpl::Finish()
 {
     UnregisterAllHandlers();
     FabricTableImpl::Finish();
+    mDataModel = nullptr;
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count)
@@ -132,14 +136,14 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
 CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
 {
     // Scene data is small, buffer can be allocated on stack
-    PersistentStore<Serializer::kEntryMaxBytes()> writeBuffer;
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> writeBuffer;
     return this->SetTableEntry(fabric_index, entry.mStorageId, entry.mStorageData, writeBuffer);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
     // All data is copied to SceneTableEntry, buffer can be allocated on stack
-    PersistentStore<Serializer::kEntryMaxBytes()> store;
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> store;
     ReturnErrorOnFailure(this->GetTableEntry(fabric_index, scene_id, entry.mStorageData, store));
     entry.mStorageId = scene_id;
     return CHIP_NO_ERROR;
@@ -242,23 +246,20 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
-        // TODO : Once zap supports the scenable quality, implement a GetSceneableClusterCountFromEndpointType function to avoid
-        // over-allocation
-        uint8_t clusterCount = GetClusterCountFromEndpoint();
-        chip::Platform::ScopedMemoryBuffer<ClusterId> cBuffer;
-        VerifyOrReturnError(cBuffer.Calloc(clusterCount), CHIP_ERROR_NO_MEMORY);
-        clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
+        ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> clustersBuilder;
+        ReturnErrorOnFailure(ServerClusters(clustersBuilder));
 
-        Span<ClusterId> cSpan(cBuffer.Get(), clusterCount);
-        for (ClusterId cluster : cSpan)
+        // TODO: If we ever get information about sceneable clusters in entry.flags
+        //       we should skip non-sceneable clusters in here.
+        for (const auto & entry : clustersBuilder.TakeBuffer())
         {
             ExtensionFieldSet EFS;
             MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
-            EFS.mID                 = cluster;
+            EFS.mID                 = entry.clusterId;
 
             for (auto & handler : mHandlerList)
             {
-                if (handler.SupportsCluster(mEndpointId, cluster))
+                if (handler.SupportsCluster(mEndpointId, entry.clusterId))
                 {
                     ReturnErrorOnFailure(handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
@@ -306,7 +307,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
-    return FabricTableImpl::RemoveFabric(fabric_index);
+    app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return FabricTableImpl::RemoveFabric(*provider, fabric_index);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
@@ -314,19 +317,10 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
     return FabricTableImpl::RemoveEndpoint();
 }
 
-/// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
-/// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
-uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
+CHIP_ERROR DefaultSceneTableImpl::ServerClusters(ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder)
 {
-    return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
-}
-
-/// @brief wrapper function around emberAfGetClusterCountForEndpoint to allow testing enforcing a specific count, shimmed in test
-/// configuration because emberAfGetClusterCountForEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated
-/// files
-uint8_t DefaultSceneTableImpl::GetClusterCountFromEndpoint()
-{
-    return emberAfGetClusterCountForEndpoint(mEndpointId);
+    VerifyOrReturnError(mDataModel != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mDataModel->ServerClusters(mEndpointId, builder);
 }
 
 void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)

@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import typing
 from datetime import timedelta
 
@@ -44,7 +45,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
@@ -96,10 +99,8 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         self.print_step(3, "Send SetUTCCommand")
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
-        try:
+        with contextlib.suppress(InteractionModelError):
             await self.send_set_utc_cmd(utc_time_in_matter_epoch())
-        except InteractionModelError:
-            pass
 
         self.print_step(4, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)

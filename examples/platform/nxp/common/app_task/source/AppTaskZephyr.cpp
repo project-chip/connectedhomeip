@@ -43,7 +43,7 @@
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #else
-#include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
+#include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #endif
 
 #include "AppFactoryData.h"

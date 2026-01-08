@@ -29,8 +29,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <functional>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
@@ -83,7 +83,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity, bool isZoneBasedTrigger = false);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -168,5 +168,7 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    uint32_t mCurrentlyUsedBandwidthbps = 0;
+    uint32_t mCurrentlyUsedBandwidthbps    = 0;
+    bool mActivationTimeSetByManualTrigger = false;
+    bool mIsZoneBasedTrigger               = false;
 };

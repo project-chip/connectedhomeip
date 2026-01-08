@@ -44,6 +44,7 @@ def find_program(names):
         found = shutil.which(name)
         if found is not None:
             return found
+    return None
 
 
 @click.command()

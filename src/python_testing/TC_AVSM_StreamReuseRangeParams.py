@@ -41,9 +41,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
@@ -104,26 +106,26 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         # Commission DUT - already done
 
         self.step(1)
-        logger.info("Verified Snapshot feature is supported")
+        log.info("Verified Snapshot feature is supported")
 
         self.step(2)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
         self.step(3)
         aSnapshotCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
         )
-        logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
+        log.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
 
         self.step(4)
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
-        logger.info("Fetch feature map to check if WMark and OSD are supported")
+        log.info("Fetch feature map to check if WMark and OSD are supported")
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         try:
             watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
             osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
@@ -142,7 +144,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
                 OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            log.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
@@ -155,7 +157,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
 
         self.step(6)
@@ -175,7 +177,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
                 OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            log.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
@@ -189,7 +191,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         asserts.assert_equal(aAllocatedSnapshotStreams[0].minResolution,
                              newMinResolution, "MinResolution does not match expected value")

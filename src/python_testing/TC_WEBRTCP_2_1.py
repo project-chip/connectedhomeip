@@ -43,7 +43,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +58,7 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no Video or Audio StreamID => expect INVALID_COMMAND"),
@@ -66,13 +68,12 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer with StreamUsage = LiveView => expect DeferredOffer=TRUE"),
             TestStep(7, "Read CurrentSessions attribute => expect 1 with valid session data"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_1(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
@@ -81,7 +82,6 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

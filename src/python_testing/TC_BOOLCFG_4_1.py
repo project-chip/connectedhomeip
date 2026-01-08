@@ -36,7 +36,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_BOOLCFG_4_1(MatterBaseTest):
@@ -48,7 +52,7 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         return "[TC-BOOLCFG-4.1] AlarmsSupported attribute with DUT as Server"
 
     def steps_TC_BOOLCFG_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
             TestStep(3, "Read AlarmsSupported attribute"),
@@ -57,13 +61,11 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
             TestStep("5a", "Verify AlarmsSupported attribute bit 1"),
             TestStep("5b", "Verify AlarmsSupported attribute bit 1"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_4_1(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -87,35 +89,35 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         if is_vis_feature_supported or is_aud_feature_supported:
             supportedAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSupported)
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("4a")
         if is_vis_feature_supported:
             asserts.assert_not_equal((supportedAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), 0,
                                      "Bit 0 in AlarmsSupported does not match feature map value")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("4b")
         if not is_vis_feature_supported:
             asserts.assert_equal((supportedAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), 0,
                                  "Bit 0 in AlarmsSupported does not match feature map value")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("5a")
         if is_aud_feature_supported:
             asserts.assert_not_equal((supportedAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), 0,
                                      "Bit 1 in AlarmsSupported does not match feature map value")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("5b")
         if not is_aud_feature_supported:
             asserts.assert_equal((supportedAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), 0,
                                  "Bit 1 in AlarmsSupported does not match feature map value")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
 
 if __name__ == "__main__":

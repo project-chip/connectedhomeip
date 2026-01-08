@@ -23,13 +23,17 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.webrtc import BrowserPeerConnection, WebRTCManager
+
+log = logging.getLogger(__name__)
 
 
 class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep("precondition-3", "Confirm DUT(Camera) supports Speaker feature AVSM.S.F04(SPKR)"),
@@ -85,7 +89,6 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-        return steps
 
     def desc_TC_WEBRTC_1_6(self) -> str:
         return " [TC-WEBRTC-1.6] Validate Two-Way-Talk Full-Duplex support in camera(DUT) - PROVISIONAL"
@@ -206,7 +209,7 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
 
         self.step(8)
         if not await webrtc_peer.check_for_session_establishment():
-            logging.error("Failed to establish webrtc session")
+            log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only:
