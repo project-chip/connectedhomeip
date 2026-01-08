@@ -58,7 +58,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         return ["DGGEN.S"]
 
     def steps_TC_DGGEN_2_5(self):
-        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT."),
+        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT.", is_commissioning=True),
                 TestStep(2, "TH1 reads DUT’s ClusterRevision global attribute in General Diagnostics cluster.",
                          "If the ClusterRevision is < 3, then skip the rest of the test steps."),
                 TestStep(3, "Ensure DUT is commissioned in TH2’s fabric.", "TH2 is able to communicate with DUT."),
