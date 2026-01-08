@@ -242,6 +242,22 @@ public:
     Platform::UniquePtr<TestSceneTable> mSceneTable;
 };
 
+class CustomDataModel : public EmptyProvider
+{
+public:
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder) override
+    {
+        static constexpr DataModel::EndpointEntry kEndpoints[] = { {
+            .id                 = kTestEndpointId,
+            .parentId           = kInvalidEndpointId,
+            .compositionPattern = EndpointCompositionPattern::kTree,
+        }
+
+        };
+        return builder.ReferenceExisting(Span(kEndpoints));
+    }
+};
+
 struct TestScenesManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -269,14 +285,23 @@ struct TestScenesManagementCluster : public ::testing::Test
 
         sceneTableProvider.Init(&testContext.StorageDelegate(), &testContext.Get().provider);
         sceneTableProvider.mSceneTable->RegisterHandler(&mMockSceneHandler);
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        ServerClusterContext context = testContext.Get();
+        clusterContext               = std::make_unique<ServerClusterContext>(ServerClusterContext{
+                          .provider           = customDataModel,
+                          .storage            = context.storage,
+                          .attributeStorage   = context.attributeStorage,
+                          .interactionContext = context.interactionContext,
+        });
+
+        ASSERT_EQ(cluster.Startup(*clusterContext), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
         sceneTableProvider.mSceneTable->UnregisterHandler(&mMockSceneHandler);
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-
+        clusterContext.release();
         fabricTable.Shutdown();
     }
 
@@ -337,6 +362,7 @@ struct TestScenesManagementCluster : public ::testing::Test
         EXPECT_EQ(response.response->status, to_underlying(expectedStatus));
     }
 
+    CustomDataModel customDataModel;
     TestServerClusterContext testContext;
     MockGroupDataProvider mockGroupDataProvider;
     PersistentStorageOpCertStore mOpCertStore;
@@ -344,6 +370,10 @@ struct TestScenesManagementCluster : public ::testing::Test
     TestScenesManagementTableProvider sceneTableProvider;
     ScenesManagementCluster cluster;
     MockSceneHandler mMockSceneHandler;
+
+    // Test context uses an empty data model provider, however we scenes relies on
+    // endpoint iteration. Create a DMP that returns some endpoints.
+    std::unique_ptr<ServerClusterContext> clusterContext;
 };
 
 TEST_F(TestScenesManagementCluster, AttributesTest)
@@ -1256,7 +1286,7 @@ TEST_F(TestScenesManagementCluster, FabricScopingAddScene)
     EXPECT_EQ(found_fabrics, 2);
 }
 
-TEST_F(TestScenesManagementCluster, DISABLED_FabricRemovalRemovesScenes)
+TEST_F(TestScenesManagementCluster, FabricRemovalRemovesScenes)
 {
     ClusterTester tester(cluster);
     tester.SetFabricIndex(kFabricIndex);

@@ -277,6 +277,7 @@ void ScenesManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, F
     VerifyOrReturn(sceneTable);
     // The implementation of SceneTable::RemoveFabric() must not call back into the FabricTable
     TEMPORARY_RETURN_IGNORED sceneTable->RemoveFabric(fabricIndex);
+    mFabricSceneInfo.ClearSceneInfoStruct(fabricIndex);
 }
 
 CHIP_ERROR ScenesManagementCluster::StoreSceneParse(const FabricIndex & fabricIdx, const GroupId & groupID, const SceneId & sceneID)
