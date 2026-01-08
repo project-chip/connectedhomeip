@@ -29,7 +29,10 @@
 #include <app/server/EchoHandler.h>
 #include <platform/DefaultTimerDelegate.h>
 #if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
-#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
+// Forward declaration to avoid dependency on cluster-specific headers
+namespace chip::app::Clusters::GeneralDiagnostics {
+void SetTestEventTriggerDelegate(chip::TestEventTriggerDelegate * delegate);
+}
 #endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
 #if CONFIG_NETWORK_LAYER_BLE
