@@ -19,6 +19,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
@@ -48,8 +49,8 @@ LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate) :
-        mTestEventTriggerDelegate(testEventTriggerDelegate)
+    explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate, System::Clock::Microseconds64 initTimestamp) :
+        mTestEventTriggerDelegate(testEventTriggerDelegate), mInitTimestamp(initTimestamp)
     {}
 
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
@@ -59,16 +60,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -77,10 +77,10 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate, functionsConfig);
+                       mTestEventTriggerDelegate, mInitTimestamp, functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate);
+                       mTestEventTriggerDelegate, mInitTimestamp);
 #endif
         return gServer.Registration();
     }
@@ -94,6 +94,7 @@ public:
 
 private:
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
+    System::Clock::Microseconds64 mInitTimestamp;
 };
 
 } // namespace
@@ -119,7 +120,8 @@ TestEventTriggerDelegate * GetTestEventTriggerDelegate()
 void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     TestEventTriggerDelegate * testEventTriggerDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
-    IntegrationDelegate integrationDelegate(testEventTriggerDelegate);
+    System::Clock::Microseconds64 initTimestamp         = Server::GetInstance().GetInitTimestamp();
+    IntegrationDelegate integrationDelegate(testEventTriggerDelegate, initTimestamp);
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
@@ -137,7 +139,8 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     TestEventTriggerDelegate * testEventTriggerDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
-    IntegrationDelegate integrationDelegate(testEventTriggerDelegate);
+    System::Clock::Microseconds64 initTimestamp         = Server::GetInstance().GetInitTimestamp();
+    IntegrationDelegate integrationDelegate(testEventTriggerDelegate, initTimestamp);
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(

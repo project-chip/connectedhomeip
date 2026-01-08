@@ -129,7 +129,8 @@ DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTr
     return (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(chip::app::Clusters::GeneralDiagnosticsCluster * cluster,
+                                                                CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                                 const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
@@ -137,7 +138,7 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler &
     Commands::TimeSnapshotResponse::Type response;
 
     System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceInit());
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     handler.AddResponse(commandPath, response);
@@ -150,8 +151,8 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler &
  (that can be determined statically) where we don't want to record posix time and pay the codesize cost for it.
  */
 std::optional<DataModel::ActionReturnStatus>
-HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const Commands::TimeSnapshot::DecodableType & commandData)
+HandleTimeSnapshotWithPosixTime(chip::app::Clusters::GeneralDiagnosticsCluster * cluster, CommandHandler & handler,
+                                const ConcreteCommandPath & commandPath, const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -167,7 +168,7 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
     }
 
     System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceInit());
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     if (posix_time_ms.count() != 0)
@@ -259,8 +260,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeValue(value, err, encoder);
     }
     case GeneralDiagnostics::Attributes::UpTime::Id: {
-        System::Clock::Seconds64 system_time_seconds =
-            std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
+        System::Clock::Seconds64 system_time_seconds = std::chrono::duration_cast<System::Clock::Seconds64>(TimeSinceInit());
         return encoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case GeneralDiagnostics::Attributes::TotalOperationalHours::Id: {
@@ -323,7 +323,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTimeSnapshot(*handler, request.path, request_data);
+        return HandleTimeSnapshot(this, *handler, request.path, request_data);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
@@ -479,9 +479,9 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         if (mFunctionConfig.enablePosixTime)
         {
-            return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
+            return HandleTimeSnapshotWithPosixTime(this, *handler, request.path, request_data);
         }
-        return HandleTimeSnapshot(*handler, request.path, request_data);
+        return HandleTimeSnapshot(this, *handler, request.path, request_data);
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
         if (mFunctionConfig.enablePayloadSnapshot)
