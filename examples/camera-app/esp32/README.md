@@ -49,14 +49,14 @@ The split mode consists of two separate firmware images:
 ```
 ┌─────────────────┐      SDIO Bridge     ┌─────────────────┐
 │    ESP32-C6     │◄────────────────────►│    ESP32-P4     │
-│  (esp32_camera) │      Communication   │ (media_adapter) │
+│ (matter_camera) │      Communication   │ (media_adapter) │
 │                 │                      │                 │
 │ ┌─────────────┐ │                      │ ┌─────────────┐ │
-│ │ Matter      │ │                      │ │ H.264       │ │
-│ │             │ │                      │ │ Encoder     │ │
+│ │             │ │                      │ │ H.264       │ │
+│ │   Matter    │ │                      │ │ Encoder     │ │
 │ │             │ │                      │ │             │ │
-│ │ AWS KVS     │ │                      │ │ Camera      │ │
-│ │ Signaling   │ │                      │ │ Interface   │ │
+│ │  Signaling  │ │                      │ │ Camera      │ │
+│ │             │ │                      │ │ Interface   │ │
 │ └─────────────┘ │                      │ └─────────────┘ │
 └─────────────────┘                      └─────────────────┘
         ▲                                        ▲
