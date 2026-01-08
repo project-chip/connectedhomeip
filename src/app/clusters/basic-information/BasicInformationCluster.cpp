@@ -189,7 +189,7 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
 
     if (status == CHIP_NO_ERROR && !vendorSuffixSpan.empty())
     {
-        memcpy(manufacturingDateString + kMaxDateLength, vendorSuffixSpan.data(), vendorSuffixSpan.size());
+        memcpy(manufacturingDateString + totalManufacturingDateLen, vendorSuffixSpan.data(), vendorSuffixSpan.size());
         totalManufacturingDateLen += vendorSuffixSpan.size();
     }
     VerifyOrReturnError(totalManufacturingDateLen <= kMaxLen, CHIP_ERROR_INCORRECT_STATE);
