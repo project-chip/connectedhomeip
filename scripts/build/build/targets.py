@@ -753,6 +753,7 @@ def BuildIMXTarget():
 
     target.AppendModifier('release', release=True)
     target.AppendModifier('trusty', trusty=True)
+    target.AppendModifier('ele', ele=True)
 
     return target
 
@@ -812,6 +813,7 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
+    target.AppendModifier('nfc-payload', chip_enable_nfc_onboarding_payload=True)
 
     return target
 

@@ -52,8 +52,10 @@ from TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -301,7 +303,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             await self.send_test_event_trigger_power_adjustment_clear()
 
         self.step("22")
-        await sub_handler.cancel()
+        sub_handler.cancel()
 
 
 if __name__ == "__main__":

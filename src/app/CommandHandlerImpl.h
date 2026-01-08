@@ -256,6 +256,11 @@ public:
                                                         NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
+    /**
+     * Check whether the InvokeRequest we are handling is targeted to a group.
+     */
+    bool IsGroupRequest() { return mGroupRequest; }
+
 protected:
     // Lifetime management for CommandHandler::Handle
 
@@ -430,11 +435,6 @@ private:
                                   const DataModel::EncodableToTLV & aEncodable);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
-
-    /**
-     * Check whether the InvokeRequest we are handling is targeted to a group.
-     */
-    bool IsGroupRequest() { return mGroupRequest; }
 
     bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
 
