@@ -129,7 +129,17 @@ TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(Testing::IsAttributesListEqualTo(server, { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry }));
+    auto globals = chip::app::DefaultServerCluster::GlobalAttributes();
+    std::vector<chip::app::DataModel::AttributeEntry> expected;
+    expected.reserve(1 + globals.size());
+    expected.push_back(WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry);
+    for (const auto & entry : globals)
+    {
+        expected.push_back(entry);
+    }
+
+    ASSERT_TRUE(Testing::IsAttributesListEqualTo(
+        server, chip::Span<chip::app::DataModel::AttributeEntry>(expected.data(), expected.size())));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
@@ -137,14 +147,15 @@ TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(server,
-                                                       {
-                                                           WebRTCTransportProvider::Commands::SolicitOffer::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::ProvideOffer::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::ProvideAnswer::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::ProvideICECandidates::kMetadataEntry,
-                                                           WebRTCTransportProvider::Commands::EndSession::kMetadataEntry,
-                                                       }));
+    std::vector<chip::app::DataModel::AcceptedCommandEntry> expected = {
+        WebRTCTransportProvider::Commands::SolicitOffer::kMetadataEntry,
+        WebRTCTransportProvider::Commands::ProvideOffer::kMetadataEntry,
+        WebRTCTransportProvider::Commands::ProvideAnswer::kMetadataEntry,
+        WebRTCTransportProvider::Commands::ProvideICECandidates::kMetadataEntry,
+        WebRTCTransportProvider::Commands::EndSession::kMetadataEntry,
+    };
+    ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(
+        server, chip::Span<chip::app::DataModel::AcceptedCommandEntry>(expected.data(), expected.size())));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCurrentSessionsAttribute)
