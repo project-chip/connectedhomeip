@@ -142,6 +142,7 @@ source_set("app-options") {
   public_deps = [
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support:arg_parser",
   ]
 
   if (matter_enable_tracing_support) {

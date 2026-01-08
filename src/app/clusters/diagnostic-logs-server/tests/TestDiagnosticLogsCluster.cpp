@@ -18,11 +18,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
-#include <app/server-cluster/testing/MockCommandHandler.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/support/Span.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
@@ -33,9 +31,7 @@ namespace app {
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DiagnosticLogs;
-using chip::Protocols::InteractionModel::Status;
-
-static constexpr EndpointId kRootEndpoint = 0;
+using chip::Testing::ClusterTester;
 
 class MockDelegate : public DiagnosticLogs::DiagnosticLogsProviderDelegate
 {
@@ -85,14 +81,6 @@ private:
     uint16_t bufferSize        = 0;
 };
 
-static Commands::RetrieveLogsResponse::DecodableType DecodeRetrieveLogsResponse(const Testing::MockCommandHandler & handler)
-{
-    Commands::RetrieveLogsResponse::DecodableType decoded;
-    CHIP_ERROR err = handler.DecodeResponse(decoded);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    return decoded;
-}
-
 struct TestDiagnosticLogsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -108,17 +96,16 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_WithDelegate_Success)
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
     diagnosticLogsCluster.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    Testing::MockCommandHandler handler;
-    diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+    ClusterTester tester(diagnosticLogsCluster);
+    Commands::RetrieveLogsRequest::Type request;
+    request.intent            = DiagnosticLogs::IntentEnum::kEndUserSupport;
+    request.requestedProtocol = DiagnosticLogs::TransferProtocolEnum::kResponsePayload;
 
-    // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
-    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler);
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kSuccess);
-    size_t logContentSize = decoded.logContent.size();
-    EXPECT_EQ(logContentSize, sizeof(buffer));
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kSuccess); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.response->logContent.size(), sizeof(buffer));            // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // If request is BDX but logs can fit in the response payload, the response should be kExhausted
@@ -131,18 +118,17 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted)
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
     diagnosticLogsCluster.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    Testing::MockCommandHandler handler;
-    diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
+    ClusterTester tester(diagnosticLogsCluster);
+    Commands::RetrieveLogsRequest::Type request;
+    request.intent                 = DiagnosticLogs::IntentEnum::kEndUserSupport;
+    request.requestedProtocol      = DiagnosticLogs::TransferProtocolEnum::kBdx;
+    request.transferFileDesignator = MakeOptional(CharSpan::fromCharString("enduser.log"));
 
-    // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
-    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler);
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
-    size_t logContentSize = decoded.logContent.size();
-    EXPECT_EQ(logContentSize, sizeof(buffer));
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kExhausted); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.response->logContent.size(), sizeof(buffer));              // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greater_than_kMaxLogContentSize)
@@ -154,35 +140,33 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greate
     delegate.SetDiagnosticBuffer(buffer, sizeof(buffer));
     diagnosticLogsCluster.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    Testing::MockCommandHandler handler;
-    diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
+    ClusterTester tester(diagnosticLogsCluster);
+    Commands::RetrieveLogsRequest::Type request;
+    request.intent                 = DiagnosticLogs::IntentEnum::kEndUserSupport;
+    request.requestedProtocol      = DiagnosticLogs::TransferProtocolEnum::kBdx;
+    request.transferFileDesignator = MakeOptional(CharSpan::fromCharString("enduser.log"));
 
-    // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
-    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler);
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
-    size_t logContentSize = decoded.logContent.size();
-
-    // The buffer is greater than kMaxLogContentSize, so the log content is cropped to kMaxLogContentSize
-    EXPECT_EQ(logContentSize, (size_t) 1024);
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kExhausted); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.response->logContent.size(),                               // NOLINT(bugprone-unchecked-optional-access)
+              static_cast<size_t>(chip::bdx::DiagnosticLogs::kMaxLogContentSize));
 }
 
 TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
 {
     DiagnosticLogsCluster diagnosticLogsCluster;
 
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    Testing::MockCommandHandler handler;
-    diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+    ClusterTester tester(diagnosticLogsCluster);
+    Commands::RetrieveLogsRequest::Type request;
+    request.intent            = DiagnosticLogs::IntentEnum::kEndUserSupport;
+    request.requestedProtocol = DiagnosticLogs::TransferProtocolEnum::kResponsePayload;
 
-    // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
-    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler);
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kNoLogs); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
@@ -194,31 +178,31 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
     delegate.SetDiagnosticBuffer(buffer, 0);
     diagnosticLogsCluster.SetDelegate(&delegate);
 
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    Testing::MockCommandHandler handler;
-    diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+    ClusterTester tester(diagnosticLogsCluster);
+    Commands::RetrieveLogsRequest::Type request;
+    request.intent            = DiagnosticLogs::IntentEnum::kEndUserSupport;
+    request.requestedProtocol = DiagnosticLogs::TransferProtocolEnum::kResponsePayload;
 
-    // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
-    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler);
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kNoLogs); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
 {
     DiagnosticLogsCluster diagnosticLogsCluster;
 
-    const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
-    Testing::MockCommandHandler handler;
-    diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
-                                                 MakeOptional(CharSpan::fromCharString("enduser.log")));
+    ClusterTester tester(diagnosticLogsCluster);
+    Commands::RetrieveLogsRequest::Type request;
+    request.intent                 = DiagnosticLogs::IntentEnum::kEndUserSupport;
+    request.requestedProtocol      = DiagnosticLogs::TransferProtocolEnum::kBdx;
+    request.transferFileDesignator = MakeOptional(CharSpan::fromCharString("enduser.log"));
 
-    // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
-    EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
-    auto decoded = DecodeRetrieveLogsResponse(handler);
-    EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kNoLogs); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 } // namespace app

@@ -16,7 +16,7 @@
 
 rsource "../../common/cmake/Kconfig"
 rsource "../cmake/Kconfig.matter.nxp"
-rsource "../cmake/Kconfig.openthread.common"
+rsource "Kconfig.openthread.common"
 rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig"
 
 # See config/common/cmake/Kconfig for full definition
@@ -111,30 +111,6 @@ choice CHIP_NVM_COMPONENT
 		bool "NVM Framework"
 		help
 			Use the NVM Framework component to store CHIP data.
-endchoice
-
-choice CHIP_CRYPTO
-	prompt "CHIP Crypto selection"
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
-	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
-
-	config CHIP_CRYPTO_MBEDTLS
-		bool "CHIP MbedTLS crypto"
-		help
-			Enables the implementation of the Matter cryptographic operations that is
-			based on the mbedTLS crypto API.
-
-	config CHIP_CRYPTO_PLATFORM
-		bool "CHIP platform crypto"
-		help
-			Enables the implementation of the Matter cryptographic operations that is
-			based on the platform crypto API.
-
-	config CHIP_CRYPTO_PSA
-		bool "CHIP PSA crypto"
-		help
-			Enables the implementation of the Matter cryptographic operations that is
-			based on the PSA crypto API.
 endchoice
 
 config CHIP_USE_GENERATED_CONFIG
@@ -366,5 +342,45 @@ config DEBUG
 	bool "Build Matter stack with debugging enabled"
 	help
 		Build Matter stack with debugging enabled.
+
+config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	bool "Use Multiple BLE connections after commissioning"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of Multiple BLE connections after commissioning.
+
+config CHIP_NXP_BLE_PAIRING
+	bool "Enable BLE Pairing"
+	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	help
+	  Enable BLE Pairing for Multiple BLE connections after commissioning.
+
+config CHIP_NXP_BLE_BONDING
+	bool "Enable BLE Bonding"
+	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	help
+	  Enable BLE Bonding for Multiple BLE connections after commissioning.
+
+config NXP_USE_SMU2_STATIC
+	bool "Use SMU2"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of SMU2.
+
+config NXP_USE_SMU2_DYNAMIC
+	bool "Use extra SMU2 after commissioning"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of extra SMU2 after commissioning.
+
+config NXP_USE_LOW_POWER
+	bool "Enable low power support"
+	help
+	  Enables low power support
+
+config NXP_USE_PLAIN_DAC_KEY
+	bool "Store DAC private key in plaintext"
+	help
+	  Store DAC private key in plaintext.
 
 endif # CHIP
