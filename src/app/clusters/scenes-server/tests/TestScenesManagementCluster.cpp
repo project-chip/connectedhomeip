@@ -49,6 +49,7 @@ using namespace chip::app::DataModel;
 constexpr EndpointId kTestEndpointId = 123;
 constexpr FabricIndex kFabricIndex   = 1;
 constexpr FabricIndex kFabricIndex2  = 2;
+constexpr FabricIndex kFabricIndex3  = 3;
 constexpr GroupId kTestGroupId       = 123;
 constexpr SceneId kTestSceneId       = 111;
 constexpr GroupId kTestOtherGroupId  = 124;
@@ -1253,6 +1254,386 @@ TEST_F(TestScenesManagementCluster, FabricScopingAddScene)
     }
     EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
     EXPECT_EQ(found_fabrics, 2);
+}
+
+TEST_F(TestScenesManagementCluster, DISABLED_FabricRemovalRemovesScenes)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // 1. Add a scene for Fabric 1
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "Fabric1Scene");
+
+    // 2. Add a scene for Fabric 2
+    tester.SetFabricIndex(kFabricIndex2);
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "Fabric2Scene");
+
+    // Verify scenes exist
+    VerifySceneInfoCount(tester, kFabricIndex, 1);
+    VerifySceneInfoCount(tester, kFabricIndex2, 1);
+
+    // 3. Simulate Fabric 1 removal
+    cluster.OnFabricRemoved(fabricTable, kFabricIndex);
+
+    // 4. Verify Fabric 1 scenes are gone
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId1(kTestSceneId, kTestGroupId);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry1(sceneStorageId1);
+    EXPECT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneStorageId1, sceneEntry1), CHIP_ERROR_NOT_FOUND);
+
+    // 5. Verify Fabric 2 scenes are still there
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId2(kTestSceneId, kTestGroupId);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry2(sceneStorageId2);
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex2, sceneStorageId2, sceneEntry2), CHIP_NO_ERROR);
+
+    // 6. Verify FabricSceneInfo list is updated
+    Attributes::FabricSceneInfo::TypeInfo::DecodableType sceneInfoList;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
+
+    auto it           = sceneInfoList.begin();
+    bool foundFabric1 = false;
+    bool foundFabric2 = false;
+    while (it.Next())
+    {
+        if (it.GetValue().fabricIndex == kFabricIndex)
+        {
+            foundFabric1 = true;
+        }
+        else if (it.GetValue().fabricIndex == kFabricIndex2)
+        {
+            foundFabric2 = true;
+            EXPECT_EQ(it.GetValue().sceneCount, 1u);
+        }
+    }
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    EXPECT_FALSE(foundFabric1); // Fabric 1 should not be in the list anymore
+    EXPECT_TRUE(foundFabric2);
+}
+
+TEST_F(TestScenesManagementCluster, GroupRemovalRemovesScenes)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // 1. Add scenes for kTestGroupId and kTestOtherGroupId
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId);
+    AddSceneToTable(tester, kTestOtherGroupId, kTestSceneId);
+
+    // Verify scenes exist
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneId1(kTestSceneId, kTestGroupId);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry entry1(sceneId1);
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneId1, entry1), CHIP_NO_ERROR);
+
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneId2(kTestSceneId, kTestOtherGroupId);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry entry2(sceneId2);
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneId2, entry2), CHIP_NO_ERROR);
+
+    // 2. Call GroupWillBeRemoved for kTestGroupId
+    ASSERT_EQ(cluster.GroupWillBeRemoved(kFabricIndex, kTestGroupId), CHIP_NO_ERROR);
+
+    // 3. Verify scenes for kTestGroupId are gone
+    EXPECT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneId1, entry1), CHIP_ERROR_NOT_FOUND);
+
+    // 4. Verify scenes for kTestOtherGroupId are still there
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneId2, entry2), CHIP_NO_ERROR);
+}
+
+TEST_F(TestScenesManagementCluster, ShutdownPermanentRemoveWipesData)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // 1. Add a scene
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId);
+
+    // Verify it exists in storage
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId(kTestSceneId, kTestGroupId);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry(sceneStorageId);
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneStorageId, sceneEntry), CHIP_NO_ERROR);
+
+    // 2. Shutdown with kPermanentRemove
+    cluster.Shutdown(ClusterShutdownType::kPermanentRemove);
+
+    // 3. Verify data is gone from storage
+    // Re-init provider and table
+    sceneTableProvider.Init(&testContext.StorageDelegate(), &testContext.Get().provider);
+
+    // Check entry
+    EXPECT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneStorageId, sceneEntry), CHIP_ERROR_NOT_FOUND);
+
+    // Restore cluster for TearDown to be happy
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+}
+
+TEST_F(TestScenesManagementCluster, PersistenceAfterPowerCycle)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // 1. Add a scene
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "PersistentScene");
+
+    // 2. Simulate Power Cycle: Shutdown cluster and provider, but KEEP storage.
+    sceneTableProvider.mSceneTable->UnregisterHandler(&mMockSceneHandler);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // 3. Re-initialize
+    sceneTableProvider.Init(&testContext.StorageDelegate(), &testContext.Get().provider);
+    sceneTableProvider.mSceneTable->RegisterHandler(&mMockSceneHandler);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // 4. Verify scene still exists
+    SceneTable<ExtensionFieldSetsImpl>::SceneStorageId sceneStorageId(kTestSceneId, kTestGroupId);
+    SceneTable<ExtensionFieldSetsImpl>::SceneTableEntry sceneEntry(sceneStorageId);
+    ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(kFabricIndex, sceneStorageId, sceneEntry), CHIP_NO_ERROR);
+    EXPECT_EQ(sceneEntry.mStorageData.mNameLength, 15u); // "PersistentScene" length
+
+    CharSpan nameSpan(sceneEntry.mStorageData.mName, sceneEntry.mStorageData.mNameLength);
+    EXPECT_TRUE(nameSpan.data_equal("PersistentScene"_span));
+}
+
+TEST_F(TestScenesManagementCluster, DISABLED_RecallSceneInvalidatesOtherFabrics)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // 1. Add scenes for Fabric 1 and Fabric 2
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "Fabric1Scene");
+
+    tester.SetFabricIndex(kFabricIndex2);
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "Fabric2Scene");
+
+    // 2. Recall Scene on Fabric 1
+    tester.SetFabricIndex(kFabricIndex);
+    RecallScene::Type recall_request;
+    recall_request.groupID = kTestGroupId;
+    recall_request.sceneID = kTestSceneId;
+    auto recall_response   = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, recall_request);
+    ASSERT_TRUE(recall_response.IsSuccess());
+
+    // 3. Verify SceneValid is TRUE for Fabric 1 and FALSE for Fabric 2
+    Attributes::FabricSceneInfo::TypeInfo::DecodableType sceneInfoList;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
+
+    auto it = sceneInfoList.begin();
+    while (it.Next())
+    {
+        auto val = it.GetValue();
+        if (val.fabricIndex == kFabricIndex)
+        {
+            EXPECT_EQ(val.currentScene, kTestSceneId);
+            EXPECT_EQ(val.currentGroup, kTestGroupId);
+            EXPECT_TRUE(val.sceneValid);
+        }
+        else if (val.fabricIndex == kFabricIndex2)
+        {
+            // For Fabric 2, if sceneValid is initialized, it should be false (or effectively treated as invalid)
+            EXPECT_FALSE(val.sceneValid);
+        }
+    }
+
+    // 4. Recall Scene on Fabric 2
+    tester.SetFabricIndex(kFabricIndex2);
+    auto recall_response2 = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, recall_request);
+    ASSERT_TRUE(recall_response2.IsSuccess());
+
+    // 5. Verify SceneValid is TRUE for Fabric 2 and FALSE for Fabric 1
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
+    auto it2 = sceneInfoList.begin();
+    while (it2.Next())
+    {
+        auto val = it2.GetValue();
+        if (val.fabricIndex == kFabricIndex)
+        {
+            // Fabric 1 should now be invalid
+            EXPECT_FALSE(val.sceneValid);
+        }
+        else if (val.fabricIndex == kFabricIndex2)
+        {
+            EXPECT_TRUE(val.sceneValid);
+        }
+    }
+}
+
+TEST_F(TestScenesManagementCluster, TransitionTimeLimit)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // Try adding a scene with TransitionTime > 60,000,000 ms
+    // 60,000,001
+    AddScene::Type request_data;
+    request_data.groupID                  = kTestGroupId;
+    request_data.sceneID                  = kTestSceneId;
+    request_data.transitionTime           = 60000001;
+    request_data.sceneName                = "TooLong"_span;
+    request_data.extensionFieldSetStructs = List<ExtensionFieldSetStruct::Type>();
+
+    auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request_data);
+
+    // Expect ConstraintError
+    ExpectCommandStatus(response, Status::ConstraintError);
+}
+
+TEST_F(TestScenesManagementCluster, SceneNameLength)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // Try adding a scene with Name length > 16
+    // "12345678901234567" (17 chars)
+    AddScene::Type request_data;
+    request_data.groupID                  = kTestGroupId;
+    request_data.sceneID                  = kTestSceneId;
+    request_data.transitionTime           = 100;
+    request_data.sceneName                = "12345678901234567"_span;
+    request_data.extensionFieldSetStructs = List<ExtensionFieldSetStruct::Type>();
+
+    auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request_data);
+
+    // Expect ConstraintError
+    ExpectCommandStatus(response, Status::ConstraintError);
+}
+
+TEST_F(TestScenesManagementCluster, DuplicateFieldSets)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+
+    // Create EFS with duplicate cluster IDs
+    AttributeValuePairStruct::Type attributeValue1;
+    attributeValue1.attributeID = 0;
+    attributeValue1.valueUnsigned8.SetValue(true); // First value
+
+    AttributeValuePairStruct::Type attributeValue2;
+    attributeValue2.attributeID = 0;
+    attributeValue2.valueUnsigned8.SetValue(false); // Second value (should overwrite)
+
+    AttributeValuePairStruct::Type avList1[] = { attributeValue1 };
+    AttributeValuePairStruct::Type avList2[] = { attributeValue2 };
+
+    ExtensionFieldSetStruct::Type efs1;
+    efs1.clusterID          = kMockClusterId;
+    efs1.attributeValueList = DataModel::List<AttributeValuePairStruct::Type>(avList1);
+
+    ExtensionFieldSetStruct::Type efs2;
+    efs2.clusterID          = kMockClusterId;
+    efs2.attributeValueList = DataModel::List<AttributeValuePairStruct::Type>(avList2);
+
+    ExtensionFieldSetStruct::Type efsList[] = { efs1, efs2 };
+    DataModel::List<ExtensionFieldSetStruct::Type> efs(efsList);
+
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "DuplicateEFS", 100, &efs);
+
+    // Verify only the last one is recorded (value should be false)
+    ViewScene::Type view_request;
+    view_request.groupID = kTestGroupId;
+    view_request.sceneID = kTestSceneId;
+
+    auto view_response = tester.Invoke<ViewScene::Type, ViewSceneResponse::DecodableType>(ViewScene::Id, view_request);
+    ExpectCommandStatus(view_response, Status::Success);
+    ASSERT_TRUE(view_response.response.has_value());
+
+    auto & data = *view_response.response;
+    ASSERT_TRUE(data.extensionFieldSetStructs.HasValue());
+    auto responseEfsList = data.extensionFieldSetStructs.Value();
+
+    int count = 0;
+    auto iter = responseEfsList.begin();
+    while (iter.Next())
+    {
+        count++;
+        auto const & received_efs = iter.GetValue();
+        if (received_efs.clusterID == kMockClusterId)
+        {
+            auto attr_iter = received_efs.attributeValueList.begin();
+            ASSERT_TRUE(attr_iter.Next());
+            auto const & attr = attr_iter.GetValue();
+            EXPECT_EQ(attr.valueUnsigned8.Value(), false); // Should be the second value
+        }
+    }
+    EXPECT_EQ(count, 1); // Should only have 1 entry for kMockClusterId
+}
+
+TEST_F(TestScenesManagementCluster, RemainingCapacityUpdatesAcrossFabrics)
+{
+    ClusterTester tester(cluster);
+
+    // 1. Add a scene on Fabric 1 to populate FabricSceneInfo and consume some capacity
+    tester.SetFabricIndex(kFabricIndex);
+    AddSceneToTable(tester, kTestGroupId, kTestSceneId, "Fabric1Scene");
+
+    // 2. Get initial capacity on Fabric 1
+    Attributes::FabricSceneInfo::TypeInfo::DecodableType sceneInfoList;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
+
+    uint8_t capacity1_initial = 0;
+    bool found1               = false;
+    auto it                   = sceneInfoList.begin();
+    while (it.Next())
+    {
+        if (it.GetValue().fabricIndex == kFabricIndex)
+        {
+            capacity1_initial = it.GetValue().remainingCapacity;
+            found1            = true;
+        }
+    }
+    ASSERT_TRUE(found1);
+
+    // 3. Add scenes on Fabric 2 and 3 until we hit global limit
+    // We simply try to add more scenes than what a single fabric can hold,
+    // and do this for multiple fabrics to exhaust the endpoint limit.
+
+    // Fill Fabric 2
+    tester.SetFabricIndex(kFabricIndex2);
+    for (int i = 0; i < kMaxScenesPerFabric + 5; i++)
+    {
+        AddScene::Type request_data;
+        request_data.groupID                  = kTestGroupId;
+        request_data.sceneID                  = static_cast<SceneId>(kTestSceneId + i + 1);
+        request_data.transitionTime           = 100;
+        request_data.sceneName                = "Fabric2Scene"_span;
+        request_data.extensionFieldSetStructs = List<ExtensionFieldSetStruct::Type>();
+
+        // We ignore the result here because we expect failure eventually
+        auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request_data);
+        (void) response;
+    }
+
+    // Fill Fabric 3
+    tester.SetFabricIndex(kFabricIndex3);
+    for (int i = 0; i < kMaxScenesPerFabric + 5; i++)
+    {
+        AddScene::Type request_data;
+        request_data.groupID                  = kTestGroupId;
+        request_data.sceneID                  = static_cast<SceneId>(kTestSceneId + i + 1);
+        request_data.transitionTime           = 100;
+        request_data.sceneName                = "Fabric3Scene"_span;
+        request_data.extensionFieldSetStructs = List<ExtensionFieldSetStruct::Type>();
+
+        // We ignore the result here because we expect failure eventually
+        auto response = tester.Invoke<AddScene::Type, AddSceneResponse::DecodableType>(AddScene::Id, request_data);
+        (void) response;
+    }
+
+    // 4. Get capacity on Fabric 1 again
+    tester.SetFabricIndex(kFabricIndex);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
+
+    uint8_t capacity1_new = 0;
+    found1                = false;
+    auto it2              = sceneInfoList.begin();
+    while (it2.Next())
+    {
+        if (it2.GetValue().fabricIndex == kFabricIndex)
+        {
+            capacity1_new = it2.GetValue().remainingCapacity;
+            found1        = true;
+        }
+    }
+    ASSERT_TRUE(found1);
+
+    // 5. Verify capacity decreased
+    EXPECT_LT(capacity1_new, capacity1_initial);
 }
 
 } // namespace
