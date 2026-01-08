@@ -371,6 +371,7 @@ choice CHIP_CRYPTO
 		help
 			Enables the implementation of the Matter cryptographic operations that is
 			based on the PSA crypto API.
+
 endchoice
 
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
