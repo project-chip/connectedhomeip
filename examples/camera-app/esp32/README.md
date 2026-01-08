@@ -22,7 +22,7 @@ The split mode consists of two separate firmware images:
 
 -   **Role**: Matter camera with KVS signaling integration
 -   **Responsibilities**:
-    -   AWS KVS WebRTC signaling
+    -   WebRTC signaling
     -   Bridge communication with media adapter
     -   Always-on connectivity for instant responsiveness
 
@@ -85,7 +85,7 @@ ESP32-P4 Function EV Board.
 
 #### Step 1: Flash matter_camera (ESP32-C6)
 
-This handles AWS KVS signaling and Matter integration.
+This handles WebRTC signaling and Matter integration.
 
 ```bash
 idf.py set-target esp32c6
