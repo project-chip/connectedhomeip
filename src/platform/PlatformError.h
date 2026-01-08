@@ -31,51 +31,43 @@ namespace chip {
 namespace Platform {
 
 namespace Internal {
+/**
+ * Maps a platform-specific error code to a CHIP_ERROR.
+ *
+ * This function encapsulates platform error codes into the CHIP error system.
+ * The resulting error will be in the kPlatform range and can be formatted
+ * using platform-specific error formatters.
+ *
+ * @note Each platform implementation is responsible for registering a platform
+ *       error formatter (via RegisterPlatformErrorFormatter() or similar) to
+ *       provide human-readable descriptions of platform-specific error codes.
+ *       For example:
+ *       - Silabs: RegisterSilabsPlatformErrorFormatter() in PlatformManagerImpl
+ *       - Tizen: RegisterTizenPlatformErrorFormatter() in PlatformManagerImpl
+ *
+ * @param aError Platform-specific error code (0 indicates success)
+ * @param location Source location (when CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION is enabled)
+ * @return CHIP_NO_ERROR if aError is 0, otherwise a CHIP_ERROR in kPlatform range
+ */
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
-::chip::ChipError MapPlatformError(int code, std::source_location location);
+inline ::chip::ChipError MapPlatformError(int aError, std::source_location location)
+{
+    return aError == 0 ? CHIP_NO_ERROR
+                       : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError), location);
+}
 #elif CHIP_CONFIG_ERROR_SOURCE
-::chip::ChipError MapPlatformError(int code, const char * file, unsigned int line);
+inline ::chip::ChipError MapPlatformError(int aError, const char * file, unsigned int line)
+{
+    return aError == 0 ? CHIP_NO_ERROR
+                       : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError), file, line);
+}
 #else
-::chip::ChipError MapPlatformError(int code);
+inline ::chip::ChipError MapPlatformError(int aError)
+{
+    return aError == 0 ? CHIP_NO_ERROR
+                       : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError));
+}
 #endif
-
-/**
- * This implements a function to return a NULL-terminated descriptive C string, associated with the specified, mapped
- * Platform error.
- *
- *  @param[in] aError  The mapped Platform-specific error to describe.
- *
- *  @return A NULL-terminated descriptive C string describing the error.
- */
-const char * DescribePlatformError(CHIP_ERROR aError);
-
-/**
- * @brief Registers the platform-specific error formatter.
- *
- * This function initializes and registers an error formatter that is responsible
- * for formatting platform-specific error codes. It ensures that errors originating
- * from the platform layer are properly formatted and reported by the error handling
- * system.
- *
- * This function is called during the initialization of the respective
- * platform layer implementation to ensure that platform-specific errors are
- * correctly handled and reported.
- */
-void RegisterPlatformErrorFormatter();
-
-/**
- * Given a platform error, returns a human-readable NULL-terminated C string
- * describing the error.
- *
- * @param[in] buf                   Buffer into which the error string will be placed.
- * @param[in] bufSize               Size of the supplied buffer in bytes.
- * @param[in] aError                The error to be described.
- *
- * @return true                     If a description string was written into the supplied buffer.
- * @return false                    If the supplied error was not a Platform error.
- *
- */
-bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR aError);
 
 } // namespace Internal
 } // namespace Platform
