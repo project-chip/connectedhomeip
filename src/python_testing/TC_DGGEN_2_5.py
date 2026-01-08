@@ -101,7 +101,8 @@ class TC_DGGEN_2_5(MatterBaseTest):
 
         # If the ClusterRevision is < 3, then skip the rest of the test steps.
         if clusterRevision < 3:
-            self.skip_step(3)
+            self.mark_all_remaining_steps_skipped(3)
+            return
             self.skip_step(4)
             self.skip_step(5)
             self.skip_step(6)
