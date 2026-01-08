@@ -59,7 +59,7 @@ public:
     /**
      * @return The endpoint ID.
      */
-    EndpointId GetEndpointId() { return mPath.mEndpointId; }
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     /**
      * @brief ServerClusterInterface methods.
