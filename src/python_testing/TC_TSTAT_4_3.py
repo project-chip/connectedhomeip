@@ -306,7 +306,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                                  "ThermostatSuggestions should not have any entries after the matching entry was removed using the RemoveThermostatSuggestion command.")
 
         self.step("7a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a") & self.check_pics("TSTAT.S.A0023") & self.check_pics("TSTAT.S.A0024")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a") and self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
             # TH sets TemperatureSetpointHold to SetpointHoldOn and TemperatureSetpointHoldDuration to null.
             await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOn), endpoint_id=endpoint, expect_success=True)
             await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHoldDuration(NullValue), endpoint_id=endpoint, expect_success=True)
@@ -462,7 +462,6 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         self.step("8b")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            print()
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to a value not matching the UniqueID field of the CurrentThermostatSuggestion attribute.
             random_uniqueID = addThermostatSuggestionResponse_uniqueID
             while random_uniqueID == addThermostatSuggestionResponse_uniqueID:
@@ -475,7 +474,6 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         self.step("8c")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            print()
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
             await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
@@ -602,7 +600,6 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         self.step("11")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            print()
             # TH reads the MaxThermostatSuggestions attribute.
             maxThermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxThermostatSuggestions)
             log.info(f"MaxThermostatSuggestions: {maxThermostatSuggestions}")
