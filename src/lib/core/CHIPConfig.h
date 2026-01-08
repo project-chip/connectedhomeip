@@ -748,26 +748,6 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER
- *
- * @brief Enable support functions for parsing command-line arguments
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 0
-#endif
-
-/**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
- *
- * @brief Enable validity checking of command-line argument definitions.
- *
- * // TODO: Determine why we wouldn't need this
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
-#endif
-
-/**
  * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking Matter unauthenticated
