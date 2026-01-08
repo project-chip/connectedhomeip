@@ -2164,7 +2164,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContex
     CommandHandler * handler = asyncCommandHandle.Get();
     ASSERT_NE(handler, nullptr);
 
-    // when gone async :Ensure that GetExchangeContext returns nullptr while TryGetExchangeContextWhenAsync returns a valid pointer
+    // when gone async: Ensure that GetExchangeContext returns nullptr while TryGetExchangeContextWhenAsync returns a valid pointer
     ASSERT_EQ(handler->GetExchangeContext(), nullptr);
 
     // Cast to CommandHandlerImpl to access TryGetExchangeContextWhenAsync, which is not accessible via CommandHandler
