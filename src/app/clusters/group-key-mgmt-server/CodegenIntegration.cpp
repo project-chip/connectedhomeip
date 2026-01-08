@@ -19,12 +19,18 @@
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-
+#include <src/app/clusters/group-key-mgmt-server/CodegenIntegration.h>
 namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GroupKeyManagement;
+
+GroupKeyManagementCluster * Instance()
+{
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
+}
 
 static_assert((GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
                GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
