@@ -763,7 +763,7 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     EXPECT_EQ(CHIP_NO_ERROR, tlvWriter.EndContainer(outerContainerType));
     EXPECT_EQ(CHIP_NO_ERROR, tlvWriter.Finalize(&msg2));
 
-    // After PAKE2 is sent, the pairingAccessory will expect a a Pake3 Message
+    // After PAKE2 is sent, the pairingAccessory will expect a Pake3 Message
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake3);
 
     /************************Injecting Fuzzed PAKE2 Message into PaseSession::OnMessageReceived*************************/

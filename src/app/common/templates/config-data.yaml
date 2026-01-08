@@ -74,7 +74,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Scenes Management
     - Thermostat
     # keep-sorted end
 
@@ -96,7 +95,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Scenes Management
     - Thermostat
     # keep-sorted end
 
@@ -145,6 +143,7 @@ CodeDrivenClusters:
     - Operational Credentials
     - Power Topology
     - Push AV Stream Transport
+    - Scenes Management
     - Software Diagnostics
     - Time Format Localization
     - Time Synchronization
