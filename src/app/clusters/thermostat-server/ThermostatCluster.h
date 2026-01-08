@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "thermostat-delegate.h"
+#include "ThermostatDelegate.h"
 
 #include <app-common/zap-generated/callback.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
