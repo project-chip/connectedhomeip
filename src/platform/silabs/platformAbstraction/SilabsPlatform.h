@@ -88,6 +88,8 @@ public:
 #if SL_MATTER_DEBUG_WATCHDOG_ENABLE
     void WatchdogInit();
     void WatchdogFeed();
+    void WatchdogEnable();
+    void WatchdogDisable();
 #endif
 
 private:

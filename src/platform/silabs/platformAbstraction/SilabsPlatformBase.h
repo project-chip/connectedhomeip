@@ -68,6 +68,8 @@ public:
     // Watchdog
     virtual void WatchdogInit(){};
     virtual void WatchdogFeed(){};
+    virtual void WatchdogEnable(){};
+    virtual void WatchdogDisable(){};
 
     /**
      * @brief Function trigger the platform to execute a software reset.

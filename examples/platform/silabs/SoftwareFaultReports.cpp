@@ -191,7 +191,7 @@ extern "C" __attribute__((naked)) void UsageFault_Handler(void)
 #if (__CORTEX_M >= 23U)
 extern "C" __attribute__((naked)) void SecureFault_Handler(void)
 {
-    faultId = 0x53464354; // 'SFCT'
+    faultId = 0x53434654; // 'SCFT'
     __asm volatile("b LogFault_Handler");
 }
 #endif // (__CORTEX_M >= 23U)
