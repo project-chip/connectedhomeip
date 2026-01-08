@@ -22,13 +22,13 @@ namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
 void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+                                   const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
 /// Set the TestEventTriggerDelegate for dependency injection.
 /// This should be called before MatterGeneralDiagnosticsClusterInitCallback.
