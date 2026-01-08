@@ -13,6 +13,9 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
+# Separate source set outside of the cluster, for dependencies
+# of other clusters that want to implement serialize/deserialize of scenes
+# without direclty using the scenes management cluster iteself.
 source_set("scenes") {
   sources = [
     "AttributeValuePairValidator.h",
