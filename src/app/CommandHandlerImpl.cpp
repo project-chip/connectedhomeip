@@ -914,24 +914,14 @@ void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommand
 
 Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContext() const
 {
-    VerifyOrDie(mpResponder);
-    if (mGoneAsync)
-    {
-        return nullptr;
-    }
+    VerifyOrReturnValue((mpResponder != nullptr) && !mGoneAsync, nullptr);
     return mpResponder->GetExchangeContext();
 }
 
 Messaging::ExchangeContext * CommandHandlerImpl::TryGetExchangeContextWhenAsync() const
 {
-    VerifyOrDie(mpResponder);
-
-    auto mpExchangeContext = mpResponder->GetExchangeContext();
-    if (mpExchangeContext == nullptr)
-    {
-        return nullptr;
-    }
-    return mpExchangeContext;
+    VerifyOrReturnValue(mpResponder, nullptr);
+    return mpResponder->GetExchangeContext();
 }
 
 #if CHIP_WITH_NLFAULTINJECTION

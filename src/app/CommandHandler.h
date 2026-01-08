@@ -249,6 +249,10 @@ public:
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
+     *         nullptr is also returned If the CommandHandler has gone async.
+     *
+     * WARNING: This method must NOT be called when the command handler has gone async, and will return nullptr in that case. Use
+     * TryGetExchangeContextWhenAsync() instead for async code paths.
      */
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
 
@@ -345,11 +349,15 @@ protected:
 
     /**
      * Returns the ExchangeContext, if one is still available, for use during asynchronous
-     * command processing. This is a best-effort accessor with no guarantees that
-     * an ExchangeContext is present once a command has gone async.
+     * command processing.
      *
-     * This method exists to prevent use of GetExchangeContext() in async code paths and
-     * must NOT be used by cluster implementations.
+     * Once a command has gone async, the existence of an ExchangeContext must not be
+     * assumed. This method exists as a best-effort alternative to GetExchangeContext()
+     * for async code paths.
+     *
+     * WARNING: There is NO GUARANTEE that the ExchangeContext exists once a command has gone async. Callers must ALWAYS handle a
+     * nullptr return but must not store, retain, or assume lifetime beyond the current execution scope.
+     *
      */
     virtual Messaging::ExchangeContext * TryGetExchangeContextWhenAsync() const { return nullptr; };
 };
