@@ -138,6 +138,10 @@ if(CONFIG_CHIP)
         matter_add_gn_arg_string("symbol_level" "0")
     endif()
 
+    if(CONFIG_CHIP_STRIP_SYMBOLS)
+        matter_add_gn_arg_bool("strip_symbols" true)
+    endif()
+
     # Allows to set chip_stack_lock_tracking level
     matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
 

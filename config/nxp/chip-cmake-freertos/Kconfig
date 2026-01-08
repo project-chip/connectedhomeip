@@ -367,4 +367,44 @@ config DEBUG
 	help
 		Build Matter stack with debugging enabled.
 
+config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	bool "Use Multiple BLE connections after commissioning"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of Multiple BLE connections after commissioning.
+
+config CHIP_NXP_BLE_PAIRING
+	bool "Enable BLE Pairing"
+	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	help
+	  Enable BLE Pairing for Multiple BLE connections after commissioning.
+
+config CHIP_NXP_BLE_BONDING
+	bool "Enable BLE Bonding"
+	default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+	help
+	  Enable BLE Bonding for Multiple BLE connections after commissioning.
+
+config NXP_USE_SMU2_STATIC
+	bool "Use SMU2"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of SMU2.
+
+config NXP_USE_SMU2_DYNAMIC
+	bool "Use extra SMU2 after commissioning"
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+	  Enable app usage of extra SMU2 after commissioning.
+
+config NXP_USE_LOW_POWER
+	bool "Enable low power support"
+	help
+	  Enables low power support
+
+config NXP_USE_PLAIN_DAC_KEY
+	bool "Store DAC private key in plaintext"
+	help
+	  Store DAC private key in plaintext.
+
 endif # CHIP

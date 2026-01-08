@@ -60,6 +60,11 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_STRIP_SYMBOLS
+	bool "Strip symbols"
+	help
+	  Remove all symbol table and relocation information from the binary.
+
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
 	default y
@@ -403,10 +408,11 @@ config CHIP_NFC_ONBOARDING_PAYLOAD
 
 # Thread network features
 
+if NET_L2_OPENTHREAD
+
 config CHIP_ENABLE_DNSSD_SRP
 	bool "OpenThread Service Registration Protocol"
 	default y
-	depends on NET_L2_OPENTHREAD
 	help
 	  Enables using the OpenThread SRP client for the Matter service
 	  advertising.
@@ -414,9 +420,22 @@ config CHIP_ENABLE_DNSSD_SRP
 config CHIP_ENABLE_DNS_CLIENT
 	bool "OpenThread DNS client"
 	default y
-	depends on NET_L2_OPENTHREAD
 	help
 	  Enables using the OpenThread DNS client for the Matter service discovery.
+
+config CHIP_SECONDARY_NETWORK_IF
+	bool "Secondary Network Interface"
+	help
+	  Enable a secondary network commissioning interface.
+
+config CHIP_THREAD_NETWORK_ENDPOINT_ID
+	int "Thread Network Endpoint ID"
+	default 2 if CHIP_SECONDARY_NETWORK_IF
+	default 0
+	help
+	  Specify the endpoint ID of the Thread network.
+
+endif # NET_L2_OPENTHREAD
 
 config CHIP_ENABLE_ICD_SUPPORT
 	bool "Matter Intermittently Connected Devices support"
@@ -518,6 +537,25 @@ config CHIP_ICD_REPORT_ON_ACTIVE_MODE
 	  Enables an ICD to send data report to the subscribers on entering the active mode.
 
 endif # CHIP_ENABLE_ICD_SUPPORT
+
+config CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+	int "Timeout (ms) for switching from fast to slow advertising"
+	default 30000
+	help
+	  The amount of time in milliseconds after which BLE should change its advertisements
+	  from fast interval to slow interval.
+
+config CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+	int "BLE advertising timeout"
+	default 900000
+	help
+	  The amount of time in milliseconds after which BLE advertisement should be disabled, counting
+	  from the moment of slow advertisement commencement.
+
+config CHIP_DEVICE_CONFIG_ENABLE_SED
+	bool "Enable Sleepy End Device (SED) support"
+	help
+	  Enable Sleepy End Device configuration.
 
 config CHIP_THREAD_SSED
 	bool "Enable Thread Synchronized Sleepy End Device support"
