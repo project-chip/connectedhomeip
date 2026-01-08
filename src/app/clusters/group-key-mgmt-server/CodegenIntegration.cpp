@@ -38,7 +38,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create();
+        gServer.Create(GroupKeyManagementCluster::Context{ .fabricTable       = Server::GetInstance().GetFabricTable(),
+                                                           .groupDataProvider = *Credentials::GetGroupDataProvider() });
         return gServer.Registration();
     }
 

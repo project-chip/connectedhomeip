@@ -143,6 +143,10 @@ source_set("thread-border-router-management-test-srcs") {
     # Sources needed because codegen integration of general commissioning provides general commissioning instance
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
+
+    # Sources for  codegen integration of group key management
+    "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.h",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.cpp",
   ]
 
   public_deps = [
