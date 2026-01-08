@@ -254,7 +254,7 @@ class literal(ValueConformance):
 class revision(ValueConformance):
     def __init__(self, value: str):
         self.value: Optional[int]
-        if value.lower == 'current':
+        if value.lower() == 'current':
             self.value = None
         else:
             self.value = int(value, 0)
