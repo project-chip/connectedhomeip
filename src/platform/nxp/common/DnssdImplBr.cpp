@@ -949,7 +949,7 @@ static void DispatchTxtResolve(intptr_t context)
     VerifyOrReturn(IsInResolveList(pResolveContext));
 
     // Stop SRV resolver before starting TXT one, ignore error as it will only happen if mMDS module is not initialized
-    (void)otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mSrvInfo);
+    (void) otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mSrvInfo);
 
     pResolveContext->mTxtInfo.mServiceInstance = pResolveContext->mMdnsService.mName;
     pResolveContext->mTxtInfo.mServiceType     = pResolveContext->mServiceType;
@@ -961,9 +961,8 @@ static void DispatchTxtResolve(intptr_t context)
     {
         pResolveContext->error = MapOpenThreadError(error);
         TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
-                                                                        reinterpret_cast<intptr_t>(pResolveContext));
+                                                                         reinterpret_cast<intptr_t>(pResolveContext));
     }
-
 }
 
 static void DispatchAddressResolve(intptr_t context)
@@ -974,7 +973,7 @@ static void DispatchAddressResolve(intptr_t context)
     VerifyOrReturn(IsInResolveList(pResolveContext));
 
     // Stop TXT resolver before starting address one, ignore error as it will only happen if mMDS module is not initialized
-    (void)otMdnsStopTxtResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mTxtInfo);
+    (void) otMdnsStopTxtResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mTxtInfo);
 
     pResolveContext->mAddrInfo.mCallback     = OtAddressCallback;
     pResolveContext->mAddrInfo.mHostName     = pResolveContext->mMdnsService.mHostName;
@@ -985,7 +984,7 @@ static void DispatchAddressResolve(intptr_t context)
     {
         pResolveContext->error = MapOpenThreadError(error);
         TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
-                                                                        reinterpret_cast<intptr_t>(pResolveContext));
+                                                                         reinterpret_cast<intptr_t>(pResolveContext));
     }
 }
 
@@ -1000,7 +999,7 @@ static void DispatchResolve(intptr_t context)
 
     // Stop Address resolver, we have finished resolving the service. Ignore error as it will only happen if
     // mMDS module is not initialized
-    (void)otMdnsStopIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mAddrInfo);
+    (void) otMdnsStopIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mAddrInfo);
 
     if (service.mAddress.has_value())
     {
