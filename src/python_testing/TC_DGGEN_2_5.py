@@ -103,7 +103,6 @@ class TC_DGGEN_2_5(MatterBaseTest):
         if clusterRevision < 3:
             self.mark_all_remaining_steps_skipped(3)
             return
-            self.skip_step(8)
         else:
             # Ensure DUT is commissioned in TH2’s fabric.
             self.step(3)
