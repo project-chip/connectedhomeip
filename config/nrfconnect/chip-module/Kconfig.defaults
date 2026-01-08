@@ -358,6 +358,7 @@ config MBEDTLS_HEAP_SIZE
 
 choice CHIP_CRYPTO
     default CHIP_CRYPTO_PSA if !CHIP_WIFI
+
 endchoice
 
 config CHIP_CRYPTO_PSA
