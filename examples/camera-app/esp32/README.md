@@ -93,17 +93,20 @@ idf.py build
 idf.py -p [PORT] flash monitor
 ```
 
-*__NOTE__*:
-- ESP32-C6 does not have an onboard UART port. You will need to use [ESP-Prog](https://docs.espressif.com/projects/esp-iot-solution/en/latest/hw-reference/ESP-Prog_guide.html) board or any other JTAG.
-- Use following Pin Connections:
+_**NOTE**_:
+
+-   ESP32-C6 does not have an onboard UART port. You will need to use
+    [ESP-Prog](https://docs.espressif.com/projects/esp-iot-solution/en/latest/hw-reference/ESP-Prog_guide.html)
+    board or any other JTAG.
+-   Use following Pin Connections:
 
 | ESP32-C6 (J2/Prog-C6) | ESP-Prog |
-|----------|----------|
-| IO0      | IO9      |
-| TX0      | TXD0     |
-| RX0      | RXD0     |
-| EN       | EN       |
-| GND      | GND      |
+| --------------------- | -------- |
+| IO0                   | IO9      |
+| TX0                   | TXD0     |
+| RX0                   | RXD0     |
+| EN                    | EN       |
+| GND                   | GND      |
 
 #### Step 2: Flash media_adapter (ESP32-P4)
 
