@@ -13,7 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/TypeTraits.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
@@ -28,8 +27,11 @@
 #include <clusters/ScenesManagement/Structs.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/tests/CHIPCert_test_vectors.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/TypeTraits.h>
 
 namespace {
 
@@ -257,6 +259,68 @@ public:
         return builder.ReferenceExisting(Span(kEndpoints));
     }
 };
+
+CHIP_ERROR AddFakeFabric(FabricTable & fabricTable, FabricIndex expectedFabricIndex)
+{
+    Crypto::P256SerializedKeypair opKeysSerialized;
+    static Crypto::P256Keypair opKey;
+
+    struct NocData
+    {
+        const ByteSpan & publicKey;
+        const ByteSpan & privateKey;
+        const ByteSpan & rcac;
+        const ByteSpan & icac;
+        const ByteSpan & noc;
+    };
+
+    static const NocData kNocItems[] = {
+        {
+            .publicKey  = TestCerts::sTestCert_Node01_01_PublicKey,
+            .privateKey = TestCerts::sTestCert_Node01_01_PrivateKey,
+            .rcac       = TestCerts::sTestCert_Root01_Chip,
+            .icac       = TestCerts::sTestCert_ICA01_Chip,
+            .noc        = TestCerts::sTestCert_Node01_01_Chip,
+        },
+        {
+            .publicKey  = TestCerts::sTestCert_Node02_02_PublicKey,
+            .privateKey = TestCerts::sTestCert_Node02_02_PrivateKey,
+            .rcac       = TestCerts::sTestCert_Root02_Chip,
+            .icac       = TestCerts::sTestCert_ICA02_Chip,
+            .noc        = TestCerts::sTestCert_Node02_02_Chip,
+        },
+    };
+
+    ssize_t nocDataIndex = -1;
+
+    switch (expectedFabricIndex)
+    {
+    case kFabricIndex:
+        nocDataIndex = 0;
+        break;
+    case kFabricIndex2:
+        nocDataIndex = 1;
+        break;
+    }
+
+    VerifyOrReturnError(nocDataIndex >= 0 && static_cast<size_t>(nocDataIndex) < MATTER_ARRAY_SIZE(kNocItems), CHIP_ERROR_INTERNAL);
+    const NocData & nocData = kNocItems[nocDataIndex];
+
+    FabricIndex fabricIndex;
+    memcpy(opKeysSerialized.Bytes(), nocData.publicKey.data(), nocData.publicKey.size());
+    memcpy(opKeysSerialized.Bytes() + nocData.publicKey.size(), nocData.privateKey.data(), nocData.privateKey.size());
+
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_01_PublicKey.size() +
+                                                    TestCerts::sTestCert_Node01_01_PrivateKey.size()));
+    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
+    ReturnErrorOnFailure(fabricTable.AddNewPendingTrustedRootCert(nocData.rcac));
+    ReturnErrorOnFailure(fabricTable.AddNewPendingFabricWithProvidedOpKey(nocData.noc, nocData.icac, VendorId::TestVendor1, &opKey,
+                                                                          /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex));
+
+    VerifyOrReturnError(fabricIndex == expectedFabricIndex, CHIP_ERROR_INTERNAL);
+
+    return fabricTable.CommitPendingFabricData();
+}
 
 struct TestScenesManagementCluster : public ::testing::Test
 {
@@ -1421,8 +1485,14 @@ TEST_F(TestScenesManagementCluster, PersistenceAfterPowerCycle)
     EXPECT_TRUE(nameSpan.data_equal("PersistentScene"_span));
 }
 
-TEST_F(TestScenesManagementCluster, DISABLED_RecallSceneInvalidatesOtherFabrics)
+TEST_F(TestScenesManagementCluster, RecallSceneInvalidatesOtherFabrics)
 {
+    // Pretend that we have some fabrics since this is what our tests expect
+    // Note I could only find mock data for 2 fabrics even though fabric index 3 is defined.
+    // This is just sufficient here for our own tests (adding fabric entries is rough!)
+    ASSERT_EQ(AddFakeFabric(fabricTable, kFabricIndex), CHIP_NO_ERROR);
+    ASSERT_EQ(AddFakeFabric(fabricTable, kFabricIndex2), CHIP_NO_ERROR);
+
     ClusterTester tester(cluster);
     tester.SetFabricIndex(kFabricIndex);
 
@@ -1441,6 +1511,9 @@ TEST_F(TestScenesManagementCluster, DISABLED_RecallSceneInvalidatesOtherFabrics)
     ASSERT_TRUE(recall_response.IsSuccess());
 
     // 3. Verify SceneValid is TRUE for Fabric 1 and FALSE for Fabric 2
+    //    Make sure read is using fabric 1 (so that we can read fabric 1 data) - that allows us to read fabric sensitive fields
+    //    like currentScene and currentGroup
+    tester.SetFabricIndex(kFabricIndex);
     Attributes::FabricSceneInfo::TypeInfo::DecodableType sceneInfoList;
     ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
 
