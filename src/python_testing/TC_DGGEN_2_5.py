@@ -81,18 +81,13 @@ class TC_DGGEN_2_5(MatterBaseTest):
                          "Verify that the TotalInteractionModelMessagesReceived field of the DeviceLoadStatus attribute is higher than the saved initialTotalInteractionModelMessagesReceived by at least 6 messages.\n"
                          "Verify that the CurrentSubscriptions field of the DeviceLoadStatus attribute is higher than the saved initialCurrentSubscriptions by exactly 3 subscriptions.\n"
                          "Verify that the CurrentSubscriptionsForFabric field of the DeviceLoadStatus attribute is higher than the saved initialCurrentSubscriptionsForFabric by exactly 2 subscriptions.\n"
-                         "Verify that the TotalSubscriptionsEstablished field of the DeviceLoadStatus attribute is higher than the saved initialTotalSubscriptionsEstablished by exactly 3 subscriptions.")
+                         "Verify that the TotalSubscriptionsEstablished field of the DeviceLoadStatus attribute is higher than the saved initialTotalSubscriptionsEstablished by exactly 3 subscriptions."),
+                TestStep(9, "Remove TH2 from the DUT", "Verify successful response.")
                 ]
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_DGGEN_2_5(self):
         endpoint = self.get_endpoint()
-
-        initialTotalInteractionModelMessageSent = 0
-        initialTotalInteractionModelMessagesReceived = 0
-        initialCurrentSubscriptions = 0
-        initialCurrentSubscriptionsForFabric = 0
-        initialTotalSubscriptionsEstablished = 0
 
         # Ensure DUT is commissioned in TH1’s fabric.
         self.step(1)
@@ -113,8 +108,9 @@ class TC_DGGEN_2_5(MatterBaseTest):
         # Ensure DUT is commissioned in TH2’s fabric.
         self.step(3)
         logger.info("Setting up TH2")
+        fabricId2 = self.th1.fabricId + 1
         th2CertificateAuth = self.certificate_authority_manager.NewCertificateAuthority()
-        th2FabricAdmin = th2CertificateAuth.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        th2FabricAdmin = th2CertificateAuth.NewFabricAdmin(vendorId=0xFFF1, fabricId=fabricId2)
         self.th2 = th2FabricAdmin.NewController(nodeId=2, useTestCommissioner=True)
 
         logger.info("Opening commissioning window on DUT")
@@ -128,25 +124,24 @@ class TC_DGGEN_2_5(MatterBaseTest):
 
         # TH1 reads the DUT’s DeviceLoadStatus attribute in General Diagnostics cluster.
         self.step(4)
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DeviceLoadStatus):
-            deviceLoadStatus = await self.read_single_attribute_check_success(
-                cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
+        deviceLoadStatus = await self.read_single_attribute_check_success(
+            cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
 
-            logger.info(f"DeviceLoadStatus Attribute: {deviceLoadStatus}")
+        logger.info(f"DeviceLoadStatus Attribute: {deviceLoadStatus}")
 
-            initialTotalInteractionModelMessageSent = deviceLoadStatus.totalInteractionModelMessagesSent
-            initialTotalInteractionModelMessagesReceived = deviceLoadStatus.totalInteractionModelMessagesReceived
-            initialCurrentSubscriptions = deviceLoadStatus.currentSubscriptions
-            initialCurrentSubscriptionsForFabric = deviceLoadStatus.currentSubscriptionsForFabric
-            initialTotalSubscriptionsEstablished = deviceLoadStatus.totalSubscriptionsEstablished
+        initialTotalInteractionModelMessageSent = deviceLoadStatus.totalInteractionModelMessagesSent
+        initialTotalInteractionModelMessagesReceived = deviceLoadStatus.totalInteractionModelMessagesReceived
+        initialCurrentSubscriptions = deviceLoadStatus.currentSubscriptions
+        initialCurrentSubscriptionsForFabric = deviceLoadStatus.currentSubscriptionsForFabric
+        initialTotalSubscriptionsEstablished = deviceLoadStatus.totalSubscriptionsEstablished
 
-            # Verify that initialCurrentSubscriptionsForFabric <= initialCurrentSubscriptions.
-            asserts.assert_less_equal(initialCurrentSubscriptionsForFabric, initialCurrentSubscriptions,
-                                      f"initialCurrentSubscriptionsForFabric: {initialCurrentSubscriptionsForFabric} is not less or equal than initialCurrentSubscriptions: {initialCurrentSubscriptions}")
+        # Verify that initialCurrentSubscriptionsForFabric <= initialCurrentSubscriptions.
+        asserts.assert_less_equal(initialCurrentSubscriptionsForFabric, initialCurrentSubscriptions,
+                                  f"initialCurrentSubscriptionsForFabric: {initialCurrentSubscriptionsForFabric} is not less or equal than initialCurrentSubscriptions: {initialCurrentSubscriptions}")
 
-            # Verify that initialTotalSubscriptionsEstablished >= initialCurrentSubscriptions.
-            asserts.assert_greater_equal(initialTotalSubscriptionsEstablished, initialCurrentSubscriptions,
-                                         f"initialTotalSubscriptionsEstablished: {initialTotalSubscriptionsEstablished} is not greater or equal than initialCurrentSubscriptions: {initialCurrentSubscriptions}")
+        # Verify that initialTotalSubscriptionsEstablished >= initialCurrentSubscriptions.
+        asserts.assert_greater_equal(initialTotalSubscriptionsEstablished, initialCurrentSubscriptions,
+                                     f"initialTotalSubscriptionsEstablished: {initialTotalSubscriptionsEstablished} is not greater or equal than initialCurrentSubscriptions: {initialCurrentSubscriptions}")
 
         # TH1 subscribes to the General Diagnostics cluster’s RebootCount attribute, min interval 1 second, max interval 30 seconds, KeepSubscriptions false.
         self.step(5)
@@ -203,6 +198,25 @@ class TC_DGGEN_2_5(MatterBaseTest):
             expectedIncreaseSubscriptionsEstablished = 3
             asserts.assert_equal(finalTotalSubscriptionsEstablished, initialTotalSubscriptionsEstablished + expectedIncreaseSubscriptionsEstablished,
                                  f"finalTotalSubscriptionsEstablished: {finalTotalSubscriptionsEstablished} is not greater by exactly {expectedIncreaseSubscriptionsEstablished} subscriptions to initialTotalSubscriptionsEstablished:{initialTotalSubscriptionsEstablished}")
+
+        # Remove TH2 from the DUT
+        self.step(9)
+        logger.info("Removing TH2 fabric from DUT")
+
+        response = await self.th1.SendCommand(
+            nodeId=self.dut_node_id,
+            endpoint=endpoint,
+            payload=Clusters.OperationalCredentials.Commands.RemoveFabric(
+                fabricIndex=fabricId2
+            )
+        )
+
+        logger.info(f"TH2 fabric (index {fabricId2}) successfully removed")
+        logger.info(f"Response: {response}")
+
+        successfulResponse = Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk
+        asserts.assert_equal(response.statusCode, successfulResponse,
+                             f"Response is {response.statusCode} and it should be {successfulResponse}")
 
         rebootCountCallBack.cancel()
         rebootCountCallBack2.cancel()
