@@ -23,9 +23,9 @@ import string
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-import matter.testing.matchers as matchers
 
 log = logging.getLogger(__name__)
 
