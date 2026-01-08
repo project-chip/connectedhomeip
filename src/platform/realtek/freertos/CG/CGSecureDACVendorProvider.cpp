@@ -29,6 +29,8 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/realtek/freertos/CHIPDevicePlatformConfig.h>
 
+#include "CGCrypto.h"
+
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
@@ -36,28 +38,21 @@ namespace DeviceLayer {
 
 CGSecureDACVendorProvider::CGSecureDACVendorProvider()
 {
-    cg_matter_data param{};
-    ChipLogDetail(DeviceLayer, "secure_app_function_call InitModule start");
-    secure_app_function_call(SECURE_APP_FUNCTION_INIT_MODULE, &param);
-
-    if (param.status_code)
-    {
-        ChipLogError(DeviceLayer, "secure_app_function_call InitModule failed %d", param.status_code);
+    int ret = InitModule(0);
+    if (ret) {
+        ChipLogDetail(DeviceLayer, "Init Module failed %d", ret);
         this->initError = CHIP_ERROR_UNINITIALIZED;
     }
-    else
-    {
-        this->initError = CHIP_NO_ERROR;
-    }
+
+    this->initError = CHIP_NO_ERROR;
 }
 
 CGSecureDACVendorProvider::~CGSecureDACVendorProvider()
 {
-    cg_matter_data param{};
-    // Release Module
-    ChipLogDetail(DeviceLayer, "secure_app_function_call ReleaseModule start");
-    secure_app_function_call(SECURE_APP_FUNCTION_RELEASE_MODULE, &param);
-    ChipLogDetail(DeviceLayer, "secure_app_function_call ReleaseModule end %d", param.status_code);
+    int ret = ReleaseModule();
+    if (ret != 0) {
+        ChipLogDetail(DeviceLayer, "Release Module failed %d", ret);
+    }
 }
 
 CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
@@ -67,30 +62,35 @@ CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpa
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
 #if CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
     constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
-    err                                   = CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
+    return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
 #else
-    cg_matter_data param{};
-    param.return_length = sizeof(param.return_data);
+    const uint8_t kCdForAllExamples[] = {
+            0x30, 0x81, 0xe8, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01,
+            0x07, 0x02, 0xa0, 0x81, 0xda, 0x30, 0x81, 0xd7, 0x02, 0x01, 0x03, 0x31,
+            0x0d, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04,
+            0x02, 0x01, 0x30, 0x44, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d,
+            0x01, 0x07, 0x01, 0xa0, 0x37, 0x04, 0x35, 0x15, 0x24, 0x00, 0x01, 0x25,
+            0x01, 0x16, 0x13, 0x36, 0x02, 0x05, 0x25, 0x1a, 0x18, 0x24, 0x03, 0x16,
+            0x2c, 0x04, 0x13, 0x5a, 0x49, 0x47, 0x32, 0x30, 0x31, 0x34, 0x32, 0x5a,
+            0x42, 0x33, 0x33, 0x30, 0x30, 0x30, 0x33, 0x2d, 0x32, 0x34, 0x24, 0x05,
+            0x00, 0x24, 0x06, 0x00, 0x25, 0x07, 0x94, 0x26, 0x24, 0x08, 0x01, 0x18,
+            0x31, 0x7d, 0x30, 0x7b, 0x02, 0x01, 0x03, 0x80, 0x14, 0x62, 0xfa, 0x82,
+            0x33, 0x59, 0xac, 0xfa, 0xa9, 0x96, 0x3e, 0x1c, 0xfa, 0x14, 0x0a, 0xdd,
+            0xf5, 0x04, 0xf3, 0x71, 0x60, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48,
+            0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86,
+            0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x04, 0x47, 0x30, 0x45, 0x02, 0x20,
+            0x43, 0xa9, 0x95, 0xed, 0xbc, 0xaa, 0x0a, 0x4c, 0xaa, 0xa2, 0xb9, 0xaf,
+            0xcc, 0x53, 0x93, 0xda, 0xef, 0xd3, 0x42, 0x45, 0x3d, 0xd9, 0x36, 0x4c,
+            0x82, 0x67, 0xbf, 0xe6, 0x9f, 0xc8, 0xec, 0xb7, 0x02, 0x21, 0x00, 0xcc,
+            0xc1, 0x07, 0xa5, 0x8f, 0xa6, 0x8a, 0x00, 0x6e, 0xf6, 0xdf, 0xff, 0x0a,
+            0x10, 0x26, 0x02, 0x9f, 0x4b, 0x71, 0x1b, 0x53, 0x79, 0xc6, 0x29, 0x44,
+            0x87, 0xe4, 0x9a, 0xd9, 0x71, 0x11, 0x81
+        };
 
-    /* Certification Declaration */
-    ChipLogDetail(DeviceLayer, "secure_app_function_call GetCertificationDeclaration start");
-    secure_app_function_call(SECURE_APP_FUNCTION_GET_CD, &param);
-    if (param.status_code)
-    {
-        ChipLogError(DeviceLayer, "secure_app_function_call GetCertificationDeclaration failed %d, %d", param.status_code,
-                     (int) param.return_length);
-        return CHIP_ERROR_CERT_NOT_FOUND;
-    }
-
-    ChipLogDetail(DeviceLayer, "secure_app_function_call GetCertificationDeclaration size: %d", (int) param.return_length);
-    err = CopySpanToMutableSpan(ByteSpan(param.return_data, param.return_length), outBuffer);
+    return CopySpanToMutableSpan(ByteSpan(kCdForAllExamples), outBuffer);
 #endif
-
-    return err;
 }
 
 CHIP_ERROR CGSecureDACVendorProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -108,24 +108,31 @@ CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan &
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    int ret = 0;
+    uint16_t dac_len = 0;
 
-    cg_matter_data param{};
-    param.return_length = sizeof(param.return_data);
-    /* DeviceAttestationCert */
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Get DeviceAttestationCert start");
-    secure_app_function_call(SECURE_APP_FUNCTION_GET_DAC, &param);
-    if (param.status_code)
+    // Step 1: Probe for certificate length
+    ret = GetCert(CGCRYPTO_OBJECT_ID_DEVICE_CERT, nullptr, &dac_len);
+    if (ret != CG_RTN_BUFFER_TOO_SMALL)
     {
-        ChipLogError(DeviceLayer, "secure_app_function_call GetDeviceAttestationCert failed %d, %d", param.status_code,
-                     (int) param.return_length);
+        ChipLogDetail(DeviceLayer, "GetDeviceAttestationCert: failed to get DAC length, err=%d", ret);
         return CHIP_ERROR_CERT_NOT_FOUND;
     }
 
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Get DeviceAttestationCert size: %d", (int) param.return_length);
-    err = CopySpanToMutableSpan(ByteSpan(param.return_data, param.return_length), outBuffer);
+    // Step 2: Check if output buffer is large enough
+    VerifyOrReturnError(outBuffer.size() >= dac_len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    return err;
+    // Step 3: Actually retrieve the certificate
+    ret = GetCert(CGCRYPTO_OBJECT_ID_DEVICE_CERT, outBuffer.data(), &dac_len);
+    if (ret != 0)
+    {
+        ChipLogDetail(DeviceLayer, "GetDeviceAttestationCert: failed to get DAC, err=%d", ret);
+        return CHIP_ERROR_CERT_NOT_FOUND;
+    }
+
+    outBuffer.reduce_size(dac_len);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
@@ -135,24 +142,31 @@ CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(Muta
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t pai_len = 0;
+    int ret;
 
-    cg_matter_data param{};
-    param.return_length = sizeof(param.return_data);
-    /* Product Attestation Intermediate Cert */
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert start");
-    secure_app_function_call(SECURE_APP_FUNCTION_GET_PAI_CERT, &param);
-    if (param.status_code)
+    // Step 1: Probe for certificate length
+    ret = GetCert(CGCRYPTO_OBJECT_ID_TRUST_ANCHOR, nullptr, &pai_len);
+    if (ret != CG_RTN_BUFFER_TOO_SMALL)
     {
-        ChipLogError(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert failed %d ,%d",
-                     param.status_code, (int) param.return_length);
+        ChipLogDetail(DeviceLayer, "GetProductAttestationIntermediateCert: failed to get PAI length, err=%d", ret);
         return CHIP_ERROR_CERT_NOT_FOUND;
     }
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert size: %d",
-                  (int) param.return_length);
-    err = CopySpanToMutableSpan(ByteSpan(param.return_data, param.return_length), outBuffer);
 
-    return err;
+    // Step 2: Check if output buffer is large enough
+    VerifyOrReturnError(outBuffer.size() >= pai_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Step 3: Retrieve the real certificate data
+    ret = GetCert(CGCRYPTO_OBJECT_ID_TRUST_ANCHOR, outBuffer.data(), &pai_len);
+    if (ret != 0)
+    {
+        ChipLogDetail(DeviceLayer, "GetProductAttestationIntermediateCert: failed to get PAI, err=%d", ret);
+        return CHIP_ERROR_CERT_NOT_FOUND;
+    }
+
+    outBuffer.reduce_size(pai_len);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
@@ -162,29 +176,34 @@ CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpa
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    Crypto::P256ECDSASignature signature;
+    // Step 1: Validate input spans and signature buffer size
+    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outSignBuffer.size() >= Crypto::kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    cg_matter_data param{};
-    param.return_length = sizeof(param.return_data);
-    /* Sign With Device Attestation Key */
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Sign start");
-    VerifyOrReturnError(messageToSign.size() <= sizeof(param.input_data), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(param.input_data, messageToSign.data(), messageToSign.size());
-    param.input_length = messageToSign.size();
-    secure_app_function_call(SECURE_APP_FUNCTION_SIGN_WITH_DAKEY, &param);
-    if (param.status_code)
+    // Step 2: Sign the data
+    uint8_t asn1_signature_buffer[Crypto::kMax_ECDSA_Signature_Length_Der];
+    MutableByteSpan asn1_signature_span(asn1_signature_buffer);
+    uint16_t signature_length = asn1_signature_span.size();
+    int ret = SignData(CGCRYPTO_KEY_ID_DEVICE_KEY, CGCRYPTO_HASH_TYPE_SHA_256,
+                       messageToSign.data(), messageToSign.size(),
+                       asn1_signature_span.data(), &signature_length);
+    if (ret != 0)
     {
-        ChipLogError(DeviceLayer, "secure_app_function_call Sign failed %d", param.status_code);
-        return CHIP_ERROR_INVALID_SIGNATURE;
+        ChipLogDetail(DeviceLayer, "SignWithDeviceAttestationKey: SignData failed, err=%d", ret);
+        return CHIP_ERROR_INTERNAL;
     }
-    ChipLogDetail(DeviceLayer, "secure_app_function_call signature size: %d", (int) param.return_length);
-    err = Crypto::EcdsaAsn1SignatureToRaw(Crypto::kP256_FE_Length, ByteSpan(param.return_data, param.return_length), outSignBuffer);
-    return err;
+    asn1_signature_span.reduce_size(signature_length);
+
+    // Step 3: Convert ASN.1 signature to raw format
+    CHIP_ERROR err = Crypto::EcdsaAsn1SignatureToRaw(Crypto::kP256_FE_Length, asn1_signature_span, outSignBuffer);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(DeviceLayer, "SignWithDeviceAttestationKey: EcdsaAsn1SignatureToRaw failed, err=%" CHIP_ERROR_FORMAT, err);
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
