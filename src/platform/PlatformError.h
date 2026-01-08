@@ -64,8 +64,7 @@ inline ::chip::ChipError MapPlatformError(int aError, const char * file, unsigne
 #else
 inline ::chip::ChipError MapPlatformError(int aError)
 {
-    return aError == 0 ? CHIP_NO_ERROR
-                       : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError));
+    return aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError));
 }
 #endif
 
