@@ -128,17 +128,17 @@ private:
         kAddNocCommandInvoked               = 0x01,
         kUpdateNocCommandInvoked            = 0x02,
         kAddTrustedRootCertInvoked          = 0x04,
-        kIsCsrRequestForUpdateNoc           = 0x08, /* The fact of whether a CSR occurred at all is stored elsewhere. */
+        kIsCsrRequestForUpdateNoc           = 0x08, /* Whether a CSR request occurred at all is stored elsewhere. */
         kUpdateTermsAndConditionsInvoked    = 0x10,
         kSetVidVerificationStatementInvoked = 0x20,
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        kAddICACInvoked = 0x40,
-#endif
+        kAddICACInvoked                     = 0x40, /* Used only by Joint Fabric*/
     };
 
     BitFlags<ContextFlags> mContextFlags;
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
+    // These bools track the state of the fail-safe and are intentionally separate from mContextFlags, which records command/context
+    // history.
     bool mFailSafeArmed = false;
     bool mFailSafeBusy  = false;
 
