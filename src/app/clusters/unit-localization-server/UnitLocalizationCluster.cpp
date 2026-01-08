@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::UnitLocalization::Attributes;
 CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    
+
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
 

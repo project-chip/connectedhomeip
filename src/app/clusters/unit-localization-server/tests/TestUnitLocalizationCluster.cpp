@@ -53,7 +53,7 @@ TEST_F(TestUnitLocalizationCluster, AttributesTemperatureFeature)
 {
     const BitFlags<Feature> features{ Feature::kTemperatureUnit };
     UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, features };
-    
+
     ASSERT_TRUE(IsAttributesListEqualTo(unitLocalizationCluster, {
         TemperatureUnit::kMetadataEntry,
         SupportedTemperatureUnits::kMetadataEntry
