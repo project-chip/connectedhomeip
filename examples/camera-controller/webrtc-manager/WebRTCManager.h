@@ -84,7 +84,7 @@ private:
     WebRTCManager();
     ~WebRTCManager();
 
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;
 
     WebRTCProviderClient mWebRTCProviderClient;

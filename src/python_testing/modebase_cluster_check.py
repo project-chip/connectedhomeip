@@ -91,6 +91,7 @@ class ModeBaseClusterChecks:
 
         This function evaluates the ModeTags of each ModeOptionStruct:
         - Should have at least one tag.
+        - There are no duplicates in ModeTag list.
         - Should be maximum 16bits in size.
         - Should be a Mfg tag or one of the supported ones (either common or specific).
         - Should have at least one common or specific tag.
@@ -106,7 +107,12 @@ class ModeBaseClusterChecks:
             if len(mode_option_struct.modeTags) == 0:
                 asserts.fail("The ModeTags field should have at least one entry.")
 
-            # Check each ModelTag
+            # There are no duplicates
+            tag_values = [tag.value for tag in mode_option_struct.modeTags]
+            if len(tag_values) != len(set(tag_values)):
+                asserts.fail(f"ModeTags contain duplicates in mode {mode_option_struct.mode}: {tag_values}.")
+
+            # Check each ModeTag
             at_least_one_common_or_derived = False
             for tag in mode_option_struct.modeTags:
                 # Value should not larger than 16bits

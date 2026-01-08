@@ -48,8 +48,10 @@ from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -723,7 +725,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
 
         self.step("44")
         # TH removes the subscription to Commodity Tariff cluster attributes
-        await subscription_handler.cancel()
+        subscription_handler.cancel()
 
 
 if __name__ == "__main__":

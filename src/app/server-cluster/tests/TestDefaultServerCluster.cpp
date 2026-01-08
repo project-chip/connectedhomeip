@@ -39,7 +39,7 @@ using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
