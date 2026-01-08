@@ -26,25 +26,26 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportRequestor;
 
-CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(uint16_t sessionId, const OfferArgs & args)
+CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleOffer");
-    return WebRTCManager::Instance().HandleOffer(sessionId, args);
+    return WebRTCManager::Instance().HandleOffer(session, args);
 }
 
-CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer)
+CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleAnswer");
-    return WebRTCManager::Instance().HandleAnswer(sessionId, sdpAnswer);
+    return WebRTCManager::Instance().HandleAnswer(session, sdpAnswer);
 }
 
-CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
+CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(const WebRTCSessionStruct & session,
+                                                        const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleICECandidates");
-    return WebRTCManager::Instance().HandleICECandidates(sessionId, candidates);
+    return WebRTCManager::Instance().HandleICECandidates(session, candidates);
 }
 
-CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode)
+CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleEnd");
     return CHIP_NO_ERROR;

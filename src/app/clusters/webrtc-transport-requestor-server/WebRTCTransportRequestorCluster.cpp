@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "webrtc-transport-requestor-cluster.h"
+#include "WebRTCTransportRequestorCluster.h"
 
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <lib/support/CodeUtils.h>
@@ -29,8 +29,6 @@ using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
-
-constexpr uint16_t kMaxSessionId = 65534;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::Offer::kMetadataEntry,
@@ -57,12 +55,12 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, Delegate & delegate) :
+WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                            AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                             AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -86,9 +84,9 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                           TLV::TLVReader & input_arguments,
-                                                                                           CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportRequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                               CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -129,75 +127,30 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
     }
 }
 
-CHIP_ERROR WebRTCTransportRequestorServer::AcceptedCommands(const ConcreteClusterPath & path,
-                                                            ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR WebRTCTransportRequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-CHIP_ERROR WebRTCTransportRequestorServer::Attributes(const ConcreteClusterPath & path,
-                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR WebRTCTransportRequestorCluster::Attributes(const ConcreteClusterPath & path,
+                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(kMandatoryMetadata), {}, {});
 }
 
-uint16_t WebRTCTransportRequestorServer::GenerateSessionId()
-{
-    static uint16_t lastSessionId = 0;
-    uint16_t candidateId          = 0;
-
-    // Try at most kMaxSessionId+1 attempts to find a free ID
-    // This ensures we never loop infinitely even if all IDs are somehow in use
-    for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
-    {
-        candidateId = lastSessionId++;
-
-        // Handle wrap-around per spec
-        if (lastSessionId > kMaxSessionId)
-        {
-            lastSessionId = 0;
-        }
-
-        if (FindSession(candidateId) == nullptr)
-        {
-            return candidateId;
-        }
-    }
-
-    // This should never happen in practice since we support 65534 sessions
-    // and typical applications will have far fewer active sessions
-    ChipLogError(Zcl, "All session IDs are in use!");
-    chipDie();
-}
-
-bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, const CommandHandler & commandHandler)
-{
-    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
-    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
-
-    // Check if the session ID is in the existing sessions list
-    WebRTCSessionStruct * existingSession = FindSession(sessionId);
-
-    if (!existingSession)
-    {
-        return false;
-    }
-
-    // Also check that the existing session belongs to the same PeerNodeID / Fabric
-    // If it doesn't match, return false
-    return (peerNodeId == existingSession->peerNodeID) && (peerFabricIndex == existingSession->GetFabricIndex());
-}
-
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const CommandHandler & commandHandler,
-                                                                          const Commands::Offer::DecodableType & req)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleOffer(const CommandHandler & commandHandler,
+                                                                           const Commands::Offer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
-    if (!IsPeerNodeSessionValid(sessionId, commandHandler))
-    {
-        return Status::NotFound;
-    }
+    // Get the session struct to pass to delegate
+    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
+    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
+
+    WebRTCSessionStruct * session = FindSession(sessionId, peerNodeId, peerFabricIndex);
+    VerifyOrReturnValue(session != nullptr, Status::NotFound);
 
     // Create arguments for Delegate.
     Delegate::OfferArgs args;
@@ -228,29 +181,31 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const 
     }
 
     // Delegate processing: handle the SDP offer, gather ICE candidates, SDP answer, etc.
-    return mDelegate.HandleOffer(sessionId, args);
+    return mDelegate.HandleOffer(*session, args);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const CommandHandler & commandHandler,
-                                                                           const Commands::Answer::DecodableType & req)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleAnswer(const CommandHandler & commandHandler,
+                                                                            const Commands::Answer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
 
-    if (!IsPeerNodeSessionValid(sessionId, commandHandler))
-    {
-        return Status::NotFound;
-    }
+    // Get the session struct to pass to delegate
+    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
+    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
+
+    WebRTCSessionStruct * session = FindSession(sessionId, peerNodeId, peerFabricIndex);
+    VerifyOrReturnValue(session != nullptr, Status::NotFound);
 
     std::string sdpAnswer(sdpSpan.data(), sdpSpan.size());
 
     // Delegate handles Answer command received.
-    return mDelegate.HandleAnswer(sessionId, sdpAnswer);
+    return mDelegate.HandleAnswer(*session, sdpAnswer);
 }
 
 DataModel::ActionReturnStatus
-WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & commandHandler,
-                                                    const Commands::ICECandidates::DecodableType & req)
+WebRTCTransportRequestorCluster::HandleICECandidates(const CommandHandler & commandHandler,
+                                                     const Commands::ICECandidates::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
@@ -286,17 +241,19 @@ WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & comma
         return Status::ConstraintError;
     }
 
-    // Check if the session, NodeID are valid
-    if (!IsPeerNodeSessionValid(sessionId, commandHandler))
-    {
-        return Status::NotFound;
-    }
+    // Get the session struct to pass to delegate
+    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
+    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
 
-    return mDelegate.HandleICECandidates(sessionId, candidates);
+    WebRTCSessionStruct * session = FindSession(sessionId, peerNodeId, peerFabricIndex);
+    VerifyOrReturnValue(session != nullptr, Status::NotFound);
+
+    // Pass the full session struct so delegate can identify which camera this is for
+    return mDelegate.HandleICECandidates(*session, candidates);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const CommandHandler & commandHandler,
-                                                                        const Commands::End::DecodableType & req)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleEnd(const CommandHandler & commandHandler,
+                                                                         const Commands::End::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto reason        = req.reason;
@@ -308,24 +265,26 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const Co
         return Status::ConstraintError;
     }
 
-    if (!IsPeerNodeSessionValid(sessionId, commandHandler))
-    {
-        return Status::NotFound;
-    }
+    // Get the session struct to pass to delegate
+    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
+    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
 
-    CHIP_ERROR delegateResult = mDelegate.HandleEnd(sessionId, reason);
+    WebRTCSessionStruct * session = FindSession(sessionId, peerNodeId, peerFabricIndex);
+    VerifyOrReturnValue(session != nullptr, Status::NotFound);
 
-    RemoveSession(sessionId);
+    // Pass the full session struct so delegate can identify which camera this is for
+    CHIP_ERROR delegateResult = mDelegate.HandleEnd(*session, reason);
+    RemoveSession(sessionId, peerNodeId, peerFabricIndex);
 
     return delegateResult;
 }
 
 // Helper functions
-WebRTCSessionStruct * WebRTCTransportRequestorServer::FindSession(uint16_t sessionId)
+WebRTCSessionStruct * WebRTCTransportRequestorCluster::FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
     for (auto & session : mCurrentSessions)
     {
-        if (session.id == sessionId)
+        if (session.id == sessionId && session.peerNodeID == peerNodeId && session.GetFabricIndex() == fabricIndex)
         {
             return &session;
         }
@@ -334,12 +293,16 @@ WebRTCSessionStruct * WebRTCTransportRequestorServer::FindSession(uint16_t sessi
     return nullptr;
 }
 
-WebRTCTransportRequestorServer::UpsertResultEnum WebRTCTransportRequestorServer::UpsertSession(const WebRTCSessionStruct & session)
+WebRTCTransportRequestorCluster::UpsertResultEnum
+WebRTCTransportRequestorCluster::UpsertSession(const WebRTCSessionStruct & session)
 {
-    // Search for a session in the current sessions
+    // Search for a session in the current sessions using the full tuple <id, peerNodeID, fabricIndex>
+    // This is critical because different cameras can allocate the same sessionId
     UpsertResultEnum result;
-    auto it = std::find_if(mCurrentSessions.begin(), mCurrentSessions.end(),
-                           [id = session.id](const auto & existing) { return existing.id == id; });
+    auto it = std::find_if(mCurrentSessions.begin(), mCurrentSessions.end(), [&session](const auto & existing) {
+        return existing.id == session.id && existing.peerNodeID == session.peerNodeID &&
+            existing.GetFabricIndex() == session.GetFabricIndex();
+    });
 
     if (it != mCurrentSessions.end())
     {
@@ -357,12 +320,16 @@ WebRTCTransportRequestorServer::UpsertResultEnum WebRTCTransportRequestorServer:
     return result;
 }
 
-void WebRTCTransportRequestorServer::RemoveSession(uint16_t sessionId)
+void WebRTCTransportRequestorCluster::RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
     size_t originalSize = mCurrentSessions.size();
-    // Remove the session if sessionId is matching
+    // Remove the session if the full tuple <sessionId, peerNodeId, fabricIndex> matches
+    // This is critical: different cameras can have the same sessionId, so we must match all three fields
     mCurrentSessions.erase(std::remove_if(mCurrentSessions.begin(), mCurrentSessions.end(),
-                                          [sessionId](const WebRTCSessionStruct & s) { return s.id == sessionId; }),
+                                          [sessionId, peerNodeId, fabricIndex](const WebRTCSessionStruct & s) {
+                                              return s.id == sessionId && s.peerNodeID == peerNodeId &&
+                                                  s.GetFabricIndex() == fabricIndex;
+                                          }),
                            mCurrentSessions.end());
 
     // Check whether session was removed

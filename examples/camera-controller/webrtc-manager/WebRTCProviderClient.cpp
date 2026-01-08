@@ -32,7 +32,7 @@ constexpr uint32_t kDeferredOfferTimeoutSeconds = 30;
 } // namespace
 
 void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpointId,
-                                Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer)
+                                Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster * requestorServer)
 {
     mPeerId          = peerId;
     mEndpointId      = endpointId;
@@ -402,7 +402,7 @@ void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * syste
 
     if (self->mCurrentSessionId != 0)
     {
-        self->mRequestorServer->RemoveSession(self->mCurrentSessionId);
+        self->mRequestorServer->RemoveSession(self->mCurrentSessionId, self->mPeerId.GetNodeId(), self->mPeerId.GetFabricIndex());
         self->mCurrentSessionId = 0;
     }
 

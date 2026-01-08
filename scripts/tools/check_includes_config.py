@@ -142,7 +142,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
     'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
-    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h': {'string', 'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
