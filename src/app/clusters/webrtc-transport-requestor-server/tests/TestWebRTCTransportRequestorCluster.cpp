@@ -26,6 +26,7 @@
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
 #include <clusters/WebRTCTransportRequestor/Metadata.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -76,7 +77,26 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestAttributes)
     MockWebRTCTransportRequestorDelegate mockDelegate;
     WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(server, { WebRTCTransportRequestor::Attributes::CurrentSessions::kMetadataEntry }));
+    std::array<chip::app::DataModel::AttributeEntry, 6> expectedAttributes = {
+        WebRTCTransportRequestor::Attributes::CurrentSessions::kMetadataEntry,
+        chip::app::DataModel::AttributeEntry(
+            Globals::Attributes::GeneratedCommandList::Id,
+            BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute), Access::Privilege::kView,
+            std::nullopt),
+        chip::app::DataModel::AttributeEntry(
+            Globals::Attributes::AcceptedCommandList::Id,
+            BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute), Access::Privilege::kView,
+            std::nullopt),
+        chip::app::DataModel::AttributeEntry(
+            Globals::Attributes::AttributeList::Id,
+            BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute), Access::Privilege::kView,
+            std::nullopt),
+        chip::app::DataModel::AttributeEntry(Globals::Attributes::FeatureMap::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                             Access::Privilege::kView, std::nullopt),
+        chip::app::DataModel::AttributeEntry(Globals::Attributes::ClusterRevision::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                             Access::Privilege::kView, std::nullopt),
+    };
+    ASSERT_TRUE(IsAttributesListEqualTo(server, expectedAttributes));
 }
 
 TEST_F(TestWebRTCTransportRequestorCluster, TestCommands)
@@ -84,13 +104,13 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCommands)
     MockWebRTCTransportRequestorDelegate mockDelegate;
     WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server,
-                                              {
-                                                  WebRTCTransportRequestor::Commands::Offer::kMetadataEntry,
-                                                  WebRTCTransportRequestor::Commands::Answer::kMetadataEntry,
-                                                  WebRTCTransportRequestor::Commands::ICECandidates::kMetadataEntry,
-                                                  WebRTCTransportRequestor::Commands::End::kMetadataEntry,
-                                              }));
+    std::array<chip::app::DataModel::AcceptedCommandEntry, 4> expectedCommands = {
+        WebRTCTransportRequestor::Commands::Offer::kMetadataEntry,
+        WebRTCTransportRequestor::Commands::Answer::kMetadataEntry,
+        WebRTCTransportRequestor::Commands::ICECandidates::kMetadataEntry,
+        WebRTCTransportRequestor::Commands::End::kMetadataEntry,
+    };
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server, expectedCommands));
 }
 
 TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
