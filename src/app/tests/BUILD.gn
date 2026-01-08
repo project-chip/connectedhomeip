@@ -144,9 +144,9 @@ source_set("thread-border-router-management-test-srcs") {
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
 
-    # Sources for  codegen integration of group key management
-    "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.h",
+    # Sources for codegen integration of group key management
     "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.cpp",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.h",
   ]
 
   public_deps = [
