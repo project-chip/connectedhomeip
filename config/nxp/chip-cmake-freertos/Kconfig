@@ -203,13 +203,6 @@ endif # CHIP_SE05X
 
 # App specific
 
-config OPERATIONAL_KEYSTORE
-	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
-	default y if CHIP_SE05X
-	help
-		"Use custom implementation of operational keystore"
-
 config LOW_POWER
 	bool "Should be replaced by CONFIG_NXP_USE_LOW_POWER. Keep it for backwards compatibility"
 	default y if NXP_USE_LOW_POWER

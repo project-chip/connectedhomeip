@@ -68,7 +68,7 @@
 #include "WifiConnect.h"
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
 #include "OperationalKeystore.h"
 #endif
 
@@ -185,7 +185,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -202,7 +202,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     TEMPORARY_RETURN_IGNORED chip::NXP::App::OperationalKeystore::Init(persistentStorage);
 #endif
 
