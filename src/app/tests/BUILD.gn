@@ -152,6 +152,7 @@ source_set("thread-border-router-management-test-srcs") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server:group-key-mgmt-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
