@@ -181,8 +181,8 @@ TLV data for you.
     `ByteSpan`, or `DecodableList`), the tester buffers the TLV data internally.
 -   **Lifetime Safety**: This data remains valid for the lifetime of the
     `ClusterTester` instance, allowing you to safely iterate over lists or
-    inspect spans without worrying about the buffer being deallocated
-    immediately after the read call.
+    inspect spans without worrying about the buffer being freed immediately
+    after the read call.
 
 ### Fabric Scoping (Writes)
 
