@@ -146,9 +146,14 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
 
-        // TODO: This runs asynchronously; getSession() may return Missing(). Make sure to not call .Value() without checking
-        // HasValue().
-        ByteSpan attestationChallenge = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+        auto session = getSession();
+        if (!session.HasValue())
+        {
+            ChipLogError(Controller, "Session is missing");
+            OnVendorIdVerificationComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+        ByteSpan attestationChallenge = session.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         CHIP_ERROR err                = Verify(info, clientChallenge, attestationChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
         OnVendorIdVerificationComplete(err);
@@ -158,10 +163,17 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         ChipLogError(Controller, "Failed to receive SignVIDVerificationResponse: %s", ErrorStr(err));
         OnVendorIdVerificationComplete(err);
     };
-    // TODO: This runs asynchronously; getSession() may return Missing(). Make sure to not call .Value() without checking
-    // HasValue().
+
+    Optional<SessionHandle> session = getSession();
+    if (!session.HasValue())
+    {
+        ChipLogError(Controller, "Session is missing");
+        CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
+        OnVendorIdVerificationComplete(err);
+        return err;
+    }
     CHIP_ERROR err =
-        Controller::InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
+        Controller::InvokeCommandRequest(exchangeMgr, session.Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));
