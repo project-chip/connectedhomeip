@@ -90,8 +90,8 @@ DefaultTlsClientManagementDelegate gDefaultDelegate;
 CertificateTableImpl gDefaultCertificateTable;
 
 TlsClientManagementDelegate * gDelegate           = &gDefaultDelegate;
-CertificateTable * gCertificateTable              = &gDefaultCertificateTable;
-constexpr uint8_t kDefaultMaxProvisionedEndpoints = 254;
+CertificateTableImpl * gCertificateTable          = &gDefaultCertificateTable;
+constexpr uint8_t kDefaultMaxProvisionedEndpoints = CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS;
 
 LazyRegisteredServerCluster<TlsClientManagementCluster> gClusterInstance;
 
@@ -106,7 +106,7 @@ void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate
     gDelegate = &delegate;
 }
 
-void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTable & certificateTable)
+void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTableImpl & certificateTable)
 {
     gCertificateTable = &certificateTable;
 }
@@ -123,13 +123,18 @@ void MatterTlsClientManagementPluginServerInitCallback()
 void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
 {
     // Only create once - avoid double initialization if callback is called multiple times
-    VerifyOrReturn(!gClusterInstance.IsConstructed());
+    // Note: This cluster only supports a single endpoint. If defined on multiple endpoints,
+    // only the first one will be initialized and functional.
+    if (gClusterInstance.IsConstructed())
+    {
+        ChipLogError(Zcl,
+                     "TLS Client Management Cluster already initialized on endpoint %u. Ignoring initialization on endpoint %u. "
+                     "This cluster only supports a single endpoint.",
+                     gClusterInstance.Cluster().GetEndpointId(), endpointId);
+        return;
+    }
 
-    // SetEndpoint is only available on CertificateTableImpl.
-    // Both the default and application-provided tables are expected to be CertificateTableImpl instances.
-    CertificateTableImpl * impl = static_cast<CertificateTableImpl *>(gCertificateTable);
-    VerifyOrDie(impl != nullptr);
-    LogErrorOnFailure(impl->SetEndpoint(endpointId));
+    LogErrorOnFailure(gCertificateTable->SetEndpoint(endpointId));
 
     gClusterInstance.Create(endpointId, *gDelegate, *gCertificateTable, kDefaultMaxProvisionedEndpoints);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gClusterInstance.Registration());

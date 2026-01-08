@@ -92,8 +92,6 @@ void TlsClientManagementCluster::Shutdown(ClusterShutdownType)
 DataModel::ActionReturnStatus TlsClientManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                         AttributeValueEncoder & encoder)
 {
-    VerifyOrDie(request.path.mClusterId == TlsClientManagement::Id);
-
     switch (request.path.mAttributeId)
     {
     case MaxProvisioned::Id:

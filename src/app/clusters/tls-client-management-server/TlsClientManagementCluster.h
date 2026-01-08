@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/tls-certificate-management-server/CertificateTable.h>
+#include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TlsClientManagement/Commands.h>
@@ -56,9 +57,6 @@ public:
      */
     uint8_t GetMaxProvisioned() const;
 
-    /**
-     * @return The endpoint ID.
-     */
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     /**
@@ -212,7 +210,7 @@ void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate
  * MUST be called before server initialization (e.g. in main() before ServerInit()).
  * If not called, a default certificate table will be used.
  */
-void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTable & certificateTable);
+void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTableImpl & certificateTable);
 
 } // namespace Clusters
 } // namespace app
