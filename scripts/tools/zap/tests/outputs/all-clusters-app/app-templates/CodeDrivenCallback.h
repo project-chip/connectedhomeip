@@ -129,6 +129,10 @@ void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterThermostatClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterThermostatClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
