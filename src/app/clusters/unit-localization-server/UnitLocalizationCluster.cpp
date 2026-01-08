@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/UnitLocalization/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -70,7 +70,8 @@ CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus UnitLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus UnitLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                      AttributeValueDecoder & decoder)
 {
     return WriteImpl(request.path, decoder);
 }
@@ -97,7 +98,8 @@ CHIP_ERROR UnitLocalizationCluster::WriteImpl(const ConcreteDataAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                     AttributeValueEncoder & encoder)
 {
     if (request.path.mClusterId != UnitLocalization::Id)
     {
@@ -145,7 +147,8 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 

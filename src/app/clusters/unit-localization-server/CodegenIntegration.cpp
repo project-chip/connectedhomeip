@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/static-cluster-config/UnitLocalization.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <clusters/UnitLocalization/Ids.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 using namespace chip;
 using namespace chip::app;

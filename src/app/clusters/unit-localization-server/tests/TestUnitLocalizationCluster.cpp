@@ -19,11 +19,11 @@
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <clusters/UnitLocalization/Metadata.h>
 #include <clusters/UnitLocalization/Attributes.h>
+#include <clusters/UnitLocalization/Metadata.h>
 
 #include <iostream>
 
@@ -54,10 +54,8 @@ TEST_F(TestUnitLocalizationCluster, AttributesTemperatureFeature)
     const BitFlags<Feature> features{ Feature::kTemperatureUnit };
     UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, features };
 
-    ASSERT_TRUE(IsAttributesListEqualTo(unitLocalizationCluster, {
-        TemperatureUnit::kMetadataEntry,
-        SupportedTemperatureUnits::kMetadataEntry
-    }));
+    ASSERT_TRUE(IsAttributesListEqualTo(unitLocalizationCluster,
+                                        { TemperatureUnit::kMetadataEntry, SupportedTemperatureUnits::kMetadataEntry }));
 }
 
 TEST_F(TestUnitLocalizationCluster, ReadMandatoryAttributes)

@@ -40,7 +40,9 @@ inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
 class UnitLocalizationCluster : public DefaultServerCluster
 {
 public:
-    UnitLocalizationCluster(EndpointId endpointId, const BitFlags<UnitLocalization::Feature> features) : DefaultServerCluster({endpointId, UnitLocalization::Id }), mFeatures(features) {}
+    UnitLocalizationCluster(EndpointId endpointId, const BitFlags<UnitLocalization::Feature> features) :
+        DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures(features)
+    {}
 
     // ServerClusterInterface
     CHIP_ERROR Startup(ServerClusterContext & context) override;
