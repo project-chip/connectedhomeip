@@ -22,6 +22,7 @@
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
+#include <minmdns/MinMdnsConfig.h>
 #include <tracing/macros.h>
 
 namespace chip {
@@ -207,7 +208,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, mTargetHostName.Get());
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
     }
 
     inactiveReset.Disarm();
