@@ -205,7 +205,7 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceI
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
-    DeviceInstanceInfoProvider::DeviceInfoCapabilityMinimas capabilityMinimasFromDeviceInfo =
+    auto capabilityMinimasFromDeviceInfo =
         deviceInfoProvider->GetSupportedCapabilityMinimaValues();
 
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
@@ -284,6 +284,9 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 
     DeviceInstanceInfoProvider * deviceInfoProvider;
     ReturnErrorOnFailure(GetDeviceInstanceInfoProviderImpl(&deviceInfoProvider));
+
+    // TODO: The configuration manager should be injected into the basic information cluster instead of
+    // directly fetching a reference to the singleton object. Issue #42602
     auto & configManager = ConfigurationMgr();
 
     switch (request.path.mAttributeId)

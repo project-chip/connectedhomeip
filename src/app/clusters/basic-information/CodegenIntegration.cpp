@@ -45,7 +45,7 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
 
 LazyRegisteredServerCluster<BasicInformationCluster> gServer;
 
-void TestOnlyDisableUniqueIdAttr(BasicInformationCluster::OptionalAttributesSet & attributeSet)
+void LegacyOnlyDisableUniqueIdAttr(BasicInformationCluster::OptionalAttributesSet & attributeSet)
 {
     attributeSet.Set<BasicInformation::Attributes::UniqueID::Id>(false);
 }
@@ -67,7 +67,7 @@ public:
         // for the lighting-app-data-mode-no-unique-id example app with the MCORE_FS_1_3 test.
         if (!optionalAttributeSet.IsSet(BasicInformation::Attributes::UniqueID::Id))
         {
-            TestOnlyDisableUniqueIdAttr(gServer.Cluster().OptionalAttributes());
+            LegacyOnlyDisableUniqueIdAttr(gServer.Cluster().OptionalAttributes());
         }
 
         return gServer.Registration();
