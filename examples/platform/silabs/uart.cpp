@@ -196,6 +196,22 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 #endif // SLI_SI91X_MCU_INTERFACE == 0
 static void uartSendBytes(UartTxStruct_t & bufferStruct);
 
+#if SLI_SI91X_MCU_INTERFACE
+static void ensureNullTermination(UartTxStruct_t & bufferStruct)
+{
+    if (bufferStruct.length > 0 && bufferStruct.length < MATTER_ARRAY_SIZE(bufferStruct.data) &&
+        bufferStruct.data[bufferStruct.length - 1] != '\0')
+    {
+        bufferStruct.data[bufferStruct.length] = '\0';
+    }
+    else
+    {
+        uint16_t nullPos           = (bufferStruct.length == 0) ? 0 : MATTER_ARRAY_SIZE(bufferStruct.data) - 1;
+        bufferStruct.data[nullPos] = '\0';
+    }
+}
+#endif
+
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
 {
     if (fifo == NULL || pDataBuffer == NULL)
@@ -565,15 +581,7 @@ void uartMainLoop(void * args)
 void uartSendBytes(UartTxStruct_t & bufferStruct)
 {
 #if SLI_SI91X_MCU_INTERFACE
-    // ensuring null termination of buffer
-    if (bufferStruct.length < MATTER_ARRAY_SIZE(bufferStruct.data) && bufferStruct.data[bufferStruct.length - 1] != '\0')
-    {
-        bufferStruct.data[bufferStruct.length] = '\0';
-    }
-    else
-    {
-        bufferStruct.data[MATTER_ARRAY_SIZE(bufferStruct.data) - 1] = '\0';
-    }
+    ensureNullTermination(bufferStruct);
     Board_UARTPutSTR(bufferStruct.data);
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
@@ -616,20 +624,26 @@ void uartFlushTxQueue(void)
     while (osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0) == osOK)
     {
 #if SLI_SI91X_MCU_INTERFACE
-        // ensuring null termination of buffer
-        if (workBuffer.length < MATTER_ARRAY_SIZE(workBuffer.data) && workBuffer.data[workBuffer.length - 1] != '\0')
-        {
-            workBuffer.data[workBuffer.length] = '\0';
-        }
-        else
-        {
-            workBuffer.data[MATTER_ARRAY_SIZE(workBuffer.data) - 1] = '\0';
-        }
+        ensureNullTermination(workBuffer);
         Board_UARTPutSTR(workBuffer.data);
 #else
         UARTDRV_ForceTransmit(vcom_handle, workBuffer.data, workBuffer.length);
 #endif
     }
+}
+
+void uartForceTransmit(const uint8_t * data, uint16_t length)
+{
+#if SLI_SI91X_MCU_INTERFACE
+    UartTxStruct_t tempBuffer;
+    uint16_t copyLength = (length < MATTER_ARRAY_SIZE(tempBuffer.data)) ? length : (MATTER_ARRAY_SIZE(tempBuffer.data) - 1);
+    memcpy(tempBuffer.data, data, copyLength);
+    tempBuffer.length = copyLength;
+    ensureNullTermination(tempBuffer);
+    Board_UARTPutSTR((char *) tempBuffer.data);
+#else
+    UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) data, length);
+#endif
 }
 
 #ifdef __cplusplus
