@@ -205,8 +205,7 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceI
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
-    auto capabilityMinimasFromDeviceInfo =
-        deviceInfoProvider->GetSupportedCapabilityMinimaValues();
+    auto capabilityMinimasFromDeviceInfo = deviceInfoProvider->GetSupportedCapabilityMinimaValues();
 
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
     capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
