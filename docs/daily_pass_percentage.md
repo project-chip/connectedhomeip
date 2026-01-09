@@ -2,11 +2,11 @@
 |:-------------------------------|------------:|
 | dependabot-updates             |           0 |
 | codeql                         |           0 |
-| tests                          |          77 |
-| darwin                         |          92 |
-| darwin-tests                   |          92 |
-| documentation-build            |          92 |
+| tests                          |          46 |
+| builds                         |          69 |
+| darwin                         |          86 |
 | chef-ci                        |         100 |
+| build-example-infineon         |         100 |
 | tv-casting-example-darwin      |         100 |
 | cancel-workflows-on-failing-ci |         100 |
 | build-example-linux-arm        |         100 |
@@ -14,8 +14,8 @@
 | delete-old-artifacts           |         100 |
 | lint-code-base                 |         100 |
 | zap                            |         100 |
-| build-example-infineon         |         100 |
-| builds                         |         100 |
+| build-example-nxp              |         100 |
+| documentation-build            |         100 |
 | unit-integration-tests         |         100 |
 | build-example-ameba            |         100 |
 | build-example-asr              |         100 |
@@ -30,13 +30,13 @@
 | build-example-stm32            |         100 |
 | build-example-esp32            |         100 |
 | build-example-telink           |         100 |
-| build-example-nxp              |         100 |
+| test-tv-casting-example        |         100 |
 | full-builds-android            |         100 |
 | run-misspell                   |         100 |
-| test-tv-casting-example        |         100 |
-| build-example-realtek          |         100 |
 | recent-fail-summary            |         100 |
+| build-example-realtek          |         100 |
 | build-example-ti-cc13xx-26xx   |         100 |
+| darwin-tests                   |         100 |
 | build-example-tizen            |         100 |
 | bloat-check                    |         100 |
 | cirque                         |         100 |
