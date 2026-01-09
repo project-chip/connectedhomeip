@@ -83,7 +83,7 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
         chip_config_network_layer_ble=false is_debug=false "$GN_VERSION_ARGS"
 
     if [ ! -f "$OUT_DIR/chip-ota-requestor-app" ]; then
-        echo "ERROR: Could not find chip-ota-requetor-app in $OUT_DIR"
+        echo "ERROR: Could not find chip-ota-requestor-app in $OUT_DIR"
         ls -l "$OUT_DIR"
         exit 1
     fi
