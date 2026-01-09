@@ -58,8 +58,6 @@ public:
     CHIP_ERROR SetTemperatureUnit(TempUnitEnum unit);
 
 private:
-    CHIP_ERROR WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
-
     DataModel::List<TempUnitEnum> mSupportedTemperatureUnits{ DataModel::List<TempUnitEnum>(mUnitsBuffer) };
     TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = { TempUnitEnum::kFahrenheit, TempUnitEnum::kCelsius,
                                                                   TempUnitEnum::kKelvin };

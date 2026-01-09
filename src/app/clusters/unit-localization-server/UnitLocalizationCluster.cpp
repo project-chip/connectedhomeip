@@ -73,57 +73,34 @@ CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List
 DataModel::ActionReturnStatus UnitLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                       AttributeValueDecoder & decoder)
 {
-    return WriteImpl(request.path, decoder);
-}
-
-CHIP_ERROR UnitLocalizationCluster::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    if (aPath.mClusterId != UnitLocalization::Id)
-    {
-        return CHIP_ERROR_INVALID_PATH_LIST;
-    }
-
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
     {
     case TemperatureUnit::Id: {
         TempUnitEnum newTempUnit = TempUnitEnum::kCelsius;
-        ReturnErrorOnFailure(aDecoder.Decode(newTempUnit));
-        ReturnErrorOnFailure(SetTemperatureUnit(newTempUnit));
-        return CHIP_NO_ERROR;
+        ReturnErrorOnFailure(decoder.Decode(newTempUnit));
+        return SetTemperatureUnit(newTempUnit);
     }
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
-    if (request.path.mClusterId != UnitLocalization::Id)
-    {
-        return CHIP_ERROR_INVALID_PATH_LIST;
-    }
-
     switch (request.path.mAttributeId)
     {
-    case TemperatureUnit::Id: {
+    case TemperatureUnit::Id:
         return encoder.Encode(mTemperatureUnit);
-    }
-    case SupportedTemperatureUnits::Id: {
+    case SupportedTemperatureUnits::Id:
         return encoder.Encode(GetSupportedTemperatureUnits());
-    }
-    case ClusterRevision::Id: {
+    case ClusterRevision::Id:
         return encoder.Encode(kRevision);
-    }
-    case FeatureMap::Id: {
+    case FeatureMap::Id:
         return encoder.Encode(mFeatures);
-    }
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)

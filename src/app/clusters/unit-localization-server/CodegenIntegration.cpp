@@ -83,7 +83,7 @@ void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, 
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = kRootEndpointId,
-            .clusterId                 = ::Id,
+            .clusterId                 = UnitLocalization::Id,
             .fixedClusterInstanceCount = UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
         },
