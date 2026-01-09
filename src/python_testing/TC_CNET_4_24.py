@@ -158,7 +158,7 @@ def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -
     Common TLV types:
     - 0x02: Extended PAN ID (8 bytes)
     - 0x03: Network Name (variable length, max 16 bytes)
-    - 0x05: Master Key/Network Key (16 bytes)
+    - 0x05: Network Key (16 bytes)
 
     Args:
         dataset: Thread operational dataset in bytes
@@ -182,69 +182,61 @@ def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -
                     f"Invalid TLV length for type 0x{tlv_type:02x}: {current_length}, expected {expected_length} bytes")
             if i + 2 + current_length <= len(dataset):
                 return dataset[i + 2:i + 2 + current_length]
-            else:
-                raise ValueError(f"TLV type 0x{tlv_type:02x} extends beyond dataset boundary")
+            raise ValueError(f"TLV type 0x{tlv_type:02x} extends beyond dataset boundary")
 
         i += 2 + current_length
 
     raise ValueError(f"TLV type 0x{tlv_type:02x} not found in Thread operational dataset")
 
 
-def modify_thread_tlvs(dataset: bytes, modifications: dict) -> bytes:
+def modify_thread_tlv(dataset: bytes, tlv_type: int, modifier_fn) -> bytes:
     """
-    Modifies specific TLV values in a Thread Operational Dataset.
+    Modifies a specific TLV value in a Thread Operational Dataset.
 
     Args:
         dataset: Original Thread operational dataset in bytes
-        modifications: Dictionary mapping TLV type (int) to modification function.
-                      The function takes the original value bytes and returns modified bytes.
-                      Example: {0x02: lambda v: bytes(b ^ 0xAA for b in v)}
+        tlv_type: TLV type to modify (e.g., 0x02 for Extended PAN ID)
+        modifier_fn: Function that takes the original value bytes and returns modified bytes.
+                    Example: lambda v: bytes(b ^ 0xAA for b in v)
 
     Returns:
         Modified dataset as bytes
 
     Raises:
-        ValueError: If a TLV type to modify is not found in the dataset
+        ValueError: If the TLV type is not found or modified value has different length
     """
     result = bytearray(dataset)
     i = 0
 
-    # Track which modifications were applied
-    applied_modifications = set()
-
     while i < len(result) - 1:
-        tlv_type = result[i]
-        tlv_length = result[i + 1]
+        current_type = result[i]
+        current_length = result[i + 1]
 
-        if tlv_type in modifications:
+        if current_type == tlv_type:
             # Extract current value
             value_start = i + 2
-            value_end = value_start + tlv_length
+            value_end = value_start + current_length
 
-            if value_end <= len(result):
-                original_value = bytes(result[value_start:value_end])
-                # Apply modification function
-                modified_value = modifications[tlv_type](original_value)
+            if value_end > len(result):
+                raise ValueError(f"TLV type 0x{tlv_type:02x} extends beyond dataset boundary")
 
-                # Ensure modified value has same length
-                if len(modified_value) != tlv_length:
-                    raise ValueError(f"Modified TLV value for type 0x{tlv_type:02x} has different length: "
-                                     f"{len(modified_value)} vs original {tlv_length}")
+            original_value = bytes(result[value_start:value_end])
+            # Apply modification function
+            modified_value = modifier_fn(original_value)
 
-                # Replace value in dataset
-                result[value_start:value_end] = modified_value
-                applied_modifications.add(tlv_type)
-                logger.info(f" --- Modified TLV type 0x{tlv_type:02x} ({tlv_length} bytes)")
+            # Ensure modified value has same length
+            if len(modified_value) != current_length:
+                raise ValueError(f"Modified TLV value for type 0x{tlv_type:02x} has different length: "
+                                 f"{len(modified_value)} vs original {current_length}")
 
-        i += 2 + tlv_length
+            # Replace value in dataset
+            result[value_start:value_end] = modified_value
+            logger.info(f" --- Modified TLV type 0x{tlv_type:02x} ({current_length} bytes)")
+            return bytes(result)
 
-    # Verify all requested modifications were applied
-    missing_types = set(modifications.keys()) - applied_modifications
-    if missing_types:
-        missing_hex = [f"0x{t:02x}" for t in missing_types]
-        raise ValueError(f"TLV types {', '.join(missing_hex)} not found in dataset")
+        i += 2 + current_length
 
-    return bytes(result)
+    raise ValueError(f"TLV type 0x{tlv_type:02x} not found in dataset")
 
 
 class TC_CNET_4_24(MatterBaseTest):
@@ -255,7 +247,7 @@ class TC_CNET_4_24(MatterBaseTest):
         To run the test case, use the following command:
 
         ```bash
-        python src/python_testing/TC_CNET_4_24.py --commissioning-method ble-thread -d <discriminator> -p <passcode> \
+        python src/python_testing/TC_CNET_4_24.py --in-test-commissioning-method ble-thread -d <discriminator> -p <passcode> \
                --endpoint <endpoint_value> --thread-dataset-hex <dataset_value>
         ```
 
@@ -335,9 +327,7 @@ class TC_CNET_4_24(MatterBaseTest):
     def steps_TC_CNET_4_24(self):
         return [
             TestStep(0, "TH commissions the DUT over BLE-Thread using correct credentials\n"
-                        "Then opens a new fail-safe window (300 seconds) for network reconfiguration testing\n"
-                        "TH reads FeatureMap attribute from the DUT and verifies if DUT supports Thread on endpoint 0",
-                        is_commissioning=True),
+                        "Then opens a new fail-safe window (300 seconds) for network reconfiguration testing\n"),
             TestStep(1, "TH reads Networks attribute and removes all configured networks",
                         "Verify that DUT successfully removed all networks configured during commissioning\n"
                         "Verify LastNetworkingStatus and LastConnectErrorValue are Null after network removal"),
@@ -346,9 +336,8 @@ class TC_CNET_4_24(MatterBaseTest):
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
             TestStep(3, "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2",
-                        "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
-                        "1. NetworkingStatus is kSuccess (0) (in non-concurrent mode)\n"
-                        "After delay, verify LastNetworkingStatus is NOT kSuccess, indicating connection failure"),
+                        "Verify DUT returns ConnectNetworkResponse with NetworkingStatus kSuccess (0).\n"
+                        "Non-concurrent mode: connection happens asynchronously, failure reported in Step 4"),
             TestStep(4, "TH reads LastNetworkingStatus after Extended PAN ID connection failure",
                         "Verify LastNetworkingStatus is kNetworkNotFound (5)"),
             TestStep(5, "TH reads Networks attribute",
@@ -358,15 +347,14 @@ class TC_CNET_4_24(MatterBaseTest):
                         "1. NetworkingStatus is kSuccess (0)"),
             TestStep(7, "TH reads Networks attribute",
                         "Verify Networks list is empty after removal"),
-            TestStep(8, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Master Key, Breadcrumb = 4",
+            TestStep(8, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Key, Breadcrumb = 4",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty\n"),
-            TestStep(9, "TH sends ConnectNetwork command with dataset containing incorrect Master Key, Breadcrumb = 5",
-                        "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
-                        "1. NetworkingStatus is kSuccess (0) (in non-concurrent mode)\n"
-                        "After delay, verify LastNetworkingStatus is NOT kSuccess, indicating connection failure"),
-            TestStep(10, "TH reads LastNetworkingStatus after Master Key connection failure",
+            TestStep(9, "TH sends ConnectNetwork command with dataset containing incorrect Network Key, Breadcrumb = 5",
+                        "Verify DUT returns ConnectNetworkResponse with NetworkingStatus kSuccess (0).\n"
+                        "Non-concurrent mode: connection happens asynchronously, failure reported in Step 10"),
+            TestStep(10, "TH reads LastNetworkingStatus after Network Key connection failure",
                          "Verify LastNetworkingStatus is kAuthFailure (7)"),
             TestStep(11, "TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 6",
                          "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
@@ -377,7 +365,7 @@ class TC_CNET_4_24(MatterBaseTest):
                          "1. NetworkingStatus is kSuccess (0)\n"
                          "2. DebugText is of type string with max length 512 or empty"),
             TestStep(13, "TH reads LastNetworkingStatus (should be kSuccess)",
-                         "Verify LastNetworkingStatus to be 'kSuccess'"),
+                         "Verify LastNetworkingStatus is kSuccess (0)"),
             TestStep(14, "TH reads Networks attribute",
                          "Verify the device is connected to the correct network"),
             TestStep(15, "TH sends ArmFailSafe(0) to close the fail-safe window and commit network changes",
@@ -398,41 +386,38 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
         # Create incorrect Thread operational datasets for testing
-        # First incorrect dataset: valid format but with modified Extended PAN ID ONLY
+        # First incorrect dataset: valid format but with modified Extended PAN ID
         # This should cause kNetworkNotFound since the Extended PAN ID identifies the network
         # Extended PAN ID: Type=0x02, Length=0x08, Value=8 bytes
-        incorrect_thread_dataset_1 = modify_thread_tlvs(
+        incorrect_thread_dataset_1 = modify_thread_tlv(
             correct_thread_dataset,
-            {
-                0x02: lambda v: bytes(b ^ 0xAA for b in v),  # XOR Extended PAN ID with 0xAA
-            }
+            0x02,  # Extended PAN ID
+            lambda v: bytes(b ^ 0xAA for b in v)  # XOR with 0xAA
         )
         logger.info(f" --- Incorrect Thread dataset 1 (modified Extended PAN ID only): {incorrect_thread_dataset_1.hex()}")
 
-        # Second incorrect dataset: valid format but with modified Master Key ONLY
+        # Second incorrect dataset: valid format but with modified Network Key
         # This should cause kAuthFailure since the network exists but credentials are wrong
-        # Master Key: Type=0x05, Length=0x10, Value=16 bytes
-        incorrect_thread_dataset_2 = modify_thread_tlvs(
+        # Network Key: Type=0x05, Length=0x10, Value=16 bytes
+        incorrect_thread_dataset_2 = modify_thread_tlv(
             correct_thread_dataset,
-            {
-                0x05: lambda v: bytes(b ^ 0xCC for b in v),  # XOR Master Key with 0xCC
-            }
+            0x05,  # Network Key
+            lambda v: bytes(b ^ 0xCC for b in v)  # XOR with 0xCC
         )
-        logger.info(f" --- Incorrect Thread dataset 2 (modified Master Key only): {incorrect_thread_dataset_2.hex()}")
+        logger.info(f" --- Incorrect Thread dataset 2 (modified Network Key only): {incorrect_thread_dataset_2.hex()}")
 
-        # Step 0: TH begins commissioning the DUT over the initial commissioning radio (PASE):
+        # Step 0: TH commissions the DUT over BLE-Thread using correct credentials
         self.step(0)
 
-        # Commission device normally (with CommissioningComplete)
-        # Thread networks cannot prevent automatic connection like WiFi (no separate password)
-        # So we commission fully, then open a new fail-safe for testing
+        # For non-concurrent mode, ConnectNetwork returns kSuccess immediately, actual connection is async so
+        # CASE Session cannot be established and falls back to PASE over Thread during commissioning.
+        # This allows testing with different Thread datasets (bad extended PAN ID and bad Network Key).
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
 
         try:
             await self.commission_devices()
-            # Device is now fully commissioned and on Thread network with CASE session established
             logger.info(" --- Device commissioned successfully, now on Thread network")
         except Exception as e:
             logger.error(f" --- Commissioning failed: {e}")
@@ -441,7 +426,6 @@ class TC_CNET_4_24(MatterBaseTest):
             )
 
         # Open a new fail-safe window (300 seconds) for network reconfiguration testing
-        # This allows us to test incorrect and correct credentials while maintaining connectivity
         await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -504,8 +488,6 @@ class TC_CNET_4_24(MatterBaseTest):
 
         # Step 2: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID, Breadcrumb = 1
         self.step(2)
-
-        logger.info(" --- Step 2: Sending AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateThreadNetwork(
@@ -519,31 +501,21 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 3: TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2
         self.step(3)
 
-        logger.info(" --- Step 3: Sending ConnectNetwork with dataset containing incorrect Extended PAN ID")
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
         network_id_1 = get_thread_tlv(incorrect_thread_dataset_1, tlv_type=0x02, expected_length=8)
-        logger.info(f" --- Extracted Extended PAN ID: {network_id_1.hex()}")
+        logger.info(f" --- Step 3: Sending ConnectNetwork with incorrect Extended PAN ID: {network_id_1.hex()}")
 
-        # Thread devices may timeout when trying to connect with incorrect credentials
-        # This is expected behavior - the device will not respond if it cannot find/join the network
-        connect_failed = False
-        try:
-            response = await self.send_single_cmd(
-                endpoint=endpoint,
-                cmd=cnet.Commands.ConnectNetwork(
-                    networkID=network_id_1,
-                    breadcrumb=2
-                ),
-                timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
-            )
-            # In non-concurrent mode, ConnectNetwork may return kSuccess immediately
-            # even though connection will fail later
-            await self._validate_connect_network_response(response, expect_success=True)
-            logger.info(" --- Step 3: ConnectNetwork returned kSuccess (non-concurrent mode)")
-        except Exception as e:
-            # Timeout is expected when device cannot connect with incorrect credentials
-            logger.info(f" --- Step 3: ConnectNetwork timed out as expected with incorrect credentials: {e}")
-            connect_failed = True
+        # Non-concurrent mode: ConnectNetwork returns kSuccess immediately, actual connection is async
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(
+                networkID=network_id_1,
+                breadcrumb=2
+            ),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(response, expect_success=True)
+        logger.info(" --- ConnectNetwork returned kSuccess (correct for non-concurrent mode)")
 
         # Wait for device to complete connection attempt
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for device to update network status...")
@@ -552,28 +524,11 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 4: TH reads LastNetworkingStatus after Extended PAN ID connection failure
         self.step(4)
 
-        last_networking_status = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.LastNetworkingStatus,
-        )
-        logger.info(f" --- LastNetworkingStatus after incorrect Extended PAN ID: {last_networking_status}")
-
-        # Verify that LastNetworkingStatus indicates a valid error status
-        # Expected: kNetworkNotFound (5) for non-existent Extended PAN ID
-        # Acceptable fallbacks: kOtherConnectionFailure (9), kAuthFailure (7), kUnknownError (12)
-        valid_statuses = [
-            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
-            cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure,
-            cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
-            cnet.Enums.NetworkCommissioningStatusEnum.kUnknownError,
-            cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,  # TODO: Remove before PR - DUT firmware bug
-        ]
-        asserts.assert_in(
-            last_networking_status,
-            valid_statuses,
-            f"LastNetworkingStatus must be one of {[s.name for s in valid_statuses]}, got {last_networking_status}"
+        # Verify that LastNetworkingStatus is kNetworkNotFound
+        # The device should detect that the Extended PAN ID does not exist in the environment
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound
         )
 
         # Step 5: TH reads Networks attribute (verify dataset with incorrect Extended PAN ID is stored)
@@ -606,10 +561,8 @@ class TC_CNET_4_24(MatterBaseTest):
         asserts.assert_equal(len(networks), 0,
                              f"Expected Networks list to be empty, but has {len(networks)} network(s)")
 
-        # Step 8: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Master Key, Breadcrumb = 4
+        # Step 8: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Key, Breadcrumb = 4
         self.step(8)
-
-        logger.info(" --- Step 8: Sending AddOrUpdateThreadNetwork with valid format but incorrect Master Key")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateThreadNetwork(
@@ -620,60 +573,37 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_network_config_response(response)
 
-        # Step 9: TH sends ConnectNetwork command with dataset containing incorrect Master Key, Breadcrumb = 5
+        # Step 9: TH sends ConnectNetwork command with dataset containing incorrect Network Key, Breadcrumb = 5
         self.step(9)
 
-        logger.info(" --- Step 9: Sending ConnectNetwork with dataset containing incorrect Master Key")
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
         network_id_2 = get_thread_tlv(incorrect_thread_dataset_2, tlv_type=0x02, expected_length=8)
-        logger.info(f" --- Extracted Extended PAN ID: {network_id_2.hex()}")
+        logger.info(f" --- Step 9: Sending ConnectNetwork with incorrect Network Key: {network_id_2.hex()}")
 
-        # Thread devices may timeout when trying to connect with incorrect credentials
-        connect_failed = False
-        try:
-            response = await self.send_single_cmd(
-                endpoint=endpoint,
-                cmd=cnet.Commands.ConnectNetwork(
-                    networkID=network_id_2,
-                    breadcrumb=5
-                ),
-                timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
-            )
-            # In non-concurrent mode, ConnectNetwork may return kSuccess immediately
-            await self._validate_connect_network_response(response, expect_success=True)
-            logger.info(" --- Step 9: ConnectNetwork returned kSuccess (non-concurrent mode)")
-        except Exception as e:
-            logger.info(f" --- Step 9: ConnectNetwork timed out as expected with incorrect credentials: {e}")
-            connect_failed = True
+        # Non-concurrent mode: ConnectNetwork returns kSuccess immediately, actual connection is async
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(
+                networkID=network_id_2,
+                breadcrumb=5
+            ),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(response, expect_success=True)
+        logger.info(" --- ConnectNetwork returned kSuccess (correct for non-concurrent mode)")
 
         # Wait for device to complete connection attempt
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for device to update network status...")
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Step 10: TH reads LastNetworkingStatus after Network Name/Master Key connection failure
+        # Step 10: TH reads LastNetworkingStatus after Network Key connection failure
         self.step(10)
 
-        last_networking_status = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.LastNetworkingStatus,
-        )
-        logger.info(f" --- LastNetworkingStatus after incorrect Master Key: {last_networking_status}")
-
-        # Verify that LastNetworkingStatus indicates a valid error status
-        # Expected: kAuthFailure (7) for incorrect Network Name/Master Key
-        # Acceptable fallbacks: kOtherConnectionFailure (9), kUnknownError (12)
-        valid_statuses = [
-            cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
-            cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure,
-            cnet.Enums.NetworkCommissioningStatusEnum.kUnknownError,
-            cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,  # TODO: Remove before PR - DUT firmware bug
-        ]
-        asserts.assert_in(
-            last_networking_status,
-            valid_statuses,
-            f"LastNetworkingStatus must be one of {[s.name for s in valid_statuses]}, got {last_networking_status}"
+        # Verify that LastNetworkingStatus is kAuthFailure
+        # The device should detect incorrect Network Key authentication failure
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure
         )
 
         # Step 11: TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 6
@@ -696,10 +626,9 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 12: TH sends ConnectNetwork command and Breadcrumb = 7
         self.step(12)
 
-        logger.info(" --- Step 12: Sending ConnectNetwork with correct operational dataset")
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
         correct_network_id = get_thread_tlv(correct_thread_dataset, tlv_type=0x02, expected_length=8)
-        logger.info(f" --- Extracted Extended PAN ID: {correct_network_id.hex()}")
+        logger.info(f" --- Step 12: Sending ConnectNetwork with correct dataset: {correct_network_id.hex()}")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
@@ -709,7 +638,7 @@ class TC_CNET_4_24(MatterBaseTest):
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
         await self._validate_connect_network_response(response, expect_success=True)
-        logger.info(" --- Step 12: ConnectNetwork succeeded with correct operational dataset")
+        logger.info(" --- ConnectNetwork succeeded")
 
         # Step 13: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(13)
@@ -737,8 +666,8 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 15: Close fail-safe to commit the network reconfiguration
         self.step(15)
 
-        # Since the device already completed commissioning in Step 0, we cannot send CommissioningComplete.
-        # Instead, close the fail-safe by sending ArmFailSafe with expiryLengthSeconds=0, which commits the network configuration changes.
+        # Commissioning completed in Step 0 (CommissioningComplete was already sent)
+        # Close the fail-safe by sending ArmFailSafe(0) to commit the network configuration changes
         logger.info(" --- Closing fail-safe window with ArmFailSafe(0) to commit network reconfiguration...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
