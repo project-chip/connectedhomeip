@@ -47,7 +47,7 @@ def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]
     return problems
 
 
-def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], info: ConformanceAssessmentData) -> list[ChoiceConformanceProblemNotice]:
+def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], conformance_assessment_data: ConformanceAssessmentData) -> list[ChoiceConformanceProblemNotice]:
     all_features = [uint(1 << i) for i in range(32)]
     all_features = [f for f in all_features if f in xml_clusters[cluster_id].features]
 
@@ -55,34 +55,38 @@ def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_c
     counts: dict[Choice, int] = {}
     for f in all_features:
         xml_feature = xml_clusters[cluster_id].features[f]
-        conformance_decision_with_choice = xml_feature.conformance(info)
-        _add_to_counts_if_required(conformance_decision_with_choice, (info.feature_map & f) != 0, counts)
+        conformance_decision_with_choice = xml_feature.conformance(conformance_assessment_data)
+        _add_to_counts_if_required(conformance_decision_with_choice, (conformance_assessment_data.feature_map & f) != 0, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
     return _evaluate_choices(location, counts)
 
 
-def evaluate_attribute_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], info: ConformanceAssessmentData) -> list[ChoiceConformanceProblemNotice]:
+def evaluate_attribute_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], conformance_assessment_data: ConformanceAssessmentData) -> list[ChoiceConformanceProblemNotice]:
     all_attributes = xml_clusters[cluster_id].attributes.keys()
 
     counts: dict[Choice, int] = {}
     for attribute_id in all_attributes:
-        conformance_decision_with_choice = xml_clusters[cluster_id].attributes[attribute_id].conformance(info)
-        _add_to_counts_if_required(conformance_decision_with_choice, attribute_id in info.attribute_list, counts)
+        conformance_decision_with_choice = xml_clusters[cluster_id].attributes[attribute_id].conformance(
+            conformance_assessment_data)
+        _add_to_counts_if_required(conformance_decision_with_choice,
+                                   attribute_id in conformance_assessment_data.attribute_list, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.ATTRIBUTE_LIST_ID)
     return _evaluate_choices(location, counts)
 
 
-def evaluate_command_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], info: ConformanceAssessmentData) -> list[ChoiceConformanceProblemNotice]:
+def evaluate_command_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], conformance_assessment_data: ConformanceAssessmentData) -> list[ChoiceConformanceProblemNotice]:
     all_commands = xml_clusters[cluster_id].accepted_commands.keys()
 
     counts: dict[Choice, int] = {}
     for command_id in all_commands:
-        conformance_decision_with_choice = xml_clusters[cluster_id].accepted_commands[command_id].conformance(info)
-        _add_to_counts_if_required(conformance_decision_with_choice, command_id in info.all_command_list, counts)
+        conformance_decision_with_choice = xml_clusters[cluster_id].accepted_commands[command_id].conformance(
+            conformance_assessment_data)
+        _add_to_counts_if_required(conformance_decision_with_choice,
+                                   command_id in conformance_assessment_data.all_command_list, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
