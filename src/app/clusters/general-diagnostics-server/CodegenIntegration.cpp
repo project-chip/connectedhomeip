@@ -61,16 +61,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -139,7 +138,7 @@ System::Clock::Microseconds64 GetInitTimestamp()
 
 void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    IntegrationDelegate integrationDelegate = MakeIntegrationDelegate();
+    static IntegrationDelegate integrationDelegate = MakeIntegrationDelegate();
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
@@ -156,7 +155,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 
 void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    IntegrationDelegate integrationDelegate = MakeIntegrationDelegate();
+    static IntegrationDelegate integrationDelegate = MakeIntegrationDelegate();
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
