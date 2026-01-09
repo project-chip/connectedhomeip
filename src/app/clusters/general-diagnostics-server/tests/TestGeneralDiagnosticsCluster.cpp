@@ -75,9 +75,14 @@ class DummyTestEventTriggerDelegate : public TestEventTriggerDelegate
 public:
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override
     {
-        // Always return false to indicate test events are not enabled
-        (void) enableKey;
-        return false;
+        for (uint8_t byte : enableKey)
+        {
+            if (byte != 0)
+            {
+                return false; // Key is not all zeros, so it's a non-matching key.
+            }
+        }
+        return true; // Key is all zeros, indicating test events are disabled.
     }
 
     CHIP_ERROR HandleEventTriggers(uint64_t eventTrigger) override
@@ -115,14 +120,15 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+protected:
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
+    DummyTestEventTriggerDelegate dummyDelegate;
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
-    System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-    DummyTestEventTriggerDelegate dummyDelegate;
-
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                       InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -143,12 +149,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 {
     {
         // everything returns empty here ..
-        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
 
         // Create cluster without enabling any feature flags
-        System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-        DummyTestEventTriggerDelegate dummyDelegate;
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                           InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
 
@@ -223,8 +226,6 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
-        System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-        DummyTestEventTriggerDelegate dummyDelegate;
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance(), &dummyDelegate,
                                           initTimestamp);
 
@@ -282,10 +283,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
 {
     // Create a cluster with no optional attributes enabled
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
-    System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-    DummyTestEventTriggerDelegate dummyDelegate;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                       InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
 
@@ -303,14 +301,11 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
 TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
 {
     // Configure cluster with POSIX time support enabled and no optional attributes enabled
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
         .enablePosixTime       = true,
         .enablePayloadSnapshot = false,
     };
-    System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-    DummyTestEventTriggerDelegate dummyDelegate;
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                                       InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp,
                                                       functionsConfig);
@@ -332,10 +327,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
 TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
 {
     // Create a cluster with no optional attributes enabled
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
-    System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-    DummyTestEventTriggerDelegate dummyDelegate;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                       InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
 
