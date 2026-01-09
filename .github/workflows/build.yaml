@@ -204,6 +204,12 @@ jobs:
                   BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clean output
               run: rm -rf ./out
+            - name: Build and run AddressSanitizer (ASAN) unit tests (Pull Requests only)
+              if: github.event_name == 'pull_request'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target linux-x64-tests-asan-clang build \
+                    && rm -rf out/linux-x64-tests-asan-clang"
             - name: Run Tests with sanitizers
               # Sanitizer tests are not likely to find extra issues so running the same tests
               # as above repeatedly on every pull request seems extra time. Instead keep this run
