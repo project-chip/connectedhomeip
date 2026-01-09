@@ -20,6 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
+#include <app/clusters/tls-client-management-server/CodegenIntegration.h>
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <app/util/af-types.h>
