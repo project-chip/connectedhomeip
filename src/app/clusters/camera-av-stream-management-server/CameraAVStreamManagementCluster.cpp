@@ -171,13 +171,6 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamManagementCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-    return CHIP_NO_ERROR;
-}
-
 bool CameraAVStreamManagementCluster::HasFeature(Feature feature) const
 {
     return mEnabledFeatures.Has(feature);

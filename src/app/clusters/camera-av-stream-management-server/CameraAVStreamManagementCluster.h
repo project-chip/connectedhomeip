@@ -458,8 +458,6 @@ public:
      */
     CHIP_ERROR Init();
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -620,8 +618,6 @@ public:
 
     Globals::ThreeLevelAutoEnum GetStatusLightBrightness() const { return mStatusLightBrightness; }
 
-    // EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
-
     // Add/Remove Management functions for streams
 
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
@@ -711,7 +707,6 @@ private:
 
     CameraAVStreamManagementDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
-    EndpointId mEndpointId;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes

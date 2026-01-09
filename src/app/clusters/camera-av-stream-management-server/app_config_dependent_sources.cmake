@@ -18,5 +18,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CameraAVStreamManagementCluster.cpp"
     "${CLUSTER_DIR}/CameraAVStreamManagementCluster.h"
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
