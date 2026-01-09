@@ -473,7 +473,7 @@ class TC_DA_1_2(BasicCompositionTests):
                      testing. Note that such CDs are NOT suitable for use on production devices.
 
                      To continue using a non-CSA signed provisional CD for certification testing, please set the
-                     override_provisional_cd_check flag (`--bool-arg override_provisional_cd_check:true') and re-run this test.
+                     override_provisional_cd_check_warning flag (`--bool-arg override_provisional_cd_check_warning:true') and re-run this test.
                    """
             self.record_error(test_name=self.current_test_info.name, location=problem_location, problem=msg)
 
