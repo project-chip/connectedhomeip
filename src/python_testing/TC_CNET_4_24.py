@@ -17,10 +17,8 @@
 
 import asyncio
 import logging
-import socket
 
 from mobly import asserts
-from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -32,122 +30,16 @@ logger = logging.getLogger(__name__)
 # Timeout constants
 TIMED_REQUEST_TIMEOUT_MS = 5000         # Matter command timeout (5s)
 CONNECT_NETWORK_TIMEOUT_MS = 60000      # ConnectNetwork timeout (60s - Thread needs more time to scan/fail)
-MDNS_DISCOVERY_TIMEOUT = 10             # mDNS discovery timeout per attempt (10s)
 NETWORK_STATUS_UPDATE_DELAY = 5         # Delay for DUT to update LastNetworkingStatus (5s for Thread)
-MDNS_DISCOVERY_PREP_DELAY = 5           # Delay before starting mDNS discovery (5s)
-SESSION_EXPIRY_DELAY = 5                # Delay for session expiry (5s)
-SCAN_RETRY_DELAY = 3                    # Delay between scan retries (3s)
-MAX_ATTEMPTS = 3                        # Maximum discovery attempts
 TIMEOUT = 300                           # Overall test timeout (5 min)
 
 # Cluster references
 cnet = Clusters.NetworkCommissioning
 cgen = Clusters.GeneralCommissioning
 
-
-class MatterServiceListener(ServiceListener):
-    """
-    Zeroconf service listener for Matter devices.
-    Collects all discovered Matter services with optional device ID filtering.
-    """
-
-    def __init__(self, target_device_id=None):
-        self.discovered_services = []
-        self.target_device_id = target_device_id
-
-    def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:
-        try:
-            service_info = zc.get_service_info(type_, name)
-            if service_info:
-                addresses = []
-                for addr in service_info.addresses:
-                    if len(addr) == 4:  # IPv4
-                        addresses.append(socket.inet_ntoa(addr))
-                    elif len(addr) == 16:  # IPv6
-                        addresses.append(socket.inet_ntop(socket.AF_INET6, addr))
-                service_data = {
-                    'name': name.replace(f'.{type_}', ''),
-                    'type': type_,
-                    'domain': 'local',
-                    'addresses': addresses,
-                    'port': service_info.port,
-                    'properties': service_info.properties
-                }
-
-                # Filter by target device ID if specified
-                if self.target_device_id:
-                    # The device ID can be in the service name or properties
-                    service_name = service_data['name']
-                    target_id_str = str(self.target_device_id)
-
-                    # Convert numeric node ID to hex format if needed
-                    if target_id_str.isdigit():
-                        target_id_hex = format(int(target_id_str), 'X')
-                    else:
-                        target_id_hex = target_id_str
-
-                    # Check if the target device ID (in various formats) is in the service name
-                    if (target_id_str.upper() in service_name.upper() or
-                        target_id_hex.upper() in service_name.upper() or
-                            target_id_hex.upper().zfill(16) in service_name.upper()):
-                        self.discovered_services.append(service_data)
-                    else:
-                        pass
-                else:
-                    # No filtering, add all services
-                    self.discovered_services.append(service_data)
-        except Exception as e:
-            logger.warning(f"MatterServiceListener: Failed to get service info for {name}: {e}")
-
-    def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
-        pass
-
-    def update_service(self, zc: Zeroconf, type_: str, name: str) -> None:
-        pass
-
-
-async def find_matter_devices_mdns(target_device_id: int = None) -> list:
-    """
-    Finds Matter devices via mDNS using zeroconf, optionally filtering by target device ID.
-    Raises an exception if no device is found after MAX_ATTEMPTS.
-    Returns the list of discovered services.
-    """
-    service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
-
-    logger.info(
-        f" --- find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + str(target_device_id) if target_device_id else ''}")
-
-    for attempt in range(1, MAX_ATTEMPTS + 1):
-        zc = None
-        try:
-            zc = Zeroconf()
-            listener = MatterServiceListener(target_device_id)
-            browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
-
-            await asyncio.sleep(MDNS_DISCOVERY_TIMEOUT)
-
-            # Cleanup
-            for browser in browsers:
-                browser.cancel()
-            await asyncio.sleep(0.1)  # Give browsers time to cleanup
-
-            if listener.discovered_services:
-                return listener.discovered_services
-
-        except Exception as e:
-            logger.error(f" --- find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
-        finally:
-            if zc is not None:
-                try:
-                    zc.close()
-                except Exception as e:
-                    logger.warning(f"Failed to close zeroconf instance: {e}")
-
-        if attempt < MAX_ATTEMPTS:
-            await asyncio.sleep(SCAN_RETRY_DELAY)
-
-    raise Exception(
-        f"find_matter_devices_mdns: mDNS discovery failed after {MAX_ATTEMPTS} attempts - No Matter devices found{' for target device ID: ' + str(target_device_id) if target_device_id else ''}")
+# Thread TLV types (from Thread Operational Dataset specification)
+EXTENDED_PAN_ID_TLV_TYPE = 0x02  # 8 bytes
+NETWORK_KEY_TLV_TYPE = 0x05      # 16 bytes
 
 
 def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -> bytes:
@@ -156,9 +48,9 @@ def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -
     Thread TLV format: Type (1 byte) | Length (1 byte) | Value (Length bytes)
 
     Common TLV types:
-    - 0x02: Extended PAN ID (8 bytes)
+    - EXTENDED_PAN_ID_TLV_TYPE (0x02): Extended PAN ID (8 bytes)
     - 0x03: Network Name (variable length, max 16 bytes)
-    - 0x05: Network Key (16 bytes)
+    - NETWORK_KEY_TLV_TYPE (0x05): Network Key (16 bytes)
 
     Args:
         dataset: Thread operational dataset in bytes
@@ -391,7 +283,7 @@ class TC_CNET_4_24(MatterBaseTest):
         # Extended PAN ID: Type=0x02, Length=0x08, Value=8 bytes
         incorrect_thread_dataset_1 = modify_thread_tlv(
             correct_thread_dataset,
-            0x02,  # Extended PAN ID
+            EXTENDED_PAN_ID_TLV_TYPE,
             lambda v: bytes(b ^ 0xAA for b in v)  # XOR with 0xAA
         )
         logger.info(f" --- Incorrect Thread dataset 1 (modified Extended PAN ID only): {incorrect_thread_dataset_1.hex()}")
@@ -401,7 +293,7 @@ class TC_CNET_4_24(MatterBaseTest):
         # Network Key: Type=0x05, Length=0x10, Value=16 bytes
         incorrect_thread_dataset_2 = modify_thread_tlv(
             correct_thread_dataset,
-            0x05,  # Network Key
+            NETWORK_KEY_TLV_TYPE,
             lambda v: bytes(b ^ 0xCC for b in v)  # XOR with 0xCC
         )
         logger.info(f" --- Incorrect Thread dataset 2 (modified Network Key only): {incorrect_thread_dataset_2.hex()}")
@@ -502,7 +394,7 @@ class TC_CNET_4_24(MatterBaseTest):
         self.step(3)
 
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
-        network_id_1 = get_thread_tlv(incorrect_thread_dataset_1, tlv_type=0x02, expected_length=8)
+        network_id_1 = get_thread_tlv(incorrect_thread_dataset_1, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 3: Sending ConnectNetwork with incorrect Extended PAN ID: {network_id_1.hex()}")
 
         # Non-concurrent mode: ConnectNetwork returns kSuccess immediately, actual connection is async
@@ -577,7 +469,7 @@ class TC_CNET_4_24(MatterBaseTest):
         self.step(9)
 
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
-        network_id_2 = get_thread_tlv(incorrect_thread_dataset_2, tlv_type=0x02, expected_length=8)
+        network_id_2 = get_thread_tlv(incorrect_thread_dataset_2, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 9: Sending ConnectNetwork with incorrect Network Key: {network_id_2.hex()}")
 
         # Non-concurrent mode: ConnectNetwork returns kSuccess immediately, actual connection is async
@@ -627,7 +519,7 @@ class TC_CNET_4_24(MatterBaseTest):
         self.step(12)
 
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
-        correct_network_id = get_thread_tlv(correct_thread_dataset, tlv_type=0x02, expected_length=8)
+        correct_network_id = get_thread_tlv(correct_thread_dataset, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 12: Sending ConnectNetwork with correct dataset: {correct_network_id.hex()}")
         response = await self.send_single_cmd(
             endpoint=endpoint,
@@ -655,8 +547,7 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(f" --- Step 14: Networks attribute has {len(response)} network(s)")
         asserts.assert_greater_equal(len(response), 1,
                                      "Expected at least one network in Networks attribute after successful connection")
-        # Verify the device is connected to the correct network
-        correct_network_id = get_thread_tlv(correct_thread_dataset, tlv_type=0x02, expected_length=8)
+        # Verify the device is connected to the correct network (correct_network_id from Step 12)
         connected_networks = [network.networkID for network in response if network.connected]
         logger.info(f" --- Connected networks: {[net.hex() for net in connected_networks]}")
         logger.info(f" --- Expected network ID: {correct_network_id.hex()}")
