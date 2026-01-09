@@ -214,7 +214,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+        const GeneralDiagnosticsCluster::OptionalAttributeSet allOptionalAttributesSet =
             GeneralDiagnosticsCluster::OptionalAttributeSet()
                 .Set<TotalOperationalHours::Id>()
                 .Set<BootReason::Id>()
@@ -226,7 +226,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance(), &dummyDelegate,
+        GeneralDiagnosticsCluster cluster(allOptionalAttributesSet, features, InteractionModelEngine::GetInstance(), &dummyDelegate,
                                           initTimestamp);
 
         // Check mandatory commands are present
