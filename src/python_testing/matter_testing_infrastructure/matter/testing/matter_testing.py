@@ -1414,7 +1414,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
-                LOGGER.info("Created restart flag file to signal app restart")
+                LOGGER.info("Created restart flag file to signal app reboot")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
@@ -1423,8 +1423,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("App restart completed successfully")
 
             except Exception as e:
-                LOGGER.error(f"Failed to restart app: {e}")
-                asserts.fail(f"App restart failed: {e}")
+                LOGGER.error(f"Failed to reboot app: {e}")
+                asserts.fail(f"App reboot failed: {e}")
 
     async def request_device_factory_reset(self):
         """Request a factory reset of the Device Under Test (DUT).
@@ -1437,7 +1437,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         restart_flag_file = self.get_restart_flag_file()
 
         if not restart_flag_file:
-            # No restart flag file: ask user to manually reboot
+            # No restart flag file: ask user to manually factory reset
             self.wait_for_user_input(prompt_msg="Factory reset the DUT. Press Enter when ready.\n")
 
             # After manual factory reset, expire previous sessions so that we can re-establish connections
@@ -1449,17 +1449,17 @@ class MatterBaseTest(base_test.BaseTestClass):
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write("reset")
-                    LOGGER.info("Created restart flag file to signal app reboot and wrote reset to trigger factory reset (remove KVS file)")
+                    LOGGER.info("Created restart flag file to signal app factory reset")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
-                LOGGER.info("App reboot completed successfully")
+                LOGGER.info("App factory reset completed successfully")
 
             except Exception as e:
-                LOGGER.error(f"Failed to reboot app: {e}")
-                asserts.fail(f"App reboot failed: {e}")
+                LOGGER.error(f"Failed to factory reset app: {e}")
+                asserts.fail(f"App factory reset failed: {e}")
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
