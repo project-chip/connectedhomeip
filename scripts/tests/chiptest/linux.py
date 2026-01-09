@@ -98,12 +98,18 @@ class NetworkLinkBase:
             self._executed_commands.append(c)
 
     def setup(self) -> None:
+        """Set up the link without bringing the link up."""
         self._run_up(*self.setup_cmds)
 
-    def link_up(self) -> None:
+    def link_up(self, *args: Any, **kwargs: Any) -> None:
+        """Bring the link up.
+
+        Subclasses might add additional arguments.
+        """
         self._run_up(*self.link_up_cmds)
 
     def terminate(self) -> None:
+        """Deconstruct the link by executing down commands for all executed commands."""
         for cmd in reversed(self._executed_commands):
             try:
                 cmd.down()
@@ -196,7 +202,7 @@ class NetworkLink(NetworkLinkBase):
 class NetworkNamespace(NetworkLink):
     ns_name: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         super().__post_init__()
         self.ns_name = f"{self.ns_name}-{self.index}"
 
