@@ -87,7 +87,7 @@ class TC_CC_6_5(MatterBaseTest):
             TestStep("5b", "TH reads EnhancedColorMode attribute from DUT.",
                      "Value has to be between a range of 0x00 to 0x03; Verify that the DUT response indicates that the EnhancedColorMode attribute has the expected value 2 (ColorTemperatureMireds)."),
         ]
-    
+
     @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds), has_attribute(Clusters.ColorControl.Attributes.StartUpColorTemperatureMireds), has_command(Clusters.OnOff.Commands.On))
     async def test_TC_CC_6_5(self):
         cc_cluster = Clusters.Objects.ColorControl
@@ -181,35 +181,35 @@ class TC_CC_6_5(MatterBaseTest):
         if not (self.is_pics_sdk_ci_only and restart_flag_file is not None):
             self.wait_for_user_input("Power On the device under test.")
             self.TH1.ExpireSessions(self.dut_node_id)
-            cc_cluster, cc_attributes.StartUpColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        asserts.assert_equal(startup_color_temp_mireds, startup_color_temperature_mireds2a,
-                             "Post cycle startup color temperature should match target value")
+            cc_cluster, cc_attributes.StartUpColorTemperatureMireds, dev_ctrl = self.TH1, endpoint = self.endpoint)
+            asserts.assert_equal(startup_color_temp_mireds, startup_color_temperature_mireds2a,
+                            "Post cycle startup color temperature should match target value")
 
-        self.step("4b")
-        # Verify ColorTemperatureMireds is valid as StartupColorTemperatureMireds
-        color_temperature_mireds = await self.read_single_attribute_check_success(
-            cc_cluster, cc_attributes.ColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        asserts.assert_true(isinstance(color_temperature_mireds, int),
-                            "Color temperature value should be an integer")
-        asserts.assert_greater_equal(color_temperature_mireds, MIN_STARTUP_COLOR_TEMP,
-                                     f"Color temperature {color_temperature_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
-        asserts.assert_less_equal(color_temperature_mireds, MAX_STARTUP_COLOR_TEMP,
+                             self.step("4b")
+                                 # Verify ColorTemperatureMireds is valid as StartupColorTemperatureMireds
+                                 color_temperature_mireds= await self.read_single_attribute_check_success(
+            cc_cluster, cc_attributes.ColorTemperatureMireds, dev_ctrl = self.TH1, endpoint = self.endpoint)
+            asserts.assert_true(isinstance(color_temperature_mireds, int),
+                           "Color temperature value should be an integer")
+                            asserts.assert_greater_equal(color_temperature_mireds, MIN_STARTUP_COLOR_TEMP,
+                                    f"Color temperature {color_temperature_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
+                                     asserts.assert_less_equal(color_temperature_mireds, MAX_STARTUP_COLOR_TEMP,
                                   f"Color temperature {color_temperature_mireds} should be <= {MAX_STARTUP_COLOR_TEMP}")
-        asserts.assert_equal(color_temperature_mireds, startup_color_temp_mireds,
+                                  asserts.assert_equal(color_temperature_mireds, startup_color_temp_mireds,
                              "Post cycle color temperature should match target value")
 
-        self.step("5a")
-        color_mode = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.ColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        log.info(f"Color mode response: {color_mode}")
-        asserts.assert_in(color_mode, range(0, 3), "Value ColorMode in range of [0,2]")
-        asserts.assert_equal(color_mode, 2, "Value ColorMode is not 2")
+                             self.step("5a")
+                                 color_mode = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.ColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
+                                 log.info(f"Color mode response: {color_mode}")
+                                 asserts.assert_in(color_mode, range(0, 3), "Value ColorMode in range of [0,2]")
+                                 asserts.assert_equal(color_mode, 2, "Value ColorMode is not 2")
 
-        self.step("5b")
-        enhanced_color_mode = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.EnhancedColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
-        log.info(f"Enhanced mode response: {enhanced_color_mode}")
-        asserts.assert_in(enhanced_color_mode, range(0, 4), "Value EnhancedColorMode in range of [0,3]")
-        asserts.assert_equal(enhanced_color_mode, 2, "Value EnhancedColorMode is not 2")
+                                 self.step("5b")
+                                 enhanced_color_mode = await self.read_single_attribute_check_success(cc_cluster, cc_attributes.EnhancedColorMode, dev_ctrl=self.TH1, endpoint=self.endpoint)
+                                 log.info(f"Enhanced mode response: {enhanced_color_mode}")
+                                 asserts.assert_in(enhanced_color_mode, range(0, 4), "Value EnhancedColorMode in range of [0,3]")
+                                 asserts.assert_equal(enhanced_color_mode, 2, "Value EnhancedColorMode is not 2")
 
 
-if __name__ == "__main__":
+                                 if __name__ == "__main__":
     default_matter_test_main()
