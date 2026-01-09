@@ -455,12 +455,22 @@ menu "CHIP Device Layer"
             bool "Enable Long Idle Time ICD"
             depends on ENABLE_ICD_SERVER
             default n
+            select ENABLE_ICD_CIP
+            select ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
             help
                 Enables or Disables LIT ICD
 
+        config ENABLE_ICD_DSLS
+            bool "Enable Dynamic SIT LIT Support"
+            depends on ENABLE_ICD_LIT
+            default y
+            help
+                Enables or Disables dynamic switching from SIT to LIT operating modes.
+
+
         config ENABLE_ICD_CIP
             bool "Enable Check-in protocol"
-            depends on ENABLE_ICD_LIT
+            depends on ENABLE_ICD_SERVER
             default y
             help
                 Enables or Disables ICD Check-in protocol
@@ -488,12 +498,12 @@ menu "CHIP Device Layer"
 
         config ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
             bool "Enable User Active Mode Trigger feature"
-            depends on ENABLE_ICD_LIT
+            depends on ENABLE_ICD_SERVER
             default y
             help
                 Enables or Disables ICD User Active Mode Trigger feature
 
-        config ENABLE_BG_EVENT_PROCESSING
+        menuconfig ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
             default n
             help

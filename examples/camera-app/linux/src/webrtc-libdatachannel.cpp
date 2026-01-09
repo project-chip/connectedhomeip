@@ -297,7 +297,7 @@ public:
 
             // Extract any candidates embedded in the SDP description
             std::vector<rtc::Candidate> candidates = desc.candidates();
-            ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+            ChipLogProgress(Camera, "Extracted %zu candidates from SDP description", candidates.size());
 
             for (const auto & candidate : candidates)
             {

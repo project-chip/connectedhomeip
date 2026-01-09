@@ -45,7 +45,11 @@ from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_WebRTCR_2_5(WEBRTCRTestBase):
@@ -63,7 +67,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_discriminator = 1234
         self.th_server_passcode = 20202021
@@ -138,7 +142,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
 
         self.step(1)
         await self.default_controller.CommissionOnNetwork(nodeId=self.th_server_local_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning TH_SERVER complete")
+        log.info("Commissioning TH_SERVER complete")
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(

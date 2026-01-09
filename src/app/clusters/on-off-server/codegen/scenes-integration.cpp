@@ -13,13 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "zap-generated/gen_config.h"
 #include <app/clusters/on-off-server/codegen/scenes-integration.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/on-off-server/on-off-server.h>
-#include <app/clusters/scenes-server/scenes-server.h> // nogncheck
+#include <app/clusters/on-off-server/on-off-server.h>                      // nogncheck
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h> // nogncheck
+#include <app/clusters/scenes-server/CodegenEndpointToIndex.h>             // nogncheck
+#include <app/clusters/scenes-server/scenes-server.h>                      // nogncheck
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -31,10 +34,9 @@ static constexpr size_t kOnOffMaxEndpointCount =
     MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static void sceneOnOffCallback(EndpointId endpoint);
-using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
-using OnOffTransitionTimeInterface =
-    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEndpointCount,
-                                                             MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
+using OnOffEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
+using OnOffTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<
+    scenes::CodegenEndpointToIndex<OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT, kOnOffMaxEndpointCount>>;
 
 #if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
@@ -45,7 +47,7 @@ public:
     // As per spec, 1 attribute is scenable in the on off cluster
     static constexpr uint8_t scenableAttributeCount = 1;
 
-    DefaultOnOffSceneHandler()           = default;
+    DefaultOnOffSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
     ~DefaultOnOffSceneHandler() override = default;
 
     // Default function for OnOff cluster, only checks if OnOff is enabled on the endpoint
@@ -125,7 +127,7 @@ public:
     }
 
 private:
-    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(OnOff::Id, sceneOnOffCallback);
+    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(sceneOnOffCallback);
 };
 static DefaultOnOffSceneHandler sOnOffSceneHandler;
 

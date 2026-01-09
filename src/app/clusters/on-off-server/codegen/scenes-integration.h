@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <app/clusters/scenes-server/SceneTable.h>
+#include <app/clusters/scenes-server/SceneTable.h> // nogncheck
 #include <app/util/config.h>
 #include <lib/core/CHIPConfig.h>
 

@@ -43,7 +43,11 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_LTIME_3_1(MatterBaseTest):
@@ -95,7 +99,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(1)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-        logging.info(f"HourFormat {type(hour_format)} with value {hour_format}")
+        log.info(f"HourFormat {type(hour_format)} with value {hour_format}")
         # Validate Enum8
         matter_asserts.assert_valid_uint8(hour_format, description="HourFormat")
         asserts.assert_is_instance(hour_format, self.cluster.Enums.HourFormatEnum, "HourFormat is not type of HourFormatEnum")
@@ -151,7 +155,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(11)
         active_calendar_type = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
-        logging.info(f"Value for {active_calendar_type}")
+        log.info(f"Value for {active_calendar_type}")
         matter_asserts.assert_valid_uint8(active_calendar_type, "ActiveCalendarType")
         asserts.assert_is_instance(active_calendar_type, self.cluster.Enums.CalendarTypeEnum,
                                    "ActiveCalendarType  is not type of CalendarTypeEnum")
@@ -161,7 +165,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(12)
         # Verify the supported calendar types are active (can read and write).
         for supported in cluster_supported_calendar_types:
-            logging.info(f"Testing for SupportedCalendarType value {supported}")
+            log.info(f"Testing for SupportedCalendarType value {supported}")
             await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(supported), self.endpoint)
             active_calendar_type = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
             asserts.assert_equal(active_calendar_type, supported)

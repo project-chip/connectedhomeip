@@ -55,12 +55,12 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, Delegate & delegate) :
+WebRTCTransportRequestorCluster::WebRTCTransportRequestorCluster(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                            AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                             AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -84,9 +84,9 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                           TLV::TLVReader & input_arguments,
-                                                                                           CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportRequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                               CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -127,21 +127,21 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
     }
 }
 
-CHIP_ERROR WebRTCTransportRequestorServer::AcceptedCommands(const ConcreteClusterPath & path,
-                                                            ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR WebRTCTransportRequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-CHIP_ERROR WebRTCTransportRequestorServer::Attributes(const ConcreteClusterPath & path,
-                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR WebRTCTransportRequestorCluster::Attributes(const ConcreteClusterPath & path,
+                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(kMandatoryMetadata), {}, {});
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const CommandHandler & commandHandler,
-                                                                          const Commands::Offer::DecodableType & req)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleOffer(const CommandHandler & commandHandler,
+                                                                           const Commands::Offer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
@@ -184,8 +184,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const 
     return mDelegate.HandleOffer(*session, args);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const CommandHandler & commandHandler,
-                                                                           const Commands::Answer::DecodableType & req)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleAnswer(const CommandHandler & commandHandler,
+                                                                            const Commands::Answer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
@@ -204,8 +204,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const
 }
 
 DataModel::ActionReturnStatus
-WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & commandHandler,
-                                                    const Commands::ICECandidates::DecodableType & req)
+WebRTCTransportRequestorCluster::HandleICECandidates(const CommandHandler & commandHandler,
+                                                     const Commands::ICECandidates::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
@@ -252,8 +252,8 @@ WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & comma
     return mDelegate.HandleICECandidates(*session, candidates);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const CommandHandler & commandHandler,
-                                                                        const Commands::End::DecodableType & req)
+DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleEnd(const CommandHandler & commandHandler,
+                                                                         const Commands::End::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto reason        = req.reason;
@@ -280,7 +280,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const Co
 }
 
 // Helper functions
-WebRTCSessionStruct * WebRTCTransportRequestorServer::FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
+WebRTCSessionStruct * WebRTCTransportRequestorCluster::FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
     for (auto & session : mCurrentSessions)
     {
@@ -293,7 +293,8 @@ WebRTCSessionStruct * WebRTCTransportRequestorServer::FindSession(uint16_t sessi
     return nullptr;
 }
 
-WebRTCTransportRequestorServer::UpsertResultEnum WebRTCTransportRequestorServer::UpsertSession(const WebRTCSessionStruct & session)
+WebRTCTransportRequestorCluster::UpsertResultEnum
+WebRTCTransportRequestorCluster::UpsertSession(const WebRTCSessionStruct & session)
 {
     // Search for a session in the current sessions using the full tuple <id, peerNodeID, fabricIndex>
     // This is critical because different cameras can allocate the same sessionId
@@ -319,7 +320,7 @@ WebRTCTransportRequestorServer::UpsertResultEnum WebRTCTransportRequestorServer:
     return result;
 }
 
-void WebRTCTransportRequestorServer::RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
+void WebRTCTransportRequestorCluster::RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex)
 {
     size_t originalSize = mCurrentSessions.size();
     // Remove the session if the full tuple <sessionId, peerNodeId, fabricIndex> matches

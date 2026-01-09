@@ -48,10 +48,12 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
@@ -140,7 +142,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("2")
         feature_map = await self.read_evse_attribute_expect_success(attribute="FeatureMap")
-        logger.info(f"FeatureMap: {feature_map}")
+        log.info(f"FeatureMap: {feature_map}")
         has_v2x = feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kV2x
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
@@ -161,7 +163,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                                 max_interval_sec=10, keepSubscriptions=True)
 
         async def accumulate_reports(wait_time):
-            logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
+            log.info(f"Test will now wait {wait_time} seconds to accumulate reports")
             await asyncio.sleep(wait_time)
 
         self.step("6")
@@ -195,23 +197,23 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
-        logging.info(f"Received {count} SessionID updates in {wait} seconds")
+        log.info(f"Received {count} SessionID updates in {wait} seconds")
         asserts.assert_equal(count, 0, f"Expected NO SessionID updates in {wait} seconds")
 
         self.step("10b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
-        logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
+        log.info(f"Received {count} SessionDuration updates in {wait} seconds")
         asserts.assert_less_equal(count, 2, f"Expected <= 2 SessionDuration updates in {wait} seconds")
 
         self.step("10c")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
-        logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
+        log.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
         asserts.assert_less_equal(count, 2, f"Expected <= 2 SessionEnergyCharged updates in {wait} seconds")
 
         self.step("10d")
         if has_v2x:
             count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
-            logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
+            log.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
             asserts.assert_less_equal(count, 2, f"Expected <= 2 SessionEnergyDischarged updates in {wait} seconds")
 
         self.step("11")
@@ -239,23 +241,23 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("15a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
-        logging.info(f"Received {count} SessionID updates in {wait} seconds")
+        log.info(f"Received {count} SessionID updates in {wait} seconds")
         asserts.assert_equal(count, 0, "Expected = 0 SessionID updates after a Unplugged operation - it changes on next plug-in")
 
         self.step("15b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
-        logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
+        log.info(f"Received {count} SessionDuration updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionDuration updates after a Unplugged operation")
 
         self.step("15c")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
-        logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
+        log.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyCharged updates after a Unplugged operation")
 
         self.step("15d")
         if has_v2x:
             count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
-            logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
+            log.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
             asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyDischarged updates after a Unplugged operation")
 
         self.step("16")
@@ -272,23 +274,23 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("18a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
-        logging.info(f"Received {count} SessionID updates in {wait} seconds")
+        log.info(f"Received {count} SessionID updates in {wait} seconds")
         asserts.assert_equal(count, 1, "Expected = 1 SessionID updates after a plug-in")
 
         self.step("18b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
-        logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
+        log.info(f"Received {count} SessionDuration updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionDuration updates after a Unplugged operation")
 
         self.step("18c")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
-        logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
+        log.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyCharged updates after a Unplugged operation")
 
         self.step("18d")
         if has_v2x:
             count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
-            logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
+            log.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
             asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyDischarged updates after a Unplugged operation")
 
         self.step("19")
@@ -300,7 +302,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_basic_clear()
 
         self.step("21")
-        await sub_handler.cancel()
+        sub_handler.cancel()
 
 
 if __name__ == "__main__":

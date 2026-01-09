@@ -31,7 +31,8 @@ void MatterSampleMeiPluginServerInitCallback()
     ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleMeiServer::Instance()));
-    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleMeiServer::Instance()),
+                   ChipLogError(Zcl, "Failed to init sample MEI %" CHIP_ERROR_FORMAT, CHIP_ERROR_INCORRECT_STATE.Format()));
 }
 
 void MatterSampleMeiPluginServerShutdownCallback()
