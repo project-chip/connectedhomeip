@@ -24,6 +24,7 @@
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -60,16 +61,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -104,6 +104,7 @@ namespace chip::app::Clusters::GeneralDiagnostics {
 
 namespace {
 TestEventTriggerDelegate * gTestEventTriggerDelegate = nullptr;
+System::Clock::Microseconds64 gInitTimestamp         = System::Clock::Microseconds64(0);
 } // namespace
 
 void SetTestEventTriggerDelegate(TestEventTriggerDelegate * delegate)
@@ -116,12 +117,22 @@ TestEventTriggerDelegate * GetTestEventTriggerDelegate()
     return gTestEventTriggerDelegate;
 }
 
+void SetInitTimestamp(System::Clock::Microseconds64 initTimestamp)
+{
+    gInitTimestamp = initTimestamp;
+}
+
+System::Clock::Microseconds64 GetInitTimestamp()
+{
+    return gInitTimestamp;
+}
+
 } // namespace chip::app::Clusters::GeneralDiagnostics
 
 void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     TestEventTriggerDelegate * testEventTriggerDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
-    System::Clock::Microseconds64 initTimestamp         = Server::GetInstance().GetInitTimestamp();
+    System::Clock::Microseconds64 initTimestamp         = GeneralDiagnostics::GetInitTimestamp();
     IntegrationDelegate integrationDelegate(testEventTriggerDelegate, initTimestamp);
 
     // register a singleton server (root endpoint only)
@@ -140,7 +151,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     TestEventTriggerDelegate * testEventTriggerDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
-    System::Clock::Microseconds64 initTimestamp         = Server::GetInstance().GetInitTimestamp();
+    System::Clock::Microseconds64 initTimestamp         = GeneralDiagnostics::GetInitTimestamp();
     IntegrationDelegate integrationDelegate(testEventTriggerDelegate, initTimestamp);
 
     // register a singleton server (root endpoint only)

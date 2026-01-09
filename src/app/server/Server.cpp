@@ -32,7 +32,8 @@
 // Forward declaration to avoid dependency on cluster-specific headers
 namespace chip::app::Clusters::GeneralDiagnostics {
 void SetTestEventTriggerDelegate(chip::TestEventTriggerDelegate * delegate);
-}
+void SetInitTimestamp(chip::System::Clock::Microseconds64 initTimestamp);
+} // namespace chip::app::Clusters::GeneralDiagnostics
 #endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -325,9 +326,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-    // Set the TestEventTriggerDelegate for GeneralDiagnostics cluster dependency injection
+    // Set the TestEventTriggerDelegate and InitTimestamp for GeneralDiagnostics cluster dependency injection
 #if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
     chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
+    chip::app::Clusters::GeneralDiagnostics::SetInitTimestamp(mInitTimestamp);
 #endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
     // SetDataModelProvider() initializes and starts the provider, which in turn
