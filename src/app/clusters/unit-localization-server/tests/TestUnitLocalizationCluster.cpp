@@ -16,8 +16,8 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -111,7 +111,7 @@ TEST_F(TestUnitLocalizationCluster, WriteAndReadTemperatureUnit)
     DataModel::List<TempUnitEnum> unitsList(supportedUnits);
     ASSERT_EQ(unitLocalizationCluster.SetSupportedTemperatureUnits(unitsList), CHIP_NO_ERROR);
 
-    TempUnitEnum temperatureUnit = TempUnitEnum::kKelvin;
+    TempUnitEnum temperatureUnit        = TempUnitEnum::kKelvin;
     TempUnitEnum currentTemperatureUnit = TempUnitEnum::kFahrenheit;
 
     // Set TemperatureUnit to Kelvin
