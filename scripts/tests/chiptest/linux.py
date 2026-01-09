@@ -151,7 +151,7 @@ class NetworkLink(NetworkLinkBase):
     link_name: str
     bridge: NetworkBridge
     ipv4: str
-    ipv6: str | None
+    ipv6: str
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -177,11 +177,11 @@ class NetworkLink(NetworkLinkBase):
             NetworkLinkCmd(f"ip addr add {self.ipv4} dev {self.link_name}", f"ip addr del {self.ipv4} dev {self.link_name}"),
             NetworkLinkCmd(f"ip link set dev {self.link_name} up", f"ip link set dev {self.link_name} down"),
             NetworkLinkCmd(f"ip link set dev {self.switch_name} up", f"ip link set dev {self.switch_name} down"),
-        ) + (() if self.ipv6 is None else (
+
             # Force IPv6 to use ULAs that we control.
             NetworkLinkCmd(f"ip -6 addr flush {self.link_name}"),
             NetworkLinkCmd(f"ip -6 a add {self.ipv6} dev {self.link_name}"),
-        ))
+        )
 
     @staticmethod
     def wait_for_duplicate_address_detection() -> bool:
@@ -230,11 +230,11 @@ class NetworkNamespace(NetworkLink):
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip link set dev {self.link_name} up"),
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip link set dev lo up"),
             NetworkLinkCmd(f"ip link set dev {self.switch_name} up", f"ip link set dev {self.switch_name} down"),
-        ) + (() if self.ipv6 is None else (
+
             # Force IPv6 to use ULAs that we control.
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip -6 addr flush {self.link_name}"),
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip -6 a add {self.ipv6} dev {self.link_name}"),
-        ))
+        )
 
 
 class IsolatedNetworkNamespace:
@@ -245,7 +245,7 @@ class IsolatedNetworkNamespace:
 
         self.index = index
         self._bridge = NetworkBridge(index, "br1")
-        self._rpc = NetworkLink(index, rpc_link_name, self._bridge, "10.10.10.5/24", None)
+        self._rpc = NetworkLink(index, rpc_link_name, self._bridge, "10.10.10.5/24", "fd00:0:1:1::5/64")
         self._app = NetworkNamespace(index, app_link_name, self._bridge, "10.10.10.1/24", "fd00:0:1:1::1/64", "app")
         self._tool = NetworkNamespace(index, tool_link_name, self._bridge, "10.10.10.2/24", "fd00:0:1:1::2/64", "tool")
         self._links = (self._rpc, self._app, self._tool)  # _bridge is handled separately
