@@ -174,7 +174,8 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
         manufacturingYear       = 2020;
         manufacturingMonth      = 1;
         manufacturingDayOfMonth = 1;
-        status                  = CHIP_NO_ERROR;
+        vendorSuffixSpan.reduce_size(0);
+        status = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(status);
 
