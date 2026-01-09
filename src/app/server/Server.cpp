@@ -695,6 +695,14 @@ void Server::Shutdown()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     Dnssd::Resolver::Instance().Shutdown();
+
+    // Clear Service Locator for GeneralDiagnostics cluster before shutting down clusters
+    // to prevent clusters from accessing dangling pointers during shutdown
+#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+    chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(nullptr);
+    chip::app::Clusters::GeneralDiagnostics::SetInitTimestamp(System::Clock::Microseconds64(0));
+#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+
     app::InteractionModelEngine::GetInstance()->Shutdown();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
