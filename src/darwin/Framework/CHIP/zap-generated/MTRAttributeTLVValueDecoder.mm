@@ -19374,6 +19374,46 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                     newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
+                if (entry_0.videoStreams.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.videoStreams.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedShort:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.videoStreams = array_3;
+                    }
+                } else {
+                    newElement_0.videoStreams = nil;
+                }
+                if (entry_0.audioStreams.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.audioStreams.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedShort:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.audioStreams = array_3;
+                    }
+                } else {
+                    newElement_0.audioStreams = nil;
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -19429,6 +19469,46 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                     newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
+                if (entry_0.videoStreams.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.videoStreams.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedShort:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.videoStreams = array_3;
+                    }
+                } else {
+                    newElement_0.videoStreams = nil;
+                }
+                if (entry_0.audioStreams.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.audioStreams.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedShort:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.audioStreams = array_3;
+                    }
+                } else {
+                    newElement_0.audioStreams = nil;
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -19623,6 +19703,60 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                         newElement_0.transportOptions.expiryTime = [NSNumber numberWithUnsignedInt:entry_0.transportOptions.Value().expiryTime.Value()];
                     } else {
                         newElement_0.transportOptions.expiryTime = nil;
+                    }
+                    if (entry_0.transportOptions.Value().videoStreams.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_0.transportOptions.Value().videoStreams.Value().begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRPushAVStreamTransportClusterVideoStreamStruct * newElement_5;
+                                newElement_5 = [MTRPushAVStreamTransportClusterVideoStreamStruct new];
+                                newElement_5.videoStreamName = AsString(entry_5.videoStreamName);
+                                if (newElement_5.videoStreamName == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    *aError = err;
+                                    return nil;
+                                }
+                                newElement_5.videoStreamID = [NSNumber numberWithUnsignedShort:entry_5.videoStreamID];
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.transportOptions.videoStreams = array_5;
+                        }
+                    } else {
+                        newElement_0.transportOptions.videoStreams = nil;
+                    }
+                    if (entry_0.transportOptions.Value().audioStreams.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_0.transportOptions.Value().audioStreams.Value().begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRPushAVStreamTransportClusterAudioStreamStruct * newElement_5;
+                                newElement_5 = [MTRPushAVStreamTransportClusterAudioStreamStruct new];
+                                newElement_5.audioStreamName = AsString(entry_5.audioStreamName);
+                                if (newElement_5.audioStreamName == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    *aError = err;
+                                    return nil;
+                                }
+                                newElement_5.audioStreamID = [NSNumber numberWithUnsignedShort:entry_5.audioStreamID];
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.transportOptions.audioStreams = array_5;
+                        }
+                    } else {
+                        newElement_0.transportOptions.audioStreams = nil;
                     }
                 } else {
                     newElement_0.transportOptions = nil;
