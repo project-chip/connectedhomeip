@@ -44,6 +44,9 @@ if(CONFIG_CHIP)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
 
     # Prepare compiler flags
+
+    # CHIP_CFLAGS can be optionally defined by the application to pass additional
+    # C flags to the CHIP GN build system
     if (CHIP_CFLAGS)
         matter_add_flags("${CHIP_CFLAGS}")
     endif()
@@ -55,6 +58,8 @@ if(CONFIG_CHIP)
         endif()
     endif()
 
+    # For ARM targets, use nosys.specs which provides stub implementations of
+    # system calls for embedded environments without full OS support
     if (CONFIG_ARM)
         matter_add_cflags(--specs=nosys.specs)
     endif()
@@ -63,8 +68,6 @@ if(CONFIG_CHIP)
         zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
         zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
     endif()
-
-    zephyr_include_directories(${CHIP_ROOT}/src)
 
     zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
     matter_add_cflags("${ZEPHYR_CFLAGS_C}")
@@ -87,9 +90,6 @@ if(CONFIG_CHIP)
     if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
         set_compiler_property(PROPERTY debug -g0)
     endif()
-
-    # Determine if ccache should be used
-    get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
     # ==============================================================================
     # Generate configuration for CHIP GN build system
