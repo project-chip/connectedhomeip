@@ -240,8 +240,8 @@ class NetworkNamespace(NetworkLink):
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
 
-    def __init__(self, index: int = 0, rpc_link_name='eth-rpc', rpc_link_up: bool = True, app_link_name: str = 'eth-app',
-                 app_link_up: bool = True, tool_link_name: str = 'eth-tool', tool_link_up: bool = True):
+    def __init__(self, index: int = 0, rpc_link_name: str = 'eth-rpc', tool_link_name: str = 'eth-tool',
+                 app_link_name: str = 'eth-app', rpc_link_up: bool = True, app_link_up: bool = True, tool_link_up: bool = True):
 
         self.index = index
         self._bridge = NetworkBridge(index, "br1")
