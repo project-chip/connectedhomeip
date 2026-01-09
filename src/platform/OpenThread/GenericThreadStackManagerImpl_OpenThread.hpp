@@ -26,6 +26,9 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <cassert>
 #include <limits>
 
@@ -57,7 +60,6 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
@@ -475,7 +477,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 Impl()->LockThreadStack();
-                otIp6SetEnabled(mOTInst, false);
+                auto err = otIp6SetEnabled(mOTInst, false);
+                if (err != OT_ERROR_NONE)
+                {
+                    ChipLogProgress(DeviceLayer, "Failed to disable Thread IPv6: %s", otThreadErrorToString(err));
+                }
                 Impl()->UnlockThreadStack();
             });
         }
@@ -551,7 +557,7 @@ CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    otError error = OT_ERROR_NONE;
     otLinkModeConfig linkMode;
 
     switch (deviceType)
@@ -567,7 +573,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
 #endif
         break;
     default:
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        ExitNow(error = OT_ERROR_INVALID_ARGS);
     }
 
 #if CHIP_PROGRESS_LOGGING
@@ -612,7 +618,9 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
     case ConnectivityManager::kThreadDeviceType_FullEndDevice:
         linkMode.mDeviceType   = true;
         linkMode.mRxOnWhenIdle = true;
-        otThreadSetRouterEligible(mOTInst, deviceType == ConnectivityManager::kThreadDeviceType_Router);
+
+        // This is expected to succeed for FTDs.
+        error = otThreadSetRouterEligible(mOTInst, deviceType == ConnectivityManager::kThreadDeviceType_Router);
         break;
 #endif
     case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
@@ -628,12 +636,17 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
         break;
     }
 
-    otThreadSetLinkMode(mOTInst, linkMode);
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    if (error == OT_ERROR_NONE)
+#endif
+    {
+        error = otThreadSetLinkMode(mOTInst, linkMode);
+    }
 
     Impl()->UnlockThreadStack();
 
 exit:
-    return err;
+    return MapOpenThreadError(error);
 }
 
 template <class ImplClass>
@@ -816,9 +829,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     VerifyOrReturn(mOTInst);
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
-    otThreadSetEnabled(mOTInst, false);
-    otIp6SetEnabled(mOTInst, false);
-    otInstanceErasePersistentInfo(mOTInst);
+    std::ignore = otThreadSetEnabled(mOTInst, false);
+    std::ignore = otIp6SetEnabled(mOTInst, false);
+    std::ignore = otInstanceErasePersistentInfo(mOTInst);
 
     if (mpCommissioningDriver)
     {
@@ -835,7 +848,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
     // Thread is not enabled, then we are not trying to connect to the network.
     VerifyOrReturn(ThreadStackMgrImpl().IsThreadEnabled() && mpStatusChangeCallback != nullptr);
 
-    ByteSpan datasetTLV;
     Thread::OperationalDataset dataset;
     ByteSpan extpanid;
 

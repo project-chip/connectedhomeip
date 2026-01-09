@@ -35,9 +35,9 @@ namespace chip {
 namespace ubus {
 
 namespace {
-System::LayerSocketsLoop & SystemLayer()
+System::LayerSelectLoop & SystemLayer()
 {
-    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+    return static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer());
 }
 } // namespace
 
