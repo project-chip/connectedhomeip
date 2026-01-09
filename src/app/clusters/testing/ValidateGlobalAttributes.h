@@ -26,7 +26,8 @@ inline bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, Span<
 // Compare the accepted commands of the cluster against the expected set.
 // Will use the first path returned by `GetPaths()` on the cluster.
 // Dies if `GetPaths()` doesn't return a list with one path.
-inline bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<app::DataModel::AcceptedCommandEntry> expected)
+inline bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
+                                          Span<app::DataModel::AcceptedCommandEntry> expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
