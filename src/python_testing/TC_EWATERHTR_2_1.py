@@ -48,9 +48,11 @@ from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
@@ -65,7 +67,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute.",
@@ -84,8 +86,6 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
                      "Verify that the DUT response contains a BoostStateEnum (enum8) value that is less than or equal to 1."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EWATERHTR_2_1(self):
 
@@ -97,7 +97,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         feature_map = await self.read_whm_attribute_expect_success(attribute="FeatureMap")
         em_supported = bool(feature_map & Clusters.WaterHeaterManagement.Bitmaps.Feature.kEnergyManagement)
         tp_supported = bool(feature_map & Clusters.WaterHeaterManagement.Bitmaps.Feature.kTankPercent)
-        logger.info(f"FeatureMap: {feature_map} : TP supported: {tp_supported} | EM supported: {em_supported}")
+        log.info(f"FeatureMap: {feature_map} : TP supported: {tp_supported} | EM supported: {em_supported}")
 
         self.step("3")
         heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
@@ -115,14 +115,14 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="TankVolume")
         else:
-            logging.info("Skipping step 5 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
+            log.info("Skipping step 5 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
 
         self.step("6")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="EstimatedHeatRequired")
             asserts.assert_greater_equal(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} >= 0")
         else:
-            logging.info("Skipping step 6 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
+            log.info("Skipping step 6 as PICS.EWATERHTR.F00(EnergyManagement) not supported")
 
         self.step("7")
         if tp_supported:
@@ -130,7 +130,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             asserts.assert_greater_equal(value, 0, f"Unexpected TankPercentage value - expected {value} >= 0")
             asserts.assert_less_equal(value, 100, f"Unexpected TankPercentage value - expected {value} <= 100")
         else:
-            logging.info("Skipping step 7 as PICS.EWATERHTR.F01(TankPercenage) not supported")
+            log.info("Skipping step 7 as PICS.EWATERHTR.F01(TankPercenage) not supported")
 
         self.step("8")
         boost_state = await self.read_whm_attribute_expect_success(attribute="BoostState")

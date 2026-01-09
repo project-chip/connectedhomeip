@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
+#include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -70,7 +70,7 @@ void MatterGroupKeyManagementClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -81,7 +81,7 @@ void MatterGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGroupKeyManagementPluginServerInitCallback() {}

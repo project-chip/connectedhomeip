@@ -32,6 +32,8 @@ import coloredlogs
 import github
 import github_fetch_artifacts
 
+log = logging.getLogger(__name__)
+
 LOG_KEEP_DAYS = 3
 BINARY_KEEP_DAYS = 30
 
@@ -73,8 +75,7 @@ def filesInDirectory(dirName):
 
 def writeFileBloatReport(f, baselineName, buildName):
     """Generate a bloat report diffing a baseline file with a build output file."""
-    logging.info('Running bloaty diff between %s and %s',
-                 baselineName, buildName)
+    log.info("Running bloaty diff between '%s' and '%s'", baselineName, buildName)
     f.write('Comparing %s and %s:\n\n' % (baselineName, buildName))
 
     result = subprocess.run(
@@ -84,7 +85,7 @@ def writeFileBloatReport(f, baselineName, buildName):
     )
 
     if result.returncode != 0:
-        logging.warning('Bloaty execution failed: %d', result.returncode)
+        log.warning("Bloaty execution failed: %d", result.returncode)
         f.write('BLOAT EXECUTION FAILED WITH CODE %d:\n' % result.returncode)
 
     content = result.stdout.decode('utf8')
@@ -112,8 +113,7 @@ def generateBloatReport(outputFileName,
                         buildOutputDir,
                         title='BLOAT REPORT'):
     """Generates a bloat report fo files between two diferent directories."""
-    logging.info('Generating bloat diff report between %s and %s', baselineDir,
-                 buildOutputDir)
+    log.info("Generating bloat diff report between '%s' and '%s'", baselineDir, buildOutputDir)
     with open(outputFileName, 'wt') as f:
         f.write(title + '\n\n')
 
@@ -122,16 +122,14 @@ def generateBloatReport(outputFileName,
 
         baselineOnly = baselineNames - outputNames
         if baselineOnly:
-            logging.warning(
-                'Some files only exist in the baseline: %r', baselineOnly)
+            log.warning("Some files only exist in the baseline: %r", baselineOnly)
             f.write('Files found only in the baseline:\n    ')
             f.write('\n    %s'.join(baselineOnly))
             f.write('\n\n')
 
         outputOnly = outputNames - baselineNames
         if outputOnly:
-            logging.warning('Some files only exist in the build output: %r',
-                            outputOnly)
+            log.warning("Some files only exist in the build output: %r", outputOnly)
             f.write('Files found only in the build output:\n    ')
             f.write('\n    %s'.join(outputOnly))
             f.write('\n\n')
@@ -148,9 +146,10 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
                         compare_results, base_sha):
     """Generates a PR comment containing the specified file content."""
 
-    logging.info('Uploading report to "%s", PR %d', gh_repo, gh_pr_number)
+    log.info("Uploading report to '%s', PR #%d", gh_repo, gh_pr_number)
 
-    rawText = open(filename, 'rt').read()
+    with open(filename) as f:
+        rawText = f.read()
 
     # a consistent title to help identify obsolete comments
     titleHeading = 'Size increase report for "{jobName}"'.format(
@@ -163,13 +162,12 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
     for comment in pull.get_issue_comments():
         if not comment.body.startswith(titleHeading):
             continue
-        logging.info(
-            'Removing obsolete comment with heading "%s"', (titleHeading))
+        log.info("Removing obsolete comment with heading '%s'", titleHeading)
 
         comment.delete()
 
     if all(len(file.sectionChanges) == 0 for file in compare_results):
-        logging.info('No results to report')
+        log.info("No results to report")
         return
 
     compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
@@ -219,7 +217,7 @@ def cleanDir(name):
 def downloadArtifact(artifact, dirName):
     """Extract an artifact into a directory."""
     zipFile = zipfile.ZipFile(io.BytesIO(artifact.downloadBlob()), 'r')
-    logging.info('Extracting zip file to %r' % dirName)
+    log.info("Extracting zip file to %r", dirName)
     zipFile.extractall(dirName)
 
 
@@ -252,8 +250,7 @@ def main():
     coloredlogs.install()
 
     if not args.github_api_token:
-        logging.error(
-            'Required arguments missing: github api token is required.')
+        log.error("Required arguments missing: github api token is required.")
         return
 
     # all known artifacts
@@ -290,7 +287,7 @@ def main():
             need_delete = True
 
         if need_delete:
-            logging.info('Old artifact: %s from %r' % (a.name, a.created_at))
+            log.info("Old artifact: '%s' from %r", a.name, a.created_at)
             a.delete()
             continue
 
@@ -299,7 +296,7 @@ def main():
             continue
 
         if a.name in seen_names:
-            logging.info('Artifact name already seen before: %s' % a.name)
+            log.info("Artifact name already seen before: '%s'", a.name)
             a.delete()
             continue
 
@@ -307,15 +304,13 @@ def main():
 
         m = pull_artifact_re.match(a.name)
         if not m:
-            logging.info('Non-PR artifact found: %r from %r' %
-                         (a.name, a.created_at))
+            log.info("Non-PR artifact found: %r from %r", a.name, a.created_at)
             continue
 
         prefix = m.group(1)
         pull_number = int(m.group(2))
 
-        logging.info('Processing PR %s via artifact %r' %
-                     (pull_number, a.name))
+        log.info("Processing PR #%d via artifact %r", pull_number, a.name)
 
         try:
             base_sha = getPullRequestBaseSha(
@@ -331,7 +326,7 @@ def main():
 
             b = base_artifacts[0]
 
-            logging.info('Diff will be against artifact %r' % b.name)
+            log.info("Diff will be against artifact %r", b.name)
 
             aOutput = os.path.join(args.output_dir, 'pull_artifact')
             bOutput = os.path.join(args.output_dir, 'master_artifact')
@@ -358,7 +353,7 @@ def main():
 
         except Exception:
             tb = traceback.format_exc()
-            logging.warning('Failed to process bloat report: %s', tb)
+            log.warning("Failed to process bloat report: '%s'", tb)
 
 
 if __name__ == '__main__':

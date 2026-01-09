@@ -43,7 +43,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +58,7 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Send ProvideOffer with no audio or video id => expect INVALID_COMMAND"),
             TestStep(3, "Send ProvideOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),
@@ -67,13 +69,12 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
             TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer with StreamUsage = LiveView => expect ProvideOfferResponse"),
             TestStep(9, "Read CurrentSessions attribute => expect 1"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_3(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
@@ -82,7 +83,6 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

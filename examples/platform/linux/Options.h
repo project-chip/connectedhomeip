@@ -25,6 +25,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -108,6 +109,7 @@ struct LinuxDeviceOptions
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
+    std::optional<chip::System::Clock::Seconds32> shortIdleModeDurationS;
 #endif
     chip::Optional<std::string> vendorName;
     chip::Optional<std::string> productName;

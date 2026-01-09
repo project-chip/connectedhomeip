@@ -44,8 +44,12 @@ from test_plan_support import commission_if_required, read_attribute, verify_suc
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_CC_2_3(MatterBaseTest):
@@ -170,7 +174,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         async def accumulate_reports():
             sub_handler.reset()
-            logging.info(f"Test will now wait {gather_time} seconds to accumulate reports")
+            log.info(f"Test will now wait {gather_time} seconds to accumulate reports")
             await asyncio.sleep(gather_time)
 
         def check_report_counts(attr: ClusterObjects.ClusterAttributeDescriptor):
@@ -305,7 +309,7 @@ class TC_CC_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(37)
-        logging.info("Test will now wait for 5 seconds")
+        log.info("Test will now wait for 5 seconds")
         await asyncio.sleep(5)
 
         self.step(38)
@@ -313,11 +317,11 @@ class TC_CC_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
 
         self.step(39)
-        logging.info("Test will now wait for 20 seconds")
+        log.info("Test will now wait for 20 seconds")
         await asyncio.sleep(20)
 
         self.step(40)
-        logging.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
+        log.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
         count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         asserts.assert_equal(count, 3, "Unexpected number of reports received")
 

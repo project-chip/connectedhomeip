@@ -45,7 +45,6 @@ _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
     "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
     "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
-    "rootnode_onofflight_samplemei",  # not actively developed,
     "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
@@ -77,14 +76,12 @@ def load_config() -> None:
     config["telink"] = {}
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
-        configStream = open(configFile, 'r')
-        config = yaml.load(configStream, Loader=yaml.SafeLoader)
-        configStream.close()
+        with open(configFile) as f:
+            config = yaml.load(f, Loader=yaml.SafeLoader)
     else:
         flush_print("Running for the first time and configuring config.yaml. " +
                     "Change this configuration file to include correct configuration " +
                     "for the vendor's SDK")
-        configStream = open(configFile, 'w')
         config["nrfconnect"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
         config["nrfconnect"]["ZEPHYR_SDK_INSTALL_DIR"] = os.environ.get(
             'ZEPHYR_SDK_INSTALL_DIR')
@@ -104,9 +101,9 @@ def load_config() -> None:
             'TELINK_ZEPHYR_SDK_DIR')
         config["telink"]["TTY"] = None
 
-        flush_print(yaml.dump(config))
-        yaml.dump(config, configStream)
-        configStream.close()
+        with open(configFile, 'w') as f:
+            flush_print(yaml.dump(config))
+            yaml.dump(config, f)
 
     return config
 
@@ -120,8 +117,7 @@ def check_python_version() -> None:
 
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
-        config = json.loads(config_file.read())
-    return config
+        return json.loads(config_file.read())
 
 
 def flush_print(
@@ -470,7 +466,7 @@ def main() -> int:
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
                         continue
-                    elif options.build_include and not re.search(options.build_include, archive_name):
+                    if options.build_include and not re.search(options.build_include, archive_name):
                         continue
                     if options.dry_run:
                         flush_print(archive_name)

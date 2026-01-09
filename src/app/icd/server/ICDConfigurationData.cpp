@@ -63,20 +63,62 @@ CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<System::Clock::Millis
     VerifyOrReturnError(activeModeDuration.HasValue() || idleModeDuration.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Convert idleModeDuration to seconds for the correct precision
-    System::Clock::Seconds32 tmpIdleModeDuration = idleModeDuration.HasValue()
-        ? std::chrono::duration_cast<System::Clock::Seconds32>(idleModeDuration.Value())
-        : mIdleModeDuration;
+    std::optional<System::Clock::Seconds32> tmpIdleModeDuration = std::nullopt;
+    if (idleModeDuration.HasValue())
+        tmpIdleModeDuration = std::chrono::duration_cast<System::Clock::Seconds32>(idleModeDuration.Value());
 
-    System::Clock::Milliseconds32 tmpActiveModeDuration = activeModeDuration.ValueOr(mActiveModeDuration);
+    // Here we set shortIdleModeDuration the same as idleModeDuration to maintain the api previous behaviour
+    return SetModeDurations(activeModeDuration.std_optional(), tmpIdleModeDuration, tmpIdleModeDuration);
+}
+
+CHIP_ERROR ICDConfigurationData::SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
+                                                  std::optional<System::Clock::Seconds32> idleModeDuration,
+                                                  std::optional<System::Clock::Seconds32> shortIdleModeDuration)
+{
+    VerifyOrReturnError(activeModeDuration.has_value() || idleModeDuration.has_value() || shortIdleModeDuration.has_value(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    System::Clock::Milliseconds32 tmpActiveModeDuration = activeModeDuration.value_or(mActiveModeDuration);
+    System::Clock::Seconds32 tmpIdleModeDuration        = idleModeDuration.value_or(mIdleModeDuration);
 
     VerifyOrReturnError(tmpActiveModeDuration <= tmpIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(tmpIdleModeDuration <= kMaxIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(tmpIdleModeDuration >= kMinIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mIdleModeDuration   = tmpIdleModeDuration;
-    mActiveModeDuration = tmpActiveModeDuration;
+    System::Clock::Seconds32 tmpShortIdleModeDuration;
+    if (shortIdleModeDuration.has_value())
+    {
+        // shortIdleModeDuration was provided, it shall be lesser than or equal to idleModeDuration.
+        tmpShortIdleModeDuration = shortIdleModeDuration.value();
+    }
+    else
+    {
+        // shortIdleModeDuration was not provided. To ensure correct mode transitions and device compliance,
+        // shortIdleModeDuration must not exceed idleModeDuration, so we use the smaller of the current shortIdleModeDuration
+        // and the resultant idleModeDuration.
+        // This approach overwrites a previous valid shortIdleModeDuration rather than erroring the call but maintains the previous
+        // api behavior.
+        tmpShortIdleModeDuration = std::min(mShortIdleModeDuration, tmpIdleModeDuration);
+    }
+
+    VerifyOrReturnError(tmpShortIdleModeDuration <= tmpIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mIdleModeDuration      = tmpIdleModeDuration;
+    mActiveModeDuration    = tmpActiveModeDuration;
+    mShortIdleModeDuration = tmpShortIdleModeDuration;
 
     return CHIP_NO_ERROR;
+}
+
+bool ICDConfigurationData::ShouldUseShortIdle()
+{
+    VerifyOrReturnValue(mShortIdleModeDuration < mIdleModeDuration, false);
+    return (mFeatureMap.Has(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport) && mICDMode == ICDMode::SIT);
+}
+
+System::Clock::Seconds32 ICDConfigurationData::GetModeBasedIdleModeDuration()
+{
+    return ShouldUseShortIdle() ? mShortIdleModeDuration : mIdleModeDuration;
 }
 
 } // namespace chip

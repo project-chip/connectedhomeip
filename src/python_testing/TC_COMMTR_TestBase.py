@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import logging
 from typing import List, Optional
 
 from mobly import asserts
@@ -25,8 +24,6 @@ from matter.clusters import ClusterObjects, Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityMetering
 
@@ -162,37 +159,25 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
     @staticmethod
     def _metered_quantity_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeteredQuantity:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeteredQuantity
         return AttributeMatcher.from_callable(description="MeteredQuantity", matcher=predicate)
 
     @staticmethod
     def _maximum_metered_quantities_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MaximumMeteredQuantities:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MaximumMeteredQuantities
         return AttributeMatcher.from_callable(description="MaximumMeteredQuantities", matcher=predicate)
 
     @staticmethod
     def _metered_quantity_timestamp_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeteredQuantityTimestamp:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeteredQuantityTimestamp
         return AttributeMatcher.from_callable(description="MeteredQuantityTimestamp", matcher=predicate)
 
     @staticmethod
     def _tariff_unit_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffUnit:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.TariffUnit
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

@@ -181,6 +181,13 @@ public:
         return ICDConfigurationData::GetInstance().SetModeDurations(activeModeDuration, idleModeDuration);
     };
 
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
+                                std::optional<System::Clock::Seconds32> idleModeDuration,
+                                std::optional<System::Clock::Seconds32> shortIdleModeDuration)
+    {
+        return ICDConfigurationData::GetInstance().SetModeDurations(activeModeDuration, idleModeDuration, shortIdleModeDuration);
+    };
+
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
 
     OperationalState GetOperaionalState() { return mOperationalState; };

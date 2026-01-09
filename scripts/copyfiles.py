@@ -26,14 +26,11 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @click.command()
@@ -72,7 +69,7 @@ def main(log_level, source_dir: str, target_dir: str, filenames: list[str]):
 
     # We are copying to target ...
     if not os.path.exists(target_dir):
-        logging.info("Creating output directory %s", target_dir)
+        log.info("Creating output directory '%s'", target_dir)
         os.makedirs(target_dir)
 
     for filename in filenames:
@@ -88,7 +85,7 @@ def main(log_level, source_dir: str, target_dir: str, filenames: list[str]):
         filename = os.path.abspath(filename)
         relative_path = os.path.relpath(filename, source_dir)
         if not filename.endswith(relative_path):
-            logging.error("%s does not seem to be a child of %s: relative path is %s", filename, source_dir, relative_path)
+            log.error("'%s' does not seem to be a child of '%s': relative path is '%s'", filename, source_dir, relative_path)
             sys.exit(1)
 
         # Prepend the destination directory to relative path. So that if we have:
@@ -105,10 +102,10 @@ def main(log_level, source_dir: str, target_dir: str, filenames: list[str]):
 
         destination_dir = os.path.dirname(destination)
         if not os.path.exists(destination_dir):
-            logging.info("Creating output directory %s", destination_dir)
+            log.info("Creating output directory '%s'", destination_dir)
             os.makedirs(destination_dir)
 
-        logging.info("Copying %s into %s", filename, destination)
+        log.info("Copying '%s' into '%s'", filename, destination)
         shutil.copyfile(filename, destination)
 
 

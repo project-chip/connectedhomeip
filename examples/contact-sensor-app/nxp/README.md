@@ -54,14 +54,14 @@ to the respective platform's readme.
 A list of popular standard contact sensor app build targets is presented below.
 These targets can be used with the `build_example.py` tool.
 
-| Target name                                                                          | Description                                                                                 |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `nxp-<device>-freertos-contact-sensor-thread-mtd-cmake-frdm`                         | Default contact sensor                                                                      |
-| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm`               | Default low-power contact sensor                                                            |
-| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-factory-cmake-frdm`       | Default low-power contact sensor with factory data                                          |
-| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-lit-cmake-frdm`           | Low-power contact sensor as LIT ICD                                                         |
-| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-sw-v2-cmake-frdm`         | Low-power contact sensor with software version 2 (can be used to test OTA)                  |
-| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-factory-sw-v2-cmake-frdm` | Low-power contact sensor with factory data and software version 2 (can be used to test OTA) |
+| Target name                                                                    | Description                                                                                 |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `nxp-<device>-freertos-contact-sensor-thread-mtd-frdm`                         | Default contact sensor                                                                      |
+| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-frdm`               | Default low-power contact sensor                                                            |
+| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-factory-frdm`       | Default low-power contact sensor with factory data                                          |
+| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-lit-frdm`           | Low-power contact sensor as LIT ICD                                                         |
+| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-sw-v2-frdm`         | Low-power contact sensor with software version 2 (can be used to test OTA)                  |
+| `nxp-<device>-freertos-contact-sensor-thread-mtd-low-power-factory-sw-v2-frdm` | Low-power contact sensor with factory data and software version 2 (can be used to test OTA) |
 
 where `device` is one of the [supported platforms](#supported-platforms).
 

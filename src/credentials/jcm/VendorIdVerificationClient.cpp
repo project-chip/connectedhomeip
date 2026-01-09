@@ -88,10 +88,9 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
 
     // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
     // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
-    VerifyOrReturnError(responseData.signature.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
     Crypto::P256ECDSASignature signature;
-    memcpy(signature.Bytes(), responseData.signature.data(), signature.Capacity());
-    signature.SetLength(signature.Capacity());
+    ReturnValueOnFailure(signature.SetLength(responseData.signature.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(signature.Bytes(), responseData.signature.data(), responseData.signature.size());
 
     ReturnLogErrorOnFailure(
         nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
@@ -132,7 +131,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
 
     // Generate a 32-octet random challenge
     uint8_t kClientChallenge[32];
-    Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
+    TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
     ByteSpan clientChallengeSpan{ kClientChallenge };
     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
 

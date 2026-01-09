@@ -19,6 +19,9 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/BooleanStateConfigurationTestEventTriggerHandler.cpp"
     "${CLUSTER_DIR}/BooleanStateConfigurationTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/boolean-state-configuration-delegate.h"
-    "${CLUSTER_DIR}/boolean-state-configuration-cluster.cpp"
+    "${CLUSTER_DIR}/BooleanStateConfigurationCluster.cpp"
+    "${CLUSTER_DIR}/BooleanStateConfigurationCluster.h"
     "${CLUSTER_DIR}/boolean-state-configuration-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

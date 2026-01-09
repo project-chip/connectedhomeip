@@ -49,30 +49,30 @@
 
 namespace {
 using namespace chip;
-using namespace chip::Access;
+using namespace Access;
 
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
-chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId2    = 7;
-chip::EndpointId kTestEndpointId   = 1;
-chip::EventId kTestEventIdDebug    = 1;
-chip::EventId kTestEventIdCritical = 2;
-chip::EventId kTestEventIdNotKnown = 3;
-chip::TLV::Tag kTestEventTag       = chip::TLV::ContextTag(1);
+app::CircularEventBuffer gCircularEventBuffer[3];
+ClusterId kTestClusterId2    = 7;
+EndpointId kTestEndpointId   = 1;
+EventId kTestEventIdDebug    = 1;
+EventId kTestEventIdCritical = 2;
+EventId kTestEventIdNotKnown = 3;
+TLV::Tag kTestEventTag       = TLV::ContextTag(1);
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const Testing::MockNodeConfig & TestMockNodeConfig()
 {
-    using namespace chip::app;
-    using namespace chip::app::Clusters::Globals::Attributes;
-    using namespace chip::Test;
+    using namespace app;
+    using namespace app::Clusters::Globals::Attributes;
+    using namespace Testing;
 
     // clang-format off
     static const MockNodeConfig config({
         MockEndpointConfig(kTestEndpointId, {
 
-            MockClusterConfig(chip::Test::kTestDeniedClusterId2,
+            MockClusterConfig(Testing::kTestDeniedClusterId2,
                  {},                    /* attributes */
                  {kTestEventIdDebug}    /* events */
                 ),
@@ -95,12 +95,12 @@ class TestAccessControlDelegate : public AccessControl::Delegate
 {
 public:
     // Check
-    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
         mNumOfTimesAclIsChecked++;
 
-        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
+        if (requestPath.cluster == Testing::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -121,14 +121,14 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
 } gDeviceTypeResolver;
 
-class TestEventGenerator : public chip::app::EventLoggingDelegate
+class TestEventGenerator : public app::EventLoggingDelegate
 {
 public:
-    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter)
+    CHIP_ERROR WriteEvent(TLV::TLVWriter & aWriter)
     {
-        chip::TLV::TLVType dataContainerType;
-        ReturnErrorOnFailure(aWriter.StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::EventDataIB::Tag::kData)),
-                                                    chip::TLV::kTLVType_Structure, dataContainerType));
+        TLV::TLVType dataContainerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(TLV::ContextTag(to_underlying(app::EventDataIB::Tag::kData)),
+                                                    TLV::kTLVType_Structure, dataContainerType));
         ReturnErrorOnFailure(aWriter.Put(kTestEventTag, mStatus));
         return aWriter.EndContainer(dataContainerType);
     }
@@ -141,16 +141,16 @@ private:
 
 void GenerateEvents()
 {
-    chip::EventNumber eid1, eid2;
-    chip::app::EventOptions options1;
-    options1.mPath     = { kTestEndpointId, chip::Test::kTestDeniedClusterId2, kTestEventIdDebug };
-    options1.mPriority = chip::app::PriorityLevel::Info;
+    EventNumber eid1, eid2;
+    app::EventOptions options1;
+    options1.mPath     = { kTestEndpointId, Testing::kTestDeniedClusterId2, kTestEventIdDebug };
+    options1.mPriority = app::PriorityLevel::Info;
 
-    chip::app::EventOptions options2;
+    app::EventOptions options2;
     options2.mPath     = { kTestEndpointId, kTestClusterId2, kTestEventIdCritical };
-    options2.mPriority = chip::app::PriorityLevel::Critical;
+    options2.mPriority = app::PriorityLevel::Critical;
     TestEventGenerator testEventGenerator;
-    chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    app::EventManagement & logMgmt = app::EventManagement::GetInstance();
 
     ChipLogDetail(DataManagement, "Generating Events");
     testEventGenerator.SetStatus(0);
@@ -160,11 +160,10 @@ void GenerateEvents()
     EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options2, eid2), CHIP_NO_ERROR);
 }
 
-class MockInteractionModelApp : public chip::app::ReadClient::Callback
+class MockInteractionModelApp : public app::ReadClient::Callback
 {
 public:
-    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-                     const chip::app::StatusIB * apStatus) override
+    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override
     {
         ++mNumDataElementIndex;
         mGotEventResponse = true;
@@ -175,7 +174,7 @@ public:
         }
         else
         {
-            mLastStatusReceived = chip::app::StatusIB();
+            mLastStatusReceived = app::StatusIB();
         }
     }
 
@@ -185,9 +184,9 @@ public:
         mReadError = true;
     }
 
-    void OnDone(chip::app::ReadClient *) override {}
+    void OnDone(app::ReadClient *) override {}
 
-    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    void OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams) override
     {
         if (aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
@@ -201,10 +200,10 @@ public:
     int mNumAttributeResponse              = 0;
     bool mGotReport                        = false;
     bool mReadError                        = false;
-    chip::app::ReadHandler * mpReadHandler = nullptr;
-    chip::app::StatusIB mLastStatusReceived;
+    app::ReadHandler * mpReadHandler       = nullptr;
+    app::StatusIB mLastStatusReceived;
     CHIP_ERROR mError = CHIP_NO_ERROR;
-    std::vector<chip::app::ConcreteAttributePath> mReceivedAttributePaths;
+    std::vector<app::ConcreteAttributePath> mReceivedAttributePaths;
 };
 
 } // namespace
@@ -212,23 +211,25 @@ public:
 namespace chip {
 namespace app {
 
-class TestAclEvent : public Test::AppContext
+using namespace Testing;
+
+class TestAclEvent : public AppContext
 {
 public:
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
-        const chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+        const app::LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), app::PriorityLevel::Critical },
         };
 
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+        app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
+                                                    gCircularEventBuffer, logStorageResources, &mEventCounter);
 
         Access::GetAccessControl().Finish();
         EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
@@ -236,14 +237,14 @@ public:
         mAccessControlDelegate                          = static_cast<TestAccessControlDelegate *>(GetTestAccessControlDelegate());
         mAccessControlDelegate->mNumOfTimesAclIsChecked = 0;
 
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
-        chip::app::EventManagement::DestroyEventManagement();
+        Testing::ResetMockNodeConfig();
+        app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
 
@@ -251,7 +252,7 @@ protected:
     TestAccessControlDelegate * mAccessControlDelegate = nullptr;
 
 private:
-    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
 
 TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
@@ -263,7 +264,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
 
     GenerateEvents();
 
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    auto * engine = app::InteractionModelEngine::GetInstance();
 
     engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
@@ -271,9 +272,9 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.
     // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
     {
-        chip::app::EventPathParams eventPathParams[1];
+        app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
+        eventPathParams[0].mClusterId  = Testing::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
@@ -284,8 +285,8 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         MockInteractionModelApp delegate;
         EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
@@ -302,9 +303,9 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     // When reading events with withcard paths without enough privilege for reading all events, we will exclude all events without
     // enough priviledge when generating the report.
     {
-        chip::app::EventPathParams eventPathParams[1];
+        app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
+        eventPathParams[0].mClusterId  = Testing::kTestDeniedClusterId2;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
@@ -314,8 +315,8 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         MockInteractionModelApp delegate;
         EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
@@ -330,7 +331,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     // When reading events with withcard paths where the partial don't have enough privilege, we will exclude those partial
     // when generating the report.
     {
-        chip::app::EventPathParams eventPathParams[1];
+        app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
@@ -341,8 +342,8 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         MockInteractionModelApp delegate;
         EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
@@ -357,9 +358,9 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     // When reading events with two concrete paths where one has enough priviledge, another don't have , we will get a EventStatusIB
     // and eventDataIB
     {
-        chip::app::EventPathParams eventPathParams[2];
+        app::EventPathParams eventPathParams[2];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
+        eventPathParams[0].mClusterId  = Testing::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
 
         eventPathParams[1].mEndpointId = kTestEndpointId;
@@ -374,8 +375,8 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         MockInteractionModelApp delegate;
         EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
@@ -383,8 +384,8 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         EXPECT_TRUE(delegate.mGotEventResponse);
         EXPECT_EQ(delegate.mNumReadEventFailureStatusReceived, 1); // need exactly one UnsupportedAccess, nothing else
         EXPECT_EQ(delegate.mLastStatusReceived.mStatus,
-                  chip::Protocols::InteractionModel::Status::Success); // The Second Concrete Event Path is Valid, therefore Last
-                                                                       // Status is a Success
+                  Protocols::InteractionModel::Status::Success); // The Second Concrete Event Path is Valid, therefore Last
+                                                                 // Status is a Success
         EXPECT_FALSE(delegate.mReadError);
     }
     EXPECT_FALSE(engine->GetNumActiveReadClients());
@@ -404,7 +405,7 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
     {
-        using namespace chip::app::Clusters;
+        using namespace app::Clusters;
 
         switch (request.path.mAttributeId)
         {
@@ -438,7 +439,7 @@ public:
 // - In that Case, we should get UnsupportedEvent as StatusIB and we should SKIP the second ACL check.
 TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
 {
-    using namespace chip::Test;
+    using namespace Testing;
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
@@ -451,9 +452,9 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     CodegenDataModelProvider model;
     ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
 
-    chip::app::DataModel::Provider * mOldProvider = nullptr;
-    auto * engine                                 = chip::app::InteractionModelEngine::GetInstance();
-    mOldProvider                                  = engine->SetDataModelProvider(&model);
+    app::DataModel::Provider * mOldProvider = nullptr;
+    auto * engine                           = app::InteractionModelEngine::GetInstance();
+    mOldProvider                            = engine->SetDataModelProvider(&model);
 
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
@@ -462,7 +463,7 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.
     // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
     {
-        chip::app::EventPathParams eventPathParams[1];
+        app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
         eventPathParams[0].mClusterId  = MockClusterId(2);
         eventPathParams[0].mEventId    = kTestEventIdNotKnown;
@@ -475,8 +476,8 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
         MockInteractionModelApp delegate;
         EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 

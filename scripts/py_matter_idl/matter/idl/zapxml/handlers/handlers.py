@@ -22,7 +22,7 @@ from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
@@ -109,16 +109,15 @@ class EventHandler(BaseHandler):
 
             self._event.fields.append(field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'access':
+        if name.lower() == 'access':
             self._event.readacl = AttrsToAccessPrivilege(attrs)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'description':
+        if name.lower() == 'description':
             return DescriptionHandler(self.context, self._event)
-        elif _IsConformanceTagName(name):
+        if _IsConformanceTagName(name):
             # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def EndProcessing(self):
         self._cluster.events.append(self._event)
@@ -147,16 +146,15 @@ class AttributeHandler(BaseHandler):
                 elif attrs['op'] == 'write':
                     self._attribute.writeacl = role
                 else:
-                    LOGGER.error("Unknown access: %r" % attrs['op'])
+                    log.error("Unknown access: %r", attrs['op'])
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'description':
+        if name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
-        elif _IsConformanceTagName(name):
+        if _IsConformanceTagName(name):
             # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def HandleContent(self, content: str):
         # Content generally is the name EXCEPT if access controls
@@ -180,8 +178,7 @@ class SkipProvisioalHandler(BaseHandler):
         if _IsConformanceTagName(name):
             # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class StructHandler(BaseHandler, IdlPostProcessor):
@@ -236,11 +233,10 @@ class StructHandler(BaseHandler, IdlPostProcessor):
 
             self._struct.fields.append(field)
             return SkipProvisioalHandler(self.context, attrs)
-        elif name.lower() == 'cluster':
+        if name.lower() == 'cluster':
             self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
         # We have two choices of adding a struct:
@@ -258,8 +254,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                     found = True
 
             if not found:
-                LOGGER.error('Struct %s could not find cluster (code %d/0x%X)' %
-                             (self._struct.name, code, code))
+                log.error("Struct '%s' could not find cluster (code %d/0x%X)", self._struct.name, code, code)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -284,11 +279,10 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
                 code=ParseInt(attrs['value'])
             ))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'cluster':
+        if name.lower() == 'cluster':
             self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
         if not self._cluster_codes:
@@ -302,8 +296,7 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
                 found.add(c.code)
 
         if found != self._cluster_codes:
-            LOGGER.error('Enum %s could not find its clusters (codes: %r)' %
-                         (self._enum.name, self._cluster_codes - found))
+            log.error("Enum '%s' could not find its clusters (codes: %r)", self._enum.name, self._cluster_codes - found)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -323,16 +316,15 @@ class BitmapHandler(BaseHandler):
             # Multiple clusters may be associated, like IasZoneStatus
             self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'field':
+        if name.lower() == 'field':
             self._bitmap.entries.append(ConstantEntry(
                 name=attrs['name'],
                 code=ParseInt(attrs['mask'])
             ))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'description':
+        if name.lower() == 'description':
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
         # We have two choices of adding a bitmap:
@@ -349,8 +341,7 @@ class BitmapHandler(BaseHandler):
                     c.bitmaps.append(self._bitmap)
                     found = True
             if not found:
-                LOGGER.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
-                             (self._bitmap.name, code, code))
+                log.error("Bitmap '%s' could not find its cluster (code %d/0x%X)", self._bitmap.name, code, code)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -472,21 +463,19 @@ class CommandHandler(BaseHandler):
             if self._command:
                 self._command.invokeacl = AttrsToAccessPrivilege(attrs)
             else:
-                LOGGER.warning(
-                    "Ignored access role for reply %r" % self._struct)
+                log.warning("Ignored access role for reply %r", self._struct)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'arg':
+        if name.lower() == 'arg':
             self._struct.fields.append(self.GetArgumentField(attrs))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name.lower() == 'description':
+        if name.lower() == 'description':
             if self._command:
                 return DescriptionHandler(self.context, self._command)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif _IsConformanceTagName(name):
+        if _IsConformanceTagName(name):
             # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def EndProcessing(self):
 
@@ -512,11 +501,9 @@ class ClusterGlobalAttributeHandler(BaseHandler):
         if name.lower() == 'featurebit':
             # It is uncler what featurebits mean. likely a bitmap should be created
             # here, however only one such example exists currently: door-lock-cluster.xml
-            LOGGER.info('Ignoring featurebit tag for global attribute 0x%X (%d)' % (
-                self._code, self._code))
+            log.info("Ignoring featurebit tag for global attribute 0x%X (%d)", self._code, self._code)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
         for attribute in self._cluster.attributes:
@@ -547,35 +534,34 @@ class ClusterHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'code':
             return ClusterCodeHandler(self.context, self._cluster)
-        elif name.lower() == 'name':
+        if name.lower() == 'name':
             return ClusterNameHandler(self.context, self._cluster)
-        elif name.lower() == 'attribute':
+        if name.lower() == 'attribute':
             return AttributeHandler(self.context, self._cluster, attrs)
-        elif name.lower() == 'event':
+        if name.lower() == 'event':
             return EventHandler(self.context, self._cluster, attrs)
-        elif name.lower() == 'globalattribute':
+        if name.lower() == 'globalattribute':
             # We ignore 'side' and 'value' since they do not seem useful
             return ClusterGlobalAttributeHandler(self.context, self._cluster, ParseInt(attrs['code']))
-        elif name.lower() == 'command':
+        if name.lower() == 'command':
             return CommandHandler(self.context, self._cluster, attrs)
-        elif name.lower() == 'description':
+        if name.lower() == 'description':
             return DescriptionHandler(self.context, self._cluster)
-        elif name.lower() == 'features':
+        if name.lower() == 'features':
             return FeaturesHandler(self.context, self._cluster)
-        elif name.lower() in ['define', 'domain', 'tag', 'client', 'server']:
+        if name.lower() in ['define', 'domain', 'tag', 'client', 'server']:
             # NOTE: we COULD use client and server to create separate definitions
             #       of each, but the usefulness of this is unclear as the definitions are
             #       likely identical and matter has no concept of differences between the two
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def EndProcessing(self):
         if not self._idl:
             raise Exception("Missing idl")
         if self._cluster.name == "NAME-MISSING":
             raise Exception("Missing cluster name")
-        elif self._cluster.code == -1:
+        if self._cluster.code == -1:
             raise Exception("Missing cluster code")
 
         self._idl.clusters.append(self._cluster)
@@ -611,8 +597,7 @@ class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
                 c.commands.extend(self._cluster.commands)
 
         if not found:
-            LOGGER.error('Could not extend cluster 0x%X (%d): cluster not found' %
-                         (self._cluster_code, self._cluster_code))
+            log.error("Could not extend cluster 0x%X (%d): cluster not found", self._cluster_code, self._cluster_code)
 
 
 class GlobalAttributeHandler(BaseHandler):
@@ -650,13 +635,11 @@ class GlobalHandler(BaseHandler):
             if attrs['side'].lower() == 'client':
                 # We expect to also have 'server' equivalent, so ignore client
                 # side attributes
-                LOGGER.debug(
-                    'Ignoring global client-side attribute %s' % (attrs['code']))
+                log.debug("Ignoring global client-side attribute '%s'", attrs['code'])
                 return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
 
             return GlobalAttributeHandler(self.context, AttrsToAttribute(attrs))
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
         global_attributes = self.context.GetGlobalAttributes()
@@ -677,32 +660,31 @@ class ConfiguratorHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'cluster':
             return ClusterHandler(self.context, self._idl)
-        elif name.lower() == 'enum':
+        if name.lower() == 'enum':
             return EnumHandler(self.context, attrs)
-        elif name.lower() == 'struct':
+        if name.lower() == 'struct':
             return StructHandler(self.context, attrs)
-        elif name.lower() == 'bitmap':
+        if name.lower() == 'bitmap':
             return BitmapHandler(self.context, attrs)
-        elif name.lower() == 'domain':
+        if name.lower() == 'domain':
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name.lower() == 'clusterextension':
+        if name.lower() == 'clusterextension':
             return ClusterExtensionHandler(self.context, ParseInt(attrs['code']))
-        elif name.lower() == 'accesscontrol':
+        if name.lower() == 'accesscontrol':
             # These contain operation/role/modifier and generally only contain a
             # description. These do not seem as useful to parse.
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name.lower() == 'atomic':
+        if name.lower() == 'atomic':
             # A list of types in 'chip-types'
             # Generally does not seem useful - matches a type id to a description, size and some discrete/analog flags
             #
             # Could be eventually used as a preload of types into base types, however matter idl
             # generator logic has hardcoded sizing as well.
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name.lower() == 'devicetype':
+        if name.lower() == 'devicetype':
             # A list of device types in 'matter-devices.xml'
             # Useful for conformance tests, but does not seem usable for serialization logic
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name.lower() == 'global':
+        if name.lower() == 'global':
             return GlobalHandler(self.context)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)

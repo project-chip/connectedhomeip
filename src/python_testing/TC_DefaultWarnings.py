@@ -39,10 +39,13 @@ from test_testing.DefaultChecker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAUL
                                          FLAG_FIXED_LABEL_EMPTY, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI, FLAG_UNIT_TESTING,
                                          FLAG_VENDOR_ID, FLAG_VENDOR_NAME, DefaultChecker)
 
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
 
-class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
+class TC_DefaultChecker(BasicCompositionTests, DefaultChecker):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -54,26 +57,25 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
         self.success = True
 
     def steps_TC_IDM_13_1(self):
-        steps = [TestStep(1, "TH performs a wildcard read of all attributes"),
-                 TestStep(2, f"If the {FLAG_PRODUCT_NAME} flag is not set, check for \"Test\" in the product name",
-                          "\"Test\" does not appear in the product name"),
-                 TestStep(3, f"If the {FLAG_VENDOR_NAME} flag is not set, check for \"Test\" in the vendor name",
-                          "\"Test\" does not appear in the vendor name"),
-                 TestStep(4, f"If the {FLAG_VENDOR_ID} flag is not set, check for test vendor IDs",
-                          "Product does not use a test vendor ID"),
-                 TestStep(5, f"If the {FLAG_DEFAULT_CALENDAR_FORMAT} flag is not set, and the TimeFormatLocalization cluster is present and has the ActiveCalendarType attribute, check for the default calendar format", "Calendar format is not the default"),
-                 TestStep(6, f"If the {FLAG_UNIT_TESTING} flag is not set, check for the presence of a unit testing cluster on any endpoint",
-                          "Unit testing cluster does not appear on any endpoint"),
-                 TestStep(7, f"If the {FLAG_FAULT_INJECTION} flag is not set, check for the presence of a fault injection cluster on any endpoint",
-                          "Fault injection cluster does not appear on any endpoint"),
-                 TestStep(8, f"If the {FLAG_SAMPLE_MEI} flag is not set, check for the presence of a sample mei cluster on any endpoint",
-                          "Sample MEI cluster does not appear on any endpoint"),
-                 TestStep(
-                     9, f"If the {FLAG_FIXED_LABEL_EMPTY} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list is not empty", "List is not empty"),
-                 TestStep(10, f"If the {FLAG_FIXED_LABEL_DEFAULT_VALUES} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list does not contain any of the default labels", "List does not contain default labels"),
-                 TestStep(11, "Fail on any problems")
-                 ]
-        return steps
+        return [TestStep(1, "TH performs a wildcard read of all attributes"),
+                TestStep(2, f"If the {FLAG_PRODUCT_NAME} flag is not set, check for \"Test\" in the product name",
+                         "\"Test\" does not appear in the product name"),
+                TestStep(3, f"If the {FLAG_VENDOR_NAME} flag is not set, check for \"Test\" in the vendor name",
+                         "\"Test\" does not appear in the vendor name"),
+                TestStep(4, f"If the {FLAG_VENDOR_ID} flag is not set, check for test vendor IDs",
+                         "Product does not use a test vendor ID"),
+                TestStep(5, f"If the {FLAG_DEFAULT_CALENDAR_FORMAT} flag is not set, and the TimeFormatLocalization cluster is present and has the ActiveCalendarType attribute, check for the default calendar format", "Calendar format is not the default"),
+                TestStep(6, f"If the {FLAG_UNIT_TESTING} flag is not set, check for the presence of a unit testing cluster on any endpoint",
+                         "Unit testing cluster does not appear on any endpoint"),
+                TestStep(7, f"If the {FLAG_FAULT_INJECTION} flag is not set, check for the presence of a fault injection cluster on any endpoint",
+                         "Fault injection cluster does not appear on any endpoint"),
+                TestStep(8, f"If the {FLAG_SAMPLE_MEI} flag is not set, check for the presence of a sample mei cluster on any endpoint",
+                         "Sample MEI cluster does not appear on any endpoint"),
+                TestStep(
+            9, f"If the {FLAG_FIXED_LABEL_EMPTY} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list is not empty", "List is not empty"),
+            TestStep(10, f"If the {FLAG_FIXED_LABEL_DEFAULT_VALUES} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list does not contain any of the default labels", "List does not contain default labels"),
+            TestStep(11, "Fail on any problems")
+        ]
 
     def desc_TC_IDM_13_1(self):
         return "[TC-IDM-13.1] Accidental defaults check - [DUT as Server]"

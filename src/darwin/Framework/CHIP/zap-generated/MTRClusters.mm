@@ -3671,6 +3671,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDeviceLoadStatusWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeDeviceLoadStatusID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID) params:params];
@@ -16524,6 +16529,133 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterAmbientContextSensing
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeHumanActivityDetectedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeHumanActivityDetectedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectIdentifiedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectIdentifiedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAudioContextDetectedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeAudioContextDetectedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAmbientContextTypeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAmbientContextTypeSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeSupportedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSimultaneousDetectionLimitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID) params:params];
+}
+
+- (void)writeAttributeSimultaneousDetectionLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeSimultaneousDetectionLimitWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeSimultaneousDetectionLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCountThresholdReachedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdReachedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCountThresholdWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdID) params:params];
+}
+
+- (void)writeAttributeCountThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeCountThresholdWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeCountThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeHoldTimeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID) params:params];
+}
+
+- (void)writeAttributeHoldTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeHoldTimeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeHoldTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeHoldTimeLimitsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeLimitsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePredictedActivityWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePrivacyModeEnabledWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributePrivacyModeEnabledID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeClusterRevisionID) params:params];
 }
 
 @end

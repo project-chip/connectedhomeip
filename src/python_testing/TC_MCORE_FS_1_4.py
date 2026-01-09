@@ -72,8 +72,12 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.testing.tasks import Subprocess
+
+log = logging.getLogger(__name__)
 
 
 class FabricSyncApp(Subprocess):
@@ -128,6 +132,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
+        self.dut_fsa_stdin = None
         self.th_fsa_controller = None
         self.th_server = None
         self.storage = None
@@ -158,7 +163,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_fsa_bridge_address = "::1"
         self.th_fsa_bridge_port = 5543
@@ -184,7 +189,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = 5544
         self.th_server_discriminator = self.th_fsa_bridge_discriminator + 1
@@ -202,6 +207,8 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             timeout=30)
 
     def teardown_class(self):
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_fsa_controller is not None:
             self.th_fsa_controller.terminate()
         if self.th_server is not None:
@@ -300,7 +307,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             ))
 
         # Get the endpoint number for just added TH_SERVER_NO_UID.
-        logging.info("Endpoints on TH_FSA_BRIDGE: old=%s, new=%s", th_fsa_bridge_endpoints, th_fsa_bridge_endpoints_new)
+        log.info("Endpoints on TH_FSA_BRIDGE: old=%s, new=%s", th_fsa_bridge_endpoints, th_fsa_bridge_endpoints_new)
         asserts.assert_true(th_fsa_bridge_endpoints_new.issuperset(th_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = th_fsa_bridge_endpoints_new - th_fsa_bridge_endpoints
@@ -315,7 +322,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             endpoint=th_fsa_bridge_th_server_endpoint)
         asserts.assert_true(matchers.is_type(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
+        log.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
 
         self.step(3)
 
@@ -390,7 +397,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         ))
 
         # Get the endpoint number for just synced TH_SERVER_NO_UID.
-        logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
+        log.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
@@ -404,7 +411,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             endpoint=dut_fsa_bridge_th_server_endpoint)
         asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
+        log.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
 
         # Make sure that the UniqueID on the DUT_FSA_BRIDGE is the same as the one on the DUT_FSA_BRIDGE.
         asserts.assert_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,

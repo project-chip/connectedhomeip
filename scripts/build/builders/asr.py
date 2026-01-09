@@ -35,54 +35,52 @@ class ASRApp(Enum):
     def ExampleName(self):
         if self == ASRApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == ASRApp.ALL_CLUSTERS_MINIMAL:
+        if self == ASRApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        elif self == ASRApp.LIGHT:
+        if self == ASRApp.LIGHT:
             return 'lighting-app'
-        elif self == ASRApp.LIGHT_SWITCH:
+        if self == ASRApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        elif self == ASRApp.LOCK:
+        if self == ASRApp.LOCK:
             return 'lock-app'
-        elif self == ASRApp.BRIDGE:
+        if self == ASRApp.BRIDGE:
             return 'bridge-app'
-        elif self == ASRApp.TEMPERATURE_MEASUREMENT:
+        if self == ASRApp.TEMPERATURE_MEASUREMENT:
             return 'temperature-measurement-app'
-        elif self == ASRApp.THERMOSTAT:
+        if self == ASRApp.THERMOSTAT:
             return 'thermostat'
-        elif self == ASRApp.OTA_REQUESTOR:
+        if self == ASRApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
-        elif self == ASRApp.DISHWASHER:
+        if self == ASRApp.DISHWASHER:
             return 'dishwasher-app'
-        elif self == ASRApp.REFRIGERATOR:
+        if self == ASRApp.REFRIGERATOR:
             return 'refrigerator-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == ASRApp.ALL_CLUSTERS:
             return 'chip-asr-all-clusters-app'
-        elif self == ASRApp.ALL_CLUSTERS_MINIMAL:
+        if self == ASRApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-asr-all-clusters-minimal-app'
-        elif self == ASRApp.LIGHT:
+        if self == ASRApp.LIGHT:
             return 'chip-asr-lighting-app'
-        elif self == ASRApp.LIGHT_SWITCH:
+        if self == ASRApp.LIGHT_SWITCH:
             return 'chip-asr-light-switch-app'
-        elif self == ASRApp.LOCK:
+        if self == ASRApp.LOCK:
             return 'chip-asr-lock-example'
-        elif self == ASRApp.BRIDGE:
+        if self == ASRApp.BRIDGE:
             return 'chip-asr-bridge-example'
-        elif self == ASRApp.TEMPERATURE_MEASUREMENT:
+        if self == ASRApp.TEMPERATURE_MEASUREMENT:
             return 'chip-asr-temperature-measurement-example'
-        elif self == ASRApp.THERMOSTAT:
+        if self == ASRApp.THERMOSTAT:
             return 'chip-asr-thermostat-example'
-        elif self == ASRApp.OTA_REQUESTOR:
+        if self == ASRApp.OTA_REQUESTOR:
             return 'chip-asr-ota-requestor-example'
-        elif self == ASRApp.DISHWASHER:
+        if self == ASRApp.DISHWASHER:
             return 'chip-asr-dishwasher-example'
-        elif self == ASRApp.REFRIGERATOR:
+        if self == ASRApp.REFRIGERATOR:
             return 'chip-asr-refrigerator-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'asr')
@@ -96,12 +94,11 @@ class ASRBoard(Enum):
     def GetIC(self):
         if self == ASRBoard.ASR582X:
             return 'asr582x'
-        elif self == ASRBoard.ASR595X:
+        if self == ASRBoard.ASR595X:
             return 'asr595x'
-        elif self == ASRBoard.ASR550X:
+        if self == ASRBoard.ASR550X:
             return 'asr550x'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: %r' % self)
 
 
 class ASRBuilder(GnBuilder):

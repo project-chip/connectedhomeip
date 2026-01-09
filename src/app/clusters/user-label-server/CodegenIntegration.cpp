@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/static-cluster-config/UserLabel.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -71,7 +71,7 @@ void MatterUserLabelClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
+void MatterUserLabelClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -82,7 +82,7 @@ void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kUserLabelFixedClusterCount,
             .maxClusterInstanceCount   = kUserLabelMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterUserLabelPluginServerInitCallback() {}

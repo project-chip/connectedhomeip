@@ -97,12 +97,12 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
-     * Connect to the specified peer.
+     * Connect to the specified peer. On success, outPeerConnHandle will be populated with a handle to the connection.
      */
     virtual CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                  ActiveTCPConnectionHandle & peerConnState)
+                                  ActiveTCPConnectionHandle & outPeerConnHandle)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INTERNAL;
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

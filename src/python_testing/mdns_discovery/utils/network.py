@@ -21,7 +21,7 @@ import logging
 import ifaddr
 from zeroconf import InterfaceChoice
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def get_host_ipv6_addresses():
@@ -68,8 +68,8 @@ def get_host_ipv6_addresses():
                     results.append(base_addr)
 
     if not results:
-        logger.info("Returning Zeroconf's interface defaults")
+        log.info("Returning Zeroconf's interface defaults")
         return InterfaceChoice.All
 
-    logger.info(f"Discovered IPv6 addresses: {results}")
+    log.info(f"Discovered IPv6 addresses: {results}")
     return results

@@ -23,6 +23,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/localization-configuration-cluster.cpp"
-    "${CLUSTER_DIR}/localization-configuration-cluster.h"
+    "${CLUSTER_DIR}/LocalizationConfigurationCluster.cpp"
+    "${CLUSTER_DIR}/LocalizationConfigurationCluster.h"
 )

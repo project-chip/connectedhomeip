@@ -50,11 +50,11 @@ CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferBegin(chip::bdx::BDXTransferProx
 
     if (mFileDesignator.data_equal(fileDesignator) && mFabricIndex == fabricIndex && mNodeId == nodeId)
     {
-        transfer->Accept();
+        TEMPORARY_RETURN_IGNORED transfer->Accept();
     }
     else
     {
-        transfer->Reject(CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+        TEMPORARY_RETURN_IGNORED transfer->Reject(CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
     }
 
     return CHIP_NO_ERROR;
@@ -88,11 +88,11 @@ CHIP_ERROR BdxDiagnosticLogsReceiver::OnTransferData(chip::bdx::BDXTransferProxy
 
     if (err == CHIP_NO_ERROR)
     {
-        transfer->Continue();
+        TEMPORARY_RETURN_IGNORED transfer->Continue();
     }
     else
     {
-        transfer->Reject(err);
+        TEMPORARY_RETURN_IGNORED transfer->Reject(err);
     }
     return CHIP_NO_ERROR;
 }

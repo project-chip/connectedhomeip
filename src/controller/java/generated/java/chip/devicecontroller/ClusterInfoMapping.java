@@ -3024,6 +3024,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGeneralDiagnosticsClusterDeviceLoadStatusAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.DeviceLoadStatusAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedGeneralDiagnosticsClusterGeneratedCommandListAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -16304,6 +16325,153 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedAmbientContextSensingClusterAmbientContextTypeAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AmbientContextTypeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAmbientContextTypeSupportedAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AmbientContextTypeSupportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterHoldTimeLimitsAttributeCallback implements ChipClusters.AmbientContextSensingCluster.HoldTimeLimitsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.AmbientContextSensingClusterHoldTimeLimitsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.AmbientContextSensingClusterHoldTimeLimitsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterPredictedActivityAttributeCallback implements ChipClusters.AmbientContextSensingCluster.PredictedActivityAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AmbientContextSensingClusterPredictedActivityStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AmbientContextSensingClusterPredictedActivityStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterGeneratedCommandListAttributeCallback implements ChipClusters.AmbientContextSensingCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAcceptedCommandListAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAmbientContextSensingClusterAttributeListAttributeCallback implements ChipClusters.AmbientContextSensingCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedWiFiNetworkManagementClusterNetworkPassphraseResponseCallback implements ChipClusters.WiFiNetworkManagementCluster.NetworkPassphraseResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -23273,6 +23441,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.SoilMeasurementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("soilMeasurement", soilMeasurementClusterInfo);
 
+    ClusterInfo ambientContextSensingClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AmbientContextSensingCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("ambientContextSensing", ambientContextSensingClusterInfo);
+
     ClusterInfo wiFiNetworkManagementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.WiFiNetworkManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("wiFiNetworkManagement", wiFiNetworkManagementClusterInfo);
@@ -23527,6 +23699,7 @@ public class ClusterInfoMapping {
     destination.get("totalVolatileOrganicCompoundsConcentrationMeasurement").combineCommands(source.get("totalVolatileOrganicCompoundsConcentrationMeasurement"));
     destination.get("radonConcentrationMeasurement").combineCommands(source.get("radonConcentrationMeasurement"));
     destination.get("soilMeasurement").combineCommands(source.get("soilMeasurement"));
+    destination.get("ambientContextSensing").combineCommands(source.get("ambientContextSensing"));
     destination.get("wiFiNetworkManagement").combineCommands(source.get("wiFiNetworkManagement"));
     destination.get("threadBorderRouterManagement").combineCommands(source.get("threadBorderRouterManagement"));
     destination.get("threadNetworkDirectory").combineCommands(source.get("threadNetworkDirectory"));
@@ -28932,6 +29105,10 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> soilMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("soilMeasurement", soilMeasurementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> ambientContextSensingClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("ambientContextSensing", ambientContextSensingClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> wiFiNetworkManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 
