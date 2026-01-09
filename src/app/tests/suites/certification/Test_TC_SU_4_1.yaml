@@ -1,0 +1,332 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.10.1. [TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)
+
+PICS:
+    - MCORE.OTA.Requestor
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1 DUT - DUT as OTA-R device type.
+          2 TH - Test harness1 as Administrator to perform read/write operations.
+          3 TH2 - Test harness2 as OTA-P on first fabric.
+          4 TH3 - Test harness3 as OTA-P on second fabric.
+          5 TH4 - Test harness4 as second OTA-P on first fabric.
+      disabled: true
+
+    - label:
+          "Step 1: TH sends a write request for the DefaultOTAProviders
+          Attribute on the first fabric to the DUT. TH2 is set as the default
+          Provider for the fabric."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]' 321 0 --commissioner-name alpha
+
+          Verify SUCCESS status response On TH(chip-tool) log:
+
+          [1686306358.438747][30535:30537] CHIP:DMG:                         StatusIB =
+          [1686306358.438798][30535:30537] CHIP:DMG:                         {
+          [1686306358.438866][30535:30537] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686306358.438919][30535:30537] CHIP:DMG:                         },
+      disabled: true
+
+    - label:
+          "Step 2: TH sends a read request to read the DefaultOTAProviders
+          Attribute on the first fabric to the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0
+
+          Verify the attribute value is set to TH2 as the default OTA provider for the fabric On TH(chip-tool) log:
+
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
+          [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 123
+          [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
+          [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]      }
+      disabled: true
+
+    - label:
+          "Step 3: TH sends a write request for the DefaultOTAProviders
+          Attribute on the second fabric to the DUT. TH3 is set as the default
+          Provider for the fabric."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 2, "providerNodeID": 222, "endpoint": 0}]' 321 0 --commissioner-name beta
+
+          Verify SUCCESS status response On TH(chip-tool) log:
+
+          [1686306358.438747][30535:30537] CHIP:DMG:                         StatusIB =
+          [1686306358.438798][30535:30537] CHIP:DMG:                         {
+          [1686306358.438866][30535:30537] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686306358.438919][30535:30537] CHIP:DMG:                         },
+      disabled: true
+
+    - label:
+          "Step 4: TH sends a read request to read the DefaultOTAProviders
+          Attribute on the first and second fabric to the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0 --commissioner-name alpha
+
+          Verify the attribute value is set to TH2 as the default OTA provider for the fabric On TH(chip-tool) log:
+
+          [1656423850.683263][5484:5489] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0000 DataVersion: 2031318700
+          [1656423850.683355][5484:5489] CHIP:TOO:   DefaultOtaProviders: 1 entries
+          [1656423850.683439][5484:5489] CHIP:TOO:     [1]: {
+          [1656423850.683477][5484:5489] CHIP:TOO:       ProviderNodeID: 123
+          [1656423850.683514][5484:5489] CHIP:TOO:       Endpoint: 0
+          [1656423850.683548][5484:5489] CHIP:TOO:       FabricIndex: 1
+          [1656423850.683580][5484:5489] CHIP:TOO:      }
+
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0 --commissioner-name beta
+
+          Verify the attribute value is set to TH3 as the default OTA provider for the fabric On TH(chip-tool) log:
+
+          [1656423863.419242][5490:5495] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0000 DataVersion: 2031318700
+          [1656423863.419334][5490:5495] CHIP:TOO:   DefaultOtaProviders: 1 entries
+          [1656423863.419418][5490:5495] CHIP:TOO:     [1]: {
+          [1656423863.419455][5490:5495] CHIP:TOO:       ProviderNodeID: 222
+          [1656423863.419489][5490:5495] CHIP:TOO:       Endpoint: 0
+          [1656423863.419523][5490:5495] CHIP:TOO:       FabricIndex: 2
+          [1656423863.419665][5490:5495] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5: TH sends a write request for the DefaultOTAProviders
+          Attribute on the first fabric to the DUT. TH4 is the first Provider
+          location and TH2 is the second Provider location in the same write
+          request on the first fabric. TH sends a read request to read the
+          DefaultOTAProviders Attribute on the first and second fabric to the
+          DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 111, "endpoint": 0}, {"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]' 321 0 --commissioner-name alpha
+
+          Verify CONSTRAINT_ERROR  response On TH(chip-tool) log:
+
+          [1651278243153] [27005:35448520] CHIP: [TOO] Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0
+
+          Verify the attribute value is set to TH2 as the default OTA provider for the fabric On TH(chip-tool) log:
+
+          [1686827497.598405][15892:15894] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0000 DataVersion: 2330409299
+          [1686827497.598423][15892:15894] CHIP:TOO:   DefaultOTAProviders: 1 entries
+          [1686827497.598433][15892:15894] CHIP:TOO:     [1]: {
+          [1686827497.598439][15892:15894] CHIP:TOO:       ProviderNodeID: 111
+          [1686827497.598442][15892:15894] CHIP:TOO:       Endpoint: 0
+          [1686827497.598445][15892:15894] CHIP:TOO:       FabricIndex: 1
+          [1686827497.598447][15892:15894] CHIP:TOO:      }
+
+
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0 --commissioner-name beta
+
+          Verify the attribute value is set to TH3 as the default OTA provider for the fabric On TH(chip-tool) log:
+
+          [1656424135.466852][5550:5555] CHIP:TOO:   DefaultOtaProviders: 1 entries
+          [1656424135.466920][5550:5555] CHIP:TOO:     [1]: {
+          [1656424135.466949][5550:5555] CHIP:TOO:       ProviderNodeID: 222
+          [1656424135.466977][5550:5555] CHIP:TOO:       Endpoint: 0
+          [1656424135.467003][5550:5555] CHIP:TOO:       FabricIndex: 2
+          [1656424135.467028][5550:5555] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 6: TH sends a write request for the DefaultOTAProviders
+          Attribute with an empty provider list on the second fabric to the DUT.
+          TH sends a read request to read the DefaultOTAProviders Attribute on
+          the first and second fabric to the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[]' 321 0 --commissioner-name beta
+
+          Verify SUCCESS status response On TH(chip-tool) log:
+
+          [1686306358.438747][30535:30537] CHIP:DMG:                         StatusIB =
+          [1686306358.438798][30535:30537] CHIP:DMG:                         {
+          [1686306358.438866][30535:30537] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686306358.438919][30535:30537] CHIP:DMG:                         },
+
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0
+
+          Verify the attribute value is set to TH4 as the default OTA provider for the fabric On TH(chip-tool) log:
+
+          [1686827713.696617][15955:15957] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0000 DataVersion: 2330409312
+          [1686827713.696633][15955:15957] CHIP:TOO:   DefaultOTAProviders: 1 entries
+          [1686827713.696646][15955:15957] CHIP:TOO:     [1]: {
+          [1686827713.696652][15955:15957] CHIP:TOO:       ProviderNodeID: 111
+          [1686827713.696655][15955:15957] CHIP:TOO:       Endpoint: 0
+          [1686827713.696657][15955:15957] CHIP:TOO:       FabricIndex: 1
+          [1686827713.696660][15955:15957] CHIP:TOO:      }
+
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0 --commissioner-name beta
+
+          Verify the DefaultOtaProviders entries is 0 On TH(chip-tool) log:
+
+          [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOtaProviders: 0 entries
+      disabled: true
+
+    - label:
+          "Step 7: TH sends a read request to read the UpdatePossible attribute
+          from the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read update-possible 321 0
+
+          where 321 is OTA Requestor node ID
+
+          Verify that the attribute value is set to True when there is an update possible On TH(chip-tool)log:
+
+          [1656424270.512404][5586:5591] CHIP:DMG: ReportDataMessage =
+          [1656424270.512452][5586:5591] CHIP:DMG: {
+          [1656424270.512493][5586:5591] CHIP:DMG:         AttributeReportIBs =
+          [1656424270.512549][5586:5591] CHIP:DMG:         [
+          [1656424270.512594][5586:5591] CHIP:DMG:                 AttributeReportIB =
+          [1656424270.512656][5586:5591] CHIP:DMG:                 {
+          [1656424270.512703][5586:5591] CHIP:DMG:                         AttributeDataIB =
+          [1656424270.512760][5586:5591] CHIP:DMG:                         {
+          [1656424270.512818][5586:5591] CHIP:DMG:                                 DataVersion = 0x791376b1,
+          [1656424270.512881][5586:5591] CHIP:DMG:                                 AttributePathIB =
+          [1656424270.512946][5586:5591] CHIP:DMG:                                 {
+          [1656424270.513014][5586:5591] CHIP:DMG:                                         Endpoint = 0x0,
+          [1656424270.513078][5586:5591] CHIP:DMG:                                         Cluster = 0x2a,
+          [1656424270.513137][5586:5591] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1656424270.513197][5586:5591] CHIP:DMG:                                 }
+          [1656424270.513255][5586:5591] CHIP:DMG:
+          [1656424270.513317][5586:5591] CHIP:DMG:                                 Data = true,
+          [1656424270.513373][5586:5591] CHIP:DMG:                         },
+          [1656424270.513432][5586:5591] CHIP:DMG:
+          [1656424270.513478][5586:5591] CHIP:DMG:                 },
+          [1656424270.513532][5586:5591] CHIP:DMG:
+          [1656424270.513576][5586:5591] CHIP:DMG:         ],
+          [1656424270.513629][5586:5591] CHIP:DMG:
+          [1656424270.513674][5586:5591] CHIP:DMG:         SuppressResponse = true,
+          [1656424270.513722][5586:5591] CHIP:DMG:         InteractionModelRevision = 1
+          [1656424270.513765][5586:5591] CHIP:DMG: }
+          [1656424270.514027][5586:5591] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0001 DataVersion: 2031318705
+          [1656424270.514089][5586:5591] CHIP:TOO:   UpdatePossible: TRUE
+      disabled: true
+
+    - label:
+          "Step 8: TH sends a read request to read the UpdateState Attribute
+          from the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read update-state 321 0
+
+          Verify that the attribute value is set to one of the following values.
+           Unknown, Idle, Querying, DelayedOnQuery, Downloading, Applying, DelayedOnApply, RollingBack, DelayedOnUserConsent.
+
+          [1656424339.446486][5594:5599] CHIP:DMG: ReportDataMessage =
+          [1656424339.446517][5594:5599] CHIP:DMG: {
+          [1656424339.446542][5594:5599] CHIP:DMG:         AttributeReportIBs =
+          [1656424339.446577][5594:5599] CHIP:DMG:         [
+          [1656424339.446605][5594:5599] CHIP:DMG:                 AttributeReportIB =
+          [1656424339.446641][5594:5599] CHIP:DMG:                 {
+          [1656424339.446670][5594:5599] CHIP:DMG:                         AttributeDataIB =
+          [1656424339.446711][5594:5599] CHIP:DMG:                         {
+          [1656424339.446752][5594:5599] CHIP:DMG:                                 DataVersion = 0x791376b1,
+          [1656424339.446790][5594:5599] CHIP:DMG:                                 AttributePathIB =
+          [1656424339.446829][5594:5599] CHIP:DMG:                                 {
+          [1656424339.446867][5594:5599] CHIP:DMG:                                         Endpoint = 0x0,
+          [1656424339.446907][5594:5599] CHIP:DMG:                                         Cluster = 0x2a,
+          [1656424339.446946][5594:5599] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1656424339.446984][5594:5599] CHIP:DMG:                                 }
+          [1656424339.447024][5594:5599] CHIP:DMG:
+          [1656424339.447062][5594:5599] CHIP:DMG:                                 Data = 1,
+          [1656424339.447097][5594:5599] CHIP:DMG:                         },
+          [1656424339.447135][5594:5599] CHIP:DMG:
+          [1656424339.447164][5594:5599] CHIP:DMG:                 },
+          [1656424339.447196][5594:5599] CHIP:DMG:
+          [1656424339.447223][5594:5599] CHIP:DMG:         ],
+          [1656424339.447258][5594:5599] CHIP:DMG:
+          [1656424339.447286][5594:5599] CHIP:DMG:         SuppressResponse = true,
+          [1656424339.447315][5594:5599] CHIP:DMG:         InteractionModelRevision = 1
+          [1656424339.447341][5594:5599] CHIP:DMG: }
+          [1656424339.447490][5594:5599] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0002 DataVersion: 2031318705
+          [1656424339.447554][5594:5599] CHIP:TOO:   UpdateState: 1
+      disabled: true
+
+    - label:
+          "Step 9: DUT should start initiating the Software update process.
+          While the DUT is downloading the image, TH sends a read request to
+          read the UpdateStateProgress attribute from the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read update-state-progress 321 0
+
+          where 321 is OTA Requestor node ID
+
+          Verify that the field value is null if no ongoing update on  TH(chip-tool) logs:
+
+          [1656424455.480729][5607:5612] CHIP:DMG: ReportDataMessage =
+          [1656424455.480766][5607:5612] CHIP:DMG: {
+          [1656424455.480795][5607:5612] CHIP:DMG:         AttributeReportIBs =
+          [1656424455.480836][5607:5612] CHIP:DMG:         [
+          [1656424455.480869][5607:5612] CHIP:DMG:                 AttributeReportIB =
+          [1656424455.480919][5607:5612] CHIP:DMG:                 {
+          [1656424455.480956][5607:5612] CHIP:DMG:                         AttributeDataIB =
+          [1656424455.481001][5607:5612] CHIP:DMG:                         {
+          [1656424455.481039][5607:5612] CHIP:DMG:                                 DataVersion = 0x791376b1,
+          [1656424455.481080][5607:5612] CHIP:DMG:                                 AttributePathIB =
+          [1656424455.481124][5607:5612] CHIP:DMG:                                 {
+          [1656424455.481169][5607:5612] CHIP:DMG:                                         Endpoint = 0x0,
+          [1656424455.481215][5607:5612] CHIP:DMG:                                         Cluster = 0x2a,
+          [1656424455.481261][5607:5612] CHIP:DMG:                                         Attribute = 0x0000_0003,
+          [1656424455.481305][5607:5612] CHIP:DMG:                                 }
+          [1656424455.481351][5607:5612] CHIP:DMG:
+          [1656424455.481396][5607:5612] CHIP:DMG:                                 Data = NULL
+          [1656424455.481441][5607:5612] CHIP:DMG:                         },
+          [1656424455.481485][5607:5612] CHIP:DMG:
+          [1656424455.481522][5607:5612] CHIP:DMG:                 },
+          [1656424455.481562][5607:5612] CHIP:DMG:
+          [1656424455.481594][5607:5612] CHIP:DMG:         ],
+          [1656424455.481634][5607:5612] CHIP:DMG:
+          [1656424455.481666][5607:5612] CHIP:DMG:         SuppressResponse = true,
+          [1656424455.481700][5607:5612] CHIP:DMG:         InteractionModelRevision = 1
+          [1656424455.481731][5607:5612] CHIP:DMG: }
+          [1656424455.482023][5607:5612] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0003 DataVersion: 2031318705
+          [1656424455.482074][5607:5612] CHIP:TOO:   UpdateStateProgress: null
+
+
+          Verify that the field value is anything between 1 to 100 for an ongoing update on the chip-tool logs
+
+          [1645823829292] [22944:21246546] CHIP: [DMG] ReportDataMessage =
+          [1645823829292] [22944:21246546] CHIP: [DMG] {
+          [1645823829292] [22944:21246546] CHIP: [DMG]         AttributeReportIBs =
+          [1645823829292] [22944:21246546] CHIP: [DMG]         [
+          [1645823829292] [22944:21246546] CHIP: [DMG]                 AttributeReportIB =
+          [1645823829292] [22944:21246546] CHIP: [DMG]                 {
+          [1645823829292] [22944:21246546] CHIP: [DMG]                         AttributeDataIB =
+          [1645823829292] [22944:21246546] CHIP: [DMG]                         {
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 DataVersion = 0x3873a966,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 AttributePathIB =
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 {
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Cluster = 0x2a,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Attribute = 0x0000_0003,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 }
+          [1645823829292] [22944:21246546] CHIP: [DMG]
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Data = 20,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                         },
+          [1645823829292] [22944:21246546] CHIP: [DMG]
+          [1645823829292] [22944:21246546] CHIP: [DMG]                 },
+          [1645823829292] [22944:21246546] CHIP: [DMG]
+          [1645823829292] [22944:21246546] CHIP: [DMG]         ],
+          [1645823829292] [22944:21246546] CHIP: [DMG]
+          [1645823829292] [22944:21246546] CHIP: [DMG]         SuppressResponse = true,
+          [1645823829292] [22944:21246546] CHIP: [DMG]         InteractionModelRevision = 1
+          [1645823829292] [22944:21246546] CHIP: [DMG] }
+      disabled: true
