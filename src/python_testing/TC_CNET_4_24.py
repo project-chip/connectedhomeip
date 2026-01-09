@@ -341,16 +341,16 @@ class TC_CNET_4_24(MatterBaseTest):
             TestStep(1, "TH reads Networks attribute and removes all configured networks",
                         "Verify that DUT successfully removed all networks configured during commissioning\n"
                         "Verify LastNetworkingStatus and LastConnectErrorValue are Null after network removal"),
-            TestStep(2, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID and Master Key, Breadcrumb = 1",
+            TestStep(2, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID, Breadcrumb = 1",
                         "Verify that DUT sends NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(3, "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID and Master Key, Breadcrumb = 2",
+            TestStep(3, "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0) (in non-concurrent mode)\n"
                         "After delay, verify LastNetworkingStatus is NOT kSuccess, indicating connection failure"),
             TestStep(4, "TH reads LastNetworkingStatus after Extended PAN ID connection failure",
-                        "Verify LastNetworkingStatus is kOtherConnectionFailure (7)"),
+                        "Verify LastNetworkingStatus is kNetworkNotFound (5)"),
             TestStep(5, "TH reads Networks attribute",
                         "Verify dataset with incorrect Extended PAN ID is in the network list"),
             TestStep(6, "TH sends RemoveNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 3",
@@ -358,16 +358,16 @@ class TC_CNET_4_24(MatterBaseTest):
                         "1. NetworkingStatus is kSuccess (0)"),
             TestStep(7, "TH reads Networks attribute",
                         "Verify Networks list is empty after removal"),
-            TestStep(8, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Name and Master Key, Breadcrumb = 4",
+            TestStep(8, "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Master Key, Breadcrumb = 4",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty\n"),
-            TestStep(9, "TH sends ConnectNetwork command with dataset containing incorrect Network Name and Master Key, Breadcrumb = 5",
+            TestStep(9, "TH sends ConnectNetwork command with dataset containing incorrect Master Key, Breadcrumb = 5",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0) (in non-concurrent mode)\n"
                         "After delay, verify LastNetworkingStatus is NOT kSuccess, indicating connection failure"),
-            TestStep(10, "TH reads LastNetworkingStatus after Network Name/Master Key connection failure",
-                         "Verify LastNetworkingStatus to be 'kOtherConnectionFailure'"),
+            TestStep(10, "TH reads LastNetworkingStatus after Master Key connection failure",
+                         "Verify LastNetworkingStatus is kAuthFailure (7)"),
             TestStep(11, "TH sends AddOrUpdateThreadNetwork with correct operational dataset and Breadcrumb = 6",
                          "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                          "1. NetworkingStatus is kSuccess (0)\n"
@@ -398,30 +398,27 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
         # Create incorrect Thread operational datasets for testing
-        # First incorrect dataset: valid format but with modified Extended PAN ID AND Master Key
-        # This ensures the device cannot connect to any existing network with matching credentials
+        # First incorrect dataset: valid format but with modified Extended PAN ID ONLY
+        # This should cause kNetworkNotFound since the Extended PAN ID identifies the network
         # Extended PAN ID: Type=0x02, Length=0x08, Value=8 bytes
-        # Master Key: Type=0x05, Length=0x10, Value=16 bytes
         incorrect_thread_dataset_1 = modify_thread_tlvs(
             correct_thread_dataset,
             {
                 0x02: lambda v: bytes(b ^ 0xAA for b in v),  # XOR Extended PAN ID with 0xAA
-                0x05: lambda v: bytes(b ^ 0x99 for b in v),  # XOR Master Key with 0x99
             }
         )
-        logger.info(f" --- Incorrect Thread dataset 1 (modified Extended PAN ID + Master Key): {incorrect_thread_dataset_1.hex()}")
+        logger.info(f" --- Incorrect Thread dataset 1 (modified Extended PAN ID only): {incorrect_thread_dataset_1.hex()}")
 
-        # Second incorrect dataset: valid format but with modified Network Name and Master Key
-        # Network Name: Type=0x03, Length=variable (max 16 bytes)
+        # Second incorrect dataset: valid format but with modified Master Key ONLY
+        # This should cause kAuthFailure since the network exists but credentials are wrong
         # Master Key: Type=0x05, Length=0x10, Value=16 bytes
         incorrect_thread_dataset_2 = modify_thread_tlvs(
             correct_thread_dataset,
             {
-                0x03: lambda v: bytes(b ^ 0x55 for b in v),  # XOR Network Name with 0x55
                 0x05: lambda v: bytes(b ^ 0xCC for b in v),  # XOR Master Key with 0xCC
             }
         )
-        logger.info(f" --- Incorrect Thread dataset 2 (modified Network Name and Master Key): {incorrect_thread_dataset_2.hex()}")
+        logger.info(f" --- Incorrect Thread dataset 2 (modified Master Key only): {incorrect_thread_dataset_2.hex()}")
 
         # Step 0: TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(0)
@@ -505,10 +502,10 @@ class TC_CNET_4_24(MatterBaseTest):
         asserts.assert_is(last_connect_error, NullValue,
                           f"Expected LastConnectErrorValue to be Null after network removal, got {last_connect_error}")
 
-        # Step 2: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID and Master Key, Breadcrumb = 1
+        # Step 2: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID, Breadcrumb = 1
         self.step(2)
 
-        logger.info(" --- Step 2: Sending AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID and Master Key")
+        logger.info(" --- Step 2: Sending AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateThreadNetwork(
@@ -519,10 +516,10 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_network_config_response(response)
 
-        # Step 3: TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID and Master Key, Breadcrumb = 2
+        # Step 3: TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2
         self.step(3)
 
-        logger.info(" --- Step 3: Sending ConnectNetwork with dataset containing incorrect Extended PAN ID and Master Key")
+        logger.info(" --- Step 3: Sending ConnectNetwork with dataset containing incorrect Extended PAN ID")
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
         network_id_1 = get_thread_tlv(incorrect_thread_dataset_1, tlv_type=0x02, expected_length=8)
         logger.info(f" --- Extracted Extended PAN ID: {network_id_1.hex()}")
@@ -609,10 +606,10 @@ class TC_CNET_4_24(MatterBaseTest):
         asserts.assert_equal(len(networks), 0,
                              f"Expected Networks list to be empty, but has {len(networks)} network(s)")
 
-        # Step 8: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Network Name and Master Key, Breadcrumb = 4
+        # Step 8: TH sends AddOrUpdateThreadNetwork with valid format but incorrect Master Key, Breadcrumb = 4
         self.step(8)
 
-        logger.info(" --- Step 8: Sending AddOrUpdateThreadNetwork with valid format but incorrect Network Name and Master Key")
+        logger.info(" --- Step 8: Sending AddOrUpdateThreadNetwork with valid format but incorrect Master Key")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateThreadNetwork(
@@ -623,10 +620,10 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_network_config_response(response)
 
-        # Step 9: TH sends ConnectNetwork command with dataset containing incorrect Network Name and Master Key, Breadcrumb = 5
+        # Step 9: TH sends ConnectNetwork command with dataset containing incorrect Master Key, Breadcrumb = 5
         self.step(9)
 
-        logger.info(" --- Step 9: Sending ConnectNetwork with dataset containing incorrect Network Name and Master Key")
+        logger.info(" --- Step 9: Sending ConnectNetwork with dataset containing incorrect Master Key")
         # Extract Extended PAN ID (8 bytes) from the dataset to use as networkID
         network_id_2 = get_thread_tlv(incorrect_thread_dataset_2, tlv_type=0x02, expected_length=8)
         logger.info(f" --- Extracted Extended PAN ID: {network_id_2.hex()}")
@@ -662,7 +659,7 @@ class TC_CNET_4_24(MatterBaseTest):
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
-        logger.info(f" --- LastNetworkingStatus after incorrect Network Name/Master Key: {last_networking_status}")
+        logger.info(f" --- LastNetworkingStatus after incorrect Master Key: {last_networking_status}")
 
         # Verify that LastNetworkingStatus indicates a valid error status
         # Expected: kAuthFailure (7) for incorrect Network Name/Master Key
