@@ -365,7 +365,7 @@ struct TestScenesManagementCluster : public ::testing::Test
     {
         sceneTableProvider.mSceneTable->UnregisterHandler(&mMockSceneHandler);
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-        clusterContext.release();
+        clusterContext.reset();
         fabricTable.Shutdown();
     }
 
