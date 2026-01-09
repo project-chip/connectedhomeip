@@ -49,8 +49,7 @@ OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char
         return nullptr;
     }
 
-    return Platform::New<OtaProviderAppCommandHandler>(
-        OtaProviderAppCommandHandler::PrivateCtorTag{}, std::move(value), delegate);    
+    return Platform::New<OtaProviderAppCommandHandler>(OtaProviderAppCommandHandler::PrivateCtorTag{}, std::move(value), delegate);
 }
 
 static std::string ToString(const Json::Value & v)
