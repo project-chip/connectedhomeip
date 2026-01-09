@@ -44,9 +44,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
-    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+    const FabricInfo * fabricInfo = mClusterContext.fabricTable.FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = mClusterContext.failSafeContext.GetFailSafeContext();
+    auto & commissionMgr          = mClusterContext.commissioningWindowManager;
 
     VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
     VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
@@ -83,9 +83,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissi
 
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
-    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
-    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+    const FabricInfo * fabricInfo = mClusterContext.fabricTable.FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = mClusterContext.failSafeContext.GetFailSafeContext();
+    auto & commissionMgr          = mClusterContext.commissioningWindowManager;
 
     VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
 
@@ -107,11 +107,14 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received RevokeCommissioning command");
 
-    auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto & commissionMgr = mClusterContext.commissioningWindowManager;
 
     commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
 
     if (!commissionMgr.IsCommissioningWindowOpen())
+        mClusterContext.failSafeContext.ForceFailSafeTimerExpiry();
+
+    if (!mClusterContext.commissioningWindowManager.IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
         return ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen);

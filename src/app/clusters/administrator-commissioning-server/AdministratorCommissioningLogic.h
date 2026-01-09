@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/server/Server.h>
 
@@ -28,17 +29,17 @@ class AdministratorCommissioningLogic
 public:
     AdministratorCommissioning::CommissioningWindowStatusEnum GetWindowStatus()
     {
-        return Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster();
+        return mClusterContext.commissioningWindowManager.CommissioningWindowStatusForCluster();
     }
 
     const app::DataModel::Nullable<FabricIndex> & GetAdminFabricIndex()
     {
-        return Server::GetInstance().GetCommissioningWindowManager().GetOpenerFabricIndex();
+        return mClusterContext.commissioningWindowManager.GetOpenerFabricIndex();
     }
 
     const app::DataModel::Nullable<VendorId> & GetAdminVendorId()
     {
-        return Server::GetInstance().GetCommissioningWindowManager().GetOpenerVendorId();
+        return mClusterContext.commissioningWindowManager.GetOpenerVendorId();
     }
 
     // Methods to handle the various commands this cluster may receive.

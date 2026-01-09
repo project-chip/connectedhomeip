@@ -18,7 +18,9 @@
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.h>
 
+#include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 
 namespace chip {
@@ -28,6 +30,12 @@ namespace Clusters {
 class AdministratorCommissioningCluster : public DefaultServerCluster
 {
 public:
+    struct Context
+    {
+        FabricTable & fabricTable;
+        CommissioningWindowManager & commissioningWindowManager;
+        FailSafeContext & failsafeContext;
+    };
     constexpr AdministratorCommissioningCluster(EndpointId endpointId,
                                                 BitFlags<AdministratorCommissioning::Feature> _unused_features) :
         DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id))
@@ -52,8 +60,7 @@ class AdministratorCommissioningWithBasicCommissioningWindowCluster : public Adm
 public:
     AdministratorCommissioningWithBasicCommissioningWindowCluster(EndpointId endpointId,
                                                                   BitFlags<AdministratorCommissioning::Feature> features) :
-        AdministratorCommissioningCluster(endpointId, features),
-        mFeatures(features)
+        AdministratorCommissioningCluster(endpointId, features), mFeatures(features)
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -64,6 +71,7 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
 private:
+    Context mClusterContext;
     const BitFlags<AdministratorCommissioning::Feature> mFeatures;
 };
 
