@@ -106,15 +106,13 @@ void StartAppTask(void)
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #if CHIP_DEVICE_LAYER_TARGET_BL616
-CHIP_ERROR AppTask::StartAppShellTask()
+void AppTask::StartAppShellTask()
 {
     Engine::Root().Init();
 
     cmd_misc_init();
 
     Engine::Root().RunMainLoop();
-
-    return CHIP_NO_ERROR;
 }
 #else
 void AppTask::AppShellTask(void * args)
@@ -122,7 +120,7 @@ void AppTask::AppShellTask(void * args)
     Engine::Root().RunMainLoop();
 }
 
-CHIP_ERROR AppTask::StartAppShellTask()
+void AppTask::StartAppShellTask()
 {
     static TaskHandle_t shellTask;
 
@@ -131,8 +129,6 @@ CHIP_ERROR AppTask::StartAppShellTask()
     cmd_misc_init();
 
     xTaskCreate(AppTask::AppShellTask, "chip_shell", 1024 / sizeof(configSTACK_DEPTH_TYPE), NULL, APP_TASK_PRIORITY, &shellTask);
-
-    return CHIP_NO_ERROR;
 }
 #endif
 #endif

@@ -12,7 +12,7 @@ MEMORY
   tcm_ocram (wxa) : ORIGIN = 0x4201C000 + __CACHE_SIZE, LENGTH = (16K - __CACHE_SIZE + 80K - __EM_SIZE - __stack_size)
   sys_stack (wxa) : ORIGIN = 0x42034000 - __EM_SIZE - __stack_size, LENGTH = __stack_size
   hbnram    (wxa) : ORIGIN = 0x40010000, LENGTH = (4K)
-  psram     (wxa) : ORIGIN = 0x26000000, LENGTH = (2M)
+  psram     (wxa) : ORIGIN = 0x24000000, LENGTH = (2M)
 }
 
 SECTIONS
