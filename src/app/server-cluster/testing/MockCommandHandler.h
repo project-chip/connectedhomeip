@@ -55,6 +55,19 @@ public:
         const char * context;
     };
 
+    MockCommandHandler() = default;
+    // Copying is disallowed because ResponseRecord contains PacketBufferHandle,
+    // which is move-only and represents unique ownership of encoded TLV data.
+    //
+    // Move is allowed because this mock does NOT maintain any self-referencing,
+    // intrusive, or address-stable state (unlike the real CommandHandler / Handle
+    // system), so relocating the object is safe.
+    MockCommandHandler(const MockCommandHandler &)             = delete;
+    MockCommandHandler & operator=(const MockCommandHandler &) = delete;
+
+    MockCommandHandler(MockCommandHandler &&)             = default;
+    MockCommandHandler & operator=(MockCommandHandler &&) = default;
+
     ~MockCommandHandler() override = default;
 
     CHIP_ERROR FallibleAddStatus(const app::ConcreteCommandPath & aRequestCommandPath,

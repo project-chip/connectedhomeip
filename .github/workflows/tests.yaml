@@ -423,7 +423,7 @@ jobs:
                      --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
                      --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                      --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT-unified}/chip-rvc-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
                      --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \

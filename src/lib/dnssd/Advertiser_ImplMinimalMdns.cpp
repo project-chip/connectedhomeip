@@ -39,10 +39,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/StringBuilder.h>
-
-// Enable detailed mDNS logging for received queries
-#undef DETAIL_LOGGING
-// #define DETAIL_LOGGING
+#include <minmdns/MinMdnsConfig.h>
 
 namespace chip {
 namespace Dnssd {
@@ -51,7 +48,7 @@ namespace {
 using chip::Platform::UniquePtr;
 using namespace mdns::Minimal;
 
-#ifdef DETAIL_LOGGING
+#if CHIP_MINMDNS_HIGH_VERBOSITY
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -100,7 +97,7 @@ void LogQuery(const QueryData & data)
 }
 #else
 void LogQuery(const QueryData & data) {}
-#endif
+#endif // CHIP_MINMDNS_HIGH_VERBOSITY
 
 // Max number of records for operational = PTR, SRV, TXT, A, AAAA, I subtype.
 constexpr size_t kMaxOperationalRecords = 6;
@@ -327,7 +324,7 @@ private:
 
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
-#ifdef DETAIL_LOGGING
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
     VerifyOrDie(info->SrcAddress.ToString(srcAddressString) != nullptr);
     ChipLogDetail(Discovery, "Received an mDNS query from %s", srcAddressString);
@@ -337,6 +334,10 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
     if (!ParsePacket(data, this))
     {
         ChipLogError(Discovery, "Failed to parse mDNS query");
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+        ChipLogDetail(Discovery, "Invalid packet content:");
+        ChipLogByteSpan(Discovery, data.AsByteSpan());
+#endif // CHIP_MINMDNS_HIGH_VERBOSITY
     }
     mCurrentSource = nullptr;
 }
