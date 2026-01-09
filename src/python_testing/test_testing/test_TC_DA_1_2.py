@@ -20,7 +20,6 @@ import json
 import os
 import subprocess
 import sys
-
 from typing import Optional
 
 CHIP_ROOT = os.path.abspath(os.path.join(
