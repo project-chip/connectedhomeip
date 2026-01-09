@@ -266,7 +266,7 @@ class IsolatedNetworkNamespace:
     def tool_ns(self):
         return self._tool.ns_name
 
-    def netns_for_subprocess_kind(self, kind: SubprocessKind):
+    def netns_for_subprocess_kind(self, kind: SubprocessKind) -> str:
         match kind:
             case SubprocessKind.APP:
                 return self.app_ns
