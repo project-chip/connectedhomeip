@@ -524,10 +524,6 @@ config MBEDTLS_PSA_CRYPTO_C
     bool "MBEDTLS_PSA_CRYPTO_C"
     default n
 
-config CHIP_CRYPTO_PSA
-    bool "CHIP_CRYPTO_PSA"
-    default n
-
 endif # !ZEPHYR_VERSION_3_3
 
 config GETOPT_LONG
