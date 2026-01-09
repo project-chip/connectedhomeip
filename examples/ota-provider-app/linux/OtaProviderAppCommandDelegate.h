@@ -50,9 +50,18 @@ public:
     static OtaProviderAppCommandHandler * FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate);
 
     static void HandleCommand(intptr_t context);
+
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
-    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d) : mCommandPayload(std::move(v)), mDelegate(d)
+    struct PrivateCtorTag
+    {
+    private:
+        friend class OtaProviderAppCommandHandler;
+        PrivateCtorTag() = default;
+    };
+
+    OtaProviderAppCommandHandler(PrivateCtorTag, Json::Value && v, OtaProviderAppCommandDelegate * d) :
+        mCommandPayload(std::move(v)), mDelegate(d)
     {}
 
 private:
