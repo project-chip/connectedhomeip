@@ -1245,9 +1245,9 @@ limitations under the License.
         <clusters>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Service Area" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Ambient Context Sensing" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Ambient Context Sensing" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
