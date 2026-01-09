@@ -21,7 +21,7 @@ from typing import Callable
 from mobly import asserts
 
 from matter.testing.conformance import (Choice, Conformance, ConformanceAssessmentData, ConformanceDecision, ConformanceException,
-                                        ConformanceParseParameters, MinimalConformance, deprecated, disallowed, mandatory, optional,
+                                        ConformanceParseParameters, EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, deprecated, disallowed, mandatory, optional,
                                         parse_basic_callable_from_xml, parse_callable_from_xml, provisional, zigbee)
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -665,7 +665,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         # TODO: switch this to check greater than once the update to the base is done (#33422)
-        asserts.assert_equal(xml_callable(MinimalConformance()).decision, ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.OPTIONAL)
         asserts.assert_equal(str(xml_callable), 'attr1 > 1')
 
         # Ensure that we can only have greater terms with exactly 2 value
@@ -750,7 +750,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         asserts.assert_equal(str(xml_callable), 'Zigbee', msg)
-        asserts.assert_equal(xml_callable(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg)
+        asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.NOT_APPLICABLE, msg)
 
         xml = ('<optionalConform>'
                '<condition name="zigbee" />'
@@ -759,7 +759,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         # expect no exception here
         asserts.assert_equal(str(xml_callable), '[Zigbee]', msg)
-        asserts.assert_equal(xml_callable(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg)
+        asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.NOT_APPLICABLE, msg)
 
         # otherwise conforms are allowed
         xml = ('<otherwiseConform>'
@@ -770,7 +770,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         # expect no exception here
         asserts.assert_equal(str(xml_callable), 'Zigbee, P', msg)
-        asserts.assert_equal(xml_callable(MinimalConformance()).decision, ConformanceDecision.PROVISIONAL, msg)
+        asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.PROVISIONAL, msg)
 
         # TODO: adjust conformance call function to accept a list of conditions and evaluate based on that
         xml = ('<mandatoryConform>'
@@ -781,7 +781,7 @@ class TestConformanceSupport(MatterBaseTest):
         asserts.assert_equal(str(xml_callable), 'CD', msg)
         # Device conditions are always optional (at least for now), even though we didn't pass in anything
         # to indicate whether or not this conditions is enabled
-        asserts.assert_equal(xml_callable(MinimalConformance()).decision, ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.OPTIONAL)
 
         xml = ('<otherwiseConform>'
                '<feature name="CD" />'
@@ -790,7 +790,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         asserts.assert_equal(str(xml_callable), 'CD, testy', msg)
-        asserts.assert_equal(xml_callable(MinimalConformance()).decision, ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.OPTIONAL)
 
     def check_good_choice(self, xml: str, conformance_str: str) -> Conformance:
         et = ElementTree.fromstring(xml)
@@ -844,21 +844,24 @@ class TestConformanceSupport(MatterBaseTest):
                    '<feature name="AB" />'
                    '</optionalConform>')
             conformance = self.check_good_choice(xml, f'[AB].{suffix}')
-            asserts.assert_equal(conformance(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            asserts.assert_equal(conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision,
+                                 ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             self.check_decision(more, conformance, AB, [], [])
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<attribute name="attr1" />'
                    '</optionalConform>')
             conformance = self.check_good_choice(xml, f'[attr1].{suffix}')
-            asserts.assert_equal(conformance(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            asserts.assert_equal(conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision,
+                                 ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             self.check_decision(more, conformance, 0, attr1, [])
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<command name="cmd1" />'
                    '</optionalConform>')
             conformance = self.check_good_choice(xml, f'[cmd1].{suffix}')
-            asserts.assert_equal(conformance(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            asserts.assert_equal(conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision,
+                                 ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             self.check_decision(more, conformance, 0, [], cmd1)
 
             xml = (f'<optionalConform {xml_attrs}>'
@@ -912,7 +915,8 @@ class TestConformanceSupport(MatterBaseTest):
                    '</optionalConform>'
                    '</otherwiseConform>')
             conformance = self.check_good_choice(xml, f'attr1, [AB].{suffix}, [CD].b')
-            asserts.assert_equal(conformance(MinimalConformance()).decision, ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            asserts.assert_equal(conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision,
+                                 ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
             # when we have this attribute, we should not have a choice
             info = ConformanceAssessmentData(0, attr1, [], 1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.MANDATORY, 'Unexpected conformance')

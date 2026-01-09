@@ -130,12 +130,15 @@ class ConformanceAssessmentData:
 
 
 @dataclass
-class MinimalConformance(ConformanceAssessmentData):
+class EmptyClusterGlobalAttributes(ConformanceAssessmentData):
     def __init__(self):
         self.feature_map = uint(0)
         self.attribute_list = []
         self.all_command_list = []
         self.cluster_revision = uint(1)
+
+
+EMPTY_CLUSTER_GLOBAL_ATTRIBUTES = EmptyClusterGlobalAttributes()
 
 
 def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional: bool):
@@ -148,11 +151,11 @@ def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, all
 
 def is_disallowed(conformance: Callable):
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
-    return conformance(MinimalConformance()).decision == ConformanceDecision.DISALLOWED
+    return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.DISALLOWED
 
 
 def is_provisional(conformance: Callable):
-    return conformance(MinimalConformance()).decision == ConformanceDecision.PROVISIONAL
+    return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL
 
 
 @dataclass

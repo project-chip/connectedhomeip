@@ -22,7 +22,7 @@ import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.conformance import ConformanceAssessmentData, MinimalConformance, conformance_allowed
+from matter.testing.conformance import ConformanceAssessmentData, EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, conformance_allowed
 from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
@@ -382,7 +382,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                 # TODO: check client clusters too?
                 for cluster_id, cluster_requirement in xml_device.server_clusters.items():
                     # Device type cluster conformances do not include any conformances based on cluster elements
-                    conformance_decision_with_choice = cluster_requirement.conformance(MinimalConformance())
+                    conformance_decision_with_choice = cluster_requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
                     location = DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
                     if conformance_decision_with_choice.is_mandatory() and cluster_id not in server_clusters:
                         record_error(location=location,
