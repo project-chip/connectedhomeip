@@ -20,9 +20,10 @@ from typing import Callable
 
 from mobly import asserts
 
-from matter.testing.conformance import (Choice, Conformance, ConformanceAssessmentData, ConformanceDecision, ConformanceException,
-                                        ConformanceParseParameters, EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, deprecated, disallowed, mandatory, optional,
-                                        parse_basic_callable_from_xml, parse_callable_from_xml, provisional, zigbee)
+from matter.testing.conformance import (EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, Choice, Conformance, ConformanceAssessmentData,
+                                        ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated,
+                                        disallowed, mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
+                                        provisional, zigbee)
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
