@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
@@ -306,7 +307,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
-    return FabricTableImpl::RemoveFabric(fabric_index);
+    app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return FabricTableImpl::RemoveFabric(*provider, fabric_index);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()

@@ -94,7 +94,7 @@ void MatterAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -108,7 +108,7 @@ void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpoint
             .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback() {}
