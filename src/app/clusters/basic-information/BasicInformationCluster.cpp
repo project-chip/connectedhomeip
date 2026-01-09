@@ -158,16 +158,14 @@ inline CHIP_ERROR ReadSoftwareVersionString(DeviceLayer::ConfigurationManager & 
 
 inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    constexpr size_t kMaxLen                         = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
-    constexpr size_t kMaxDateLength                  = 8; // YYYYMMDD
-    constexpr size_t kMaxVendorSuffixLength          = kMaxLen - kMaxDateLength;
-    char manufacturingDateString[kMaxLen + 1]        = { 0 };
-    char vendorSuffixBuf[kMaxVendorSuffixLength + 1] = { 0 };
+    constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
+    constexpr size_t kMaxDateLength           = 8; // YYYYMMDD
+    char manufacturingDateString[kMaxLen + 1] = { 0 };
     uint16_t manufacturingYear;
     uint8_t manufacturingMonth;
     uint8_t manufacturingDayOfMonth;
     size_t totalManufacturingDateLen = 0;
-    MutableCharSpan vendorSuffixSpan(vendorSuffixBuf);
+    MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, kMaxDateLength + 1);
     CHIP_ERROR status = deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
     // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
