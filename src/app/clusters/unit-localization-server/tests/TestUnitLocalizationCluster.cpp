@@ -63,7 +63,7 @@ TEST_F(TestUnitLocalizationCluster, ReadMandatoryAttributes)
     UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, {} };
 
     ClusterTester tester(unitLocalizationCluster);
-    uint16_t clusterRevision;
+    uint16_t clusterRevision = 0;
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, kRevision);
 
