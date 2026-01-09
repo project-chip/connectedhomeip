@@ -110,9 +110,7 @@ public:
             suffixBuffer.reduce_size(0);
             return CHIP_NO_ERROR;
         }
-        CHIP_ERROR err = SafeCopyString(suffixBuffer.data(), suffixBuffer.size(), mManufacturingDateSuffix);
-        suffixBuffer.reduce_size(strlen(mManufacturingDateSuffix));
-        return err;
+        return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(mManufacturingDateSuffix), suffixBuffer);
     }
 
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kPartNumber); }
@@ -137,6 +135,7 @@ public:
 
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
 
+    // NOTE: suffix lifetime MUST be longer than this object lifetime as just a pointer is kept.
     void SetManufacturingDateSuffix(const char * suffix) { mManufacturingDateSuffix = suffix; }
 
 private:

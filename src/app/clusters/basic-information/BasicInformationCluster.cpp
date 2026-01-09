@@ -158,14 +158,15 @@ inline CHIP_ERROR ReadSoftwareVersionString(DeviceLayer::ConfigurationManager & 
 
 inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
-    constexpr size_t kMaxDateLength           = 8; // YYYYMMDD
+    constexpr size_t kMaxLen        = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
+    constexpr size_t kMaxDateLength = 8; // YYYYMMDD
+    static_assert(kMaxLen > kMaxDateLength, "kMaxLen must be greater than kMaxDateLength");
     char manufacturingDateString[kMaxLen + 1] = { 0 };
     uint16_t manufacturingYear;
     uint8_t manufacturingMonth;
     uint8_t manufacturingDayOfMonth;
     size_t totalManufacturingDateLen = 0;
-    MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, kMaxDateLength + 1);
+    MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, sizeof(manufacturingDateString) - kMaxDateLength);
     CHIP_ERROR status = deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
     // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
@@ -184,14 +185,16 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
              manufacturingDayOfMonth);
 
     totalManufacturingDateLen = strnlen(manufacturingDateString, kMaxLen);
-    status                    = deviceInfoProvider->GetManufacturingDateSuffix(vendorSuffixSpan);
-
-    if (status == CHIP_NO_ERROR && !vendorSuffixSpan.empty())
+    if (!vendorSuffixSpan.empty())
     {
-        memcpy(manufacturingDateString + totalManufacturingDateLen, vendorSuffixSpan.data(), vendorSuffixSpan.size());
-        totalManufacturingDateLen += vendorSuffixSpan.size();
+        status = deviceInfoProvider->GetManufacturingDateSuffix(vendorSuffixSpan);
+        if (status == CHIP_NO_ERROR)
+        {
+            totalManufacturingDateLen += vendorSuffixSpan.size();
+        }
     }
-    VerifyOrReturnError(totalManufacturingDateLen <= kMaxLen, CHIP_ERROR_INCORRECT_STATE);
+
+    VerifyOrDie(totalManufacturingDateLen <= kMaxLen);
 
     return aEncoder.Encode(CharSpan(manufacturingDateString, totalManufacturingDateLen));
 }
