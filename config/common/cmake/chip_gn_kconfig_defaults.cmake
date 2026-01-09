@@ -50,6 +50,7 @@ if(CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg("chip_device_config_thread_network_endpoint_id" ${CONFIG_CHIP_THREAD_NETWORK_ENDPOINT_ID})
     matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_CHIP_OPENTHREAD_FTD)
     matter_add_gn_arg_bool("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OT_ENDPOINT)
+    matter_add_gn_arg_bool ("chip_system_config_use_sockets" NOT CONFIG_CHIP_USE_OT_ENDPOINT AND NOT CONFIG_CHIP_WITH_LWIP)
 endif()
 
 if(CONFIG_DEBUG)
