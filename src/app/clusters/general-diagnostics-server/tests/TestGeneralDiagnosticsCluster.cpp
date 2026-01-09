@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -29,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -67,6 +69,25 @@ class NullProvider : public DeviceLayer::DiagnosticDataProvider
 {
 };
 
+// Dummy TestEventTriggerDelegate for testing
+class DummyTestEventTriggerDelegate : public TestEventTriggerDelegate
+{
+public:
+    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override
+    {
+        // Always return false to indicate test events are not enabled
+        (void) enableKey;
+        return false;
+    }
+
+    CHIP_ERROR HandleEventTriggers(uint64_t eventTrigger) override
+    {
+        // No-op for testing
+        (void) eventTrigger;
+        return CHIP_NO_ERROR;
+    }
+};
+
 // Helper method to invoke TimeSnapshot command and decode response
 CHIP_ERROR InvokeTimeSnapshotAndGetResponse(ClusterTester & tester,
                                             GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
@@ -100,9 +121,10 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
+    DummyTestEventTriggerDelegate dummyDelegate;
 
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance(), nullptr, initTimestamp);
+                                      InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -111,7 +133,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     };
 
     GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(
-        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(), nullptr,
+        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(), &dummyDelegate,
         initTimestamp, functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
@@ -126,8 +148,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster without enabling any feature flags
         System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
+        DummyTestEventTriggerDelegate dummyDelegate;
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                          InteractionModelEngine::GetInstance(), nullptr, initTimestamp);
+                                          InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
 
         // Check required accepted commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -201,7 +224,8 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
         System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance(), nullptr,
+        DummyTestEventTriggerDelegate dummyDelegate;
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance(), &dummyDelegate,
                                           initTimestamp);
 
         // Check mandatory commands are present
@@ -261,8 +285,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
+    DummyTestEventTriggerDelegate dummyDelegate;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance(), nullptr, initTimestamp);
+                                      InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -285,8 +310,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
         .enablePayloadSnapshot = false,
     };
     System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
+    DummyTestEventTriggerDelegate dummyDelegate;
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                                      InteractionModelEngine::GetInstance(), nullptr, initTimestamp,
+                                                      InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp,
                                                       functionsConfig);
 
     ClusterTester tester(cluster);
@@ -309,8 +335,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     System::Clock::Microseconds64 initTimestamp = System::Clock::Microseconds64(0);
+    DummyTestEventTriggerDelegate dummyDelegate;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance(), nullptr, initTimestamp);
+                                      InteractionModelEngine::GetInstance(), &dummyDelegate, initTimestamp);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
