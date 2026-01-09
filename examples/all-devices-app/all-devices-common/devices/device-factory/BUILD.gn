@@ -20,6 +20,7 @@ source_set("device-factory") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl:toggling",
     "${chip_root}/src/lib/support",
   ]

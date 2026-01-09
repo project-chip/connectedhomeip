@@ -170,7 +170,7 @@ CHIP_ERROR ServerClusterShim::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ServerClusterShim::Shutdown()
+void ServerClusterShim::Shutdown(ClusterShutdownType)
 {
     mContext = nullptr;
 }

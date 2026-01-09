@@ -37,7 +37,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     mBasicInformationCluster.Create();
 
-    // TODO: This needs to be refactored so the optional attributes being set for
+    // TODO: This needs to be refactored so the optional attributes, commands and features being set for
     //  the cluster are configurable to allow different settings
     mBasicInformationCluster.Cluster()
         .OptionalAttributes()
@@ -100,42 +100,42 @@ void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     SingleEndpointUnregistration(provider);
     if (mBasicInformationCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mBasicInformationCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mBasicInformationCluster.Cluster()));
         mBasicInformationCluster.Destroy();
     }
     if (mGeneralCommissioningCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster()));
         mGeneralCommissioningCluster.Destroy();
     }
     if (mAdministratorCommissioningCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster()));
         mAdministratorCommissioningCluster.Destroy();
     }
     if (mGeneralDiagnosticsCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster()));
         mGeneralDiagnosticsCluster.Destroy();
     }
     if (mGroupKeyManagementCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));
         mGroupKeyManagementCluster.Destroy();
     }
     if (mSoftwareDiagnosticsServerCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster()));
         mSoftwareDiagnosticsServerCluster.Destroy();
     }
     if (mAccessControlCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mAccessControlCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mAccessControlCluster.Cluster()));
         mAccessControlCluster.Destroy();
     }
     if (mOperationalCredentialsCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
         mOperationalCredentialsCluster.Destroy();
     }
 }
