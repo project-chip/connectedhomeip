@@ -17,6 +17,8 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
@@ -182,6 +184,30 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
         return supportedStreamUsage;
     }
 
+    static CHIP_ERROR InitializeCameraAVSMDefaults(CameraAvStreamManagement::CameraAVStreamManagementCluster & mServer)
+    {
+        ReturnErrorOnFailure(mServer.SetSoftRecordingPrivacyModeEnabled(true));
+        ReturnErrorOnFailure(mServer.SetSoftLivestreamPrivacyModeEnabled(true));
+        ReturnErrorOnFailure(mServer.SetHardPrivacyModeOn(true));
+        ReturnErrorOnFailure(mServer.SetViewport({ 0, 0, 1920, 1080 }));
+        ReturnErrorOnFailure(mServer.SetSpeakerMuted(true));
+        ReturnErrorOnFailure(mServer.SetSpeakerVolumeLevel(1));
+        ReturnErrorOnFailure(mServer.SetSpeakerMinLevel(1));
+        ReturnErrorOnFailure(mServer.SetSpeakerMaxLevel(254));
+        ReturnErrorOnFailure(mServer.SetMicrophoneMuted(true));
+        ReturnErrorOnFailure(mServer.SetMicrophoneVolumeLevel(1));
+        ReturnErrorOnFailure(mServer.SetMicrophoneMinLevel(1));
+        ReturnErrorOnFailure(mServer.SetMicrophoneMaxLevel(254));
+        ReturnErrorOnFailure(mServer.SetMicrophoneAGCEnabled(true));
+        ReturnErrorOnFailure(mServer.SetImageRotation(0));
+        ReturnErrorOnFailure(mServer.SetImageFlipHorizontal(false));
+        ReturnErrorOnFailure(mServer.SetImageFlipVertical(false));
+        ReturnErrorOnFailure(mServer.SetStatusLightEnabled(true));
+        ReturnErrorOnFailure(mServer.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kMedium));
+
+        return CHIP_NO_ERROR;
+    }
+
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
         mServer(mMockDelegate, kTestEndpointId,
@@ -203,7 +229,15 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
         mClusterTester(mServer)
     {}
 
-    void SetUp() override { ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR); }
+    void SetUp() override
+    {
+        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
+        EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
+    }
+
+    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
 
     std::vector<VideoStreamStruct> mVideoStreams;
     std::vector<AudioStreamStruct> mAudioStreams;
@@ -211,6 +245,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     MockCameraAVStreamManagementDelegate mMockDelegate;
     CameraAvStreamManagement::CameraAVStreamManagementCluster mServer;
     ClusterTester mClusterTester;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
@@ -495,98 +530,98 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadStreamUsagePriorities)
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSoftRecordingPrivacyModeEnabled)
 {
-    bool softRecordingPrivacyModeEnabled = true;
+    bool softRecordingPrivacyModeEnabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftRecordingPrivacyModeEnabled::Id, softRecordingPrivacyModeEnabled),
               CHIP_NO_ERROR);
-    EXPECT_FALSE(softRecordingPrivacyModeEnabled);
+    EXPECT_TRUE(softRecordingPrivacyModeEnabled);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSoftLivestreamPrivacyModeEnabled)
 {
-    bool softLivestreamPrivacyModeEnabled = true;
+    bool softLivestreamPrivacyModeEnabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftLivestreamPrivacyModeEnabled::Id, softLivestreamPrivacyModeEnabled),
               CHIP_NO_ERROR);
-    EXPECT_FALSE(softLivestreamPrivacyModeEnabled);
+    EXPECT_TRUE(softLivestreamPrivacyModeEnabled);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadHardPrivacyModeOn)
 {
-    bool hardPrivacyModeOn = true;
+    bool hardPrivacyModeOn = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HardPrivacyModeOn::Id, hardPrivacyModeOn), CHIP_NO_ERROR);
-    EXPECT_FALSE(hardPrivacyModeOn);
+    EXPECT_TRUE(hardPrivacyModeOn);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadViewport)
 {
-    Attributes::Viewport::TypeInfo::Type viewport;
+    Attributes::Viewport::TypeInfo::Type viewport = { 0, 0, 0, 0 };
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Viewport::Id, viewport), CHIP_NO_ERROR);
     EXPECT_EQ(viewport.x1, 0);
     EXPECT_EQ(viewport.y1, 0);
-    EXPECT_EQ(viewport.x2, 0);
-    EXPECT_EQ(viewport.y2, 0);
+    EXPECT_EQ(viewport.x2, 1920);
+    EXPECT_EQ(viewport.y2, 1080);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMuted)
 {
-    bool speakerMuted = true;
+    bool speakerMuted = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMuted::Id, speakerMuted), CHIP_NO_ERROR);
-    EXPECT_FALSE(speakerMuted);
+    EXPECT_TRUE(speakerMuted);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerVolumeLevel)
 {
-    uint8_t speakerVolumeLevel = 1;
+    uint8_t speakerVolumeLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
-    EXPECT_EQ(speakerVolumeLevel, 0);
+    EXPECT_EQ(speakerVolumeLevel, 1);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMaxLevel)
 {
-    uint8_t speakerMaxLevel = 1;
+    uint8_t speakerMaxLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMaxLevel::Id, speakerMaxLevel), CHIP_NO_ERROR);
-    EXPECT_EQ(speakerMaxLevel, kMaxSpeakerLevel);
+    EXPECT_EQ(speakerMaxLevel, 254);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMinLevel)
 {
-    uint8_t speakerMinLevel = 1;
+    uint8_t speakerMinLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMinLevel::Id, speakerMinLevel), CHIP_NO_ERROR);
-    EXPECT_EQ(speakerMinLevel, 0);
+    EXPECT_EQ(speakerMinLevel, 1);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneMuted)
 {
-    bool microphoneMuted = true;
+    bool microphoneMuted = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMuted::Id, microphoneMuted), CHIP_NO_ERROR);
-    EXPECT_FALSE(microphoneMuted);
+    EXPECT_TRUE(microphoneMuted);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneVolumeLevel)
 {
-    uint8_t microphoneVolumeLevel = 1;
+    uint8_t microphoneVolumeLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
-    EXPECT_EQ(microphoneVolumeLevel, 0);
+    EXPECT_EQ(microphoneVolumeLevel, 1);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneMaxLevel)
 {
     uint8_t microphoneMaxLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMaxLevel::Id, microphoneMaxLevel), CHIP_NO_ERROR);
-    EXPECT_EQ(microphoneMaxLevel, kMaxMicrophoneLevel);
+    EXPECT_EQ(microphoneMaxLevel, 254);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneMinLevel)
 {
-    uint8_t microphoneMinLevel = 1;
+    uint8_t microphoneMinLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMinLevel::Id, microphoneMinLevel), CHIP_NO_ERROR);
-    EXPECT_EQ(microphoneMinLevel, 0);
+    EXPECT_EQ(microphoneMinLevel, 1);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneAGCEnabled)
 {
-    bool microphoneAGCEnabled = true;
+    bool microphoneAGCEnabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneAGCEnabled::Id, microphoneAGCEnabled), CHIP_NO_ERROR);
-    EXPECT_FALSE(microphoneAGCEnabled);
+    EXPECT_TRUE(microphoneAGCEnabled);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadImageRotation)
@@ -612,9 +647,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadImageFlipVertical)
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadStatusLightEnabled)
 {
-    bool statusLightEnabled = true;
+    bool statusLightEnabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightEnabled::Id, statusLightEnabled), CHIP_NO_ERROR);
-    EXPECT_FALSE(statusLightEnabled);
+    EXPECT_TRUE(statusLightEnabled);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadStatusLightBrightness)
