@@ -31,6 +31,7 @@ LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
 
 UnitLocalizationServer & UnitLocalizationServer::Instance()
 {
+    VerifyOrDie(gServer.IsConstructed());
     return gServer.Cluster();
 }
 

@@ -141,7 +141,7 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
     VerifyOrReturnError(isValid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnValue(mTemperatureUnit != newTempUnit, CHIP_NO_ERROR);
     mTemperatureUnit = newTempUnit;
-    MatterReportingAttributeChangeCallback(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id);
+    NotifyAttributeChanged(TemperatureUnit::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
     return CHIP_NO_ERROR;

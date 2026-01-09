@@ -17,6 +17,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -94,4 +95,39 @@ TEST_F(TestUnitLocalizationCluster, ReadSupportedTemperatureUnits)
     ASSERT_TRUE(it.Next());
     EXPECT_EQ(it.GetValue(), TempUnitEnum::kFahrenheit);
     ASSERT_FALSE(it.Next());
+}
+
+TEST_F(TestUnitLocalizationCluster, WriteAndReadTemperatureUnit)
+{
+    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+    const BitFlags<Feature> features{ Feature::kTemperatureUnit };
+    UnitLocalizationCluster unitLocalizationCluster{ kRootEndpointId, features };
+    ClusterTester tester(unitLocalizationCluster);
+    VerifyOrDie(persistenceProvider.Init(&tester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
+    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
+
+    // Set supported units as Kelvin and Celsius
+    TempUnitEnum supportedUnits[2] = { TempUnitEnum::kCelsius, TempUnitEnum::kKelvin };
+    DataModel::List<TempUnitEnum> unitsList(supportedUnits);
+    ASSERT_EQ(unitLocalizationCluster.SetSupportedTemperatureUnits(unitsList), CHIP_NO_ERROR);
+
+    TempUnitEnum temperatureUnit = TempUnitEnum::kKelvin;
+    TempUnitEnum currentTemperatureUnit = TempUnitEnum::kFahrenheit;
+
+    // Set TemperatureUnit to Kelvin
+    ASSERT_EQ(tester.WriteAttribute(TemperatureUnit::Id, temperatureUnit), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(TemperatureUnit::Id, currentTemperatureUnit), CHIP_NO_ERROR);
+    EXPECT_EQ(currentTemperatureUnit, TempUnitEnum::kKelvin);
+    // Set TemperatureUnit to Celsius
+
+    temperatureUnit = TempUnitEnum::kCelsius;
+    ASSERT_EQ(tester.WriteAttribute(TemperatureUnit::Id, temperatureUnit), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(TemperatureUnit::Id, currentTemperatureUnit), CHIP_NO_ERROR);
+    EXPECT_EQ(currentTemperatureUnit, TempUnitEnum::kCelsius);
+
+    // Fahrenheit not supported, should return error
+    temperatureUnit = TempUnitEnum::kFahrenheit;
+    ASSERT_EQ(tester.WriteAttribute(TemperatureUnit::Id, temperatureUnit), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    app::SetSafeAttributePersistenceProvider(nullptr);
 }
