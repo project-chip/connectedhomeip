@@ -162,6 +162,13 @@ string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = false\n")
 else()
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = true\n")
 endif(matter_enable_med)
+
+if(matter_enable_icd_lit)
+string(APPEND CHIP_GN_ARGS "chip_enable_icd_lit = true\n")
+string(APPEND CHIP_GN_ARGS "chip_enable_icd_checkin = true\n")
+string(APPEND CHIP_GN_ARGS "chip_enable_icd_user_active_mode_trigger = true\n")
+endif(matter_enable_icd_lit)
+
 endif(matter_enable_mtd)
 
 # Build Matter Shell
