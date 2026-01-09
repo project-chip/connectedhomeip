@@ -65,13 +65,13 @@ class TC_CC_6_5(MatterBaseTest):
             TestStep("0b", "TH sends On command to DUT",
                      "Verify DUT responds with a successful (value 0x00) status response."),
             TestStep("0c", "TH reads ColorTemperatureMireds attribute from DUT.",
-                     "Verify that the DUT response contains with ColorTemperatureMireds attribute value."),
+                     "Verify that the DUT response contains the ColorTemperatureMireds attribute value."),
             TestStep("0d", "TH reads ColorTempPhysicalMinMireds attribute from DUT.",
-                     "Verify that the DUT response contains with ColorTempPhysicalMinMireds attribute value."),
+                     "Verify that the DUT response contains the ColorTempPhysicalMinMireds attribute value."),
             TestStep("0e", "TH reads ColorTempPhysicalMaxMireds attribute from DUT.",
-                     "Verify that the DUT response contains with ColorTempPhysicalMaxMireds attribute value."),
+                     "Verify that the DUT response contains the ColorTempPhysicalMaxMireds attribute value."),
             TestStep("1", "TH reads from the DUT the StartUpColorTemperatureMireds attribute",
-                     "Verify that the DUT response contains an uint16 [Min:1 Max:0xfeff or null]"),
+                     "Verify that the DUT response contains a uint16 [Min:1 Max:0xfeff or null]"),
             TestStep("2a", "TH writes to StartUpColorTemperatureMireds attribute with value",
                      "Verify DUT responds with a successful (value 0x00) status response."),
             TestStep("2b", "TH reads from the DUT the StartUpColorTemperatureMireds attribute",
@@ -87,8 +87,8 @@ class TC_CC_6_5(MatterBaseTest):
             TestStep("5b", "TH reads EnhancedColorMode attribute from DUT.",
                      "Value has to be between a range of 0x00 to 0x03; Verify that the DUT response indicates that the EnhancedColorMode attribute has the expected value 2 (ColorTemperatureMireds)."),
         ]
-
-    @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds) and has_command(Clusters.OnOff.Commands.On))
+    
+    @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds), has_attribute(Clusters.ColorControl.Attributes.StartUpColorTemperatureMireds), has_command(Clusters.OnOff.Commands.On))
     async def test_TC_CC_6_5(self):
         cc_cluster = Clusters.Objects.ColorControl
         cc_attributes = cc_cluster.Attributes
@@ -137,26 +137,22 @@ class TC_CC_6_5(MatterBaseTest):
 
         asserts.assert_true(startup_color_temp_mireds is NullValue or matter_asserts.is_valid_uint_value(
             startup_color_temp_mireds, 16), "Startup color is different from Int[] or NullValue")
-        asserts.assert_greater_equal(startup_color_temp_mireds, MIN_STARTUP_COLOR_TEMP,
-                                     f"Startup color temperature {startup_color_temp_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
-        asserts.assert_less_equal(startup_color_temp_mireds, MAX_STARTUP_COLOR_TEMP,
-                                  f"Startup color temperature {startup_color_temp_mireds} should be <= {MAX_STARTUP_COLOR_TEMP}")
+        if startup_color_temp_mireds is not NullValue:
+            asserts.assert_greater_equal(startup_color_temp_mireds, MIN_STARTUP_COLOR_TEMP,
+                                         f"Startup color temperature {startup_color_temp_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
+            asserts.assert_less_equal(startup_color_temp_mireds, MAX_STARTUP_COLOR_TEMP,
+                                      f"Startup color temperature {startup_color_temp_mireds} should be <= {MAX_STARTUP_COLOR_TEMP}")
 
         self.step("2a")
-        # If (ColorTempPhysicalMaxMireds - ColorTempPhysicalMinMireds)/2 + ColorTempPhysicalMinMireds = ColorTemperatureMireds then
-        #   StartUpColorTemperatureMireds = (ColorTempPhysicalMaxMireds - ColorTempPhysicalMinMireds)/4 + ColorTempPhysicalMinMireds;
-        # else
-        #   StartUpColorTemperatureMireds = (ColorTempPhysicalMaxMireds - ColorTempPhysicalMinMireds)/2 + ColorTempPhysicalMinMireds
-        startup_color_temperature_mireds2a = None
-        if ((colortemp_physical_max_mireds - colortemp_physical_min_mireds)/2 + colortemp_physical_min_mireds) == color_temp_mireds:
+        if ((colortemp_physical_max_mireds - colortemp_physical_min_mireds) // 2 + colortemp_physical_min_mireds) == color_temp_mireds:
             startup_color_temperature_mireds2a = int((colortemp_physical_max_mireds -
-                                                      colortemp_physical_min_mireds)/4 + colortemp_physical_min_mireds)
+                                                      colortemp_physical_min_mireds) // 4 + colortemp_physical_min_mireds)
         else:
             startup_color_temperature_mireds2a = int((colortemp_physical_max_mireds -
-                                                      colortemp_physical_min_mireds)/2 + colortemp_physical_min_mireds)
+                                                      colortemp_physical_min_mireds) // 2 + colortemp_physical_min_mireds)
 
         log.info(f"Defined new value for StartUpColorTemperatureMireds with value {startup_color_temperature_mireds2a}")
-        # First attempt: Write with minimal parameters
+        # Write computed StartUpColorTemperatureMireds value to the endpoint
         await self.write_single_attribute(cc_attributes.StartUpColorTemperatureMireds(startup_color_temperature_mireds2a), self.endpoint, expect_success=True)
 
         self.step("2b")
@@ -166,6 +162,7 @@ class TC_CC_6_5(MatterBaseTest):
                              "Startup color temperature should match target value")
 
         self.step("3a")
+        # Restart file check/creation sequence
         restart_flag_file = self.get_restart_flag_file()
         if self.is_pics_sdk_ci_only and restart_flag_file is not None:
             with open(restart_flag_file, "w") as f:
@@ -177,13 +174,13 @@ class TC_CC_6_5(MatterBaseTest):
             self.TH1.ExpireSessions(self.dut_node_id)
             self.wait_for_user_input("Power Off the device under test.")
 
+            self.wait_for_user_input("Power Off the device under test.")
+
         self.step("3b")
         # On CI Restart has the PowerOn
         if not (self.is_pics_sdk_ci_only and restart_flag_file is not None):
             self.wait_for_user_input("Power On the device under test.")
-
-        self.step("4a")
-        startup_color_temp_mireds = await self.read_single_attribute_check_success(
+            self.TH1.ExpireSessions(self.dut_node_id)
             cc_cluster, cc_attributes.StartUpColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
         asserts.assert_equal(startup_color_temp_mireds, startup_color_temperature_mireds2a,
                              "Post cycle startup color temperature should match target value")
@@ -193,7 +190,7 @@ class TC_CC_6_5(MatterBaseTest):
         color_temperature_mireds = await self.read_single_attribute_check_success(
             cc_cluster, cc_attributes.ColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
         asserts.assert_true(isinstance(color_temperature_mireds, int),
-                            "Startup color temperature value should be an integer")
+                            "Color temperature value should be an integer")
         asserts.assert_greater_equal(color_temperature_mireds, MIN_STARTUP_COLOR_TEMP,
                                      f"Color temperature {color_temperature_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
         asserts.assert_less_equal(color_temperature_mireds, MAX_STARTUP_COLOR_TEMP,
