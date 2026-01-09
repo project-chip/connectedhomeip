@@ -279,7 +279,7 @@ class IsolatedNetworkNamespace:
             case SubprocessKind.TOOL:
                 return self.tool_ns
             case _:
-                raise KeyError("Unknown subprocess kind.")
+                raise ValueError("Unknown subprocess kind.")
 
     def _setup_links(self):
         # Bridge needs to be completely set up first, as other links use it.
