@@ -125,8 +125,8 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                 ChipLogProgress(AppServer,
                                 "Assigning from cache. Current: nodeId=0x" ChipLogFormatX64
                                 " fabricIndex=%d, Cached: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
-                                ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex,
-                                ChipLogValueX64(it->GetNodeId()), it->GetFabricIndex());
+                                ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex, ChipLogValueX64(it->GetNodeId()),
+                                it->GetFabricIndex());
 
                 // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
                 unsigned int discoveredNumIPs = mAttributes.numIPs;
