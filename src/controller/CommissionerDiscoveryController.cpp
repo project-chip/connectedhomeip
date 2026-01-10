@@ -515,6 +515,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         cd.SetNeedsPasscode(true);
         TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
             cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        ResetState();
         return;
     }
 
