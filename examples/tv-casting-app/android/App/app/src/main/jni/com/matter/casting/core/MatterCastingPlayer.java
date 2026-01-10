@@ -164,8 +164,8 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   /**
-   * @brief Directly sends a User-directed Commissioning request with the provided idOptions. 
-   *     This bypasses additionals checks and processes around commissioning like setting up a 
+   * @brief Directly sends a User-directed Commissioning request with the provided idOptions. This
+   *     bypasses additionals checks and processes around commissioning like setting up a
    *     commissioning-window and instead can be used to directly talk to the CastingPlayer.
    * @param connectionCallbacks contains the onSuccess (Required), onFailure (Required) and
    *     onCommissionerDeclaration (Optional) callbacks defiend in ConnectCallbacks.java.
