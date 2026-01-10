@@ -112,7 +112,7 @@
 
 #ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
 // Increase memory pools for better attribute reading performance
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 500  // Default is 15
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 500 // Default is 15
 
 // Include the CHIPProjectConfig from config/standalone
 // Add this at the end so that we can hit our #defines first
