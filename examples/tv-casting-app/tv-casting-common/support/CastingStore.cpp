@@ -19,8 +19,8 @@
 #include "CastingStore.h"
 
 #include <lib/core/TLV.h>
-#include <platform/KeyValueStoreManager.h>
 #include <list>
+#include <platform/KeyValueStoreManager.h>
 
 namespace matter {
 namespace casting {
@@ -431,7 +431,7 @@ std::list<core::CastingPlayer> CastingStore::ReadAll()
             ChipLogProgress(AppServer, "CastingStore::ReadAll() Created CastingPlayer with deviceName: %s",
                             castingPlayer.GetDeviceName());
             castingPlayers.push_back(castingPlayer);
-            
+
             // Get pointer to the added element (safe with std::list)
             core::CastingPlayer * finalCastingPlayer = &castingPlayers.back();
             for (auto & endpointAttributes : endpointAttributesList)

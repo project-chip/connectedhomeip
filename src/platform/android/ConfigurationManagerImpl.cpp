@@ -71,7 +71,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset() {}
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     AndroidConfig::Key configKey{ AndroidConfig::kConfigNamespace_ChipCounters, key };
- 
+
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -79,7 +79,7 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
     }
     return err;
 }
- 
+
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     AndroidConfig::Key configKey{ AndroidConfig::kConfigNamespace_ChipCounters, key };

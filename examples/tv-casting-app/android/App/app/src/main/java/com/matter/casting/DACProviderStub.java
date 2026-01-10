@@ -27,7 +27,6 @@ import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPrivateKeySpec;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 public class DACProviderStub implements DACProvider {
@@ -109,7 +108,7 @@ public class DACProviderStub implements DACProvider {
       return signature.sign();
 
     } catch (Exception e) {
-      Log.i(TAG, "SignWithDeviceAttestationKey e:"+e, e);
+      Log.i(TAG, "SignWithDeviceAttestationKey e:" + e, e);
       return null;
     }
   }
