@@ -190,8 +190,7 @@ public class MatterCastingPlayer implements CastingPlayer {
    */
   @Override
   public native MatterError sendUDC(
-      ConnectionCallbacks connectionCallbacks,
-      IdentificationDeclarationOptions idOptions);
+      ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions);
 
   /**
    * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
