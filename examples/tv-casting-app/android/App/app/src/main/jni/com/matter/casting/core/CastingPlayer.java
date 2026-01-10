@@ -75,7 +75,7 @@ public interface CastingPlayer {
   @Override
   int hashCode();
 
- /**
+  /**
    * @brief Directly sends a User-directed Commissioning request with the provided idOptions. This
    *     bypasses additionals checks and processes around commissioning like setting up a
    *     commissioning-window and instead can be used to directly talk to the CastingPlayer.
@@ -100,8 +100,8 @@ public interface CastingPlayer {
    * @return MatterError - MatterError.NO_ERROR if request submitted successfully, otherwise a
    *     MatterError object corresponding to the error.
    */
- MatterError sendUDC(
-     ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions);
+  MatterError sendUDC(
+      ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions);
 
   /**
    * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
