@@ -116,8 +116,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
             ChipLogProgress(
                 AppServer,
                 "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer found in cache; checking for TargetApp(s)");
-            auto it_index = it;
-            if (ContainsDesiredTargetApp(&(*it_index), idOptions.getTargetAppInfoList()))
+            if (ContainsDesiredTargetApp(&*it, idOptions.getTargetAppInfoList()))
             {
                 ChipLogProgress(
                     AppServer,
@@ -127,7 +126,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                                 "Assigning from cache. Current: nodeId=0x" ChipLogFormatX64
                                 " fabricIndex=%d, Cached: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
                                 ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex,
-                                ChipLogValueX64(it_index->GetNodeId()), it_index->GetFabricIndex());
+                                ChipLogValueX64(it->GetNodeId()), it->GetFabricIndex());
 
                 // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
                 unsigned int discoveredNumIPs = mAttributes.numIPs;
@@ -137,7 +136,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     discoveredIpAddresses[i] = mAttributes.ipAddresses[i];
                 }
                 chip::Inet::InterfaceId discoveredInterfaceId = mAttributes.interfaceId;
-                *this                                         = *it_index;
+                *this                                         = *it;
                 mConnectionState                              = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                                  = connectionCallbacks.mOnConnectionComplete;
                 mCommissioningWindowTimeoutSec                = commissioningWindowTimeoutSec;

@@ -80,7 +80,6 @@ public class DACProviderStub implements DACProvider {
     try {
       byte[] privateKeyBytes = Base64.decode(kDevelopmentDAC_PrivateKey_FFF1_8001, Base64.DEFAULT);
 
-      boolean isPKCS8 = false;
       PrivateKey privateKey = null;
       KeyFactory keyFactory = KeyFactory.getInstance("EC");
       // the format can be determined by the header in the private key file:
@@ -108,7 +107,7 @@ public class DACProviderStub implements DACProvider {
       return signature.sign();
 
     } catch (Exception e) {
-      Log.i(TAG, "SignWithDeviceAttestationKey e:" + e, e);
+      Log.i(TAG, "SignWithDeviceAttestationKey failed", e);
       return null;
     }
   }
