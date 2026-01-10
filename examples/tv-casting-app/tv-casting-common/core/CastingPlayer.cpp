@@ -35,8 +35,8 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() called");
 
     CastingPlayerDiscovery * castingPlayerDiscovery = CastingPlayerDiscovery::GetInstance();
-    std::vector<core::CastingPlayer>::iterator it;
-    std::vector<core::CastingPlayer> cachedCastingPlayers = support::CastingStore::GetInstance()->ReadAll();
+    std::list<core::CastingPlayer>::iterator it;
+    std::list<core::CastingPlayer> cachedCastingPlayers = support::CastingStore::GetInstance()->ReadAll();
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -116,15 +116,15 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
             ChipLogProgress(
                 AppServer,
                 "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer found in cache; checking for TargetApp(s)");
-            unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
-            if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.getTargetAppInfoList()))
+            auto it_index = it;
+            if (ContainsDesiredTargetApp(&(*it_index), idOptions.getTargetAppInfoList()))
             {
                 ChipLogProgress(
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
 
                 ChipLogProgress(AppServer, "Assigning from cache. Current: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d, Cached: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex,
-                    ChipLogValueX64(cachedCastingPlayers[index].GetNodeId()), cachedCastingPlayers[index].GetFabricIndex());
+                    ChipLogValueX64(it_index->GetNodeId()), it_index->GetFabricIndex());
 
                 // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
                 unsigned int discoveredNumIPs = mAttributes.numIPs;
@@ -134,7 +134,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     discoveredIpAddresses[i] = mAttributes.ipAddresses[i];
                 }
                 chip::Inet::InterfaceId discoveredInterfaceId = mAttributes.interfaceId;
-                *this                          = cachedCastingPlayers[index];
+                *this                          = *it_index;
                 mConnectionState               = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
                 mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;

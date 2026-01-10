@@ -27,6 +27,7 @@ import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 public class DACProviderStub implements DACProvider {
@@ -82,22 +83,21 @@ public class DACProviderStub implements DACProvider {
 
       boolean isPKCS8 = false;
       PrivateKey privateKey = null;
+      KeyFactory keyFactory = KeyFactory.getInstance("EC");
       // the format can be determined by the header in the private key file:
       // -----BEGIN PRIVATE KEY----- - PKCS#8 format
       // -----BEGIN EC PRIVATE KEY----- - SEC1/traditional EC format
-      if (isPKCS8) {
-        // Use PKCS8EncodedKeySpec for PKCS#8 format
+      try {
+        // Try PKCS#8 format first.
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
         privateKey = keyFactory.generatePrivate(keySpec);
-      } else {
+      } catch (java.security.spec.InvalidKeySpecException e) {
+        // Fallback to SEC1 format.
         AlgorithmParameters algorithmParameters = AlgorithmParameters.getInstance("EC");
         algorithmParameters.init(new ECGenParameterSpec("secp256r1"));
         ECParameterSpec parameterSpec = algorithmParameters.getParameterSpec(ECParameterSpec.class);
         ECPrivateKeySpec ecPrivateKeySpec =
             new ECPrivateKeySpec(new BigInteger(1, privateKeyBytes), parameterSpec);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
         privateKey = keyFactory.generatePrivate(ecPrivateKeySpec);
       }
 
@@ -109,7 +109,6 @@ public class DACProviderStub implements DACProvider {
       return signature.sign();
 
     } catch (Exception e) {
-      e.printStackTrace();
       Log.i(TAG, "SignWithDeviceAttestationKey e:"+e, e);
       return null;
     }
