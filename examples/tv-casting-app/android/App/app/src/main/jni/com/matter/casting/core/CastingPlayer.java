@@ -101,8 +101,7 @@ public interface CastingPlayer {
    *     MatterError object corresponding to the error.
    */
  MatterError sendUDC(
-     ConnectionCallbacks connectionCallbacks,
-     IdentificationDeclarationOptions idOptions);
+     ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions);
 
   /**
    * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
