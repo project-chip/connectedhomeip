@@ -184,14 +184,11 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
     snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear, manufacturingMonth,
              manufacturingDayOfMonth);
 
-    totalManufacturingDateLen = strnlen(manufacturingDateString, kMaxLen);
-    if (!vendorSuffixSpan.empty())
+    totalManufacturingDateLen = kMaxDateLength;
+    status                    = deviceInfoProvider->GetManufacturingDateSuffix(vendorSuffixSpan);
+    if (status == CHIP_NO_ERROR)
     {
-        status = deviceInfoProvider->GetManufacturingDateSuffix(vendorSuffixSpan);
-        if (status == CHIP_NO_ERROR)
-        {
-            totalManufacturingDateLen += vendorSuffixSpan.size();
-        }
+        totalManufacturingDateLen += vendorSuffixSpan.size();
     }
 
     VerifyOrDie(totalManufacturingDateLen <= kMaxLen);
