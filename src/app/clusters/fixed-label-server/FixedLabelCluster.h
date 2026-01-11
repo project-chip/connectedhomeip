@@ -34,7 +34,6 @@ public:
 
 private:
     DeviceLayer::DeviceInfoProvider * mDeviceInfoProvider;
-    ;
 };
 
 } // namespace chip::app::Clusters
