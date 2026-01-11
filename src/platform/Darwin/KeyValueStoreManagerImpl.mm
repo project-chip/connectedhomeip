@@ -189,20 +189,34 @@ namespace DeviceLayer {
 
                 NSPersistentStoreCoordinator * coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
 
+                // Configure store options
+                NSMutableDictionary * options = [@{
+                    NSMigratePersistentStoresAutomaticallyOption: @YES,
+                    NSInferMappingModelAutomaticallyOption: @YES
+                } mutableCopy];
+                
+#if TARGET_OS_IPHONE
+                // File protection is only available on iOS
+                options[NSPersistentStoreFileProtectionKey] = NSFileProtectionCompleteUntilFirstUserAuthentication;
+#endif
+
                 NSError * error = nil;
-                if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error]) {
-                    ChipLogError(DeviceLayer, "Invalid store. Attempting to clear: %s", error.localizedDescription.UTF8String);
+                if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:options error:&error]) {
+                    ChipLogError(DeviceLayer, "Invalid store (code: %ld). Attempting to clear: %s", 
+                        (long)error.code, error.localizedDescription.UTF8String);
                     if (![[NSFileManager defaultManager] removeItemAtURL:url error:&error]) {
                         ChipLogError(DeviceLayer, "Failed to delete item: %s", error.localizedDescription.UTF8String);
                     }
 
+                    error = nil;
                     if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                    configuration:nil
                                                              URL:url
-                                                         options:nil
+                                                         options:options
                                                            error:&error]) {
-                        ChipLogError(DeviceLayer, "Failed to initialize clear KVS storage: %s", error.localizedDescription.UTF8String);
-                        chipDie();
+                        ChipLogError(DeviceLayer, "Failed to initialize clear KVS storage (code: %ld): %s", 
+                            (long)error.code, error.localizedDescription.UTF8String);
+                        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
                     }
                 }
 
