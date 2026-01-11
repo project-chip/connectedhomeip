@@ -510,7 +510,9 @@ await self.request_device_reboot()
 
 # Factory reset - clears device state (removes KVS)
 await self.request_device_factory_reset()
+```
 
+```shell
 #Example Command w/ run_python_test.py test runner:
 scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1" --script src/python_testing/TC_ACL_2_10.py --app-ready-pattern "APP STATUS: Starting event loop"
 ```
