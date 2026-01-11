@@ -20,15 +20,52 @@ import copy
 import ctypes
 import json
 import logging
+import os
 import re
+import shutil
+import tempfile
 from abc import ABC, abstractmethod
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
+from io import StringIO
 from typing import Any, Dict, Optional
 
 from ..native import GetLibraryHandle
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _atomic_write(path: str, content: str):
+    """Atomically write content to a file to prevent corruption on power loss."""
+    backup_path = path + '.backup'
+
+    if os.path.exists(path):
+        shutil.copy(path, backup_path)
+        with open(backup_path, 'r+b') as f:
+            f.flush()
+            os.fsync(f.fileno())
+
+    fd, temp_path = tempfile.mkstemp(dir=os.path.dirname(path) or '.', prefix='.tmp_')
+    try:
+        with os.fdopen(fd, 'w') as f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, path)
+        try:
+            dir_fd = os.open(os.path.dirname(path) or '.', os.O_RDONLY)
+            try:
+                os.fsync(dir_fd)
+            finally:
+                os.close(dir_fd)
+        except (OSError, AttributeError):
+            pass
+    except Exception:
+        try:
+            os.unlink(temp_path)
+        except Exception:
+            pass
+        raise
 
 _SetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), c_uint16)
 _GetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16), POINTER(c_bool))
@@ -302,11 +339,11 @@ class PersistentStorageJSON(PersistentStorageBase):
 
     def Commit(self):
         try:
-            with open(self._path, 'w') as f:
-                json.dump({
-                    'repl-config': self._data,
-                    'sdk-config': self._sdkData,
-                }, f, ensure_ascii=True, indent=4)
+            content = json.dumps({
+                'repl-config': self._data,
+                'sdk-config': self._sdkData,
+            }, ensure_ascii=True, indent=4)
+            _atomic_write(self._path, content)
         except Exception as ex:
             LOGGER.critical("Could not save configuration to JSON file: %s", ex)
 
@@ -372,8 +409,9 @@ class PersistentStorageINI(PersistentStorageBase):
                 if _caKeyMatch.fullmatch(key):
                     configFabric['Default'][key] = sdkConfig.pop(key)
             try:
-                with open(self._chipToolFabricStoragePath, 'w') as f:
-                    configFabric.write(f)
+                fabric_buffer = StringIO()
+                configFabric.write(fabric_buffer)
+                _atomic_write(self._chipToolFabricStoragePath, fabric_buffer.getvalue())
             except Exception as ex:
                 LOGGER.critical("Could not save fabric configuration to INI file: %s", ex)
         config = PersistentStorageINI.ConfigParser()
@@ -383,7 +421,8 @@ class PersistentStorageINI(PersistentStorageBase):
             for k, v in self._data.items()
         }
         try:
-            with open(self._path, 'w') as f:
-                config.write(f)
+            config_buffer = StringIO()
+            config.write(config_buffer)
+            _atomic_write(self._path, config_buffer.getvalue())
         except Exception as ex:
             LOGGER.critical("Could not save configuration to INI file: %s", ex)
