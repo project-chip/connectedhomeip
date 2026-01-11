@@ -510,11 +510,14 @@ await self.request_device_reboot()
 
 # Factory reset - clears device state (removes KVS)
 await self.request_device_factory_reset()
+
+#Example Command w/ run_python_test.py test runner:
+scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1" --script src/python_testing/TC_ACL_2_10.py --app-ready-pattern "APP STATUS: Starting event loop"
 ```
 
 The `request_device_reboot()` and `request_device_factory_reset()` methods work
 differently depending on the environment. When the test is started with
-`run_python_test.py` as it is in the CI, the device is automatically rebooted
+`run_python_test.py` as it is in the CI, also need to make sure to import MatterBaseTest to make this functionality work, the device is automatically rebooted
 and possibly factory reset during the test depending on test implementation
 using the restart_flag_file. When the test is started by some other means (e.g.,
 during certification testing), you'll be prompted to manually reboot or factory
