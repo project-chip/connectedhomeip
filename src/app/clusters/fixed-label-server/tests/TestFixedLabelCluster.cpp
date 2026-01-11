@@ -26,6 +26,9 @@
 #include <clusters/FixedLabel/Attributes.h>
 #include <clusters/FixedLabel/Metadata.h>
 
+#include <clusters/FixedLabel/Structs.h>
+#include <platform/DeviceInfoProvider.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -35,6 +38,29 @@ using namespace chip::Testing;
 using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
+
+// Mock DeviceInfoProvider for testing
+class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
+{
+public:
+    MockDeviceInfoProvider()           = default;
+    ~MockDeviceInfoProvider() override = default;
+
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; }
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
+    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
+
+protected:
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override
+    {
+        val = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
+};
 
 struct TestFixedLabelCluster : public ::testing::Test
 {
@@ -46,9 +72,10 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     void TearDown() override { fixedLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
+    TestFixedLabelCluster() : fixedLabel(kRootEndpointId, &mDeviceInfoProvider) {}
 
     TestServerClusterContext testContext;
+    MockDeviceInfoProvider mDeviceInfoProvider;
     FixedLabelCluster fixedLabel;
 };
 
