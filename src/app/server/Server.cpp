@@ -123,6 +123,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mNodeStartupTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
+    // Set the TestEventTriggerDelegate and NodeStartupTimestamp for GeneralDiagnostics cluster dependency injection
+    // This MUST be done before SetDataModelProvider() to ensure delegates are available when clusters are initialized
+#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+    chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(initParams.testEventTriggerDelegate);
+    chip::app::Clusters::GeneralDiagnostics::SetNodeStartupTimestamp(mNodeStartupTimestamp);
+#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
@@ -325,12 +332,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
-
-    // Set the TestEventTriggerDelegate and NodeStartupTimestamp for GeneralDiagnostics cluster dependency injection
-#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
-    chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
-    chip::app::Clusters::GeneralDiagnostics::SetNodeStartupTimestamp(mNodeStartupTimestamp);
-#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
     // SetDataModelProvider() initializes and starts the provider, which in turn
     // triggers the initialization of cluster implementations. This callsite is

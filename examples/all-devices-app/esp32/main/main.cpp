@@ -180,8 +180,16 @@ void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg
              static_cast<unsigned int>(heap_caps_get_total_size(MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM)));
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate,
+                                                                     chip::TestEventTriggerDelegate * testEventTriggerDelegate)
 {
+    // Set the TestEventTriggerDelegate and NodeStartupTimestamp for GeneralDiagnostics cluster dependency injection
+    // This MUST be done before creating clusters to ensure delegates are available during cluster initialization
+#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+    chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(testEventTriggerDelegate);
+    chip::app::Clusters::GeneralDiagnostics::SetNodeStartupTimestamp(chip::System::SystemClock().GetMonotonicMicroseconds64());
+#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
+
     // Initialize the attribute persistence provider with the storage delegate
     CHIP_ERROR err = gAttributePersistenceProvider.Init(delegate);
     if (err != CHIP_NO_ERROR)
@@ -232,7 +240,8 @@ void InitServer(intptr_t context)
         return;
     }
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider =
+        PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
