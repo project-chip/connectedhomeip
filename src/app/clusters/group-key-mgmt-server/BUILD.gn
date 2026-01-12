@@ -14,15 +14,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("app_config_dependent_sources.gni")
-
 source_set("group-key-mgmt-server") {
   sources = [
     "GroupKeyManagementCluster.cpp",
     "GroupKeyManagementCluster.h",
   ]
-
-  sources += app_config_dependent_sources
 
   public_deps = [
     "${chip_root}/src/app:attribute-access",
