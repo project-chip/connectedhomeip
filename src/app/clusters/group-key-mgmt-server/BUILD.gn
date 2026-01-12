@@ -16,8 +16,6 @@ import("//build_overrides/chip.gni")
 
 source_set("group-key-mgmt-server") {
   sources = [
-    "CodegenIntegration.cpp",
-    "CodegenIntegration.h",
     "GroupKeyManagementCluster.cpp",
     "GroupKeyManagementCluster.h",
   ]
@@ -28,6 +26,7 @@ source_set("group-key-mgmt-server") {
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement",
