@@ -606,8 +606,8 @@ class PushAvServer:
 
     def create_stream(self, interface: SupportedIngestInterface = SupportedIngestInterface.cmaf):
         # Find the last registered stream
-        dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
-        last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
+        stream_ids = [int(d.name) for d in self.wd.path("streams").iterdir() if d.is_dir() and d.name.isdigit()]
+        last_stream = max(stream_ids) if stream_ids else 0
         stream_id = last_stream + 1
         stream_id_str = str(stream_id)
 
