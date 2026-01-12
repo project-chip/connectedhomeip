@@ -34,13 +34,12 @@ config("network_uri_config_disable_warnings") {
 }
 
 source_set("network-uri") {
-
   sources = [
     "patches/src/uri.cpp",
-    "repo/uri/src/uri_errors.cpp",
+    "repo/uri/src/detail/uri_advance_parts.cpp",
     "repo/uri/src/detail/uri_parse.cpp",
     "repo/uri/src/detail/uri_parse_authority.cpp",
-    "repo/uri/src/detail/uri_advance_parts.cpp",
+    "repo/uri/src/uri_errors.cpp",
   ]
 
   include_dirs = [
