@@ -274,7 +274,8 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeValue(value, err, encoder);
     }
     case GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id: {
-        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled(mTestEventTriggerDelegate);
+        TestEventTriggerDelegate * currentDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
+        bool isTestEventTriggersEnabled            = IsTestEventTriggerEnabled(currentDelegate);
         return encoder.Encode(isTestEventTriggersEnabled);
     }
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
