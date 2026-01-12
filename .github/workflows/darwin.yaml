@@ -15,13 +15,8 @@
 name: Darwin
 
 on:
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    pull_request:
-    merge_group:
-    workflow_dispatch:
+  # Workflow disabled on 1.4.2: macos-13 runners retired in GitHub, runs get auto-cancelled
+  workflow_dispatch:
 
 concurrency:
     group:
