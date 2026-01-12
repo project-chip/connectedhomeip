@@ -105,7 +105,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -117,7 +117,7 @@ void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGeneralDiagnosticsPluginServerInitCallback() {}

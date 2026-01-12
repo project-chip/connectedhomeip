@@ -43,7 +43,9 @@ from mobly import asserts  # type: ignore
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 ROOT_NODE_ENDPOINT_ID = 0
 UNIT_TESTING_ENDPOINT_ID = 1

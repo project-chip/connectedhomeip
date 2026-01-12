@@ -43,7 +43,7 @@ public:
         DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

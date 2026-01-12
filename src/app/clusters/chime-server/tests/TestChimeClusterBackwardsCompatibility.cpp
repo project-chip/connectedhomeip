@@ -19,7 +19,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/clusters/testing/ClusterTester.h>
+#include <app/server-cluster/testingClusterTester.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <gtest/gtest.h>
 

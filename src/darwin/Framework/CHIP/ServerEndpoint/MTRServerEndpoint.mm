@@ -393,7 +393,11 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     assertChipStackLockedByCurrentThread();
 
     if (_endpointIndex.has_value()) {
-        emberAfClearDynamicEndpoint(_endpointIndex.value());
+        // Using `kClusterShutdown` (instead of `kPermanentRemove`):
+        // Clusters that have "storage" are not used by the framework. In practice,
+        // the only clusters that are expected to appear here are Descriptor, OTA Provider
+        // and non-SDK clusters.
+        emberAfClearDynamicEndpoint(_endpointIndex.value(), MatterClusterShutdownType::kClusterShutdown);
     }
 
     _endpointIndex.reset();

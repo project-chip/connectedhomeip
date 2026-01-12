@@ -13718,6 +13718,8 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
                     "SFrameConfig": "SFrameStruct",
+                    "videoStreams": "int",
+                    "audioStreams": "int",
                 },
             },
             0x00000002: {
@@ -13734,6 +13736,8 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
                     "SFrameConfig": "SFrameStruct",
+                    "videoStreams": "int",
+                    "audioStreams": "int",
                 },
             },
             0x00000004: {

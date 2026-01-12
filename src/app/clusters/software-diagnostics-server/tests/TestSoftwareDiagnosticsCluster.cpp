@@ -16,10 +16,10 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -34,6 +34,8 @@ namespace {
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
+
+using chip::app::ClusterShutdownType;
 
 template <class T>
 class ScopedDiagnosticsProvider
@@ -278,7 +280,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     ASSERT_TRUE(decodedFault.faultRecording.HasValue());
     EXPECT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

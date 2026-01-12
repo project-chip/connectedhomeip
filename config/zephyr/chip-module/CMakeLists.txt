@@ -70,6 +70,10 @@ if(CONFIG_CHIP)
         zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
     endif()
 
+    if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+        set_compiler_property(PROPERTY debug -g0)
+    endif()
+
     # ==============================================================================
     # Generate configuration for CHIP GN build system
     # ==============================================================================
@@ -78,6 +82,7 @@ if(CONFIG_CHIP)
         LIB_SHELL CONFIG_CHIP_LIB_SHELL
         LIB_TESTS CONFIG_CHIP_BUILD_TESTS
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
+        DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     )
 
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
@@ -91,10 +96,10 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_bool("chip_enable_openthread" CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_OPENTHREAD_FTD)
     matter_add_gn_arg_bool("chip_inet_config_enable_ipv4" CONFIG_CHIP_IPV4)
-    matter_add_gn_arg_bool("chip_enable_wifi" CONFIG_WIFI)
+    matter_add_gn_arg_bool("chip_enable_wifi" CONFIG_CHIP_WIFI)
     matter_add_gn_arg_bool("chip_config_network_layer_ble" CONFIG_BT)
-    matter_add_gn_arg_bool("chip_mdns_minimal" CONFIG_WIFI)
-    matter_add_gn_arg_bool("chip_mdns_minimal" CONFIG_NET_L2_ETHERNET)
+    matter_add_gn_arg_bool("chip_mdns_minimal" CONFIG_CHIP_WIFI)
+    matter_add_gn_arg_bool("chip_mdns_minimal" CONFIG_CHIP_ETHERNET)
     matter_add_gn_arg_bool("chip_mdns_platform" CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" CONFIG_CHIP_BUILD_TESTS)
     matter_add_gn_arg_bool("chip_malloc_sys_heap" CONFIG_CHIP_MALLOC_SYS_HEAP)
@@ -112,9 +117,9 @@ if(CONFIG_CHIP)
         matter_add_gn_arg_string("chip_mdns" "platform")
     endif()
 
-    if(CONFIG_WIFI)
+    if(CONFIG_CHIP_WIFI)
         matter_add_gn_arg_string("chip_mdns" "minimal")
-    elseif(CONFIG_NET_L2_ETHERNET)
+    elseif(CONFIG_CHIP_ETHERNET)
         matter_add_gn_arg_string("chip_mdns" "minimal")
     elseif(CONFIG_NET_L2_OPENTHREAD)
         matter_add_gn_arg_string("chip_mdns" "platform")
@@ -129,6 +134,17 @@ if(CONFIG_CHIP)
         matter_add_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
     endif()
 
+    if(NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+        matter_add_gn_arg_string("symbol_level" "0")
+    endif()
+
+    if(CONFIG_CHIP_STRIP_SYMBOLS)
+        matter_add_gn_arg_bool("strip_symbols" true)
+    endif()
+
+    # Allows to set chip_stack_lock_tracking level
+    matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
+
     matter_generate_args_tmp_file()
 
     # ==============================================================================
@@ -137,6 +153,7 @@ if(CONFIG_CHIP)
     matter_build(chip
         LIB_SHELL ${CONFIG_CHIP_LIB_SHELL}
         LIB_TESTS ${CONFIG_CHIP_BUILD_TESTS}
+        DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
         GN_DEPENDENCIES kernel
     )
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
