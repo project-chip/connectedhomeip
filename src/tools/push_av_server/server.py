@@ -663,7 +663,11 @@ class PushAvServer:
 
                 if mpd_type == "static":
                     session.complete = True
-                
+
+                path_regex = re.compile(r"^session_\d+/index\.mpd$")
+                if not path_regex.match(file_path):
+                    errors.append("DASH manifest must be uploaded as session_X/index.mpd")
+
                 session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
             elif ext == "m3u8":
                 # HLS manifest files
