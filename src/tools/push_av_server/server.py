@@ -515,18 +515,6 @@ class PushAvServer:
 
     # Utilities
 
-    def _read_stream_details(self, stream_id: int):
-        # TODO Remove
-        p = self.wd.path("streams", str(stream_id), "details.json")
-
-        try:
-            with open(p, 'r') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            raise HTTPException(404, detail="Stream doesn't exists")
-        except Exception as e:
-            raise HTTPException(500, f"An unexpected error occurred: {e}")
-
     def _list_streams(self):
         streams: dict[str, Stream] = {}
 
@@ -580,9 +568,6 @@ class PushAvServer:
             p = self.wd.path("streams", str(stream_id), file_path)
             with open(p, "r") as f:
                 context['cert'] = json.load(f)
-        elif file_path == 'details.json':
-            context['type'] = 'details'
-            context['details'] = self._read_stream_details(stream_id)
         else:
             context['type'] = 'media'
             context['probe'] = self.ffprobe_check(stream_id, file_path)
