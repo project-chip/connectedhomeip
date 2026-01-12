@@ -621,6 +621,8 @@ class PushAvServer:
             Validate the file name based on the extension and path format.
             Always save the uploaded file to disk for further analysis.
             If strict mode is enabled, return bad requests with the errors if any.
+
+            TODO Currently doesn't gracefuly handle overwrite uploads (e.g. when the same session number is reused)
         """
         log.debug(f"Upload started: stream={stream_id}, file={file_path}.{ext}")
 
@@ -654,7 +656,7 @@ class PushAvServer:
                 if mpd_type == "static":
                     session.complete = True
 
-                path_regex = re.compile(r"^session_\d+/index\.mpd$")
+                path_regex = re.compile(r"^session_\d+/index$")
                 if not path_regex.match(file_path):
                     errors.append("DASH manifest must be uploaded as session_X/index.mpd")
 
@@ -666,7 +668,7 @@ class PushAvServer:
 
                 if session is None:
                     session = stream.new_session()
-                
+
                 # TODO Lifecycle validation for HLS manifests
 
                 session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
@@ -678,7 +680,8 @@ class PushAvServer:
                 else:
                     errors.append("No active session when uploading " + file_path_with_ext)
 
-                # The Track's init segment is uploaded as `session_name/track_name/track_name.init`
+                # The Track's init segment is uploaded as `session_name/track_name/track_name.init`.
+                # Note that the extension is not part of the `file_path` variable.
                 #
                 # `/session_1/index.mpd` - Initial upload. Has `MPD@type="dynamic"`.
                 # `/session_1/video1/video1.init`
@@ -691,11 +694,9 @@ class PushAvServer:
                 # `/session_1/audio1/segment_1003.m4s`
                 # `/session_1/index.mpd` - Final upload. Has `MPD@type="static"`.
 
-                # TODO Make sure this is correct. Most likely not at this point.
-
-                path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+\.m4s$"
+                path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$"
                 if ext == "init":
-                    path_regex = r"^session_\d+/(?P<trackName>[^/]+)/[^/]+\.init$"
+                    path_regex = r"^session_\d+/(?P<trackName>[^/]+)/[^/]+"
                 path_regex = re.compile(path_regex)
 
                 match = path_regex.match(file_path)
