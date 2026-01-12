@@ -26,6 +26,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <assert.h>
+#include <network/uri.hpp>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -229,49 +230,39 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
 
 bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
 {
-    const std::string https = "https://";
+    std::error_code ec;
+    network::uri parsed_uri(url, ec);
 
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
-    {
+    if (ec) {
         return false;
     }
 
-    // Check that URL does not contain fragment character '#'
-    if (url.find('#') != std::string::npos)
-    {
-        ChipLogError(Camera, "URL contains fragment character '#'");
+    if (!parsed_uri.has_scheme() || !parsed_uri.has_host()) {
         return false;
     }
 
-    // Check that URL does not contain query character '?'
-    if (url.find('?') != std::string::npos)
-    {
-        ChipLogError(Camera, "URL contains query character '?'");
-        return false;
+    std::string scheme(parsed_uri.scheme().begin(), parsed_uri.scheme().end());
+    std::string path(parsed_uri.has_path() ? std::string(parsed_uri.path().begin(), parsed_uri.path().end()) : "");
+    std::string host(parsed_uri.host().begin(), parsed_uri.host().end());
+
+    // Convert to lowercase for case-insensitive comparison
+    for (char& c : scheme) {
+        c = static_cast<char>(std::tolower(c));
     }
 
-    // Check that URL ends with a forward slash '/'
-    if (url.back() != '/')
-    {
-        ChipLogError(Camera, "URL does not end with '/'");
-        return false;
-    }
+    // Check if path ends with '/'
+    bool pathEndsWithSlash = !path.empty() && path.back() == '/';
 
-    // Extract host part
-    size_t hostStart = https.size();
-    size_t hostEnd   = url.find('/', hostStart);
-    std::string host = url.substr(hostStart, hostEnd - hostStart);
+    // Check if query and fragment are empty
+    bool noQuery = !parsed_uri.has_query();
+    bool noFragment = !parsed_uri.has_fragment();
 
-    // Basic host validation: ensure non-empty
-    if (host.empty())
-    {
-        ChipLogError(Camera, "URL does not contain a valid host.");
-        return false;
-    }
+    return scheme == "https" &&
+           noFragment &&
+           noQuery &&
+           pathEndsWithSlash &&
+           !host.empty();
 
-    // Accept any host as long as non-empty
-    return true;
 }
 
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
