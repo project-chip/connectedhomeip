@@ -20,6 +20,7 @@ source_set("on-off-server") {
     "OnOffCluster.cpp",
     "OnOffCluster.h",
     "OnOffDelegate.h",
+    "OnOffEffectDelegate.h",
     "OnOffLightingCluster.cpp",
     "OnOffLightingCluster.h",
   ]
