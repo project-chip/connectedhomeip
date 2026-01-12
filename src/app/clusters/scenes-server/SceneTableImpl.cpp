@@ -283,7 +283,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
         for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldSetCount(); i++)
         {
             ExtensionFieldSet EFS;
-            scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
+            TEMPORARY_RETURN_IGNORED scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
             ByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, EFS.mUsedBytes);
 
             if (!EFS.IsEmpty())

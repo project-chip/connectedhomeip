@@ -428,11 +428,11 @@ static TlsClientManagementServer gTlsClientManagementClusterServerInstance = Tls
 
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
-    gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    gTlsClientManagementClusterServerInstance.Init();
+    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
+    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterServerInstance.Init();
 }
 
 void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
 {
-    gTlsClientManagementClusterServerInstance.Finish();
+    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterServerInstance.Finish();
 }

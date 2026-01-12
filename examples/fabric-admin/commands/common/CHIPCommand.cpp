@@ -516,7 +516,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
-    CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex());
+    ReturnErrorOnFailure(CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex()));
 
     mCommissioners[identity] = std::move(commissioner);
 

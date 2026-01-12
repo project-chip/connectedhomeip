@@ -361,7 +361,7 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
     ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kCertificatePayload)));
     ByteSpan key;
     ReturnErrorOnFailure(reader.Get(key));
-    data.key.SetLength(key.size());
+    ReturnErrorOnFailure(data.key.SetLength(key.size()));
     MutableByteSpan keyAsSpan(data.key.Bytes(), data.key.Length());
     return CopySpanToMutableSpan(key, keyAsSpan);
 }

@@ -1111,9 +1111,8 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
 CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    mOpCredsContext.fabricTable.AddFabricDelegate(this);
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(mOpCredsContext.fabricTable.AddFabricDelegate(this));
+    return DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
 }
 
 void OperationalCredentialsCluster::Shutdown()
@@ -1276,7 +1275,7 @@ void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTa
     // to restart advertising altogether.
     GetDNSSDServer().StartServer();
 
-    EventManagement::GetInstance().FabricRemoved(fabricIndex);
+    TEMPORARY_RETURN_IGNORED EventManagement::GetInstance().FabricRemoved(fabricIndex);
 
     NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
     NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);

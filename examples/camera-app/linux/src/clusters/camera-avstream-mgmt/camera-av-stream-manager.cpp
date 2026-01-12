@@ -322,7 +322,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
             mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
 
             // Set the current frame rate attribute from HAL
-            GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+            TEMPORARY_RETURN_IGNORED GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(
+                mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             return Status::Success;
         }
@@ -341,7 +342,8 @@ void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & all
         mCameraDeviceHAL->GetCameraHALInterface().StartVideoStream(allocatedStream);
 
         // Set the current frame rate attribute from HAL once stream has started
-        GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
+        TEMPORARY_RETURN_IGNORED GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(
+            mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
         break;
 
     case StreamAllocationAction::kModification:

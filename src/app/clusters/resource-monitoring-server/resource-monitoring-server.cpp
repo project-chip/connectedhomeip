@@ -61,7 +61,7 @@ Instance::~Instance()
     {
         mDelegate->SetInstance(nullptr);
     }
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -134,7 +134,7 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
@@ -212,7 +212,7 @@ CHIP_ERROR Instance::ReadReplaceableProductList(AttributeValueEncoder & aEncoder
         ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
         if (nullptr == productListManagerInstance)
         {
-            aEncoder.EncodeEmptyList();
+            TEMPORARY_RETURN_IGNORED aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
 
@@ -278,7 +278,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     case Attributes::LastChangedTime::Id: {
         DataModel::Nullable<uint32_t> newLastChangedTime;
         ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
-        UpdateLastChangedTime(newLastChangedTime);
+        TEMPORARY_RETURN_IGNORED UpdateLastChangedTime(newLastChangedTime);
         break;
     }
     }

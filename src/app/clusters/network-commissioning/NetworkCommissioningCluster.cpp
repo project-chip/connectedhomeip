@@ -837,7 +837,7 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     }
     if (commissioningError == Status::kSuccess)
     {
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
             ByteSpan(mLastNetworkID, mLastNetworkIDLen));
         SetLastConnectErrorValue(NullNullable);
     }
@@ -950,7 +950,7 @@ void NetworkCommissioningCluster::OnCommissioningComplete()
     VerifyOrReturn(mpWirelessDriver != nullptr);
 
     ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
-    mpWirelessDriver->CommitConfiguration();
+    TEMPORARY_RETURN_IGNORED mpWirelessDriver->CommitConfiguration();
 }
 
 void NetworkCommissioningCluster::OnFailSafeTimerExpired()
@@ -958,7 +958,7 @@ void NetworkCommissioningCluster::OnFailSafeTimerExpired()
     VerifyOrReturn(mpWirelessDriver != nullptr);
 
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
-    mpWirelessDriver->RevertConfiguration();
+    TEMPORARY_RETURN_IGNORED mpWirelessDriver->RevertConfiguration();
     mAsyncCommandHandle.Release();
 
     // Mark the network list changed since `mpWirelessDriver->RevertConfiguration()` may have updated it.

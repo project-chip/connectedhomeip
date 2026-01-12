@@ -60,7 +60,7 @@ Instance::~Instance()
     {
         mDelegate->SetInstance(nullptr);
     }
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -257,7 +257,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
-        InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
         auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 

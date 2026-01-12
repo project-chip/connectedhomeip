@@ -90,12 +90,12 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Closure Panel Endpoint 3 initialized successfully");
 
     // Set Taglist for Closure endpoints
-    SetTagList(/* endpoint= */ kClosureEndpoint1,
-               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosureEndpoint1TagList));
-    SetTagList(/* endpoint= */ kClosurePanelEndpoint2,
-               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint2TagList));
-    SetTagList(/* endpoint= */ kClosurePanelEndpoint3,
-               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint3TagList));
+    SuccessOrDie(SetTagList(/* endpoint= */ kClosureEndpoint1,
+                            Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosureEndpoint1TagList)));
+    SuccessOrDie(SetTagList(/* endpoint= */ kClosurePanelEndpoint2,
+                            Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint2TagList)));
+    SuccessOrDie(SetTagList(/* endpoint= */ kClosurePanelEndpoint3,
+                            Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint3TagList)));
 
     // Set Initial state for Closure endpoints
     VerifyOrDie(SetClosureControlInitialState(mClosureEndpoint1) == CHIP_NO_ERROR);
@@ -382,7 +382,8 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
 
     mEp1CurrentAction    = ClosureAction::kMoveToAction;
     mEp1MotionInProgress = true;
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp1ClosureActionTimer, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs),
+                                                                   HandleEp1ClosureActionTimer, this);
     return Status::Success;
 }
 
@@ -661,10 +662,10 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
 
         ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
         ep1OverallCurrentState.Value().secureState.SetNonNull(false);
-        mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
+        TEMPORARY_RETURN_IGNORED mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
 
         panelCurrentState.Value().latch.SetValue(false);
-        panelEp->GetLogic().SetCurrentState(panelCurrentState);
+        TEMPORARY_RETURN_IGNORED panelEp->GetLogic().SetCurrentState(panelCurrentState);
 
         ChipLogProgress(AppServer, "Unlatched action completed");
     }
@@ -714,7 +715,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         VerifyOrReturn(!nextPosition.IsNull(), ChipLogError(AppServer, "Next position is not set for Endpoint %d", endpointId));
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextPosition.Value()));
-        ep->GetLogic().SetCurrentState(panelCurrentState);
+        TEMPORARY_RETURN_IGNORED ep->GetLogic().SetCurrentState(panelCurrentState);
 
         panelProgressPossible = (nextPosition.Value() != panelTargetState.Value().position.Value().Value());
         ChipLogProgress(AppServer, "EndPoint %d Current Position: %d, Target Position: %d", endpointId, nextPosition.Value(),
@@ -766,10 +767,10 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 
                 ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
                 ep1OverallCurrentState.Value().secureState.SetNonNull(false);
-                mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
+                TEMPORARY_RETURN_IGNORED mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
 
                 panelCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                ep->GetLogic().SetCurrentState(panelCurrentState);
+                TEMPORARY_RETURN_IGNORED ep->GetLogic().SetCurrentState(panelCurrentState);
 
                 ChipLogProgress(AppServer, "Latch action completed");
             }
@@ -834,7 +835,7 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
-        ep->GetLogic().SetCurrentState(panelCurrentState);
+        TEMPORARY_RETURN_IGNORED ep->GetLogic().SetCurrentState(panelCurrentState);
 
         // Cancel any existing timer before starting a new action
         if (endpointId == kClosurePanelEndpoint2)
@@ -917,11 +918,11 @@ void ClosureManager::HandleClosureMotionAction()
                 ChipLogProgress(AppServer, "Performing unlatch action");
                 ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
                 ep1CurrentState.Value().secureState.SetNonNull(false);
-                instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
+                TEMPORARY_RETURN_IGNORED instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
                 ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-                instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
+                TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
                 ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-                instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
+                TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
                 ChipLogProgress(AppServer, "Unlatched action completed");
             }
         }
@@ -939,7 +940,7 @@ void ClosureManager::HandleClosureMotionAction()
     {
         VerifyOrReturn(!ep2NextPosition.IsNull(), ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
         ep2CurrentState.Value().position.SetValue(DataModel::MakeNullable(ep2NextPosition.Value()));
-        instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
+        TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
         isEndPoint2ProgressPossible = (ep2NextPosition.Value() != ep2TargetState.Value().position.Value().Value());
         ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", ep2NextPosition.Value(),
                         ep2TargetState.Value().position.Value().Value());
@@ -950,7 +951,7 @@ void ClosureManager::HandleClosureMotionAction()
     {
         VerifyOrReturn(!ep3NextPosition.IsNull(), ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
         ep3CurrentState.Value().position.SetValue(DataModel::MakeNullable(ep3NextPosition.Value()));
-        instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
+        TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
         isEndPoint3ProgressPossible = (ep3NextPosition.Value() != ep3TargetState.Value().position.Value().Value());
         ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", ep3NextPosition.Value(),
                         ep3TargetState.Value().position.Value().Value());
@@ -970,8 +971,8 @@ void ClosureManager::HandleClosureMotionAction()
     {
         mEp1CurrentAction    = ClosureAction::kMoveToAction;
         mEp1MotionInProgress = true;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp1ClosureActionTimer,
-                                              this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs),
+                                                                       HandleEp1ClosureActionTimer, this);
         ChipLogProgress(AppServer, "Rescheduled HandleEp1ClosureActionTimer for motion action");
         return;
     }
@@ -1000,11 +1001,11 @@ void ClosureManager::HandleClosureMotionAction()
                         ep1CurrentState.Value().secureState.SetNonNull(false);
                     }
                 }
-                instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
+                TEMPORARY_RETURN_IGNORED instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(ep1CurrentState);
                 ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
+                TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(ep2CurrentState);
                 ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
-                instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
+                TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(ep3CurrentState);
                 ChipLogProgress(AppServer, "latched action complete");
             }
         }
@@ -1058,7 +1059,7 @@ ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(EndpointId en
     {
         return &instance.mClosurePanelEndpoint2;
     }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
+    if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
     {
         return &instance.mClosurePanelEndpoint3;
     }

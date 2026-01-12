@@ -101,7 +101,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 

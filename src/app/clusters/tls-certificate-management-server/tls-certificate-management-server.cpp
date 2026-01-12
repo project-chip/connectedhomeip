@@ -69,13 +69,13 @@ TlsCertificateManagementServer::~TlsCertificateManagementServer()
     mDelegate.SetTlsCertificateManagementServer(nullptr);
 
     // unregister
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR TlsCertificateManagementServer::Init()
 {
-    mCertificateTable.Init(Server::GetInstance().GetPersistentStorage());
+    ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -87,8 +87,8 @@ CHIP_ERROR TlsCertificateManagementServer::Finish()
 {
     mCertificateTable.Finish();
 
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
     return CHIP_NO_ERROR;

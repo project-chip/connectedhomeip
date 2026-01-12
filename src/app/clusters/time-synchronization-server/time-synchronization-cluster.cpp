@@ -449,11 +449,11 @@ void TimeSynchronizationServer::Init()
     }
     if (LoadTimeZone() != CHIP_NO_ERROR)
     {
-        ClearTimeZone();
+        TEMPORARY_RETURN_IGNORED ClearTimeZone();
     }
     if (LoadDSTOffset() != CHIP_NO_ERROR)
     {
-        ClearDSTOffset();
+        TEMPORARY_RETURN_IGNORED ClearDSTOffset();
     }
 
     // Set the granularity to none for now - this will force us to go to the delegate so it can
@@ -467,7 +467,7 @@ void TimeSynchronizationServer::Init()
     {
         ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
     }
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void TimeSynchronizationServer::Shutdown()
@@ -941,7 +941,7 @@ void TimeSynchronizationServer::OnFabricRemoved(const FabricTable & fabricTable,
     if (!mTrustedTimeSource.IsNull() && mTrustedTimeSource.Value().fabricIndex == fabricIndex)
     {
         DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
-        TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
+        TEMPORARY_RETURN_IGNORED TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
         emitMissingTrustedTimeSourceEvent(0);
     }
 }
@@ -1115,7 +1115,7 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
     }
     else
     {
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kTimeNotAccepted));
+        TEMPORARY_RETURN_IGNORED commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kTimeNotAccepted));
     }
     return true;
 }
@@ -1142,7 +1142,7 @@ bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
         emitMissingTrustedTimeSourceEvent(commandPath.mEndpointId);
     }
 
-    TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
+    TEMPORARY_RETURN_IGNORED TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
     commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
@@ -1204,7 +1204,7 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
     if (response.DSTOffsetRequired)
     {
         TimeState dstState = TimeSynchronizationServer::Instance().UpdateDSTOffsetState();
-        TimeSynchronizationServer::Instance().ClearDSTOffset();
+        TEMPORARY_RETURN_IGNORED TimeSynchronizationServer::Instance().ClearDSTOffset();
         if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
         {
             emitDSTStatusEvent(commandPath.mEndpointId, false);

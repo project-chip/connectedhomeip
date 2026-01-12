@@ -202,7 +202,7 @@ CHIP_ERROR EVSEManufacturerShutdown()
     if (gEvseManufacturer)
     {
         /* Shutdown the EVSEManufacturer */
-        gEvseManufacturer->Shutdown();
+        TEMPORARY_RETURN_IGNORED gEvseManufacturer->Shutdown();
         gEvseManufacturer.reset();
     }
 

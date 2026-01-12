@@ -146,7 +146,7 @@ void emberAfActionsClusterInitCallback(EndpointId endpoint)
     sActionsDelegateImpl = std::make_unique<Actions::ActionsDelegateImpl>();
     sActionsServer       = std::make_unique<Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
 
-    sActionsServer->Init();
+    TEMPORARY_RETURN_IGNORED sActionsServer->Init();
 }
 
 void emberAfActionsClusterShutdownCallback(EndpointId endpoint)

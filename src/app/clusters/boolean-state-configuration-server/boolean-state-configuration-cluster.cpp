@@ -336,7 +336,7 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanStateConfiguration::Alar
     Delegate * delegate = GetDelegate(ep);
     if (!isDelegateNull(delegate))
     {
-        delegate->HandleSuppressAlarm(alarm);
+        TEMPORARY_RETURN_IGNORED delegate->HandleSuppressAlarm(alarm);
     }
 
     VerifyOrReturnError(Status::Success == AlarmsSuppressed::Get(ep, &alarmsSuppressed), attribute_error);
@@ -414,7 +414,7 @@ bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
 
     if (!isDelegateNull(delegate))
     {
-        delegate->HandleEnableDisableAlarms(alarms);
+        TEMPORARY_RETURN_IGNORED delegate->HandleEnableDisableAlarms(alarms);
     }
 
     VerifyOrExit(Status::Success == AlarmsActive::Get(ep, &alarmsActive), status.Emplace(Status::Failure));

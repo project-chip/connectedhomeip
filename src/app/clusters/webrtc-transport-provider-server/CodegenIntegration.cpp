@@ -16,27 +16,17 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <lib/support/logging/CHIPLogging.h>
 
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+// These callbacks are required by the Ember/codegen integration but are not
+// needed for the server cluster interface implementation.
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WebRTCTransportProvider {
-
-/**
- * The application interface to define the options & implement commands.
- */
-class WebRTCTransportProviderController
+void MatterWebRTCTransportProviderPluginServerInitCallback()
 {
-public:
-    virtual ~WebRTCTransportProviderController() = default;
+    ChipLogProgress(Zcl, "Initializing WebRTC Transport Provider cluster.");
+}
 
-    virtual void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) = 0;
-};
-
-} // namespace WebRTCTransportProvider
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void MatterWebRTCTransportProviderPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutdown WebRTC Transport Provider cluster.");
+}

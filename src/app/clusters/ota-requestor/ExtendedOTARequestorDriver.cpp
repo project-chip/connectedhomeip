@@ -108,13 +108,13 @@ void ExtendedOTARequestorDriver::HandleUserConsentState(chip::ota::UserConsentSt
         ScheduleDelayedAction(
             mDelayedActionTime,
             [](System::Layer *, void * context) {
-                static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->CancelImageUpdate();
+                TEMPORARY_RETURN_IGNORED static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->CancelImageUpdate();
             },
             this);
         break;
 
     case chip::ota::UserConsentState::kObtaining:
-        SystemLayer().ScheduleWork(
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleWork(
             [](System::Layer *, void * context) {
                 static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->DownloadUpdateDelayedOnUserConsent();
             },
