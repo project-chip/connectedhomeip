@@ -774,8 +774,15 @@ class PushAvServer:
         )
 
         if proc.returncode != 0:
-            # TODO Add more details (maybe stderr) to the response
-            raise HTTPException(500, "ffprobe failed to analyze the media file")
+            stderr_text = proc.stderr.decode('utf-8', errors='replace')
+            raise HTTPException(
+                500,
+                detail={
+                    "message": "ffprobe failed to analyze the media file",
+                    "stderr": stderr_text,
+                    "command": " ".join(cmd)
+                }
+            )
 
         return json.loads(proc.stdout)
 
