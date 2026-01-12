@@ -650,8 +650,6 @@ class PushAvServer:
                 if session is None:
                     session = stream.new_session()
 
-                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
-
                 # TODO Validate the path is always session_name/index.mpd
 
                 root = xml.etree.ElementTree.fromstring(body)
@@ -665,6 +663,8 @@ class PushAvServer:
 
                 if mpd_type == "static":
                     session.complete = True
+                
+                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
             elif ext == "m3u8":
                 # HLS manifest files
                 if stream.interface != SupportedIngestInterface.hls:
@@ -672,10 +672,10 @@ class PushAvServer:
 
                 if session is None:
                     session = stream.new_session()
+                
+                # TODO Lifecycle validation for HLS manifests
 
                 session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
-
-                # TODO Lifecycle validation for HLS manifests
             elif ext == "m4s" or ext == "init":
                 # Segmented video files
 
