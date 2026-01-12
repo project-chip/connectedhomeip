@@ -496,7 +496,8 @@ class PushAvServer:
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
         self.router.add_api_route("/ui/streams", self.ui_streams_list, methods=["GET"], response_class=HTMLResponse)
-        self.router.add_api_route("/ui/streams/{stream_id}/{file_path:path}", self.ui_streams_details, methods=["GET"])
+        self.router.add_api_route("/ui/streams/{stream_id}", self.ui_streams_details, methods=["GET"])
+        self.router.add_api_route("/ui/streams/{stream_id}/{file_path:path}", self.ui_streams_file_details, methods=["GET"])
         self.router.add_api_route("/ui/certificates", self.ui_certificates_list, methods=["GET"], response_class=HTMLResponse)
         self.router.add_api_route("/ui/certificates/{hierarchy}/{name}",
                                   self.ui_certificates_details, methods=["GET"], response_class=HTMLResponse)
@@ -557,11 +558,22 @@ class PushAvServer:
             request=request, name="streams_list.jinja2", context={"streams": s["streams"]}
         )
 
+    def ui_streams_details(self, request: Request, stream_id: int):
+        context = {}
+
+        stream = self.streams.get(str(stream_id))
+        if stream is None:
+            raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
+
+        context['stream'] = stream
+        
+        return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
+
     # TODO Change what we show in here.
     # Stream listing page should only show the number of sessions and errors.
     # Stream details should provide the ffprobe of the index.mpd, the session history details (including errors?),
     # the stream configuration, and the per-file details (should reconsider if it's actually useful for media)
-    def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
+    def ui_streams_file_details(self, request: Request, stream_id: int, file_path: str):
         context = {}
         context['streams'] = self.list_streams()['streams']
         context['stream_id'] = stream_id
@@ -577,7 +589,7 @@ class PushAvServer:
             context['probe'] = self.ffprobe_check(stream_id, file_path)
             context['pretty_probe'] = json.dumps(context['probe'], sort_keys=True, indent=4)
 
-        return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
+        return self.templates.TemplateResponse(request=request, name="streams_file_details.jinja2", context=context)
 
     def ui_certificates_list(self, request: Request):
         return self.templates.TemplateResponse(
@@ -710,7 +722,7 @@ class PushAvServer:
                     track_name_in_path = match.group("trackName")
                     track_name = stream.track_name
 
-                    # TODO Need to find out where the number after the symbolic track name is coming from
+                    # TODO The track naming strategy has changed in 1.5.1. It's now a per audio/video stream option.
                     if track_name and track_name != track_name_in_path:
                         errors.append("Track name mismatch: "
                                       f"{track_name_in_path} != {track_name}, "
