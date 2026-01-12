@@ -214,7 +214,8 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
                 chip::BitFlags<CameraAvStreamManagement::Feature>(
                     CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
                     CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
-                    CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy),
+                    CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
+                    CameraAvStreamManagement::Feature::kWatermark),
                 chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
                     CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
                     CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
@@ -298,12 +299,15 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAcceptedCommands)
                                                {
                                                    CameraAvStreamManagement::Commands::VideoStreamAllocate::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::VideoStreamDeallocate::kMetadataEntry,
+                                                   CameraAvStreamManagement::Commands::VideoStreamModify::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::AudioStreamAllocate::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::AudioStreamDeallocate::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::SnapshotStreamAllocate::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::kMetadataEntry,
+                                                   CameraAvStreamManagement::Commands::SnapshotStreamModify::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::SetStreamPriorities::kMetadataEntry,
                                                    CameraAvStreamManagement::Commands::CaptureSnapshot::kMetadataEntry,
+
                                                }));
 }
 

@@ -1140,7 +1140,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetViewport(const Globals::Structs::
     }
     mViewport = aViewport;
 
-    ReturnErrorOnFailure(StoreViewport(mViewport));
+    TEMPORARY_RETURN_IGNORED StoreViewport(mViewport);
     mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
     NotifyAttributeChanged(Attributes::Viewport::Id);
 
@@ -1823,8 +1823,12 @@ CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClust
 
     if (HasFeature(Feature::kVideo) && (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay)))
     {
-        ReturnErrorOnFailure(builder.AppendElements(
-            { Commands::VideoStreamModify::kMetadataEntry, Commands::SnapshotStreamModify::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::VideoStreamModify::kMetadataEntry }));
+    }
+
+    if (HasFeature(Feature::kSnapshot) && (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay)))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::SnapshotStreamModify::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kSnapshot))
