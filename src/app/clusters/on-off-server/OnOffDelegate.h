@@ -29,7 +29,7 @@ public:
     /// Cluster was started up with this given on/off value.
     ///
     /// For lighting applications, the value will be according to the startup
-    /// enum (i.e. it would be forced on or off or togggled)
+    /// enum (i.e. it would be forced on or off or toggled)
     virtual void OnOffStartup(bool on) = 0;
 
     /// Called when the OnOff attribute has changed.
