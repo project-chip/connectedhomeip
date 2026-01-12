@@ -27,8 +27,8 @@ namespace Clusters {
 /**
  * Set the delegate for the TLS Client Management cluster.
  *
- * MUST be called before server initialization (e.g. in main() before ServerInit()).
- * The delegate is used during cluster initialization via MatterTlsClientManagementClusterInitCallback.
+ * MUST be called before Matter data model initialization (e.g. in main() before ServerInit()).
+ * The delegate is used during cluster initialization.
  * If called after cluster initialization, it will have no effect as the cluster instance
  * has already been created with the previous delegate.
  *
