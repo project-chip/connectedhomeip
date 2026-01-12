@@ -566,7 +566,7 @@ class PushAvServer:
             raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
 
         context['stream'] = stream
-        
+
         return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
 
     # TODO Change what we show in here.
@@ -766,10 +766,9 @@ class PushAvServer:
                     status_code=400,
                     content={"errors": errors}
                 )
-            else:
-                log.info("Upload successful:"
-                         f"stream={stream_id}, file={file_path}.{ext}, errors={errors}, strict={stream.strict_mode}")
-                return Response(status_code=202)
+            log.info("Upload successful:"
+                     f"stream={stream_id}, file={file_path}.{ext}, errors={errors}, strict={stream.strict_mode}")
+            return Response(status_code=202)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
 
