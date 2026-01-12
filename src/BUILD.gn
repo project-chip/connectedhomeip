@@ -76,6 +76,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
+      "${chip_root}/src/app/clusters/on-off-server/tests",
       "${chip_root}/src/app/clusters/operational-credentials-server/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/power-topology-server/tests",
