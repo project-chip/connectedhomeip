@@ -640,7 +640,7 @@ void uartForceTransmit(const uint8_t * data, uint16_t length)
     memcpy(tempBuffer.data, data, copyLength);
     tempBuffer.length = copyLength;
     ensureNullTermination(tempBuffer);
-    Board_UARTPutSTR((char *) tempBuffer.data);
+    Board_UARTPutSTR(tempBuffer.data);
 #else
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) data, length);
 #endif
