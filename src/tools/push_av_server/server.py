@@ -536,12 +536,14 @@ class PushAvServer:
         Note that any exceptions raised within the context will prevent streams from being saved to disk.
         """
         stream_id_str = str(stream_id)
-        yield self.streams[stream_id_str]
 
-        # TODO Look if we need the following try/catch block if the default behavior of the framework
-        # is good enough for debugging purposes.
-        # except Exception as e:
-        #    raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
+        stream = self.streams.get(stream_id_str)
+
+        if stream is None:
+            raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
+
+        yield stream
+
         self.streams[stream_id_str].save_to_disk(self.wd)
 
     # UI website
