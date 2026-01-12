@@ -17,6 +17,28 @@ import("//build_overrides/build.gni")
 import("${build_root}/config/android/config.gni")
 import("${build_root}/config/android_abi.gni")
 
+if (current_os == "linux" || current_os == "android") {
+  android_ndk_host_platform = "linux-x86_64"
+} else if (current_os == "mac") {
+  android_ndk_host_platform = "darwin-x86_64"
+} else {
+  assert(false, "Unsupported host OS for Android NDK prebuilts")
+}
+
+if (current_cpu == "arm") {
+  android_toolchain_dir = "arm-linux-androideabi"
+} else if (current_cpu == "arm64") {
+  android_toolchain_dir = "aarch64-linux-android"
+} else if (current_cpu == "x64") {
+  android_toolchain_dir = "x86_64-linux-android"
+} else if (current_cpu == "x86") {
+  android_toolchain_dir = "i686-linux-android"
+} else if (current_cpu == "riscv64") {
+  android_toolchain_dir = "riscv64-linux-android"
+} else {
+  assert(false, "Unsupported target_cpu for Android: ${current_cpu}")
+}
+
 # Place a copy of the shared c++ support library in the jni output directory
 # See:
 #   https://developer.android.com/ndk/guides/cpp-support
@@ -24,6 +46,6 @@ import("${build_root}/config/android_abi.gni")
 # Generally CHIP cannot ensure a single shared library per java application, so a shared
 # CPP support library is used
 copy("shared_cpplib") {
-  sources = [ "${android_ndk_root}/sources/cxx-stl/llvm-libc++/libs/${android_abi}/libc++_shared.so" ]
+  sources = [ "${android_ndk_root}/toolchains/llvm/prebuilt/${android_ndk_host_platform}/sysroot/usr/lib/${android_toolchain_dir}/libc++_shared.so" ]
   outputs = [ "${root_out_dir}/lib/jni/${android_abi}/libc++_shared.so" ]
 }

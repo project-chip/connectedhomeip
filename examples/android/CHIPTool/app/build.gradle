@@ -6,7 +6,7 @@ android {
     compileSdkVersion 31
     ndkPath System.getenv("ANDROID_NDK_HOME")
 
-    ndkVersion "23.2.8568313"
+    ndkVersion "28.2.13676358"
 
     defaultConfig {
         applicationId "com.google.chip.chiptool"
