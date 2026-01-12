@@ -1,0 +1,60 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+config("network_uri_config") {
+  include_dirs = [
+    "patches/include",
+    "repo/uri/include",
+  ]
+}
+
+config("network_uri_config_disable_warnings") {
+  cflags = [
+    "-Wno-shadow",
+    "-Wno-extra",
+    "-Wno-return-type",
+  ]
+  cflags_cc = [
+    "-Wno-shadow",
+    "-Wno-error=shadow",
+  ]
+}
+
+source_set("network-uri") {
+
+  sources = [
+    "patches/src/uri.cpp",
+    "repo/uri/src/uri_errors.cpp",
+    "repo/uri/src/detail/uri_parse.cpp",
+    "repo/uri/src/detail/uri_parse_authority.cpp",
+    "repo/uri/src/detail/uri_advance_parts.cpp",
+  ]
+
+  include_dirs = [
+    "patches",
+    "repo/uri/src",
+  ]
+
+  cflags_cc = [
+    "-include",
+    rebase_path("patches/detail/uri_percent_encode.hpp", root_build_dir),
+    "-Wno-shadow",
+    "-Wno-error=shadow",
+  ]
+
+  public_configs = [ ":network_uri_config" ]
+  configs += [ ":network_uri_config_disable_warnings" ]
+}

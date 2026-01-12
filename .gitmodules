@@ -338,3 +338,7 @@
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
 	platforms = esp32
 	recursive = true
+[submodule "third_party/uri/repo/uri"]
+	path = third_party/uri/repo/uri
+	url = https://github.com/cpp-netlib/uri.git
+	recursive = true
