@@ -548,7 +548,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceNodeStartup());
         uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
 
         energyImported.endSystime.SetValue(nowMS);
@@ -621,7 +621,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceNodeStartup());
         uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
 
         energyImported.endSystime.SetValue(nowMS);
