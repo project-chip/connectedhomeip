@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -52,15 +53,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -73,7 +74,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                       InteractionModelEngine::GetInstance());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
-    mGroupKeyManagementCluster.Create();
+    mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{
+        .fabricTable = Server::GetInstance().GetFabricTable(), .groupDataProvider = *Credentials::GetGroupDataProvider() });
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet{});

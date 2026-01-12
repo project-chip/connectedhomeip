@@ -17,13 +17,12 @@
 
 #include <app/clusters/group-key-mgmt-server/CodegenIntegration.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
-// #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-// #include <app/server/Server.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-// #include <lib/core/DataModelTypes.h>
-// #include <lib/support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <app/util/config.h>
 
 namespace {
