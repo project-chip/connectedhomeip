@@ -23,8 +23,6 @@ namespace Clusters {
 namespace GroupKeyManagement {
 
 /// Returns the singleton instance of the group key management cluster, if enabled.
-///
-/// This is a temporary integration point for ember-based apps.
 GroupKeyManagementCluster * Instance();
 
 } // namespace GroupKeyManagement
