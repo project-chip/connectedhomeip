@@ -16,13 +16,12 @@
  *    limitations under the License.
  */
 
-#include "unit-localization-server.h"
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/reporting/reporting.h>
+#include <clusters/UnitLocalization/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -32,14 +31,12 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
-UnitLocalizationServer UnitLocalizationServer::mInstance;
-
-UnitLocalizationServer & UnitLocalizationServer::Instance()
+CHIP_ERROR UnitLocalizationCluster::Init()
 {
-    return UnitLocalizationServer::mInstance;
+    return Startup();
 }
 
-CHIP_ERROR UnitLocalizationServer::Init()
+CHIP_ERROR UnitLocalizationCluster::Startup()
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
@@ -58,7 +55,7 @@ CHIP_ERROR UnitLocalizationServer::Init()
     return err;
 }
 
-CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
+CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
 {
     VerifyOrReturnError(units.size() >= kMinSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(units.size() <= kMaxSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -74,7 +71,12 @@ CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR UnitLocalizationCluster::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    return WriteImpl(aPath, aDecoder);
+}
+
+CHIP_ERROR UnitLocalizationCluster::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     if (aPath.mClusterId != UnitLocalization::Id)
     {
@@ -96,7 +98,7 @@ CHIP_ERROR UnitLocalizationServer::Write(const ConcreteDataAttributePath & aPath
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR UnitLocalizationCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != UnitLocalization::Id)
     {
@@ -112,7 +114,7 @@ CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath,
         return aEncoder.Encode(GetSupportedTemperatureUnits());
     }
     case ClusterRevision::Id: {
-        return aEncoder.Encode(kClusterRevision);
+        return aEncoder.Encode(kRevision);
     }
     default:
         break;
@@ -120,7 +122,7 @@ CHIP_ERROR UnitLocalizationServer::Read(const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
+CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
 {
     bool isValid       = false;
     const auto & units = GetSupportedTemperatureUnits();
@@ -139,15 +141,4 @@ CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
     return CHIP_NO_ERROR;
-}
-
-void MatterUnitLocalizationPluginServerInitCallback()
-{
-    TEMPORARY_RETURN_IGNORED UnitLocalizationServer::Instance().Init();
-    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
-}
-
-void MatterUnitLocalizationPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&UnitLocalizationServer::Instance());
 }

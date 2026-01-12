@@ -74,7 +74,7 @@ TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLife
         EXPECT_TRUE(instance.HasFeature(Feature::kConstraintBasedAdjustment));
 
         // Test shutdown (unregistration)
-        instance.Shutdown();
+        instance.Shutdown(ClusterShutdownType::kClusterShutdown);
 
         // Verify cluster is unregistered from the registry
         auto * unregisteredCluster =
@@ -97,7 +97,7 @@ TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLife
         EXPECT_FALSE(instance.HasFeature(Feature::kPausable));
 
         // Test shutdown
-        instance.Shutdown();
+        instance.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 

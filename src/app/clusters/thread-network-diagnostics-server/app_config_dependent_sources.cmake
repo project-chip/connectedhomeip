@@ -16,7 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/thread-network-diagnostics-provider.cpp"
-    "${CLUSTER_DIR}/thread-network-diagnostics-provider.h"
-    "${CLUSTER_DIR}/thread-network-diagnostics-server.cpp"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.cpp"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.h"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.cpp"
 )
