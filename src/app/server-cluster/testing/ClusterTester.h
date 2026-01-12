@@ -219,7 +219,19 @@ public:
         mHandler.ClearResponses();
         mHandler.ClearStatuses();
 
-        const app::DataModel::InvokeRequest invokeRequest = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        // Verify that the command is present in AcceptedCommands before attempting to invoke it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
+        auto checkStatus = VerifyCommandInAcceptedCommandsList(commandId);
+        if (!checkStatus.IsSuccess())
+        {
+            result.status = checkStatus;
+            return result;
+        }
+
+        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        app::DataModel::InvokeRequest invokeRequest;
+        invokeRequest.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
+        invokeRequest.subjectDescriptor = &subjectDescriptor;
 
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
@@ -339,6 +351,34 @@ private:
 
         // Attribute not found in AttributeList
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    }
+
+    // Verifies that a command is present in the cluster's AcceptedCommands list.
+    // @returns CHIP_NO_ERROR if the command is found in AcceptedCommands.
+    // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedCommand) if the command is not found in AcceptedCommands.
+    // @returns error status if AcceptedCommands cannot be retrieved.
+    app::DataModel::ActionReturnStatus VerifyCommandInAcceptedCommandsList(CommandId command_id)
+    {
+        auto path = mCluster.GetPaths()[0];
+
+        // Get the list of accepted commands from the cluster
+        ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> builder;
+        CHIP_ERROR err = mCluster.AcceptedCommands(path, builder);
+        ReturnErrorOnFailure(err);
+
+        ReadOnlyBuffer<app::DataModel::AcceptedCommandEntry> commandEntries = builder.TakeBuffer();
+
+        // Check if the requested command ID is present in the accepted commands list
+        for (const auto & entry : commandEntries)
+        {
+            if (entry.commandId == command_id)
+            {
+                return CHIP_NO_ERROR;
+            }
+        }
+
+        // Command not found in AcceptedCommands
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedCommand);
     }
 
     TestServerClusterContext mTestServerClusterContext{};
