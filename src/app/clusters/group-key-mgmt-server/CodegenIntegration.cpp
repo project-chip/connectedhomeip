@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/group-key-mgmt-server/CodegenIntegration.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
@@ -22,19 +23,12 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <src/app/clusters/group-key-mgmt-server/CodegenIntegration.h>
 
 namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GroupKeyManagement;
-
-GroupKeyManagementCluster * Instance()
-{
-    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
-    return &gServer.Cluster();
-}
 
 static_assert((GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
                GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
@@ -64,6 +58,14 @@ public:
 };
 
 } // namespace
+
+namespace chip::app::Clusters::GroupKeyManagement {
+GroupKeyManagementCluster * Instance()
+{
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
+}
+} // namespace chip::app::Clusters::GroupKeyManagement
 
 void MatterGroupKeyManagementClusterInitCallback(EndpointId endpointId)
 {
