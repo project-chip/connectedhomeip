@@ -720,6 +720,17 @@ class PushAvServer:
 
             file_local_path = self.wd.mkdir("streams", str(stream_id), file_path_with_ext, is_file=True)
 
+            # If file already exists, create versioned backup.
+            # Especially useful for manifests that have a fixed location.
+            if file_local_path.exists():
+                # TODO Also needs to update the Session value so that we can retrieved the backed up file.
+                #  Which imply we will need to keep both the original upload name (for validation) and the
+                #  actual on-disk file name (for reading).
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                backup_path = file_local_path.with_stem(f"{file_local_path.stem}.{timestamp}")
+                file_local_path.rename(backup_path)
+                log.info(f"Backed up existing file to {backup_path}")
+
             cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
 
             # TODO If file already exists, come up with a way to version it instead of overwriting it.
