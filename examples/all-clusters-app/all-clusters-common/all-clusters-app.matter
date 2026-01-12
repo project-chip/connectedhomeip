@@ -359,6 +359,8 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
   fabric_idx fabricIndex = 254;
 }
 
@@ -6325,6 +6327,7 @@ cluster CameraAvStreamManagement = 1361 {
 
   enum ImageCodecEnum : enum8 {
     kJPEG = 0 [spec_name = "JPEG"];
+    kHEIC = 1 [spec_name = "HEIC"];
   }
 
   enum TriStateAutoEnum : enum8 {
