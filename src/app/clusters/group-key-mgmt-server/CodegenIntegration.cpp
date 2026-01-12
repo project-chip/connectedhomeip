@@ -16,9 +16,14 @@
  */
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <app/util/config.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <src/app/clusters/group-key-mgmt-server/CodegenIntegration.h>
+
 namespace {
 using namespace chip;
 using namespace chip::app;
