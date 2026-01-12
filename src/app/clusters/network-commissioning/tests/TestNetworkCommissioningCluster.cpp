@@ -16,15 +16,13 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributePathParams.h>
-#include <app/AttributeValueDecoder.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/data-model-provider/tests/TestConstants.h>
-#include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -33,8 +31,8 @@
 #include <clusters/NetworkCommissioning/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 
 #include "FakeDrivers.h"
 
@@ -44,11 +42,10 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
 
-using chip::app::AttributeValueDecoder;
 using chip::app::ClusterShutdownType;
 using chip::app::DataModel::AttributeEntry;
-using chip::Testing::kAdminSubjectDescriptor;
-using chip::Testing::WriteOperation;
+using chip::Testing::ClusterTester;
+using chip::Testing::IsAttributesListEqualTo;
 
 class NoopBreadcrumbTracker : public BreadCrumbTracker
 {
@@ -70,34 +67,24 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 
         NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      MaxNetworks::kMetadataEntry,
-                      Networks::kMetadataEntry,
-                      InterfaceEnabled::kMetadataEntry,
-                      LastNetworkingStatus::kMetadataEntry,
-                      LastNetworkID::kMetadataEntry,
-                      LastConnectErrorValue::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
         //       For now keep the logic as inherited from previous implementation.
+        std::vector<AttributeEntry> expectedAttributes;
+        expectedAttributes.push_back(MaxNetworks::kMetadataEntry);
+        expectedAttributes.push_back(Networks::kMetadataEntry);
+        expectedAttributes.push_back(InterfaceEnabled::kMetadataEntry);
+        expectedAttributes.push_back(LastNetworkingStatus::kMetadataEntry);
+        expectedAttributes.push_back(LastNetworkID::kMetadataEntry);
+        expectedAttributes.push_back(LastConnectErrorValue::kMetadataEntry);
+
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      ScanMaxTimeSeconds::kMetadataEntry,
-                      ConnectMaxTimeSeconds::kMetadataEntry,
-                      SupportedWiFiBands::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
+        expectedAttributes.push_back(ScanMaxTimeSeconds::kMetadataEntry);
+        expectedAttributes.push_back(ConnectMaxTimeSeconds::kMetadataEntry);
+        expectedAttributes.push_back(SupportedWiFiBands::kMetadataEntry);
 #endif
 
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
     }
 
     // TODO: more tests for ethernet and thread should be added
@@ -109,35 +96,25 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     NoopBreadcrumbTracker tracker;
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-    chip::Testing::TestServerClusterContext context;
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     {
-        WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
-        writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(false);
-
         // no notification if enable fails
-        context.ChangeListener().DirtyList().clear();
+        tester.GetDirtyList().clear();
         fakeWifiDriver.SetEnabledAllowed(false);
-        ASSERT_FALSE(cluster.WriteAttribute(writeOp.GetRequest(), decoder).IsSuccess());
-        ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+        ASSERT_FALSE(tester.WriteAttribute(InterfaceEnabled::Id, false).IsSuccess());
+        ASSERT_TRUE(tester.GetDirtyList().empty());
     }
 
     {
-        WriteOperation writeOp(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id);
-        writeOp.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(true);
-
         // Receive a notification if enable succeeds
-        context.ChangeListener().DirtyList().clear();
+        tester.GetDirtyList().clear();
         fakeWifiDriver.SetEnabledAllowed(true);
-        ASSERT_TRUE(cluster.WriteAttribute(writeOp.GetRequest(), decoder).IsSuccess());
-        ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-        ASSERT_EQ(context.ChangeListener().DirtyList()[0],
-                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id)
-
-        );
+        ASSERT_TRUE(tester.WriteAttribute(InterfaceEnabled::Id, true).IsSuccess());
+        ASSERT_EQ(tester.GetDirtyList().size(), 1u);
+        ASSERT_EQ(tester.GetDirtyList()[0],
+                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

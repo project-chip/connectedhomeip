@@ -41,16 +41,6 @@ config CHIP_OTA_IMAGE_BUILD
 	depends on SIGN_IMAGES
 	select DFU_MULTI_IMAGE_PACKAGE_BUILD
 
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
-
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
 	default y
@@ -273,11 +263,8 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	bool "Enable Silicon Labs Wi-Fi support"
-	default y if BOARD_SIWX917_RB4338A
-	default y if BOARD_SIWX917_RB4342A
 	select WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
