@@ -569,10 +569,6 @@ class PushAvServer:
 
         return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
 
-    # TODO Change what we show in here.
-    # Stream listing page should only show the number of sessions and errors.
-    # Stream details should provide the ffprobe of the index.mpd, the session history details (including errors?),
-    # the stream configuration, and the per-file details (should reconsider if it's actually useful for media)
     def ui_streams_file_details(self, request: Request, stream_id: int, file_path: str):
         context = {}
         context['streams'] = self.list_streams()['streams']
@@ -655,8 +651,6 @@ class PushAvServer:
 
                 if session is None:
                     session = stream.new_session()
-
-                # TODO Validate the path is always session_name/index.mpd
 
                 root = xml.etree.ElementTree.fromstring(body)
                 mpd_type = root.attrib.get('type')
