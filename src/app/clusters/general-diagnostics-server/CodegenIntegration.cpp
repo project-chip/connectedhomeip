@@ -50,8 +50,9 @@ LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate, System::Clock::Microseconds64 initTimestamp) :
-        mTestEventTriggerDelegate(testEventTriggerDelegate), mInitTimestamp(initTimestamp)
+    explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate,
+                                 System::Clock::Microseconds64 nodeStartupTimestamp) :
+        mTestEventTriggerDelegate(testEventTriggerDelegate), mNodeStartupTimestamp(nodeStartupTimestamp)
     {}
 
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
@@ -61,16 +62,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -79,10 +79,10 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate, mInitTimestamp, functionsConfig);
+                       mTestEventTriggerDelegate, mNodeStartupTimestamp, functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate, mInitTimestamp);
+                       mTestEventTriggerDelegate, mNodeStartupTimestamp);
 #endif
         return gServer.Registration();
     }
@@ -96,14 +96,14 @@ public:
 
 private:
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
-    System::Clock::Microseconds64 mInitTimestamp;
+    System::Clock::Microseconds64 mNodeStartupTimestamp;
 };
 
 IntegrationDelegate MakeIntegrationDelegate()
 {
     TestEventTriggerDelegate * testEventTriggerDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
-    System::Clock::Microseconds64 initTimestamp         = GeneralDiagnostics::GetInitTimestamp();
-    return IntegrationDelegate(testEventTriggerDelegate, initTimestamp);
+    System::Clock::Microseconds64 nodeStartupTimestamp  = GeneralDiagnostics::GetNodeStartupTimestamp();
+    return IntegrationDelegate(testEventTriggerDelegate, nodeStartupTimestamp);
 }
 
 } // namespace
@@ -112,7 +112,7 @@ namespace chip::app::Clusters::GeneralDiagnostics {
 
 namespace {
 TestEventTriggerDelegate * gTestEventTriggerDelegate = nullptr;
-System::Clock::Microseconds64 gInitTimestamp         = System::Clock::Microseconds64(0);
+System::Clock::Microseconds64 gNodeStartupTimestamp  = System::Clock::Microseconds64(0);
 } // namespace
 
 void SetTestEventTriggerDelegate(TestEventTriggerDelegate * delegate)
@@ -125,14 +125,14 @@ TestEventTriggerDelegate * GetTestEventTriggerDelegate()
     return gTestEventTriggerDelegate;
 }
 
-void SetInitTimestamp(System::Clock::Microseconds64 initTimestamp)
+void SetNodeStartupTimestamp(System::Clock::Microseconds64 nodeStartupTimestamp)
 {
-    gInitTimestamp = initTimestamp;
+    gNodeStartupTimestamp = nodeStartupTimestamp;
 }
 
-System::Clock::Microseconds64 GetInitTimestamp()
+System::Clock::Microseconds64 GetNodeStartupTimestamp()
 {
-    return gInitTimestamp;
+    return gNodeStartupTimestamp;
 }
 
 } // namespace chip::app::Clusters::GeneralDiagnostics

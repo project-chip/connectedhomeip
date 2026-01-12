@@ -32,7 +32,7 @@
 // Forward declaration to avoid dependency on cluster-specific headers
 namespace chip::app::Clusters::GeneralDiagnostics {
 void SetTestEventTriggerDelegate(chip::TestEventTriggerDelegate * delegate);
-void SetInitTimestamp(chip::System::Clock::Microseconds64 initTimestamp);
+void SetNodeStartupTimestamp(chip::System::Clock::Microseconds64 nodeStartupTimestamp);
 } // namespace chip::app::Clusters::GeneralDiagnostics
 #endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
@@ -121,7 +121,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     ChipLogProgress(AppServer, "Server initializing...");
     assertChipStackLockedByCurrentThread();
 
-    mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
+    mNodeStartupTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
@@ -317,19 +317,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
         };
 
-        err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &sGlobalEventIdCounter,
-                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
-                                                       &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+        err = app::EventManagement::GetInstance().Init(
+            &mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0], &logStorageResources[0], &sGlobalEventIdCounter,
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(mNodeStartupTimestamp),
+            &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
 
         SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-    // Set the TestEventTriggerDelegate and InitTimestamp for GeneralDiagnostics cluster dependency injection
+    // Set the TestEventTriggerDelegate and NodeStartupTimestamp for GeneralDiagnostics cluster dependency injection
 #if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
     chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
-    chip::app::Clusters::GeneralDiagnostics::SetInitTimestamp(mInitTimestamp);
+    chip::app::Clusters::GeneralDiagnostics::SetNodeStartupTimestamp(mNodeStartupTimestamp);
 #endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
     // SetDataModelProvider() initializes and starts the provider, which in turn
@@ -700,7 +700,7 @@ void Server::Shutdown()
     // to prevent clusters from accessing dangling pointers during shutdown
 #if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
     chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(nullptr);
-    chip::app::Clusters::GeneralDiagnostics::SetInitTimestamp(System::Clock::Microseconds64(0));
+    chip::app::Clusters::GeneralDiagnostics::SetNodeStartupTimestamp(System::Clock::Microseconds64(0));
 #endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
 
     app::InteractionModelEngine::GetInstance()->Shutdown();

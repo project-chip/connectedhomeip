@@ -23,13 +23,13 @@ namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
 void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                                   const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
 /// Set the TestEventTriggerDelegate for dependency injection.
 /// This should be called before MatterGeneralDiagnosticsClusterInitCallback.
@@ -39,11 +39,11 @@ void SetTestEventTriggerDelegate(TestEventTriggerDelegate * delegate);
 /// Returns nullptr if not set.
 TestEventTriggerDelegate * GetTestEventTriggerDelegate();
 
-/// Set the initialization timestamp for dependency injection.
+/// Set the node startup timestamp for dependency injection.
 /// This should be called before MatterGeneralDiagnosticsClusterInitCallback.
-void SetInitTimestamp(System::Clock::Microseconds64 initTimestamp);
+void SetNodeStartupTimestamp(System::Clock::Microseconds64 nodeStartupTimestamp);
 
-/// Get the initialization timestamp that was set via SetInitTimestamp.
+/// Get the node startup timestamp that was set via SetNodeStartupTimestamp.
 /// Returns 0 if not set.
-System::Clock::Microseconds64 GetInitTimestamp();
+System::Clock::Microseconds64 GetNodeStartupTimestamp();
 } // namespace chip::app::Clusters::GeneralDiagnostics

@@ -138,7 +138,7 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(chip::app::Clust
     Commands::TimeSnapshotResponse::Type response;
 
     System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceInit());
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceNodeStartup());
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     handler.AddResponse(commandPath, response);
@@ -168,7 +168,7 @@ HandleTimeSnapshotWithPosixTime(chip::app::Clusters::GeneralDiagnosticsCluster *
     }
 
     System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceInit());
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceNodeStartup());
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     if (posix_time_ms.count() != 0)
@@ -260,7 +260,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return EncodeValue(value, err, encoder);
     }
     case GeneralDiagnostics::Attributes::UpTime::Id: {
-        System::Clock::Seconds64 system_time_seconds = std::chrono::duration_cast<System::Clock::Seconds64>(TimeSinceInit());
+        System::Clock::Seconds64 system_time_seconds = std::chrono::duration_cast<System::Clock::Seconds64>(TimeSinceNodeStartup());
         return encoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case GeneralDiagnostics::Attributes::TotalOperationalHours::Id: {

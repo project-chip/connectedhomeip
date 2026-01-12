@@ -475,9 +475,9 @@ public:
 
     void ScheduleFactoryReset();
 
-    System::Clock::Microseconds64 TimeSinceInit() const
+    System::Clock::Microseconds64 TimeSinceNodeStartup() const
     {
-        return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
+        return System::SystemClock().GetMonotonicMicroseconds64() - mNodeStartupTimestamp;
     }
 
     static Server & GetInstance() { return sServer; }
@@ -729,7 +729,7 @@ private:
     uint16_t mUserDirectedCommissioningPort;
     Inet::InterfaceId mInterfaceId;
 
-    System::Clock::Microseconds64 mInitTimestamp;
+    System::Clock::Microseconds64 mNodeStartupTimestamp;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager mICDManager;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
