@@ -98,6 +98,13 @@ static_library("Zephyr") {
     sources += [ "SysHeapMalloc.cpp" ]
   }
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
   cflags = [ "-Wconversion" ]
 }
 

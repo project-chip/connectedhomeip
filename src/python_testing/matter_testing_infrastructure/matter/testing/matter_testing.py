@@ -31,11 +31,7 @@ from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from typing import Any, Callable, List, Optional, Type, Union
 
-import matter.testing.conversions as conversions
-import matter.testing.decorators as decorators
 import matter.testing.matchers as matchers
-import matter.testing.runner as runner
-import matter.testing.timeoperations as timeoperations
 
 # isort: off
 
@@ -56,6 +52,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
+from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -87,6 +84,17 @@ def clear_queue(report_queue: queue.Queue):
             report_queue.get(block=False)
         except queue.Empty:
             break
+
+
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
+    created_codes = []
+    for idx, discriminator in enumerate(matter_test_config.discriminators):
+        created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
+
+    setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+    if not setup_codes:
+        return None
+    return setup_codes[0]
 
 
 @dataclass
@@ -477,6 +485,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
+
+    @property
+    def first_setup_code(self) -> Optional[str]:
+        return get_first_setup_code(self.default_controller, self.matter_test_config)
 
     @property
     def is_pics_sdk_ci_only(self) -> bool:
@@ -1400,41 +1412,3 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     ])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
-
-
-# TODO(#37537): Remove these temporary aliases after transition period
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
-bytes_from_hex = conversions.bytes_from_hex
-hex_from_bytes = conversions.hex_from_bytes
-id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_with_name
-
-async_test_body = decorators.async_test_body
-run_if_endpoint_matches = decorators.run_if_endpoint_matches
-run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-has_cluster = decorators.has_cluster
-has_attribute = decorators.has_attribute
-has_command = decorators.has_command
-has_feature = decorators.has_feature
-should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-# autopep8: off
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
-# autopep8: on
-_has_feature = decorators._has_feature
-_has_command = decorators._has_command
-_has_attribute = decorators._has_attribute
-
-default_matter_test_main = runner.default_matter_test_main
-get_test_info = runner.get_test_info
-run_tests = runner.run_tests
-run_tests_no_exit = runner.run_tests_no_exit
-get_default_paa_trust_store = runner.get_default_paa_trust_store
-
-# Backward compatibility aliases for relocated functions
-parse_matter_test_args = runner.parse_matter_test_args
-
-# isort: off

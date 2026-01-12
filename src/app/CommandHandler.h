@@ -114,6 +114,11 @@ public:
 
         void Invalidate() { mpHandler = nullptr; }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // Test-only method to release the session held by the CommandHandler's exchange context.
+        void TestOnlyReleaseSession();
+#endif
+
     private:
         void Init(CommandHandler * handler);
 
@@ -232,6 +237,11 @@ public:
     /**
      * Gets the inner exchange context object, without ownership.
      *
+     * GetExchangeContext() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it will not work right if the session we're using was evicted.
+     *
      * WARNING: This is dangerous, since it is directly interacting with the
      *          exchange being managed automatically by mpResponder and
      *          if not done carefully, may end up with use-after-free errors.
@@ -239,6 +249,10 @@ public:
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
+     *         nullptr is also returned if the CommandHandler has gone async.
+     *
+     * WARNING: This method must NOT be called when the command handler has gone async, and will return nullptr in that case. Use
+     * TryGetExchangeContextWhenAsync() instead for async code paths.
      */
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
 
@@ -332,6 +346,20 @@ protected:
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
     virtual void DecrementHoldOff(Handle * apHandle) {}
+
+    /**
+     * Returns the ExchangeContext, if one is still available, for use during asynchronous
+     * command processing.
+     *
+     * Once a command has gone async, the existence of an ExchangeContext must not be
+     * assumed. This method exists as a best-effort alternative to GetExchangeContext()
+     * for async code paths.
+     *
+     * WARNING: There is NO GUARANTEE that the ExchangeContext exists once a command has gone async. Callers must ALWAYS handle a
+     * nullptr return but must not store, retain, or assume lifetime beyond the current execution scope.
+     *
+     */
+    virtual Messaging::ExchangeContext * TryGetExchangeContextWhenAsync() const { return nullptr; }
 };
 
 } // namespace app

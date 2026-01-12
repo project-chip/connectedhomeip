@@ -144,6 +144,7 @@ __all__ = [
     "TotalVolatileOrganicCompoundsConcentrationMeasurement",
     "RadonConcentrationMeasurement",
     "SoilMeasurement",
+    "AmbientContextSensing",
     "WiFiNetworkManagement",
     "ThreadBorderRouterManagement",
     "ThreadNetworkDirectory",
@@ -724,6 +725,8 @@ class Globals:
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=7, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -734,6 +737,8 @@ class Globals:
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
             metadataEnabled: 'bool' = False
+            videoStreams: 'typing.Optional[typing.List[uint]]' = None
+            audioStreams: 'typing.Optional[typing.List[uint]]' = None
             fabricIndex: 'uint' = 0
 
 
@@ -41863,6 +41868,401 @@ class SoilMeasurement(Cluster):
 
 
 @dataclass
+class AmbientContextSensing(Cluster):
+    id: typing.ClassVar[int] = 0x00000431
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="humanActivityDetected", Tag=0x00000000, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="objectIdentified", Tag=0x00000001, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="audioContextDetected", Tag=0x00000002, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=0x00000003, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]]),
+                ClusterObjectFieldDescriptor(Label="ambientContextTypeSupported", Tag=0x00000004, Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]),
+                ClusterObjectFieldDescriptor(Label="simultaneousDetectionLimit", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="countThresholdReached", Tag=0x00000006, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="countThreshold", Tag=0x00000007, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="objectCount", Tag=0x00000008, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000009, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x0000000A, Type=typing.Optional[AmbientContextSensing.Structs.HoldTimeLimitsStruct]),
+                ClusterObjectFieldDescriptor(Label="predictedActivity", Tag=0x0000000B, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]]),
+                ClusterObjectFieldDescriptor(Label="privacyModeEnabled", Tag=0x0000000C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    humanActivityDetected: typing.Optional[bool] = None
+    objectIdentified: typing.Optional[bool] = None
+    audioContextDetected: typing.Optional[bool] = None
+    ambientContextType: typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]] = None
+    ambientContextTypeSupported: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
+    simultaneousDetectionLimit: uint = 0
+    countThresholdReached: typing.Optional[bool] = None
+    countThreshold: typing.Optional[uint] = None
+    objectCount: typing.Optional[uint] = None
+    holdTime: typing.Optional[uint] = None
+    holdTimeLimits: typing.Optional[AmbientContextSensing.Structs.HoldTimeLimitsStruct] = None
+    predictedActivity: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
+    privacyModeEnabled: typing.Optional[bool] = None
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kHumanActivity = 0x1
+            kObjectCounting = 0x2
+            kObjectIdentification = 0x4
+            kSoundClassification = 0x8
+            kPredictedActivity = 0x10
+
+    class Structs:
+        @dataclass
+        class AmbientContextTypeStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="ambientContextSensed", Tag=0, Type=typing.List[Globals.Structs.SemanticTagStruct]),
+                        ClusterObjectFieldDescriptor(Label="detectionStartTime", Tag=1, Type=typing.Optional[uint]),
+                    ])
+
+            ambientContextSensed: 'typing.List[Globals.Structs.SemanticTagStruct]' = field(default_factory=lambda: [])
+            detectionStartTime: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class HoldTimeLimitsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="holdTimeMin", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="holdTimeMax", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="holdTimeDefault", Tag=2, Type=uint),
+                    ])
+
+            holdTimeMin: 'uint' = 0
+            holdTimeMax: 'uint' = 0
+            holdTimeDefault: 'uint' = 0
+
+        @dataclass
+        class PredictedActivityStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="startTimestamp", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endTimestamp", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=2, Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]),
+                        ClusterObjectFieldDescriptor(Label="crowdDetected", Tag=3, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="crowdCount", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="confidence", Tag=5, Type=uint),
+                    ])
+
+            startTimestamp: 'uint' = 0
+            endTimestamp: 'uint' = 0
+            ambientContextType: 'typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]' = None
+            crowdDetected: 'typing.Optional[bool]' = None
+            crowdCount: 'typing.Optional[uint]' = None
+            confidence: 'uint' = 0
+
+    class Attributes:
+        @dataclass
+        class HumanActivityDetected(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class ObjectIdentified(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class AudioContextDetected(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class AmbientContextType(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]])
+
+            value: typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]] = None
+
+        @dataclass
+        class AmbientContextTypeSupported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]])
+
+            value: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
+
+        @dataclass
+        class SimultaneousDetectionLimit(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class CountThresholdReached(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class CountThreshold(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class ObjectCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class HoldTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class HoldTimeLimits(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[AmbientContextSensing.Structs.HoldTimeLimitsStruct])
+
+            value: typing.Optional[AmbientContextSensing.Structs.HoldTimeLimitsStruct] = None
+
+        @dataclass
+        class PredictedActivity(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]])
+
+            value: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
+
+        @dataclass
+        class PrivacyModeEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+
+@dataclass
 class WiFiNetworkManagement(Cluster):
     id: typing.ClassVar[int] = 0x00000451
 
@@ -47573,11 +47973,12 @@ class CameraAvStreamManagement(Cluster):
 
         class ImageCodecEnum(MatterIntEnum):
             kJpeg = 0x00
+            kHeic = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1
+            kUnknownEnumValue = 2
 
         class TriStateAutoEnum(MatterIntEnum):
             kOff = 0x00
@@ -49355,6 +49756,8 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=7, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=9, Type=typing.Optional[typing.List[uint]]),
                     ])
 
             streamUsage: Globals.Enums.StreamUsageEnum = 0
@@ -49365,6 +49768,8 @@ class WebRTCTransportProvider(Cluster):
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
             SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
+            videoStreams: typing.Optional[typing.List[uint]] = None
+            audioStreams: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class SolicitOfferResponse(ClusterCommand):
@@ -49409,6 +49814,8 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=8, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=9, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=10, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=11, Type=typing.Optional[typing.List[uint]]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
@@ -49421,6 +49828,8 @@ class WebRTCTransportProvider(Cluster):
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
             SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
+            videoStreams: typing.Optional[typing.List[uint]] = None
+            audioStreams: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class ProvideOfferResponse(ClusterCommand):
@@ -49855,6 +50264,8 @@ class PushAvStreamTransport(Cluster):
             kInvalidOptions = 0x09
             kInvalidStreamUsage = 0x0A
             kInvalidTime = 0x0B
+            kInvalidPreRollLength = 0x0C
+            kDuplicateStreamValues = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -49884,11 +50295,12 @@ class PushAvStreamTransport(Cluster):
             kUserInitiated = 0x00
             kAutomation = 0x01
             kEmergency = 0x02
+            kDoorbellPressed = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -49925,6 +50337,32 @@ class PushAvStreamTransport(Cluster):
 
             zone: 'typing.Union[Nullable, uint]' = NullValue
             sensitivity: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AudioStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=1, Type=uint),
+                    ])
+
+            audioStreamName: 'str' = ""
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class VideoStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=uint),
+                    ])
+
+            videoStreamName: 'str' = ""
+            videoStreamID: 'uint' = 0
 
         @dataclass
         class TransportTriggerOptionsStruct(ClusterObject):
@@ -49998,6 +50436,8 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=6, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
                         ClusterObjectFieldDescriptor(Label="containerOptions", Tag=7, Type=PushAvStreamTransport.Structs.ContainerOptionsStruct),
                         ClusterObjectFieldDescriptor(Label="expiryTime", Tag=8, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=9, Type=typing.Optional[typing.List[PushAvStreamTransport.Structs.VideoStreamStruct]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=10, Type=typing.Optional[typing.List[PushAvStreamTransport.Structs.AudioStreamStruct]]),
                     ])
 
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
@@ -50009,6 +50449,8 @@ class PushAvStreamTransport(Cluster):
             ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
             containerOptions: 'PushAvStreamTransport.Structs.ContainerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.ContainerOptionsStruct())
             expiryTime: 'typing.Optional[uint]' = None
+            videoStreams: 'typing.Optional[typing.List[PushAvStreamTransport.Structs.VideoStreamStruct]]' = None
+            audioStreams: 'typing.Optional[typing.List[PushAvStreamTransport.Structs.AudioStreamStruct]]' = None
 
         @dataclass
         class TransportConfigurationStruct(ClusterObject):
@@ -50310,11 +50752,15 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="triggerType", Tag=1, Type=PushAvStreamTransport.Enums.TransportTriggerTypeEnum),
                         ClusterObjectFieldDescriptor(Label="activationReason", Tag=2, Type=typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum]),
+                        ClusterObjectFieldDescriptor(Label="containerType", Tag=3, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="CMAFSessionNumber", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             connectionID: uint = 0
             triggerType: PushAvStreamTransport.Enums.TransportTriggerTypeEnum = 0
             activationReason: typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum] = None
+            containerType: PushAvStreamTransport.Enums.ContainerFormatEnum = 0
+            CMAFSessionNumber: typing.Optional[uint] = None
 
         @dataclass
         class PushTransportEnd(ClusterEvent):
@@ -50331,9 +50777,13 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="containerType", Tag=1, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="CMAFSessionNumber", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             connectionID: uint = 0
+            containerType: PushAvStreamTransport.Enums.ContainerFormatEnum = 0
+            CMAFSessionNumber: typing.Optional[uint] = None
 
 
 @dataclass

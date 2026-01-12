@@ -25,7 +25,6 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
@@ -118,7 +117,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     return endpoint_tlv
 
 
-class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
+class TestConformanceTest(DeviceConformanceTests):
     def setup_class(self):
         # Latest fully qualified version
         # TODO: It might be good to find a way to run this against each directory.
