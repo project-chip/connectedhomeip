@@ -32,7 +32,7 @@ namespace Clusters {
  * If called after cluster initialization, it will have no effect as the cluster instance
  * has already been created with the previous delegate.
  *
- * If not called before initialization, a default delegate with minimal functionality will be used.
+ * If not called before initialization, the cluster will NOT be initialized.
  *
  * @param delegate The delegate to be used by the TLS Client Management cluster.
  */
@@ -41,7 +41,7 @@ void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate
 /**
  * Set the certificate table for the TLS Client Management cluster.
  *
- * MUST be called before server initialization (e.g. in main() before ServerInit()).
+ * MUST be called before Matter data model initialization (e.g. in main() before ServerInit()).
  * The certificate table is used during cluster initialization via MatterTlsClientManagementClusterInitCallback.
  * If called after cluster initialization, it will have no effect as the cluster instance
  * has already been created with the previous certificate table.

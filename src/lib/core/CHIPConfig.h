@@ -2017,8 +2017,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
  *
  * @brief The default maximum number of TLS endpoints that can be provisioned in the
- *        TLS Client Management cluster. The Matter spec requires this to be between 5 and 254.
- *        Applications can override this by providing a custom delegate.
+ *        TLS Client Management cluster when using the code-driven implementation. The Matter spec
+ *        requires this to be between 5 and 254. Applications can override this by providing a custom delegate.
  */
 #ifndef CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
 #define CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS 5

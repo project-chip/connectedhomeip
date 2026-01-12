@@ -33,63 +33,9 @@ using namespace chip::app::DataModel;
 
 namespace {
 
-// Default implementations - applications can override via SetDelegate/SetCertificateTable
-class DefaultTlsClientManagementDelegate : public TlsClientManagementDelegate
-{
-public:
-    CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
-    {
-        // No endpoints provisioned in default implementation
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
-                                           LoadedEndpointCallback callback) override
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    Protocols::InteractionModel::ClusterStatusCode
-    ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
-                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
-                      uint16_t & endpointID) override
-    {
-        return Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-
-    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                      uint16_t endpointID) override
-    {
-        return Protocols::InteractionModel::Status::NotFound;
-    }
-
-    void RemoveFabric(FabricIndex fabricIndex) override {}
-
-    CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
-                                            int8_t delta) override
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
-    {
-        // Default: allow removal (no dependencies tracked)
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override
-    {
-        // Default: allow removal (no dependencies tracked)
-        return CHIP_NO_ERROR;
-    }
-};
-
-DefaultTlsClientManagementDelegate gDefaultDelegate;
 CertificateTableImpl gDefaultCertificateTable;
 
-TlsClientManagementDelegate * gDelegate           = &gDefaultDelegate;
+TlsClientManagementDelegate * gDelegate           = nullptr;
 CertificateTableImpl * gCertificateTable          = &gDefaultCertificateTable;
 constexpr uint8_t kDefaultMaxProvisionedEndpoints = CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS;
 
@@ -122,15 +68,29 @@ void MatterTlsClientManagementPluginServerInitCallback()
 
 void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
 {
+    // TODO:(#42638) This cluster SHALL be present on the root node endpoint (endpoint 0) when required, and SHALL NOT be present on
+    // any other endpoint. if (endpointId != kRootEndpointId)
+    // {
+    //     ChipLogError(Zcl,
+    //                  "TLS Client Management Cluster can only be initialized on root endpoint (0). "
+    //                  "Ignoring initialization on endpoint %u.",
+    //                  endpointId);
+    //     return;
+    // }
+
     // Only create once - avoid double initialization if callback is called multiple times
-    // Note: This cluster only supports a single endpoint. If defined on multiple endpoints,
-    // only the first one will be initialized and functional.
     if (gClusterInstance.IsConstructed())
     {
+        ChipLogError(Zcl, "TLS Client Management Cluster already initialized on endpoint 0. Ignoring duplicate initialization.");
+        return;
+    }
+
+    // Require a proper delegate - the cluster cannot function without one
+    if (gDelegate == nullptr)
+    {
         ChipLogError(Zcl,
-                     "TLS Client Management Cluster already initialized on endpoint %u. Ignoring initialization on endpoint %u. "
-                     "This cluster only supports a single endpoint.",
-                     gClusterInstance.Cluster().GetEndpointId(), endpointId);
+                     "TLS Client Management Cluster cannot be initialized without a delegate. "
+                     "Call MatterTlsClientManagementSetDelegate() before ServerInit().");
         return;
     }
 
@@ -148,6 +108,7 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
 void MatterTlsClientManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(gClusterInstance.IsConstructed());
+    VerifyOrReturn(gClusterInstance.Cluster().GetEndpointId() == endpointId);
 
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gClusterInstance.Cluster()));
     gClusterInstance.Destroy();
