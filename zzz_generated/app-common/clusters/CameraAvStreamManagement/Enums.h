@@ -44,11 +44,12 @@ enum class AudioCodecEnum : uint8_t
 enum class ImageCodecEnum : uint8_t
 {
     kJpeg = 0x00,
+    kHeic = 0x01,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 1,
+    kUnknownEnumValue = 2,
 };
 
 // Enum for TriStateAutoEnum

@@ -738,23 +738,13 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER
+ * @def CHIP_CONFIG_MAX_TRACING_BACKENDS
  *
- * @brief Enable support functions for parsing command-line arguments
+ * @brief The maximum number of tracing backends that can be registered.
+ * This value only takes effect if tracing is enabled at all.
  */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 0
-#endif
-
-/**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
- *
- * @brief Enable validity checking of command-line argument definitions.
- *
- * // TODO: Determine why we wouldn't need this
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
+#ifndef CHIP_CONFIG_MAX_TRACING_BACKENDS
+#define CHIP_CONFIG_MAX_TRACING_BACKENDS 4
 #endif
 
 /**

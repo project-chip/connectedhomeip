@@ -38,8 +38,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import has_attribute, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_5(MatterBaseTest):
@@ -67,16 +71,16 @@ class TC_ACL_2_5(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=True
         )
-        logging.info(f"Initial events response {str(events_response)}")
+        log.info(f"Initial events response {str(events_response)}")
 
         # Extract events from the response
-        logging.info(f"Found {len(events_response)} initial events")
+        log.info(f"Found {len(events_response)} initial events")
         if not force_legacy_encoding:
             # if new list method is used we will have 0 events, however since we created events during prior run with new list method then we would have events already
             asserts.assert_equal(len(events_response), 0, "Expected 0 events")
 
         # Set up event subscription before making change
-        logging.info("Setting up event subscription...")
+        log.info("Setting up event subscription...")
         events_callback = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
@@ -88,7 +92,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=D_OK_EMPTY)
 
         # Write the extension to the device - properly wrap the extensions list
-        logging.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
+        log.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
         extensions_list = [extension]
         result = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -96,17 +100,17 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result {str(result)}")
+        log.info(f"Write result {str(result)}")
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(5)
         # Wait for and verify the event from subscription
-        logging.info("Waiting for AccessControlExtensionChanged event from subscription...")
+        log.info("Waiting for AccessControlExtensionChanged event from subscription...")
         subscription_event = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
         # Read the event directly
-        logging.info("Reading event directly...")
+        log.info("Reading event directly...")
         latest_event_num = await self.get_latest_event_number(acec_event)
         direct_events = await self.default_controller.ReadEvent(
             self.dut_node_id,
@@ -120,7 +124,7 @@ class TC_ACL_2_5(MatterBaseTest):
         direct_event = direct_events[0]
 
         # Verify both methods return the same event data
-        logging.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
+        log.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
         asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
 
         asserts.assert_equal(subscription_event.changeType,
@@ -152,7 +156,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=D_OK_SINGLE)
 
         # Write the new extension
-        logging.info(f"Writing new extension with data {D_OK_SINGLE.hex()}")
+        log.info(f"Writing new extension with data {D_OK_SINGLE.hex()}")
         extensions_list = [new_extension]
         result = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -160,13 +164,13 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result: {result}")
+        log.info(f"Write result: {result}")
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(7)
         # Wait for and verify the event
-        logging.info("Waiting for AccessControlExtensionChanged event...")
+        log.info("Waiting for AccessControlExtensionChanged event...")
         event_data1 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
         if not force_legacy_encoding:
@@ -239,7 +243,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=too_long_data)
 
         # This should fail with CONSTRAINT_ERROR
-        logging.info("Attempting to write extension that exceeds max length (should fail)")
+        log.info("Attempting to write extension that exceeds max length (should fail)")
         extensions_list = [too_long_extension]
         a = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -247,13 +251,13 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result {str(a)}")
+        log.info(f"Write result {str(a)}")
         asserts.assert_equal(a[0].Status, Status.ConstraintError,
                              "Write should have failed with CONSTRAINT_ERROR 135")
 
         self.step(9)
         # Verify no event was generated for the failed write
-        logging.info("Reading events after failed write (too long extension)...")
+        log.info("Reading events after failed write (too long extension)...")
 
         latest_event_num = await self.get_latest_event_number(acec_event)
 
@@ -264,10 +268,10 @@ class TC_ACL_2_5(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_num + 1
         )
-        logging.info(f"Events response {str(events_response2)}")
+        log.info(f"Events response {str(events_response2)}")
 
         # Extract events from the response
-        logging.info(f"Found {len(events_response2)} events")
+        log.info(f"Found {len(events_response2)} events")
         if not force_legacy_encoding:
             asserts.assert_equal(len(events_response2), 0, "There should be no events found")
 
@@ -294,7 +298,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
-        logging.info("Attempting to write multiple extensions (should fail)")
+        log.info("Attempting to write multiple extensions (should fail)")
         extensions_list = [extension, new_extension]
         b = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -302,13 +306,13 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result {str(b)}")
+        log.info(f"Write result {str(b)}")
         asserts.assert_equal(b[0].Status, Status.ConstraintError,
                              "Write should have failed with CONSTRAINT_ERROR")
 
         self.step(11)
         # Verify no event was generated at all, since the whole extensions list was rejected.
-        logging.info("Reading events after failed write (multiple extensions)...")
+        log.info("Reading events after failed write (multiple extensions)...")
 
         latest_event_num2 = await self.get_latest_event_number(acec_event)
 
@@ -318,10 +322,10 @@ class TC_ACL_2_5(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_num2 + 1
         )
-        logging.info(f"Events response {str(events_response3)}")
+        log.info(f"Events response {str(events_response3)}")
 
         # Extract events from the response
-        logging.info(f"Found {len(events_response3)} events")
+        log.info(f"Found {len(events_response3)} events")
         if not force_legacy_encoding:
             asserts.assert_equal(len(events_response3), 0, "There should be no events found")
         else:
@@ -347,7 +351,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(12)
         # Write an empty list to clear all extensions
-        logging.info("Writing empty extension list to clear all extensions...")
+        log.info("Writing empty extension list to clear all extensions...")
         extensions_list2 = []
         result = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -355,12 +359,12 @@ class TC_ACL_2_5(MatterBaseTest):
             [(0, extension_attr(value=extensions_list2))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        logging.info(f"Write result {str(result)}")
+        log.info(f"Write result {str(result)}")
         asserts.assert_equal(
             result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(13)
-        logging.info("Waiting for AccessControlExtensionChanged event...")
+        log.info("Waiting for AccessControlExtensionChanged event...")
         event_data5 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
         if not force_legacy_encoding:
@@ -397,7 +401,7 @@ class TC_ACL_2_5(MatterBaseTest):
         # Rerunning test using the legacy list writing mechanism
         if not force_legacy_encoding:
             self.step(14)
-            logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
+            log.info("*** Rerunning test using the legacy list writing mechanism now ***")
         else:
             self.skip_step(14)
 

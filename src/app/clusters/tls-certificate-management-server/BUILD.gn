@@ -28,7 +28,7 @@ source_set("certificate-table") {
 }
 
 source_set("tls-certificate-management-server") {
-  public = [ "tls-certificate-management-server.h" ]
+  public = [ "TlsCertificateManagementCluster.h" ]
 
   deps = [
     ":certificate-table",
@@ -38,5 +38,5 @@ source_set("tls-certificate-management-server") {
     "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
   ]
 
-  sources = [ "tls-certificate-management-server.cpp" ]
+  sources = [ "TlsCertificateManagementCluster.cpp" ]
 }

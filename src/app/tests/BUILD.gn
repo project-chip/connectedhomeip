@@ -107,19 +107,16 @@ source_set("actions-cluster-test-srcs") {
 }
 
 source_set("scenes-table-test-srcs") {
+  # Tests currently validate/use capping logic from codegen, so we add codegen support
+  # and mock data models.
   sources = [
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/storage:fabric-table",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",

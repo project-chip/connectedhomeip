@@ -19,14 +19,10 @@
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
-#include <app/data-model-provider/tests/ReadTesting.h>
-#include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <clusters/ElectricalEnergyMeasurement/Metadata.h>
@@ -36,7 +32,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
-using namespace chip::Test;
 using namespace chip::Testing;
 
 namespace {
@@ -53,7 +48,7 @@ struct TestElectricalEnergyMeasurementCluster : public ::testing::Test
 
 TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Test 1: No features activated - should only have mandatory Accuracy attribute
     {
@@ -69,7 +64,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 2: All features activated - optional attributes are automatically determined by features
@@ -96,7 +91,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
                                                 Attributes::CumulativeEnergyReset::kMetadataEntry,
                                             }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 3: CumulativeEnergyReset requires kCumulativeEnergy feature
@@ -116,13 +111,13 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
         // Verify CumulativeEnergyReset is NOT present because kCumulativeEnergy feature is not enabled
         EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
 TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidationTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Test 1: Cluster with all features enabled - snapshot methods and getters should work
     {
@@ -171,7 +166,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         EXPECT_EQ(cluster.GetCumulativeEnergyReset(readResetValue), CHIP_NO_ERROR);
         EXPECT_TRUE(readResetValue.HasValue());
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 2: Cluster with no features - getters should fail
@@ -196,13 +191,13 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> readResetValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyReset(readResetValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
 TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Test 1: Cluster with all features - all optional attributes should be readable
     {
@@ -217,61 +212,45 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        Span<const ConcreteClusterPath> paths = cluster.GetPaths();
-        ASSERT_EQ(paths.size(), 1u);
+        ClusterTester tester(cluster);
 
         // Test CumulativeEnergyImported (requires kCumulativeEnergy + kImportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyImported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyImported::Id, value).IsSuccess());
         }
 
         // Test CumulativeEnergyExported (requires kCumulativeEnergy + kExportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyExported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyExported::Id, value).IsSuccess());
         }
 
         // Test PeriodicEnergyImported (requires kPeriodicEnergy + kImportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyImported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyImported::Id, value).IsSuccess());
         }
 
         // Test PeriodicEnergyExported (requires kPeriodicEnergy + kExportedEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, PeriodicEnergyExported::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyExported::Id, value).IsSuccess());
         }
 
         // Test CumulativeEnergyReset (requires kCumulativeEnergy)
         {
-            const ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, CumulativeEnergyReset::Id };
-            chip::app::Testing::ReadOperation readOperation(path);
-            std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-            auto result                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
-            EXPECT_TRUE(result.IsSuccess());
+            DataModel::Nullable<Structs::CumulativeEnergyResetStruct::DecodableType> value;
+            EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyReset::Id, value).IsSuccess());
         }
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
 TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTest)
 {
-    chip::Test::TestServerClusterContext context;
+    TestServerClusterContext context;
 
     // Create a cluster with all features enabled
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
@@ -286,7 +265,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Create ClusterTester for simplified attribute reading
-    chip::Test::ClusterTester tester(cluster);
+    ClusterTester tester(cluster);
 
     Structs::MeasurementAccuracyStruct::DecodableType accuracy;
     ASSERT_EQ(tester.ReadAttribute(Accuracy::Id, accuracy), CHIP_NO_ERROR);
@@ -321,12 +300,12 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
     DataModel::Nullable<Structs::CumulativeEnergyResetStruct::DecodableType> resetValue;
     ASSERT_EQ(tester.ReadAttribute(CumulativeEnergyReset::Id, resetValue), CHIP_NO_ERROR);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEvents)
 {
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
 
     // Create a cluster with all features enabled
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
@@ -424,7 +403,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
         EXPECT_EQ(decodedEvent.energyExported.Value().energy, 5000);
     }
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

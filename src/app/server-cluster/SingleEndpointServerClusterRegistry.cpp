@@ -47,7 +47,7 @@ SingleEndpointServerClusterRegistry::ClustersList SingleEndpointServerClusterReg
     return { mRegistrations, endpointId };
 }
 
-void SingleEndpointServerClusterRegistry::UnregisterAllFromEndpoint(EndpointId endpointId)
+void SingleEndpointServerClusterRegistry::UnregisterAllFromEndpoint(EndpointId endpointId, ClusterShutdownType clusterShutdownType)
 {
     ServerClusterRegistration * prev    = nullptr;
     ServerClusterRegistration * current = mRegistrations;
@@ -77,7 +77,7 @@ void SingleEndpointServerClusterRegistry::UnregisterAllFromEndpoint(EndpointId e
             current->next = nullptr; // Make sure current does not look like part of a list.
             if (mContext.has_value())
             {
-                current->serverClusterInterface->Shutdown();
+                current->serverClusterInterface->Shutdown(clusterShutdownType);
             }
 
             current = actual_next;

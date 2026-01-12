@@ -48,9 +48,11 @@ from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 
@@ -400,7 +402,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
             self.step("19")
 
             if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+                log.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
 
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             await self.check_default_randomization_type_attribute(endpoint)
@@ -418,7 +420,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
             self.step("20")
 
             if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+                log.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
 
             # TH reads DefaultRandomizationOffset attribute, expects a int16
             await self.check_default_randomization_offset_attribute(endpoint)

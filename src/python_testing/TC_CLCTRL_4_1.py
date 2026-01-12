@@ -42,9 +42,12 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                           default_matter_test_main)
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 triggerProtected = 0x0104000000000001
 triggerDisengaged = 0x0104000000000002
@@ -216,7 +219,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("2a")
 
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        logging.info(f"FeatureMap: {feature_map}")
+        log.info(f"FeatureMap: {feature_map}")
         is_ps_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_vt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kVentilation
         is_pd_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPedestrian
@@ -230,21 +233,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("2b")
 
         if not is_ps_feature_supported:
-            logging.info("Position feature not supported, skipping test case")
+            log.info("Position feature not supported, skipping test case")
             self.mark_all_remaining_steps_skipped("2c")
             return
 
         # STEP 2c: TH reads TestEventTriggerEnabled attribute from the General Diagnostic Cluster
         self.step("2c")
 
-        logging.info("Checking if TestEventTrigger attribute is enabled")
+        log.info("Checking if TestEventTrigger attribute is enabled")
         self.check_test_event_triggers_enabled()
 
         # STEP 2d: TH reads from the DUT the (0xFFFB) AttributeList attribute
         self.step("2d")
 
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
-        logging.info(f"AttributeList: {attribute_list}")
+        log.info(f"AttributeList: {attribute_list}")
 
         # STEP 2e: TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
         self.step("2e")
@@ -256,7 +259,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("3a")
 
         overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-        logging.info(f"OverallCurrentState: {overall_current_state}")
+        log.info(f"OverallCurrentState: {overall_current_state}")
 
         if overall_current_state is NullValue:
             asserts.assert_fail("OverallCurrentState is NullValue.")
@@ -269,7 +272,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("3b")
 
         if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
-            logging.info("CurrentPosition is FullyClosed, skipping steps 3c to 3d")
+            log.info("CurrentPosition is FullyClosed, skipping steps 3c to 3d")
 
             # Skipping steps 3c and 3d
             self.skip_step("3c")
@@ -291,7 +294,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 3d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
             self.step("3d")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+            log.info("Waiting for OverallCurrentState.Position to be FullyClosed")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
                                                           timeout_sec=timeout)
 
@@ -299,13 +302,13 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("3e")
 
         if is_lt_feature_supported:
-            logging.info("Motion Latching feature supported.")
+            log.info("Motion Latching feature supported.")
 
             # STEP 3f: TH reads from the DUT the OverallCurrentState attribute
             self.step("3f")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -316,7 +319,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
-                logging.info(f"LatchControlModes: {LatchControlModes}")
+                log.info(f"LatchControlModes: {LatchControlModes}")
 
                 if LatchControlModes is NullValue:
                     asserts.assert_fail("LatchControlModes is NullValue.")
@@ -327,33 +330,33 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("3h")
 
             if CurrentLatch:
-                logging.info("CurrentLatch is True, skipping steps 3i to 3m")
+                log.info("CurrentLatch is True, skipping steps 3i to 3m")
 
                 # Skipping steps 3i to 3m
                 self.mark_step_range_skipped("3i", "3m")
             else:
-                logging.info("CurrentLatch is False, proceeding to steps 3i to 3m")
+                log.info("CurrentLatch is False, proceeding to steps 3i to 3m")
 
                 # STEP 3i: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3j
                 self.step("3i")
                 if not LatchControlModes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
-                    logging.info("LatchControlModes Bit 0 is 0 (RemoteLatching = False), skipping step 3j")
+                    log.info("LatchControlModes Bit 0 is 0 (RemoteLatching = False), skipping step 3j")
                     self.skip_step("3j")
 
                     # STEP 3k: If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3l
                     self.step("3k")
 
-                    logging.info("RemoteLatching is False, proceeding to step 3l")
+                    log.info("RemoteLatching is False, proceeding to step 3l")
 
                     # STEP 3l: Latch the DUT manually to set OverallCurrentState.Latch to True
                     self.step("3l")
 
-                    logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
+                    log.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                     # Simulating manual latching by waiting for user input
                     self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
-                    logging.info("Manual latching completed.")
+                    log.info("Manual latching completed.")
                 else:
-                    logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 3j")
+                    log.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 3j")
 
                     # STEP 3j: TH sends command MoveTo with Latch = True
                     self.step("3j")
@@ -372,7 +375,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 # STEP 3m: Wait until TH receives a subscription report with  _{A_OVERALL_STATE}.Latch_ = True.
                 self.step("3m")
 
-                logging.info("Waiting for OverallCurrentState.Latch to be True")
+                log.info("Waiting for OverallCurrentState.Latch to be True")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)],
                                                               timeout_sec=timeout)
 
@@ -380,7 +383,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("3n")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
+            log.info(f"MainState: {main_state}")
             asserts.assert_true(main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
                                 "MainState is not in the expected state")
 
@@ -402,23 +405,23 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
             sub_handler.reset()
             if not LatchControlModes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                logging.info("LatchControlModes Bit 1 is 0 (RemoteUnlatching = False), skipping step 5b")
+                log.info("LatchControlModes Bit 1 is 0 (RemoteUnlatching = False), skipping step 5b")
                 self.skip_step("5b")
 
                 # STEP 5c: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 5d
                 self.step("5c")
 
-                logging.info("RemoteUnlatching is False, proceeding to step 5d")
+                log.info("RemoteUnlatching is False, proceeding to step 5d")
 
                 # STEP 5d: Unlatch the DUT manually to set OverallCurrentState.Latch to False
                 self.step("5d")
 
-                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                log.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
                 self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
-                logging.info("Manual unlatching completed.")
+                log.info("Manual unlatching completed.")
             else:
-                logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 5b")
+                log.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 5b")
 
                 # STEP 5b: TH sends command MoveTo with Latch = False
                 self.step("5b")
@@ -438,11 +441,11 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 5e: Wait until TH receives a subscription report with OverallCurrentState.Latch = False
             self.step("5e")
 
-            logging.info("Waiting for OverallCurrentState.Latch to be False")
+            log.info("Waiting for OverallCurrentState.Latch to be False")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)],
                                                           timeout_sec=timeout)
         else:
-            logging.info("Motion Latching feature not supported, skipping steps 3f to 5e")
+            log.info("Motion Latching feature not supported, skipping steps 3f to 5e")
 
             # Skipping steps 3f to 5e
             self.mark_step_range_skipped("3f", "5e")
@@ -451,18 +454,18 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("6a")
 
         if not is_sp_feature_supported:
-            logging.info("Speed feature not supported, skipping steps 6b to 6e")
+            log.info("Speed feature not supported, skipping steps 6b to 6e")
 
             # Skipping steps 6b to 6e
             self.mark_step_range_skipped("6b", "6e")
         else:
-            logging.info("Speed feature supported.")
+            log.info("Speed feature supported.")
 
             # STEP 6b: TH reads from the DUT the OverallCurrentState attribute
             self.step("6b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -474,13 +477,13 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("6c")
 
             if CurrentSpeed == Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow:
-                logging.info("CurrentSpeed is Low, skipping steps 6d to 6e")
+                log.info("CurrentSpeed is Low, skipping steps 6d to 6e")
 
                 # Skipping steps 6d and 6e
                 self.skip_step("6d")
                 self.skip_step("6e")
             else:
-                logging.info("CurrentSpeed is not Low, proceeding to steps 6d and 6e")
+                log.info("CurrentSpeed is not Low, proceeding to steps 6d and 6e")
 
                 # STEP 6d: TH sends command MoveTo with Speed = Low
                 self.step("6d")
@@ -498,7 +501,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 # STEP 6e: Wait until TH receives a subscription report with OverallCurrentState.Speed = Low
                 self.step("6e")
 
-                logging.info("Waiting for OverallCurrentState.Speed to be Low")
+                log.info("Waiting for OverallCurrentState.Speed to be Low")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow)],
                                                               timeout_sec=timeout)
 
@@ -519,21 +522,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("7b")
 
         overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-        logging.info(f"OverallTargetState: {overall_target}")
+        log.info(f"OverallTargetState: {overall_target}")
         asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
                              "OverallTarget.position is not MoveToSignaturePosition")
 
         # STEP 7c: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedAtSignature
         self.step("7c")
 
-        logging.info("Waiting for OverallCurrentState.Position to be OpenedAtSignature")
+        log.info("Waiting for OverallCurrentState.Position to be OpenedAtSignature")
         sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedAtSignature)],
                                                       timeout_sec=timeout)
 
         # STEP 7d: Wait until TH receives a subscription report with MainState = Stopped
         self.step("7d")
 
-        logging.info("Waiting for MainState to be Stopped")
+        log.info("Waiting for MainState to be Stopped")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                       timeout_sec=timeout)
 
@@ -541,7 +544,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("8a")
 
         if not is_vt_feature_supported:
-            logging.info("Ventilation feature not supported, skipping steps 8b to 8i")
+            log.info("Ventilation feature not supported, skipping steps 8b to 8i")
 
             # Skipping steps 8b to 8i
             self.mark_step_range_skipped("8b", "8i")
@@ -550,7 +553,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("8b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
             CurrentPosition = overall_current_state.position
@@ -559,12 +562,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("8c")
 
             if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
-                logging.info("CurrentPosition is FullyClosed, skipping steps 8d to 8e")
+                log.info("CurrentPosition is FullyClosed, skipping steps 8d to 8e")
 
                 # Skipping steps 8d and 8e
                 self.mark_step_range_skipped("8d", "8e")
             else:
-                logging.info("CurrentPosition is not FullyClosed, proceeding to steps 8d and 8e")
+                log.info("CurrentPosition is not FullyClosed, proceeding to steps 8d and 8e")
 
                 # STEP 8d: TH sends command MoveTo with Position = MoveToFullyClosed
                 self.step("8d")
@@ -582,7 +585,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 # STEP 8e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
                 self.step("8e")
 
-                logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+                log.info("Waiting for OverallCurrentState.Position to be FullyClosed")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
                                                               timeout_sec=timeout)
 
@@ -603,21 +606,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("8g")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            logging.info(f"OverallTargetState: {overall_target}")
+            log.info(f"OverallTargetState: {overall_target}")
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
                                  "OverallTargetState.position is not MoveToVentilationPosition")
 
             # STEP 8h: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForVentilation
             self.step("8h")
 
-            logging.info("Waiting for OverallCurrentState.Position to be OpenedForVentilation")
+            log.info("Waiting for OverallCurrentState.Position to be OpenedForVentilation")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedForVentilation)],
                                                           timeout_sec=timeout)
 
             # STEP 8i: Wait until TH receives a subscription report with MainState = Stopped
             self.step("8i")
 
-            logging.info("Waiting for MainState to be Stopped")
+            log.info("Waiting for MainState to be Stopped")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                           timeout_sec=timeout)
 
@@ -625,17 +628,17 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("9a")
 
         if not is_pd_feature_supported:
-            logging.info("Pedestrian feature not supported, skipping steps 9b to 9i")
+            log.info("Pedestrian feature not supported, skipping steps 9b to 9i")
 
             # Skipping steps 9b to 9i
             self.mark_step_range_skipped("9b", "9i")
         else:
-            logging.info("Pedestrian feature supported.")
+            log.info("Pedestrian feature supported.")
             # STEP 9b: TH reads from the DUT the OverallCurrentState attribute
             self.step("9b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -645,12 +648,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("9c")
 
             if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
-                logging.info("CurrentPosition is FullyClosed, skipping steps 9d to 9e")
+                log.info("CurrentPosition is FullyClosed, skipping steps 9d to 9e")
 
                 # Skipping steps 9d and 9e
                 self.mark_step_range_skipped("9d", "9e")
             else:
-                logging.info("CurrentPosition is not FullyClosed, proceeding to steps 9d and 9e")
+                log.info("CurrentPosition is not FullyClosed, proceeding to steps 9d and 9e")
 
                 # STEP 9d: TH sends command MoveTo with Position = MoveToFullyClosed
                 self.step("9d")
@@ -668,7 +671,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 # STEP 9e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
                 self.step("9e")
 
-                logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+                log.info("Waiting for OverallCurrentState.Position to be FullyClosed")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
                                                               timeout_sec=timeout)
 
@@ -689,21 +692,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("9g")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            logging.info(f"OverallTargetState: {overall_target}")
+            log.info(f"OverallTargetState: {overall_target}")
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
                                  "OverallTarget.position is not MoveToPedestrianPosition")
 
             # STEP 9h: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForPedestrian
             self.step("9h")
 
-            logging.info("Waiting for OverallCurrentState.Position to be OpenedForPedestrian")
+            log.info("Waiting for OverallCurrentState.Position to be OpenedForPedestrian")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedForPedestrian)],
                                                           timeout_sec=timeout)
 
             # STEP 9i: Wait until TH receives a subscription report with MainState = Stopped
             self.step("9i")
 
-            logging.info("Waiting for MainState to be Stopped")
+            log.info("Waiting for MainState to be Stopped")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                           timeout_sec=timeout)
 
@@ -711,7 +714,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("10a")
 
         overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-        logging.info(f"OverallCurrentState: {overall_current_state}")
+        log.info(f"OverallCurrentState: {overall_current_state}")
         if overall_current_state is NullValue:
             asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -721,10 +724,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("10b")
 
         if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
-            logging.info("CurrentPosition is FullyClosed, skipping steps 10c to 10d")
+            log.info("CurrentPosition is FullyClosed, skipping steps 10c to 10d")
             self.mark_step_range_skipped("10c", "10d")
         else:
-            logging.info("CurrentPosition is not FullyClosed, proceeding to steps 10c and 10d")
+            log.info("CurrentPosition is not FullyClosed, proceeding to steps 10c and 10d")
 
             # STEP 10c: TH sends command MoveTo with Position = MoveToFullyClosed
             self.step("10c")
@@ -742,7 +745,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 10d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
             self.step("10d")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+            log.info("Waiting for OverallCurrentState.Position to be FullyClosed")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
                                                           timeout_sec=timeout)
 
@@ -763,21 +766,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("10f")
 
         overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-        logging.info(f"OverallTarget: {overall_target}")
+        log.info(f"OverallTarget: {overall_target}")
         asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                              "OverallTargetState.position is not MoveToFullyOpen")
 
         # STEP 10g: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened
         self.step("10g")
 
-        logging.info("Waiting for OverallCurrentState.Position to be FullyOpened")
+        log.info("Waiting for OverallCurrentState.Position to be FullyOpened")
         sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
                                                       timeout_sec=timeout)
 
         # STEP 10h: Wait until TH receives a subscription report with MainState = Stopped
         self.step("10h")
 
-        logging.info("Waiting for MainState to be Stopped")
+        log.info("Waiting for MainState to be Stopped")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                       timeout_sec=timeout)
 
@@ -798,21 +801,21 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("11b")
 
         overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-        logging.info(f"OverallTargetState: {overall_target}")
+        log.info(f"OverallTargetState: {overall_target}")
         asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
                              "OverallTargetState.position is not MoveToFullyClosed")
 
         # STEP 11c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
         self.step("11c")
 
-        logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+        log.info("Waiting for OverallCurrentState.Position to be FullyClosed")
         sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
                                                       timeout_sec=timeout)
 
         # STEP 11d: Wait until TH receives a subscription report with MainState = Stopped
         self.step("11d")
 
-        logging.info("Waiting for MainState to be Stopped")
+        log.info("Waiting for MainState to be Stopped")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                       timeout_sec=timeout)
 
@@ -820,7 +823,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("12a")
 
         if not is_sp_feature_supported:
-            logging.info("Speed feature not supported, skipping steps 12b to 12g")
+            log.info("Speed feature not supported, skipping steps 12b to 12g")
 
             # Skipping steps 12b to 12g
             self.mark_step_range_skipped("12b", "12g")
@@ -842,14 +845,14 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("12c")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            logging.info(f"OverallTarget: {overall_target}")
+            log.info(f"OverallTarget: {overall_target}")
             asserts.assert_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
                                  "OverallTargetState.speed is not High")
 
             # STEP 12d: Wait until TH receives a subscription report with OverallCurrentState.Speed = High
             self.step("12d")
 
-            logging.info("Waiting for OverallCurrentState.Speed to be High")
+            log.info("Waiting for OverallCurrentState.Speed to be High")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh)],
                                                           timeout_sec=timeout)
 
@@ -870,14 +873,14 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("12f")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            logging.info(f"OverallTargetState: {overall_target}")
+            log.info(f"OverallTargetState: {overall_target}")
             asserts.assert_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow,
                                  "OverallTargetState.speed is not Low")
 
             # STEP 12g: Wait until TH receives a subscription report with OverallCurrentState.Speed = Low
             self.step("12g")
 
-            logging.info("Waiting for OverallCurrentState.Speed to be Low")
+            log.info("Waiting for OverallCurrentState.Speed to be Low")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow)],
                                                           timeout_sec=timeout)
 
@@ -899,7 +902,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("13c")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
+            log.info(f"MainState: {main_state}")
             asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kProtected,
                                  "MainState is not Protected")
 
@@ -930,11 +933,11 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("13f")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
+            log.info(f"MainState: {main_state}")
             is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
             asserts.assert_true(is_stopped, "MainState is not in the expected state")
         else:
-            logging.info("Position feature not supported, skipping steps 13b to 13f")
+            log.info("Position feature not supported, skipping steps 13b to 13f")
             # Skipping steps 13b to 13f
             self.mark_step_range_skipped("13b", "13f")
 
@@ -956,7 +959,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("14c")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
+            log.info(f"MainState: {main_state}")
             asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kDisengaged,
                                  "MainState is not Disengaged")
 
@@ -987,11 +990,11 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("14f")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
+            log.info(f"MainState: {main_state}")
             is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
             asserts.assert_true(is_stopped, "MainState is not in the expected state")
         else:
-            logging.info("ManuallyOperable feature not supported, skipping steps 14b to 14f")
+            log.info("ManuallyOperable feature not supported, skipping steps 14b to 14f")
             # Skipping steps 14b to 14f
             self.mark_step_range_skipped("14b", "14f")
 
@@ -1016,7 +1019,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("15c")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            logging.info(f"OverallTargetState: {overall_target}")
+            log.info(f"OverallTargetState: {overall_target}")
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                                  "OverallTargetState.position is not MoveToFullyOpen")
 
@@ -1026,19 +1029,19 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             await asyncio.sleep(2)
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
 
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
             asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
                                  "OverallCurrentState.position is not FullyOpened")
 
             # STEP 15e: Wait until TH receives a subscription report with MainState = Stopped.
             self.step("15e")
 
-            logging.info("Waiting for MainState to be Stopped")
+            log.info("Waiting for MainState to be Stopped")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                           timeout_sec=timeout)
 
@@ -1059,7 +1062,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("15g")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            logging.info(f"OverallTarget: {overall_target}")
+            log.info(f"OverallTarget: {overall_target}")
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
                                  "OverallTargetState.position is not MoveToFullyClosed")
 
@@ -1068,24 +1071,24 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
             await asyncio.sleep(2)
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
 
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+            log.info(f"OverallCurrentState: {overall_current_state}")
             asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed,
                                  "OverallCurrentState.position is not FullyClosed")
 
             # STEP 15i: Wait until TH receives a subscription report with MainState = Stopped.
             self.step("15i")
 
-            logging.info("Waiting for MainState to be Stopped")
+            log.info("Waiting for MainState to be Stopped")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                           timeout_sec=timeout)
 
         else:
-            logging.info("Instantaneous feature not supported, skipping steps 15b to 15i")
+            log.info("Instantaneous feature not supported, skipping steps 15b to 15i")
             # Skipping steps 15b to 15i
             self.mark_step_range_skipped("15b", "15i")
 

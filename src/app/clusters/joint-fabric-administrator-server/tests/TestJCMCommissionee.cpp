@@ -162,10 +162,8 @@ protected:
         {
             return TrustVerificationStage::kComplete;
         }
-        else
-        {
-            return mStageToRun;
-        }
+
+        return mStageToRun;
     }
 
     CHIP_ERROR ReadAdminFabricIndexAttribute(
@@ -212,38 +210,40 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
         TLV::TLVType structType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType));
 
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(
-                       Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
-                   ByteSpan(kDummyRootKey, sizeof(kDummyRootKey)));
-        writer.Put(TLV::ContextTag(
-                       static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
-                   static_cast<uint16_t>(0x1234));
-        writer.Put(TLV::ContextTag(
-                       static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
-                   static_cast<FabricId>(0x1122334455667788ULL));
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(
-                       Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
-                   fabricIndex);
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                           Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
+                       ByteSpan(kDummyRootKey, sizeof(kDummyRootKey))));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
+                                        static_cast<uint16_t>(0x1234)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
+                                        static_cast<FabricId>(0x1122334455667788ULL)));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                           Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
+                       fabricIndex));
 
-        writer.EndContainer(structType);
-        writer.EndContainer(outerType);
+        ReturnErrorOnFailure(writer.EndContainer(structType));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        ReturnErrorOnFailure(reader.EnterContainer(innerType));
 
         value.SetReader(reader);
         value.SetFabricIndex(fabricIndex);
 
-        reader.ExitContainer(innerType);
+        ReturnErrorOnFailure(reader.ExitContainer(innerType));
 
         ConcreteAttributePath path(kRootEndpointId, FabricsAttr::GetClusterId(), FabricsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -268,20 +268,20 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
-        writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert)));
-        writer.EndContainer(outerType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert))));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        ReturnErrorOnFailure(reader.EnterContainer(innerType));
 
         value.SetReader(reader);
 
-        reader.ExitContainer(innerType);
+        ReturnErrorOnFailure(reader.ExitContainer(innerType));
 
         ConcreteAttributePath path(kRootEndpointId, CertsAttr::GetClusterId(), CertsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -310,32 +310,34 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
         TLV::TLVType structType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
-                   ByteSpan(kDummyNoc, sizeof(kDummyNoc)));
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
-                   ByteSpan(kDummyIcac, sizeof(kDummyIcac)));
-        writer.Put(
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
+                       ByteSpan(kDummyNoc, sizeof(kDummyNoc))));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
+                       ByteSpan(kDummyIcac, sizeof(kDummyIcac))));
+        ReturnErrorOnFailure(writer.Put(
             TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kFabricIndex)),
-            fabricIndex);
+            fabricIndex));
 
-        writer.EndContainer(structType);
-        writer.EndContainer(outerType);
+        ReturnErrorOnFailure(writer.EndContainer(structType));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        ReturnErrorOnFailure(reader.EnterContainer(innerType));
 
         value.SetReader(reader);
         value.SetFabricIndex(fabricIndex);
 
-        reader.ExitContainer(innerType);
+        ReturnErrorOnFailure(reader.ExitContainer(innerType));
 
         ConcreteAttributePath path(kRootEndpointId, NOCsAttr::GetClusterId(), NOCsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -343,13 +345,13 @@ protected:
     }
 };
 
-class TestJCMCommissionee : public chip::Test::AppContext
+class TestJCMCommissionee : public chip::Testing::AppContext
 {
 public:
     static void SetUpTestSuite()
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        chip::Test::AppContext::SetUpTestSuite();
+        chip::Testing::AppContext::SetUpTestSuite();
     }
 
     static void TearDownTestSuite()

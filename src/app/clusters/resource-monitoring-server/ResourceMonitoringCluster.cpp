@@ -311,7 +311,7 @@ CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath
 {
     if (mResetConditionCommandSupported)
     {
-        constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+        static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
             { ResourceMonitoring::Commands::ResetCondition::kMetadataEntry }
         };
         ReturnErrorOnFailure(builder.ReferenceExisting(kCommands));

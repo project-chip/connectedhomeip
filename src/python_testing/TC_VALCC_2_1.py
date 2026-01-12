@@ -38,7 +38,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_VALCC_2_1(MatterBaseTest):
@@ -94,7 +98,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(open_duration_dut, 0xFFFFFFFE, "OpenDuration attribute is out of range")
                 asserts.assert_greater_equal(open_duration_dut, 1, "OpenDuration attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(4)
         if attributes.DefaultOpenDuration.attribute_id in attribute_list:
@@ -104,7 +108,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(default_open_duration_dut, 0xFFFFFFFE, "DefaultOpenDuration attribute is out of range")
                 asserts.assert_greater_equal(default_open_duration_dut, 1, "DefaultOpenDuration attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(5)
         if attributes.AutoCloseTime.attribute_id in attribute_list:
@@ -113,7 +117,7 @@ class TC_VALCC_2_1(MatterBaseTest):
             if auto_close_time_dut is not NullValue:
                 asserts.assert_less_equal(auto_close_time_dut, 0xFFFFFFFFFFFFFFFE, "OpenDuration attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(6)
         if attributes.RemainingDuration.attribute_id in attribute_list:
@@ -123,7 +127,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(remaining_duration_dut, 0xFFFFFFFE, "RemainingDuration attribute is out of range")
                 asserts.assert_greater_equal(remaining_duration_dut, 1, "RemainingDuration attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(7)
         if attributes.CurrentState.attribute_id in attribute_list:
@@ -133,7 +137,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less(current_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kUnknownEnumValue,
                                     "CurrentState is not in valid range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(8)
         if attributes.TargetState.attribute_id in attribute_list:
@@ -143,7 +147,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less(target_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kUnknownEnumValue,
                                     "TargetState is not in valid range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(9)
         if attributes.CurrentLevel.attribute_id in attribute_list:
@@ -153,7 +157,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(current_level_dut, 100, "CurrentLevel attribute is out of range")
                 asserts.assert_greater_equal(current_level_dut, 0, "CurrentLevel attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(10)
         if attributes.TargetLevel.attribute_id in attribute_list:
@@ -163,7 +167,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(target_level_dut, 100, "TargetLevel attribute is out of range")
                 asserts.assert_greater_equal(target_level_dut, 0, "TargetLevel attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(11)
         if attributes.DefaultOpenLevel.attribute_id in attribute_list:
@@ -173,7 +177,7 @@ class TC_VALCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(default_open_level_dut, 100, "DefaultOpenLevel attribute is out of range")
                 asserts.assert_greater_equal(default_open_level_dut, 1, "DefaultOpenLevel attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(12)
         if attributes.ValveFault.attribute_id in attribute_list:
@@ -181,7 +185,7 @@ class TC_VALCC_2_1(MatterBaseTest):
 
             asserts.assert_less_equal(valve_fault_dut, 0b00111111, "ValveFault is not in valid range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(13)
         if attributes.LevelStep.attribute_id in attribute_list:
@@ -190,7 +194,7 @@ class TC_VALCC_2_1(MatterBaseTest):
             asserts.assert_less_equal(level_step_dut, 50, "LevelStep attribute is out of range")
             asserts.assert_greater_equal(level_step_dut, 1, "LevelStep attribute is out of range")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
 
 if __name__ == "__main__":

@@ -44,9 +44,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_4_1(MatterBaseTest):
@@ -251,7 +254,7 @@ class TC_FAN_4_1(MatterBaseTest):
                 asserts.assert_not_equal(percent_setting, 0, "Incorrect percent setting")
 
             self.step(step_num + 3)
-            logging.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
+            log.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
             await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)

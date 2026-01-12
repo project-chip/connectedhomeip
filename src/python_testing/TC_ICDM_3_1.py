@@ -50,9 +50,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 kRootEndpointId = 0
 
@@ -147,17 +149,17 @@ class TC_ICDM_3_1(MatterBaseTest):
             self.step(1)
             featureMap = await self._read_icdm_attribute_expect_success(attributes.FeatureMap)
             if featureMap & features.kCheckInProtocolSupport == 0:
-                logging.info('CheckInProtocolSupport feature (ICDM.S.F00) is not supported, skipping test.')
+                log.info('CheckInProtocolSupport feature (ICDM.S.F00) is not supported, skipping test.')
                 self.mark_all_remaining_steps_skipped("2a")
                 return
 
             # Step 2a: Read TestEventTriggersEnabled from General Diagnostics Cluster
             self.step("2a")
-            self.check_test_event_triggers_enabled()
+            await self.check_test_event_triggers_enabled()
 
             # Step 2b: Send TestEventTrigger command to General Diagnostics Cluster
             self.step("2b")
-            self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
+            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
             # Step 3: Read RegisteredClients, clear if not empty
             self.step(3)

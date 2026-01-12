@@ -43,8 +43,12 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_non_empty_string
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class Test_TC_LCFG_2_1(MatterBaseTest):
@@ -138,7 +142,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         if filtered_supported_locales:
             value_present_in_supported_locales = random.choice(filtered_supported_locales)
         else:
-            logging.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
+            log.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
             self.mark_all_remaining_steps_skipped(5)
             return
 
