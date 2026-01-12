@@ -608,6 +608,7 @@ class PushAvServer:
         self.wd.mkdir("streams", str(stream_id))
         self.streams[stream_id_str].save_to_disk(self.wd)
 
+        log.info(f"Stream created: id={stream_id}, interface={interface}")
         return stream  # TODO Update TH to use sessions instead
 
     def list_streams(self):
@@ -621,6 +622,8 @@ class PushAvServer:
             Always save the uploaded file to disk for further analysis.
             If strict mode is enabled, return bad requests with the errors if any.
         """
+        log.debug(f"Upload started: stream={stream_id}, file={file_path}.{ext}")
+
         with self._open_stream(stream_id) as stream:
             file_path_with_ext = f"{file_path}.{ext}"
             session = stream.last_in_progress_session()
@@ -743,11 +746,14 @@ class PushAvServer:
             # And finally return the appropriate response to the camera
 
             if stream.strict_mode and len(errors) > 0:
+                log.warning(f"Upload validation failed: {errors}")
                 return JSONResponse(
                     status_code=400,
                     content={"errors": errors}
                 )
             else:
+                log.info("Upload successful:"
+                         f"stream={stream_id}, file={file_path}.{ext}, errors={errors}, strict={stream.strict_mode}")
                 return Response(status_code=202)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
