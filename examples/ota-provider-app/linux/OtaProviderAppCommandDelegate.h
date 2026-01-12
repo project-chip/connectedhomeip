@@ -39,21 +39,29 @@ private:
     NamedPipeCommands * mPipes = nullptr;
 };
 
-// This class is a helper that parses and validates incoming JSON commands received over the out-of-band channel.
-// It is separated from OtaProviderAppCommandDelegate to:
-//  - Keep JSON parsing and command dispach logic isolated from OTA logic
-//  - Allow early validation and reporting
-//  - Extracts generic command fields and delegates the actual OTA operations to OtaProviderAppCommandDelegate
-
+/// This class is a helper that parses and validates incoming JSON commands received over the out-of-band channel.
+/// It is separated from OtaProviderAppCommandDelegate to:
+///  - Keep JSON parsing and command dispach logic isolated from OTA logic
+///  - Allow early validation and reporting
+///  - Extracts generic command fields and delegates the actual OTA operations to OtaProviderAppCommandDelegate
 class OtaProviderAppCommandHandler
 {
 public:
     static OtaProviderAppCommandHandler * FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate);
 
     static void HandleCommand(intptr_t context);
+
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
-    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d) : mCommandPayload(std::move(v)), mDelegate(d)
+    struct PrivateCtorTag
+    {
+    private:
+        friend class OtaProviderAppCommandHandler;
+        PrivateCtorTag() = default;
+    };
+
+    OtaProviderAppCommandHandler(PrivateCtorTag, Json::Value && v, OtaProviderAppCommandDelegate * d) :
+        mCommandPayload(std::move(v)), mDelegate(d)
     {}
 
 private:

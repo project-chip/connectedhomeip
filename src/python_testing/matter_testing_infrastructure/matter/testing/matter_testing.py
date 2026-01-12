@@ -1047,21 +1047,24 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
-        # If is not empty from the args, verify if the fifo file exists.
-        if app_pipe_out is not None and not os.path.exists(app_pipe_out):
-            LOGGER.error("Named pipe %r does NOT exist" % app_pipe_out)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
-
         if app_pipe_out is None:
             app_pipe_out = self.matter_test_config.pipe_name_out
 
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
 
+        if not os.path.exists(app_pipe_out):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+
         dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
 
-        # Checks for concatenate app_pipe and app_pid
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
         if dut_ip is None:
+            # Use manual chunked reads instead of readline(): FIFO is opened non-blocking
+            # and we need explicit timeout handling and a hard size limit for safety.
             fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
             try:
                 buf = bytearray()
@@ -1119,16 +1122,15 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
-        # If is not empty from the args, verify if the fifo file exists.
-        if app_pipe is not None and not os.path.exists(app_pipe):
-            LOGGER.error("Named pipe %r does NOT exist" % app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
-
         if app_pipe is None:
             app_pipe = self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
+
+        if not os.path.exists(app_pipe):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
@@ -1137,7 +1139,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
 
-        # Checks for concatenate app_pipe and app_pid
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
                 LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
