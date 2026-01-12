@@ -781,7 +781,7 @@ class PushAvServer:
             "ffprobe", "-allowed_extensions", "init,m4s",
             "-show_streams", "-show_format", "-output_format", "json",
             str(p.absolute())
-            ]
+        ]
 
         print(cmd)
         # ffprobe -show_streams -show_format -output_format json /Users/francoismonniot/.pavstest/streams/1/index.mpd
