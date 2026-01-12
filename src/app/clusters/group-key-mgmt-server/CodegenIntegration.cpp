@@ -25,7 +25,6 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>
 
-
 namespace {
 using namespace chip;
 using namespace chip::app;
