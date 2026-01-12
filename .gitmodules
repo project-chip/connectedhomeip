@@ -323,7 +323,7 @@
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
-	branch = matter_support
+	branch = rtk_matter_support
 	platforms = realtek
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo

@@ -14,9 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <app/storage/TableEntry.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -572,8 +573,11 @@ CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 {
     // We want to release as many resources as possible; if anything fails,
     // hold on to the error until we've had a chance to try to free other resources
-    CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
-    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(*provider, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
+    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(*provider, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
 
     GlobalCertificateData globalData(mEndpointId);
     CHIP_ERROR globalDataResult = globalData.Load(mStorage);

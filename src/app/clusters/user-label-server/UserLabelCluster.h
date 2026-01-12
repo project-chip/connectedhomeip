@@ -27,7 +27,7 @@ public:
     UserLabelCluster(EndpointId endpoint);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
 
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
