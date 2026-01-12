@@ -216,7 +216,7 @@ namespace DeviceLayer {
                                                            error:&error]) {
                         ChipLogError(DeviceLayer, "Failed to initialize clear KVS storage (code: %ld): %s",
                             (long) error.code, error.localizedDescription.UTF8String);
-                        return nil;
+                        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
                     }
                 }
 
