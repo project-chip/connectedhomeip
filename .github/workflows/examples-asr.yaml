@@ -15,7 +15,7 @@
 name: Build example - ASR
 
 on:
-  # Workflow disabled on 1.4.2: Runnint out of disk space in CI:
+  # Workflow disabled on 1.4.2: Running out of disk space in CI:
   # INFO    /tmp/ccEoSAFy.s: Assembler messages:
   # INFO    /tmp/ccEoSAFy.s: Fatal error: can't write 3919 bytes to section .debug_str of obj/third_party/connectedhomeip/src/app/server/libCHIPAppServer.CommissioningWindowManager.cpp.o: 'No space left on device'
   # INFO    /tmp/ccEoSAFy.s: Fatal error: can't close obj/third_party/connectedhomeip/src/app/server/libCHIPAppServer.CommissioningWindowManager.cpp.o: No space left on device
