@@ -500,3 +500,32 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+namespace chip::app::Clusters::GeneralDiagnostics {
+
+namespace {
+TestEventTriggerDelegate * gTestEventTriggerDelegate = nullptr;
+System::Clock::Microseconds64 gNodeStartupTimestamp  = System::Clock::Microseconds64(0);
+} // namespace
+
+void SetTestEventTriggerDelegate(TestEventTriggerDelegate * delegate)
+{
+    gTestEventTriggerDelegate = delegate;
+}
+
+TestEventTriggerDelegate * GetTestEventTriggerDelegate()
+{
+    return gTestEventTriggerDelegate;
+}
+
+void SetNodeStartupTimestamp(System::Clock::Microseconds64 nodeStartupTimestamp)
+{
+    gNodeStartupTimestamp = nodeStartupTimestamp;
+}
+
+System::Clock::Microseconds64 GetNodeStartupTimestamp()
+{
+    return gNodeStartupTimestamp;
+}
+
+} // namespace chip::app::Clusters::GeneralDiagnostics

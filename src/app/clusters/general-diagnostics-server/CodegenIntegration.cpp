@@ -52,8 +52,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 public:
     explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate,
                                  System::Clock::Microseconds64 nodeStartupTimestamp) :
-        mTestEventTriggerDelegate(testEventTriggerDelegate),
-        mNodeStartupTimestamp(nodeStartupTimestamp)
+        mTestEventTriggerDelegate(testEventTriggerDelegate), mNodeStartupTimestamp(nodeStartupTimestamp)
     {}
 
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
@@ -63,16 +62,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -109,35 +107,6 @@ IntegrationDelegate MakeIntegrationDelegate()
 }
 
 } // namespace
-
-namespace chip::app::Clusters::GeneralDiagnostics {
-
-namespace {
-TestEventTriggerDelegate * gTestEventTriggerDelegate = nullptr;
-System::Clock::Microseconds64 gNodeStartupTimestamp  = System::Clock::Microseconds64(0);
-} // namespace
-
-void SetTestEventTriggerDelegate(TestEventTriggerDelegate * delegate)
-{
-    gTestEventTriggerDelegate = delegate;
-}
-
-TestEventTriggerDelegate * GetTestEventTriggerDelegate()
-{
-    return gTestEventTriggerDelegate;
-}
-
-void SetNodeStartupTimestamp(System::Clock::Microseconds64 nodeStartupTimestamp)
-{
-    gNodeStartupTimestamp = nodeStartupTimestamp;
-}
-
-System::Clock::Microseconds64 GetNodeStartupTimestamp()
-{
-    return gNodeStartupTimestamp;
-}
-
-} // namespace chip::app::Clusters::GeneralDiagnostics
 
 void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
