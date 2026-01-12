@@ -26,9 +26,9 @@
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <assert.h>
-#include <network/uri.hpp>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <network/uri.hpp>
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
 
@@ -233,11 +233,13 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     std::error_code ec;
     network::uri parsed_uri(url, ec);
 
-    if (ec) {
+    if (ec)
+    {
         return false;
     }
 
-    if (!parsed_uri.has_scheme() || !parsed_uri.has_host()) {
+    if (!parsed_uri.has_scheme() || !parsed_uri.has_host())
+    {
         return false;
     }
 
@@ -246,7 +248,8 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     std::string host(parsed_uri.host().begin(), parsed_uri.host().end());
 
     // Convert to lowercase for case-insensitive comparison
-    for (char& c : scheme) {
+    for (char & c : scheme)
+    {
         c = static_cast<char>(std::tolower(c));
     }
 
@@ -254,15 +257,10 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     bool pathEndsWithSlash = !path.empty() && path.back() == '/';
 
     // Check if query and fragment are empty
-    bool noQuery = !parsed_uri.has_query();
+    bool noQuery    = !parsed_uri.has_query();
     bool noFragment = !parsed_uri.has_fragment();
 
-    return scheme == "https" &&
-           noFragment &&
-           noQuery &&
-           pathEndsWithSlash &&
-           !host.empty();
-
+    return scheme == "https" && noFragment && noQuery && pathEndsWithSlash && !host.empty();
 }
 
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
