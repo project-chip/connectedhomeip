@@ -519,9 +519,9 @@ scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-cluster
 
 The `request_device_reboot()` and `request_device_factory_reset()` methods work
 differently depending on the environment. When the test is started with
-`run_python_test.py` as it is in the CI, also need to make sure to import
-MatterBaseTest to make this functionality work, the device is automatically
-rebooted and possibly factory reset during the test depending on test
+`run_python_test.py` as it is in the CI, need to make sure to import
+MatterBaseTest and have your test module inherit from it to make this functionality accessible during your test, 
+the device is automatically rebooted and possibly factory reset during the test depending on test
 implementation using the restart_flag_file. When the test is started by some
 other means (e.g., during certification testing), you'll be prompted to manually
 reboot or factory reset the device using the device-specific mechanism.
