@@ -57,7 +57,7 @@ public:
 
     difference_type length() const noexcept { return last - first; }
 
-    string_view to_string_view() const noexcept { return string_view(ptr(), length()); }
+    string_view to_string_view() const noexcept { return string_view(ptr(), static_cast<size_type>(length())); }
 
 private:
     const_iterator first, last;

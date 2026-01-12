@@ -123,7 +123,7 @@ public:
 
     const_reference back() const
     {
-        auto last = (end()) -1;
+        auto last = (end()) - 1;
         return *last;
     }
 

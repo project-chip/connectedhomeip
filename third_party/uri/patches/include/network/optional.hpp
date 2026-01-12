@@ -378,11 +378,7 @@ public:
      * \returns The underlying optional value, if \c bool(*this).
      * \throws A bad_optional_access if \c !*this.
      */
-    constexpr T const & value() const
-    {
-        return *this ? base_type::storage_.value_
-                     : (abort(), base_type::storage_.value_);
-    }
+    constexpr T const & value() const { return *this ? base_type::storage_.value_ : (abort(), base_type::storage_.value_); }
     /**
      * \returns The underlying optional value, if \c bool(*this).
      * \throws A bad_optional_access if \c !*this.
