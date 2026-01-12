@@ -61,7 +61,7 @@ class TC_CC_6_5(MatterBaseTest):
 
     def pics_TC_CC_6_5(self) -> list[str]:
         return ["CC.S"]
-    
+
     def steps_TC_CC_6_5(self) -> list[TestStep]:
         return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
