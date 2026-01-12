@@ -436,7 +436,9 @@ class UploadError(BaseModel):
 
 
 class Session(BaseModel):
-    id: int  # TODO Ignore and use the index in the list instead?
+    # The id is the index in the stream's list.
+    # Keeping a duplicated value here to have it included in API responses.
+    id: int
 
     uploaded_segments: list[Tuple[str, str]] = []
     uploaded_manifests: list[Tuple[str, str]] = []
