@@ -57,8 +57,8 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 49b897291728750c96e0ceaec97627e88717b461"
+            # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -404,8 +404,8 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py c54279352617c842c4daa4c593be3aa043a37d2b"
+            # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a5be7391771c64062e0cbd7fd6f7ef6e05d27a8b"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
