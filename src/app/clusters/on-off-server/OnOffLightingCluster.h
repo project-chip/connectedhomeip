@@ -60,8 +60,8 @@ public:
 
     /// Sets the on off value, however it is specific for needs other integrations.
     ///
-    /// In particular 1.5.4.1 Lighting feature requires that if level control cluster sets
-    /// then onoff value then:
+    /// In particular, the 1.5.4.1 Lighting feature requires that if the Level Control cluster sets
+    /// the OnOff value, then:
     ///   - if value is set to false, OnTime is set to 0
     ///   - if value is set to true, OffWaitTime is set to 0
     CHIP_ERROR SetOnOffWithTimeReset(bool on);
