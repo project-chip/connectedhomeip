@@ -30892,6 +30892,12 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("metadataEnabled",webRTCTransportProvidersolicitOffermetadataEnabledCommandParameterInfo);
 
+
+    CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamsCommandParameterInfo = new CommandParameterInfo("videoStreams", Optional.class, ArrayList.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("videoStreams",webRTCTransportProvidersolicitOffervideoStreamsCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProvidersolicitOfferaudioStreamsCommandParameterInfo = new CommandParameterInfo("audioStreams", Optional.class, ArrayList.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("audioStreams",webRTCTransportProvidersolicitOfferaudioStreamsCommandParameterInfo);
     InteractionInfo webRTCTransportProvidersolicitOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -30919,6 +30925,12 @@ public class ClusterInfoMapping {
 
            , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct>)
              commandArguments.get("SFrameConfig")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("videoStreams")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("audioStreams")
 
             );
         },
@@ -30954,6 +30966,12 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo = new CommandParameterInfo("metadataEnabled", Optional.class, Boolean.class);
     webRTCTransportProviderprovideOfferCommandParams.put("metadataEnabled",webRTCTransportProviderprovideOffermetadataEnabledCommandParameterInfo);
 
+
+    CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamsCommandParameterInfo = new CommandParameterInfo("videoStreams", Optional.class, ArrayList.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("videoStreams",webRTCTransportProviderprovideOffervideoStreamsCommandParameterInfo);
+
+    CommandParameterInfo webRTCTransportProviderprovideOfferaudioStreamsCommandParameterInfo = new CommandParameterInfo("audioStreams", Optional.class, ArrayList.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("audioStreams",webRTCTransportProviderprovideOfferaudioStreamsCommandParameterInfo);
     InteractionInfo webRTCTransportProviderprovideOfferInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WebRTCTransportProviderCluster) cluster)
@@ -30987,6 +31005,12 @@ public class ClusterInfoMapping {
 
            , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct>)
              commandArguments.get("SFrameConfig")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("videoStreams")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("audioStreams")
 
             );
         },
