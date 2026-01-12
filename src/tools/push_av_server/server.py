@@ -822,7 +822,7 @@ class PushAvServer:
     def create_client_keypair(self, name: str, override: bool = True):
         (key, cert, created) = self.device_hierarchy.gen_keypair(name, override)
 
-        return {key, cert, created}
+        return {"key": key, "cert": cert, "created": created}
 
     # Seems unused in the current TH tests
     # TODO Verify in spec how a track name updated should be handled mid-stream
@@ -836,8 +836,7 @@ class PushAvServer:
     ):
         (key, cert, created) = self.device_hierarchy.gen_cert(name, req.csr, override)
 
-        # TODO Verify that key is always None, and if true, get rid of it
-        return {key, cert, created}
+        return {"key": key, "cert": cert, "created": created}
 
 
 class PushAvContext:
