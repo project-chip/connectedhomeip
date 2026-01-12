@@ -114,6 +114,6 @@ private:
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault;
     uint8_t mLevelStep{ kDefaultLevelStep };
     ValveConfigurationAndControl::Delegate * mDelegate{ nullptr };
-    ValveConfigurationAndControl::TimeSyncTracker * mTsTracker{ nullptr};
+    ValveConfigurationAndControl::TimeSyncTracker * mTsTracker{ nullptr };
 };
 } // namespace chip::app::Clusters
