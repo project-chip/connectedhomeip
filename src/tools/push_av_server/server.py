@@ -699,9 +699,9 @@ class PushAvServer:
 
                 # TODO Make sure this is correct. Most likely not at this point.
 
-                path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$"
+                path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+\.m4s$"
                 if ext == "init":
-                    path_regex = r"^session_\d+/(?P<trackName>.init$"
+                    path_regex = r"^session_\d+/(?P<trackName>[^/]+)/[^/]+\.init$"
                 path_regex = re.compile(path_regex)
 
                 match = path_regex.match(file_path)
