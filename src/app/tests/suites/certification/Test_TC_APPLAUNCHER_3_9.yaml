@@ -26,7 +26,10 @@ config:
         defaultValue: 123
     applicationId:
         type: char_string
-        defaultValue: "exampleid"
+        defaultValue: "applicationId"
+    DataValue:
+        type: octet_string
+        defaultValue: "data"
     #ApplicationBasic cluster endpoint
     ApplicationBasic.Endpoint: 3
 
@@ -40,9 +43,29 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1a: TH sends a HideApp command to DUT to Hide a running and
+          "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
+          application to the foreground"
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "Data"
+                value: DataValue
+              - name: "Application"
+                value:
+                    {
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: DataValue
+
+    - label:
+          "Step 2a: TH sends a HideApp command to DUT to Hide a running and
           Active application"
-      PICS: APPLAUNCHER.S.C02.Rsp
       command: "HideApp"
       arguments:
           values:
@@ -52,12 +75,19 @@ tests:
                         CatalogVendorID: catalogVendorId,
                         ApplicationID: applicationId,
                     }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: DataValue
 
-    - label: "Step 1b: TH reads the Status attribute"
+    - label: "Step 2b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
       command: "readAttribute"
       attribute: "Status"
       response:
           constraints:
+              # STOPPED (0) or ACTIVE_HIDDEN (2) as per spec
               anyOf: [0, 2]
