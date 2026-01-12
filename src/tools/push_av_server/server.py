@@ -775,7 +775,7 @@ class PushAvServer:
 
         return json.loads(proc.stdout)
 
-    async def segment_download(self, file_path: str, stream_id: int):
+    async def segment_download(self, stream_id: int, file_path: str):
         return FileResponse(self.wd.path("streams", str(stream_id), file_path))
 
     def list_certs(self):
