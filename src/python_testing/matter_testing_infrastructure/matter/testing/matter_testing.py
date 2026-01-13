@@ -1006,6 +1006,26 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+        """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
+
+        If `endpoint_id` is None, the default DUT endpoint for the test is selected.
+
+        If `expect_success` is True, a test assertion fails on error status codes
+
+        Status code is returned.
+        """
+        dev_ctrl = self.default_controller
+        node_id = self.dut_node_id
+        if endpoint_id is None:
+            endpoint_id = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
+
+        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
+        if expect_success:
+            asserts.assert_equal(write_result[0].Status, Status.Success,
+                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
+        return write_result[0].Status
+
     def read_from_app_pipe(
         self,
         app_pipe_out: Optional[str] = None,
