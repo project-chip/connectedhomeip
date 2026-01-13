@@ -155,11 +155,11 @@ class TC_ICDM_3_1(MatterBaseTest):
 
             # Step 2a: Read TestEventTriggersEnabled from General Diagnostics Cluster
             self.step("2a")
-            self.check_test_event_triggers_enabled()
+            await self.check_test_event_triggers_enabled()
 
             # Step 2b: Send TestEventTrigger command to General Diagnostics Cluster
             self.step("2b")
-            self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
+            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
             # Step 3: Read RegisteredClients, clear if not empty
             self.step(3)
