@@ -329,7 +329,7 @@ private:
     bool IsAttributeInAttributeList(AttributeId attr_id)
     {
         // These methods work IF AND ONLY IF cluster path contains exactly one path since
-        // we get accepted commands by path.
+        // we get attributes by path.
         VerifyOrDie(mCluster.GetPaths().size() == 1);
         auto path = mCluster.GetPaths()[0];
 
