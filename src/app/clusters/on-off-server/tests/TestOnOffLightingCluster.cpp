@@ -43,6 +43,30 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
+const char * AsStr(bool v)
+{
+    return v ? "TRUE" : "FALSE";
+}
+
+const char * StartupOnOffAsStr(std::optional<uint8_t> v)
+{
+    if (!v.has_value())
+    {
+        return "NONE";
+    }
+    switch (*v)
+    {
+    case to_underlying(StartUpOnOffEnum::kOn):
+        return "ON";
+    case to_underlying(StartUpOnOffEnum::kOff):
+        return "OFF";
+    case to_underlying(StartUpOnOffEnum::kToggle):
+        return "TOGGLE";
+    default:
+        return "INVALID";
+    }
+}
+
 class MockScenesIntegrationDelegate : public chip::scenes::ScenesIntegrationDelegate
 {
 public:
@@ -163,7 +187,7 @@ struct TestOnOffLightingCluster : public ::testing::Test
 
 TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
 {
-    // set up storage and restart
+    // Test how StartUpOnOff attribute in storage affects the OnOff state after startup.
     using TestCase = struct
     {
         bool startValue;
@@ -181,17 +205,15 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
         { true, to_underlying(StartUpOnOffEnum::kToggle), false },
         { false, to_underlying(StartUpOnOffEnum::kToggle), true },
 
-        // invalid value tests
+        // Test with invalid StartUpOnOff values, should not change the initial OnOff.
         { true, 123, true },
         { false, 234, false },
     };
 
     for (const TestCase & testCase : kTestCases)
     {
-        // fresh start
         mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 
-        // set up storage
         mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
         WriteAttributeToStorage(Attributes::OnOff::Id, testCase.startValue);
         if (testCase.startupOnOffValue.has_value())
@@ -199,33 +221,15 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
             WriteAttributeToStorage(Attributes::StartUpOnOff::Id, *testCase.startupOnOffValue);
         }
 
-        // startup and check we work correctly
-        ChipLogProgress(
-            Test, "Running %s:%s, expecting %s", testCase.startValue ? "TRUE" : "FALSE",
-            [&]() {
-                if (!testCase.startupOnOffValue.has_value())
-                {
-                    return "NONE";
-                }
-                switch (*testCase.startupOnOffValue)
-                {
-                case to_underlying(StartUpOnOffEnum::kOn):
-                    return "ON";
-                case to_underlying(StartUpOnOffEnum::kOff):
-                    return "OFF";
-                case to_underlying(StartUpOnOffEnum::kToggle):
-                    return "TOGGLE";
-                default:
-                    return "INVALID";
-                }
-            }(),
-            testCase.expectedStartState ? "TRUE" : "FALSE");
+        ChipLogProgress(Test, "Running %s:%s, expecting %s", AsStr(testCase.startValue),
+                        StartupOnOffAsStr(testCase.startupOnOffValue), AsStr(testCase.expectedStartState));
 
         mMockDelegate.Reset();
+
         ASSERT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(mCluster.GetOnOff(), testCase.expectedStartState);
 
-        // Only startup should be called, with the correct value
+        // Only the startup delegate method should be called.
         EXPECT_TRUE(mMockDelegate.mStartupCalled);
         EXPECT_FALSE(mMockDelegate.mCalled);
         EXPECT_EQ(mMockDelegate.mOnOff, testCase.expectedStartState);
@@ -234,22 +238,18 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
 
 TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
 {
-    // Test Read GlobalSceneControl (Default true)
     bool globalSceneControl = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
 
-    // Test Read OnTime (Default 0)
     uint16_t onTime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 0);
 
-    // Test Read OffWaitTime (Default 0)
     uint16_t offWaitTime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 0);
 
-    // Test Read StartUpOnOff (Default Null)
     DataModel::Nullable<StartUpOnOffEnum> startUpOnOff;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_TRUE(startUpOnOff.IsNull());
@@ -257,17 +257,16 @@ TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
 
 TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff)
 {
-    // 1. Turn On with Timed Off (OnTime = 10, OffWaitTime = 20)
+    // Step 1: Turn On with Timed Off (OnTime = 10, OffWaitTime = 20)
     Commands::OnWithTimedOff::Type command;
     command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0); // Unconditional
     command.onTime      = 10;
     command.offWaitTime = 20;
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
-    EXPECT_TRUE(mMockDelegate.mOnOff); // Should be ON
+    EXPECT_TRUE(mMockDelegate.mOnOff);
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // Verify Attributes
     uint16_t onTime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 10);
@@ -276,14 +275,13 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 20);
 
-    // 2. Advance Clock (simulate 1 tick of 100ms)
+    // Step 2: Advance Clock (simulate 1 tick of 100ms)
     mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(100));
 
-    // OnTime should decrement
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 9);
 
-    // 3. Exhaust OnTime
+    // Step 3: Advance Clock to exhaust OnTime
     for (int i = 0; i < 9; ++i)
     {
         mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(100));
@@ -292,8 +290,7 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 0);
 
-    // Should now be OFF and OffWaitTime 0 (per spec/logic)
-    // Wait, logic says: "If OnTime reaches 0, the server SHALL set the OffWaitTime and OnOff attributes to 0 and FALSE"
+    // Per spec: "If OnTime reaches 0, the server SHALL set the OffWaitTime and OnOff attributes to 0 and FALSE"
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
@@ -302,38 +299,33 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff)
 
 TEST_F(TestOnOffLightingCluster, TestOffWithEffect)
 {
-    // 1. Turn On first
+    // Step 1: Turn On
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Off With Effect
+    // Step 2: Invoke OffWithEffect
     Commands::OffWithEffect::Type command;
     command.effectIdentifier = EffectIdentifierEnum::kDyingLight;
     command.effectVariant    = 0; // Variant is not used for DyingLight
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
 
-    // Check Effect Delegate
     EXPECT_TRUE(mMockEffectDelegate.mCalled);
     EXPECT_EQ(mMockEffectDelegate.mEffectId, EffectIdentifierEnum::kDyingLight);
-
-    // Check State (Should be OFF)
     EXPECT_FALSE(mMockDelegate.mOnOff);
-
-    // Check MarkSceneInvalid was called
     EXPECT_EQ(mMockScenesIntegrationDelegate.markInvalidCalls, 1);
 }
 
 TEST_F(TestOnOffLightingCluster, TestOffWithEffect_DelegateFails)
 {
-    // 1. Turn On first
+    // Step 1: Turn On
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Setup mock to fail
+    // Step 2: Configure the effect delegate to return Failure
     mMockEffectDelegate.mReturnStatus = Status::Failure;
 
-    // 3. Off With Effect
+    // Step 3: Invoke OffWithEffect
     Commands::OffWithEffect::Type command;
     command.effectIdentifier = EffectIdentifierEnum::kDelayedAllOff;
     command.effectVariant    = 0;
@@ -341,14 +333,12 @@ TEST_F(TestOnOffLightingCluster, TestOffWithEffect_DelegateFails)
     auto result = mClusterTester.Invoke(command);
     EXPECT_EQ(result.status, Status::Failure);
 
-    // Check Effect Delegate was called
     EXPECT_TRUE(mMockEffectDelegate.mCalled);
     EXPECT_EQ(mMockEffectDelegate.mEffectId, EffectIdentifierEnum::kDelayedAllOff);
 
-    // Check State is still ON, because effect failed
+    // OnOff state should not change if the effect fails.
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // Global Scene control should not have changed
     bool globalSceneControl = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
@@ -356,7 +346,7 @@ TEST_F(TestOnOffLightingCluster, TestOffWithEffect_DelegateFails)
 
 TEST_F(TestOnOffLightingCluster, TestTimerCancellation)
 {
-    // 1. OnWithTimedOff (OnTime=10, OffWaitTime=0)
+    // Step 1: Invoke OnWithTimedOff with OnTime=10 and OffWaitTime=0
     Commands::OnWithTimedOff::Type command;
     command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command.onTime      = 10;
@@ -365,17 +355,17 @@ TEST_F(TestOnOffLightingCluster, TestTimerCancellation)
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 2. Send Off
+    // Step 2: Send an Off command.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // Timer should be cancelled (because OffWaitTime is 0)
+    // Timer should be cancelled because OffWaitTime is 0.
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 }
 
 TEST_F(TestOnOffLightingCluster, TestOffWaitTime)
 {
-    // 1. OnWithTimedOff (OnTime=10, OffWaitTime=5)
+    // Step 1: Invoke OnWithTimedOff with OnTime=10 and OffWaitTime=5
     Commands::OnWithTimedOff::Type command;
     command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command.onTime      = 10;
@@ -383,23 +373,21 @@ TEST_F(TestOnOffLightingCluster, TestOffWaitTime)
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
 
-    // 2. Send Off (Manually)
+    // Step 2: Send an Off command.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // Timer should be ACTIVE (for OffWaitTime)
+    // Timer should remain active to count down OffWaitTime.
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 3. Advance clock 5 ticks
+    // Step 3: Advance clock to exhaust OffWaitTime.
     for (int i = 0; i < 5; ++i)
     {
         mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(100));
     }
 
-    // Timer should stop
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // OffWaitTime should be 0
     uint16_t offWaitTime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 0);
@@ -407,12 +395,12 @@ TEST_F(TestOnOffLightingCluster, TestOffWaitTime)
 
 TEST_F(TestOnOffLightingCluster, TestGlobalSceneControl)
 {
-    // 1. Initial State: GlobalSceneControl = true
+    // Step 1: Check initial State: GlobalSceneControl is true
     bool globalSceneControl = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
 
-    // 2. OffWithEffect -> Should set GlobalSceneControl = false
+    // Step 2: OffWithEffect should set GlobalSceneControl to false and store the scene.
     Commands::OffWithEffect::Type offCommand;
     offCommand.effectIdentifier = EffectIdentifierEnum::kDyingLight;
     offCommand.effectVariant    = 0;
@@ -420,122 +408,97 @@ TEST_F(TestOnOffLightingCluster, TestGlobalSceneControl)
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_FALSE(globalSceneControl);
-
-    // Verify StoreCurrentScene was called
     EXPECT_EQ(mMockScenesIntegrationDelegate.storeCalls.size(), 1u);
-    // We don't have a great way to check the fabric index here, so we just check the call was made.
 
-    // 3. OnWithRecallGlobalScene -> Should set GlobalSceneControl = true
+    // Step 3: OnWithRecallGlobalScene should set GlobalSceneControl to true and recall the scene.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::OnWithRecallGlobalScene::Type()).IsSuccess());
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
-
-    // Verify RecallScene was called
     EXPECT_EQ(mMockScenesIntegrationDelegate.recallCalls.size(), 1u);
-    // We don't have a great way to check the fabric index here, so we just check the call was made.
 }
 
 TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
 {
     OnOffLightingClusterTestAccess testAccess(mCluster);
 
-    // 1. Set OnTime and OffWaitTime to non-zero values
+    // Step 1: Set OnTime and OffWaitTime to non-zero values
     testAccess.SetOnTime(100);
     testAccess.SetOffWaitTime(200);
 
-    // 2. Call SetOnOffWithTimeReset(false)
+    // Step 2: Call SetOnOffWithTimeReset(false) to turn off and clear OnTime.
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(false), CHIP_NO_ERROR);
-
-    // Verify OnTime is reset
     uint16_t onTime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 0);
-
-    // OffWaitTime should not change
     uint16_t offWaitTime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 200);
 
-    // 3. Set OnTime and OffWaitTime to non-zero values again
+    // Step 3: Set OnTime and OffWaitTime to non-zero values again
     testAccess.SetOnTime(100);
     testAccess.SetOffWaitTime(200);
 
-    // 4. Call SetOnOffWithTimeReset(true)
+    // Step 4: Call SetOnOffWithTimeReset(true) to turn on and clear OffWaitTime.
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(true), CHIP_NO_ERROR);
-
-    // Verify OffWaitTime is reset
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 0);
-
-    // OnTime should not change
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 100);
 }
 
 TEST_F(TestOnOffLightingCluster, TestOffWithEffect_GlobalSceneControlFalse)
 {
-    // 1. Turn On first
+    // Step 1: Turn On.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Set GlobalSceneControl to false (by invoking OffWithEffect once)
+    // Step 2: Set GlobalSceneControl to false by invoking OffWithEffect.
     Commands::OffWithEffect::Type offCommand1;
     offCommand1.effectIdentifier = EffectIdentifierEnum::kDyingLight;
     offCommand1.effectVariant    = 0;
     EXPECT_TRUE(mClusterTester.Invoke(offCommand1).IsSuccess());
+    EXPECT_EQ(mMockScenesIntegrationDelegate.storeCalls.size(), 1u);
 
     bool globalSceneControl = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_FALSE(globalSceneControl);
-    EXPECT_EQ(mMockScenesIntegrationDelegate.storeCalls.size(), 1u); // Scene was stored
 
-    // 3. Reset mock delegates
+    // Step 3: Reset mock delegates for next call.
     mMockScenesIntegrationDelegate.storeCalls.clear();
     mMockEffectDelegate.mCalled = false;
 
-    // 4. Turn On again
+    // Step 4: Turn On again.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 5. Call OffWithEffect again
+    // Step 5: Call OffWithEffect again. Since GlobalSceneControl is false,
+    // no effect should be triggered and no scene operations should occur.
     Commands::OffWithEffect::Type offCommand2;
     offCommand2.effectIdentifier = EffectIdentifierEnum::kDelayedAllOff;
     offCommand2.effectVariant    = 0;
     EXPECT_TRUE(mClusterTester.Invoke(offCommand2).IsSuccess());
 
-    // Verify no scene operations are performed
     EXPECT_EQ(mMockScenesIntegrationDelegate.storeCalls.size(), 0u);
-
-    // Verify effect delegate was NOT called
     EXPECT_FALSE(mMockEffectDelegate.mCalled);
-
-    // Verify device is Off
     EXPECT_FALSE(mMockDelegate.mOnOff);
 }
 
 TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_GlobalSceneControlTrue)
 {
-    // Initial State: GlobalSceneControl = true (default)
-    // OnOff is false initially as well.
+    // If GlobalSceneControl is true, OnWithRecallGlobalScene should do nothing.
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // Invoke command
     EXPECT_TRUE(mClusterTester.Invoke(Commands::OnWithRecallGlobalScene::Type()).IsSuccess());
 
-    // Verify recall was NOT called
     EXPECT_EQ(mMockScenesIntegrationDelegate.recallCalls.size(), 0u);
-
-    // Verify OnOff state remains unchanged (still OFF)
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // GlobalSceneControl should still be true
     bool globalSceneControl = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
 }
 
-// Custom mock delegate for simulating scene recall failure
 class FailingRecallScenesIntegrationDelegate : public MockScenesIntegrationDelegate
 {
 public:
@@ -548,8 +511,8 @@ public:
 
 TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_RecallFails)
 {
-    // 1. Setup cluster with standard mock delegate first to set GlobalSceneControl to false
-    EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess()); // Ensure On != Off
+    // Step 1: Set GlobalSceneControl to false using the default delegate.
+    EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     Commands::OffWithEffect::Type offCommand;
     offCommand.effectIdentifier = EffectIdentifierEnum::kDyingLight;
     offCommand.effectVariant    = 0;
@@ -558,7 +521,7 @@ TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_RecallFails)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_FALSE(globalSceneControl);
 
-    // 2. Now, re-setup with the FailingRecallScenesIntegrationDelegate
+    // Step 2: Re-setup the cluster with the FailingRecallScenesIntegrationDelegate.
     FailingRecallScenesIntegrationDelegate failingDelegate;
     MockOnOffDelegate localMockDelegate;
     OnOffLightingCluster cluster(kTestEndpointId, mMockTimerDelegate, mMockEffectDelegate, &failingDelegate);
@@ -566,31 +529,31 @@ TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_RecallFails)
     cluster.AddDelegate(&localMockDelegate);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Need to set GlobalSceneControl to false again with the new cluster instance
-    EXPECT_TRUE(tester.Invoke(Commands::On::Type()).IsSuccess()); // Ensure On != Off
+    // Step 3: Set GlobalSceneControl to false again with the new cluster instance.
+    EXPECT_TRUE(tester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(tester.Invoke(offCommand).IsSuccess());
     EXPECT_EQ(tester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_FALSE(globalSceneControl);
 
-    // Invoke OnWithRecallGlobalScene command
+    // Step 4: Invoke OnWithRecallGlobalScene. Recall will fail.
     EXPECT_TRUE(tester.Invoke(Commands::OnWithRecallGlobalScene::Type()).IsSuccess());
 
-    // Verify recall was called once on the failing delegate
     EXPECT_EQ(failingDelegate.recallCalls.size(), 1u);
 
-    // Verify OnOff state is true (fallback behavior)
+    // Fallback behavior: OnOff should be set to TRUE.
     EXPECT_TRUE(localMockDelegate.mOnOff);
 
-    // GlobalSceneControl should be true
     EXPECT_EQ(tester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
 }
 
 TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_AcceptOnlyWhenOn)
 {
-    // 1. Ensure device is OFF
+    // Step 1: Ensure device is OFF (default state).
+    EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 2. OnWithTimedOff with AcceptOnlyWhenOn = true
+    // Step 2: Call OnWithTimedOff with AcceptOnlyWhenOn = true.
+    // The command should be discarded as the device is OFF.
     Commands::OnWithTimedOff::Type command;
     command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 1);
     command.onTime      = 10;
@@ -598,26 +561,24 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_AcceptOnlyWhenOn)
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
 
-    // Verify OnOff state remains false (command discarded)
     EXPECT_FALSE(mMockDelegate.mOnOff);
-
-    // Verify timer is not active
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 }
 
 TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_DelayedOffGuard)
 {
-    // 1. Ensure device is OFF
+    // Step 1: Ensure device is OFF.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 2. Set OffWaitTime to a non-zero value
+    // Step 2: Set OffWaitTime to a non-zero value.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
     uint16_t offWaitTime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 5);
 
-    // 3. Call OnWithTimedOff (should be ignored due to OffWaitTime > 0 and OnOff is false)
+    // Step 3: Call OnWithTimedOff. Since the device is OFF and OffWaitTime > 0,
+    // the command should only potentially reduce OffWaitTime.
     Commands::OnWithTimedOff::Type command;
     command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0); // Unconditional
     command.onTime      = 10;
@@ -625,90 +586,79 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_DelayedOffGuard)
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
 
-    // Verify OnOff state remains false
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // Verify OffWaitTime is reduced to min(current, new)
+    // OffWaitTime should be min(current, new).
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, std::min(static_cast<uint16_t>(5), static_cast<uint16_t>(20)));
 
-    // Verify timer is active (decrementing OffWaitTime)
+    // Timer should be active to count down OffWaitTime.
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 }
 
 TEST_F(TestOnOffLightingCluster, TestWriteOnTimeUpdatesTimer)
 {
-    // Initially timer is not active
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 1. Turn device ON
+    // Step 1: Turn device ON.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Write non-zero OnTime
+    // Step 2: Write non-zero OnTime, timer should start.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OnTime::Id, static_cast<uint16_t>(100)), CHIP_NO_ERROR);
-
-    // Verify timer is active
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 2. Write 0 to OnTime
+    // Step 3: Write 0 to OnTime, timer should stop.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OnTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
-
-    // Verify timer is cancelled
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 }
 
 TEST_F(TestOnOffLightingCluster, TestWriteOffWaitTimeUpdatesTimer)
 {
-    // 1. Ensure device is OFF
+    // Step 1: Ensure device is OFF.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 2. Write non-zero OffWaitTime
+    // Step 2: Write non-zero OffWaitTime, timer should start.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(100)), CHIP_NO_ERROR);
-
-    // Verify timer is active
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 3. Write 0 to OffWaitTime
+    // Step 3: Write 0 to OffWaitTime, timer should stop.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 }
 
 TEST_F(TestOnOffLightingCluster, TestWriteStartUpOnOff)
 {
-    // 1. Initial State: OnOff is false, StartUpOnOff is null
+    // Step 1: Check Initial State: OnOff is false, StartUpOnOff is null.
     EXPECT_FALSE(mMockDelegate.mOnOff);
     DataModel::Nullable<StartUpOnOffEnum> startUpOnOff;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_TRUE(startUpOnOff.IsNull());
 
-    // 2. Write StartUpOnOff to kOn
+    // Step 2: Write StartUpOnOff to kOn. OnOff state should not change.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, StartUpOnOffEnum::kOn), CHIP_NO_ERROR);
-
-    // Verify OnOff state does not change
     EXPECT_FALSE(mMockDelegate.mOnOff);
-
-    // Verify StartUpOnOff is updated
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_FALSE(startUpOnOff.IsNull());
     EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kOn);
 
-    // 3. Write StartUpOnOff to kOff
+    // Step 3: Write StartUpOnOff to kOff. OnOff state should not change.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, StartUpOnOffEnum::kOff), CHIP_NO_ERROR);
     EXPECT_FALSE(mMockDelegate.mOnOff);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_FALSE(startUpOnOff.IsNull());
     EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kOff);
 
-    // 4. Write StartUpOnOff to kToggle
+    // Step 4: Write StartUpOnOff to kToggle. OnOff state should not change.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, StartUpOnOffEnum::kToggle), CHIP_NO_ERROR);
     EXPECT_FALSE(mMockDelegate.mOnOff);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_FALSE(startUpOnOff.IsNull());
     EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kToggle);
 
-    // 5. Write StartUpOnOff to Null
+    // Step 5: Write StartUpOnOff to Null. OnOff state should not change.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, DataModel::Nullable<StartUpOnOffEnum>()), CHIP_NO_ERROR);
     EXPECT_FALSE(mMockDelegate.mOnOff);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
@@ -717,32 +667,28 @@ TEST_F(TestOnOffLightingCluster, TestWriteStartUpOnOff)
 
 TEST_F(TestOnOffLightingCluster, TestWriteInvalidStartUpOnOff)
 {
-    // 1. Initial State: StartUpOnOff is null
+    // Step 1: Initial State: StartUpOnOff is null.
     DataModel::Nullable<StartUpOnOffEnum> startUpOnOff;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_TRUE(startUpOnOff.IsNull());
 
-    // 2. Attempt to write an invalid enum value
+    // Step 2: Attempt to write an invalid enum value.
     DataModel::Nullable<uint8_t> invalidValue = 0x99;
     DataModel::ActionReturnStatus result      = mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, invalidValue);
     EXPECT_TRUE(result.IsError());
     EXPECT_EQ(result, Status::ConstraintError);
-
-    // 3. Verify StartUpOnOff attribute is still null
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_TRUE(startUpOnOff.IsNull());
 
-    // 4. Write a valid value first
+    // Step 3: Write a valid value first.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, StartUpOnOffEnum::kOn), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kOn);
 
-    // 5. Attempt to write an invalid enum value again
+    // Step 4: Attempt to write an invalid enum value again.
     result = mClusterTester.WriteAttribute(Attributes::StartUpOnOff::Id, invalidValue);
     EXPECT_TRUE(result.IsError());
     EXPECT_EQ(result, Status::ConstraintError);
-
-    // 6. Verify StartUpOnOff attribute is still kOn
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
     EXPECT_FALSE(startUpOnOff.IsNull());
     EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kOn);
@@ -750,7 +696,7 @@ TEST_F(TestOnOffLightingCluster, TestWriteInvalidStartUpOnOff)
 
 TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_OnTimeActive)
 {
-    // 1. Turn On with Timed Off (OnTime = 10, OffWaitTime = 0)
+    // Step 1: Turn On with Timed Off (OnTime = 10, OffWaitTime = 0).
     Commands::OnWithTimedOff::Type command1;
     command1.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command1.onTime      = 10;
@@ -758,27 +704,27 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_OnTimeActive)
     EXPECT_TRUE(mClusterTester.Invoke(command1).IsSuccess());
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 2. Call OnWithTimedOff again with smaller OnTime (5)
+    // Step 2: Call OnWithTimedOff again with a smaller OnTime (5).
+    // OnTime should remain 10 because the new value is not greater.
     Commands::OnWithTimedOff::Type command2;
     command2.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command2.onTime      = 5;
     command2.offWaitTime = 0;
     EXPECT_TRUE(mClusterTester.Invoke(command2).IsSuccess());
 
-    // Verify OnTime is still 10 (max of current and new)
     uint16_t onTime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 10);
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
-    // 3. Call OnWithTimedOff again with larger OnTime (15)
+    // Step 3: Call OnWithTimedOff again with a larger OnTime (15).
+    // OnTime should update to 15.
     Commands::OnWithTimedOff::Type command3;
     command3.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command3.onTime      = 15;
     command3.offWaitTime = 0;
     EXPECT_TRUE(mClusterTester.Invoke(command3).IsSuccess());
 
-    // Verify OnTime is now 15
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 15);
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
@@ -786,7 +732,7 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_OnTimeActive)
 
 TEST_F(TestOnOffLightingCluster, TestWriteOnTimeWhenOffWaitActive)
 {
-    // 1. Turn ON then OFF to activate OffWaitTime
+    // Step 1: Turn ON, set OffWaitTime, then turn OFF to start the OffWaitTime timer.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     OnOffLightingClusterTestAccess testAccess(mCluster);
     testAccess.SetOffWaitTime(10);
@@ -794,10 +740,9 @@ TEST_F(TestOnOffLightingCluster, TestWriteOnTimeWhenOffWaitActive)
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 2. Write to OnTime
+    // Step 2: Write to OnTime. This should not affect the active OffWaitTime timer.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OnTime::Id, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
 
-    // Verify timer is still active (for OffWaitTime)
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
     uint16_t onTime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
@@ -806,7 +751,7 @@ TEST_F(TestOnOffLightingCluster, TestWriteOnTimeWhenOffWaitActive)
 
 TEST_F(TestOnOffLightingCluster, TestWriteOffWaitTimeWhenOnTimeActive)
 {
-    // 1. Turn ON with OnTime
+    // Step 1: Turn ON with OnTime to start the OnTime timer.
     Commands::OnWithTimedOff::Type command1;
     command1.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command1.onTime      = 10;
@@ -815,10 +760,9 @@ TEST_F(TestOnOffLightingCluster, TestWriteOffWaitTimeWhenOnTimeActive)
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Write to OffWaitTime
+    // Step 2: Write to OffWaitTime. This should not affect the active OnTime timer.
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
 
-    // Verify timer is still active (for OnTime)
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
     uint16_t offWaitTime = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
@@ -827,8 +771,8 @@ TEST_F(TestOnOffLightingCluster, TestWriteOffWaitTimeWhenOnTimeActive)
 
 TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_NullDelegate)
 {
-    // 1. Setup cluster with standard mock delegate first to set GlobalSceneControl to false
-    EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess()); // Ensure On != Off
+    // Step 1: Set GlobalSceneControl to false using the default delegate.
+    EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     Commands::OffWithEffect::Type offCommand;
     offCommand.effectIdentifier = EffectIdentifierEnum::kDyingLight;
     offCommand.effectVariant    = 0;
@@ -837,26 +781,24 @@ TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_NullDelegate)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_FALSE(globalSceneControl);
 
-    // 2. Now, re-setup with a null scenes delegate
+    // Step 2: Re-setup the cluster with a null scenes delegate.
     MockOnOffDelegate localMockDelegate;
     OnOffLightingCluster cluster(kTestEndpointId, mMockTimerDelegate, mMockEffectDelegate, nullptr);
     ClusterTester tester(cluster);
     cluster.AddDelegate(&localMockDelegate);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Need to set GlobalSceneControl to false again with the new cluster instance
-    EXPECT_TRUE(tester.Invoke(Commands::On::Type()).IsSuccess()); // Ensure On != Off
+    // Step 3: Set GlobalSceneControl to false again with the new cluster instance.
+    EXPECT_TRUE(tester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(tester.Invoke(offCommand).IsSuccess());
     EXPECT_EQ(tester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_FALSE(globalSceneControl);
 
-    // 3. Invoke OnWithRecallGlobalScene
+    // Step 4: Invoke OnWithRecallGlobalScene.
+    // Should turn on the device as a fallback since the scenes delegate is null.
     EXPECT_TRUE(tester.Invoke(Commands::OnWithRecallGlobalScene::Type()).IsSuccess());
 
-    // Verify device is ON
     EXPECT_TRUE(localMockDelegate.mOnOff);
-
-    // Verify GlobalSceneControl is true
     EXPECT_EQ(tester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
     EXPECT_TRUE(globalSceneControl);
 }

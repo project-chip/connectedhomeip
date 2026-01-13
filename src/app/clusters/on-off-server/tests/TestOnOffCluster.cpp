@@ -111,17 +111,14 @@ TEST_F(TestOnOffCluster, TestAcceptedCommands)
 
 TEST_F(TestOnOffCluster, TestReadAttributes)
 {
-    // Test Read OnOff (Default false)
     bool onOff = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
     EXPECT_FALSE(onOff);
 
-    // Test Read ClusterRevision
     uint16_t revision = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
     EXPECT_EQ(revision, kRevision);
 
-    // Test Read FeatureMap
     uint32_t featureMap = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
@@ -129,18 +126,17 @@ TEST_F(TestOnOffCluster, TestReadAttributes)
 
 TEST_F(TestOnOffCluster, TestCommands)
 {
-    // 1. On Command
+    // Step 1: Test On Command
     EXPECT_TRUE(mClusterTester.Invoke<Commands::On::Type>(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mCalled);
     EXPECT_TRUE(mMockDelegate.mOnOff);
     mMockDelegate.mCalled = false;
 
-    // Verify Attribute
     bool onOff = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
     EXPECT_TRUE(onOff);
 
-    // 2. Off Command
+    // Step 2: Test Off Command
     EXPECT_TRUE(mClusterTester.Invoke<Commands::Off::Type>(Commands::Off::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mCalled);
     EXPECT_FALSE(mMockDelegate.mOnOff);
@@ -149,7 +145,7 @@ TEST_F(TestOnOffCluster, TestCommands)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
     EXPECT_FALSE(onOff);
 
-    // 3. Toggle Command (from Off to On)
+    // Step 3: Test Toggle Command (from Off to On)
     EXPECT_TRUE(mClusterTester.Invoke<Commands::Toggle::Type>(Commands::Toggle::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mCalled);
     EXPECT_TRUE(mMockDelegate.mOnOff);
@@ -158,7 +154,7 @@ TEST_F(TestOnOffCluster, TestCommands)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
     EXPECT_TRUE(onOff);
 
-    // 4. Toggle Command (from On to Off)
+    // Step 4: Test Toggle Command (from On to Off)
     EXPECT_TRUE(mClusterTester.Invoke<Commands::Toggle::Type>(Commands::Toggle::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mCalled);
     EXPECT_FALSE(mMockDelegate.mOnOff);
@@ -172,7 +168,7 @@ TEST_F(TestOnOffCluster, TestNoPersistence)
     MockOnOffDelegate mockDelegate;
     TimerDelegateMock mockTimerDelegate;
 
-    // 1. Initial startup, set to ON
+    // Step 1: Initial startup, set to ON
     {
         TestServerClusterContext context;
         OnOffCluster cluster(kTestEndpointId, mockTimerDelegate);
@@ -186,7 +182,7 @@ TEST_F(TestOnOffCluster, TestNoPersistence)
         EXPECT_TRUE(onOff);
     }
 
-    // 2. Restart, verify state is NOT persisted (should be default OFF)
+    // Step 2: Restart, verify state is NOT persisted (should be default OFF)
     {
         TestServerClusterContext context;
         OnOffCluster cluster(kTestEndpointId, mockTimerDelegate);
@@ -196,7 +192,7 @@ TEST_F(TestOnOffCluster, TestNoPersistence)
 
         bool onOff = true; // Initialize to true to ensure it's changed
         EXPECT_EQ(tester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
-        EXPECT_FALSE(onOff); // Expect default value FALSE
+        EXPECT_FALSE(onOff);
     }
 }
 
@@ -233,14 +229,11 @@ TEST_F(TestOffOnlyOnOffCluster, TestAcceptedCommands)
 
 TEST_F(TestOffOnlyOnOffCluster, TestInvokeCommands)
 {
-    // Off should still work
     EXPECT_TRUE(mClusterTester.Invoke<Commands::Off::Type>(Commands::Off::Type()).IsSuccess());
 
-    // On should fail with UnsupportedCommand
     EXPECT_EQ(mClusterTester.Invoke<Commands::On::Type>(Commands::On::Type()).status,
               Protocols::InteractionModel::Status::UnsupportedCommand);
 
-    // Toggle should fail with UnsupportedCommand
     EXPECT_EQ(mClusterTester.Invoke<Commands::Toggle::Type>(Commands::Toggle::Type()).status,
               Protocols::InteractionModel::Status::UnsupportedCommand);
 }
@@ -250,7 +243,7 @@ TEST_F(TestOnOffCluster, TestMultipleDelegates)
     MockOnOffDelegate secondaryDelegate;
     mCluster.AddDelegate(&secondaryDelegate);
 
-    // 1. On Command - Both should be called
+    // Step 1: On Command - Both delegates should be called
     EXPECT_TRUE(mClusterTester.Invoke<Commands::On::Type>(Commands::On::Type()).IsSuccess());
 
     EXPECT_TRUE(mMockDelegate.mCalled);
@@ -261,10 +254,10 @@ TEST_F(TestOnOffCluster, TestMultipleDelegates)
     EXPECT_TRUE(secondaryDelegate.mOnOff);
     secondaryDelegate.mCalled = false;
 
-    // 2. Remove secondary delegate
+    // Step 2: Remove secondary delegate
     mCluster.RemoveDelegate(&secondaryDelegate);
 
-    // 3. Off Command - Only primary should be called
+    // Step 3: Off Command - Only primary should be called
     EXPECT_TRUE(mClusterTester.Invoke<Commands::Off::Type>(Commands::Off::Type()).IsSuccess());
 
     EXPECT_TRUE(mMockDelegate.mCalled);
@@ -276,21 +269,21 @@ TEST_F(TestOnOffCluster, TestMultipleDelegates)
 
 TEST_F(TestOnOffCluster, TestSceneSupport)
 {
-    // 1. Setup: Turn ON
+    // Step 1: Turn ON
     EXPECT_TRUE(mClusterTester.Invoke<Commands::On::Type>(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Serialize Save
+    // Step 2: Serialize the current state
     uint8_t buffer[128];
     MutableByteSpan serializedBytes(buffer);
     EXPECT_EQ(mCluster.SerializeSave(kTestEndpointId, Clusters::OnOff::Id, serializedBytes), CHIP_NO_ERROR);
     EXPECT_GT(serializedBytes.size(), 0u);
 
-    // 3. Turn OFF
+    // Step 3: Turn OFF
     EXPECT_TRUE(mClusterTester.Invoke<Commands::Off::Type>(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 4. Apply Scene (Restore ON)
+    // Step 4: Apply the saved scene to restore the ON state
     EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 0), CHIP_NO_ERROR);
     EXPECT_TRUE(mMockDelegate.mOnOff);
 }
@@ -299,76 +292,73 @@ TEST_F(TestOnOffCluster, TestSceneInvalidAttribute)
 {
     using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
-    // Construct invalid data (Wrong Attribute ID)
+    // Construct invalid scene data with a wrong Attribute ID.
     AttributeValuePair pairs[1];
-    pairs[0].attributeID = Attributes::OnOff::Id + 1; // Invalid ID
+    pairs[0].attributeID = Attributes::OnOff::Id + 1;
     pairs[0].valueUnsigned8.SetValue(1);
 
     uint8_t buffer[128];
     MutableByteSpan serializedBytes(buffer);
     app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
 
-    // Encode invalid list
     EXPECT_EQ(mCluster.EncodeAttributeValueList(attributeValueList, serializedBytes), CHIP_NO_ERROR);
 
-    // Apply Scene should fail
     EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 0), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestOnOffCluster, TestSceneTransition)
 {
-    // 1. Start ON
+    // Step 1: Start ON
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // 2. Serialize Save (ON state)
+    // Step 2: Serialize the ON state
     uint8_t buffer[128];
     MutableByteSpan serializedBytes(buffer);
     EXPECT_EQ(mCluster.SerializeSave(kTestEndpointId, Clusters::OnOff::Id, serializedBytes), CHIP_NO_ERROR);
 
-    // 3. Turn OFF
+    // Step 3: Turn OFF
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 4. Apply Scene (Restore ON) with 1000ms transition
+    // Step 4: Apply Scene to restore ON state with a 1000ms transition
     EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 1000), CHIP_NO_ERROR);
 
-    // Should still be OFF (transition pending)
+    // OnOff should still be FALSE as the transition is in progress.
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 5. Advance Clock (1000ms)
+    // Step 5: Advance time to complete the transition
     mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1000));
 
-    // Should be ON
     EXPECT_TRUE(mMockDelegate.mOnOff);
 }
 
 TEST_F(TestOnOffCluster, TestSceneTransitionCancellation)
 {
-    // 1. Setup: Start OFF
+    // Step 1: Start OFF
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(mMockDelegate.mOnOff);
 
-    // 2. Serialize Save (ON state)
+    // Step 2: Prepare a scene that would turn the light ON.
     uint8_t buffer[128];
     MutableByteSpan serializedBytes(buffer);
     EXPECT_EQ(mCluster.SetOnOff(true), CHIP_NO_ERROR); // Manually set to save ON
     EXPECT_EQ(mCluster.SerializeSave(kTestEndpointId, Clusters::OnOff::Id, serializedBytes), CHIP_NO_ERROR);
-    EXPECT_EQ(mCluster.SetOnOff(false), CHIP_NO_ERROR); // Back to OFF
+    EXPECT_EQ(mCluster.SetOnOff(false), CHIP_NO_ERROR); // Revert to OFF
 
-    // 3. Apply Scene (Restore ON) with 1000ms transition
+    // Step 3: Apply the scene with a 1000ms transition.
     EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 1000), CHIP_NO_ERROR);
     EXPECT_FALSE(mMockDelegate.mOnOff);
     EXPECT_TRUE(OnOffClusterTestAccess(mCluster).IsSceneTransitionPending());
 
-    // 4. Send "Off" Command -> Should cancel transition
+    // Step 4: Send an "Off" Command, which should cancel the ongoing transition.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_FALSE(OnOffClusterTestAccess(mCluster).IsSceneTransitionPending());
 
-    // 5. Advance Clock (1000ms)
+    // Step 5: Advance time beyond the original transition time.
     mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1000));
 
-    // Should STILL be OFF
+    // The state should remain OFF because the transition was cancelled.
     EXPECT_FALSE(mMockDelegate.mOnOff);
 }
 
