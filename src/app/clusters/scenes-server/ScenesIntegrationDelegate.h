@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +33,7 @@ public:
     // == Global Scene Methods ==
     // These methods interact with the Global Scene (Group ID 0, Scene ID 0).
 
-    /// Stores the current state of into the Global Scene for the fabric.
+    /// Stores the current state into the Global Scene for the fabric.
     virtual CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) = 0;
 
     /// Recalls the Global Scene for the given fabric.
@@ -47,7 +46,7 @@ public:
     /// This can be used to invalidate scenes that reference the given group.
     virtual CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) = 0;
 
-    // Marks all scenes on the associated endpoint as invalid for all fabrics.
+    /// Marks all scenes on the associated endpoint as invalid for all fabrics.
     virtual CHIP_ERROR MakeSceneInvalidForAllFabrics() = 0;
 };
 
