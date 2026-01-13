@@ -331,6 +331,9 @@ private:
     // @returns error status if Attributes cannot be retrieved.
     app::DataModel::ActionReturnStatus VerifyAttributeInAttributeList(AttributeId attr_id)
     {
+        // These methods work IF AND ONLY IF cluster path contains exactly one path since
+        // we get accepted commands by path.
+        VerifyOrReturnError(mCluster.GetPaths().size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
         auto path = mCluster.GetPaths()[0];
 
         // Get the list of attributes from the cluster's metadata
@@ -359,6 +362,9 @@ private:
     // @returns error status if AcceptedCommands cannot be retrieved.
     app::DataModel::ActionReturnStatus VerifyCommandInAcceptedCommandsList(CommandId commandId)
     {
+        // These methods work IF AND ONLY IF cluster path contains exactly one path since
+        // we get accepted commands by path.
+        VerifyOrReturnError(mCluster.GetPaths().size() == 1, CHIP_ERROR_INCORRECT_STATE);
         auto path = mCluster.GetPaths()[0];
 
         // Get the list of accepted commands from the cluster
