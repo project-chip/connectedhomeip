@@ -333,12 +333,9 @@ private:
         // These methods work IF AND ONLY IF cluster path contains exactly one path since
         // we get attributes by path.
         VerifyOrDie(mCluster.GetPaths().size() == 1);
-        auto path = mCluster.GetPaths()[0];
 
-        // Get the list of attributes from the cluster's metadata
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
-        CHIP_ERROR err = mCluster.Attributes(path, builder);
-        if (err != CHIP_NO_ERROR)
+        if (CHIP_ERROR err = mCluster.Attributes(mCluster.GetPaths()[0], builder); err != CHIP_NO_ERROR)
         {
             ChipLogError(Test, "Failed to get attribute list: %" CHIP_ERROR_FORMAT, err.Format());
             return false;
@@ -354,12 +351,9 @@ private:
         // These methods work IF AND ONLY IF cluster path contains exactly one path since
         // we get accepted commands by path.
         VerifyOrDie(mCluster.GetPaths().size() == 1);
-        auto path = mCluster.GetPaths()[0];
 
-        // Get the list of accepted commands from the cluster
         ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> builder;
-        CHIP_ERROR err = mCluster.AcceptedCommands(path, builder);
-        if (err != CHIP_NO_ERROR)
+        if (CHIP_ERROR err = mCluster.AcceptedCommands(mCluster.GetPaths()[0], builder); err != CHIP_NO_ERROR)
         {
             ChipLogError(Test, "Failed to get accepted commands: %" CHIP_ERROR_FORMAT, err.Format());
             return false;
