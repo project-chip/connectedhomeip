@@ -232,10 +232,10 @@ public:
 
         const Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
         const app::DataModel::InvokeRequest invokeRequest = [&]() {
-            app::DataModel::InvokeRequest request;
-            request.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
-            request.subjectDescriptor = &subjectDescriptor;
-            return request;
+            app::DataModel::InvokeRequest req;
+            req.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
+            req.subjectDescriptor = &subjectDescriptor;
+            return req;
         }();
 
         TLV::TLVWriter writer;
