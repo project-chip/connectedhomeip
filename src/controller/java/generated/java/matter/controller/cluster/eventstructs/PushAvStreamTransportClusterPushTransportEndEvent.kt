@@ -16,16 +16,23 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UShort) {
+class PushAvStreamTransportClusterPushTransportEndEvent(
+  val connectionID: UShort,
+  val containerType: UByte,
+  val CMAFSessionNumber: Optional<ULong>,
+) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
     append("\tconnectionID : $connectionID\n")
+    append("\tcontainerType : $containerType\n")
+    append("\tCMAFSessionNumber : $CMAFSessionNumber\n")
     append("}\n")
   }
 
@@ -33,12 +40,19 @@ class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UShort
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CONNECTION_ID), connectionID)
+      put(ContextSpecificTag(TAG_CONTAINER_TYPE), containerType)
+      if (CMAFSessionNumber.isPresent) {
+        val optCMAFSessionNumber = CMAFSessionNumber.get()
+        put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
+      }
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_CONNECTION_ID = 0
+    private const val TAG_CONTAINER_TYPE = 1
+    private const val TAG_CMAF_SESSION_NUMBER = 2
 
     fun fromTlv(
       tlvTag: Tag,
@@ -46,10 +60,21 @@ class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UShort
     ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
+      val containerType = tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_TYPE))
+      val CMAFSessionNumber =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterPushTransportEndEvent(connectionID)
+      return PushAvStreamTransportClusterPushTransportEndEvent(
+        connectionID,
+        containerType,
+        CMAFSessionNumber,
+      )
     }
   }
 }
