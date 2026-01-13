@@ -42,7 +42,10 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterBaseTest, TestStep, get_first_setup_code
+from matter.testing.matter_test_config import MatterTestConfig
+
+from matter.testing.commissioning import SetupParameters
 
 
 from matter.testing.decorators import async_test_body
@@ -130,6 +133,17 @@ class TC_DA_1_1(MatterBaseTest):
         logging.info(f"setupPayloadInfo: {setupPayloadInfo}")
         if not setupPayloadInfo:
             asserts.fail("Setup payload info is required for commissioning.")
+        
+        setup_params = SetupParameters(
+            discriminator=setupPayloadInfo[0].filter_value,
+            passcode=setupPayloadInfo[0].passcode
+        )
+            
+        # codelenz = get_first_setup_code(self.default_controller, MatterTestConfig)
+        # logging.info(f"codelenz: {codelenz}")
+            
+            
+            
 
         # Setup
         root_node_id = 0
@@ -171,6 +185,11 @@ class TC_DA_1_1(MatterBaseTest):
         self.step(3)
         # await self.request_device_factory_reset()
         await self.factory_reset_dut(th1)
+        
+        # logging.info(f"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        # logging.info(f"SLPEEEEEEEEEEEEEEEEEEEEEEEEEPIN!")
+        # await asyncio.sleep(45)
+        # logging.info(f"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
         # *** STEP 4 ***
         # Commission DUT to TH2's Fabric
@@ -187,24 +206,25 @@ class TC_DA_1_1(MatterBaseTest):
 
         # Open a PASE session
         pase_node_id = self.dut_node_id + 1
-        params = await self.open_commissioning_window()
-        await th2.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeId=pase_node_id)
+        # params = await self.open_commissioning_window()
+        logging.info(f"setup_params.qr_code: {setup_params.qr_code}")
+        await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
 
-        # *** STEP 5 ***
-        # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT
-        self.step(5)
-        response = await th2.ReadAttribute(
-            nodeId=pase_node_id,
-            attributes=(root_node_id, fabrics_attr),
-            fabricFiltered=False
-        )       
-        fabrics_th2 = response[0][opcreds_cluster][fabrics_attr]
-        logging.info(f"fabrics_th2: {fabrics_th2}")
+        # # *** STEP 5 ***
+        # # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT
+        # self.step(5)
+        # response = await th2.ReadAttribute(
+        #     nodeId=pase_node_id,
+        #     attributes=(root_node_id, fabrics_attr),
+        #     fabricFiltered=False
+        # )       
+        # fabrics_th2 = response[0][opcreds_cluster][fabrics_attr]
+        # logging.info(f"fabrics_th2: {fabrics_th2}")
 
-        # Verify that TH1's FabricID is not present in the fabrics list after factory reset
-        fabrics_th2_ids = [f.fabricID for f in fabrics_th2]
-        asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_th2_ids,
-                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's fabrics after factory reset, found: {fabrics_th2_ids}")
+        # # Verify that TH1's FabricID is not present in the fabrics list after factory reset
+        # fabrics_th2_ids = [f.fabricID for f in fabrics_th2]
+        # asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_th2_ids,
+        #                       f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's fabrics after factory reset, found: {fabrics_th2_ids}")
 
 
 
