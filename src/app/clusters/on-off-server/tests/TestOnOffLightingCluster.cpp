@@ -87,9 +87,10 @@ public:
     bool mCalled        = false;
     bool mStartupCalled = false;
 
-    void Reset() {
-        mOnOff = false;
-        mCalled = false;
+    void Reset()
+    {
+        mOnOff         = false;
+        mCalled        = false;
         mStartupCalled = false;
     }
 
@@ -228,7 +229,6 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
         EXPECT_TRUE(mMockDelegate.mStartupCalled);
         EXPECT_FALSE(mMockDelegate.mCalled);
         EXPECT_EQ(mMockDelegate.mOnOff, testCase.expectedStartState);
-
     }
 }
 
