@@ -87,6 +87,12 @@ public:
     bool mCalled        = false;
     bool mStartupCalled = false;
 
+    void Reset() {
+        mOnOff = false;
+        mCalled = false;
+        mStartupCalled = false;
+    }
+
     void OnOnOffChanged(bool on) override
     {
         mOnOff  = on;
@@ -214,8 +220,15 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
             }(),
             testCase.expectedStartState ? "TRUE" : "FALSE");
 
+        mMockDelegate.Reset();
         ASSERT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(mCluster.GetOnOff(), testCase.expectedStartState);
+
+        // Only startup should be called, with the correct value
+        EXPECT_TRUE(mMockDelegate.mStartupCalled);
+        EXPECT_FALSE(mMockDelegate.mCalled);
+        EXPECT_EQ(mMockDelegate.mOnOff, testCase.expectedStartState);
+
     }
 }
 
