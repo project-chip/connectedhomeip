@@ -204,12 +204,14 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
     if (!on && (mOnTime != 0))
     {
         mOnTime = 0;
+        UpdateTimer();
         NotifyAttributeChanged(Attributes::OnTime::Id);
     }
 
     if (on && (mOffWaitTime != 0))
     {
         mOffWaitTime = 0;
+        UpdateTimer();
         NotifyAttributeChanged(Attributes::OffWaitTime::Id);
     }
 
