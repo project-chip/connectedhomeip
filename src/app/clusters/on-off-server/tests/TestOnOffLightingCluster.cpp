@@ -14,16 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <app/clusters/on-off-server/OnOffLightingCluster.h>
-#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
-#include <clusters/OnOff/Metadata.h>
-#include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/MessageDef/StatusIB.h>
+#include <app/clusters/on-off-server/OnOffLightingCluster.h>
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <clusters/OnOff/ClusterId.h>
+#include <clusters/OnOff/Enums.h>
+#include <clusters/OnOff/Metadata.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegateMock.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -147,6 +153,71 @@ struct TestOnOffLightingCluster : public ::testing::Test
 
     ClusterTester mClusterTester{ mCluster };
 };
+
+TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
+{
+    // set up storage and restart
+    using TestCase = struct
+    {
+        bool startValue;
+        std::optional<uint8_t> startupOnOffValue;
+        bool expectedStartState;
+    };
+
+    const TestCase kTestCases[] = {
+        { true, std::nullopt, true },
+        { false, std::nullopt, false },
+        { true, to_underlying(StartUpOnOffEnum::kOff), false },
+        { false, to_underlying(StartUpOnOffEnum::kOff), false },
+        { true, to_underlying(StartUpOnOffEnum::kOn), true },
+        { false, to_underlying(StartUpOnOffEnum::kOn), true },
+        { true, to_underlying(StartUpOnOffEnum::kToggle), false },
+        { false, to_underlying(StartUpOnOffEnum::kToggle), true },
+
+        // invalid value tests
+        { true, 123, true },
+        { false, 234, false },
+    };
+
+    for (const TestCase & testCase : kTestCases)
+    {
+        // fresh start
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+        // set up storage
+        mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
+        WriteAttributeToStorage(Attributes::OnOff::Id, testCase.startValue);
+        if (testCase.startupOnOffValue.has_value())
+        {
+            WriteAttributeToStorage(Attributes::StartUpOnOff::Id, *testCase.startupOnOffValue);
+        }
+
+        // startup and check we work correctly
+        ChipLogProgress(
+            Test, "Running %s:%s, expecting %s", testCase.startValue ? "TRUE" : "FALSE",
+            [&]() {
+                if (!testCase.startupOnOffValue.has_value())
+                {
+                    return "NONE";
+                }
+                switch (*testCase.startupOnOffValue)
+                {
+                case to_underlying(StartUpOnOffEnum::kOn):
+                    return "ON";
+                case to_underlying(StartUpOnOffEnum::kOff):
+                    return "OFF";
+                case to_underlying(StartUpOnOffEnum::kToggle):
+                    return "TOGGLE";
+                default:
+                    return "INVALID";
+                }
+            }(),
+            testCase.expectedStartState ? "TRUE" : "FALSE");
+
+        ASSERT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        EXPECT_EQ(mCluster.GetOnOff(), testCase.expectedStartState);
+    }
+}
 
 TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
 {
