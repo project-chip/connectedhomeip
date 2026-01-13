@@ -129,10 +129,14 @@ if (wifi_soc != true) {  # CCP board
 
     source_set("ot-efr32-cert") {
       sources = [
+        "${openthread_root}/examples/platforms/utils/code_utils.h",
+        "${openthread_root}/examples/platforms/utils/encoding.h",
         "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
         "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
         "${openthread_root}/examples/platforms/utils/mac_frame.h",
+        "${openthread_root}/examples/platforms/utils/settings.h",
         "${openthread_root}/examples/platforms/utils/settings_ram.c",
+        "${openthread_root}/examples/platforms/utils/soft_source_match_table.h",
         "${sl_ot_efr32_root}/alarm.c",
         "${sl_ot_efr32_root}/crypto.c",
         "${sl_ot_efr32_root}/entropy.c",
