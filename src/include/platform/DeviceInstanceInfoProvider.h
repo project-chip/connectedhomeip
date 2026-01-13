@@ -269,7 +269,7 @@ public:
     }
 
 protected:
-    volatile bool mLocalConfigDisabled = false;
+    bool mLocalConfigDisabled = false;
 };
 
 /**
