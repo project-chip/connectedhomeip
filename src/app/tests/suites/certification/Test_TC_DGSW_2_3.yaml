@@ -67,8 +67,8 @@ tests:
           [1654697032.108154][7037:7042] CHIP:TOO:      }
       disabled: true
 
-      - label: "Step 3: TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used_original."
-        PICS: DGSW.S.A0002
+    - label: "Step 3: TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used_original."
+      PICS: DGSW.S.A0002
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
@@ -91,7 +91,7 @@ tests:
           [1663066925.496999][4072:4077] CHIP:TOO:   CurrentHeapHighWatermark: 1389328
       disabled: true
 
-      - label: "Step 5: TH sends ResetWatermarks to the DUT."
+    - label: "Step 5: TH sends ResetWatermarks to the DUT."
       PICS: DGSW.S.C00.Rsp
       verification: |
           ./chip-tool softwarediagnostics  reset-watermarks 1 0
