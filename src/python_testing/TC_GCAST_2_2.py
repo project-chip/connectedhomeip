@@ -287,7 +287,7 @@ class TC_GCAST_2_2(MatterBaseTest):
             exceeding_endpoint = 21
             while exceeding_endpoint in endpoints_list:
                 exceeding_endpoint += 1
-            endpoints_list_exceeds_DUT_endpoints = endpoints_list.append(exceeding_endpoint)
+            endpoints_list_exceeds_DUT_endpoints = endpoints_list + [exceeding_endpoint]
             try:
                 await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                     groupID=groupID3,
