@@ -1234,6 +1234,23 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-ambient-context-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Ambient Context Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0150</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Service Area" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Ambient Context Sensing" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-closure</name>
         <domain>CHIP</domain>
         <typeName>Closure</typeName>

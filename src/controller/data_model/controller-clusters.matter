@@ -359,6 +359,8 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
   fabric_idx fabricIndex = 254;
 }
 
@@ -10123,6 +10125,7 @@ cluster CameraAvStreamManagement = 1361 {
 
   enum ImageCodecEnum : enum8 {
     kJPEG = 0 [spec_name = "JPEG"];
+    kHEIC = 1 [spec_name = "HEIC"];
   }
 
   enum TriStateAutoEnum : enum8 {
@@ -10490,7 +10493,7 @@ cluster CameraAvSettingsUserLevelManagement = 1362 {
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
 cluster WebRTCTransportProvider = 1363 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kMetadata = 0x1;
@@ -10518,6 +10521,8 @@ cluster WebRTCTransportProvider = 1363 {
     optional char_string<16> ICETransportPolicy = 5;
     optional boolean metadataEnabled = 6;
     optional SFrameStruct SFrameConfig = 7;
+    optional int16u videoStreams[] = 8;
+    optional int16u audioStreams[] = 9;
   }
 
   response struct SolicitOfferResponse = 1 {
@@ -10538,6 +10543,8 @@ cluster WebRTCTransportProvider = 1363 {
     optional char_string<16> ICETransportPolicy = 7;
     optional boolean metadataEnabled = 8;
     optional SFrameStruct SFrameConfig = 9;
+    optional int16u videoStreams[] = 10;
+    optional int16u audioStreams[] = 11;
   }
 
   response struct ProvideOfferResponse = 3 {
@@ -10575,7 +10582,7 @@ cluster WebRTCTransportProvider = 1363 {
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
 cluster WebRTCTransportRequestor = 1364 {
-  revision 1;
+  revision 2;
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -10618,7 +10625,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 1;
+  revision 2;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -10645,6 +10652,8 @@ cluster PushAvStreamTransport = 1365 {
     kInvalidOptions = 9;
     kInvalidStreamUsage = 10;
     kInvalidTime = 11;
+    kInvalidPreRollLength = 12;
+    kDuplicateStreamValues = 13;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -10662,6 +10671,7 @@ cluster PushAvStreamTransport = 1365 {
     kUserInitiated = 0;
     kAutomation = 1;
     kEmergency = 2;
+    kDoorbellPressed = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -10679,6 +10689,16 @@ cluster PushAvStreamTransport = 1365 {
   struct TransportZoneOptionsStruct {
     nullable int16u zone = 0;
     optional int8u sensitivity = 1;
+  }
+
+  struct AudioStreamStruct {
+    char_string<16> audioStreamName = 0;
+    int16u audioStreamID = 1;
+  }
+
+  struct VideoStreamStruct {
+    char_string<16> videoStreamName = 0;
+    int16u videoStreamID = 1;
   }
 
   struct TransportTriggerOptionsStruct {
@@ -10715,6 +10735,8 @@ cluster PushAvStreamTransport = 1365 {
     IngestMethodsEnum ingestMethod = 6;
     ContainerOptionsStruct containerOptions = 7;
     optional epoch_s expiryTime = 8;
+    optional VideoStreamStruct videoStreams[] = 9;
+    optional AudioStreamStruct audioStreams[] = 10;
   }
 
   fabric_scoped struct TransportConfigurationStruct {
@@ -10733,10 +10755,14 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
+    ContainerFormatEnum containerType = 3;
+    optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
+    ContainerFormatEnum containerType = 1;
+    optional int64u CMAFSessionNumber = 2;
   }
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
