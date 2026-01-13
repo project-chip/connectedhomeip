@@ -116,6 +116,9 @@ public:
         mReadOperations.push_back(std::move(readOperation));
         chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
+        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        readOperationRef.SetSubjectDescriptor(subjectDescriptor);
+
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
         app::DataModel::ActionReturnStatus status           = mCluster.ReadAttribute(readOperationRef.GetRequest(), *encoder);
         VerifyOrReturnError(status.IsSuccess(), status);
@@ -151,7 +154,7 @@ public:
         chip::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack
-        Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
+        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
