@@ -22,7 +22,7 @@
 #include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <lib/support/TimerDelegate.h>
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
 
 class OnOffLightingClusterTestAccess;
 
@@ -38,7 +38,7 @@ class OnOffLightingCluster : public OnOffCluster, public TimerContext
 public:
     OnOffLightingCluster(EndpointId endpointId, TimerDelegate & timerDelegate, OnOffEffectDelegate & effectDelegate,
                          chip::scenes::ScenesIntegrationDelegate * scenesIntegrationDelegate = nullptr,
-                         BitMask<Feature> featureMap                                         = Feature::kLighting);
+                         BitMask<OnOff::Feature> featureMap                                  = OnOff::Feature::kLighting);
 
     ~OnOffLightingCluster() override;
 
@@ -79,7 +79,7 @@ private:
     bool mGlobalSceneControl = true;
     uint16_t mOnTime         = 0;
     uint16_t mOffWaitTime    = 0;
-    DataModel::Nullable<StartUpOnOffEnum> mStartUpOnOff;
+    DataModel::Nullable<OnOff::StartUpOnOffEnum> mStartUpOnOff;
 
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
@@ -111,4 +111,4 @@ private:
     OnOffLightingCluster & mCluster;
 };
 
-} // namespace chip::app::Clusters::OnOff
+} // namespace chip::app::Clusters

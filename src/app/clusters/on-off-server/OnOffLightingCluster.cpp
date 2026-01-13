@@ -24,9 +24,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
 
 OnOffLightingCluster::OnOffLightingCluster(EndpointId endpointId, TimerDelegate & timerDelegate,
                                            OnOffEffectDelegate & effectDelegate,
@@ -419,4 +420,4 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
     return Status::Success;
 }
 
-} // namespace chip::app::Clusters::OnOff
+} // namespace chip::app::Clusters

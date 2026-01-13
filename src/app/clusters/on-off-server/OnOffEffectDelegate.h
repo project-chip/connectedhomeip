@@ -21,7 +21,7 @@
 
 #include <cstdint>
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
 
 /// Interface for handling lighting effects.
 class OnOffEffectDelegate
@@ -29,13 +29,13 @@ class OnOffEffectDelegate
 public:
     virtual ~OnOffEffectDelegate() = default;
 
-    virtual DataModel::ActionReturnStatus TriggerEffect(EffectIdentifierEnum effectId, uint8_t effectVariant)
+    virtual DataModel::ActionReturnStatus TriggerEffect(OnOff::EffectIdentifierEnum effectId, uint8_t effectVariant)
     {
         switch (effectId)
         {
-        case EffectIdentifierEnum::kDelayedAllOff:
+        case OnOff::EffectIdentifierEnum::kDelayedAllOff:
             return TriggerDelayedAllOff();
-        case EffectIdentifierEnum::kDyingLight:
+        case OnOff::EffectIdentifierEnum::kDyingLight:
             return TriggerDyingLight();
         default:
             return Protocols::InteractionModel::Status::InvalidCommand;
@@ -47,4 +47,4 @@ public:
     virtual DataModel::ActionReturnStatus TriggerDyingLight() { return Protocols::InteractionModel::Status::UnsupportedCommand; }
 };
 
-} // namespace chip::app::Clusters::OnOff
+} // namespace chip::app::Clusters

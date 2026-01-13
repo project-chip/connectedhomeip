@@ -18,7 +18,7 @@
 
 #include <lib/support/IntrusiveList.h>
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
 
 /// Interface for implementing application-specific logic for the OnOff Cluster.
 class OnOffDelegate : public IntrusiveListNodeBase<IntrusiveMode::AutoUnlink>
@@ -39,4 +39,4 @@ public:
     virtual void OnOnOffChanged(bool on) = 0;
 };
 
-} // namespace chip::app::Clusters::OnOff
+} // namespace chip::app::Clusters

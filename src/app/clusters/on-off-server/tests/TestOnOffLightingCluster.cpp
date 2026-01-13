@@ -43,12 +43,12 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-const char * AsStr(bool v)
+[[maybe_unused]] const char * AsStr(bool v)
 {
     return v ? "TRUE" : "FALSE";
 }
 
-const char * StartupOnOffAsStr(std::optional<uint8_t> v)
+[[maybe_unused]] const char * StartupOnOffAsStr(std::optional<uint8_t> v)
 {
     if (!v.has_value())
     {

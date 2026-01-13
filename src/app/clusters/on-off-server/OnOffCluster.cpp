@@ -25,7 +25,7 @@
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
 
 namespace {
 
@@ -240,4 +240,4 @@ void OnOffCluster::SceneTransitionTimer::TimerFired()
     LogErrorOnFailure(mCluster.SetOnOff(mTargetValue));
 }
 
-} // namespace chip::app::Clusters::OnOff
+} // namespace chip::app::Clusters

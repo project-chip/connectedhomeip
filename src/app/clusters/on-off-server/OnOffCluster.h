@@ -26,7 +26,7 @@
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/TimerDelegate.h>
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
 
 /// Implements an On/Off server cluster.
 ///
@@ -34,7 +34,7 @@ namespace chip::app::Clusters::OnOff {
 class OnOffCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl
 {
 public:
-    OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<Feature> featureMap = {});
+    OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<OnOff::Feature> featureMap = {});
     ~OnOffCluster() override;
 
     void AddDelegate(OnOffDelegate * delegate) { mDelegates.PushBack(delegate); }
@@ -73,11 +73,11 @@ protected:
     /// Validates that requested 'featureMap' does not exceed implementation capabilities.
     ///
     /// This will VerifyOrDie that featureMap is a subset of supportedFeatures.
-    OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<Feature> featureMap,
-                 BitMask<Feature> supportedFeatures);
+    OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<OnOff::Feature> featureMap,
+                 BitMask<OnOff::Feature> supportedFeatures);
 
     IntrusiveList<OnOffDelegate, IntrusiveMode::AutoUnlink> mDelegates;
-    BitMask<Feature> mFeatureMap;
+    BitMask<OnOff::Feature> mFeatureMap;
 
     // Attribute local storage
     bool mOnOff = false;
@@ -105,4 +105,4 @@ private:
     friend class OnOffClusterTestAccess;
 };
 
-} // namespace chip::app::Clusters::OnOff
+} // namespace chip::app::Clusters

@@ -34,7 +34,8 @@ using namespace chip::Testing;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
-namespace chip::app::Clusters::OnOff {
+namespace chip::app::Clusters {
+
 class OnOffClusterTestAccess
 {
 public:
@@ -45,7 +46,8 @@ public:
 private:
     OnOffCluster & mCluster;
 };
-} // namespace chip::app::Clusters::OnOff
+
+} // namespace chip::app::Clusters
 
 namespace {
 
