@@ -41,7 +41,10 @@ public:
     }
 };
 
-OnOffValidator sValidator;
+OnOffValidator &GlobalOnOffValidator() {
+    static OnOffValidator sValidator;
+    return sValidator;
+}
 
 } // namespace
 
@@ -52,7 +55,7 @@ OnOffCluster::OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate,
 OnOffCluster::OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<Feature> featureMap,
                            BitMask<Feature> supportedFeatures) :
     DefaultServerCluster({ endpointId, Clusters::OnOff::Id }),
-    DefaultSceneHandlerImpl(sValidator), mFeatureMap(featureMap), mTimerDelegate(timerDelegate), mSceneTimer(*this)
+    DefaultSceneHandlerImpl(GlobalOnOffValidator()), mFeatureMap(featureMap), mTimerDelegate(timerDelegate), mSceneTimer(*this)
 {
     VerifyOrDie(supportedFeatures.HasAll(featureMap));
 
