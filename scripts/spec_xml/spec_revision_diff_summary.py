@@ -22,7 +22,7 @@
 
 import click
 
-from matter.testing.conformance import ConformanceDecision, EMPTY_CLUSTER_GLOBAL_ATTRIBUTES
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceDecision
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 
 

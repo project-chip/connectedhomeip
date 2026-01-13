@@ -29,7 +29,7 @@ import click
 import paths
 from lxml import etree
 
-from matter.testing.conformance import ConformanceDecision, EMPTY_CLUSTER_GLOBAL_ATTRIBUTES
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 
 log = logging.getLogger(__name__)
