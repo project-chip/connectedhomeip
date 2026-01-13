@@ -34,7 +34,6 @@
 
 import logging
 import random
-import time
 
 from mobly import asserts
 
@@ -113,7 +112,7 @@ class TC_ACL_2_10(MatterBaseTest):
         self.step(3)
         # TH1 puts DUT into commissioning mode, TH2 is created and commissions DUT using admin node ID
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeid=self.dut_node_id, out=900, iteration=10000, discriminator=self.discriminator, option=1)
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
             vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
