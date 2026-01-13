@@ -3320,9 +3320,6 @@ endpoint 1 {
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
     ram      attribute doorState;
-    ram      attribute doorOpenEvents;
-    ram      attribute doorClosedEvents;
-    ram      attribute openPeriod;
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
     ram      attribute numberOfRFIDUsersSupported default = 10;
