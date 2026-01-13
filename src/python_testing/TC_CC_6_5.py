@@ -41,7 +41,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_attribute, has_command, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_attribute, has_command, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -92,6 +92,7 @@ class TC_CC_6_5(MatterBaseTest):
                      "Value has to be between a range of 0x00 to 0x03; Verify that the DUT response indicates that the EnhancedColorMode attribute has the expected value 2 (ColorTemperatureMireds)."),
         ]
 
+    @async_test_body
     @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds), has_attribute(Clusters.ColorControl.Attributes.StartUpColorTemperatureMireds), has_command(Clusters.OnOff.Commands.On))
     async def test_TC_CC_6_5(self):
         cc_cluster = Clusters.Objects.ColorControl
@@ -105,7 +106,7 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("0a")
         self.TH1 = self.default_controller
         log.info(f"Writing Options attribute on endpoint {self.endpoint}")
-        await self.write_single_attribute(cc_attributes.Options(0x00), self.endpoint, expect_success=True)
+        await self.write_single_attribute(cc_attributes.Options(0x00), endpoint=self.endpoint, expect_success=True)
 
         self.step("0b")
         log.info(f"Sending On command to endpoint {self.endpoint}")
@@ -118,7 +119,7 @@ class TC_CC_6_5(MatterBaseTest):
 
         self.step("0c")
         color_temp_mireds = await self.read_single_attribute_check_success(
-            cc_cluster, cc_attributes.ColorTemperatureMireds, self.TH1, endpoint=self.endpoint)
+            cluster=cc_cluster, attribute=cc_attributes.ColorTemperatureMireds, dev_ctrl=self.TH1, endpoint=self.endpoint)
         log.info(f"Current color temperature response: {color_temp_mireds}")
         matter_asserts.assert_valid_uint16(color_temp_mireds, "Color temperature value should be an integer")
 
