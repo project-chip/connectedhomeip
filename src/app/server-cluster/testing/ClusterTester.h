@@ -23,12 +23,12 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
-#include <app/data-model/List.h>
-#include <app/data-model/NullObject.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
