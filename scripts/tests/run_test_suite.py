@@ -71,8 +71,9 @@ class RunContext:
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
 # and drop this implementation.
 def deprecation_warning(context, param, value):
-    # Hack: Try to reverse the conversion between flag and variable name which happens in click
-    warnings.warn(f"Use '{param.replacement}' instead of '--{str.replace(param.name, '_', '-')}'", category=DeprecationWarning)
+    if value:
+        # Hack: Try to reverse the conversion between flag and variable name which happens in click
+        warnings.warn(f"Use '{param.replacement}' instead of '--{str.replace(param.name, '_', '-')}'", category=DeprecationWarning)
     return value
 
 
@@ -330,16 +331,16 @@ class Terminable(Protocol):
     '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.option(
-    '--app-path', multiple=True,
-    help='Set path for an application (run in app network namespace), value should be <key>:<path>'
+    '--app-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
-    '--tool-path', multiple=True,
-    help='Set path for a tool (run in tool network namespace), value should be <key>:<path>'
+    '--tool-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for a tool (run in tool network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
-    '--custom-path', multiple=True,
-    help="Set path with a custom kind, value should be <kind>:<key>:<path>, valid kind values are "
+    '--custom-path', multiple=True, metavar="<kind>:<key>:<path>",
+    help="Set path with a custom kind, valid kind values are "
     f"{[v.value for v in SubprocessKind]}"
 )
 @click.option(
@@ -347,6 +348,12 @@ class Terminable(Protocol):
     is_flag=True,
     default=False,
     help='Discover missing paths for application and tool binaries'
+)
+@click.option(
+    '--help-paths',
+    is_flag=True,
+    default=False,
+    help="Print keys for known application and tool paths"
 )
 @click.option(
     '--pics-file',
@@ -379,7 +386,7 @@ class Terminable(Protocol):
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], tool_path: list[str], custom_path: list[str], discover_paths: bool,
+            app_path: list[str], tool_path: list[str], custom_path: list[str], discover_paths: bool, help_paths: bool,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -393,6 +400,14 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
+
+    if help_paths:
+        print("---")  # Handmade artisanal YAML
+        print("# Known application and tool path keys:")
+        for key, entry in subproc_info_repo.subproc_knowhow.items():
+            print(f"- key: {key}")
+            print(f"  kind: {entry.kind}")
+        sys.exit(0)
 
     def handle_deprecated_pathopt(key, path, kind):
         if path is not None:
