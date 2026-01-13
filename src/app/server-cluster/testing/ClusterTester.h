@@ -46,6 +46,7 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <type_traits>
@@ -53,6 +54,7 @@
 
 namespace chip {
 namespace Testing {
+
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
@@ -343,17 +345,8 @@ private:
         }
 
         ReadOnlyBuffer<app::DataModel::AttributeEntry> attributeEntries = builder.TakeBuffer();
-
-        // Check if the requested attribute ID is present in the attribute list
-        for (const auto & entry : attributeEntries)
-        {
-            if (entry.attributeId == attr_id)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return std::any_of(attributeEntries.begin(), attributeEntries.end(),
+                           [&](const app::DataModel::AttributeEntry & entry) { return entry.attributeId == attr_id; });
     }
 
     bool IsCommandAnAcceptedCommand(CommandId commandId)
@@ -373,18 +366,8 @@ private:
         }
 
         ReadOnlyBuffer<app::DataModel::AcceptedCommandEntry> commandEntries = builder.TakeBuffer();
-
-        // Check if the requested command ID is present in the accepted commands list
-        for (const auto & entry : commandEntries)
-        {
-            if (entry.commandId == commandId)
-            {
-                return true;
-            }
-        }
-
-        // Command not found in AcceptedCommands
-        return false;
+        return std::any_of(commandEntries.begin(), commandEntries.end(),
+                           [&](const app::DataModel::AcceptedCommandEntry & entry) { return entry.commandId == commandId; });
     }
 
     TestServerClusterContext mTestServerClusterContext{};
