@@ -51,8 +51,7 @@ class TC_BOOL_2_2(MatterBaseTest):
     async def set_dut_state_value(self, endpoint: int, state: bool):
         """Set the DUT's BooleanState value via named pipe command."""
         logger.info(f" --- Setting DUT StateValue to {'TRUE' if state else 'FALSE'}")
-        # if self.is_pics_sdk_ci_only:    # for running in CI
-        if True:
+        if self.is_pics_sdk_ci_only:    # for running in CI
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
             self.write_to_app_pipe(command_dict)
         else:                           # for manual testing
@@ -65,6 +64,18 @@ class TC_BOOL_2_2(MatterBaseTest):
             endpoint=endpoint,
             cluster=Clusters.BooleanState,
             attribute=Clusters.BooleanState.Attributes.StateValue)
+
+    async def is_state_change_event_supported(self) -> bool:
+        """Check if StateChange event is supported via PICS or feature map."""
+        # TODO: In future spec version also check feature map for event support
+        # when that capability is added. See https://github.com/project-chip/connectedhomeip/issues/42425
+        # feature_map = await self.read_single_attribute_check_success(
+        #     cluster=Clusters.BooleanState,
+        #     attribute=Clusters.BooleanState.Attributes.FeatureMap
+        # )
+        # return self.check_pics("BOOL.S.E00") or bool(feature_map & Clusters.BooleanState.Bitmaps.Feature.kEventSupport)
+
+        return self.check_pics("BOOL.S.E00")
 
     def desc_TC_BOOL_2_2(self) -> str:
         return "[TC-BOOL-2.2] Primary Functionality with Server as DUT"
@@ -103,10 +114,8 @@ class TC_BOOL_2_2(MatterBaseTest):
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
 
-        # Check if the StateChange event (E00) is supported via PICS
-        # TODO: In future spec version also check feature map for event support
-        # when that capability is added. See https://github.com/project-chip/connectedhomeip/issues/42425
-        has_event = self.check_pics("BOOL.S.E00")
+        # Check if the StateChange event is supported via PICS or feature map
+        has_event = await self.is_state_change_event_supported()
 
         if not has_event:
             logger.info("StateChange event (BOOL.S.E00) is not supported. Skipping remaining steps.")
