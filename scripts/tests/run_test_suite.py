@@ -455,7 +455,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
             subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
     except (ValueError, LookupError) as e:
-        raise click.BadOptionUsage("{app,tool,custom}-path", f"Missing required path: {e}")
+        raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
