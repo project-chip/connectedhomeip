@@ -225,92 +225,85 @@ class TC_IDM_4_3(BasicCompositionTests):
                         Clusters.AccessControl.Attributes.Acl,
                         # InterfaceEnabled only writeable attribute and returns error status 1. Writing to it would cause the DUT to disconnect if successful, spec 11.9.6.5 shows this could attribute could be protected and will return a INVALID_ACTION error if attempted to be written too.
                         Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
+                        # Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
+                        Clusters.BasicInformation.Attributes.Location,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
                         continue
 
-                    try:
-                        # Get current value from priming data
-                        cached_val = attributes[attribute]
+                    # Get current value from priming data
+                    cached_val = attributes[attribute]
 
-                        # Skip if value decode failed
-                        if isinstance(cached_val, ValueDecodeFailure):
-                            log.info(f"{test_step}: Skipping {attribute.__name__} - decode failure")
-                            continue
+                    # Skip if value decode failed
+                    if isinstance(cached_val, ValueDecodeFailure):
+                        log.info(f"{test_step}: Skipping {attribute.__name__} - decode failure")
+                        continue
 
-                        # Determine new value based on type
-                        if isinstance(cached_val, str):
-                            # For very short strings (likely codes/enums), use simple toggle
-                            # Example: Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
-                            if len(cached_val) <= 2:
-                                # Location, country codes, short identifiers
-                                new_val = "US" if cached_val != "US" else "CA"
-                            else:
-                                # Normal strings - use unique timestamped value
-                                new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
-                        elif isinstance(cached_val, list):
-                            # List attribute - toggle between empty and non-empty to ensure actual change
-                            if len(cached_val) == 0:
-                                # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
-                                log.info(
-                                    f"{test_step}: Skipping {attribute.__name__} - empty list")
-                                continue
-                            # Non-empty list -> write empty list (safe change)
-                            new_val = []
-                        elif isinstance(cached_val, bool):
-                            # Boolean attribute - flip the value to trigger actual change
-                            new_val = not cached_val
-                        elif isinstance(cached_val, (int, float)):
-                            # increment to trigger actual change
-                            # Try incrementing first, but respect reasonable upper bounds
-                            if cached_val < 100:
-                                # For values 0-99, safe to increment (handles percentages, small enums)
-                                new_val = cached_val + 1
-                            elif cached_val < 1000000:
-                                # For larger values, decrement to ensure change without hitting constraints
-                                # Example: DefaultOpenLevel is 0-100, so we can decrement to 99 to trigger a change, if we incremented to 101 then it hits a constraint error..
-                                new_val = cached_val - 1
-                            else:
-                                # For very large values, use a safe 0 value
-                                new_val = 0
-                        else:
-                            # For other types, skip to avoid writing same value
-                            # Writing the same value should NOT trigger a report
-                            log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
-                            continue
+                    # Determine new value based on type
+                    if isinstance(cached_val, str):
+                        # Normal strings - use unique timestamped value
+                        new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
 
-                        # Write the attribute
-                        log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
-                        resp = await self.default_controller.WriteAttribute(
-                            nodeId=self.dut_node_id,
-                            attributes=[(endpoint_id, attribute(new_val))]
-                        )
-
-                        if resp[0].Status == Status.Success:
-                            changed_count += 1
+                    elif isinstance(cached_val, list):
+                        # List attribute - toggle between empty and non-empty to ensure actual change
+                        if len(cached_val) == 0:
+                            # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
                             log.info(
-                                f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
-
-                            # Track this change for verification
-                            changed_attributes.append({
-                                'endpoint': endpoint_id,
-                                'cluster': cluster_class,
-                                'attribute': attribute,
-                                'old_value': cached_val,
-                                'new_value': new_val
-                            })
-
-                        elif resp[0].Status == Status.UnsupportedAccess:
-                            asserts.fail(f"{test_step}: Write to {attribute.__name__} returned UnsupportedAccess")
-
+                                f"{test_step}: Skipping {attribute.__name__} - empty list")
+                            continue
+                        # Non-empty list -> write empty list (safe change)
+                        new_val = []
+                    elif isinstance(cached_val, bool):
+                        # Boolean attribute - flip the value to trigger actual change
+                        new_val = not cached_val
+                    elif isinstance(cached_val, (int, float)):
+                        # increment to trigger actual change
+                        # Try incrementing first, but respect reasonable upper bounds
+                        if cached_val < 100:
+                            # For values 0-99, safe to increment (handles percentages, small enums)
+                            new_val = cached_val + 1
+                        elif cached_val < 1000000:
+                            # For larger values, decrement to ensure change without hitting constraints
+                            # Example: DefaultOpenLevel is 0-100, so we can decrement to 99 to trigger a change, if we incremented to 101 then it hits a constraint error..
+                            new_val = cached_val - 1
                         else:
-                            # Other errors are acceptable per TC_AccessChecker pattern
-                            # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
-                            log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+                            # For very large values, use a safe 0 value
+                            new_val = 0
+                    else:
+                        # For other types, skip to avoid writing same value
+                        # Writing the same value should NOT trigger a report
+                        log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                        continue
 
-                    except Exception as e:
-                        log.info(f"{test_step}: Exception writing {attribute.__name__}: {e}")
+                    # Write the attribute
+                    log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
+                    resp = await self.default_controller.WriteAttribute(
+                        nodeId=self.dut_node_id,
+                        attributes=[(endpoint_id, attribute(new_val))]
+                    )
+
+                    if resp[0].Status == Status.Success:
+                        changed_count += 1
+                        log.info(
+                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
+
+                        # Track this change for verification
+                        changed_attributes.append({
+                            'endpoint': endpoint_id,
+                            'cluster': cluster_class,
+                            'attribute': attribute,
+                            'old_value': cached_val,
+                            'new_value': new_val
+                        })
+
+                    elif resp[0].Status == Status.UnsupportedAccess:
+                        asserts.fail(f"{test_step}: Write to {attribute.__name__} returned UnsupportedAccess")
+
+                    else:
+                        # Other errors are acceptable per TC_AccessChecker pattern
+                        # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
+                        log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
@@ -364,7 +357,6 @@ class TC_IDM_4_3(BasicCompositionTests):
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
-        self.device_clusters = self.all_device_clusters()
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         TH: ChipDeviceController = self.default_controller
 
