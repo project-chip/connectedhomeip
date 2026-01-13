@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "protocols/interaction_model/StatusCode.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -104,7 +105,7 @@ public:
 
         // Verify that the attribute is present in AttributeList before attempting to read it.
         // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-        VerifyOrReturnError(IsAttributeInAttributeList(attr_id), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsAttributeInAttributeList(attr_id), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
         auto path = mCluster.GetPaths()[0];
 
@@ -148,7 +149,7 @@ public:
 
         // Verify that the attribute is present in AttributeList before attempting to write it.
         // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-        VerifyOrReturnError(IsAttributeInAttributeList(attr), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsAttributeInAttributeList(attr), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         chip::Testing::WriteOperation writeOp(path);
@@ -223,7 +224,7 @@ public:
         // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
         if (!IsCommandAnAcceptedCommand(commandId))
         {
-            result.status = CHIP_ERROR_INVALID_ARGUMENT;
+            result.status = Protocols::InteractionModel::Status::InvalidCommand;
             return result;
         }
 
