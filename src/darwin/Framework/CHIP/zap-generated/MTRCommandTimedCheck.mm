@@ -536,6 +536,15 @@ static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInGroupcastCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Groupcast;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -548,6 +557,15 @@ static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAt
 static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInWaterTankLevelMonitoringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterTankLevelMonitoring;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -602,15 +620,6 @@ static BOOL CommandNeedsTimedInvokeInWaterHeaterManagementCluster(AttributeId aA
 static BOOL CommandNeedsTimedInvokeInCommodityPriceCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommodityPrice;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -710,6 +719,15 @@ static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(Attribute
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalGridConditionsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -762,6 +780,12 @@ static BOOL CommandNeedsTimedInvokeInClosureControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ClosureControl;
     switch (aAttributeId) {
+    case Commands::MoveTo::Id: {
+        return YES;
+    }
+    case Commands::Calibrate::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -771,6 +795,12 @@ static BOOL CommandNeedsTimedInvokeInClosureDimensionCluster(AttributeId aAttrib
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
+    case Commands::SetTarget::Id: {
+        return YES;
+    }
+    case Commands::Step::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -983,6 +1013,24 @@ static BOOL CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(Attrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInSoilMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SoilMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -996,6 +1044,12 @@ static BOOL CommandNeedsTimedInvokeInThreadBorderRouterManagementCluster(Attribu
 {
     using namespace Clusters::ThreadBorderRouterManagement;
     switch (aAttributeId) {
+    case Commands::SetActiveDatasetRequest::Id: {
+        return YES;
+    }
+    case Commands::SetPendingDatasetRequest::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1137,6 +1191,18 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ContentControl;
     switch (aAttributeId) {
+    case Commands::UpdatePIN::Id: {
+        return YES;
+    }
+    case Commands::ResetPIN::Id: {
+        return YES;
+    }
+    case Commands::Enable::Id: {
+        return YES;
+    }
+    case Commands::Disable::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1241,6 +1307,24 @@ static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAtt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInJointFabricDatastoreCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricDatastore;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInJointFabricAdministratorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricAdministrator;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInTLSCertificateManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TlsCertificateManagement;
@@ -1282,6 +1366,9 @@ static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId
     using namespace Clusters::UnitTesting;
     switch (aAttributeId) {
     case Commands::TimedInvokeRequest::Id: {
+        return YES;
+    }
+    case Commands::TestCheckCommandFlags::Id: {
         return YES;
     }
     default: {
@@ -1473,11 +1560,17 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ScenesManagement::Id: {
         return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
     }
+    case Clusters::Groupcast::Id: {
+        return CommandNeedsTimedInvokeInGroupcastCluster(commandID);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(commandID);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
+        return CommandNeedsTimedInvokeInWaterTankLevelMonitoringCluster(commandID);
     }
     case Clusters::BooleanStateConfiguration::Id: {
         return CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(commandID);
@@ -1496,9 +1589,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::CommodityPrice::Id: {
         return CommandNeedsTimedInvokeInCommodityPriceCluster(commandID);
-    }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
     case Clusters::Messages::Id: {
         return CommandNeedsTimedInvokeInMessagesCluster(commandID);
@@ -1523,6 +1613,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
+    }
+    case Clusters::ElectricalGridConditions::Id: {
+        return CommandNeedsTimedInvokeInElectricalGridConditionsCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);
@@ -1605,6 +1698,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::RadonConcentrationMeasurement::Id: {
         return CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(commandID);
     }
+    case Clusters::SoilMeasurement::Id: {
+        return CommandNeedsTimedInvokeInSoilMeasurementCluster(commandID);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
+    }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);
     }
@@ -1685,6 +1784,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::CommissionerControl::Id: {
         return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        return CommandNeedsTimedInvokeInJointFabricDatastoreCluster(commandID);
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        return CommandNeedsTimedInvokeInJointFabricAdministratorCluster(commandID);
     }
     case Clusters::TlsCertificateManagement::Id: {
         return CommandNeedsTimedInvokeInTLSCertificateManagementCluster(commandID);

@@ -6,7 +6,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <app/util/endpoint-config-defines.h>
 
-{{#endpoint_config allowUnknownStorageOption="false" spaceForDefaultValue=4}}
+{{#endpoint_config allowUnknownStorageOption="false" spaceForDefaultValue=4 isReadableMaskGenerationEnabled="true"}}
 
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob

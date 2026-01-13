@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
 
 /**
  * Application callback function when a context used in PendingNotificationEntry will not be needed and should be
@@ -68,7 +70,7 @@ public:
 class PendingNotificationMap
 {
 public:
-    static constexpr uint8_t kMaxPendingNotifications = MATTER_BINDING_TABLE_SIZE;
+    static constexpr uint8_t kMaxPendingNotifications = Table::kMaxBindingEntries;
 
     friend class Iterator;
 
@@ -129,4 +131,7 @@ private:
     uint8_t mNumEntries = 0;
 };
 
+} // namespace Binding
+} // namespace Clusters
+} // namespace app
 } // namespace chip

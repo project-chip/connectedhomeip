@@ -204,6 +204,11 @@ private:
     static void StartCommissioning(intptr_t arg);
     static void StopCommissioning(intptr_t arg);
     static void SwitchCommissioningState(intptr_t arg);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
+    bool mTbrmClusterEnabled                          = false;
+#endif
 };
 
 /**

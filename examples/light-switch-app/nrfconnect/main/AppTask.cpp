@@ -26,6 +26,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -39,8 +40,11 @@
 #include <system/SystemError.h>
 
 #ifdef CONFIG_CHIP_WIFI
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/nrfconnect/wifi/NrfWiFiDriver.h>
+#endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR
@@ -106,6 +110,11 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif
 } // namespace
 
 namespace LedConsts {
@@ -166,6 +175,8 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed: %s", ErrorStr(err));
         return err;
     }
+
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 #elif defined(CONFIG_CHIP_WIFI)
     sWiFiCommissioningInstance.Init();
 #else
@@ -260,7 +271,7 @@ CHIP_ERROR AppTask::Init()
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point
     // to avoid data races between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -482,7 +493,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            TEMPORARY_RETURN_IGNORED NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;

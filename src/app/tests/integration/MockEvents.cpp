@@ -127,7 +127,7 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
     options.mPath     = { aEndpointId, kTestClusterId, aEventId };
     options.mPriority = aPriorityLevel;
     mStatus           = static_cast<int32_t>(aStatus);
-    logManager.LogEvent(this, options, number);
+    TEMPORARY_RETURN_IGNORED logManager.LogEvent(this, options, number);
     return number;
 }
 
@@ -156,8 +156,8 @@ CHIP_ERROR MockEventGeneratorImpl::Init(chip::Messaging::ExchangeManager * apExc
         mEventsLeft = mpEventGenerator->GetNumStates();
 
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(mTimeBetweenEvents),
-                                                                      HandleNextEvent, this);
+        TEMPORARY_RETURN_IGNORED mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+            chip::System::Clock::Milliseconds32(mTimeBetweenEvents), HandleNextEvent, this);
 
     return err;
 }
@@ -176,8 +176,8 @@ void MockEventGeneratorImpl::HandleNextEvent(chip::System::Layer * apSystemLayer
         generator->mEventsLeft--;
         if ((generator->mEventWraparound) || (generator->mEventsLeft > 0))
         {
-            apSystemLayer->StartTimer(chip::System::Clock::Milliseconds32(generator->mTimeBetweenEvents), HandleNextEvent,
-                                      generator);
+            TEMPORARY_RETURN_IGNORED apSystemLayer->StartTimer(chip::System::Clock::Milliseconds32(generator->mTimeBetweenEvents),
+                                                               HandleNextEvent, generator);
         }
     }
 }
@@ -190,7 +190,8 @@ void MockEventGeneratorImpl::SetEventGeneratorStop()
     // This helps quit the standalone app in an orderly way without
     // spurious leaked timers.
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::kZero, HandleNextEvent, this);
+        TEMPORARY_RETURN_IGNORED mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::kZero,
+                                                                                               HandleNextEvent, this);
 }
 
 bool MockEventGeneratorImpl::IsEventGeneratorStopped()

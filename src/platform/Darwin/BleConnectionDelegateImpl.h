@@ -18,6 +18,7 @@
 #pragma once
 
 #include <ble/Ble.h>
+#include <lib/support/Span.h>
 #include <platform/Darwin/BleScannerDelegate.h>
 
 namespace chip {
@@ -32,10 +33,20 @@ public:
 
     void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override;
+    CHIP_ERROR NewConnection(Ble::BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
+                             OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
+                             OnConnectionErrorFunct onConnectionError) override;
     CHIP_ERROR CancelConnection() override;
 
 private:
     CHIP_ERROR DoCancel();
+
+    // Caller should pass in only one of onConnectionComplete and onConnectionCompleteWithDiscriminator
+    void
+    NewConnectionImpl(Ble::BleLayer * bleLayer, void * appState, const chip::Span<const SetupDiscriminator> & desiredDiscriminators,
+                      Ble::BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+                      Ble::BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onConnectionCompleteWithDiscriminator,
+                      Ble::BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
 };
 
 } // namespace Internal

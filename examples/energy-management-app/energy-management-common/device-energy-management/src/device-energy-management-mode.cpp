@@ -107,10 +107,29 @@ void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpo
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
     gDeviceEnergyManagementModeInstance = std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(),
                                                                                endpointId, DeviceEnergyManagementMode::Id, 0);
-    gDeviceEnergyManagementModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gDeviceEnergyManagementModeInstance->Init();
 }
 
-void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpoint)
+void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId)
 {
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
+    if (gDeviceEnergyManagementModeInstance)
+    {
+        gDeviceEnergyManagementModeInstance->Shutdown();
+    }
+    DeviceEnergyManagementMode::Shutdown();
+}
+
+void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpointId)
+{
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     DeviceEnergyManagementMode::Shutdown();
 }

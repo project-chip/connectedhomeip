@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021,2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
  */
 #include "DeviceAttestationSe05xCredsExample.h"
 
-#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 
 /* Device attestation key ids */
 #define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
 #define DEV_ATTESTATION_CERT_SE05X_ID 0x7D300001
 
-extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
+extern CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
 namespace chip {
 namespace Credentials {
@@ -52,7 +53,7 @@ CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & o
 #else
     size_t buflen = out_dac_buffer.size();
     ChipLogDetail(Crypto, "Get DA certificate from se05x");
-    ReturnErrorOnFailure(se05xGetCertificate(DEV_ATTESTATION_CERT_SE05X_ID, out_dac_buffer.data(), &buflen));
+    ReturnErrorOnFailure(se05x_get_certificate(DEV_ATTESTATION_CERT_SE05X_ID, out_dac_buffer.data(), &buflen));
     out_dac_buffer.reduce_size(buflen);
     return CHIP_NO_ERROR;
 #endif
@@ -140,7 +141,7 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
 
     // Add public key + reference private key (ref to key inside SE)
 
-    serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
+    TEMPORARY_RETURN_IGNORED serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
 
     memset(serialized_keypair.Bytes(), 0, Crypto::kP256_PublicKey_Length);
     memcpy(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length, magic_bytes, sizeof(magic_bytes));

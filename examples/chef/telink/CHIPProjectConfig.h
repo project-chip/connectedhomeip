@@ -31,7 +31,7 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-// Enable support functions for parsing command-line arguments
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
-
 #define CHIP_DEVICE_CONFIG_DISABLE_SHELL_PING 1
+
+// Needed for Door Lock samples
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

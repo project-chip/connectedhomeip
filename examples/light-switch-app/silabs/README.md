@@ -11,6 +11,10 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
         -   [Mac OS X](#mac-os-x)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SEGGER RTT](#segger-rtt)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
             -   [On Border Router:](#on-border-router)
@@ -30,7 +34,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -76,8 +80,8 @@ Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     MG24 boards :
 
@@ -97,52 +101,52 @@ Silicon Labs platform.
 
 *   Build the example application:
 
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/ ./out/light-switch-app BRD4187C
+            cd ~/connectedhomeip
+            ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/ ./out/light-switch-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/
+            $ cd ~/connectedhomeip
+            $ rm -rf ./out/
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/light-switch-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
-          $ rm -rf out/
+            $ cd ~/connectedhomeip/examples/light-switch-app/silabs
+            $ rm -rf out/
 
 *   Build the example with Matter shell
 
-          ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/ out/light-switch-app BRD4187C chip_build_libshell=true
+            ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/ out/light-switch-app BRD4187C chip_build_libshell=true
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/ ./out/light-switch-app_ICD BRD4187C --icd
+            $ ./scripts/examples/gn_silabs_example.sh ./examples/light-switch-app/silabs/ ./out/light-switch-app_ICD BRD4187C --icd
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false chip_build_libshell=true'
+            $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false chip_build_libshell=true'
 
 *   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/ out/light-switch-app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+            $ ./scripts/examples/gn_silabs_example.sh examples/light-switch-app/silabs/ out/light-switch-app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/light-switch-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+            $ ninja -C out/debug
 
 For more build options, help is provided when running the build script without
 arguments
@@ -153,21 +157,22 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/light-switch-app/silabs
-          $ python3 out/debug/matter-silabs-light-switch-example.flash.py
+            $ cd ~/connectedhomeip/examples/light-switch-app/silabs
+            $ python3 out/debug/matter-silabs-light-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
-info. Pre-built bootloader binaries are available in the Assets section of the
-Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases).
+info. Pre-built bootloader binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#matter-bootloader-binaries).
 
 -   On the command line:
 
-          $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
+            $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
 
 ## Viewing Logging Output
+
+### SEGGER RTT
 
 The example application is built to use the SEGGER Real Time Transfer (RTT)
 facility for log output. RTT is a feature built-in to the J-Link Interface MCU
@@ -189,14 +194,14 @@ after flashing the .out file.
 
 *   Install the J-Link software
 
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+            $ cd ~/Downloads
+            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
 *   In Linux, grant the logged in user the ability to talk to the development
     hardware via the linux tty device (/dev/ttyACMx) by adding them to the
     dialout group.
 
-          $ sudo usermod -a -G dialout ${USER}
+            $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
@@ -205,13 +210,37 @@ combination with JLinkRTTClient as follows:
 
     For MG24 use:
 
-          ```
-          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-          ```
+            ```
+            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+            ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
-          $ JLinkRTTClient
+            $ JLinkRTTClient
+
+### Console Log
+
+If the binary was built with this option or if you're using the Siwx917 WiFi
+SoC, the logs and the CLI (if enabled) will be available on the serial console.
+
+This console required a baudrate of **115200** with CTS/RTS. This is the default
+configuration of Silicon Labs dev kits.
+
+**HOWEVER** the console will required a baudrate of **921600** with CTS/RTS if
+the verbose mode is selected (--verbose)
+
+#### Configuring the VCOM
+
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
+    ```
+    commander vcom config --baudrate 921600 --handshake rtscts
+    ```
+
+### Using the console
+
+With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
@@ -233,70 +262,70 @@ combination with JLinkRTTClient as follows:
     Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
     BLE
 
-        * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
-          a URL can be found in the RTT logs.
+          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+            a URL can be found in the RTT logs.
 
-          <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0**
 
-        -   ICD Configuration (Default) - LED is only active under two circumstances:
+          -   ICD Configuration (Default) - LED is only active under two circumstances:
 
-            1. Factory reset sequence - LED will blink when initiated upon press and hold of
-            Button 0 after 3 seconds
-            2. An Identify command was received
+              1. Factory reset sequence - LED will blink when initiated upon press and hold of
+              Button 0 after 3 seconds
+              2. An Identify command was received
 
-        -   Non-ICD Configuration - shows the overall state of the device and its connectivity. The
-            following states are possible:
+          -   Non-ICD Configuration - shows the overall state of the device and its connectivity. The
+              following states are possible:
 
-            Short Flash On (50 ms on/950 ms off): The device is in the
-            unprovisioned (unpaired) state and is waiting for a commissioning
-            application to connect.
+              Short Flash On (50 ms on/950 ms off): The device is in the
+              unprovisioned (unpaired) state and is waiting for a commissioning
+              application to connect.
 
-            Rapid Even Flashing (100 ms on/100 ms off): The device is in the
-            unprovisioned state and a commissioning application is connected through
-            Bluetooth LE.
+              Rapid Even Flashing (100 ms on/100 ms off): The device is in the
+              unprovisioned state and a commissioning application is connected through
+              Bluetooth LE.
 
-            Short Flash Off (950ms on/50ms off): The device is fully
-            provisioned, but does not yet have full Thread network or service
-            connectivity.
+              Short Flash Off (950ms on/50ms off): The device is fully
+              provisioned, but does not yet have full Thread network or service
+              connectivity.
 
-            Solid On: The device is fully provisioned and has full Thread
-            network and service connectivity.
+              Solid On: The device is fully provisioned and has full Thread
+              network and service connectivity.
 
     **Push Button 0**
 
-        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
-            for 30 seconds. The device will then switch to a slower interval advertisement.
-            After 15 minutes, the advertisement stops.
-            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
+          -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+              for 30 seconds. The device will then switch to a slower interval advertisement.
+              After 15 minutes, the advertisement stops.
+              Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
-        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
-            Releasing the button within the 6-second window cancels the factory reset
-            procedure. **LEDs** blink in unison when the factory reset procedure is
-            initiated.
+          -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
+              Releasing the button within the 6-second window cancels the factory reset
+              procedure. **LEDs** blink in unison when the factory reset procedure is
+              initiated.
 
     **Push Button 1**
 
-        -   Sends a Toggle command to bound light app
+          -   Sends a Toggle command to bound light app
 
     **Matter shell**
 
     **_OnOff Cluster_**
 
-        -  'switch onoff on'            : Sends unicast On command to bound device
-        -  'switch onoff off'           : Sends unicast Off command to bound device
-        -  'switch onoff toggle'        : Sends unicast Toggle command to bound device
+          -  'switch onoff on'            : Sends unicast On command to bound device
+          -  'switch onoff off'           : Sends unicast Off command to bound device
+          -  'switch onoff toggle'        : Sends unicast Toggle command to bound device
 
-        -  'switch groups onoff on'     : Sends On group command to bound group
-        -  'switch groups onoff off'    : Sends On group command to bound group
-        -  'switch groups onoff toggle' : Sends On group command to bound group
+          -  'switch groups onoff on'     : Sends On group command to bound group
+          -  'switch groups onoff off'    : Sends On group command to bound group
+          -  'switch groups onoff toggle' : Sends On group command to bound group
 
     **_Binding Cluster_**
 
-        - 'switch binding unicast  <fabric index> <node id> <endpoint>' : Creates a unicast binding
-        - 'switch binding group <fabric index> <group id>'              : Creates a group binding
+          - 'switch binding unicast  <fabric index> <node id> <endpoint>' : Creates a unicast binding
+          - 'switch binding group <fabric index> <group id>'              : Creates a group binding
 
 *   You can provision and control the Chip device using the python controller,
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)

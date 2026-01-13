@@ -13,8 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# py_matter_idl may not be installed in the pigweed venv.
+# Reference it directly from the source tree.
+from python_path import PythonPath
+
+with PythonPath('py_matter_idl', relative_to=__file__):
+    from matter.idl.generators.path_resolution import expand_path_for_idl
+    from matter.idl.matter_idl_parser import CreateParser
+
 import logging
-import sys
 
 import click
 
@@ -24,23 +31,12 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
-try:
-    from matter.idl.matter_idl_parser import CreateParser
-except ImportError:
-    import os
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter.idl.matter_idl_parser import CreateParser
-
-# isort: off
-from matter.idl.generators.path_resolution import expand_path_for_idl
-
-
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -85,8 +81,11 @@ def main(log_level, idl, path: list[str]):
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
+    with open(idl) as f:
+        idl_content = f.read()
+
     for p in path:
-        for expanded in expand_path_for_idl(CreateParser().parse(open(idl, "rt").read()), p):
+        for expanded in expand_path_for_idl(CreateParser().parse(idl_content), p):
             # The intent of codegen_paths is to print out the "expanded" paths from the inputs,
             # one per line.
             #

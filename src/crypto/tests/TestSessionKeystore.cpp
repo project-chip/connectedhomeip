@@ -27,6 +27,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
@@ -130,13 +131,19 @@ TEST_F(TestSessionKeystore, TestBasicImport)
         EXPECT_EQ(keystore.CreateKey(keyMaterial, keyHandle), CHIP_NO_ERROR);
 
         Platform::ScopedMemoryBuffer<uint8_t> ciphertext;
+        // for a plaintext with length = 0, the ciphertext buffer must be a nullptr (for OpenSSL Implementation)
+        uint8_t * ciphertext_ptr = nullptr;
+        if (test.ct_len > 0)
+        {
+            EXPECT_TRUE(ciphertext.Alloc(test.ct_len));
+            ciphertext_ptr = ciphertext.Get();
+        }
         Platform::ScopedMemoryBuffer<uint8_t> tag;
-        EXPECT_TRUE(ciphertext.Alloc(test.ct_len));
         EXPECT_TRUE(tag.Alloc(test.tag_len));
         EXPECT_EQ(AES_CCM_encrypt(test.pt, test.pt_len, test.aad, test.aad_len, keyHandle, test.nonce, test.nonce_len,
-                                  ciphertext.Get(), tag.Get(), test.tag_len),
+                                  ciphertext_ptr, tag.Get(), test.tag_len),
                   test.result);
-        EXPECT_EQ(memcmp(ciphertext.Get(), test.ct, test.ct_len), 0);
+        EXPECT_EQ(memcmp(ciphertext_ptr, test.ct, test.ct_len), 0);
         EXPECT_EQ(memcmp(tag.Get(), test.tag, test.tag_len), 0);
 
         keystore.DestroyKey(keyHandle);
@@ -151,7 +158,7 @@ TEST_F(TestSessionKeystore, TestDeriveKey)
     {
         P256ECDHDerivedSecret secret;
         memcpy(secret.Bytes(), test.secret, strlen(test.secret));
-        secret.SetLength(strlen(test.secret));
+        EXPECT_SUCCESS(secret.SetLength(strlen(test.secret)));
 
         Aes128KeyHandle keyHandle;
         EXPECT_EQ(keystore.DeriveKey(secret, ToSpan(test.salt), ToSpan(test.info), keyHandle), CHIP_NO_ERROR);
@@ -173,7 +180,7 @@ TEST_F(TestSessionKeystore, TestDeriveSessionKeys)
     {
         P256ECDHDerivedSecret secret;
         memcpy(secret.Bytes(), test.secret, strlen(test.secret));
-        secret.SetLength(strlen(test.secret));
+        EXPECT_SUCCESS(secret.SetLength(strlen(test.secret)));
 
         Aes128KeyHandle i2r;
         Aes128KeyHandle r2i;

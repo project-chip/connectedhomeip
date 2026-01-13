@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,34 +20,38 @@ namespace CommissionerControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SupportedDeviceCategories {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedDeviceCategories::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategories::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
+                                                          std::nullopt);
 } // namespace SupportedDeviceCategories
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    SupportedDeviceCategories::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace RequestCommissioningApproval {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommissionerControl::Commands::RequestCommissioningApproval::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(RequestCommissioningApproval::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace RequestCommissioningApproval
 namespace CommissionNode {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = CommissionerControl::Commands::CommissionNode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CommissionNode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace CommissionNode
 
 } // namespace Commands
+
+namespace Events {
+namespace CommissioningRequestResult {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kManage };
+} // namespace CommissioningRequestResult
+
+} // namespace Events
 } // namespace CommissionerControl
 } // namespace Clusters
 } // namespace app

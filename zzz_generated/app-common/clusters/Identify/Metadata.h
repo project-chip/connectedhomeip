@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,45 +17,40 @@ namespace app {
 namespace Clusters {
 namespace Identify {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
+
 namespace IdentifyTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IdentifyTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace IdentifyTime
 namespace IdentifyType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = IdentifyType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace IdentifyType
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    IdentifyTime::kMetadataEntry,
+    IdentifyType::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Identify {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Identify::Commands::Identify::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Identify::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace Identify
 namespace TriggerEffect {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Identify::Commands::TriggerEffect::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TriggerEffect::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace TriggerEffect
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Identify
 } // namespace Clusters
 } // namespace app

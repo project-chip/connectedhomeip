@@ -38,28 +38,42 @@ _install_lcov() {
 
 _install_lcov
 
-_normpath() {
-    python3 -c "import os.path; print(os.path.normpath('$@'))"
+_install_gcovr() {
+    if ! gcovr --version >/dev/null 2>&1; then
+        echo "gcovr not installed. Installing..."
+        pip3 install gcovr==8.3
+    fi
 }
 
-CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
+# Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
+_abspath() {
+    python3 -c "import os.path; print(os.path.abspath('$@'))"
+}
+
+CHIP_ROOT=$(_abspath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
 CODE="core"
+QUIET_FLAG=()
+ACCUMULATE=false
 
 skip_gn=false
-TEST_TARGET=check
+TEST_TARGETS=(check)
 
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
 ENABLE_PYTHON=false
+
+GENERATE_XML=false
 
 help() {
     echo "Usage: $file_name [--output_root=<output_root>] [--code=<core|clusters|all>] [Test options"
     echo
     echo "Misc:"
     echo "    -h, --help              Print this help, then exit."
+    echo "    -q, --quiet             Decrease verbosity level."
+    echo "    -a, --accumulate        Accumulate coverage data from previous runs."
     echo
     echo "Build/Output options:"
     echo "    -o, --output_root=DIR   Set the build output directory."
@@ -76,7 +90,7 @@ help() {
     echo "    --python                In addition to unit tests, run Python-based tests."
     echo "                            Both can be combined if needed."
     echo
-    echo "    --target=TARGET         Specific test target to run for unit tests (e.g. 'TestEmberAttributeBuffer.run')."
+    echo "    --target=TARGET         Specify one or more test targets to run for unit tests (e.g. 'TestEmberAttributeBuffer.run' or 'TestBleLayer.run TestBtpEngine.run')."
     echo
 }
 
@@ -96,7 +110,8 @@ for i in "$@"; do
             shift
             ;;
         --target=*)
-            TEST_TARGET="${i#*=}"
+            TEST_TARGETS="${i#*=}"
+            IFS=' ' read -ra TEST_TARGETS <<<"$TEST_TARGETS"
             shift
             ;;
         -o=* | --output_root=*)
@@ -111,6 +126,18 @@ for i in "$@"; do
             ;;
         --python)
             ENABLE_PYTHON=true
+            shift
+            ;;
+        --xml)
+            GENERATE_XML=true
+            shift
+            ;;
+        -q | --quiet)
+            QUIET_FLAG=("--quiet")
+            shift
+            ;;
+        -a | --accumulate)
+            ACCUMULATE=true
             shift
             ;;
         *)
@@ -135,6 +162,12 @@ if [ "$skip_gn" == false ]; then
     # Ensure environment is set
     source "$CHIP_ROOT/scripts/activate.sh"
 
+    # Set coverage data to zero if not accumulating
+    if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
+        lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
+            "${QUIET_FLAG[@]}"
+    fi
+
     # Generate ninja files
     EXTRA_GN_ARGS=""
 
@@ -148,10 +181,14 @@ if [ "$skip_gn" == false ]; then
 
     gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="use_coverage=true $EXTRA_GN_ARGS"
 
+    # Clean the targets to reexecute them
+
+    "$CHIP_ROOT/scripts/helpers/clean_runnable_targets.py" "${TEST_TARGETS[@]}"
+
     #
     # 1) Always run unit tests
     #
-    ninja -C "$OUTPUT_ROOT" "$TEST_TARGET"
+    ninja -C "$OUTPUT_ROOT" "${TEST_TARGETS[@]}"
 
     #
     # 2) Run YAML tests if requested
@@ -184,66 +221,116 @@ if [ "$skip_gn" == false ]; then
         echo "Running Python tests ..."
         # TODO: run python tests.
     fi
-
-    # ----------------------------------------------------------------------------
-    # Remove objects we do NOT want included in coverage
-    # ----------------------------------------------------------------------------
-    rm -rf "$OUTPUT_ROOT/obj/src/app/app-platform"
-    rm -rf "$OUTPUT_ROOT/obj/src/app/common"
-    rm -rf "$OUTPUT_ROOT/obj/src/app/util/mock"
-    rm -rf "$OUTPUT_ROOT/obj/src/controller/python"
-    rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/platform"
-    rm -rf "$OUTPUT_ROOT/obj/src/lib/shell"
-    rm -rf "$OUTPUT_ROOT/obj/src/lwip"
-    rm -rf "$OUTPUT_ROOT/obj/src/platform"
-    rm -rf "$OUTPUT_ROOT/obj/src/tools"
-
-    # Remove unit test objects from coverage
-    find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
-
-    # Restrict coverage to 'core' or 'clusters' if specified
-    if [ "$CODE" == "core" ]; then
-        rm -rf "$OUTPUT_ROOT/obj/src/app/clusters"
-    elif [ "$CODE" == "clusters" ]; then
-        mv "$OUTPUT_ROOT/obj/src/app/clusters" "$OUTPUT_ROOT/obj/clusters"
-        rm -rf "$OUTPUT_ROOT/obj/src"
-        mkdir -p "$OUTPUT_ROOT/obj/src"
-        mv "$OUTPUT_ROOT/obj/clusters" "$OUTPUT_ROOT/obj/src/clusters"
-    fi
 fi
 
 # ------------------------------------------------------------------------------
 # Coverage Generation
-# ------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused,gcov,gcov" # Some error types mentioned twice is needed to suppress the warnings.
+LCOV_EXCLUDE_INCLUDE_OPTIONS=()
+
+# Exclude files we do NOT want included in coverage
+# Exclude unit test files from coverage
+if [[ "$skip_gn" == false ]]; then
+    LCOV_EXCLUDE_INCLUDE_OPTIONS=(
+        --exclude "$CHIP_ROOT/zzz_generated/**"
+        --exclude "$CHIP_ROOT/third_party/**"
+        --exclude "/usr/include/**"
+        --exclude "$CHIP_ROOT/src/app/app-platform/**"
+        --exclude "$CHIP_ROOT/src/app/common/**"
+        --exclude "$CHIP_ROOT/src/app/util/mock/**"
+        --exclude "$CHIP_ROOT/src/controller/python/**"
+        --exclude "$CHIP_ROOT/src/lib/dnssd/platform/**"
+        --exclude "$CHIP_ROOT/src/lib/shell/**"
+        --exclude "$CHIP_ROOT/src/lwip/**"
+        --exclude "$CHIP_ROOT/src/platform/**"
+        --exclude "$CHIP_ROOT/src/tools/**"
+        --exclude "**/tests/**"
+    )
+
+    # Restrict coverage to 'core' or 'clusters' if needed
+    if [[ "$CODE" == "core" ]]; then
+        # --exclude code in 'app/clusters' folder
+        LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
+            --exclude "$CHIP_ROOT/src/app/clusters/**"
+        )
+    elif [[ "$CODE" == "clusters" ]]; then
+        # "--include" code in 'app/clusters' folder, meaning "include ONLY the code in the 'app/clusters' folder in the coverage report."
+        LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
+            --include "$CHIP_ROOT/src/app/clusters/**"
+        )
+    fi
+fi
+
 mkdir -p "$COVERAGE_ROOT"
 
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
-    --exclude=/usr/include/* \
-    --ignore-errors inconsistent \
-    --output-file "$COVERAGE_ROOT/lcov_base.info"
+# Capture compile time coverage data
+lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors "$LCOV_IGNORE_ERRORS" \
+    --output-file "$COVERAGE_ROOT/lcov_base.info" \
+    "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
+    "${QUIET_FLAG[@]}"
 
+# Capture runtime coverage data
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
-    --exclude=/usr/include/* \
-    --ignore-errors inconsistent \
-    --output-file "$COVERAGE_ROOT/lcov_test.info"
+    --ignore-errors "$LCOV_IGNORE_ERRORS" \
+    --output-file "$COVERAGE_ROOT/lcov_test.info" \
+    "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
+    "${QUIET_FLAG[@]}"
 
-lcov --ignore-errors inconsistent \
+# Combine them
+lcov --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --ignore-errors inconsistent \
-    --output-file "$COVERAGE_ROOT/lcov_final.info"
+    --output-file "$COVERAGE_ROOT/lcov_final.info" \
+    "${QUIET_FLAG[@]}"
 
+# Generate HTML report
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
-    --ignore-errors inconsistent \
+    --ignore-errors inconsistent,inconsistent,category,count \
+    --rc max_message_count=1000 \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
-    --header-title "Matter SDK Coverage Report"
+    --header-title "Matter SDK Coverage Report" \
+    --prefix "$CHIP_ROOT/src" \
+    "${QUIET_FLAG[@]}"
+
+if [ "$GENERATE_XML" == true ]; then
+    _install_gcovr
+
+    gcovr --exclude=zzz_generated/ \
+        --exclude=third_party/ \
+        --exclude=".*tests/.*" \
+        --exclude=".*testing/.*" \
+        --include=src/ \
+        --gcov-ignore-parse-errors \
+        --merge-mode-functions=merge-use-line-min \
+        --xml="$COVERAGE_ROOT"/coverage.xml
+
+    XML_INDEX=$(_abspath "$COVERAGE_ROOT/coverage.xml")
+    if [ -f "$XML_INDEX" ]; then
+        echo
+        echo "============================================================"
+        echo "Coverage report successfully generated:"
+        echo "    file://$XML_INDEX"
+        echo "============================================================"
+    else
+        echo "WARNING: Coverage XML index was not found at expected path:"
+        echo "    $XML_INDEX"
+    fi
+fi
+
+HTML_INDEX=$(_abspath "$COVERAGE_ROOT/html/index.html")
+if [ -f "$HTML_INDEX" ]; then
+    echo
+    echo "============================================================"
+    echo "Coverage report successfully generated:"
+    echo "    file://$HTML_INDEX"
+    echo "============================================================"
+else
+    echo "WARNING: Coverage HTML index was not found at expected path:"
+    echo "    $HTML_INDEX"
+fi
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"

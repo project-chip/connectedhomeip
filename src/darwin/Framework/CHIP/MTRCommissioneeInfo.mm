@@ -16,33 +16,142 @@
 
 #import "MTRCommissioneeInfo_Internal.h"
 
+#import <Matter/MTRClusterConstants.h>
+
+#import "MTRBaseDevice.h"
+#import "MTRBaseDevice_Internal.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTREndpointInfo_Internal.h"
+#import "MTRLogging_Internal.h"
+#import "MTRNetworkInterfaceInfo_Internal.h"
 #import "MTRProductIdentity.h"
 #import "MTRUtilities.h"
+
+#include <app/AttributePathParams.h>
+#include <lib/core/TLVReader.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_DIRECT_MEMBERS
 @implementation MTRCommissioneeInfo
 
-- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info
+- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info commissioningParameters:(MTRCommissioningParameters *)commissioningParameters
 {
+    using namespace chip::app;
+
     self = [super init];
     _productIdentity = [[MTRProductIdentity alloc] initWithVendorID:@(info.basic.vendorId) productID:@(info.basic.productId)];
 
-    // TODO: We should probably hold onto our MTRCommissioningParameters so we can look at `readEndpointInformation`
-    // instead of just reading whatever Descriptor cluster information happens to be in the cache.
-    auto * endpoints = [MTREndpointInfo endpointsFromAttributeCache:info.attributes];
-    if (endpoints.count > 0) {
-        _endpointsById = endpoints;
+    if (commissioningParameters.readEndpointInformation) {
+        auto * endpoints = [MTREndpointInfo endpointsFromAttributeCache:info.attributes];
+        if (endpoints.count > 0) {
+            _endpointsById = endpoints;
+        }
     }
+
+    NSMutableArray<MTRNetworkInterfaceInfo *> * networkInterfaces = [[NSMutableArray alloc] init];
+
+    if (info.attributes != nullptr) {
+        NSMutableDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes = [[NSMutableDictionary alloc] init];
+
+        // Only expose attributes that match pathFilters, so that API consumers
+        // don't start relying on undocumented internal details of which paths
+        // we read from the device in which circumstances.
+        std::vector<AttributePathParams> pathFilters;
+        if (commissioningParameters.extraAttributesToRead != nil) {
+            for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
+                [requestPath convertToAttributePathParams:pathFilters.emplace_back()];
+            }
+        }
+
+        // Always include the Network Commissioning cluster FeatureMap
+        // attributes, using a wildcard-endpoint path.
+        pathFilters.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
+
+        TEMPORARY_RETURN_IGNORED info.attributes->ForEachAttribute([&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+            // Only grab paths that are included in extraAttributesToRead so that
+            // API consumers don't develop dependencies on implementation details
+            // (like which other attributes we happen to read).
+
+            // TODO: This means API consumers might duplicate attribute reads we
+            // already do.  We should either offer guarantees about things like
+            // "network commissioning feature maps" that will always be present, or
+            // perhaps dedup in some way under the hood when issuing the
+            // reads.
+
+            // This is unfortunately not very efficient; if we have a lot of
+            // paths we may need a better way to do this.
+            bool isRequestedPath = false;
+            for (auto & filter : pathFilters) {
+                if (!filter.IsAttributePathSupersetOf(path)) {
+                    continue;
+                }
+
+                isRequestedPath = true;
+                break;
+            }
+
+            if (!isRequestedPath) {
+                // Skip it.
+                return CHIP_NO_ERROR;
+            }
+
+            chip::TLV::TLVReader reader;
+            CHIP_ERROR err = info.attributes->Get(path, reader);
+            if (err != CHIP_NO_ERROR) {
+                // We actually got an error, not data.  Just skip this path.
+                return CHIP_NO_ERROR;
+            }
+
+            auto value = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+            if (value == nil) {
+                // Decode errors can happen (e.g. invalid TLV); just skip this path.
+                return CHIP_NO_ERROR;
+            }
+
+            auto * mtrPath = [[MTRAttributePath alloc] initWithPath:path];
+            attributes[mtrPath] = value;
+            return CHIP_NO_ERROR;
+        });
+
+        _attributes = attributes;
+
+        // Now grab the Network Commissioning information in a nicer form.
+        TEMPORARY_RETURN_IGNORED info.attributes->ForEachAttribute(MTRClusterIDTypeNetworkCommissioningID, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+            if (path.mAttributeId != MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
+                return CHIP_NO_ERROR;
+            }
+
+            uint32_t value;
+            CHIP_ERROR err = info.attributes->Get<Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(path, value);
+            if (err != CHIP_NO_ERROR) {
+                // Keep iterating no matter what.
+                return CHIP_NO_ERROR;
+            }
+
+            MTRNetworkInterfaceInfo * _Nullable interfaceInfo = [[MTRNetworkInterfaceInfo alloc] initWithEndpointID:@(path.mEndpointId) featureMap:@(value)];
+            if (!interfaceInfo) {
+                // Invalid feature map.  Just keep looking for other ones.
+                return CHIP_NO_ERROR;
+            }
+
+            [networkInterfaces addObject:interfaceInfo];
+            return CHIP_NO_ERROR;
+        });
+    }
+
+    auto * endpointDescriptor = [[NSSortDescriptor alloc] initWithKey:@"endpointID" ascending:YES];
+    [networkInterfaces sortUsingDescriptors:@[ endpointDescriptor ]];
+    _networkInterfaces = networkInterfaces;
 
     return self;
 }
 
 static NSString * const sProductIdentityCodingKey = @"pi";
 static NSString * const sEndpointsCodingKey = @"ep";
+static NSString * const sAttributesCodingKey = @"at";
+static NSString * const sNetworkInterfacesCodingKey = @"ni";
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
@@ -52,6 +161,43 @@ static NSString * const sEndpointsCodingKey = @"ep";
     _endpointsById = [coder decodeDictionaryWithKeysOfClass:NSNumber.class
                                              objectsOfClass:MTREndpointInfo.class
                                                      forKey:sEndpointsCodingKey];
+
+    // TODO: Can we do better about duplicating the set of classes that appear
+    // in data-values?  We have this set in a bunch of places....  But here we need
+    // not just those, but also MTRAttributePath.
+    static NSSet * const sAttributeClasses = [NSSet setWithObjects:NSDictionary.class, NSArray.class, NSData.class, NSString.class, NSNumber.class, MTRAttributePath.class, nil];
+    _attributes = [coder decodeObjectOfClasses:sAttributeClasses forKey:sAttributesCodingKey];
+
+    if (_attributes != nil) {
+        // Check that the right types are in the right places.
+        if (![_attributes isKindOfClass:NSDictionary.class]) {
+            MTR_LOG_ERROR("MTRCommissioneeInfo decoding: attributes are not a dictionary: %@", _attributes);
+            return nil;
+        }
+
+        for (id key in _attributes) {
+            if (![key isKindOfClass:MTRAttributePath.class]) {
+                MTR_LOG_ERROR("MTRCommissioneeInfo decoding: expected MTRAttributePath but found %@", key);
+                return nil;
+            }
+
+            id value = _attributes[key];
+            if (![value isKindOfClass:NSDictionary.class] || !MTRDataValueDictionaryIsWellFormed(value)) {
+                MTR_LOG_ERROR("MTRCommissioneeInfo decoding: expected data-value dictionary but found %@", value);
+                return nil;
+            }
+        }
+    }
+
+    // Decode network interface array (may be nil if decoding something encoded
+    // before we added these properties).
+    _networkInterfaces = [coder decodeArrayOfObjectsOfClass:MTRNetworkInterfaceInfo.class forKey:sNetworkInterfacesCodingKey];
+
+    // Provide empty array for backward compatibility if not present in encoded data
+    if (_networkInterfaces == nil) {
+        _networkInterfaces = @[];
+    }
+
     return self;
 }
 
@@ -59,6 +205,8 @@ static NSString * const sEndpointsCodingKey = @"ep";
 {
     [coder encodeObject:_productIdentity forKey:sProductIdentityCodingKey];
     [coder encodeObject:_endpointsById forKey:sEndpointsCodingKey];
+    [coder encodeObject:_attributes forKey:sAttributesCodingKey];
+    [coder encodeObject:_networkInterfaces forKey:sNetworkInterfacesCodingKey];
 }
 
 + (BOOL)supportsSecureCoding
@@ -77,6 +225,9 @@ static NSString * const sEndpointsCodingKey = @"ep";
     MTRCommissioneeInfo * other = object;
     VerifyOrReturnValue(MTREqualObjects(_productIdentity, other->_productIdentity), NO);
     VerifyOrReturnValue(MTREqualObjects(_endpointsById, other->_endpointsById), NO);
+    VerifyOrReturnValue(MTREqualObjects(_attributes, other->_attributes), NO);
+    VerifyOrReturnValue(MTREqualObjects(_networkInterfaces, other->_networkInterfaces), NO);
+
     return YES;
 }
 

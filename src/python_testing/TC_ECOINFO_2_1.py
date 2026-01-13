@@ -62,14 +62,19 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
+from matter.testing.runner import default_matter_test_main
+from matter.tlv import uint
+
+log = logging.getLogger(__name__)
 
 
 class TC_ECOINFO_2_1(MatterBaseTest):
@@ -78,6 +83,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
     async def setup_class(self):
         super().setup_class()
 
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -85,6 +91,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             await self._setup_ci_prerequisites()
 
     def teardown_class(self):
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -104,11 +112,11 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
         if not dut_fsa_stdin_pipe:
             asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5544
         self.th_server_setup_params = SetupParameters(
@@ -126,7 +134,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        # Add some server to the DUT_FSA's Aggregator/Bridge.
+        # Automatically commission some server to the DUT_FSA using the command line interface provided
+        # by either the unified fabric-sync app or the fabric-admin + fabric-bridge apps.
         if self.user_params.get("unified_fabric_sync_app"):
             self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
         else:
@@ -143,51 +152,51 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 asserts.assert_equal(device.deviceNameLastEdit, None, "Unexpected value in deviceNameLastEdit")
                 asserts.assert_equal(device.bridgedEndpoint, 0, "Unexpected value in bridgedEndpoint")
                 asserts.assert_equal(device.originalEndpoint, 0, "Unexpected value in originalEndpoint")
-                asserts.assert_true(type_matches(device.deviceTypes, list), "DeviceTypes should be a list")
+                asserts.assert_true(matchers.is_type(device.deviceTypes, list), "DeviceTypes should be a list")
                 asserts.assert_equal(len(device.deviceTypes), 0, "DeviceTypes list should be empty")
-                asserts.assert_true(type_matches(device.uniqueLocationIDs, list), "UniqueLocationIds should be a list")
+                asserts.assert_true(matchers.is_type(device.uniqueLocationIDs, list), "UniqueLocationIds should be a list")
                 asserts.assert_equal(len(device.uniqueLocationIDs), 0, "uniqueLocationIDs list should be empty")
                 asserts.assert_equal(device.uniqueLocationIDsLastEdit, 0, "Unexpected value in uniqueLocationIDsLastEdit")
                 continue
 
             if device.deviceName is not None:
-                asserts.assert_true(type_matches(device.deviceName, str), "DeviceName should be a string")
+                asserts.assert_true(matchers.is_type(device.deviceName, str), "DeviceName should be a string")
                 asserts.assert_less_equal(len(device.deviceName), 64, "DeviceName should be <= 64")
-                asserts.assert_true(type_matches(device.deviceNameLastEdit, uint), "DeviceNameLastEdit should be a uint")
+                asserts.assert_true(matchers.is_type(device.deviceNameLastEdit, uint), "DeviceNameLastEdit should be a uint")
                 asserts.assert_greater(device.deviceNameLastEdit, 0, "DeviceNameLastEdit must be greater than 0")
             else:
                 asserts.assert_true(device.deviceNameLastEdit is None,
                                     "DeviceNameLastEdit should not be provided when there is no DeviceName")
 
-            asserts.assert_true(type_matches(device.bridgedEndpoint, uint), "BridgedEndpoint should be a uint")
+            asserts.assert_true(matchers.is_type(device.bridgedEndpoint, uint), "BridgedEndpoint should be a uint")
             asserts.assert_greater_equal(device.bridgedEndpoint, 0, "BridgedEndpoint >= 0")
             asserts.assert_less_equal(device.bridgedEndpoint, 0xffff_ffff,
                                       "BridgedEndpoint less than or equal to Invalid Endpoint value")
 
-            asserts.assert_true(type_matches(device.originalEndpoint, uint), "OriginalEndpoint should be a uint")
+            asserts.assert_true(matchers.is_type(device.originalEndpoint, uint), "OriginalEndpoint should be a uint")
             asserts.assert_greater_equal(device.originalEndpoint, 0, "OriginalEndpoint >= 0")
             asserts.assert_less(device.originalEndpoint, 0xffff_ffff,
                                 "OriginalEndpoint less than or equal to Invalid Endpoint value")
 
-            asserts.assert_true(type_matches(device.deviceTypes, list), "DeviceTypes should be a list")
+            asserts.assert_true(matchers.is_type(device.deviceTypes, list), "DeviceTypes should be a list")
             asserts.assert_greater_equal(len(device.deviceTypes), 1, "DeviceTypes list must contains at least one entry")
             for device_type in device.deviceTypes:
-                asserts.assert_true(type_matches(device_type.deviceType, uint), "DeviceType should be a uint")
+                asserts.assert_true(matchers.is_type(device_type.deviceType, uint), "DeviceType should be a uint")
                 # TODO what other validation can we do here to device_type.deviceType
-                asserts.assert_true(type_matches(device_type.revision, uint), "device type's revision should be a uint")
+                asserts.assert_true(matchers.is_type(device_type.revision, uint), "device type's revision should be a uint")
                 asserts.assert_greater_equal(device_type.revision, 1, "device type's revision must >= 1")
 
-            asserts.assert_true(type_matches(device.uniqueLocationIDs, list), "UniqueLocationIds should be a list")
+            asserts.assert_true(matchers.is_type(device.uniqueLocationIDs, list), "UniqueLocationIds should be a list")
             num_of_unique_location_ids = len(device.uniqueLocationIDs)
             asserts.assert_less_equal(num_of_unique_location_ids, 64, "UniqueLocationIds list should be <= 64")
             for location_id in device.uniqueLocationIDs:
-                asserts.assert_true(type_matches(location_id, str), "UniqueLocationId should be a string")
+                asserts.assert_true(matchers.is_type(location_id, str), "UniqueLocationId should be a string")
                 location_id_string_length = len(location_id)
                 asserts.assert_greater_equal(location_id_string_length, 1,
                                              "UniqueLocationId must contain at least one character")
                 asserts.assert_less_equal(location_id_string_length, 64, "UniqueLocationId should be <= 64")
 
-            asserts.assert_true(type_matches(device.uniqueLocationIDsLastEdit, uint),
+            asserts.assert_true(matchers.is_type(device.uniqueLocationIDsLastEdit, uint),
                                 "UniqueLocationIdsLastEdit should be a uint")
             if num_of_unique_location_ids:
                 asserts.assert_greater(device.uniqueLocationIDsLastEdit, 0, "UniqueLocationIdsLastEdit must be non-zero")
@@ -206,18 +215,18 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 asserts.assert_equal(location.locationDescriptorLastEdit, 0, "Unexpected value in locationDescriptorLastEdit")
                 continue
 
-            asserts.assert_true(type_matches(location.uniqueLocationID, str), "UniqueLocationId should be a string")
+            asserts.assert_true(matchers.is_type(location.uniqueLocationID, str), "UniqueLocationId should be a string")
             location_id_string_length = len(location.uniqueLocationID)
             asserts.assert_greater_equal(location_id_string_length, 1,
                                          "UniqueLocationId must contain at least one character")
             asserts.assert_less_equal(location_id_string_length, 64, "UniqueLocationId should be <= 64")
 
-            asserts.assert_true(type_matches(location.locationDescriptor.locationName, str),
+            asserts.assert_true(matchers.is_type(location.locationDescriptor.locationName, str),
                                 "LocationName should be a string")
             asserts.assert_less_equal(len(location.locationDescriptor.locationName), 64, "LocationName should be <= 64")
 
             if location.locationDescriptor.floorNumber is not NullValue:
-                asserts.assert_true(type_matches(location.locationDescriptor.floorNumber, int),
+                asserts.assert_true(matchers.is_type(location.locationDescriptor.floorNumber, int),
                                     "FloorNumber should be an int")
                 # TODO check in range of int16.
 
@@ -225,7 +234,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 # TODO check areaType is valid.
                 pass
 
-            asserts.assert_true(type_matches(location.locationDescriptorLastEdit, uint),
+            asserts.assert_true(matchers.is_type(location.locationDescriptorLastEdit, uint),
                                 "UniqueLocationIdsLastEdit should be a uint")
             asserts.assert_greater(location.locationDescriptorLastEdit, 0, "LocationDescriptorLastEdit must be non-zero")
 

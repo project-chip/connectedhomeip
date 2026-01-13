@@ -41,6 +41,9 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
   override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Long) =
     listener.onCommissioningStatusUpdate(nodeId, stage, errorCode.toUInt())
 
+  override fun onCommissioningStageStart(nodeId: Long, stage: String?) =
+    listener.onCommissioningStageStart(nodeId, stage)
+
   override fun onReadCommissioningInfo(
     vendorId: Int,
     productId: Int,

@@ -75,7 +75,7 @@ namespace app {
 inline constexpr const uint32_t kEventManagementProfile = 0x1;
 inline constexpr const uint32_t kFabricIndexTag         = 0x1;
 inline constexpr size_t kMaxEventSizeReserve            = 512;
-constexpr uint16_t kRequiredEventField =
+inline constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
@@ -201,6 +201,13 @@ struct LogStorageResources
 class EventManagement : public DataModel::EventsGenerator
 {
 public:
+    /**
+     * Note: Even though this class is used as a singleton, the default constructor is public in
+     * order to preserve the ability to instantiate this class in test code. This is meant to be
+     * temporary until we find a better solution.
+     */
+    constexpr EventManagement() = default;
+
     /**
      * Initialize the EventManagement with an array of LogStorageResources and
      * an equal-length array of CircularEventBuffers that correspond to those
@@ -388,8 +395,11 @@ public:
     /* EventsGenerator implementation */
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                              EventNumber & generatedEventNumber) override;
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override;
 
 private:
+    static EventManagement sInstance;
+
     class InternalEventOptions : public EventOptions
     {
     public:
@@ -501,9 +511,11 @@ private:
      *
      * The function is used to scan through the event log to find events matching the spec in the supplied context.
      * Particularly, it would check against mStartingEventNumber, and skip fetched event.
+     *
+     * On success, if the event represented by the EventEnvelopeContext should be encoded, encodeEvent will be set to true.
      */
     static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
-                                    EventEnvelopeContext * event);
+                                    EventEnvelopeContext * event, bool & encodeEvent);
 
     /**
      * @brief Internal iterator function used to fetch event into EventEnvelopeContext, then EventIterator would filter event
@@ -532,15 +544,10 @@ private:
     /**
      * @brief Check whether the event instance represented by the EventEnvelopeContext should be included in the report.
      *
-     * @retval CHIP_ERROR_UNEXPECTED_EVENT This path should be excluded in the generated event report.
-     * @retval CHIP_EVENT_ID_FOUND This path should be included in the generated event report.
-     * @retval CHIP_ERROR_ACCESS_DENIED This path should be included in the generated event report, but the client does not have
-     * .       enough privilege to access it.
-     *
-     * TODO: Consider using CHIP_NO_ERROR, CHIP_ERROR_SKIP_EVENT, CHIP_ERROR_ACCESS_DENINED or some enum to represent the checking
-     * result.
+     * @retval false This event instance should be excluded in the generated event report.
+     * @retval true This event instance should be included in the generated event report.
      */
-    static CHIP_ERROR CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
+    static bool IncludeEventInReport(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
 
     /**
      * @brief copy event from circular buffer to target buffer for report
@@ -567,9 +574,9 @@ private:
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
-    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+    Timestamp mLastEventTimestamp{};  ///< The timestamp of the last event in this buffer
 
-    System::Clock::Milliseconds64 mMonotonicStartupTime;
+    System::Clock::Milliseconds64 mMonotonicStartupTime{};
 
     EventReporter * mpEventReporter = nullptr;
 };

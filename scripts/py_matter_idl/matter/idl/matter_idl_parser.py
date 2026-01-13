@@ -1,27 +1,35 @@
-#!/usr/bin/env python
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import dataclasses
 import functools
 import logging
-import sys
-from pathlib import Path
+import pprint
 from typing import Dict, List, Optional
 
+import click
 from lark import Lark
 from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
-try:
-    from matter.idl.matter_idl_types import AccessPrivilege
-except ModuleNotFoundError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.matter_idl_types import AccessPrivilege
+from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation,
+                                         AttributeQuality, AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
-from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
-                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
-                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+LOGGER = logging.getLogger(__name__)
 
 
 def UnionOfAllFlags(flags_list):
@@ -37,7 +45,7 @@ class PrefixCppDocComment:
         self.value_len = len(token.value)  # includes /***/ AND whitespace
         self.value = token.value[3:-2].strip()
 
-    def appply_to_idl(self, idl: Idl, content: str):
+    def apply_to_idl(self, idl: Idl, content: str):
         if self.start_pos is None:
             return
 
@@ -46,7 +54,7 @@ class PrefixCppDocComment:
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
-        # preceeds id (skipping whitespace)
+        # precedes id (skipping whitespace)
         for item in self.supported_types(idl):
             meta = item.parse_meta
             if meta and meta.start_pos == actual_pos:
@@ -57,9 +65,26 @@ class PrefixCppDocComment:
         """List all types supported by doc comments."""
         for cluster in idl.clusters:
             yield cluster
-
+            for attribute in cluster.attributes:
+                yield attribute.definition
             for command in cluster.commands:
                 yield command
+            for struct in cluster.structs:
+                yield struct
+                for field in struct.fields:
+                    yield field
+            for event in cluster.events:
+                yield event
+                for field in event.fields:
+                    yield field
+            for enum in cluster.enums:
+                yield enum
+                for entry in enum.entries:
+                    yield entry
+            for bitmap in cluster.bitmaps:
+                yield bitmap
+                for entry in bitmap.entries:
+                    yield entry
 
     def __repr__(self):
         return ("PREFIXDoc: %r at %r" % (self.value, self.start_pos))
@@ -139,8 +164,7 @@ class MatterIdlTransformer(Transformer):
         n = tokens[0].value
         if n.startswith('0x'):
             return int(n[2:], 16)
-        else:
-            return int(n)
+        return int(n)
 
     @v_args(inline=True)
     def negative_integer(self, value):
@@ -189,35 +213,38 @@ class MatterIdlTransformer(Transformer):
         if len(tokens) == 1:
             return DataType(name=tokens[0])
             # Just a string for data type
-        elif len(tokens) == 2:
+        if len(tokens) == 2:
             return DataType(name=tokens[0], max_length=tokens[1])
-        else:
-            raise Exception("Unexpected size for data type")
+        raise Exception("Unexpected size for data type")
 
-    @v_args(inline=True)
-    def constant_entry(self, api_maturity, id, number):
+    @v_args(meta=True, inline=True)
+    def constant_entry(self, meta, api_maturity, id, number, spec_name):
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
-        return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return ConstantEntry(name=id, code=number, api_maturity=api_maturity, specification_name=spec_name, parse_meta=meta)
 
-    @v_args(inline=True)
-    def enum(self, shared, id, type, *entries):
+    @v_args(meta=True, inline=True)
+    def enum(self, meta, shared, id, type, *entries):
         if shared is None:
             shared = False
-        return Enum(name=id, base_type=type, entries=list(entries), is_shared=shared)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Enum(name=id, base_type=type, entries=list(entries), is_shared=shared, parse_meta=meta)
 
-    @v_args(inline=True)
-    def bitmap(self, shared, id, type, *entries):
+    @v_args(meta=True, inline=True)
+    def bitmap(self, meta, shared, id, type, *entries):
         if shared is None:
             shared = False
-        return Bitmap(name=id, base_type=type, entries=list(entries), is_shared=shared)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Bitmap(name=id, base_type=type, entries=list(entries), is_shared=shared, parse_meta=meta)
 
-    def field(self, args):
+    @v_args(meta=True)
+    def field(self, meta, args):
         data_type, name = args[0], args[1]
         is_list = (len(args) == 4)
         code = args[-1]
-
-        return Field(data_type=data_type, name=name, code=code, is_list=is_list)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Field(data_type=data_type, name=name, code=code, is_list=is_list, parse_meta=meta)
 
     def optional(self, _):
         return FieldQuality.OPTIONAL
@@ -230,6 +257,9 @@ class MatterIdlTransformer(Transformer):
 
     def attr_readonly(self, _):
         return AttributeQuality.READABLE
+
+    def attr_writeonly(self, _):
+        return AttributeQuality.WRITABLE
 
     def attr_nosubscribe(self, _):
         return AttributeQuality.NOSUBSCRIBE
@@ -306,14 +336,12 @@ class MatterIdlTransformer(Transformer):
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
-        cmd = Command(
+        return Command(
             parse_meta=meta,
             qualities=args[0],
             input_param=args[2], output_param=args[3], code=args[4],
             **args[1],
         )
-
-        return cmd
 
     def event_access(self, privilege):
         return privilege[0]
@@ -334,8 +362,10 @@ class MatterIdlTransformer(Transformer):
     def cluster_revision(self, revision):
         return revision
 
-    def event(self, args):
-        return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
+    @v_args(meta=True)
+    def event(self, meta, args):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], parse_meta=meta, **args[2])
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
@@ -408,33 +438,35 @@ class MatterIdlTransformer(Transformer):
         # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
-    @v_args(inline=True)
-    def attribute(self, qualities, definition_tuple):
+    @v_args(meta=True, inline=True)
+    def attribute(self, meta, qualities, definition_tuple):
         (definition, acl) = definition_tuple
 
-        # until we support write only (and need a bit of a reshuffle)
-        # if the 'attr_readonly == READABLE' is not in the list, we make things
-        # read/write
-        if AttributeQuality.READABLE not in qualities:
+        # If the attribute is neither "readonly" nor "writeonly", then it must be Read/Write
+        if AttributeQuality.READABLE not in qualities and AttributeQuality.WRITABLE not in qualities:
             qualities |= AttributeQuality.READABLE
             qualities |= AttributeQuality.WRITABLE
 
+        definition.parse_meta = None if self.skip_meta else ParseMetaData(meta)
+
         return Attribute(definition=definition, qualities=qualities, **acl)
 
-    @v_args(inline=True)
-    def struct(self, shared, qualities, id, *fields):
+    @v_args(meta=True, inline=True)
+    def struct(self, meta, shared, qualities, id, *fields):
         if shared is None:
             shared = False
-        return Struct(name=id, qualities=qualities, fields=list(fields), is_shared=shared)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Struct(name=id, qualities=qualities, fields=list(fields), is_shared=shared, parse_meta=meta)
 
     @v_args(inline=True)
     def request_struct(self, value):
         value.tag = StructTag.REQUEST
         return value
 
-    @v_args(inline=True)
-    def response_struct(self, id, code, *fields):
-        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
+    @v_args(meta=True, inline=True)
+    def response_struct(self, meta, id, code, *fields):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields), parse_meta=meta)
 
     @v_args(inline=True)
     def endpoint(self, number, *transforms):
@@ -615,15 +647,15 @@ class GlobalMapping:
                 if type_name in self.bitmap_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.bitmaps.append(self.bitmap_map[type_name])
+                    cluster.bitmaps.insert(0, self.bitmap_map[type_name])
                 elif type_name in self.enum_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.enums.append(self.enum_map[type_name])
+                    cluster.enums.insert(0, self.enum_map[type_name])
                 elif type_name in self.struct_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.structs.append(self.struct_map[type_name])
+                    cluster.structs.insert(0, self.struct_map[type_name])
 
         return cluster
 
@@ -682,10 +714,10 @@ class ParserWithLines:
                         f"Different cluster definition for {c.name}/{c.code}")
             else:
                 clusters[c.code] = c
-        idl.clusters = [c for c in clusters.values()]
+        idl.clusters = list(clusters.values())
 
         for comment in self.transformer.doc_comments:
-            comment.appply_to_idl(idl, file)
+            comment.apply_to_idl(idl, file)
 
         if self.merge_globals:
             idl = _merge_global_types_into_clusters(idl)
@@ -711,40 +743,36 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
     return ParserWithLines(skip_meta, merge_globals)
 
 
-if __name__ == '__main__':
-    # This Parser is generally not intended to be run as a stand-alone binary.
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARNING,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output.')
+@click.argument('filename')
+def main(log_level, filename):
+    # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
-    import pprint
 
-    import click
+    logging.basicConfig(
+        level=__LOG_LEVELS__[log_level],
+        format='%(asctime)s %(levelname)-7s %(message)s',
+    )
 
-    # Supported log levels, mapping string values required for argument
-    # parsing into logging constants
-    __LOG_LEVELS__ = {
-        'debug': logging.DEBUG,
-        'info': logging.INFO,
-        'warn': logging.WARN,
-        'fatal': logging.FATAL,
-    }
+    LOGGER.info("Starting to parse ...")
+    with open(filename) as f:
+        data = CreateParser().parse(f.read(), file_name=filename)
+    LOGGER.info("Parse completed")
 
-    @click.command()
-    @click.option(
-        '--log-level',
-        default='INFO',
-        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
-        help='Determines the verbosity of script output.')
-    @click.argument('filename')
-    def main(log_level, filename=None):
-        logging.basicConfig(
-            level=__LOG_LEVELS__[log_level],
-            format='%(asctime)s %(levelname)-7s %(message)s',
-        )
-
-        logging.info("Starting to parse ...")
-        data = CreateParser().parse(open(filename).read(), file_name=filename)
-        logging.info("Parse completed")
-
-        logging.info("Data:")
-        pprint.pp(data)
-
-    main(auto_envvar_prefix='CHIP')
+    LOGGER.info("Data:")
+    pprint.pp(data)

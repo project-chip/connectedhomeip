@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2024 Project CHIP Authors
+#   Copyright (c) 2024-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,16 +19,12 @@
 
 if CHIP
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	bool "Enable NXP Wi-Fi support"
 	default y
 	select WIFI
 	select WIFI_NXP
 	select WIFI_NM_WPA_SUPPLICANT
-	select WIFI_NM_WPA_SUPPLICANT_CRYPTO_ENTERPRISE
-	select WIFI_NM_WPA_SUPPLICANT_DPP
-	select WIFI_NM_WPA_SUPPLICANT_EAPOL
-	select WIFI_NM_WPA_SUPPLICANT_WPS
 	select NET_L2_ETHERNET
 	select NET_IPV4
 	select NET_DHCPV4
@@ -76,8 +72,8 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_ETHERNET
-	bool "Enable NXP Ethernet support"
 	default n
 	depends on !CHIP_WIFI
 	select NET_MGMT_EVENT

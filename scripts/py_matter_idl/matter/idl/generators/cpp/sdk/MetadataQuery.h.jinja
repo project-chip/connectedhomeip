@@ -1,0 +1,49 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// This file provides a function to query into the MetadataProviders without 
+// instantiating any unnecessary metadata.
+// It will instatiate all metadata for the selected cluster commands, even unused commands. 
+//
+// If used without parameters it will instatiate metadata 
+// for all clusters and might incur a big overhead.
+//
+// based on {{input_name}}
+#pragma once
+
+#include <optional>
+#include <lib/core/DataModelTypes.h>
+
+{%- for cluster in clusters | sort(attribute='name') %}
+#include <clusters/{{cluster.name | name_for_id_usage}}/Ids.h>
+#include <clusters/{{cluster.name | name_for_id_usage}}/MetadataProvider.h>
+{%- endfor%}
+
+
+namespace chip {
+namespace app {
+namespace DataModel {
+namespace detail {
+
+// Implements a search for the AcceptedCommandEntry in multiple clusters
+// If no Clusters are provided it will search all clusters.
+// We provide this function for convenience, however it is not expected to be used long-term.
+template <ClusterId... TClusterIds>
+std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId id, CommandId command)
+{
+    using namespace chip::app::Clusters; 
+    {%- for cluster in clusters | sort(attribute='name') %}
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == {{cluster.name}}::Id) || ...))
+    {
+        if(id == {{cluster.name}}::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, {{cluster.name}}::Id>::EntryFor(command);
+    }
+    {%- endfor%}
+
+    return std::nullopt;
+}
+
+
+} // namespace detail
+} // namespace DataModel
+} // namespace app
+} // namespace chip

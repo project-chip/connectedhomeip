@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -46,6 +46,9 @@ private:
 
     CHIP_ERROR Init(void) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+#if CONFIG_CHIP_ETHERNET
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override;
+#endif
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
@@ -79,9 +82,8 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    CHIP_ERROR DetermineBootReason(uint8_t rebootCause);
-#endif
+
+    CHIP_ERROR DetermineBootReason(uint32_t rebootCause);
 };
 
 /**

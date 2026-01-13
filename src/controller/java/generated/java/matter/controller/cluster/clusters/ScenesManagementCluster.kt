@@ -104,16 +104,6 @@ class ScenesManagementCluster(
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
-  }
-
   class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
@@ -183,13 +173,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -266,17 +252,11 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+      } else if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
         transitionTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -288,9 +268,7 @@ class ScenesManagementCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
         sceneName_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -302,9 +280,7 @@ class ScenesManagementCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SET_STRUCTS)) {
+      } else if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SET_STRUCTS)) {
         extensionFieldSetStructs_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -396,13 +372,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -462,9 +434,7 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
@@ -527,13 +497,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -633,9 +599,7 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_CAPACITY)) {
+      } else if (tag == ContextSpecificTag(TAG_CAPACITY)) {
         capacity_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -648,13 +612,9 @@ class ScenesManagementCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_LIST)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_LIST)) {
         sceneList_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -750,13 +710,9 @@ class ScenesManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM)) {
+      } else if (tag == ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM)) {
         groupIdentifierFrom_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
+      } else if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
         sceneIdentifierFrom_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -1153,101 +1109,6 @@ class ScenesManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

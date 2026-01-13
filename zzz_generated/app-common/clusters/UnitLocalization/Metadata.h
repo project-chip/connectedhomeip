@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,21 +17,29 @@ namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace TemperatureUnit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace TemperatureUnit
+namespace SupportedTemperatureUnits {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedTemperatureUnits::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedTemperatureUnits
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace UnitLocalization
 } // namespace Clusters
 } // namespace app

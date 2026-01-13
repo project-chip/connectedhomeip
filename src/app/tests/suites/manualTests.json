@@ -7,10 +7,6 @@
         "Test_TC_DD_1_9",
         "Test_TC_DD_1_10",
         "Test_TC_DD_1_11",
-        "Test_TC_DD_1_12",
-        "Test_TC_DD_1_13",
-        "Test_TC_DD_1_14",
-        "Test_TC_DD_1_15",
         "Test_TC_DD_2_1",
         "Test_TC_DD_2_2",
         "Test_TC_DD_3_1",
@@ -64,7 +60,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
         "Test_TC_DISHALM_3_3",
@@ -80,11 +75,8 @@
         "Test_TC_DISHM_3_3"
     ],
     "DeviceManagement": [
-        "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_3",
-        "Test_TC_OPCREDS_3_4",
-        "Test_TC_OPCREDS_3_5",
         "Test_TC_OPCREDS_3_6",
         "Test_TC_CNET_4_1",
         "Test_TC_CNET_4_2",
@@ -94,14 +86,11 @@
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
-        "Test_TC_CNET_4_12",
         "Test_TC_CNET_4_13",
         "Test_TC_CNET_4_14",
-        "Test_TC_CNET_4_15",
         "Test_TC_CNET_4_16",
         "Test_TC_CNET_4_20",
-        "Test_TC_CNET_4_21",
-        "Test_TC_CNET_4_22"
+        "Test_TC_CNET_4_21"
     ],
     "DiagnosticsLogs": [
         "Test_TC_DLOG_2_1",
@@ -122,7 +111,6 @@
         "Test_TC_IDM_2_1",
         "Test_TC_IDM_2_2",
         "Test_TC_IDM_3_1",
-        "Test_TC_IDM_3_2",
         "Test_TC_IDM_4_1",
         "Test_TC_IDM_4_3",
         "Test_TC_IDM_4_4",
@@ -173,12 +161,10 @@
         "Test_TC_CADMIN_1_16",
         "Test_TC_CADMIN_1_17",
         "Test_TC_CADMIN_1_18",
-        "Test_TC_CADMIN_1_5",
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26"
+        "Test_TC_CADMIN_1_25"
     ],
     "ModeSelect": ["Test_TC_MOD_1_2", "Test_TC_MOD_1_3", "Test_TC_MOD_2_2"],
     "OTASoftwareUpdate": [
@@ -213,7 +199,6 @@
         "Test_TC_SC_3_2",
         "Test_TC_SC_3_3",
         "Test_TC_SC_3_4",
-        "Test_TC_SC_4_1",
         "Test_TC_SC_4_2",
         "Test_TC_SC_4_4",
         "Test_TC_SC_4_5",
@@ -225,11 +210,7 @@
         "Test_TC_SC_5_3",
         "Test_TC_SC_6_1"
     ],
-    "SoftwareDiagnostics": [
-        "Test_TC_DGSW_2_1",
-        "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3"
-    ],
+    "SoftwareDiagnostics": ["Test_TC_DGSW_2_1", "Test_TC_DGSW_2_3"],
     "EthernetNetworkDiagnostics": [],
     "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
     "WindowCovering": [],
@@ -262,7 +243,12 @@
         "Test_TC_TCCM_2_1"
     ],
     "Switch": ["Test_TC_SWTCH_3_2"],
-    "TemperatureControl": [],
+    "TemperatureControl": [
+        "Test_TC_TCTL_2_1",
+        "Test_TC_TCTL_2_2",
+        "Test_TC_TCTL_3_2",
+        "Test_TC_TCTL_3_2"
+    ],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
@@ -276,10 +262,7 @@
     "PumpConfigurationControl": [],
     "AccessControl": [],
     "UserLabel": [],
-    "BridgedDeviceBasicInformation": [
-        "Test_TC_BRBINFO_2_2",
-        "Test_TC_BRBINFO_3_1"
-    ],
+    "BridgedDeviceBasicInformation": ["Test_TC_BRBINFO_2_2"],
     "LaundryWasherControl": [],
     "OvenMode": ["Test_TC_OTCCM_1_2", "Test_TC_OTCCM_3_2", "Test_TC_OTCCM_3_3"],
     "AccessControlEnforcement": [],

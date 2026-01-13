@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,64 +20,50 @@ namespace Timer {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SetTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SetTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SetTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace SetTime
 namespace TimeRemaining {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TimeRemaining::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TimeRemaining::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace TimeRemaining
 namespace TimerState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TimerState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TimerState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace TimerState
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    SetTime::kMetadataEntry,
+    TimeRemaining::kMetadataEntry,
+    TimerState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SetTimer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Timer::Commands::SetTimer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTimer::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace SetTimer
 namespace ResetTimer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Timer::Commands::ResetTimer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetTimer::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace ResetTimer
 namespace AddTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Timer::Commands::AddTime::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddTime::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace AddTime
 namespace ReduceTime {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = Timer::Commands::ReduceTime::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ReduceTime::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace ReduceTime
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Timer
 } // namespace Clusters
 } // namespace app

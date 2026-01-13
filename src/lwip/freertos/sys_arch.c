@@ -58,7 +58,7 @@ static uint8_t gTCPIPMsgQueueStorage[SYS_MESG_QUEUE_LENGTH * sizeof(void *)];
 
 static inline u32_t TicksToMS(TickType_t ticks)
 {
-    return (ticks * 1000) / configTICK_RATE_HZ;
+    return ((uint64_t) ticks * 1000) / configTICK_RATE_HZ;
 }
 
 void sys_init(void)

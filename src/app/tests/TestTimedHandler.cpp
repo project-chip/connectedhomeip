@@ -37,7 +37,7 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
-class TestTimedHandler : public chip::Test::AppContext
+class TestTimedHandler : public chip::Testing::AppContext
 {
 public:
     void TestFollowingMessageFastEnough(MsgType aMsgType);
@@ -100,7 +100,9 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
 {
 
     System::PacketBufferHandle payload;
-    GenerateTimedRequest(500, payload);
+    // Make sure we have a timeout that is long enough to not cause
+    // a timeout on slow systems (CI or QEMU emulation).
+    GenerateTimedRequest(1500, payload);
 
     TestExchangeDelegate delegate;
     ExchangeContext * exchange = NewExchangeToAlice(&delegate);

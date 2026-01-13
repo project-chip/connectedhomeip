@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
@@ -55,7 +56,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)      \
     } /* cluster revision */                                                                                                       \
     }
 
@@ -65,9 +66,14 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
 // * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
 // * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
+//
+// NOTE: ZAP_ATTRIBUTE_MASK(READABLE) is added by default to ensure backward compatibility, since DECLARE_DYNAMIC_ATTRIBUTE() is a
+// widely used API. If you want to add a write-only dynamic attribute, either expand the macro or contribute a
+// DECLARE_WRITEONLY_DYNAMIC_ATTRIBUTE API.
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType),                                                               \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
     }
 
 /**
@@ -188,6 +194,15 @@ chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPa
 uint16_t emberAfFixedEndpointCount();
 
 /**
+ * Get semantic tag list associated with the provided endpoint.
+ * Result is as an empty Span if the endpoint is invalid.
+ * @param endpoint The target endpoint.
+ * @param semanticTags The Span of SemanticTagStructs that will point to the tag list.
+ */
+void GetSemanticTagsForEndpoint(chip::EndpointId endpoint,
+                                chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags);
+
+/**
  * Get the semantic tags of the endpoint.
  * Fills in the provided SemanticTagStruct with tag at index `index` if there is one,
  * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of tag,
@@ -207,6 +222,10 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t in
 //
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
                       chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(chip::EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan);
+#endif
 
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
@@ -259,7 +278,50 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                      chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
-chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
+
+// Register a dynamic endpoint. This involves registering descriptors that describe
+// the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
+// storage for data versions.
+//
+// dataVersionStorage.size() needs to be at least as large as the number of
+// server clusters on this endpoint.  If it's not, the endpoint will not be able
+// to store data versions, which may break consumers.
+//
+// The memory backing dataVersionStorage needs to remain allocated until this dynamic
+// endpoint is cleared.
+//
+// An optional device type list can be passed in as well. If provided, the memory
+// backing the list needs to remain allocated until this dynamic endpoint is cleared.
+//
+// An optional endpointUniqueId can be passed, the data will be copied out of
+// endpointUniqueId and it does not need to survive once this call returns.
+//
+// An optional parent endpoint id should be passed for child endpoints of composed device.
+//
+// Returns  CHIP_NO_ERROR                   No error.
+//          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
+//          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
+//          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
+//
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                                   const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                                   chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                                   chip::CharSpan endpointUniqueId                    = {},
+                                                   chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+
+/// Free the given dynamic endpoint index.
+///
+/// The given endpoint index will be shut down and marked as not valid anymore.
+///
+/// `index` represents the 0-based index of the dynamic endpoints (i.e. the offset from
+/// FIXED_ENDPOINT_COUNT). Use `emberAfGetDynamicIndexFromEndpoint` to convert an EndpointId
+/// to an index.
+///
+/// Note that default shutdown type here is `assume endpoint removal` so clusters
+/// are free to clear any persistent data.
+chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index,
+                                             MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kPermanentRemove);
+
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
  * @brief Loads attribute defaults and any non-volatile attributes stored
@@ -296,7 +358,7 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 
 /// Returns a change listener that uses the global InteractionModelEngine
 /// instance to report dirty paths
-chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener();
+chip::app::DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener();
 
 /// Mark the given attribute as having changed:
 ///   - increases the cluster data version for the given cluster
@@ -305,15 +367,15 @@ chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesCh
 ///     receive updated attribute values for a cluster.
 ///
 /// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
-/// and a `AttributesChangeListener::MarkDirty` always occur in lock-step.
+/// and a `ProviderChangeListener::MarkDirty` always occur in lock-step.
 void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                             chip::app::AttributesChangedListener * listener);
+                             chip::app::DataModel::ProviderChangeListener * listener);
 
 /// Mark attributes on the given endpoint as having changed.
 ///
 /// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
 /// any cluster data versions.
-void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
+void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::DataModel::ProviderChangeListener * listener);
 
 /// Maintains a increasing index of structural changes within ember
 /// that determine if existing "indexes" and metadata pointers within ember

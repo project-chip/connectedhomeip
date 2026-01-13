@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace SupportedModes {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
@@ -20,14 +24,6 @@ namespace CurrentMode {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
-namespace StartUpMode {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace StartUpMode
-
-namespace OnMode {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace OnMode
-
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -35,10 +31,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

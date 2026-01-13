@@ -46,8 +46,6 @@ enable_eventlist_attribute = true
 declare_args() {
   # TODO : set no_mcuboot to false by default when enabling ota requestor by default
   no_mcuboot = true
-
-  chip_enable_secondary_nwk_if = false
 }
 
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"

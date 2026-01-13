@@ -24,81 +24,49 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include <BaseAppTask.h>
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <ble/Ble.h>
-#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <platform/qpg/FactoryDataProvider.h>
 
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x01)
-
+#ifdef APP_NAME
+#undef APP_NAME
+#endif
 #define APP_NAME "Lock-app"
-class AppTask
+
+class AppTask : public BaseAppTask
 {
 
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR StartAppTask();
-    static void AppTaskMain(void * pvParameter);
+    // Base class overrides
+    CHIP_ERROR Init() override;
+    void UpdateClusterState() override;
+    bool ButtonEventHandler(uint8_t btnIdx, bool btnPressed) override;
+    void PowerCycleExpiredHandler(uint8_t resetCounts) override;
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
-    void PostEvent(const AppEvent * event);
-    void UpdateClusterState();
 
-    static void ButtonEventHandler(uint8_t btnIdx, bool btnPressed);
-    static void OpenCommissioning(intptr_t arg);
+    static AppTask & GetAppTask(void) { return sAppTask; }
+
+    // Static wrapper that redirects to the instance method
+    static void InitServerWrapper(intptr_t arg) { sAppTask.InitServer(arg); }
+    static void ButtonEventHandlerWrapper(uint8_t button, bool pressed) { sAppTask.ButtonEventHandler(button, pressed); }
+    static void PowerCycleExpiredHandlerWrapper(uint8_t resetCounts) { sAppTask.PowerCycleExpiredHandler(resetCounts); }
 
 private:
-    friend AppTask & GetAppTask(void);
-
-    static void InitServer(intptr_t arg);
-
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction);
 
-    void CancelTimer(void);
-
-    void DispatchEvent(AppEvent * event);
-
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
     static void JammedLockEventHandler(AppEvent * aEvent);
-    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
-    static void TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppState);
 
-    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    static void UpdateLEDs(void);
-
-    void StartTimer(uint32_t aTimeoutMs);
-
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 1,
-        kFunction_FactoryReset   = 2,
-        kFunction_StartBleAdv    = 3,
-
-        kFunction_Invalid
-    } Function;
-
-    Function_t mFunction;
-    bool mFunctionTimerActive;
     bool mSyncClusterToButtonAction;
     bool mNotifyState;
 
-    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
-
     static AppTask sAppTask;
 };
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}
 
 #endif // APP_TASK_H

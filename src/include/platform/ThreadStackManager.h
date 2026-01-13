@@ -49,6 +49,7 @@ class ConfigurationManagerImpl;
 class DeviceControlServer;
 
 namespace Internal {
+class NFCCommissioningManagerImpl;
 class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
@@ -102,13 +103,8 @@ public:
     bool IsThreadProvisioned();
     bool IsThreadAttached();
     CHIP_ERROR GetThreadProvision(Thread::OperationalDataset & dataset);
-    CHIP_ERROR GetAndLogThreadStatsCounters();
-    CHIP_ERROR GetAndLogThreadTopologyMinimal();
-    CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR GetThreadVersion(uint16_t & version);
-    CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
@@ -162,6 +158,9 @@ private:
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
     friend class DeviceControlServer;
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    friend class Internal::NFCCommissioningManagerImpl;
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
 #endif
@@ -190,8 +189,6 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif
-
-    bool HaveMeshConnectivity();
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -419,44 +416,14 @@ inline CHIP_ERROR ThreadStackManager::SetPollingInterval(System::Clock::Millisec
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-inline bool ThreadStackManager::HaveMeshConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveMeshConnectivity();
-}
-
-inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters()
-{
-    return static_cast<ImplClass *>(this)->_GetAndLogThreadStatsCounters();
-}
-
-inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyMinimal()
-{
-    return static_cast<ImplClass *>(this)->_GetAndLogThreadTopologyMinimal();
-}
-
-inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull()
-{
-    return static_cast<ImplClass *>(this)->_GetAndLogThreadTopologyFull();
-}
-
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
 }
 
-inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    return static_cast<ImplClass *>(this)->_GetExternalIPv6Address(addr);
-}
-
 inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
 {
     return static_cast<ImplClass *>(this)->_GetThreadVersion(version);
-}
-
-inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
-{
-    return static_cast<ImplClass *>(this)->_GetPollPeriod(buf);
 }
 
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()

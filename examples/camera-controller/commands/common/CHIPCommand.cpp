@@ -21,6 +21,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <device-manager/DeviceManager.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -169,6 +170,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
     mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
                                                allowTestCdSigningKey);
+
+    ReturnLogErrorOnFailure(camera::DeviceManager::Instance().Init(&CurrentCommissioner()));
 
     return CHIP_NO_ERROR;
 }
@@ -323,7 +326,7 @@ std::string CHIPCommand::GetIdentity()
             // normalize name since it is used in persistent storage
 
             char s[24];
-            sprintf(s, "%lx", fabricId);
+            sprintf(s, "%" PRIx64, fabricId);
 
             name = s;
         }

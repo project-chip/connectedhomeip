@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
-#include <credentials/CHIPCert.h>
+#include <string.h>
+
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
@@ -26,6 +28,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 
+#include <credentials/CHIPCert.h>
+
 #include "PersistentStorageOpCertStore.h"
 
 namespace chip {
@@ -33,7 +37,8 @@ namespace Credentials {
 
 namespace {
 
-using CertChainElement = OperationalCertificateStore::CertChainElement;
+using CertChainElement       = OperationalCertificateStore::CertChainElement;
+using VidVerificationElement = OperationalCertificateStore::VidVerificationElement;
 
 StorageKeyName GetStorageKeyForCert(FabricIndex fabricIndex, CertChainElement element)
 {
@@ -142,6 +147,48 @@ CHIP_ERROR DeleteCertFromStorage(PersistentStorageDelegate * storage, FabricInde
     return storage->SyncDeleteKeyValue(storageKey.KeyName());
 }
 
+CHIP_ERROR SaveVidVerificationElementToStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex,
+                                               VidVerificationElement element, ByteSpan elementData)
+{
+    StorageKeyName storageKey = StorageKeyName::FromConst("");
+
+    switch (element)
+    {
+    case VidVerificationElement::kVidVerificationStatement:
+        storageKey = DefaultStorageKeyAllocator::FabricVidVerificationStatement(fabricIndex);
+        break;
+    case VidVerificationElement::kVvsc:
+        storageKey = DefaultStorageKeyAllocator::FabricVVSC(fabricIndex);
+        break;
+    default:
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (!storageKey)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (elementData.empty())
+    {
+        CHIP_ERROR err = storage->SyncDeleteKeyValue(storageKey.KeyName());
+        if ((err == CHIP_NO_ERROR) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+        {
+            return CHIP_NO_ERROR;
+        }
+        return err;
+    }
+
+    return storage->SyncSetKeyValue(storageKey.KeyName(), elementData.data(), static_cast<uint16_t>(elementData.size()));
+}
+
+CHIP_ERROR DeleteVidVerificationElementFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex,
+                                                   VidVerificationElement element)
+{
+    // Saving an empty bytespan actually deletes the element.
+    return SaveVidVerificationElementToStorage(storage, fabricIndex, element, ByteSpan{});
+}
+
 } // namespace
 
 bool PersistentStorageOpCertStore::HasPendingRootCert() const
@@ -208,6 +255,19 @@ bool PersistentStorageOpCertStore::HasCertificateForFabric(FabricIndex fabricInd
     return StorageHasCertificate(mStorage, fabricIndex, element);
 }
 
+bool PersistentStorageOpCertStore::HasNocChainForFabric(FabricIndex fabricIndex) const
+{
+    // If we have at least RCAC and NOC, we are good. Chain may be invalid without ICAC, but caller is to ensure that.
+    return (HasCertificateForFabric(fabricIndex, CertChainElement::kRcac) &&
+            HasCertificateForFabric(fabricIndex, CertChainElement::kNoc));
+}
+
+bool PersistentStorageOpCertStore::HasPendingVidVerificationElements() const
+{
+    // If any VID verifications statement data has been touched, we may need to store or erase data on commit.
+    return mStateFlags.HasAny(StateFlags::kVidVerificationStatementUpdated, StateFlags::kVvscUpdated);
+}
+
 CHIP_ERROR PersistentStorageOpCertStore::AddNewTrustedRootCertForFabric(FabricIndex fabricIndex, const ByteSpan & rcac)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -238,7 +298,6 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewOpCertsForFabric(FabricIndex fabr
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(!noc.empty() && (noc.size() <= Credentials::kMaxCHIPCertLength), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(icac.size() <= Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-
     // Can't have called UpdateOpCertsForFabric first, or called with pending certs
     VerifyOrReturnError(!mStateFlags.HasAny(StateFlags::kUpdateOpCertsCalled, StateFlags::kAddNewOpCertsCalled),
                         CHIP_ERROR_INCORRECT_STATE);
@@ -319,6 +378,93 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabr
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PersistentStorageOpCertStore::BasicVidVerificationAssumptionsAreMet(FabricIndex fabricIndex) const
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    // Must already have a valid NOC chain.
+    VerifyOrReturnError(HasNocChainForFabric(fabricIndex), CHIP_ERROR_INCORRECT_STATE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PersistentStorageOpCertStore::UpdateVidVerificationSignerCertForFabric(FabricIndex fabricIndex, ByteSpan vvsc)
+{
+    ReturnErrorOnFailure(BasicVidVerificationAssumptionsAreMet(fabricIndex));
+    VerifyOrReturnError(vvsc.empty() || vvsc.size() <= Credentials::kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR vvscErr = CHIP_NO_ERROR;
+
+    if (vvsc.empty())
+    {
+        if (fabricIndex == mPendingFabricIndex)
+        {
+            mPendingVvsc.Free();
+            mStateFlags.Set(StateFlags::kVvscUpdated);
+        }
+        else
+        {
+            vvscErr = DeleteVidVerificationElementFromStorage(mStorage, fabricIndex, VidVerificationElement::kVvsc);
+        }
+    }
+    else
+    {
+        if (fabricIndex == mPendingFabricIndex)
+        {
+            VerifyOrReturnError(mPendingVvsc.Alloc(vvsc.size()), CHIP_ERROR_NO_MEMORY);
+            memcpy(mPendingVvsc.Get(), vvsc.data(), vvsc.size());
+            mStateFlags.Set(StateFlags::kVvscUpdated);
+        }
+        else
+        {
+            vvscErr = SaveVidVerificationElementToStorage(mStorage, fabricIndex, VidVerificationElement::kVvsc, vvsc);
+        }
+    }
+
+    return vvscErr;
+}
+
+CHIP_ERROR PersistentStorageOpCertStore::UpdateVidVerificationStatementForFabric(FabricIndex fabricIndex,
+                                                                                 ByteSpan vidVerificationStatement)
+{
+    ReturnErrorOnFailure(BasicVidVerificationAssumptionsAreMet(fabricIndex));
+    VerifyOrReturnError(vidVerificationStatement.empty() ||
+                            vidVerificationStatement.size() == Crypto::kVendorIdVerificationStatementV1Size,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR vvsErr = CHIP_NO_ERROR;
+
+    if (vidVerificationStatement.empty())
+    {
+        if (fabricIndex == mPendingFabricIndex)
+        {
+            mPendingVidVerificationStatement.Free();
+            mStateFlags.Set(StateFlags::kVidVerificationStatementUpdated);
+        }
+        else
+        {
+            vvsErr =
+                DeleteVidVerificationElementFromStorage(mStorage, fabricIndex, VidVerificationElement::kVidVerificationStatement);
+        }
+    }
+    else
+    {
+        if (fabricIndex == mPendingFabricIndex)
+        {
+            VerifyOrReturnError(mPendingVidVerificationStatement.Alloc(vidVerificationStatement.size()), CHIP_ERROR_NO_MEMORY);
+            memcpy(mPendingVidVerificationStatement.Get(), vidVerificationStatement.data(), vidVerificationStatement.size());
+            mStateFlags.Set(StateFlags::kVidVerificationStatementUpdated);
+        }
+        else
+        {
+            vvsErr = SaveVidVerificationElementToStorage(mStorage, fabricIndex, VidVerificationElement::kVidVerificationStatement,
+                                                         vidVerificationStatement);
+        }
+    }
+
+    return vvsErr;
+}
+
 CHIP_ERROR PersistentStorageOpCertStore::CommitOpCertsForFabric(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -350,10 +496,13 @@ CHIP_ERROR PersistentStorageOpCertStore::CommitOpCertsForFabric(FabricIndex fabr
         rcacErr = SaveCertToStorage(mStorage, mPendingFabricIndex, CertChainElement::kRcac, pendingRcacSpan);
     }
 
+    CHIP_ERROR vidVerifyErr = CommitVidVerificationForFabric(mPendingFabricIndex);
+
     // Remember which was the first error, and if any error occurred.
     CHIP_ERROR stickyErr = nocErr;
     stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : icacErr;
     stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : rcacErr;
+    stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : vidVerifyErr;
 
     if (stickyErr != CHIP_NO_ERROR)
     {
@@ -363,6 +512,9 @@ CHIP_ERROR PersistentStorageOpCertStore::CommitOpCertsForFabric(FabricIndex fabr
         {
             (void) DeleteCertFromStorage(mStorage, mPendingFabricIndex, CertChainElement::kNoc);
             (void) DeleteCertFromStorage(mStorage, mPendingFabricIndex, CertChainElement::kIcac);
+            (void) DeleteVidVerificationElementFromStorage(mStorage, mPendingFabricIndex, VidVerificationElement::kVvsc);
+            (void) DeleteVidVerificationElementFromStorage(mStorage, mPendingFabricIndex,
+                                                           VidVerificationElement::kVidVerificationStatement);
         }
         if (mStateFlags.Has(StateFlags::kAddNewTrustedRootCalled))
         {
@@ -415,15 +567,58 @@ CHIP_ERROR PersistentStorageOpCertStore::RemoveOpCertsForFabric(FabricIndex fabr
     CHIP_ERROR icacErr = DeleteCertFromStorage(mStorage, fabricIndex, CertChainElement::kIcac);
     CHIP_ERROR rcacErr = DeleteCertFromStorage(mStorage, fabricIndex, CertChainElement::kRcac);
 
-    // Ignore missing cert errors
+    CHIP_ERROR vvscErr = DeleteVidVerificationElementFromStorage(mStorage, fabricIndex, VidVerificationElement::kVvsc);
+    CHIP_ERROR vvsErr =
+        DeleteVidVerificationElementFromStorage(mStorage, fabricIndex, VidVerificationElement::kVidVerificationStatement);
+
+    // Ignore missing data errors
     nocErr  = (nocErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : nocErr;
     icacErr = (icacErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : icacErr;
     rcacErr = (rcacErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : rcacErr;
+    vvscErr = (vvscErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : vvscErr;
+    vvsErr  = (vvsErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : vvsErr;
 
     // Find the first error and return that
     CHIP_ERROR stickyErr = nocErr;
     stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : icacErr;
     stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : rcacErr;
+    stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : vvscErr;
+    stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : vvsErr;
+
+    return stickyErr;
+}
+
+CHIP_ERROR PersistentStorageOpCertStore::CommitVidVerificationForFabric(FabricIndex fabricIndex)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (!HasPendingVidVerificationElements())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    CHIP_ERROR vvscErr = CHIP_NO_ERROR;
+    CHIP_ERROR vvsErr  = CHIP_NO_ERROR;
+
+    if (mStateFlags.Has(StateFlags::kVvscUpdated))
+    {
+        ByteSpan pendingVvscSpan{ mPendingVvsc.Get(), mPendingVvsc.AllocatedSize() };
+        vvscErr =
+            SaveVidVerificationElementToStorage(mStorage, mPendingFabricIndex, VidVerificationElement::kVvsc, pendingVvscSpan);
+    }
+
+    if (mStateFlags.Has(StateFlags::kVidVerificationStatementUpdated))
+    {
+        ByteSpan pendingVidVerificationStatementSpan{ mPendingVidVerificationStatement.Get(),
+                                                      mPendingVidVerificationStatement.AllocatedSize() };
+        vvsErr = SaveVidVerificationElementToStorage(
+            mStorage, mPendingFabricIndex, VidVerificationElement::kVidVerificationStatement, pendingVidVerificationStatementSpan);
+    }
+
+    // Remember which was the first error, and if any error occurred.
+    CHIP_ERROR stickyErr = vvscErr;
+    stickyErr            = (stickyErr != CHIP_NO_ERROR) ? stickyErr : vvsErr;
 
     return stickyErr;
 }
@@ -492,6 +687,60 @@ CHIP_ERROR PersistentStorageOpCertStore::GetCertificate(FabricIndex fabricIndex,
 
     // Not found in pending, let's look in persisted
     return LoadCertFromStorage(mStorage, fabricIndex, element, outCertificate);
+}
+
+CHIP_ERROR PersistentStorageOpCertStore::GetVidVerificationElement(FabricIndex fabricIndex, VidVerificationElement element,
+                                                                   MutableByteSpan & outElement) const
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    StorageKeyName keyName = StorageKeyName::FromConst("");
+    if (element == VidVerificationElement::kVidVerificationStatement)
+    {
+        if (mStateFlags.Has(StateFlags::kVidVerificationStatementUpdated) && (fabricIndex == mPendingFabricIndex))
+        {
+            return CopySpanToMutableSpan(
+                ByteSpan{ mPendingVidVerificationStatement.Get(), mPendingVidVerificationStatement.AllocatedSize() }, outElement);
+        }
+
+        keyName = DefaultStorageKeyAllocator::FabricVidVerificationStatement(fabricIndex);
+    }
+
+    if (element == VidVerificationElement::kVvsc)
+    {
+        if (mStateFlags.Has(StateFlags::kVvscUpdated) && (fabricIndex == mPendingFabricIndex))
+        {
+            return CopySpanToMutableSpan(ByteSpan{ mPendingVvsc.Get(), mPendingVvsc.AllocatedSize() }, outElement);
+        }
+
+        keyName = DefaultStorageKeyAllocator::FabricVVSC(fabricIndex);
+    }
+
+    if (!keyName)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint8_t storageBuffer[kMaxCHIPCertLength];
+    uint16_t keySize = sizeof(storageBuffer);
+    static_assert(kMaxCHIPCertLength > (2 * (Crypto::kVendorIdVerificationStatementV1Size)),
+                  "Assuming that at least two VidVerificationStatement fit in a CHIP Cert to give space for future growth and "
+                  "upgrade/downgrade scenarios.");
+
+    CHIP_ERROR err = mStorage->SyncGetKeyValue(keyName.KeyName(), &storageBuffer[0], keySize);
+    if ((err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) || (err == CHIP_ERROR_NOT_FOUND))
+    {
+        outElement.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        return CopySpanToMutableSpan(ByteSpan{ &storageBuffer[0], static_cast<size_t>(keySize) }, outElement);
+    }
+
+    return err;
 }
 
 } // namespace Credentials

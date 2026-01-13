@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,10 +40,6 @@
 
 namespace chip {
 namespace Transport {
-
-// Forward declaration of friend class for test access.
-template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
-class TCPBaseTestAccess;
 
 /** Defines listening parameters for setting up a TCP transport */
 class TcpListenParameters
@@ -159,6 +155,7 @@ public:
     void Close() override;
 
     CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR SendMessage(const ActiveTCPConnectionHandle & connection, System::PacketBufferHandle && msgBuf);
 
     /*
      * Connect to the given peerAddress over TCP.
@@ -178,14 +175,7 @@ public:
      *
      */
     CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionState ** outPeerConnState) override;
-
-    void TCPDisconnect(const PeerAddress & address) override;
-
-    // Close an active connection (corresponding to the passed
-    // ActiveTCPConnectionState object)
-    // and release from the pool.
-    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = false) override;
+                          Transport::ActiveTCPConnectionHandle & outPeerConnState) override;
 
     bool CanSendToPeer(const PeerAddress & address) override
     {
@@ -193,11 +183,11 @@ public:
             (address.GetIPAddress().Type() == mEndpointType);
     }
 
-    const Optional<PeerAddress> GetConnectionPeerAddress(const Inet::TCPEndPoint * con)
+    const Optional<PeerAddress> GetConnectionPeerAddress(const Inet::TCPEndPointHandle & con)
     {
-        ActiveTCPConnectionState * activeConState = FindActiveConnection(con);
+        ActiveTCPConnectionHandle activeConState = FindActiveConnection(con);
 
-        return activeConState != nullptr ? MakeOptional<PeerAddress>(activeConState->mPeerAddr) : Optional<PeerAddress>::Missing();
+        return !activeConState.IsNull() ? MakeOptional<PeerAddress>(activeConState->mPeerAddr) : Optional<PeerAddress>::Missing();
     }
 
     /**
@@ -212,38 +202,41 @@ public:
      */
     void CloseActiveConnections();
 
+#if INET_CONFIG_TEST
+    static bool sForceFailureInDoHandleIncomingConnection;
+#endif
+
 private:
     // Allow tests to access private members.
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
     friend class TCPBaseTestAccess;
 
     /**
-     * Allocate an unused connection from the pool
-     *
+     * Allocate and initialize a connection from the pool.
      */
-    ActiveTCPConnectionState * AllocateConnection();
+    ActiveTCPConnectionState * AllocateConnection(const Inet::TCPEndPointHandle & endpoint, const PeerAddress & address);
     /**
      * Find an active connection to the given peer or return nullptr if
      * no active connection exists.
      */
-    ActiveTCPConnectionState * FindActiveConnection(const PeerAddress & addr);
-    ActiveTCPConnectionState * FindActiveConnection(const Inet::TCPEndPoint * endPoint);
+    ActiveTCPConnectionHandle FindInUseConnection(const PeerAddress & addr);
+    ActiveTCPConnectionState * FindActiveConnection(const Inet::TCPEndPointHandle & endPoint);
 
     /**
      * Find an allocated connection that matches the corresponding TCPEndPoint.
      */
-    ActiveTCPConnectionState * FindInUseConnection(const Inet::TCPEndPoint * endPoint);
+    ActiveTCPConnectionHandle FindInUseConnection(const Inet::TCPEndPoint & endPoint);
 
     /**
      * Sends the specified message once a connection has been established.
      *
-     * @param addr - what peer to connect to
+     * @param existing - an already-existing connection; must not be empty
      * @param msg - what buffer to send once a connection has been established.
      *
      * Ownership of msg is taken over and will be freed at some unspecified time
      * in the future (once connection succeeds/fails).
      */
-    CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBufferHandle && msg);
+    CHIP_ERROR SendAfterConnect(const ActiveTCPConnectionHandle & existing, System::PacketBufferHandle && msg);
 
     /**
      * Process a single received buffer from the specified peer address.
@@ -255,7 +248,7 @@ private:
      * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
      * as needed during processing.
      */
-    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+    CHIP_ERROR ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
                                      System::PacketBufferHandle && buffer);
 
     /**
@@ -267,7 +260,7 @@ private:
      *                              is no other data).
      * @param[in]     messageSize   Size of the single message.
      */
-    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, size_t messageSize);
+    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState & state, size_t messageSize);
 
     /**
      * Initiate a connection to the given peer. On connection completion,
@@ -275,39 +268,50 @@ private:
      *
      */
     CHIP_ERROR StartConnect(const PeerAddress & addr, AppTCPConnectionCallbackCtxt * appState,
-                            Transport::ActiveTCPConnectionState ** outPeerConnState);
+                            ActiveTCPConnectionHandle & outPeerConnState);
+
+    // Close an active connection (corresponding to the passed
+    // ActiveTCPConnectionState object)
+    // and release from the pool.
+    void TCPDisconnect(ActiveTCPConnectionState & conn, bool shouldAbort = false);
 
     /**
      * Gracefully Close or Abort a given connection.
      *
      */
-    void CloseConnectionInternal(ActiveTCPConnectionState * connection, CHIP_ERROR err, SuppressCallback suppressCallback);
+    void CloseConnectionInternal(ActiveTCPConnectionState & connection, CHIP_ERROR err, SuppressCallback suppressCallback);
 
     // Close the listening socket endpoint
     void CloseListeningSocket();
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static CHIP_ERROR HandleTCPEndPointDataReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer);
+    static CHIP_ERROR HandleTCPEndPointDataReceived(const Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct
-    static void HandleTCPEndPointConnectComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
+    static void HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection has been closed.
     // @see TCPEndpoint::OnConnectionClosedFunct
-    static void HandleTCPEndPointConnectionClosed(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
+    static void HandleTCPEndPointConnectionClosed(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
     // @see TCPEndpoint::OnConnectionReceivedFunct
-    static void HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
+    static void HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
                                          const Inet::IPAddress & peerAddress, uint16_t peerPort);
+
+    CHIP_ERROR DoHandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
+                                          const Inet::IPAddress & peerAddress, uint16_t peerPort);
 
     // Callback handler for handling accept error
     // @see TCPEndpoint::OnAcceptErrorFunct
-    static void HandleAcceptError(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
+    static void HandleAcceptError(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
-    Inet::TCPEndPoint * mListenSocket = nullptr;                       ///< TCP socket used by the transport
+    void InitEndpoint(const Inet::TCPEndPointHandle & endpoint);
+    CHIP_ERROR PrepareBuffer(System::PacketBufferHandle & msgBuf);
+
+    Inet::TCPEndPointHandle mListenSocket;                             ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
     TCPState mState                   = TCPState::kNotReady;           ///< State of the TCP transport
 
@@ -334,7 +338,7 @@ public:
     {
         for (size_t i = 0; i < kActiveConnectionsSize; ++i)
         {
-            mConnectionsBuffer[i].Init(nullptr, PeerAddress::Uninitialized());
+            mConnectionsBuffer[i].Init(nullptr, PeerAddress::Uninitialized(), [](auto &) {});
         }
     }
 

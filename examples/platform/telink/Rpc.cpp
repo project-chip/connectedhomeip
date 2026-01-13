@@ -87,7 +87,7 @@ namespace {
 
 void reboot_timer_handler(struct k_timer * dummy)
 {
-    sys_reboot(0);
+    sys_reboot(SYS_REBOOT_WARM);
 }
 K_TIMER_DEFINE(reboot_timer, reboot_timer_handler, NULL);
 

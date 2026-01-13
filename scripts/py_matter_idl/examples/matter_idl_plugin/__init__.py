@@ -14,7 +14,8 @@
 
 import os
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import Cluster, Command, Field, Idl
 
 
@@ -158,8 +159,7 @@ def toEncodedTag(tag, typeNum: EncodingDataType):
     """ Return the final encoded tag from the given field number and field encoded data type.
         The Matter field type information is encoded into the upper range of the protobuf field
         tag for stateless translation to Matter TLV. """
-    tag = (int(typeNum) << 19) | int(tag)
-    return tag
+    return (int(typeNum) << 19) | int(tag)
 
 
 def toProtobufFullType(field: Field):
@@ -176,16 +176,14 @@ def toProtobufFullType(field: Field):
 def toFieldTag(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    tag = toEncodedTag(field.code, typeNum)
-    return tag
+    return toEncodedTag(field.code, typeNum)
 
 
 def toFieldComment(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    tagComment = "/** %s Type: %d IsList: %d FieldId: %d */" % (
+    return "/** %s Type: %d IsList: %d FieldId: %d */" % (
         field.data_type.name, typeNum, field.is_list, field.code)
-    return tagComment
 
 
 class CustomGenerator(CodeGenerator):
@@ -195,7 +193,7 @@ class CustomGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for java generation and will add
+        Initialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))

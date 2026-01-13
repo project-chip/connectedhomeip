@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,26 +20,34 @@ namespace PowerTopology {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace AvailableEndpoints {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = AvailableEndpoints::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableEndpoints::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace AvailableEndpoints
 namespace ActiveEndpoints {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActiveEndpoints::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ActiveEndpoints::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ActiveEndpoints
+namespace ElectricalCircuitNodes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ElectricalCircuitNodes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace ElectricalCircuitNodes
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

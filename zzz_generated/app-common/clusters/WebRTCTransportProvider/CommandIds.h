@@ -11,32 +11,39 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 5;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
+
 namespace SolicitOffer {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr CommandId Id = 0x00000000;
 } // namespace SolicitOffer
 
 namespace ProvideOffer {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr CommandId Id = 0x00000002;
 } // namespace ProvideOffer
 
 namespace ProvideAnswer {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr CommandId Id = 0x00000004;
 } // namespace ProvideAnswer
 
 namespace ProvideICECandidates {
-inline constexpr CommandId Id = 0x00000006;
+inline constexpr CommandId Id = 0x00000005;
 } // namespace ProvideICECandidates
 
 namespace EndSession {
-inline constexpr CommandId Id = 0x00000007;
+inline constexpr CommandId Id = 0x00000006;
 } // namespace EndSession
 
 namespace SolicitOfferResponse {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr CommandId Id = 0x00000001;
 } // namespace SolicitOfferResponse
 
 namespace ProvideOfferResponse {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr CommandId Id = 0x00000003;
 } // namespace ProvideOfferResponse
 
 } // namespace Commands

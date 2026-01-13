@@ -21,6 +21,8 @@ from typing import List, Optional, Union
 from matter.idl.data_model_xml.handlers import Context, DataModelXmlHandler
 from matter.idl.matter_idl_types import Idl
 
+log = logging.getLogger(__name__)
+
 
 class ParseHandler(xml.sax.handler.ContentHandler):
     """A parser for data model XML data definitions.
@@ -67,13 +69,13 @@ class ParseHandler(xml.sax.handler.ContentHandler):
             raise Exception("Unexpected nesting!")
 
     def startElement(self, name: str, attrs):
-        logging.debug("ELEMENT START: %r / %r" % (name, attrs))
+        log.debug("ELEMENT START: %r / %r", name, attrs)
         self._context.path.push(name)
         self._processing_stack.append(
             self._processing_stack[-1].GetNextProcessor(name, attrs))
 
     def endElement(self, name: str):
-        logging.debug("ELEMENT END: %r" % name)
+        log.debug("ELEMENT END: %r", name)
 
         last = self._processing_stack.pop()
         last.EndProcessing()
@@ -88,7 +90,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
 @dataclass
 class ParseSource:
-    """Represents an input sopurce for ParseXmls.
+    """Represents an input source for ParseXmls.
 
     Allows for named data sources to be parsed.
     """
@@ -96,7 +98,7 @@ class ParseSource:
     # actual filename to use, None if the source is a filename already
     name: Optional[str] = None
 
-    @ property
+    @property
     def source_file_name(self):
         if self.name:
             return self.name
@@ -113,7 +115,7 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
     handler = ParseHandler(include_meta_data=include_meta_data)
 
     for source in sources:
-        logging.info('Parsing %s...' % source.source_file_name)
+        log.info("Parsing '%s'...", source.source_file_name)
         handler.PrepareParsing(source.source_file_name)
 
         parser = xml.sax.make_parser()
@@ -121,8 +123,8 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
         try:
             parser.parse(source.source)
         except AssertionError as e:
-            logging.error("AssertionError %s at %r", e,
-                          handler._context.GetCurrentLocationMeta())
+            log.error("%r at %r", e,
+                      handler._context.GetCurrentLocationMeta())
             raise
 
     return handler.Finish()

@@ -32,9 +32,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_TCTL_2_3(MatterBaseTest):
@@ -43,14 +46,13 @@ class TC_TCTL_2_3(MatterBaseTest):
 
     def pics_TC_TCTL_2_3(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "TCTL.S",      # Temperature Control as a Server
             "TCTL.S.F01",  # Does a device support temperature level feature
         ]
-        return pics
 
     def steps_TC_TCTL_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SelectedTemperatureLevel attribute",
                      "Verify that the DUT response contains the value of _SelectedTemperatureLevel_ with a range of 0 to 31"),
@@ -60,7 +62,6 @@ class TC_TCTL_2_3(MatterBaseTest):
                       "* Each temperature level should be a string\n"
                       "* Length of each temperature level string has to be equal or less than 16\n")),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(Clusters.TemperatureControl, Clusters.TemperatureControl.Bitmaps.Feature.kTemperatureLevel))
     async def test_TC_TCTL_2_3(self):

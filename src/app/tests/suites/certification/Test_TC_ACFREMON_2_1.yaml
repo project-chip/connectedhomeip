@@ -68,9 +68,10 @@ tests:
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
-          value: 1
           constraints:
               type: enum8
+              minValue: 0
+              maxValue: 2
 
     - label: "Step 5: TH reads from the DUT the InPlaceIndicator attribute"
       PICS: ACFREMON.S.A0003

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 
 #include "OTAImageProcessorImpl.h"
 
+#include "Reboot.h"
+
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 
 #include <zephyr/dfu/mcuboot.h>
@@ -54,7 +57,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
 const struct device * flash_dev;
 
@@ -123,7 +127,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
             [](System::Layer *, void * /* context */) {
                 PlatformMgr().HandleServerShuttingDown();
                 k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
-                sys_reboot(SYS_REBOOT_WARM);
+                Reboot(SoftwareRebootReason::kSoftwareUpdate);
             },
             nullptr /* context */);
     }
@@ -165,12 +169,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                TEMPORARY_RETURN_IGNORED mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
                 downloadedBytesRestored = 0;
             }
             else
             {
-                mDownloader->FetchNextData();
+                TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
             }
         }
         else
@@ -238,10 +242,31 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
+        uint16_t vendorId  = 0;
+        uint16_t productId = 0;
+
+        if (GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(DeviceLayer, "Failed to retrieve local Vendor ID for OTA validation");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        if (GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(DeviceLayer, "Failed to retrieve local Product ID for OTA validation");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        if (header.mVendorId != vendorId || header.mProductId != productId)
+        {
+            ChipLogDetail(DeviceLayer, "The argument is invalid, mVendorId: 0x%x - \
+                          mProductId: 0x%x \t vendorId : 0x%x - productId : 0x%x",
+                          header.mVendorId, header.mProductId, vendorId, productId);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
         mParams.totalFileBytes = header.mPayloadSize;
 
         // Restore interrupted OTA process
-        RestoreBytes(header.mImageDigest);
+        TEMPORARY_RETURN_IGNORED RestoreBytes(header.mImageDigest);
 
         mHeaderParser.Clear();
     }

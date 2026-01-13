@@ -133,29 +133,16 @@ class TestCommissioner(CHIPVirtualHome):
         req_device_id = req_ids[0]
 
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_clusters-0.0-py3-none-any.whl")))
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl")))
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
-
-        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
-                   "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}").format(
-            os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
-            servers[0]['ip'],
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-            servers[0]['discriminator'],
-            servers[0]['nodeid'])
-        ret = self.execute_device_cmd(req_device_id, command)
-
-        self.assertEqual(ret['return_code'], '0',
-                         "Test failed: non-zero return code")
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
 
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[1]['discriminator'],
             "33331712336",
@@ -169,7 +156,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[2]['discriminator'],
             "10054912339",
@@ -183,7 +170,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[3]['discriminator'],
             "20054912334",

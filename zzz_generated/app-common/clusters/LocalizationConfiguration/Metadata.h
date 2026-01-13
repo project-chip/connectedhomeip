@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,26 +20,28 @@ namespace LocalizationConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace ActiveLocale {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ActiveLocale::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveLocale::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace ActiveLocale
 namespace SupportedLocales {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedLocales::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedLocales::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportedLocales
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    ActiveLocale::kMetadataEntry,
+    SupportedLocales::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace LocalizationConfiguration
 } // namespace Clusters
 } // namespace app

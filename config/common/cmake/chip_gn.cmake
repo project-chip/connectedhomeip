@@ -73,6 +73,7 @@ endif()
 #   DEVICE_INFO_EXAMPLE_PROVIDER Add example device info provider support
 #
 #   GN_DEPENDENCIES List of targets that should be built before Matter GN project
+#   LINK_TARGETS    List of additional libraries that should be linked with target as a single group
 macro(matter_build target)
     set(options)
     set(oneValueArgs
@@ -83,7 +84,10 @@ macro(matter_build target)
         DEVICE_INFO_EXAMPLE_PROVIDER
         FORCE_LOGGING_STDIO
     )
-    set(multiValueArgs GN_DEPENDENCIES)
+    set(multiValueArgs
+        GN_DEPENDENCIES
+        LINK_TARGETS
+    )
 
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -130,7 +134,7 @@ macro(matter_build target)
         BUILD_COMMAND           ${CMAKE_COMMAND} -E echo "Starting Matter library build in ${CMAKE_CURRENT_BINARY_DIR}"
         COMMAND                 ${Python3_EXECUTABLE} ${CHIP_ROOT}/config/common/cmake/make_gn_args.py @args.tmp > args.gn.tmp
         # Replace the config only if it has changed to avoid triggering unnecessary rebuilds
-        COMMAND                 bash -c "(! diff -q args.gn.tmp args.gn && mv args.gn.tmp args.gn) || true"
+        COMMAND                 "${CMAKE_COMMAND}" -E copy_if_different "args.gn.tmp" "args.gn"
         # Regenerate the ninja build system
         COMMAND                 ${GN_EXECUTABLE}
                                     --root=${CHIP_ROOT}
@@ -178,6 +182,10 @@ macro(matter_build target)
             ${CHIP_ROOT}/third_party/mbedtls/repo/include
         )
     endif()
+
+    foreach(link_target ${ARG_LINK_TARGETS})
+      list(APPEND MATTER_LIBRARIES $<TARGET_FILE:${link_target}>)
+    endforeach()
 
     # ==============================================================================
     # Link required libraries

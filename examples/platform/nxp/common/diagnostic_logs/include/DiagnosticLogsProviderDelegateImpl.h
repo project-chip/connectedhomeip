@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,10 @@
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <map>
+
+#ifndef CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE
+#define CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE 1024
+#endif
 
 namespace chip {
 namespace app {

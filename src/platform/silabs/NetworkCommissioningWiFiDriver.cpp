@@ -36,6 +36,8 @@ NetworkCommissioning::WiFiScanResponse * sScanResult;
 SlScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
 } // namespace
 
+SlWiFiDriver * SlWiFiDriver::mDriver = nullptr;
+
 CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
@@ -44,6 +46,7 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mpScanCallback         = nullptr;
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
+    mDriver                = this;
 
 #ifdef SL_ONNETWORK_PAIRING
     memcpy(&mSavedNetwork.ssid[0], SL_WIFI_SSID, sizeof(SL_WIFI_SSID));
@@ -68,7 +71,7 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
 #endif
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
 
@@ -76,8 +79,10 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
     uint8_t securityType = WFX_SEC_WPA2;
 
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
+    ReturnErrorOnFailure(
+        SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials,
+                                                           mStagingNetwork.credentialsLen));
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
 
     mSavedNetwork = mStagingNetwork;
@@ -157,7 +162,9 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
     wifiConfig.security = WFX_SEC_WPA2;
 
-    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
+    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", NullTerminated(ssid, ssidLen).c_str());
+    // Resetting the retry connection state machine for a new access point connection
+    WifiInterface::GetInstance().ResetConnectionRetryInterval();
     // Configure the WFX WiFi interface.
     WifiInterface::GetInstance().SetWifiCredentials(wifiConfig);
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
@@ -195,7 +202,7 @@ void SlWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -220,7 +227,7 @@ void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 exit:
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -270,7 +277,7 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "StartNetworkScan failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "StartNetworkScan failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
@@ -279,24 +286,28 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
 void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
 {
+    SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+    // Cannot use the driver if the instance is not initialized.
+    VerifyOrDie(nwDriver != nullptr); // should never be null
+
     if (!aScanResult)
     {
         ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone: Receive all scanned networks information.");
 
-        if (GetInstance().mpScanCallback != nullptr)
+        if (nwDriver->mpScanCallback != nullptr)
         {
             if (mScanResponseIter.Count() == 0)
             {
                 // if there is no network found, return kNetworkNotFound
-                DeviceLayer::SystemLayer().ScheduleLambda([]() {
-                    GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), nullptr);
-                    GetInstance().mpScanCallback = nullptr;
+                TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
+                    nwDriver->mpScanCallback->OnFinished(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), nullptr);
+                    nwDriver->mpScanCallback = nullptr;
                 });
                 return;
             }
-            DeviceLayer::SystemLayer().ScheduleLambda([]() {
-                GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
-                GetInstance().mpScanCallback = nullptr;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
+                nwDriver->mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                nwDriver->mpScanCallback = nullptr;
             });
         }
     }
@@ -304,7 +315,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     {
         NetworkCommissioning::WiFiScanResponse scanResponse = {};
 
-        scanResponse.security.Set(GetInstance().ConvertSecuritytype(aScanResult->security));
+        scanResponse.security.Set(nwDriver->ConvertSecuritytype(aScanResult->security));
         scanResponse.channel = aScanResult->chan;
         scanResponse.rssi    = aScanResult->rssi;
         scanResponse.ssidLen = aScanResult->ssid_length;

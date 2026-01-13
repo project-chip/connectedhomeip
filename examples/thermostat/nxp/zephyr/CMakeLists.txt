@@ -72,7 +72,7 @@ target_sources(app
 
 if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
     target_sources(app PRIVATE
-                    ${THERMOSTAT_NXP_COMMON_DIR}/main/BleZephyrManagerApp.cpp
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
     )
 else()
     target_sources(app PRIVATE
@@ -87,6 +87,13 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     )
     target_include_directories(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/include/
+    )
+endif()
+
+if (CONFIG_CHIP_FACTORY_DATA)
+    target_sources(app PRIVATE
+        ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
+        ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
     )
 endif()
 

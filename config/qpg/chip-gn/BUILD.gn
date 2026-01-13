@@ -56,7 +56,5 @@ group("default") {
     "//src/setup_payload",
     "//third_party/openthread/platforms:libopenthread-platform",
     "//third_party/openthread/platforms:libopenthread-platform-utils",
-    "//third_party/openthread/repo:libopenthread-cli-mtd",
-    "//third_party/openthread/repo:libopenthread-mtd",
   ]
 }

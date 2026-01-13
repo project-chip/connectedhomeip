@@ -28,10 +28,12 @@ namespace chip {
 
 typedef uint32_t CASEAuthTag;
 
-static constexpr CASEAuthTag kUndefinedCAT    = 0;
-static constexpr NodeId kTagIdentifierMask    = 0x0000'0000'FFFF'0000ULL;
-static constexpr uint32_t kTagIdentifierShift = 16;
-static constexpr NodeId kTagVersionMask       = 0x0000'0000'0000'FFFFULL;
+static constexpr CASEAuthTag kUndefinedCAT     = 0;
+static constexpr NodeId kTagIdentifierMask     = 0x0000'0000'FFFF'0000ULL;
+static constexpr uint32_t kTagIdentifierShift  = 16;
+static constexpr NodeId kTagVersionMask        = 0x0000'0000'0000'FFFFULL;
+static constexpr uint16_t kAdminCATIdentifier  = 0xFFFF;
+static constexpr uint16_t kAnchorCATIdentifier = 0xFFFE;
 
 // Maximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
 static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
@@ -59,6 +61,16 @@ constexpr uint16_t GetCASEAuthTagIdentifier(CASEAuthTag aCAT)
 constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
 {
     return static_cast<uint16_t>(aCAT & kTagVersionMask);
+}
+
+constexpr CASEAuthTag GetAdminCATWithVersion(uint16_t version)
+{
+    return ((static_cast<uint32_t>(kAdminCATIdentifier) << 16) | version);
+}
+
+constexpr CASEAuthTag GetAnchorCATWithVersion(uint16_t version)
+{
+    return ((static_cast<uint32_t>(kAnchorCATIdentifier) << 16) | version);
 }
 
 struct CATValues
@@ -209,24 +221,22 @@ struct CATValues
     static constexpr size_t kSerializedLength = kMaxSubjectCATAttributeCount * sizeof(CASEAuthTag);
     typedef uint8_t Serialized[kSerializedLength];
 
-    CHIP_ERROR Serialize(Serialized & outSerialized) const
+    void Serialize(Serialized & outSerialized) const
     {
         uint8_t * p = outSerialized;
         for (size_t i = 0; i < kMaxSubjectCATAttributeCount; i++)
         {
             Encoding::LittleEndian::Write32(p, values[i]);
         }
-        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Deserialize(const Serialized & inSerialized)
+    void Deserialize(const Serialized & inSerialized)
     {
         const uint8_t * p = inSerialized;
         for (size_t i = 0; i < kMaxSubjectCATAttributeCount; i++)
         {
             values[i] = Encoding::LittleEndian::Read32(p);
         }
-        return CHIP_NO_ERROR;
     }
 };
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,51 +17,45 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace CurrentSessions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentSessions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kAdminister,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentSessions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace CurrentSessions
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    CurrentSessions::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Offer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::Offer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Offer::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace Offer
 namespace Answer {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::Answer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Answer::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace Answer
 namespace ICECandidates {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::ICECandidates::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ICECandidates::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace ICECandidates
 namespace End {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = WebRTCTransportRequestor::Commands::End::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(End::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace End
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace WebRTCTransportRequestor
 } // namespace Clusters
 } // namespace app

@@ -53,7 +53,8 @@ namespace Logging {
     X(ICD, "ICD")                                                                                                                  \
     X(FabricSync, "FS")                                                                                                            \
     X(WiFiPAF, "PAF")                                                                                                              \
-    X(Camera, "CAM")
+    X(Camera, "CAM")                                                                                                               \
+    X(JointFabric, "JF")
 
 /**
  *  @enum LogModule
@@ -250,6 +251,10 @@ enum LogModule
 
 #ifndef CHIP_CONFIG_LOG_MODULE_Camera
 #define CHIP_CONFIG_LOG_MODULE_Camera 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_JointFabric
+#define CHIP_CONFIG_LOG_MODULE_JointFabric 1
 #endif
 
 /**

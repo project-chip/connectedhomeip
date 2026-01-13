@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -28,6 +29,7 @@ class AccessControlClusterAccessControlEntryStruct(
   val authMode: UByte,
   val subjects: List<ULong>?,
   val targets: List<AccessControlClusterAccessControlTargetStruct>?,
+  val auxiliaryType: Optional<UByte>,
   val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -36,6 +38,7 @@ class AccessControlClusterAccessControlEntryStruct(
     append("\tauthMode : $authMode\n")
     append("\tsubjects : $subjects\n")
     append("\ttargets : $targets\n")
+    append("\tauxiliaryType : $auxiliaryType\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -63,6 +66,10 @@ class AccessControlClusterAccessControlEntryStruct(
       } else {
         putNull(ContextSpecificTag(TAG_TARGETS))
       }
+      if (auxiliaryType.isPresent) {
+        val optauxiliaryType = auxiliaryType.get()
+        put(ContextSpecificTag(TAG_AUXILIARY_TYPE), optauxiliaryType)
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -73,6 +80,7 @@ class AccessControlClusterAccessControlEntryStruct(
     private const val TAG_AUTH_MODE = 2
     private const val TAG_SUBJECTS = 3
     private const val TAG_TARGETS = 4
+    private const val TAG_AUXILIARY_TYPE = 5
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlEntryStruct {
@@ -105,6 +113,12 @@ class AccessControlClusterAccessControlEntryStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_TARGETS))
           null
         }
+      val auxiliaryType =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUXILIARY_TYPE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_AUXILIARY_TYPE)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
@@ -114,6 +128,7 @@ class AccessControlClusterAccessControlEntryStruct(
         authMode,
         subjects,
         targets,
+        auxiliaryType,
         fabricIndex,
       )
     }

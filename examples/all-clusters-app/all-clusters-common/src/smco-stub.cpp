@@ -48,7 +48,8 @@ void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 {
     ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test running");
 
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec), EndSelfTestingEventHandler, nullptr);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec),
+                                                                   EndSelfTestingEventHandler, nullptr);
 }
 
 bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)

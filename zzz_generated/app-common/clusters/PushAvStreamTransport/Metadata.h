@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,81 +17,77 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-namespace SupportedContainerFormats {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedContainerFormats::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace SupportedContainerFormats
-namespace SupportedIngestMethods {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedIngestMethods::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace SupportedIngestMethods
+
+namespace SupportedFormats {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedFormats::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedFormats
 namespace CurrentConnections {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CurrentConnections::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentConnections::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SupportedFormats::kMetadataEntry,
+    CurrentConnections::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AllocatePushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::AllocatePushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(AllocatePushTransport::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kManage);
 } // namespace AllocatePushTransport
 namespace DeallocatePushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::DeallocatePushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(DeallocatePushTransport::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kManage);
 } // namespace DeallocatePushTransport
 namespace ModifyPushTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::ModifyPushTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ModifyPushTransport::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kManage);
 } // namespace ModifyPushTransport
 namespace SetTransportStatus {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::SetTransportStatus::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SetTransportStatus::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kManage);
 } // namespace SetTransportStatus
 namespace ManuallyTriggerTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ManuallyTriggerTransport::Id,
+                   BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace ManuallyTriggerTransport
 namespace FindTransport {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = PushAvStreamTransport::Commands::FindTransport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(FindTransport::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
 } // namespace FindTransport
 
 } // namespace Commands
+
+namespace Events {
+namespace PushTransportBegin {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PushTransportBegin
+namespace PushTransportEnd {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PushTransportEnd
+
+} // namespace Events
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

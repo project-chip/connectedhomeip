@@ -33,7 +33,7 @@ def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = Fa
         reset = ' --factory-reset'
 
     app = os.path.join(
-        CHIP_ROOT, 'out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')
+        CHIP_ROOT, 'objdir-clone/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')
 
     # Certs in the commissioner_dut directory use 0x8000 as the PID
     app_args = '--discriminator 1234 --KVS kvs1 --product-id ' + \
@@ -77,6 +77,11 @@ def main():
     # struct_cd_cert_id_mismatch - excluded because this is a DCL test not covered by cert
     exclude_cases = ['struct_cd_version_number_wrong',
                      'struct_cd_cert_id_mismatch']
+
+    # struct_cd_provisional_cd and struct_cd_official_cd will be handled when TC-DA-1.2
+    # is updated to handle provisional CDs.
+    # https://github.com/project-chip/matter-test-scripts/issues/731 - fast follow to this PR
+    exclude_cases += ['struct_cd_provisional_cd', 'struct_cd_official_cd']
 
     passes = []
     for p in os.listdir(cert_path):

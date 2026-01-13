@@ -167,7 +167,7 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationE
     {
         return true;
     }
-    ChipLogProgress(Zcl, "ValidatePIN %.*s", static_cast<int>(pinCode.Value().size()), pinCode.Value().data());
+    ChipLogProgress(Zcl, "ValidatePIN %s", NullTerminated(pinCode.Value()).c_str());
 
     // Check the PIN code
     for (const auto & credential : mCredentials)
@@ -264,7 +264,7 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = lock;
     event.Handler            = ActuatorMovementTimerEventHandler;
-    GetAppTask().PostEvent(&event);
+    AppTask::GetAppTask().PostEvent(&event);
 }
 
 void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)

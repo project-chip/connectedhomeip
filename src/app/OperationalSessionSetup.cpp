@@ -296,7 +296,21 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
-    auto & config = result.mrpRemoteConfig;
+    auto config = result.mrpRemoteConfig;
+
+    if (result.isICDOperatingAsLIT)
+    {
+        // When an ICD operates as a LIT, the DNS-SD advertisement lacks the Session Idle Interval
+        // (SII). This would cause mIdleRetransTimeout to be 0, which is not a usable value. Since
+        // CASE is established with LIT ICDs only when they are active, we can base
+        // mIdleRetransTimeout on active mode parameters. To ensure sufficient time for MRP
+        // retransmissions, particularly in Thread networks where mActiveRetransTimeout might be too
+        // small, we use the maximum of config.mActiveRetransTimeout and
+        // mInitParams.minimumLITBackoffInterval
+
+        config.mIdleRetransTimeout =
+            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(0)));
+    }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
     {

@@ -89,12 +89,12 @@ CommandHandler::Handle gAsyncCommandHandle;
 } // namespace DataModelTests
 
 static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                        const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                        AttributeEncodeState * apEncoderState)
+                                        bool allowInfiniteReads, const ConcreteReadAttributePath & aPath,
+                                        AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
-    if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
+    if (aPath.mEndpointId >= chip::Testing::kMockEndpointMin)
     {
-        return chip::Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+        return chip::Testing::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
     if (gReadResponseDirective == ReadResponseDirective::kSendManyDataResponses ||
@@ -146,6 +146,7 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
 
             return valueEncoder.Encode(++gInt16uTotalReadCount);
         }
+
         if (aPath.mClusterId == kPerpetualClusterId ||
             (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
@@ -153,9 +154,9 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
             AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
                                                state);
 
-            CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                encoder.Encode(static_cast<uint8_t>(1));
-                return CHIP_ERROR_NO_MEMORY;
+            CHIP_ERROR err = valueEncoder.EncodeList([allowInfiniteReads](const auto & encoder) -> CHIP_ERROR {
+                TEMPORARY_RETURN_IGNORED encoder.Encode(static_cast<uint8_t>(1));
+                return allowInfiniteReads ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
             });
 
             if (err != CHIP_NO_ERROR)
@@ -199,7 +200,10 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         attributeData.DataVersion(kDataVersion);
         ReturnErrorOnFailure(attributeData.GetError());
         AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
@@ -213,13 +217,16 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         ReturnErrorOnFailure(aAttributeReports.GetError());
         AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
         AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
+        TEMPORARY_RETURN_IGNORED attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
         ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB());
     }
@@ -331,8 +338,9 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
         subjectDescriptor = *request.subjectDescriptor;
     }
 
-    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
-                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+    CHIP_ERROR err =
+        ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), mAllowInfiniteReads,
+                              request.path, TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
 
     // state must survive CHIP_ERRORs as it is used for chunking
     TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);

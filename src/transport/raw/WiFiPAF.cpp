@@ -40,29 +40,6 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
     mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
     SetWiFiPAFLayerTransportToSelf();
     mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
-
-    if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-    {
-        ChipLogError(Inet, "Wi-Fi Management has not started, do it now.");
-        static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
-        static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
-        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        {
-            for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
-            {
-                if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-                {
-                    break;
-                }
-                usleep(kWiFiStartCheckTimeUsec);
-            }
-        }
-        if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-        {
-            ChipLogError(Inet, "Wi-Fi Management taking too long to start - device configuration will be reset.");
-        }
-        ChipLogProgress(Inet, "Wi-Fi Management is started");
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -78,12 +55,10 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Pack
         /*
             The session does not exist
         */
-        ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %lu", address.GetRemoteId());
+        ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %" PRIu64, address.GetRemoteId());
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
-
-    return CHIP_NO_ERROR;
+    return mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
 }
 
 bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
@@ -129,18 +104,21 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBu
 CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
 }
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
 {
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
     mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     return CHIP_NO_ERROR;
+}
+
+bool WiFiPAFBase::WiFiPAFResourceAvailable(void)
+{
+    return DeviceLayer::ConnectivityMgr().WiFiPAFResourceAvailable();
 }
 
 CHIP_ERROR WiFiPAFBase::SendAfterConnect(PacketBufferHandle && msg)

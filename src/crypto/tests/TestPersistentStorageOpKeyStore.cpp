@@ -28,6 +28,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -88,7 +89,7 @@ public:
         }
 
         memcpy(outKeypair.Bytes(), kP256SerializedKeypairRaw, outKeypair.Capacity());
-        outKeypair.SetLength(sizeof(kP256SerializedKeypairRaw));
+        EXPECT_SUCCESS(outKeypair.SetLength(sizeof(kP256SerializedKeypairRaw)));
 
         return CHIP_NO_ERROR;
     }
@@ -335,7 +336,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestMigrationKeys)
     FabricIndex kFabricIndex    = 111;
     std::string opKeyStorageKey = DefaultStorageKeyAllocator::FabricOpKey(kFabricIndex).KeyName();
 
-    opKeyStore.Init(&storageDelegate);
+    EXPECT_SUCCESS(opKeyStore.Init(&storageDelegate));
 
     // Failure on invalid Fabric indexes
     EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kUndefinedFabricIndex, testOperationalKeystore),

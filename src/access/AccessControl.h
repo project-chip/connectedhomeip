@@ -233,6 +233,13 @@ public:
             mDelegate = &mDefaultDelegate.get();
         }
 
+        /**
+         * Validate whether an ACL Entry is valid and complies with all defined constraints.
+         *
+         * @retval true if all the fields within the Entry are valid and compliant.
+         */
+        bool IsValid() const;
+
     private:
         static Global<Delegate> mDefaultDelegate;
         Delegate * mDelegate = &mDefaultDelegate.get();
@@ -501,7 +508,7 @@ public:
      */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
-        VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->CreateEntry(index, entry, fabricIndex);
     }
@@ -551,7 +558,7 @@ public:
      */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
-        VerifyOrReturnError(IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->UpdateEntry(index, entry, fabricIndex);
     }
@@ -668,8 +675,6 @@ public:
 
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
-
-    bool IsValid(const Entry & entry);
 
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);

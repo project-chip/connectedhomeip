@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -12,9 +12,13 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Attributes {
-namespace MaxConcurrentVideoEncoders {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 46;
+
+namespace MaxConcurrentEncoders {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace MaxConcurrentVideoEncoders
+} // namespace MaxConcurrentEncoders
 
 namespace MaxEncodedPixelRate {
 inline constexpr AttributeId Id = 0x00000001;
@@ -24,13 +28,13 @@ namespace VideoSensorParams {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace VideoSensorParams
 
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 inline constexpr AttributeId Id = 0x00000003;
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 
-namespace MinViewport {
+namespace MinViewportResolution {
 inline constexpr AttributeId Id = 0x00000004;
-} // namespace MinViewport
+} // namespace MinViewportResolution
 
 namespace RateDistortionTradeOffPoints {
 inline constexpr AttributeId Id = 0x00000005;
@@ -52,9 +56,9 @@ namespace TwoWayTalkSupport {
 inline constexpr AttributeId Id = 0x00000009;
 } // namespace TwoWayTalkSupport
 
-namespace SupportedSnapshotParams {
+namespace SnapshotCapabilities {
 inline constexpr AttributeId Id = 0x0000000A;
-} // namespace SupportedSnapshotParams
+} // namespace SnapshotCapabilities
 
 namespace MaxNetworkBandwidth {
 inline constexpr AttributeId Id = 0x0000000B;
@@ -84,9 +88,9 @@ namespace AllocatedSnapshotStreams {
 inline constexpr AttributeId Id = 0x00000011;
 } // namespace AllocatedSnapshotStreams
 
-namespace RankedVideoStreamPrioritiesList {
+namespace StreamUsagePriorities {
 inline constexpr AttributeId Id = 0x00000012;
-} // namespace RankedVideoStreamPrioritiesList
+} // namespace StreamUsagePriorities
 
 namespace SoftRecordingPrivacyModeEnabled {
 inline constexpr AttributeId Id = 0x00000013;
@@ -183,10 +187,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

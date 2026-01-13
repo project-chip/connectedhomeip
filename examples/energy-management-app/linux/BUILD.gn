@@ -36,6 +36,7 @@ executable("chip-energy-management-app") {
   sources = [
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/Identify.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
@@ -67,14 +68,6 @@ executable("chip-energy-management-app") {
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",
   ]
-
-  if (chip_examples_enable_imgui_ui) {
-    deps += [
-      "${chip_root}/examples/common/imgui_ui",
-      "${chip_root}/examples/common/imgui_ui/windows:occupancy_sensing",
-      "${chip_root}/examples/common/imgui_ui/windows:qrcode",
-    ]
-  }
 
   include_dirs = [
     "include",
@@ -152,6 +145,7 @@ source_set("test-evse-targets-store") {
 
   deps = [
     "${chip_root}/examples/energy-management-app/energy-management-common",
+    "${chip_root}/src/app/clusters/electrical-energy-measurement-server:electrical-energy-measurement-server",
     "${chip_root}/src/lib",
   ]
 }

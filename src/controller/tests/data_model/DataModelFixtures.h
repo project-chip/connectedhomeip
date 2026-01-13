@@ -35,8 +35,8 @@ namespace DataModelTests {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-constexpr ClusterId kPerpetualClusterId     = Test::MockClusterId(2);
-constexpr AttributeId kPerpetualAttributeid = Test::MockAttributeId(1);
+constexpr ClusterId kPerpetualClusterId     = Testing::MockClusterId(2);
+constexpr AttributeId kPerpetualAttributeid = Testing::MockAttributeId(1);
 
 constexpr DataVersion kRejectedDataVersion = 1;
 constexpr DataVersion kAcceptedDataVersion = 5;
@@ -123,6 +123,15 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
+
+    struct EnableInfiniteReads
+    {
+        EnableInfiniteReads() { Instance().mAllowInfiniteReads = true; }
+        ~EnableInfiniteReads() { Instance().mAllowInfiniteReads = false; }
+    };
+
+private:
+    bool mAllowInfiniteReads = false;
 };
 
 } // namespace DataModelTests

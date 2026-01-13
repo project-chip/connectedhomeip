@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 69;
+
 namespace LocalTemperature {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace LocalTemperature
@@ -252,6 +256,22 @@ namespace SetpointHoldExpiryTimestamp {
 inline constexpr AttributeId Id = 0x00000052;
 } // namespace SetpointHoldExpiryTimestamp
 
+namespace MaxThermostatSuggestions {
+inline constexpr AttributeId Id = 0x00000053;
+} // namespace MaxThermostatSuggestions
+
+namespace ThermostatSuggestions {
+inline constexpr AttributeId Id = 0x00000054;
+} // namespace ThermostatSuggestions
+
+namespace CurrentThermostatSuggestion {
+inline constexpr AttributeId Id = 0x00000055;
+} // namespace CurrentThermostatSuggestion
+
+namespace ThermostatSuggestionNotFollowingReason {
+inline constexpr AttributeId Id = 0x00000056;
+} // namespace ThermostatSuggestionNotFollowingReason
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -259,10 +279,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

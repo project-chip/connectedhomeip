@@ -36,8 +36,8 @@ OTA images will generated under
 -   `chip-bl602dk-lighting-example.bin.xz.hash.matter`, OTA image packed with
     compressed firmware image.
 
-BL616 SoC platform uses different OTA image format. Take BL616D lighting app
-with Wi-Fi and `littlefs` supported as example:
+BL616 SoC platform uses different OTA image format. Take BL616 lighting app with
+Wi-Fi and `littlefs` supported as example:
 
 -   `chip-bl616-lighting-example.bin.ota.matter`, OTA image packed with raw
     firmware image.

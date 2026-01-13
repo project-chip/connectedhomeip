@@ -59,7 +59,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init(AttributeChangeCallback *
     mpAttributeChangeCallback = callback;
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     // When the Thread Border Router is reboot during SetActiveDataset, we need to revert the active dateset.
-    RevertActiveDataset();
+    TEMPORARY_RETURN_IGNORED RevertActiveDataset();
     return CHIP_NO_ERROR;
 }
 
@@ -79,7 +79,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSp
     }
     if (otErr == OT_ERROR_NONE)
     {
-        CopySpanToMutableSpan(ByteSpan(borderAgentId.mId), borderAgentIdSpan);
+        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(ByteSpan(borderAgentId.mId), borderAgentIdSpan);
         return CHIP_NO_ERROR;
     }
     return DeviceLayer::Internal::MapOpenThreadError(otErr);
@@ -120,7 +120,8 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::Operational
     {
         return dataset.Init(ByteSpan(datasetTlvs.mTlvs, datasetTlvs.mLength));
     }
-    return DeviceLayer::Internal::MapOpenThreadError(otErr);
+    // If the dataset is not configured, return CHIP_ERROR_NOT_FOUND. Otherwise, map the error.
+    return (otErr == OT_ERROR_NOT_FOUND) ? CHIP_ERROR_NOT_FOUND : DeviceLayer::Internal::MapOpenThreadError(otErr);
 }
 
 void GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
@@ -158,18 +159,18 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
     {
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_NETIF_STATE)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda(
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
                 [delegate]() { delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::InterfaceEnabled::Id); });
         }
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_ACTIVE_DATASET)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::ActiveDatasetTimestamp::Id);
             });
         }
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_PENDING_DATASET)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::PendingDatasetTimestamp::Id);
             });
         }
@@ -194,7 +195,8 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
     bool activeDatasetConfigured        = true;
     uint16_t activeDatasetConfiguredLen = sizeof(bool);
     VerifyOrReturnError(mStorage, CHIP_ERROR_INTERNAL);
-    mStorage->SyncGetKeyValue(kFailsafeActiveDatasetConfigured, &activeDatasetConfigured, activeDatasetConfiguredLen);
+    TEMPORARY_RETURN_IGNORED mStorage->SyncGetKeyValue(kFailsafeActiveDatasetConfigured, &activeDatasetConfigured,
+                                                       activeDatasetConfiguredLen);
     VerifyOrDie(activeDatasetConfiguredLen == sizeof(bool));
     if (!activeDatasetConfigured)
     {
@@ -203,7 +205,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
         // triggered.
         Thread::OperationalDataset emptyDataset = {};
         CHIP_ERROR err                          = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(emptyDataset, nullptr);
-        SaveActiveDatasetConfigured(false);
+        TEMPORARY_RETURN_IGNORED SaveActiveDatasetConfigured(false);
         return err;
     }
     return CHIP_NO_ERROR;

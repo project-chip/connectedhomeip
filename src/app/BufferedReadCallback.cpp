@@ -94,7 +94,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    writer.Finalize(backingBuffer);
+    TEMPORARY_RETURN_IGNORED writer.Finalize(backingBuffer);
 
     aReader.Init(std::move(backingBuffer), totalBufSize);
 
@@ -117,7 +117,8 @@ CHIP_ERROR BufferedReadCallback::BufferListItem(TLV::TLVReader & reader)
     // TLV element. Since the tag can vary in size, for now, let's just do the safe thing. In the future, if this is a problem,
     // we can improve this.
     //
-    handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    const size_t bufSize = mAllowLargePayload ? chip::app::kMaxLargeSecureSduLengthBytes : chip::app::kMaxSecureSduLengthBytes;
+    handle               = System::PacketBufferHandle::New(bufSize);
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     writer.Init(std::move(handle), false);

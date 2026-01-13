@@ -21,12 +21,14 @@ import subprocess
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -73,11 +75,11 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
     image = list(image)
 
     if file_image_list:
-        logging.info("Reading image list from %s", file_image_list)
+        log.info("Reading image list from %s", file_image_list)
 
         basedir = os.path.dirname(file_image_list)
 
-        with open(file_image_list, 'rt') as f:
+        with open(file_image_list) as f:
             for name in f.readlines():
                 name = name.strip()
 
@@ -85,12 +87,12 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 if not os.path.isabs(name):
                     image_path = os.path.join(basedir, name)
 
-                logging.info("    Found %s => %s", name, image_path)
+                log.info("    Found %s => %s", name, image_path)
                 image.append(image_path)
 
     # the list "image" contains all the images that need to run
     for path in image:
-        logging.info("Executing image %s", path)
+        log.info("Executing image %s", path)
 
         status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
                                  "-drive", "file=%s,if=mtd,format=raw" % path], capture_output=True)
@@ -146,7 +148,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 print(output)
                 print("========== TEST OUTPUT END   ============")
 
-            logging.info("Image %s PASSED", path)
+            log.info("Image %s PASSED", path)
         except Exception:
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")

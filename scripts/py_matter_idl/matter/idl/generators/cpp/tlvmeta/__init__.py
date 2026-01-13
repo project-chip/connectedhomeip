@@ -16,7 +16,8 @@ import os
 from dataclasses import dataclass
 from typing import Generator, List, Optional
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import Cluster, Field, Idl, StructTag
 
 
@@ -170,9 +171,7 @@ class ClusterTablesGenerator:
             )
             for e in self.cluster.events if e.fields
         ])
-        cluster_entries.extend(
-            [entry for entry in self.CommandEntries()]
-        )
+        cluster_entries.extend(self.CommandEntries())
 
         yield Table(
             full_name=self.cluster.name,
@@ -240,9 +239,7 @@ class ClusterTablesGenerator:
 def CreateTables(idl: Idl) -> List[Table]:
     result = []
     for cluster in idl.clusters:
-        result.extend(
-            [table for table in ClusterTablesGenerator(cluster).GenerateTables()])
-
+        result.extend(ClusterTablesGenerator(cluster).GenerateTables())
     return result
 
 

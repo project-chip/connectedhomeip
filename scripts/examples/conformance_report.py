@@ -36,7 +36,7 @@ DEFAULT_TARGETS = [
 DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]
 TMP_RESULTS_DIR = "/tmp/conformance_report"
 OUT_DIR = "./out"
-TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00\"'"
+TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00 --bool-arg ignore_in_progress:True allow_provisional:True\"'"
 BUILD_COMMAND = "python3 scripts/build/build_examples.py --ninja-jobs {} --target {} build"
 NINJA_JOBS = max(os.cpu_count() - 2, 1)  # Limit # of jobs to avoid using too much CPU and RAM
 
@@ -85,7 +85,7 @@ def parse_test_logs(test_log_paths):
       test_log_paths: A list of paths to test output files.
 
     Returns:
-      A dictionary where keys are test names and values are lists of results. 
+      A dictionary where keys are test names and values are lists of results.
       Each result is a list: [app_target_name, test_pass_fail, error_count, test_cmd, error_summary].
     """
 
@@ -297,7 +297,7 @@ def csv_to_html_report(csv_file_paths, html_page_title, html_out_dir, sha):
     </head>
     <h1>{html_page_title}</h1>
     <hr>
-    <h4>Generated on {now}<br>SHA: {sha}</h4> 
+    <h4>Generated on {now}<br>SHA: {sha}</h4>
     <hr>
     <body>
     """

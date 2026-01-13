@@ -59,28 +59,23 @@ def DihedralMultiply(x, y, n):
     if (x < n):
         if (y < n):
             return (x + y) % n
-        else:
-            return ((x + (y - n)) % n) + n
-    else:
-        if (y < n):
-            return ((n + (x - n) - y) % n) + n
-        else:
-            return (n + (x - n) - (y - n)) % n
+        return ((x + (y - n)) % n) + n
+    if (y < n):
+        return ((n + (x - n) - y) % n) + n
+    return (n + (x - n) - (y - n)) % n
 
 
 def DihedralInvert(val, n):
     if (val > 0 and val < n):
         return n - val
-    else:
-        return val
+    return val
 
 
 def Permute(val, permTable, iterCount):
     val = val % len(permTable)
     if (iterCount == 0):
         return val
-    else:
-        return Permute(permTable[val], permTable, iterCount - 1)
+    return Permute(permTable[val], permTable, iterCount - 1)
 
 
 def _ComputeCheckChar(str, strLen, polygonSize, permTable, charSet):

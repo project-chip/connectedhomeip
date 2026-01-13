@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "CHIPProjectConfig.h"
 #if defined(ENABLE_CHIP_SHELL)
 #include "EventHandlerLibShell.h"
 #endif // ENABLE_CHIP_SHELL
@@ -66,7 +67,7 @@ using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SilabsDoorLock::LockInitParams;
 
 namespace {
 LEDWidget sLockLED;
@@ -79,7 +80,8 @@ void UpdateClusterStateAfterUnlatch(intptr_t context)
 
 void UnlatchTimerCallback(TimerHandle_t xTimer)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch,
+                                                                           reinterpret_cast<intptr_t>(nullptr));
 }
 
 void CancelUnlatchTimer(void)
@@ -195,7 +197,8 @@ CHIP_ERROR AppTask::AppInit()
                              .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
                              .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                              .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam());
+                             .GetLockParam(),
+                         &Server::GetInstance().GetPersistentStorage());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -225,7 +228,7 @@ CHIP_ERROR AppTask::AppInit()
 #endif // QR_CODE_ENABLED
 #endif
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -254,9 +257,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif
 
     SILABS_LOG("App Task started");
-
-    // Users and credentials should be checked once from nvm flash on boot
-    LockMgr().ReadConfigValues();
 
     while (true)
     {
@@ -371,7 +371,8 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                               reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }

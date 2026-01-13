@@ -15,8 +15,10 @@
  *    limitations under the License.
  */
 
+#include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
+
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -25,17 +27,50 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Camera;
 
+namespace {
+NamedPipeCommands sChipNamedPipeCommands;
+CameraAppCommandDelegate sCameraAppCommandDelegate;
+} // namespace
+
 CameraDevice gCameraDevice;
 
 void ApplicationInit()
 {
     ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
+    if (LinuxDeviceOptions::GetInstance().cameraVideoDevice.HasValue())
+    {
+        std::string videoDevicePath = LinuxDeviceOptions::GetInstance().cameraVideoDevice.Value();
+        // If the path does not start with '/', assume it's a device name and prepend /dev/
+        if (!videoDevicePath.empty() && videoDevicePath[0] != '/')
+        {
+            videoDevicePath = "/dev/" + videoDevicePath;
+        }
+        ChipLogDetail(Camera, "Using video device path from options: %s", videoDevicePath.c_str());
+        gCameraDevice.SetVideoDevicePath(videoDevicePath);
+    }
+    else
+    {
+        ChipLogDetail(Camera, "Using default video device path: %s", Camera::kDefaultVideoDevicePath);
+    }
+
+    std::string appPipePath = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if ((!appPipePath.empty()) && (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
+    }
+
+    gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
+
+    sCameraAppCommandDelegate.SetCameraDevice(&gCameraDevice);
 }
 
 void ApplicationShutdown()
 {
     CameraAppShutdown();
+
+    TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])

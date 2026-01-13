@@ -168,7 +168,7 @@ void InteractionModel::OnError(CHIP_ERROR error)
 void InteractionModel::OnDone(ReadClient * aReadClient)
 {
     InteractionModelReports::CleanupReadClient(aReadClient);
-    ContinueOnChipMainThread(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
 void InteractionModel::OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams)
@@ -178,7 +178,7 @@ void InteractionModel::OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPr
 
 void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
 {
-    ContinueOnChipMainThread(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
 /////////// WriteClient Callback Interface /////////
@@ -196,7 +196,7 @@ void InteractionModel::OnError(const WriteClient * client, CHIP_ERROR error)
 void InteractionModel::OnDone(WriteClient * client)
 {
     mWriteClient.reset();
-    ContinueOnChipMainThread(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
 /////////// CommandSender Callback Interface /////////
@@ -224,7 +224,7 @@ void InteractionModel::OnDone(CommandSender * client)
     // before exiting.
     if (!mCommandSender.size())
     {
-        ContinueOnChipMainThread(CHIP_NO_ERROR);
+        TEMPORARY_RETURN_IGNORED ContinueOnChipMainThread(CHIP_NO_ERROR);
     }
 }
 

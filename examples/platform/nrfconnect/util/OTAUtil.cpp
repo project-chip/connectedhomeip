@@ -24,6 +24,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/nrfconnect/ExternalFlashManager.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 #include <zephyr/dfu/mcuboot.h>
 #endif
@@ -60,7 +61,7 @@ void InitBasicOTARequestor()
     imageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&imageProcessor);
     sOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
+    TEMPORARY_RETURN_IGNORED sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
     imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);

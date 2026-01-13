@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 15;
+
 namespace NetworkInterfaces {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace NetworkInterfaces
@@ -48,6 +52,10 @@ namespace TestEventTriggersEnabled {
 inline constexpr AttributeId Id = 0x00000008;
 } // namespace TestEventTriggersEnabled
 
+namespace DeviceLoadStatus {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace DeviceLoadStatus
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -55,10 +63,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

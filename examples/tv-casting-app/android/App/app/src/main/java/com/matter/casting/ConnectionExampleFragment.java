@@ -30,7 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import com.R;
+import com.chip.casting.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.support.CommissionerDeclaration;
 import com.matter.casting.support.ConnectionCallbacks;
@@ -47,9 +47,6 @@ public class ConnectionExampleFragment extends Fragment {
   // Must be >= 3 minutes.
   private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
   private static final Integer DESIRED_TARGET_APP_VENDOR_ID = 65521;
-  // Use this Target Content Application Vendor ID, configured on the tv-app, to demonstrate the
-  // CastingPlayer/Commissioner-Generated passcode commissioning flow.
-  private static final Integer DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW = 1111;
   private static final long DEFAULT_COMMISSIONER_GENERATED_PASSCODE = 12345678;
   private static final int DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW = 0;
   private final CastingPlayer targetCastingPlayer;
@@ -139,8 +136,8 @@ public class ConnectionExampleFragment extends Fragment {
               if (useCommissionerGeneratedPasscode) {
                 // Set commissionerPasscode to true for CastingPlayer/Commissioner-Generated
                 // passcode commissioning.
-                idOptions = new IdentificationDeclarationOptions(false, false, true, false, false);
-                targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW);
+                idOptions =
+                    new IdentificationDeclarationOptions(false, false, true, false, false, 0);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
@@ -148,7 +145,16 @@ public class ConnectionExampleFragment extends Fragment {
                         + ", useCommissionerGeneratedPasscode: "
                         + useCommissionerGeneratedPasscode);
               } else {
-                idOptions = new IdentificationDeclarationOptions();
+                int passcodeLength =
+                    String.valueOf(
+                            Math.abs(
+                                InitializationExample.commissionableDataProvider
+                                    .get()
+                                    .getSetupPasscode()))
+                        .length();
+                idOptions =
+                    new IdentificationDeclarationOptions(
+                        false, false, false, false, false, passcodeLength);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
@@ -223,7 +229,9 @@ public class ConnectionExampleFragment extends Fragment {
                                 displayPasscodeInputDialog(activity);
 
                                 connectionFragmentStatusTextView.setText(
-                                    "CommissionerDeclaration message received from Casting Player: A passcode is now displayed for the user by the Casting Player. \n\n");
+                                    "CommissionerDeclaration message received from Casting Player: A passcode (length "
+                                        + cd.getPasscodeLength()
+                                        + ") is now displayed for the user by the Casting Player. \n\n");
                               }
                               if (cd.getCancelPasscode()) {
                                 if (useCommissionerGeneratedPasscode) {

@@ -94,10 +94,8 @@ namespace DeviceLayer {
 
     void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     {
-        ConfigurationManagerImpl::GetDefaultInstance().ClearWiFiNetworkInformations();
+        TEMPORARY_RETURN_IGNORED ConfigurationManagerImpl::GetDefaultInstance().ClearWiFiNetworkInformations();
     }
-
-    bool ConnectivityManagerImpl::_CanStartWiFiScan() { return _IsWiFiStationConnected(); }
 
     CHIP_ERROR ConnectivityManagerImpl::GetWiFiInterfaceName(char * outName, size_t maxLen)
     {

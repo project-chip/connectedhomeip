@@ -30,11 +30,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TCP_Tests(MatterBaseTest):
@@ -52,12 +55,11 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
         ]
-        return steps
 
     # TCP Connection Establishment
     @async_test_body
@@ -66,7 +68,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -79,12 +81,11 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that the session established with DUT allows large payloads."),
         ]
-        return steps
 
     # Large Payload Session Establishment
     @async_test_body
@@ -93,7 +94,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -105,14 +106,13 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
             TestStep(4, "TH closes the TCP connection with DUT"),
             TestStep(5, "Verifying that the secure session with DUT is inactive."),
         ]
-        return steps
 
     # Session Inactive After TCP Disconnect
     @async_test_body
@@ -121,7 +121,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -140,7 +140,7 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
@@ -150,7 +150,6 @@ class TCP_Tests(MatterBaseTest):
             TestStep(7, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
             TestStep(8, "Verifying that the large-payload secure session with DUT is active."),
         ]
-        return steps
 
     # TCP Connect, Disconnect, Then Connect Again
     @async_test_body
@@ -159,7 +158,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -177,7 +176,7 @@ class TCP_Tests(MatterBaseTest):
         # Connect again
         try:
             self.step(6)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -192,7 +191,7 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
@@ -200,7 +199,6 @@ class TCP_Tests(MatterBaseTest):
             TestStep(5, "TH initiates an InvokeCommandRequest with DUT over the established session."),
             TestStep(6, "Verifying successful invocation with DUT over the established session without any error."),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_SC_8_5(self):
@@ -208,7 +206,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -231,7 +229,7 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
@@ -239,7 +237,6 @@ class TCP_Tests(MatterBaseTest):
             TestStep(5, "TH initiates a Read of all attributes of all clusters of DUT."),
             TestStep(6, "Verifying wildcard read was successful with DUT over the established session without any error."),
         ]
-        return steps
 
     # WildCard Read Over TCP Session
     @async_test_body
@@ -248,7 +245,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -271,7 +268,7 @@ class TCP_Tests(MatterBaseTest):
         return ['MCORE.SC.TCP']
 
     def steps_TC_SC_8_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH initiates a CASE session establishment with DUT, requesting a session supporting large payloads."),
             TestStep(3, "Verifying that a session is set up with an underlying TCP connection established with DUT."),
@@ -279,7 +276,6 @@ class TCP_Tests(MatterBaseTest):
             TestStep(5, "TH initiates a regularly-sized InvokeCommandRequest with DUT, specifying that either a MRP or TCP-based session is usable."),
             TestStep(6, "Verifying successful invocation with DUT over the established TCP-based session without any error."),
         ]
-        return steps
 
     # Use TCP Session If Available For MRP Interaction
     @async_test_body
@@ -289,7 +285,7 @@ class TCP_Tests(MatterBaseTest):
 
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")

@@ -36,6 +36,8 @@
 #ifdef BOARD_ENABLE_I2C
 #include "wiced_hal_i2c.h"
 #endif
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -46,6 +48,7 @@
 #include <mbedtls/platform.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <wiced_rtos.h>
@@ -78,6 +81,8 @@ static UnprovisionedOptigaFactoryDataProvider sFactoryDataProvider;
 #else  /* !BOARD_USE_OPTIGA */
 static FactoryDataProvider sFactoryDataProvider;
 #endif /* BOARD_USE_OPTIGA */
+
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
@@ -123,6 +128,7 @@ CHIP_ERROR CYW30739MatterConfig::InitOpenThread(void)
         printf("ERROR SetThreadDeviceType %ld\n", err.AsInteger());
     }
 
+    sThreadNetworkDriver.Init();
     printf("Starting thread task\n");
     ReturnLogErrorOnFailure(ThreadStackMgr().StartThreadTask());
 
@@ -231,7 +237,16 @@ void CYW30739MatterConfig::InitApp(void)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
-    // Init Matter Server
+    /*
+     * Init Matter Server. A general diagnostics cluster instance is instantiated here because the
+     * GenericEventManagementTestEventTriggerHandler needs to use the fault detect functions that are
+     * part of the cluster. The EventManagementTestEventTriggerHandler is based upon
+     * GenericEventManagementTestEventTriggerHandler, and so creating an instance of it here allows
+     * this to work and replace the old global instance call to the cluster
+     */
+    const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
+    static Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
+    sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR

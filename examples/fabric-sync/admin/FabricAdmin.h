@@ -24,7 +24,7 @@
 #include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
-#include <bridge/include/FabricAdminDelegate.h>
+#include <bridge/FabricAdminDelegate.h>
 #include <map>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <system/SystemClock.h>

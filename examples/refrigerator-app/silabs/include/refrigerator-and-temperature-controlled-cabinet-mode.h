@@ -33,20 +33,21 @@ const uint8_t ModeNormal      = 0;
 const uint8_t ModeRapidCool   = 1;
 const uint8_t ModeRapidFreeze = 2;
 
-/// This is an application level delegate to handle LaundryWasherMode commands according to the specific business logic.
+/// This is an application level delegate to handle TemperatureControlledCabinetMode commands according to the specific business
+/// logic.
 class RefrigeratorAndTemperatureControlledCabinetModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType                  = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNoarmal[1]     = { { .value = to_underlying(ModeTag::kAuto) } };
+    ModeTagStructType modeTagsNormal[1]      = { { .value = to_underlying(ModeTag::kAuto) } };
     ModeTagStructType modeTagsRapidCool[1]   = { { .value = to_underlying(ModeTag::kRapidCool) } };
-    ModeTagStructType modeTagsRapidFreeze[3] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
+    ModeTagStructType modeTagsRapidFreeze[2] = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
                                                  { .value = to_underlying(ModeTag::kRapidFreeze) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
                                                  .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNoarmal) },
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Cool"),
                                                  .mode     = ModeRapidCool,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsRapidCool) },

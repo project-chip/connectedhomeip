@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <camera-av-settings-user-level-management-instance.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -25,20 +27,18 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
-static AVSettingsUserLevelManagementDelegate * gDelegate                           = nullptr;
-static CameraAvSettingsUserLevelMgmtServer * gAVSettingsUserLevelManagementCluster = nullptr;
-static constexpr EndpointId kEndpointId                                            = 1;
+std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
+std::unique_ptr<CameraAvSettingsUserLevelManagementCluster> gAVSettingsUserLevelManagementCluster;
+static constexpr EndpointId kEndpointId = 1;
 
-CameraAvSettingsUserLevelMgmtServer * GetInstance()
-{
-    return gAVSettingsUserLevelManagementCluster;
-}
+static void onTimerExpiry(System::Layer * systemLayer, void * data);
 
 void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
     {
-        delete gAVSettingsUserLevelManagementCluster;
+        gDelegate->CancelActiveTimers();
+        gDelegate                             = nullptr;
         gAVSettingsUserLevelManagementCluster = nullptr;
     }
 }
@@ -50,40 +50,64 @@ bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
     return true;
 }
 
-bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t aVideoStreamID)
+void AVSettingsUserLevelManagementDelegate::VideoStreamAllocated(uint16_t aStreamID)
 {
-    // The server needs to verify that the provided Video Stream ID is valid and known and subject to digital modification
-    // The camera app needs to also have an instance of AV Stream Management, querying that to determine validity of the provided
-    // id.
-    return true;
+    // The app needs to invoke this whenever the AV Stream Manager allocates a video stream; this informs the server of the
+    // id that is now subject to DPTZ, and the default viewport of the device
+    Globals::Structs::ViewportStruct::Type viewport = { 0, 0, 1920, 1080 };
+    this->GetServer()->AddMoveCapableVideoStream(aStreamID, viewport);
+}
+
+void AVSettingsUserLevelManagementDelegate::VideoStreamDeallocated(uint16_t aStreamID)
+{
+    // The app needs to invoke this whenever the AV Stream Manager deallocates a video stream; this informs the server of the
+    // deallocated id that is now not subject to DPTZ
+    this->GetServer()->RemoveMoveCapableVideoStream(aStreamID);
+}
+
+void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport)
+{
+    // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs
+    // the server of the new viewport that shall be appled to all known streams.
+    this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                              Optional<uint8_t> aZoom)
+                                                              Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
-    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
-    // will persist the new values.
+    // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
+    // the callback. The server itself will persist the new values.
     //
+    mCallback = callback;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+
     return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<uint8_t> aZoom)
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
-    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
-    // will persist the new values.
+    // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
+    // the callback. The server itself will persist the new values.
     //
+    mCallback = callback;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+
     return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<uint8_t> aZoom)
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
-    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
+    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
+    // movements, invoke the callback. The server itself will persist the new values.
     //
+    mCallback = callback;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+
     return Status::Success;
 }
 
@@ -103,7 +127,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID,
+                                                              Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -113,19 +138,76 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStr
 }
 
 Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta)
+                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                               Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
-    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
-    // and set the new values for the viewpoort based on the pixel movement requested
+    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate
+    // new dimensions after application of the deltas, and set the new values for the viewport based on the pixel movement
+    // requested
+    // The passed in viewport is empty, and needs to be populated by the delegate with the value of the viewport after
+    // applying all deltas within the constraints of the sensor.
     //
+    aViewport = { 0, 0, 1920, 1080 };
     return Status::Success;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
+{
+    mptzPresetHelpers.clear();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
+{
+    dptzStreams.clear();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
+{
+    return CHIP_NO_ERROR;
+}
+
+// Timer expiration to mimic PTZ physical movememt
+//
+static void onTimerExpiry(System::Layer * systemLayer, void * data)
+{
+    AVSettingsUserLevelManagementDelegate * delegate = reinterpret_cast<AVSettingsUserLevelManagementDelegate *>(data);
+
+    // All timers are cancelled on delegate shutdown, hence if this is invoked the delegate is alive
+    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+}
+
+void AVSettingsUserLevelManagementDelegate::ShutdownApp()
+{
+    CancelActiveTimers();
+}
+
+void AVSettingsUserLevelManagementDelegate::CancelActiveTimers()
+{
+    // Cancel the PTZ mimic timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(onTimerExpiry, this);
+}
+
+// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
+// make sure that is still alive before trying to invoke methods thereon.
+//
+void AVSettingsUserLevelManagementDelegate::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
+{
+    if (GetServer() != nullptr)
+    {
+        if (mCallback != nullptr)
+        {
+            mCallback->OnPhysicalMovementComplete(status);
+        }
+    }
 }
 
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
 {
     VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
+    VerifyOrDie(!gDelegate && !gAVSettingsUserLevelManagementCluster);
     const int16_t appPanMin     = -90;
     const int16_t appPanMax     = 90;
     const int16_t appTiltMin    = -45;
@@ -133,7 +215,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const uint8_t appZoomMax    = 75;
     const uint8_t appMaxPresets = 5;
 
-    gDelegate = new AVSettingsUserLevelManagementDelegate;
+    gDelegate = std::make_unique<AVSettingsUserLevelManagementDelegate>();
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
         CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
@@ -143,21 +225,22 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
 
-    gAVSettingsUserLevelManagementCluster =
-        new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets);
-    gAVSettingsUserLevelManagementCluster->Init();
+    gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelManagementCluster>(
+        kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom
-    gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
-    gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
-    gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
-    gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
-    gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
 }

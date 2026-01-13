@@ -29,4 +29,10 @@ declare_args() {
 
   # Set to true to enable device-specific attestation credentials
   chip_build_platform_attestation_credentials_provider = false
+
+  # Set to true to code-generate CodgenProcessingConfig.h
+  #
+  # This is to allow cmake-based systems to have a CodegenProcessingConfig available
+  # since the build config headers are processed as part of gn processing.
+  chip_build_enable_codegen_configuration = true
 }

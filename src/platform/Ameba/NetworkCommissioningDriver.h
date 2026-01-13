@@ -110,6 +110,7 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
+    void OnConnectWiFiNetworkFailed(uint16_t reason);
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 

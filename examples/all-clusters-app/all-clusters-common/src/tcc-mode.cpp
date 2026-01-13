@@ -94,9 +94,8 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gTccModeDelegate == nullptr && gTccModeInstance == nullptr);
     gTccModeDelegate = new RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate;
-    gTccModeInstance = new ModeBase::Instance(gTccModeDelegate, 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id,
-                                              chip::to_underlying(Feature::kOnOff));
-    gTccModeInstance->Init();
+    gTccModeInstance = new ModeBase::Instance(gTccModeDelegate, 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gTccModeInstance->Init();
 }
 
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId)

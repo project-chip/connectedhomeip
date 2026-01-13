@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     AndroidChipPlatform(
       AndroidBleManager(),
+      AndroidNfcCommissioningManager(),
       PreferencesKeyValueStoreManager(this),
       PreferencesConfigurationManager(this),
       NsdManagerServiceResolver(this),

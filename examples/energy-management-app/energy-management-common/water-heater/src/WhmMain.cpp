@@ -82,7 +82,7 @@ CHIP_ERROR WhmInit(EndpointId endpointId)
     err = gWhmInstance->Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "gWhmInstance->Init failed %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "gWhmInstance->Init failed: %" CHIP_ERROR_FORMAT, err.Format());
         gWhmInstance.reset();
         gWhmDelegate.reset();
         return err;
@@ -158,7 +158,7 @@ CHIP_ERROR WhmManufacturerShutdown()
     if (gWhmManufacturer)
     {
         /* Shutdown the WhmManufacturer */
-        gWhmManufacturer->Shutdown();
+        TEMPORARY_RETURN_IGNORED gWhmManufacturer->Shutdown();
         gWhmManufacturer.reset();
     }
 
@@ -178,7 +178,7 @@ CHIP_ERROR WhmApplicationInit(EndpointId endpointId)
 CHIP_ERROR WhmApplicationShutdown()
 {
     /* Shutdown in reverse order that they were created */
-    WhmManufacturerShutdown();
+    TEMPORARY_RETURN_IGNORED WhmManufacturerShutdown();
 
     return WhmShutdown();
 }

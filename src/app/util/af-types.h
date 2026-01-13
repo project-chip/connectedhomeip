@@ -26,7 +26,6 @@
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
 
-#include <app/util/AttributesChangedListener.h>
 #include <app/util/MarkAttributeDirty.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
@@ -235,6 +234,22 @@ struct EmberAfDefinedEndpoint
      * Span pointing to a list of tags. Lifetime has to outlive usage, and data is owned by callers.
      */
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    /**
+     * Unique Id for this endpoint.
+     */
+    char endpointUniqueId[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+
+    uint8_t endpointUniqueIdSize = 0;
+#endif
+};
+
+enum class MatterClusterShutdownType
+{
+    kClusterShutdown, // "normal" shutdown, e.g. application stop. Perform cleanups like: timer and delegate cleanup.
+    kPermanentRemove, // full "remove", for situations when the endpoint the cluster on is going away permanently (for example, a
+                      // bridged device that is no longer being bridged).
 };
 
 /**

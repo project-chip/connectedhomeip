@@ -71,6 +71,7 @@ public:
     SmokeCOTestEventTriggerHandler() = default;
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
+        eventTrigger = clearEndpointInEventTrigger(eventTrigger);
         return HandleSmokeCOTestEventTrigger(eventTrigger) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
     }
 };

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,50 +20,39 @@ namespace IlluminanceMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace MeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MinMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MinMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MaxMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MaxMeasuredValue
 namespace Tolerance {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Tolerance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Tolerance::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace Tolerance
 namespace LightSensorType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = LightSensorType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LightSensorType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace LightSensorType
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    MeasuredValue::kMetadataEntry,
+    MinMeasuredValue::kMetadataEntry,
+    MaxMeasuredValue::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace IlluminanceMeasurement
 } // namespace Clusters
 } // namespace app

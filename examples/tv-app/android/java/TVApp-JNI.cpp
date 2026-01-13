@@ -228,10 +228,10 @@ class MyPincodeService : public PasscodeService
         }
     }
 
-    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
     {
         // TODO: randomly generate this value
-        return 12345678;
+        return { 12345678, 8 };
     }
 
     void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
@@ -351,9 +351,9 @@ class MyPostCommissioningListener : public PostCommissioningListener
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
         auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
-                                                             OnFailureResponse);
+        TEMPORARY_RETURN_IGNORED ContentAppPlatform::GetInstance().ManageClientAccess(
+            *mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId, rotatingIdSpan, mPasscode, bindings,
+            OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 
@@ -407,7 +407,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     }
 
     ChipLogProgress(AppServer, "Starting commissioner");
-    InitCommissioner(CHIP_PORT + 2 + 10, CHIP_UDC_PORT);
+    TEMPORARY_RETURN_IGNORED InitCommissioner(CHIP_PORT + 2 + 10, CHIP_UDC_PORT);
     ChipLogProgress(AppServer, "Started commissioner");
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

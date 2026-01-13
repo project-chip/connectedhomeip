@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -66,14 +67,19 @@ import struct
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -95,6 +101,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         self._partslist_subscription = None
         self._cadmin_subscription = None
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -107,14 +114,14 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         if self.is_pics_sdk_ci_only:
             # Get the named pipe path for the DUT_FSA app input from the user params.
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = th_server_port
         self.th_server_setup_params = SetupParameters(
@@ -139,6 +146,8 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         if self._cadmin_subscription is not None:
             self._cadmin_subscription.Shutdown()
             self._cadmin_subscription = None
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -157,7 +166,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_5(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep("precondition", "Commission DUT if not done", is_commissioning=True),
             TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
             TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
             TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
@@ -180,7 +189,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
     async def test_TC_MCORE_FS_1_5(self):
 
         # Commissioning - done
-        self.step(0)
+        self.step("precondition")
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30
@@ -192,7 +201,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=parts_list_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
@@ -205,7 +214,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = parts_list_cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:
@@ -221,7 +230,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         self.step(3)
         report_waiting_timeout_delay_sec = 30
-        logging.info("Waiting for update to PartsList.")
+        log.info("Waiting for update to PartsList.")
         start_time = time.time()
         elapsed = 0
         time_remaining = report_waiting_timeout_delay_sec
@@ -278,7 +287,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             (newly_added_endpoint, Clusters.AdministratorCommissioning)
         ]
         self._cadmin_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=cadmin_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
@@ -292,7 +301,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         await asyncio.sleep(1)
 
         self.step(7)
-        await self.default_controller.OpenCommissioningWindow(nodeid=self.th_server_local_nodeid, timeout=180, iteration=1000, discriminator=3840, option=1)
+        await self.default_controller.OpenCommissioningWindow(nodeId=self.th_server_local_nodeid, timeout=180, iteration=1000, discriminator=3840, option=1)
 
         self.step(8)
         current_fabric_index = await self.read_single_attribute_check_success(node_id=self.th_server_local_nodeid, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
@@ -308,7 +317,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
         self.step(10)
         report_waiting_timeout_delay_sec = max_report_interval_sec + 1
-        logging.info("Waiting for update to AdministratorCommissioning attributes.")
+        log.info("Waiting for update to AdministratorCommissioning attributes.")
         start_time = time.time()
         elapsed = 0
         time_remaining = report_waiting_timeout_delay_sec
@@ -322,8 +331,8 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                 # Record arrival of an expected subscription change when seen
                 if endpoint == newly_added_endpoint and attribute == cadmin_attr.WindowStatus:
                     if value != th_server_direct_cadmin[cadmin_attr.WindowStatus]:
-                        logging.info("Window status is %r, waiting for %r", value,
-                                     th_server_direct_cadmin[cadmin_attr.WindowStatus])
+                        log.info("Window status is %r, waiting for %r", value,
+                                 th_server_direct_cadmin[cadmin_attr.WindowStatus])
                         continue
                     cadmin_sub_new_data = True
                     break

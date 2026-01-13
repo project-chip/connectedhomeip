@@ -146,3 +146,17 @@ chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const
  */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
+
+void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
+ * Mark the given cluster as being shut down (i.e. not active anymore)
+ *
+ * In many cases, this is a result of dynamic endpoint disabling (i.e. kPermanentRemove shutdownType)
+ * This is assumed to perform any cleanup such as:
+ *   - cancel pending timers
+ *   - remove delegates added during startup
+ *   - Permanent remove only (e.g. bridges): clean up storage
+ */
+void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                         MatterClusterShutdownType shutdownType);

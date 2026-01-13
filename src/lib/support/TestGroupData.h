@@ -98,9 +98,12 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
     err = provider->SetKeySet(fabric_index, compressed_fabric_id, keyset3);
     ReturnErrorOnFailure(err);
 
-    provider->SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
-    provider->SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
-    provider->SetGroupKeyAt(fabric_index, 2, chip::Credentials::GroupDataProvider::GroupKey(kGroup3, kKeySet3));
+    ReturnErrorOnFailure(
+        provider->SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1)));
+    ReturnErrorOnFailure(
+        provider->SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2)));
+    ReturnErrorOnFailure(
+        provider->SetGroupKeyAt(fabric_index, 2, chip::Credentials::GroupDataProvider::GroupKey(kGroup3, kKeySet3)));
 
     return CHIP_NO_ERROR;
 }

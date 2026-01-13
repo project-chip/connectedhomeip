@@ -24,6 +24,7 @@
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDelegateManager.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
@@ -65,27 +66,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
-@interface MTRDeviceControllerDelegateInfo : NSObject
-- (instancetype)initWithDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
-@property (nonatomic, weak, readonly) id<MTRDeviceControllerDelegate> delegate;
-@property (nonatomic, readonly) dispatch_queue_t queue;
-@end
-
-@implementation MTRDeviceControllerDelegateInfo
-@synthesize delegate = _delegate, queue = _queue;
-- (instancetype)initWithDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _delegate = delegate;
-    _queue = queue;
-
-    return self;
-}
-@end
-
 @interface MTRDeviceController ()
 @property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
 @end
@@ -99,7 +79,7 @@ using namespace chip::Tracing::DarwinFramework;
     // specific queue, so can't race against each other.
     std::atomic<bool> _suspended;
 
-    NSMutableArray<MTRDeviceControllerDelegateInfo *> * _delegates;
+    MTRDelegateManager<id<MTRDeviceControllerDelegate>, MTRDelegateInfo<id<MTRDeviceControllerDelegate>> *> * _delegateManager;
     id<MTRDeviceControllerDelegate> _strongDelegateForSetDelegateAPI;
 }
 
@@ -124,7 +104,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
-    _delegates = [NSMutableArray array];
+    _delegateManager = [[MTRDelegateManager alloc] initWithOwner:self];
 
     return self;
 }
@@ -575,20 +555,8 @@ using namespace chip::Tracing::DarwinFramework;
 - (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     @synchronized(self) {
-        __block BOOL delegateAlreadyAdded = NO;
-        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
-            if (delegateInfo.delegate == delegate) {
-                delegateAlreadyAdded = YES;
-            }
-        }];
-        if (delegateAlreadyAdded) {
-            MTR_LOG("%@ addDeviceControllerDelegate: delegate already added", self);
-            return;
-        }
-
-        MTRDeviceControllerDelegateInfo * newDelegateInfo = [[MTRDeviceControllerDelegateInfo alloc] initWithDelegate:delegate queue:queue];
-        [_delegates addObject:newDelegateInfo];
-        MTR_LOG("%@ addDeviceControllerDelegate: added %p total %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
+        MTRDelegateInfo<id<MTRDeviceControllerDelegate>> * newDelegateInfo = [[MTRDelegateInfo alloc] initWithDelegate:delegate queue:queue];
+        [_delegateManager addDelegateInfo:newDelegateInfo];
     }
 }
 
@@ -599,19 +567,7 @@ using namespace chip::Tracing::DarwinFramework;
             _strongDelegateForSetDelegateAPI = nil;
         }
 
-        __block MTRDeviceControllerDelegateInfo * delegateInfoToRemove = nil;
-        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
-            if (delegateInfo.delegate == delegate) {
-                delegateInfoToRemove = delegateInfo;
-            }
-        }];
-
-        if (delegateInfoToRemove) {
-            [_delegates removeObject:delegateInfoToRemove];
-            MTR_LOG("%@ removeDeviceControllerDelegate: removed %p remaining %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
-        } else {
-            MTR_LOG("%@ removeDeviceControllerDelegate: delegate %p not found in %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
-        }
+        [_delegateManager removeDelegate:delegate];
     }
 }
 
@@ -619,55 +575,24 @@ using namespace chip::Tracing::DarwinFramework;
 {
     @synchronized(self) {
         _strongDelegateForSetDelegateAPI = nil;
-        [_delegates removeAllObjects];
+        [_delegateManager removeAllDelegates];
     }
 }
 
 // Iterates the delegates, and remove delegate info objects if the delegate object has dealloc'ed
 // Returns number of delegates called
-- (NSUInteger)_iterateDelegateInfoWithBlock:(void (^_Nullable)(MTRDeviceControllerDelegateInfo * delegateInfo))block
+- (NSUInteger)_iterateDelegateInfoWithBlock:(void (^_Nullable)(MTRDelegateInfo<id<MTRDeviceControllerDelegate>> * delegateInfo))block
 {
     @synchronized(self) {
-        if (!_delegates.count) {
-            MTR_LOG("%@ No delegates to iterate", self);
-            return 0;
-        }
-
-        // Opportunistically remove defunct delegate references on every iteration
-        NSMutableArray * delegatesToRemove = nil;
-        for (MTRDeviceControllerDelegateInfo * delegateInfo in _delegates) {
-            id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
-            if (strongDelegate) {
-                if (block) {
-                    block(delegateInfo);
-                }
-            } else {
-                if (!delegatesToRemove) {
-                    delegatesToRemove = [NSMutableArray array];
-                }
-                [delegatesToRemove addObject:delegateInfo];
-            }
-        }
-
-        if (delegatesToRemove.count) {
-            [_delegates removeObjectsInArray:delegatesToRemove];
-            MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), static_cast<unsigned long>(_delegates.count));
-        }
-
-        return _delegates.count;
+        return [_delegateManager iterateDelegatesWithBlock:block];
     }
 }
 
 - (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString
 {
-    NSUInteger delegatesCalled = [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
-        id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
-        dispatch_async(delegateInfo.queue, ^{
-            block(strongDelegate);
-        });
-    }];
-
-    MTR_LOG("%@ %lu delegates called for %s", self, static_cast<unsigned long>(delegatesCalled), logString);
+    @synchronized(self) {
+        [_delegateManager callDelegatesWithBlock:block logString:logString];
+    }
 }
 
 #if DEBUG

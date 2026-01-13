@@ -131,12 +131,14 @@ void emberAfColorControlClusterInitCallback(EndpointId endpoint)
 void ApplicationInit()
 {
 #if ENABLE_DBUS_UI
-    sDBusInterface.Init();
+    SuccessOrDie(sDBusInterface.Init());
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sWiFiNetworkCommissioningInstance.Init();
+    SuccessOrDie(sWiFiNetworkCommissioningInstance.Init());
 #endif
-    ledManager.Init();
+    // NOTE(gmarcosb): tizen-arm-tests-no-ble-no-thread fails if we use
+    // SuccessOrDie here
+    TEMPORARY_RETURN_IGNORED ledManager.Init();
 }
 
 void ApplicationShutdown() {}
@@ -145,7 +147,7 @@ int main(int argc, char * argv[])
 {
     TizenServiceAppMain app;
     VerifyOrDie(app.Init(argc, argv) == 0);
-    VerifyOrDie(LightingMgr().Init() == CHIP_NO_ERROR);
+    SuccessOrDie(LightingMgr().Init());
 
     return app.RunMainLoop();
 }

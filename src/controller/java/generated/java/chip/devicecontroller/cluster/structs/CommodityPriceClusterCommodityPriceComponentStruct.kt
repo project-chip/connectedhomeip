@@ -24,8 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class CommodityPriceClusterCommodityPriceComponentStruct(
-  val price: Optional<Long>,
-  val priceLevel: Optional<Int>,
+  val price: Long,
   val source: UInt,
   val description: Optional<String>,
   val tariffComponentID: Optional<ULong>,
@@ -33,7 +32,6 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
   override fun toString(): String = buildString {
     append("CommodityPriceClusterCommodityPriceComponentStruct {\n")
     append("\tprice : $price\n")
-    append("\tpriceLevel : $priceLevel\n")
     append("\tsource : $source\n")
     append("\tdescription : $description\n")
     append("\ttariffComponentID : $tariffComponentID\n")
@@ -43,14 +41,7 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (price.isPresent) {
-        val optprice = price.get()
-        put(ContextSpecificTag(TAG_PRICE), optprice)
-      }
-      if (priceLevel.isPresent) {
-        val optpriceLevel = priceLevel.get()
-        put(ContextSpecificTag(TAG_PRICE_LEVEL), optpriceLevel)
-      }
+      put(ContextSpecificTag(TAG_PRICE), price)
       put(ContextSpecificTag(TAG_SOURCE), source)
       if (description.isPresent) {
         val optdescription = description.get()
@@ -66,28 +57,16 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
 
   companion object {
     private const val TAG_PRICE = 0
-    private const val TAG_PRICE_LEVEL = 1
-    private const val TAG_SOURCE = 2
-    private const val TAG_DESCRIPTION = 3
-    private const val TAG_TARIFF_COMPONENT_ID = 4
+    private const val TAG_SOURCE = 1
+    private const val TAG_DESCRIPTION = 2
+    private const val TAG_TARIFF_COMPONENT_ID = 3
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): CommodityPriceClusterCommodityPriceComponentStruct {
       tlvReader.enterStructure(tlvTag)
-      val price =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
-        } else {
-          Optional.empty()
-        }
-      val priceLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PRICE_LEVEL)))
-        } else {
-          Optional.empty()
-        }
+      val price = tlvReader.getLong(ContextSpecificTag(TAG_PRICE))
       val source = tlvReader.getUInt(ContextSpecificTag(TAG_SOURCE))
       val description =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
@@ -106,7 +85,6 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
 
       return CommodityPriceClusterCommodityPriceComponentStruct(
         price,
-        priceLevel,
         source,
         description,
         tariffComponentID,

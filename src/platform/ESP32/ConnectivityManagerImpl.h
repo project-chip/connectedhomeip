@@ -116,7 +116,6 @@ private:
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
     CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
-    bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
@@ -139,28 +138,6 @@ private:
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    WiFiAPMode _GetWiFiAPMode(void);
-    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
-    bool _IsWiFiAPActive(void);
-    void _DemandStartWiFiAP(void);
-    void _StopOnDemandWiFiAP(void);
-    void _MaintainOnDemandWiFiAP(void);
-    System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
-    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
-    bool _IsWiFiAPApplicationControlled(void);
-
-    System::Clock::Timestamp mLastAPDemandTime;
-    WiFiAPMode mWiFiAPMode;
-    WiFiAPState mWiFiAPState;
-    System::Clock::Timeout mWiFiAPIdleTimeout;
-
-    void DriveAPState(void);
-    CHIP_ERROR ConfigureWiFiAP(void);
-    void ChangeWiFiAPState(WiFiAPState newState);
-    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
@@ -196,33 +173,6 @@ inline bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectInterval(void)
 {
     return mWiFiStationReconnectInterval;
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(void)
-{
-    return mWiFiAPMode;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPActive(void)
-{
-    return mWiFiAPState == kWiFiAPState_Active;
-}
-
-inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout(void)
-{
-    return mWiFiAPIdleTimeout;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled(void)
-{
-    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
-inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return mWiFiStationState != kWiFiStationState_Connecting;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

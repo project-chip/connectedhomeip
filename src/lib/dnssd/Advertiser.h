@@ -27,6 +27,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Dnssd {
@@ -43,9 +44,10 @@ enum class CommssionAdvertiseMode : uint8_t
 
 enum class CommissioningMode
 {
-    kDisabled,       // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
-    kEnabledBasic,   // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
-    kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
+    kDisabled,           // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
+    kEnabledBasic,       // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
+    kEnabledEnhanced,    // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
+    kEnabledJointFabric, // Joint Fabric Commissioning Mode, CM=3 in DNS-SD key/value pairs
 };
 
 enum class ICDModeAdvertise : uint8_t
@@ -204,6 +206,15 @@ public:
     }
     CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CommissionAdvertisingParameters & SetJointFabricMode(BitFlags<JointFabricMode> mode)
+    {
+        mJointFabricMode = mode;
+        return *this;
+    }
+    BitFlags<JointFabricMode> GetJointFabricMode() const { return mJointFabricMode; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     CommissionAdvertisingParameters & SetDeviceType(std::optional<uint32_t> deviceType)
     {
         mDeviceType = deviceType;
@@ -291,6 +302,9 @@ private:
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
     CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
     CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    BitFlags<JointFabricMode> mJointFabricMode;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     std::optional<uint16_t> mVendorId;
     std::optional<uint16_t> mProductId;
     std::optional<uint32_t> mDeviceType;

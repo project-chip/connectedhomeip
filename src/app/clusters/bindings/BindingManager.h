@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,12 +19,15 @@
 
 #include <app/CASESessionManager.h>
 #include <app/clusters/bindings/PendingNotificationMap.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <app/server/Server.h>
-#include <app/util/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
 
 /**
  * Application callback function when a cluster associated with a binding changes.
@@ -39,8 +42,7 @@ namespace chip {
  *
  * The handler is not allowed to hold onto the pointer to the SessionHandler that is passed in.
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
-                                           void * context);
+using BoundDeviceChangedHandler = void (*)(const TableEntry & binding, OperationalDeviceProxy * peer_device, void * context);
 
 /**
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
@@ -48,7 +50,7 @@ using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & bindin
  */
 using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandler;
 
-struct BindingManagerInitParams
+struct ManagerInitParams
 {
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
@@ -71,10 +73,10 @@ struct BindingManagerInitParams
  * or watched cluster is changed).
  *
  */
-class BindingManager
+class Manager
 {
 public:
-    BindingManager() {}
+    Manager() {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -88,7 +90,7 @@ public:
         mPendingNotificationMap.RegisterPendingNotificationContextReleaseHandler(handler);
     }
 
-    CHIP_ERROR Init(const BindingManagerInitParams & params);
+    CHIP_ERROR Init(const ManagerInitParams & params);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
@@ -120,7 +122,7 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
-    static BindingManager & GetInstance() { return sBindingManager; }
+    static Manager & GetInstance() { return sBindingManager; }
 
 private:
     /*
@@ -136,7 +138,7 @@ private:
     class ConnectionCallback
     {
     public:
-        ConnectionCallback(BindingManager & bindingManager) :
+        ConnectionCallback(Manager & bindingManager) :
             mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
             mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
         {}
@@ -159,18 +161,18 @@ private:
             Platform::Delete(_this);
         }
 
-        BindingManager & mBindingManager;
+        Manager & mBindingManager;
         Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
         Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     };
 
-    static BindingManager sBindingManager;
+    static Manager sBindingManager;
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    BindingManagerInitParams mInitParams;
+    ManagerInitParams mInitParams;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
@@ -179,4 +181,19 @@ private:
     CHIP_ERROR mLastSessionEstablishmentError;
 };
 
+} // namespace Binding
+
+/**
+ * @brief appends a binding to the list of bindings
+ *        This function is to be used when a device wants to add a binding to its own table
+ *        If entry is a unicast binding, BindingManager will be notified and will establish a case session with the peer device
+ *        Entry will be added to the binding table and persisted into storage
+ *        BindingManager will be notified and the binding added callback will be called if it has been set
+ *
+ * @param entry binding to add
+ */
+CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry);
+
+} // namespace Clusters
+} // namespace app
 } // namespace chip

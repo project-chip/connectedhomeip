@@ -154,7 +154,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 
     if (mWiFiStationMode != val)
     {
@@ -179,7 +179,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     {
         WifiInterface::GetInstance().ClearWifiCredentials();
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 }
 
@@ -197,16 +197,16 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
     ChipLogProgress(DeviceLayer, "_ON WIFI PROVISION CHANGE");
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    // TODO ICD
+    // TODO: The polling interval feature is not implemented on this platform. Return success to prevent spurious error logs from
+    // ICDManager. Revisit this once we complete the ICD integration
     (void) pollingInterval;
-    ChipLogError(DeviceLayer, "Set ICD Fast Polling on Silabs Wifi platform");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
@@ -224,7 +224,8 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         // Ensure that the Wifi task is started.
         CHIP_ERROR error = WifiInterface::GetInstance().StartWifiTask();
-        VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartWifiTask() failed: %s", ErrorStr(error)));
+        VerifyOrReturn(error == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "StartWifiTask() failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
         // Ensure that station mode is enabled in the WiFi layer.
         WifiInterface::GetInstance().ConfigureStationMode();
@@ -257,7 +258,8 @@ void ConnectivityManagerImpl::DriveStationState()
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
             CHIP_ERROR error = WifiInterface::GetInstance().TriggerDisconnection();
-            SuccessOrExitAction(error, ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", ErrorStr(error)));
+            SuccessOrExitAction(error,
+                                ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
@@ -329,7 +331,10 @@ exit:
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
+    NetworkCommissioning::SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+    // Cannot use the driver if the instance is not initialized.
+    VerifyOrDie(nwDriver != nullptr); // should never be null
+    nwDriver->OnConnectWiFiNetwork();
 
     UpdateInternetConnectivityState();
     // Alert other components of the new state.
@@ -362,7 +367,11 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
+
+        NetworkCommissioning::SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+        // Cannot use the driver if the instance is not initialized.
+        VerifyOrDie(nwDriver != nullptr); // should never be null
+        nwDriver->UpdateNetworkingStatus();
     }
 }
 
@@ -378,7 +387,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-        haveIPv4Conn = WifiInterface::GetIstance().HasAnIPv4Address();
+        haveIPv4Conn = WifiInterface::GetInstance().HasAnIPv4Address();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         haveIPv6Conn = WifiInterface::GetInstance().HasAnIPv6Address();
     }

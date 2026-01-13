@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -18,35 +19,43 @@ namespace AccountLogin {
 
 inline constexpr uint32_t kRevision = 2;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {
+
 namespace GetSetupPIN {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AccountLogin::Commands::GetSetupPIN::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    GetSetupPIN::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kAdminister);
 } // namespace GetSetupPIN
 namespace Login {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AccountLogin::Commands::Login::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    Login::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kAdminister);
 } // namespace Login
 namespace Logout {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = AccountLogin::Commands::Logout::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    Logout::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kOperate);
 } // namespace Logout
 
 } // namespace Commands
+
+namespace Events {
+namespace LoggedOut {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace LoggedOut
+
+} // namespace Events
 } // namespace AccountLogin
 } // namespace Clusters
 } // namespace app

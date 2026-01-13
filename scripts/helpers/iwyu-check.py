@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -28,14 +29,11 @@ from pathlib import Path
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 proj_root_dir = os.path.join(Path(root_dir).parent.parent)
@@ -46,6 +44,7 @@ def find_program(names):
         found = shutil.which(name)
         if found is not None:
             return found
+    return None
 
 
 @click.command()
@@ -94,7 +93,7 @@ def main(compile_commands_glob, source, mapping_file_dir,
     iwyu = find_program(('iwyu_tool', 'iwyu_tool.py'))
 
     if iwyu is None:
-        logging.error("Can't find IWYU")
+        log.error("Can't find IWYU")
         sys.exit(1)
 
     # For iterating how many files had problems with includes
@@ -104,7 +103,7 @@ def main(compile_commands_glob, source, mapping_file_dir,
     compile_commands_glob = glob.glob(compile_commands_glob)
 
     if not compile_commands_glob:
-        logging.error("Can't find compile_commands.json file(s)")
+        log.error("Can't find compile_commands.json file(s)")
         sys.exit(1)
 
     for compile_commands in compile_commands_glob:
@@ -112,8 +111,8 @@ def main(compile_commands_glob, source, mapping_file_dir,
         compile_commands_path = os.path.dirname(compile_commands)
         compile_commands_file = os.path.join(
             compile_commands_path, "compile_commands.json")
-        logging.debug("Copy compile command file %s to %s",
-                      compile_commands, compile_commands_file)
+        log.debug("Copy compile command file '%s' to '%s'",
+                  compile_commands, compile_commands_file)
 
         with contextlib.suppress(shutil.SameFileError):
             shutil.copyfile(compile_commands, compile_commands_file)
@@ -128,7 +127,7 @@ def main(compile_commands_glob, source, mapping_file_dir,
                 platform = find_re.group(1)
                 break
         if not platform:
-            logging.error("Can't find platform")
+            log.error("Can't find platform")
             sys.exit(1)
 
         if not mapping_file_dir:
@@ -156,43 +155,42 @@ def main(compile_commands_glob, source, mapping_file_dir,
             "-Xiwyu", "--mapping_file=" + mapping_file_dir + "/iwyu.imp",
         ] + platform_clang_args + [clang_args]
 
-        logging.info("Used compile commands: %s", compile_commands)
-        logging.info("Scanning includes for platform: %s", platform)
-        logging.info("Scanning sources(s): %s", ", ".join(source))
+        log.info("Used compile commands: '%s'", compile_commands)
+        log.info("Scanning includes for platform: '%s'", platform)
+        log.info("Scanning sources(s): '%s'", ", ".join(source))
 
-        logging.debug("Command: %s", " ".join(command_arr))
+        log.debug("Command: %s", shlex.join(command_arr))
         status = subprocess.Popen(" ".join(command_arr),
                                   shell=True,
                                   text=True,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
 
-        logging.info("============== IWYU output start  ================")
+        log.info("============== IWYU output start  ================")
 
-        logger = logging.info
+        logger = log.info
         for line in status.stdout:
             line = line.rstrip()
 
             if re.search(r"^warning:", line):
-                logger = logging.warning
+                logger = log.warning
             elif re.search(r"should (add|remove)? these lines:$", line):
-                logger = logging.warning
+                logger = log.warning
             elif re.search(r"has correct #includes/fwd-decls\)$", line):
-                logger = logging.info
+                logger = log.info
             elif re.search(r"^The full include-list for", line):
-                logger = logging.warning
+                logger = log.warning
                 warning_in_files += 1
 
-            logger("%s", line)
+            logger(line)
 
-        logging.info("============== IWYU output end  ================")
+        log.info("============== IWYU output end  ================")
 
     if warning_in_files:
-        logging.error("Number of files with include issues: %d",
-                      warning_in_files)
+        log.error("Number of files with include issues: %d", warning_in_files)
         sys.exit(2)
     else:
-        logging.info("Every include looks good!")
+        log.info("Every include looks good!")
 
 
 if __name__ == '__main__':

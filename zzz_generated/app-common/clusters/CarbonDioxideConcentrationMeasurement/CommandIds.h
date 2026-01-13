@@ -10,7 +10,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CarbonDioxideConcentrationMeasurement {
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 0;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
+} // namespace Commands
 } // namespace CarbonDioxideConcentrationMeasurement
 } // namespace Clusters
 } // namespace app

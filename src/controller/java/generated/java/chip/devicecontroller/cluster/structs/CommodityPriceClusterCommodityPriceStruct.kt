@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class CommodityPriceClusterCommodityPriceStruct(
   val periodStart: ULong,
   val periodEnd: ULong?,
-  val price: Optional<CommodityPriceClusterPriceStruct>,
+  val price: Optional<Long>,
   val priceLevel: Optional<Int>,
   val description: Optional<String>,
   val components: Optional<List<CommodityPriceClusterCommodityPriceComponentStruct>>,
@@ -54,7 +54,7 @@ class CommodityPriceClusterCommodityPriceStruct(
       }
       if (price.isPresent) {
         val optprice = price.get()
-        optprice.toTlv(ContextSpecificTag(TAG_PRICE), this)
+        put(ContextSpecificTag(TAG_PRICE), optprice)
       }
       if (priceLevel.isPresent) {
         val optpriceLevel = priceLevel.get()
@@ -96,9 +96,7 @@ class CommodityPriceClusterCommodityPriceStruct(
         }
       val price =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
-          Optional.of(
-            CommodityPriceClusterPriceStruct.fromTlv(ContextSpecificTag(TAG_PRICE), tlvReader)
-          )
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
         } else {
           Optional.empty()
         }

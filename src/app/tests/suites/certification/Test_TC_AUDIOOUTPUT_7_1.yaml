@@ -35,25 +35,28 @@ tests:
                 value: nodeId
 
     - label: "Step 1: TH reads the OutputList attribute"
-      PICS: AUDIOOUTPUT.S.A0000
       command: "readAttribute"
       attribute: "OutputList"
       response:
           constraints:
               type: list
 
+    - label: "Step 2: TH reads the CurrentOutput attribute from the DUT"
+      command: "readAttribute"
+      attribute: "CurrentOutput"
+      response:
+          value: Index
+
     - label:
-          "Step 2: TH sends a SelectAudioOutput command to the DUT with an index
+          "Step 3: TH sends a SelectAudioOutput command to the DUT with an index
           from the list in step 1"
-      PICS: AUDIOOUTPUT.S.C00.Rsp
       command: "SelectOutput"
       arguments:
           values:
               - name: "Index"
                 value: Index
 
-    - label: "Step 3: TH reads the CurrentOutput attribute from the DUT"
-      PICS: AUDIOOUTPUT.S.A0001 && AUDIOOUTPUT.S.C00.Rsp
+    - label: "Step 4: TH reads the CurrentOutput attribute from the DUT"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:

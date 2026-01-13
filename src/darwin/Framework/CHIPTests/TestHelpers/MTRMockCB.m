@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) CBPeripheralState state;
 @property (nonatomic, nullable, copy) NSDictionary<NSString *, id> * extraAdvertisementData;
-@property (nonatomic, copy) NSArray<CBUUID *> * services;
+@property (nonatomic, copy) NSArray<CBMutableService *> * serviceDetails;
 
 @end
 
@@ -81,6 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)_initWithDetails:(MTRMockCBPeripheralDetails *)details manager:(MTRMockCBCentralManager *)manager;
 
 @property (readonly, strong, nonatomic) MTRMockCBCentralManager * manager; // not API, but used by BlePlatformDelegateImpl via KVC
+@property (readonly, nonatomic) NSUInteger mtuLength; // not API, but used by BlePlatformDelegateImpl via KVC
 
 #pragma mark - CBPeer
 
@@ -226,6 +227,16 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     }
 }
 
+- (void)reportApiViolation:(NSString *)format, ... NS_FORMAT_FUNCTION(1, 2)
+{
+    // For now treat these as fatal. We could instead report to a callback.
+    va_list args;
+    va_start(args, format);
+    NSString * reason = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:reason userInfo:nil];
+}
+
 - (BOOL)isValid
 {
     __block BOOL result;
@@ -241,6 +252,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
         [_peripherals removeAllObjects];
         _onScanForPeripheralsWithServicesOptions = nil;
         _onStopScan = nil;
+        _onConnectPeripheralWithOptions = nil;
     }];
 }
 
@@ -289,7 +301,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 }
 
 - (void)addMockPeripheralWithIdentifier:(NSUUID *)identifier
-                               services:(nonnull NSArray<CBUUID *> *)services
+                               services:(NSArray<CBMutableService *> *)services
                       advertisementData:(nullable NSDictionary<NSString *, id> *)advertisementData
 {
     [self sync:^(BOOL isValid) {
@@ -299,7 +311,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
                 details = [[MTRMockCBPeripheralDetails alloc] initWithIdentifier:identifier];
                 _peripherals[identifier] = details;
             }
-            details.services = services;
+            details.serviceDetails = services;
             details.extraAdvertisementData = advertisementData;
 
             for (MTRMockCBCentralManager * manager in _managers) {
@@ -307,6 +319,19 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
             }
         }
     }];
+}
+
+- (void)addMockPeripheralWithIdentifier:(NSUUID *)identifier
+                           serviceUUIDs:(NSArray<CBUUID *> *)serviceUUIDs
+                      advertisementData:(nullable NSDictionary<NSString *, id> *)advertisementData
+{
+    NSMutableArray<CBMutableService *> * services = [[NSMutableArray alloc] initWithCapacity:serviceUUIDs.count];
+    BOOL primary = YES;
+    for (CBUUID * uuid in serviceUUIDs) {
+        [services addObject:[[CBMutableService alloc] initWithType:uuid primary:primary]];
+        primary = NO;
+    }
+    [self addMockPeripheralWithIdentifier:identifier services:services advertisementData:advertisementData];
 }
 
 - (void)addMockCommissionableMatterDeviceWithIdentifier:(NSUUID *)identifier
@@ -330,8 +355,20 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     };
     NSData * matterServiceData = [NSData dataWithBytes:serviceDataBytes length:sizeof(serviceDataBytes)];
 
-    [self addMockPeripheralWithIdentifier:[NSUUID UUID]
-                                 services:@[ matterServiceUUID ]
+    CBMutableService * matterService = [[CBMutableService alloc] initWithType:matterServiceUUID primary:YES];
+    matterService.characteristics = @[
+        [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"18ee2ef5-263d-4559-959f-4f9c429f9d11"]
+                                           properties:CBCharacteristicPropertyWrite
+                                                value:nil
+                                          permissions:0],
+        [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"18ee2ef5-263d-4559-959f-4f9c429f9d12"]
+                                           properties:CBCharacteristicPropertyIndicate
+                                                value:nil
+                                          permissions:0],
+    ];
+
+    [self addMockPeripheralWithIdentifier:identifier
+                                 services:@[ matterService ]
                         advertisementData:@{ CBAdvertisementDataServiceDataKey : @ { matterServiceUUID : matterServiceData } }];
 }
 
@@ -364,7 +401,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 {
     NSMutableDictionary * data = [[NSMutableDictionary alloc] init];
     data[CBAdvertisementDataLocalNameKey] = self.name;
-    data[CBAdvertisementDataServiceUUIDsKey] = self.services;
+    data[CBAdvertisementDataServiceUUIDsKey] = self.serviceUUIDs;
     data[CBAdvertisementDataIsConnectable] = @YES;
     if (_extraAdvertisementData) {
         [data addEntriesFromDictionary:_extraAdvertisementData];
@@ -372,17 +409,23 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     return [data copy];
 }
 
+- (NSArray<CBUUID *> *)serviceUUIDs
+{
+    NSMutableArray<CBUUID *> * uuids = [[NSMutableArray alloc] initWithCapacity:_serviceDetails.count];
+    for (CBMutableService * service in _serviceDetails) {
+        [uuids addObject:service.UUID];
+    }
+    return uuids;
+}
+
 - (BOOL)matchesAnyServices:(nullable NSArray<CBUUID *> *)serviceUUIDs
 {
     if (!serviceUUIDs) {
         return YES; // special case
     }
-    for (CBUUID * expected in serviceUUIDs) {
-        if ([self.services containsObject:expected]) {
-            return YES;
-        }
-    }
-    return NO;
+    NSSet<CBUUID *> * actual = [NSSet setWithArray:self.serviceUUIDs];
+    NSSet<CBUUID *> * expected = [NSSet setWithArray:serviceUUIDs];
+    return [actual intersectsSet:expected];
 }
 
 @end
@@ -391,6 +434,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 @package
     MTRMockCB * _mock; // retain cycle (broken by stopMocking)
     BOOL _initialized;
+    NSMapTable<NSUUID *, MTRMockCBPeripheral *> * _peripherals; // strong to weak
 
     id<CBCentralManagerDelegate> __weak _Nullable _delegate;
     dispatch_queue_t _delegateQueue;
@@ -463,6 +507,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 {
     XCTAssertFalse(_initialized);
     _initialized = YES;
+    _peripherals = [NSMapTable strongToWeakObjectsMapTable];
 
     _delegate = delegate;
     _delegateQueue = queue ?: dispatch_get_main_queue();
@@ -526,6 +571,27 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 
 - (void)connectPeripheral:(CBPeripheral *)peripheral options:(nullable NSDictionary<NSString *, id> *)options
 {
+    [_mock sync:^(BOOL isValid) {
+        if (isValid) {
+            MTRMockCBPeripheralDetails * details = [self _activeDetailsForPeripheral:peripheral];
+            if (!details || details.state != CBPeripheralStateDisconnected) {
+                return;
+            }
+
+            details.state = CBPeripheralStateConnecting;
+            __auto_type callback = _mock.onConnectPeripheralWithOptions;
+            if (callback && callback(peripheral, options)) {
+                details.state = CBPeripheralStateConnected;
+                if ([_delegate respondsToSelector:@selector(centralManager:didConnectPeripheral:)]) {
+                    os_log(_mock->_log, "%@ didConnectPeripheral %@", self, peripheral);
+                    dispatch_async(_delegateQueue, ^{
+                        [self->_delegate centralManager:(id) self
+                                   didConnectPeripheral:peripheral];
+                    });
+                }
+            }
+        }
+    }];
 }
 
 - (void)cancelPeripheralConnection:(CBPeripheral *)peripheral
@@ -546,12 +612,49 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     });
 }
 
+- (MTRMockCBPeripheral *)_peripheral:(MTRMockCBPeripheralDetails *)details
+{
+    // MTRMockCBPeripheralDetails is managed by the MTRMockCB and is valid for
+    // all (MTRMock)CBCentralManager instances, but (MTRMock)CBPeripheral is
+    // specific to each central manager, cache them in our weak map table.
+    NSUUID * identifier = details.identifier;
+    MTRMockCBPeripheral * peripheral = [_peripherals objectForKey:identifier];
+    if (!peripheral) {
+        peripheral = [[MTRMockCBPeripheral alloc] _initWithDetails:details manager:self];
+        [_peripherals setObject:peripheral forKey:identifier];
+    }
+    return peripheral;
+}
+
+- (nullable MTRMockCBPeripheralDetails *)_activeDetailsForPeripheral:(nullable CBPeripheral *)peripheral
+{
+    if (!peripheral) {
+        [_mock reportApiViolation:@"Passed a nil CBPeripheral"];
+        return nil;
+    }
+
+    if (![peripheral isKindOfClass:MTRMockCBPeripheral.class]) {
+        [_mock reportApiViolation:@"Passed a foreign (non-mock) CBPeripheral %@", peripheral];
+        return nil;
+    }
+
+    MTRMockCBPeripheral * mockPeripheral = (id) peripheral;
+    MTRMockCBCentralManager * manager = mockPeripheral.manager;
+    if (manager != self) {
+        [_mock reportApiViolation:@"Passed a peripheral %@ belonging to manager %@ rather than %@",
+               mockPeripheral, manager, self];
+        return nil;
+    }
+
+    // Look up details via identifier to ensure the peripheral has not been removed
+    return _mock->_peripherals[mockPeripheral.identifier];
+}
+
 - (void)_maybeDiscoverPeripheral:(MTRMockCBPeripheralDetails *)details
 {
     if (_isScanning && [details matchesAnyServices:_scanServiceUUIDs] &&
         [_delegate respondsToSelector:@selector(centralManager:didDiscoverPeripheral:advertisementData:RSSI:)]) {
-        // TODO: Cache CBPeripheral mocks as long as the client keeps them alive?
-        MTRMockCBPeripheral * peripheral = [[MTRMockCBPeripheral alloc] _initWithDetails:details manager:self];
+        MTRMockCBPeripheral * peripheral = [self _peripheral:details];
         NSDictionary<NSString *, id> * advertisementData = details.advertisementData;
         os_log(_mock->_log, "%@ didDiscoverPeripheral %@", self, peripheral);
         dispatch_async(_delegateQueue, ^{
@@ -590,6 +693,11 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
         result = [NSString stringWithFormat:@"<%@ %p %@ %@>", self.class, self, self.identifier, isValid ? @"valid" : @"defunct"];
     }];
     return result;
+}
+
+- (NSUInteger)mtuLength
+{
+    return 15;
 }
 
 #pragma mark - CBPeer <NSCopying>
@@ -633,7 +741,20 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 
 - (nullable NSArray<CBService *> *)services
 {
-    return nil;
+    // Just return the CBMutableService instances directly for now.
+    // They don't hold the expected back reference to our peripheral,
+    // but this is good enough for our current mocking needs.
+    return _details.serviceDetails;
+}
+
+- (BOOL)canSendWriteWithoutResponse
+{
+    return YES; // ?
+}
+
+- (BOOL)ancsAuthorized
+{
+    return NO;
 }
 
 - (void)readRSSI
@@ -642,6 +763,16 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 
 - (void)discoverServices:(nullable NSArray<CBUUID *> *)serviceUUIDs
 {
+    [_manager->_mock sync:^(BOOL isValid) {
+        if (isValid &&
+            [_details matchesAnyServices:serviceUUIDs] &&
+            [_delegate respondsToSelector:@selector(peripheral:didDiscoverServices:)]) {
+            os_log(_manager->_mock->_log, "%@ didDiscoverServices", self);
+            dispatch_async(_manager->_delegateQueue, ^{
+                [self->_delegate peripheral:(id) self didDiscoverServices:nil];
+            });
+        }
+    }];
 }
 
 - (void)discoverIncludedServices:(nullable NSArray<CBUUID *> *)includedServiceUUIDs forService:(CBService *)service
@@ -650,6 +781,15 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 
 - (void)discoverCharacteristics:(nullable NSArray<CBUUID *> *)characteristicUUIDs forService:(CBService *)service
 {
+    // We don't actually keep track of what characteristics have been discovered
+    [_manager->_mock sync:^(BOOL isValid) {
+        if (isValid && [_delegate respondsToSelector:@selector(peripheral:didDiscoverCharacteristicsForService:error:)]) {
+            os_log(_manager->_mock->_log, "%@ didDiscoverCharacteristicsForService %@", self, service);
+            dispatch_async(_manager->_delegateQueue, ^{
+                [self->_delegate peripheral:(id) self didDiscoverCharacteristicsForService:service error:nil];
+            });
+        }
+    }];
 }
 
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic
@@ -663,6 +803,14 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 
 - (void)writeValue:(NSData *)data forCharacteristic:(CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type
 {
+    [_manager->_mock sync:^(BOOL isValid) {
+        if (isValid) {
+            __auto_type callback = _manager->_mock.onWriteValueForCharacteristic;
+            if (callback) {
+                callback((id) self, data, (id) characteristic, type);
+            }
+        }
+    }];
 }
 
 - (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic

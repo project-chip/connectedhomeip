@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #include <thermostat-delegate-impl.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -26,19 +27,34 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace System::Clock;
 
 ThermostatDelegate ThermostatDelegate::sInstance;
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets                   = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList        = 0;
-    mNextFreeIndexInPendingPresetsList = 0;
+    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
+    mNextFreeIndexInPresetsList                 = 0;
+    mNextFreeIndexInPendingPresetsList          = 0;
+    mMaxThermostatSuggestions                   = kMaxNumberOfThermostatSuggestions;
+    mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
+    mNextFreeIndexInThermostatSuggestionsList   = 0;
+    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
+
+    // Start the unique ID from 0 and it increases montonically.
+    mUniqueID = 0;
 
     InitializePresets();
 
+    InitializeScheduleTypes();
+
     memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
+}
+
+ThermostatDelegate::~ThermostatDelegate()
+{
+    CancelExpirationTimer();
 }
 
 void ThermostatDelegate::InitializePresets()
@@ -54,8 +70,8 @@ void ThermostatDelegate::InitializePresets()
 
         // Set the preset handle to the preset scenario value as a unique id.
         const uint8_t handle[] = { static_cast<uint8_t>(presetScenario) };
-        mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-        mPresets[index].SetName(NullOptional);
+        TEMPORARY_RETURN_IGNORED mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+        TEMPORARY_RETURN_IGNORED mPresets[index].SetName(NullOptional);
         int16_t coolingSetpointValue = static_cast<int16_t>(2500 + (index * 100));
         mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
 
@@ -191,7 +207,8 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithO
             // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
             // each type are supported.
             const uint8_t handle[] = { static_cast<uint8_t>(preset.GetPresetScenario()) };
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+            TEMPORARY_RETURN_IGNORED mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(
+                DataModel::MakeNullable(ByteSpan(handle)));
         }
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
@@ -224,4 +241,273 @@ CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
 void ThermostatDelegate::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
+}
+
+uint8_t ThermostatDelegate::GetMaxThermostatSuggestions()
+{
+    return mMaxThermostatSuggestions;
+}
+
+uint8_t ThermostatDelegate::GetNumberOfThermostatSuggestions()
+{
+    return mNextFreeIndexInThermostatSuggestionsList;
+}
+
+CHIP_ERROR ThermostatDelegate::GetThermostatSuggestionAtIndex(size_t index,
+                                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
+{
+    if (index < mNextFreeIndexInThermostatSuggestionsList)
+    {
+        thermostatSuggestion = mThermostatSuggestions[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+void ThermostatDelegate::GetCurrentThermostatSuggestion(
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion)
+{
+    if (mIndexOfCurrentSuggestion < mNextFreeIndexInThermostatSuggestionsList)
+    {
+        currentThermostatSuggestion.SetNonNull(mThermostatSuggestions[mIndexOfCurrentSuggestion]);
+    }
+    else
+    {
+        currentThermostatSuggestion.SetNull();
+    }
+}
+
+DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> ThermostatDelegate::GetThermostatSuggestionNotFollowingReason()
+{
+    return mThermostatSuggestionNotFollowingReason;
+}
+
+CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
+    const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason)
+{
+    bool hasChanged = (mThermostatSuggestionNotFollowingReason != thermostatSuggestionNotFollowingReason);
+
+    if (hasChanged)
+    {
+        mThermostatSuggestionNotFollowingReason = thermostatSuggestionNotFollowingReason;
+        MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ThermostatSuggestionNotFollowingReason::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatDelegate::SetCurrentThermostatSuggestion(size_t index)
+{
+    // The MaxThermostatSuggestions attribute value is used as an index to set the current thermostat suggestion to null. Hence the
+    // <= check below.
+    if (index <= GetMaxThermostatSuggestions())
+    {
+        bool hasChanged = (mIndexOfCurrentSuggestion != index);
+        if (hasChanged)
+        {
+            mIndexOfCurrentSuggestion = index;
+            MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::CurrentThermostatSuggestion::Id);
+        }
+    }
+}
+
+CHIP_ERROR
+ThermostatDelegate::AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion)
+{
+    if (mNextFreeIndexInThermostatSuggestionsList < MATTER_ARRAY_SIZE(mThermostatSuggestions))
+    {
+        mThermostatSuggestions[mNextFreeIndexInThermostatSuggestionsList++] = thermostatSuggestion;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(size_t indexToRemove)
+{
+    if (indexToRemove >= GetNumberOfThermostatSuggestions())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Shift elements to the left to fill the gap.
+    for (size_t index = indexToRemove; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList - 1); index++)
+    {
+        mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
+    }
+    if (indexToRemove == mIndexOfCurrentSuggestion)
+    {
+        CancelExpirationTimer();
+        SetCurrentThermostatSuggestion(GetMaxThermostatSuggestions());
+    }
+    mNextFreeIndexInThermostatSuggestionsList--;
+    return CHIP_NO_ERROR;
+}
+
+bool ThermostatDelegate::HaveSuggestionWithID(uint8_t uniqueIDToFind)
+{
+    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
+    {
+        if (uniqueIDToFind == suggestion.GetUniqueID())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
+{
+    uint8_t maxUniqueId = 0;
+
+    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
+    {
+        uint8_t existingUniqueID = suggestion.GetUniqueID();
+        if (existingUniqueID > maxUniqueId)
+        {
+            maxUniqueId = existingUniqueID;
+        }
+    }
+
+    uniqueID = maxUniqueId + 1;
+
+    // If overflow occurs, check for next available uniqueID.
+    if (uniqueID == 0)
+    {
+        while (HaveSuggestionWithID(uniqueID))
+        {
+            uniqueID++;
+            if (uniqueID == UINT8_MAX)
+            {
+                return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+            }
+        };
+    }
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief Starts a timer to wait for the expiration of the current thermostat suggestion.
+ *
+ * @param[in] timeoutInSecs The timeout in seconds.
+ */
+CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeout)
+{
+    ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
+                    timeout.count());
+    mIsExpirationTimerRunning = true;
+    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeout), TimerExpiredCallback,
+                                                 static_cast<void *>(this));
+}
+
+void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void * appState)
+{
+    auto ctx = static_cast<ThermostatDelegate *>(appState);
+    if (ctx == nullptr)
+    {
+        ChipLogError(Zcl, "TimerExpiredCallback: Failed to ReEvaluateCurrentSuggestion since context is null");
+        return;
+    }
+    TEMPORARY_RETURN_IGNORED ctx->ReEvaluateCurrentSuggestion();
+}
+
+void ThermostatDelegate::CancelExpirationTimer()
+{
+    if (mIsExpirationTimerRunning)
+    {
+        ChipLogProgress(Zcl, "Cancelling expiration timer for the current thermostat suggestion");
+        DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(this));
+        mIsExpirationTimerRunning = false;
+    }
+}
+
+CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
+{
+    CancelExpirationTimer();
+
+    uint32_t currentMatterEpochTimestampInSeconds = 0;
+    CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    Seconds32 currentMatterEpochTimestamp = Seconds32(currentMatterEpochTimestampInSeconds);
+
+    // For the reference thermostat app, we will always choose a suggestion with the earliest effective time.
+    mIndexOfCurrentSuggestion = GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestamp);
+    SetCurrentThermostatSuggestion(mIndexOfCurrentSuggestion);
+
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> nullableCurrentThermostatSuggestion;
+    GetCurrentThermostatSuggestion(nullableCurrentThermostatSuggestion);
+
+    if (!nullableCurrentThermostatSuggestion.IsNull())
+    {
+
+        ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
+
+        // TODO: Check if a hold is set and set the ThermostatSuggestionNotFollowingReason to OngoingHold and do not update
+        // ActivePresetHandle. Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set
+        // ThermostatSuggestionNotFollowingReason to null.
+        TEMPORARY_RETURN_IGNORED SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
+        MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
+        TEMPORARY_RETURN_IGNORED SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
+
+        // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
+        if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestamp)
+        {
+            TEMPORARY_RETURN_IGNORED StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() -
+                                                          currentMatterEpochTimestamp);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime(Seconds32 currentMatterEpochTimestamp)
+{
+    uint8_t maxThermostatSuggestions = GetMaxThermostatSuggestions();
+    VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
+
+    Seconds32 minEffectiveTimeValue        = Seconds32(UINT32_MAX);
+    size_t minEffectiveTimeSuggestionIndex = maxThermostatSuggestions;
+
+    for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)
+    {
+        ThermostatSuggestionStructWithOwnedMembers suggestion;
+        CHIP_ERROR err = GetThermostatSuggestionAtIndex(index, suggestion);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, maxThermostatSuggestions);
+
+        // Check for the least effective time that is less than the current timestamp.
+        Seconds32 effectiveTime = suggestion.GetEffectiveTime();
+        if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestamp)
+        {
+            minEffectiveTimeValue           = effectiveTime;
+            minEffectiveTimeSuggestionIndex = index;
+        }
+    }
+    return minEffectiveTimeSuggestionIndex;
+}
+
+void ThermostatDelegate::InitializeScheduleTypes()
+{
+    static_assert(MATTER_ARRAY_SIZE(mScheduleTypes) == 2);
+
+    mScheduleTypes[0] = { .systemMode           = SystemModeEnum::kHeat,
+                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
+                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
+
+    mScheduleTypes[1] = { .systemMode           = SystemModeEnum::kCool,
+                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
+                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
+}
+
+CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
+{
+    if (index < MATTER_ARRAY_SIZE(mScheduleTypes))
+    {
+        scheduleType = mScheduleTypes[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }

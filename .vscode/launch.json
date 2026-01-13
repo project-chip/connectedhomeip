@@ -47,9 +47,94 @@
             "name": "Run application (Darwin x64)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/${input:outAppDarwin}",
-            "args": [],
+            "program": "${workspaceFolder}/examples/chip-tool/out/debug/chip-tool",
+            "args": [
+                "--storage-directory",
+                "./storage",
+                "interactive",
+                "start"
+            ],
+            "cwd": "${workspaceFolder}/examples/chip-tool/out/debug"
+        },
+        {
+            "name": "Run mdns-advertiser product-id 1 (Linux x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/minimal-mdns/out/debug/mdns-advertiser",
+            "args": [
+                "-4",
+                "-m",
+                "commissionable-node",
+                "--vendor-id",
+                "4381",
+                "--product-id",
+                "1",
+                "--device-type",
+                "144",
+                "--commissioning-mode",
+                "0"
+            ],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run TestFabricTable",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/out/test/tests/TestFabricTable",
+            "cwd": "${workspaceFolder}/src/credentials/tests/out/test/tests"
+        },
+        {
+            "name": "Run TestJCMCommissioner",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestJCMCommissioner",
+            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestTrustVerification",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestVendorIdVerificationClient",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestVendorIdVerificationClient",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestCommissioningWindowManager",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/app/tests/out/test/tests/TestCommissioningWindowManager",
+            "cwd": "${workspaceFolder}/src/app/tests/out/test/tests"
+        },
+        {
+            "name": "Run TestCommands",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestCommands",
+            "cwd": "${workspaceFolder}/src/controller/tests/out/test/tests"
+        },
+        {
+            "name": "Run application (valgrind jfc-app)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "valgrind",
+            "args": [
+                "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+                "--rpc-server-ip",
+                "192.168.1.64",
+                "--rpc-server-port",
+                "33055",
+                "--storage-directory",
+                "./jfc_b_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF2"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
         },
         {
             "name": "Run application (Linux x64)",
@@ -67,7 +152,6 @@
             "args": [],
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Run pw FuzzTest (Linux x64) UnitTest Mode",
             "type": "cppdbg",
@@ -75,7 +159,6 @@
             "program": "${workspaceFolder}/out/${input:outPWFuzzTestLinux}",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Run pw FuzzTest (Linux x64) Continuous Fuzzing Mode",
             "type": "cppdbg",
@@ -85,7 +168,6 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": ""
         },
-
         {
             "name": "QRCode Tests",
             "type": "cppdbg",
@@ -179,273 +261,6 @@
                 }
             ]
         },
-
-        {
-            "name": "Debug Mbed examples",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
-            "servertype": "openocd",
-            "searchDir": [
-                "${workspaceRoot}/config/mbed/scripts",
-                "${env:OPENOCD_PATH}/scripts"
-            ],
-            "configFiles": ["${input:mbedTarget}.tcl"],
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "monitor program {./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex}",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "numberOfProcessors": 2,
-            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
-            "overrideRestartCommands": [
-                "monitor reset init",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "runToMain": true, // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Debug Mbed examples [remote]",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "external",
-            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "monitor reset halt",
-                "load ./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "overrideRestartCommands": [
-                "monitor reset init",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "runToMain": true, // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Flash Mbed examples",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
-            "servertype": "openocd",
-            "searchDir": [
-                "${workspaceRoot}/config/mbed/scripts",
-                "${env:OPENOCD_PATH}/scripts"
-            ],
-            "configFiles": ["${input:mbedTarget}.tcl"],
-            "overrideLaunchCommands": [
-                "monitor reset halt",
-                "monitor program {./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex}",
-                "monitor reset run",
-                "quit"
-            ],
-            "numberOfProcessors": 2,
-            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Flash Mbed examples [remote]",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "external",
-            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
-            "overrideLaunchCommands": [
-                "monitor reset halt",
-                "load ./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
-                "monitor reset run",
-                "quit"
-            ],
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Debug Mbed unit tests",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
-            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "openocd",
-            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
-            "searchDir": [
-                "${workspaceRoot}/config/mbed/scripts",
-                "${env:OPENOCD_PATH}/scripts"
-            ],
-            "configFiles": ["${input:mbedTarget}.tcl"],
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "monitor program {./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.hex}",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "numberOfProcessors": 2,
-            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
-            "overrideRestartCommands": [
-                "monitor reset init",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "runToMain": true, // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Debug Mbed unit tests [remote]",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
-            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "external",
-            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "monitor reset halt",
-                "load ./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.hex",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "overrideRestartCommands": [
-                "monitor reset init",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "runToMain": true, // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Flash Mbed unit tests",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed//unit_tests",
-            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "openocd",
-            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
-            "searchDir": [
-                "${workspaceRoot}/config/mbed/scripts",
-                "${env:OPENOCD_PATH/scripts}"
-            ],
-            "configFiles": ["${input:mbedTarget}.tcl"],
-            "overrideLaunchCommands": [
-                "monitor reset halt",
-                "monitor program {./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.hex}",
-                "monitor reset run",
-                "quit"
-            ],
-            "numberOfProcessors": 2,
-            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Flash Mbed unit tests [remote]",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
-            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "external",
-            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
-            "overrideLaunchCommands": [
-                "monitor reset halt",
-                "load ./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.hex",
-                "monitor reset run",
-                "quit"
-            ],
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Debug Mbed bootloader",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/platform/mbed/bootloader",
-            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "openocd",
-            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
-            "searchDir": [
-                "${workspaceRoot}/config/mbed/scripts",
-                "${env:OPENOCD_PATH}/scripts"
-            ],
-            "configFiles": ["${input:mbedTarget}.tcl"],
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "monitor program {./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.hex}",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "numberOfProcessors": 2,
-            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
-            "overrideRestartCommands": [
-                "monitor reset init",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "runToMain": true, // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
-        {
-            "name": "Debug Mbed bootloader [remote]",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/platform/mbed/bootloader",
-            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
-            "servertype": "external",
-            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "monitor reset halt",
-                "load ./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.hex",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "overrideRestartCommands": [
-                "monitor reset init",
-                "monitor reset run",
-                "monitor sleep 200",
-                "monitor psoc6 reset_halt sysresetreq"
-            ],
-            "runToMain": true, // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-        },
-
         {
             "name": "CHIP All Clusters App (Linux)",
             "type": "lldb",
@@ -453,7 +268,6 @@
             "program": "${workspaceFolder}/out/debug/standalone/chip-all-clusters-app",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Fabric Admin (Linux)",
             "type": "lldb",
@@ -462,7 +276,6 @@
             "args": ["--log-file-path", "/tmp/fabric_admin.log"],
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Fabric Bridge App (Linux)",
             "type": "lldb",
@@ -470,7 +283,6 @@
             "program": "${workspaceFolder}/out/debug/standalone/fabric-bridge-app",
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "Fabric Sync (Linux)",
             "type": "lldb",
@@ -478,7 +290,82 @@
             "program": "${workspaceFolder}/out/debug/standalone/fabric-sync",
             "cwd": "${workspaceFolder}"
         },
-
+        {
+            "name": "Joint Fabric (JFA-A)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug/jfa-app",
+            "args": [
+                "--capabilities",
+                "0x4",
+                "--passcode",
+                "11022033",
+                "--discriminator",
+                "3840",
+                "--secured-device-port",
+                "5533",
+                "--rpc-server-port",
+                "33033",
+                "--KVS",
+                "jfa_a_kvs"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug"
+        },
+        {
+            "name": "Joint Fabric (JFC-A)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "127.0.0.1",
+                "--rpc-server-port",
+                "33033",
+                "--storage-directory",
+                "./jfc_a_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF1"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
+        {
+            "name": "Joint Fabric (JFA-B)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug/jfa-app",
+            "args": [
+                "--capabilities",
+                "0x4",
+                "--passcode",
+                "11022055",
+                "--discriminator",
+                "3841",
+                "--secured-device-port",
+                "5555",
+                "--rpc-server-port",
+                "33055",
+                "--KVS",
+                "jfa_b_kvs"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-admin-app/linux/out/debug"
+        },
+        {
+            "name": "Joint Fabric (JFC-B)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/jf-control-app/out/debug/jfc-app",
+            "args": [
+                "--rpc-server-ip",
+                "127.0.0.1",
+                "--rpc-server-port",
+                "33055",
+                "--storage-directory",
+                "./jfc_b_storage_directory",
+                "--commissioner-vendor-id",
+                "0xFFF2"
+            ],
+            "cwd": "${workspaceFolder}/examples/jf-control-app/out/debug"
+        },
         {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
@@ -494,7 +381,6 @@
             ],
             "cwd": "${workspaceFolder}"
         },
-
         {
             "name": "OTA Provider App (Linux)",
             "type": "lldb",
@@ -509,47 +395,6 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
-        },
-
-        {
-            "name": "Debug Open IoT SDK example application",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/examples/${input:openiotsdkExample}/openiotsdk",
-            "executable": "./build/chip-openiotsdk-${input:openiotsdkExample}-example.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
-            "servertype": "external",
-            "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "add-symbol-file ./build/bl2.elf 0x10000000",
-                "add-symbol-file ./build/tfm_s.elf 0x38000400",
-                "add-symbol-file ./build/chip-openiotsdk-${input:openiotsdkExample}-example_ns.elf 0x28060400",
-                "break main_ns.cpp:main"
-            ],
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Debug Open IoT SDK example",
-            "showDevDebugOutput": "parsed"
-        },
-        {
-            "name": "Debug Open IoT SDK unit-tests application",
-            "type": "cortex-debug",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
-            "executable": "./build/${input:openiotsdkUnitTest}.elf",
-            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
-            "servertype": "external",
-            "gdbTarget": ":31627", //GDBserver port on FVP
-            "overrideLaunchCommands": [
-                "-enable-pretty-printing",
-                "add-symbol-file ./build/bl2.elf 0x10000000",
-                "add-symbol-file ./build/tfm_s.elf 0x38000400",
-                "add-symbol-file ./build/${input:openiotsdkUnitTest}_ns.elf 0x28060400",
-                "break main_ns.cpp:main"
-            ],
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Debug Open IoT SDK unit-tests",
-            "showDevDebugOutput": "parsed"
         },
         {
             "name": "Zephyr native tests",
@@ -569,6 +414,41 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "Run TestFabricTable",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/out/test/tests/TestFabricTable",
+            "cwd": "${workspaceFolder}/src/credentials/tests/out/test/tests"
+        },
+        {
+            "name": "Run TestJCMCommissioner",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests/TestJCMCommissioner",
+            "cwd": "${workspaceFolder}/src/controller/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestTrustVerification",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestTrustVerification",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestVendorIdVerificationClient",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests/TestVendorIdVerificationClient",
+            "cwd": "${workspaceFolder}/src/credentials/tests/jcm/out/test/tests"
+        },
+        {
+            "name": "Run TestCommands",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/controller/tests/out/test/tests/TestCommands",
+            "cwd": "${workspaceFolder}/src/controller/tests/out/test/tests"
         }
     ],
     "inputs": [
@@ -615,65 +495,6 @@
             "args": {
                 "command": "./out/${input:outPWFuzzTestLinux} --list_fuzz_tests | grep 'Fuzz test:' | awk -F ': ' '{print $2}'",
                 "description": "Select the specific FuzzTest to fuzz continuously"
-            }
-        },
-        {
-            "type": "pickString",
-            "id": "mbedDebugProfile",
-            "description": "What mbed profile do you want to debug?",
-            "options": ["debug", "develop"],
-            "default": "debug"
-        },
-        {
-            "type": "pickString",
-            "id": "mbedFlashProfile",
-            "description": "What mbed profile do you want to flash?",
-            "options": ["release", "debug", "develop"],
-            "default": "release"
-        },
-        {
-            "type": "pickString",
-            "id": "mbedApp",
-            "description": "What mbed application do you want to use?",
-            "options": [
-                "lock-app",
-                "lighting-app",
-                "pigweed-app",
-                "all-clusters-app",
-                "shell",
-                "ota-requestor-app"
-            ],
-            "default": "lock-app"
-        },
-        {
-            "type": "pickString",
-            "id": "mbedTarget",
-            "description": "What mbed target do you want to use?",
-            "options": ["CY8CPROTO_062_4343W"],
-            "default": "CY8CPROTO_062_4343W"
-        },
-        {
-            "type": "command",
-            "id": "openiotsdkExample",
-            "command": "shellCommand.execute",
-            "args": {
-                "command": "cat examples/platform/openiotsdk/supported_examples.txt",
-                "description": "What Open IoT SDK example application do you want to use?"
-            }
-        },
-        {
-            "type": "promptString",
-            "id": "openiotsdkRemoteHost",
-            "description": "Type the hostname/IP address of external GDB target that you want to connect to. Leave blank for internal GDB server",
-            "default": ""
-        },
-        {
-            "type": "command",
-            "id": "openiotsdkUnitTest",
-            "command": "shellCommand.execute",
-            "args": {
-                "command": "cat src/test_driver/openiotsdk/unit-tests/test_components.txt",
-                "description": "What Open IoT SDK unit test application do you want to use?"
             }
         }
     ]

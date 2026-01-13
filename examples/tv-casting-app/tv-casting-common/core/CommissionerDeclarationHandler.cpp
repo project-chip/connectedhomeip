@@ -54,7 +54,7 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), calling CloseCommissioningWindow()");
         // Close the commissioning window.
         chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        support::ChipDeviceEventHandler::SetUdcStatus(false);
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
@@ -65,7 +65,7 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                         "CastingPlayer/Commissioner user has decided to exit the commissioning attempt. Connection aborted.");
         // Close the commissioning window.
         chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        support::ChipDeviceEventHandler::SetUdcStatus(false);
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
         // Since the CastingPlayer/Commissioner user has decided to exit the commissioning process, we cancel the ongoing
         // connection attempt without notifying the CastingPlayer/Commissioner. Therefore the
         // shouldSendIdentificationDeclarationMessage flag in the internal StopConnecting() API call is set to false. The

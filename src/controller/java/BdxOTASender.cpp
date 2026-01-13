@@ -62,7 +62,7 @@ CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeMa
     VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
+    TEMPORARY_RETURN_IGNORED exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 
     mSystemLayer = systemLayer;
     mExchangeMgr = exchangeMgr;
@@ -75,7 +75,7 @@ CHIP_ERROR BdxOTASender::Shutdown()
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+    TEMPORARY_RETURN_IGNORED mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
     ResetState();
 
     mExchangeMgr = nullptr;

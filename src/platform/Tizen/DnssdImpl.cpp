@@ -92,7 +92,7 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
         ChipLogError(DeviceLayer, "DNSsd %s: Error: %s", __func__, get_error_message(result));
         rCtx->mCallback(rCtx->mCbContext, nullptr, nullptr, TizenToChipError(result));
         // After this point, the context might be no longer valid
-        rCtx->mInstance->RemoveContext(rCtx);
+        TEMPORARY_RETURN_IGNORED rCtx->mInstance->RemoveContext(rCtx);
         return;
     }
 
@@ -120,7 +120,7 @@ gboolean OnBrowseTimeout(void * userData)
     bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), true, CHIP_NO_ERROR);
 
     // After this point the context might be no longer valid
-    bCtx->mInstance->RemoveContext(bCtx);
+    TEMPORARY_RETURN_IGNORED bCtx->mInstance->RemoveContext(bCtx);
 
     // This is a one-shot timer
     return G_SOURCE_REMOVE;
@@ -213,7 +213,7 @@ exit:
     {
         bCtx->mCallback(bCtx->mCbContext, nullptr, 0, true, TizenToChipError(ret));
         // After this point the context might be no longer valid
-        bCtx->mInstance->RemoveContext(bCtx);
+        TEMPORARY_RETURN_IGNORED bCtx->mInstance->RemoveContext(bCtx);
     }
 }
 
@@ -336,7 +336,8 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         err == CHIP_NO_ERROR,
         ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen, reinterpret_cast<void **>(&rCtx->mResultTxtRecord));
+    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen,
+                                           reinterpret_cast<void **>(&rCtx->mResultTxtRecord.GetReceiver()));
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed: %s", get_error_message(ret)));
 
@@ -346,7 +347,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         ChipLogProgress(DeviceLayer, "DNSsd Handle resolve task on schedule lambda");
 
         rCtx->Finalize(CHIP_NO_ERROR);
-        rCtx->mInstance->RemoveContext(rCtx);
+        TEMPORARY_RETURN_IGNORED rCtx->mInstance->RemoveContext(rCtx);
     });
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "Failed to schedule resolve task: %" CHIP_ERROR_FORMAT, err.Format()));
@@ -355,7 +356,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
 
 exit:
     rCtx->Finalize(ret != DNSSD_ERROR_NONE ? TizenToChipError(ret) : err);
-    rCtx->mInstance->RemoveContext(rCtx);
+    TEMPORARY_RETURN_IGNORED rCtx->mInstance->RemoveContext(rCtx);
 }
 
 CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
@@ -462,11 +463,6 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
     mCbContext = context;
 }
 
-ResolveContext::~ResolveContext()
-{
-    g_free(mResultTxtRecord);
-}
-
 void ResolveContext::Finalize(CHIP_ERROR error)
 {
     ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
@@ -474,7 +470,7 @@ void ResolveContext::Finalize(CHIP_ERROR error)
     VerifyOrReturn(error == CHIP_NO_ERROR, mCallback(mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), error));
 
     std::vector<chip::Dnssd::TextEntry> textEntries;
-    GetTextEntries(mResultTxtRecordLen, mResultTxtRecord, textEntries);
+    GetTextEntries(mResultTxtRecordLen, reinterpret_cast<uint8_t *>(mResultTxtRecord.get()), textEntries);
     mResult.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     mResult.mTextEntrySize = textEntries.size();
 
@@ -589,7 +585,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
         callback(context, nullptr, nullptr, err);
-        RemoveContext(serviceCtx);
+        TEMPORARY_RETURN_IGNORED RemoveContext(serviceCtx);
     }
     return err;
 }
@@ -628,7 +624,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
         callback(context, nullptr, 0, true, err);
-        RemoveContext(browseCtx);
+        TEMPORARY_RETURN_IGNORED RemoveContext(browseCtx);
     }
     return err;
 }
@@ -650,7 +646,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
 
 exit:
     if (err != CHIP_NO_ERROR)
-        RemoveContext(resolveCtx);
+        TEMPORARY_RETURN_IGNORED RemoveContext(resolveCtx);
     return err;
 }
 
@@ -745,7 +741,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
     {
-        DeviceLayer::ThreadStackMgr().InvalidateAllSrpServices();
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ThreadStackMgr().InvalidateAllSrpServices();
         return DeviceLayer::ThreadStackMgr().RemoveInvalidSrpServices();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

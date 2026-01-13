@@ -20,7 +20,7 @@
 #include <AppMain.h>
 #include <CommissionerMain.h>
 #include <app/server/Server.h>
-#include <bridge/include/FabricBridge.h>
+#include <bridge/FabricBridge.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 
 using namespace ::chip;
@@ -80,8 +80,8 @@ CHIP_ERROR
 FabricAdmin::CommissionRemoteBridge(Controller::CommissioningWindowPasscodeParams params, VendorId vendorId, uint16_t productId)
 {
     char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
-    Encoding::BytesToHex(params.GetSalt().data(), params.GetSalt().size(), saltHex, sizeof(saltHex),
-                         Encoding::HexFlags::kNullTerminate);
+    ReturnErrorOnFailure(Encoding::BytesToHex(params.GetSalt().data(), params.GetSalt().size(), saltHex, sizeof(saltHex),
+                                              Encoding::HexFlags::kNullTerminate));
 
     ChipLogProgress(NotSpecified, "Received CommissionNode request");
 
@@ -135,8 +135,7 @@ CHIP_ERROR FabricAdmin::KeepActive(ScopedNodeId scopedNodeId, uint32_t stayActiv
     KeepActiveWorkData * data = Platform::New<KeepActiveWorkData>(this, scopedNodeId, stayActiveDurationMs, timeoutMs);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
 }
 
 void FabricAdmin::OnCheckInCompleted(const app::ICDClientInfo & clientInfo)
@@ -169,7 +168,7 @@ void FabricAdmin::OnCheckInCompleted(const app::ICDClientInfo & clientInfo)
     // command that there was a failure, we simply fail silently. After spec issue is
     // addressed, we can implement what spec defines here.
     auto onDone = [=](uint32_t promisedActiveDuration) {
-        bridge::FabricBridge::Instance().ActiveChanged(scopedNodeId, promisedActiveDuration);
+        TEMPORARY_RETURN_IGNORED bridge::FabricBridge::Instance().ActiveChanged(scopedNodeId, promisedActiveDuration);
     };
     CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                              app::InteractionModelEngine::GetInstance(), onDone);

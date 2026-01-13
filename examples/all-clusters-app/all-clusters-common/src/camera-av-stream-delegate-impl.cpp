@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <camera-av-stream-delegate-impl.h>
 #include <fstream>
 #include <iostream>
@@ -33,6 +33,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Globals;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using chip::Protocols::InteractionModel::Status;
 
@@ -40,7 +41,7 @@ using chip::Protocols::InteractionModel::Status;
 std::unique_ptr<CameraAVStreamManager> sCameraAVStreamMgrInstance;
 
 // Global pointer to Camera AVStream Mgmt Server SDK cluster;
-std::unique_ptr<CameraAVStreamMgmtServer> sCameraAVStreamMgmtClusterServerInstance;
+std::unique_ptr<CameraAVStreamManagementCluster> sCameraAVStreamMgmtClusterServerInstance;
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
@@ -146,7 +147,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -207,9 +208,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::Success;
 }
 
-void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
 {
-    ChipLogProgress(Zcl, "Ranked stream priorities changed");
+    ChipLogProgress(Zcl, "Video stream has been allocated");
+}
+
+void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
+{
+    ChipLogProgress(Zcl, "Stream usage priorities changed");
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
@@ -217,7 +223,7 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const uint16_t streamID,
+Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const Nullable<uint16_t> streamID,
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
@@ -228,7 +234,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
         return Status::Failure;
     }
 
-    std::streamsize size = file.tellg();
+    std::streamsize size = static_cast<std::streamsize>(file.tellg());
     file.seekg(0, std::ios::beg);
 
     // Ensure space for image snapshot data in outImageSnapshot
@@ -251,35 +257,44 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams)
-{
-    allocatedVideoStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams)
-{
-    allocatedAudioStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams)
-{
-    allocatedSnapshotStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogError(Zcl, "Persistent attributes loaded");
+    ChipLogDetail(Zcl, "Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+{
+    ChipLogDetail(Zcl, "Transport acquired audio/video streams");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+{
+    ChipLogDetail(Zcl, "Transport released audio/video streams");
+
+    return CHIP_NO_ERROR;
+}
+
+const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
+{
+    return videoStreamStructs;
+}
+
+const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
+{
+    return audioStreamStructs;
+}
+
+void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                   uint32_t & outBandwidthbps)
+{
+    ChipLogDetail(Zcl, "Get bandwidth for streams called");
 }
 
 void CameraAVStreamManager::InitializeAvailableVideoStreams()
@@ -333,29 +348,49 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
 
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
+    features.Set(Feature::kVideo);
+    features.Set(Feature::kNightVision);
+    features.Set(Feature::kImageControl);
+    features.Set(Feature::kAudio);
+    features.Set(Feature::kPrivacy);
+    features.Set(Feature::kSpeaker);
+    features.Set(Feature::kLocalStorage);
+    features.Set(Feature::kWatermark);
+    features.Set(Feature::kOnScreenDisplay);
+    features.Set(Feature::kHighDynamicRange);
 
+    // Pure optional attributes that aren't covered by a feature flag, or are attested by the server given feature flag settings
     BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+    optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
+    optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+    optionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
+    optionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
+    optionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
+    optionalAttrs.Set(OptionalAttribute::kImageRotation);
+
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;
     VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
-    bool nightVisionCapable              = false;
+    bool nightVisionUsesInfrared         = false;
     VideoResolutionStruct minViewport    = { 854, 480 }; // Assuming 480p resolution.
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
     uint32_t maxContentBufferSize                                          = 1024;
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
-    TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
-    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
-    uint32_t maxNetworkBandwidth                              = 64;
-    std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    TwoWayTalkSupportTypeEnum twowayTalkSupport                  = TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
+    uint32_t maxNetworkBandwidth                                 = 64 * 1000 * 1000; // 64 Mbps
+    std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> streamUsagePriorities           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
-    sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
+    sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamManagementCluster>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
-        sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
-        spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
-    sCameraAVStreamMgmtClusterServerInstance->Init();
+        sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
+        spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
+        streamUsagePriorities);
+    TEMPORARY_RETURN_IGNORED sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 
 void emberAfCameraAvStreamManagementClusterShutdownCallback(EndpointId endpoint)

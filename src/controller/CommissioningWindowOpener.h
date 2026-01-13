@@ -26,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <setup_payload/SetupPayload.h>
 
 namespace chip {
@@ -121,6 +122,27 @@ public:
      */
     CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    /**
+     * @brief
+     *   Try to look up the device attached to our controller with the given
+     *   node id and ask it to enter joint commissioning mode with a PASE verifier
+     *   derived from the given information and the given discriminator. The
+     *   device will exit joint commissioning mode after a successful joint commissioning,
+     *   or after the given `timeout` time.
+     *
+     * @param[in] params    The parameters required to open a joint commissioning window
+     *                      with the provided passcode.
+     * @param[out] payload  The setup payload, not including the VID/PID bits,
+     *                      even if those were asked for, that is generated
+     *                      based on the passed-in information.  The payload
+     *                      provided to the callback function, unlike this
+     *                      out parameter, will include the VID/PID bits if
+     *                      readVIDPIDAttributes is true.
+     */
+    CHIP_ERROR OpenJointCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     /**
      * @brief
      *   Try to look up the device attached to our controller with the given
@@ -177,6 +199,10 @@ private:
 
     Callback::Callback<OnDeviceConnected> mDeviceConnected;
     Callback::Callback<OnDeviceConnectionFailure> mDeviceConnectionFailure;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool mJointCommissioning = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 };
 
 /**

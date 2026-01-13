@@ -122,12 +122,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     NetworkInterface * ifp = new NetworkInterface();
+    if (ifp == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to allocate memory for NetworkInterface");
+        *netifpp = nullptr;
+        return CHIP_ERROR_NO_MEMORY;
+    }
     struct netif * netif;
 
     netif = (struct netif *) net_get_sta_handle(); // assume only on station mode
-    if (netif == NULL || ifp == NULL)
+    if (netif == NULL)
     {
         ChipLogError(DeviceLayer, "Can't get the netif instance");
+        delete ifp;
         *netifpp = NULL;
         return CHIP_ERROR_INTERNAL;
     }

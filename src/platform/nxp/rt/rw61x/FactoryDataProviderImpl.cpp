@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright 2023-2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,10 +24,6 @@ extern "C" {
 
 #include "ELSFactoryData.h"
 #include "mflash_drv.h"
-
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-#include "els_pkc_mbedtls.h"
-#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
 
 #include "fsl_adapter_flash.h"
 
@@ -94,7 +90,6 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     CHIP_ERROR err               = CHIP_ERROR_NOT_FOUND;
     uint8_t type                 = 0;
     uint32_t index               = 0;
-    uint8_t * addrContent        = NULL;
     uint8_t * factoryDataAddress = &factoryDataRamBuffer[0];
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
@@ -182,9 +177,6 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
 
     PLOG_DEBUG_BUFFER("digestToSign", digestToSign.data(), digestToSign.size());
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_lock();
-#endif
     /* Import blob DAC key into SE50 (reserved key slot) */
     status = import_die_int_wrapped_key_into_els(els_key_blob, els_key_blob_size, plain_key_properties, &key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("import_die_int_wrapped_key_into_els failed: 0x%08x", status);
@@ -206,16 +198,10 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     els_delete_key(key_index);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CopySpanToMutableSpan(ByteSpan{ ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE }, outSignBuffer);
 
 exit:
     els_delete_key(key_index);
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CHIP_ERROR_INVALID_SIGNATURE;
 }
 
@@ -224,7 +210,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint32_t hashId;
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     CHIP_ERROR res;
     uint8_t currentBlock[16];
@@ -305,8 +290,6 @@ CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
-    uint16_t len;
-    uint8_t type;
     uint16_t keySize = 0;
 
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
@@ -343,8 +326,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     uint32_t KeyAddr;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-
-    VerifyOrReturnError(factoryDataRamBuffer != nullptr, CHIP_ERROR_INTERNAL);
 
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     /* Import pain DAC key and generate the blob */

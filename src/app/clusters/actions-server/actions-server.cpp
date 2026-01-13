@@ -39,7 +39,7 @@ ActionsServer::~ActionsServer()
 
 void ActionsServer::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -170,7 +170,7 @@ void ActionsServer::HandleCommand(HandlerContext & handlerContext, FuncT func)
         if (actionIndex != kMaxActionListLength)
         {
             ActionStructStorage action;
-            mDelegate.ReadActionAtIndex(actionIndex, action);
+            TEMPORARY_RETURN_IGNORED mDelegate.ReadActionAtIndex(actionIndex, action);
             // Check if the command bit is set in the SupportedCommands of an ations.
             if (!(action.supportedCommands.Raw() & (1 << handlerContext.mRequestPath.mCommandId)))
             {

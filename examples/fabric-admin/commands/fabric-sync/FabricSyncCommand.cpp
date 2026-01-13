@@ -74,7 +74,8 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
             //
             // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
             // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-            DeviceLayer::SystemLayer().ScheduleLambda([]() { DeviceManager::Instance().ReadSupportedDeviceCategories(); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+                []() { DeviceManager::Instance().ReadSupportedDeviceCategories(); });
         }
     }
     else

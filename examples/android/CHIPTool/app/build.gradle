@@ -3,15 +3,16 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion 31
+    namespace 'com.google.chip.chiptool'
+    compileSdkVersion 34
     ndkPath System.getenv("ANDROID_NDK_HOME")
 
-    ndkVersion "23.2.8568313"
+    ndkVersion "28.2.13676358"
 
     defaultConfig {
         applicationId "com.google.chip.chiptool"
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -39,8 +40,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+        // This will prevent the build from failing on warnings, including deprecation warnings.
+        // It's generally better to fix the underlying code or use @Suppress at the specific call site.
+        allWarningsAsErrors = false
     }
 
 

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster AccessControl (cluster code: 31/0x041F)
+// Identifier constant values for cluster AccessControl (cluster code: 31/0x001F)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

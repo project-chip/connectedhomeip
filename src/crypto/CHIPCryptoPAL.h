@@ -32,10 +32,12 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/support/Base64.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -311,7 +313,7 @@ public:
             return *this;
 
         ClearSecretData(mBytes);
-        SetLength(other.Length());
+        TEMPORARY_RETURN_IGNORED SetLength(other.Length());
         ::memcpy(Bytes(), other.ConstBytes(), other.Length());
         return *this;
     }
@@ -526,6 +528,7 @@ struct alignas(size_t) P256KeypairContext
  */
 using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length>;
 
+// Base class of P256Keypair. Do not use directly.
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
 protected:
@@ -536,25 +539,22 @@ protected:
     P256KeypairBase & operator=(const P256KeypairBase &) = default;
 
 public:
-    /**
-     * @brief Initialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Initialize(ECPKeyTarget key_target) = 0;
-
-    /**
-     * @brief Serialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
+    virtual CHIP_ERROR Initialize(ECPKeyTarget key_target)             = 0;
     virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const = 0;
-
-    /**
-     * @brief Deserialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) = 0;
+    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input)      = 0;
 };
 
+/**
+ * A platform-specific P256 keypair implementation.
+ *
+ * WARNING: This class does not currently define the behavior of certain sequences of operations;
+ * depending on the platform and/or crypto backend, these sequences may work, return errors, or
+ * have undefined behavior. Such sequences include:
+ * - Calling any method that uses the keypair before calling a method that initializes it.
+ * - Calling any method that uses the keypair after calling Clear()
+ * - Calling any method that initializes, deserializes, or loads the key pair on a
+ *   keypair that has already been initialized, without an intervening call to Clear().
+ */
 class P256Keypair : public P256KeypairBase
 {
 public:
@@ -566,25 +566,25 @@ public:
     P256Keypair & operator=(const P256Keypair &) = delete;
 
     /**
-     * @brief Initialize the keypair.
+     * @brief Initializes this object by generating a new keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
 
     /**
-     * @brief Serialize the keypair.
+     * @brief Exports the keypair as a P256SerializedKeypair containing raw public and private key bytes.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     /**
-     * @brief Deserialize the keypair.
+     * @brief Initializes this object by importing from a P256SerializedKeypair containing raw public and private key bytes.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
+    CHIP_ERROR Deserialize(/* const */ P256SerializedKeypair & input) override;
 
     /**
-     * @brief Generate a new Certificate Signing Request (CSR).
+     * @brief Generates a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
      *CSR.
@@ -593,7 +593,7 @@ public:
     CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
 
     /**
-     * @brief A function to sign a msg using ECDSA
+     * @brief Signs a message using ECDSA
      * @param msg Message that needs to be signed
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
@@ -603,7 +603,7 @@ public:
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     /**
-     * @brief A function to derive a shared secret using ECDH
+     * @brief Derives a shared secret using ECDH
      *
      * This implements the CHIP_Crypto_ECDH(PrivateKey myPrivateKey, PublicKey theirPublicKey) cryptographic primitive
      * from the specification, using this class's private key from `mKeypair` as `myPrivateKey` and the remote
@@ -617,15 +617,42 @@ public:
      **/
     CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
 
-    /** @brief Return public key for the keypair.
+    /**
+     * @brief Loads a P256 keypair from raw private and public key byte spans.
+     *
+     * !!!!!! IMPORTANT !!!!!!!
+     * Raw private keys SHOULD NOT be loaded directly without extreme care about ensuring they do not get retained in
+     * memory (e.g. stack or heap) and have the shortest possible lifecycle. Please consider replacing basic example
+     * usage of private key loading with delegation of signing to another part of the system that preferably has key
+     * material isolation or protection.
+     *
+     * Combines the public and private key data into a serialized keypair format,
+     * then deserializes it into this keypair object.
+     *
+     * @param private_key ByteSpan containing the raw private key bytes.
+     * @param public_key ByteSpan containing the raw public key bytes.
+     * @return CHIP_ERROR indicating success or failure of the operation.
+     */
+    CHIP_ERROR HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key);
+
+    /** @brief Returns the public key for the keypair.
      **/
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
+
+#if CHIP_WITH_NLFAULTINJECTION
+    P256PublicKey & TestOnlyMutablePubkey() { return mPublicKey; }
+#endif
 
     /** Release resources associated with this key pair */
     void Clear();
 
 protected:
+#if CHIP_WITH_NLFAULTINJECTION
+    mutable P256PublicKey mPublicKey;
+#else
     P256PublicKey mPublicKey;
+#endif
+    // P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
     bool mInitialized = false;
 };
@@ -1794,6 +1821,112 @@ CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteS
  * @brief Extracts Issuer Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
  **/
 CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
+
+class PemEncoder
+{
+public:
+    /**
+     * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
+     *
+     * LIFETIME: both encodedElement and derBytes lifetime must be >= PemEncoder lifetime.
+     *           PemEncoder references these while processing `NextLine()` calls.
+     *
+     * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct
+     * uppercase.
+     * @param derBytes - Byte span containing data to encode. May be empty.
+     */
+    explicit PemEncoder(const char * encodedElement, ByteSpan derBytes) : mEncodedElement(encodedElement), mDerBytes(derBytes) {}
+
+    // No copies.
+    PemEncoder(const PemEncoder &)             = delete;
+    PemEncoder & operator=(const PemEncoder &) = delete;
+
+    /**
+     * @brief Returns the pointer to the next null-terminated line of the encoding, or nullptr if done.
+     *
+     * The returned pointer has the lifetime of this class and during that lifetime will always point
+     * to valid memory.
+     *
+     * When header/footer are written, the heading type (`encodedElement` value) such as
+     * `CERTIFICATE` is clamped so that the entire header line with `-----BEGIN ${encodedElement}-----`
+     * and footer line with `-----END ${encodedElement}-----` are not wider than 64 bytes. This
+     * will not happen in practice with the types of things this is meant to encode.
+     *
+     * Usage should be in a loop, for example:
+     *
+     *   std::vector<std::string> pemLines;
+     *
+     *   PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+     *
+     *   const char* line = encoder.NextLine();
+     *   while (line)
+     *   {
+     *       pemLines.push_back(std::string{ line });
+     *       line = encoder.NextLine();
+     *   }
+     *
+     * @return a pointer to the internal line buffer for next line or nullptr when done.
+     */
+    const char * NextLine();
+
+private:
+    static constexpr size_t kNumBytesPerLine = 48u;
+    static constexpr size_t kLineBufferSize  = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
+    static_assert(kLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1), "Internal incoherence of library configuration!");
+
+    enum State : int
+    {
+        kPrintHeader = 0,
+        kPrintBody   = 1,
+        kPrintFooter = 2,
+        kDone        = 3,
+    };
+
+    const char * mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.
+    ByteSpan mDerBytes;
+    State mState           = State::kPrintHeader;
+    size_t mProcessedBytes = 0;
+    StringBuilder<kLineBufferSize> mStringBuilder{};
+};
+
+// Utility class to take subject Key IDs (AKID/SKID) and convert them to DCL format ("A5:FF:00.....:DE:AD").
+class KeyIdStringifier
+{
+public:
+    KeyIdStringifier() = default;
+
+    /**
+     * @brief Returns the null-terminated string buffer owned by the class containing converted KeyID.
+     *
+     * LIFETIME NOTE: The last returned value from KeyIdToHex is valid until the next call.
+     *
+     * This is optimized for standard 20-byte AKID/SKID but works for any length, truncating very long ones.
+     *
+     * @param keyIdBuffer - buffer of bytes of the key ID.
+     * @return pointer to class-owned storage of a null-terminated string in DCL format.
+     */
+    const char * KeyIdToHex(ByteSpan keyIdBuffer)
+    {
+        mStringBuilder.Reset();
+        if (keyIdBuffer.empty())
+        {
+            mStringBuilder.Add("<EMPTY KEY ID>");
+            return mStringBuilder.c_str();
+        }
+
+        mStringBuilder.AddFormat("%02X", keyIdBuffer[0]);
+        for (size_t i = 1; i < keyIdBuffer.size(); ++i)
+        {
+            mStringBuilder.Add(":");
+            mStringBuilder.AddFormat("%02X", keyIdBuffer[i]);
+        }
+
+        return mStringBuilder.AddMarkerIfOverflow().c_str();
+    }
+
+private:
+    StringBuilder<(Crypto::kAuthorityKeyIdentifierLength * 3) + 1> mStringBuilder;
+};
 
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.

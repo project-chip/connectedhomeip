@@ -15,12 +15,9 @@
 #    limitations under the License.
 #
 
-import logging
-
-from chip.clusters.Types import NullValue
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+from matter.clusters.Types import NullValue
 
 # Maximum value for ModeTags according to specs is 16bits.
 MAX_MODE_TAG = 0xFFFF
@@ -94,6 +91,7 @@ class ModeBaseClusterChecks:
 
         This function evaluates the ModeTags of each ModeOptionStruct:
         - Should have at least one tag.
+        - There are no duplicates in ModeTag list.
         - Should be maximum 16bits in size.
         - Should be a Mfg tag or one of the supported ones (either common or specific).
         - Should have at least one common or specific tag.
@@ -109,7 +107,12 @@ class ModeBaseClusterChecks:
             if len(mode_option_struct.modeTags) == 0:
                 asserts.fail("The ModeTags field should have at least one entry.")
 
-            # Check each ModelTag
+            # There are no duplicates
+            tag_values = [tag.value for tag in mode_option_struct.modeTags]
+            if len(tag_values) != len(set(tag_values)):
+                asserts.fail(f"ModeTags contain duplicates in mode {mode_option_struct.mode}: {tag_values}.")
+
+            # Check each ModeTag
             at_least_one_common_or_derived = False
             for tag in mode_option_struct.modeTags:
                 # Value should not larger than 16bits
@@ -118,8 +121,9 @@ class ModeBaseClusterChecks:
 
                 # Check if is tag is common, derived or mfg.
                 is_mfg = (START_MFGTAGS_RANGE <= tag.value <= END_MFGTAGS_RANGE)
+                value = hex(tag.value)
                 if not (is_mfg or tag.value in self.mode_tags):
-                    asserts.fail("Mode tag value is not a common, derived or vendor tag.")
+                    asserts.fail(f"Mode tag value: {value} is not a common tag, derived tag or vendor tag")
 
                 # Confirm if tag is common or derived.
                 if not is_mfg:

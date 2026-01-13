@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -18,25 +19,28 @@ namespace FaultInjection {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {
+
 namespace FailAtFault {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = FaultInjection::Commands::FailAtFault::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(FailAtFault::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace FailAtFault
 namespace FailRandomlyAtFault {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = FaultInjection::Commands::FailRandomlyAtFault::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(FailRandomlyAtFault::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace FailRandomlyAtFault
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace FaultInjection
 } // namespace Clusters
 } // namespace app

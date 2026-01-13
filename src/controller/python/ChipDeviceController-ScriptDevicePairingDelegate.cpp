@@ -20,7 +20,7 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "lib/support/TypeTraits.h"
 #include <app/icd/client/DefaultICDClientStorage.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -148,8 +148,8 @@ void ScriptDevicePairingDelegate::OnOpenCommissioningWindow(NodeId deviceId, CHI
         std::string setupManualCode;
         std::string setupQRCode;
 
-        ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
-        QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(setupQRCode);
+        TEMPORARY_RETURN_IGNORED ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
+        TEMPORARY_RETURN_IGNORED QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(setupQRCode);
         ChipLogProgress(Zcl, "SetupManualCode = %s", setupManualCode.c_str());
         ChipLogProgress(Zcl, "SetupQRCode = %s", setupQRCode.c_str());
         mOnWindowOpenCompleteCallback(deviceId, payload.setUpPINCode, setupManualCode.c_str(), setupQRCode.c_str(),

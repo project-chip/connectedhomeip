@@ -50,7 +50,7 @@ def lowfirst_except_acronym(s: str) -> str:
 
 
 def to_snake_case(s: str) -> str:
-    """convert to snake case; all words are seperated by underscore and are lower case
+    """convert to snake case; all words are separated by underscore and are lower case
        examples:
         FooBarBaz --> foo_bar_baz
         foo BarBaz --> foo_bar_baz
@@ -68,7 +68,7 @@ def to_snake_case(s: str) -> str:
 
 
 def to_constant_case(s: str) -> str:
-    """convert to constant case; all words are seperated by underscore and are upper case
+    """convert to constant case; all words are separated by underscore and are upper case
        similar to a snake case but with upper case
        examples:
        FooBarBaz --> FOO_BAR_BAZ
@@ -76,13 +76,12 @@ def to_constant_case(s: str) -> str:
        FOOBarBaz --> FOO_BAR_BAZ
     """
     snake_case = to_snake_case(s)
-    constant_case = snake_case.upper()
-    return constant_case
+    return snake_case.upper()
 
 
 def to_spinal_case(s: str) -> str:
-    """convert to spinal case; all words sperated by hypen and are lower case
-        similar to a snake case but with hyphen seperator instead of underscore 
+    """convert to spinal case; all words separated by hyphen and are lower case
+        similar to a snake case but with hyphen separator instead of underscore
         examples:
         FooBarBaz --> foo-bar-baz
         foo BarBaz --> foo-bar-baz
@@ -102,9 +101,7 @@ def to_pascal_case(s: str) -> str:
 
     snake_case = to_snake_case(s)
     snake_case_split = snake_case.split('_')
-    pascal_case = ''.join(word.capitalize() for word in snake_case_split)
-
-    return pascal_case
+    return ''.join(word.capitalize() for word in snake_case_split)
 
 
 def to_camel_case(s) -> str:

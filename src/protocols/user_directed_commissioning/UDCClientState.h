@@ -185,6 +185,9 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
+    void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
+    uint8_t GetPasscodeLength() const { return mPasscodeLength; };
+
     void SetCachedCommissionerPasscode(uint32_t newValue) { mCachedCommissionerPasscode = newValue; };
     uint32_t GetCachedCommissionerPasscode() const { return mCachedCommissionerPasscode; };
 
@@ -211,6 +214,7 @@ public:
         mUDCClientProcessingState   = UDCClientProcessingState::kNotInitialized;
         mCachedCommissionerPasscode = 0;
         mNumTargetAppInfos          = 0;
+        mPasscodeLength             = 0;
     }
 
 private:
@@ -235,6 +239,7 @@ private:
     bool mCommissionerPasscode      = false;
     bool mCommissionerPasscodeReady = false;
     bool mCancelPasscode            = false;
+    uint8_t mPasscodeLength         = 0;
 
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;

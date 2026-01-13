@@ -46,6 +46,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/KvsPersistentStorageDelegate.h>
@@ -68,9 +69,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <transport/raw/WiFiPAF.h>
 #endif
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -80,6 +83,11 @@
 #include <app/icd/server/ICDCheckInBackOffStrategy.h>        // nogncheck
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <app/server/JointFabricAdministrator.h> //nogncheck
+#include <app/server/JointFabricDatastore.h>     //nogncheck
+#endif                                           // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 namespace chip {
 
@@ -107,10 +115,18 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                               ,
                                               chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
+#if INET_CONFIG_ENABLE_IPV4
+                                              ,
+                                              chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                               ,
                                               chip::Transport::WiFiPAFBase
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                              ,
+                                              chip::Transport::NFC
 #endif
                                               >;
 
@@ -133,6 +149,8 @@ struct ServerInitParams
 
     // Application delegate to handle some commissioning lifecycle events
     AppDelegate * appDelegate = nullptr;
+    // device discovery timeout
+    System::Clock::Seconds32 discoveryTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS);
     // Port to use for Matter commissioning/operational traffic
     uint16_t operationalServicePort = CHIP_PORT;
     // Port to use for UDC if supported
@@ -193,18 +211,22 @@ struct ServerInitParams
     // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
+
+    bool advertiseCommissionableIfNoFabrics = CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART;
 };
 
 /**
  * Transitional version of ServerInitParams to assist SDK integrators in
  * transitioning to injecting product/platform-owned resources. This version
- * of `ServerInitParams` statically owns and initializes (via the
- * `InitializeStaticResourcesBeforeServerInit()` method) the persistent storage
- * delegate, the group data provider, and the access control delegate. This is to reduce
- * the amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
- * main.cpp).
+ * of `ServerInitParams` owns and initializes (via the `InitializeStaticResourcesBeforeServerInit()`
+ * method) the persistent storage delegate, the group data provider, and the access control delegate.
+ * This is to reduce the amount of copied boilerplate in all the example initializations
+ * (e.g. AppTask.cpp, main.cpp).
  *
  * This version SHOULD BE USED ONLY FOR THE IN-TREE EXAMPLES.
+ *
+ * IMPORTANT: Instances of this class MUST outlive the Server because Server::Init()
+ *            stores pointers to resources owned by this class.
  *
  * ACTION ITEMS FOR TRANSITION from a example in-tree to a product:
  *
@@ -246,8 +268,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
                 DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-            ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
-            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+            ReturnErrorOnFailure(mKvsPersistentStorageDelegate.Init(&kvsManager));
+            this->persistentStorageDelegate = &mKvsPersistentStorageDelegate;
         }
 
         // PersistentStorageDelegate "software-based" operational key access injection
@@ -255,8 +277,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
             //          for examples and for now.
-            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
-            this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+            ReturnErrorOnFailure(mPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
+            this->operationalKeystore = &mPersistentStorageOperationalKeystore;
         }
 
         // OpCertStore can be injected but default to persistent storage default
@@ -265,8 +287,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
             //          for examples and for now, since all storage is immediate for that impl.
-            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
-            this->opCertStore = &sPersistentStorageOpCertStore;
+            ReturnErrorOnFailure(mPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
+            this->opCertStore = &mPersistentStorageOpCertStore;
         }
 
         // Injection of report scheduler WILL lead to two schedulers being allocated. As recommended above, this should only be used
@@ -274,43 +296,58 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // CommonCaseDeviceServerInitParams should not be allocated.
         if (this->reportScheduler == nullptr)
         {
-            reportScheduler = &sReportScheduler;
+            this->reportScheduler = &mReportScheduler;
         }
 
         // Session Keystore injection
-        this->sessionKeystore = &sSessionKeystore;
+        if (this->sessionKeystore == nullptr)
+        {
+            this->sessionKeystore = &mSessionKeystore;
+        }
 
         // Group Data provider injection
-        sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
-        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
-        ReturnErrorOnFailure(sGroupDataProvider.Init());
-        this->groupDataProvider = &sGroupDataProvider;
+        if (this->groupDataProvider == nullptr)
+        {
+            mGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
+            mGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
+            ReturnErrorOnFailure(mGroupDataProvider.Init());
+            this->groupDataProvider = &mGroupDataProvider;
+        }
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->sessionResumptionStorage = &sSessionResumptionStorage;
-#else
-        this->sessionResumptionStorage = nullptr;
+        if (this->sessionResumptionStorage == nullptr)
+        {
+            ChipLogProgress(AppServer, "Initializing session resumption storage...");
+            ReturnErrorOnFailure(mSessionResumptionStorage.Init(this->persistentStorageDelegate));
+            this->sessionResumptionStorage = &mSessionResumptionStorage;
+        }
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        if (this->accessDelegate == nullptr)
+        {
+            this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        }
 
-        // Inject ACL storage. (Don't initialize it.)
-        this->aclStorage = &sAclStorage;
+        if (this->aclStorage == nullptr)
+        {
+            // Inject ACL storage. (Don't initialize it.)
+            this->aclStorage = &mAclStorage;
+        }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-        ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
-        ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
-#else
-        ChipLogProgress(AppServer, "Subscription persistence not supported");
+        if (this->subscriptionResumptionStorage == nullptr)
+        {
+            ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
+            ReturnErrorOnFailure(mSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
+            this->subscriptionResumptionStorage = &mSubscriptionResumptionStorage;
+        }
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         if (this->icdCheckInBackOffStrategy == nullptr)
         {
-            this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
+            this->icdCheckInBackOffStrategy = &mICDCheckInBackOffStrategy;
         }
 #endif
 
@@ -318,23 +355,29 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     }
 
 private:
-    static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
-    static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
-    static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
-    static Credentials::GroupDataProviderImpl sGroupDataProvider;
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static app::reporting::ReportSchedulerImpl sReportScheduler;
+    // Owned resources - these are instance members (not static) so each
+    // CommonCaseDeviceServerInitParams instance owns its own copy.
+    // They must outlive Server::Init() because that method stores pointers to them.
+    KvsPersistentStorageDelegate mKvsPersistentStorageDelegate;
+    PersistentStorageOperationalKeystore mPersistentStorageOperationalKeystore;
+    Credentials::PersistentStorageOpCertStore mPersistentStorageOpCertStore;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
+    app::DefaultTimerDelegate mTimerDelegate;
+    app::reporting::ReportSchedulerImpl mReportScheduler{ &mTimerDelegate };
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-    static SimpleSessionResumptionStorage sSessionResumptionStorage;
+    SimpleSessionResumptionStorage mSessionResumptionStorage;
 #endif
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    static app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
+    app::SimpleSubscriptionResumptionStorage mSubscriptionResumptionStorage;
 #endif
-    static app::DefaultAclStorage sAclStorage;
-    static Crypto::DefaultSessionKeystore sSessionKeystore;
+
+    app::DefaultAclStorage mAclStorage;
+    Crypto::DefaultSessionKeystore mSessionKeystore;
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    static app::DefaultICDCheckInBackOffStrategy sDefaultICDCheckInBackOffStrategy;
+    app::DefaultICDCheckInBackOffStrategy mICDCheckInBackOffStrategy;
 #endif
 };
 
@@ -415,6 +458,11 @@ public:
     app::DefaultSafeAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
+    app::JointFabricAdministrator & GetJointFabricAdministrator() { return mJointFabricAdministrator; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
@@ -507,7 +555,7 @@ private:
                 return;
             }
 
-            mServer->GetTransportManager().MulticastGroupJoinLeave(
+            TEMPORARY_RETURN_IGNORED mServer->GetTransportManager().MulticastGroupJoinLeave(
                 Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id), false);
         };
 
@@ -694,6 +742,11 @@ private:
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    app::JointFabricDatastore mJointFabricDatastore;
+    app::JointFabricAdministrator mJointFabricAdministrator;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
