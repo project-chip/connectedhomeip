@@ -87,7 +87,7 @@ class TC_GCAST_2_2(MatterBaseTest):
                 TestStep("16c", "TH waits grace period plus tolerance"),
                 TestStep("16d", "TH awaits subscription report of new membership within max interval"),
                 TestStep(17, "Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to Group G5 (result: constraint error)"),
-                TestStep(18, "Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to ?? (result: constraint error)"),
+                TestStep(18, "If Listener feature is not supported, attempt to join a group with AuxiliaryACL (result: constraint error)"),
                 TestStep(19, "JoinGroup with invalid GroupID (result: constraint error)"),
                 TestStep(20, "JoinGroup with Key length != 16 (result: constraint error)"),
                 TestStep(21, "JoinGroup with GracePeriod > 86400 (result: constraint error)")]
@@ -106,7 +106,6 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("1a")
         ln_enabled, sd_enabled = await get_feature_map(self)  # from TC_GCAST_common.py
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoints_list = [endpoints_list[0]]
 
         # TH removes any existing group and KeyID on the DUT.
         self.step("1b")
@@ -126,7 +125,6 @@ class TC_GCAST_2_2(MatterBaseTest):
         # {THcommand} JoinGroup (GroupID=G1, Endpoints=[EP1], KeyID=K1, Key=InputKey1)
         # success
         self.step("3a")
-        # priyamal clean up unnecessary redeclarations throughout file
         groupID1 = 1
         keyID1 = 1
         inputKey1 = secrets.token_bytes(16)
@@ -134,7 +132,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
-            endpoints=endpoint1,
+            endpoints=[endpoint1],
             keyID=keyID1,
             key=inputKey1,
             useAuxiliaryACL="false")
@@ -143,7 +141,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("3b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID1, endpoints=endpoint1, key_id=keyID1, has_auxiliary_acl="false")
+            groupID1, endpoints=[endpoint1], key_id=keyID1, has_auxiliary_acl="false")
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a.
@@ -155,7 +153,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("4b")
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            # groupID=groupID1,
+            groupID=groupID1,
             endpoints=endpoints_list[0:2],
             keyID=keyID1,
             key=inputKey1,
@@ -171,11 +169,10 @@ class TC_GCAST_2_2(MatterBaseTest):
         # Attempt to join Group G2 with existing Key1 and using Auxiliary ACL
         self.step("5a")
         groupID2 = 2
-        keyID1 = 2
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID2,
-            endpoints=endpoint1,
+            endpoints=[endpoint1],
             keyID=keyID1,
             useAuxiliaryACL="true")
         )
@@ -183,7 +180,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("5b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID2, endpoints=endpoint1, key_id=keyID1, has_auxiliary_acl="true")
+            groupID2, endpoints=[endpoint1], key_id=keyID1, has_auxiliary_acl="true")
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 using a new Key and providing a grace period for K1:
@@ -195,7 +192,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID2,
-            endpoints=endpoint1,
+            endpoints=[endpoint1],
             keyID=keyID2,
             gracePeriod=gracePeriodSeconds,
             key=inputKey2,
@@ -216,7 +213,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # TH awaits subscription report of new membership within max interval
         self.step("6d")
-        # sub.reset()  priyamal ?
+        sub.reset()
         membership_matcher = generate_membership_entry_matcher(
             groupID2, key_id=keyID2, expiring_key_id_must_not_exist=True, has_auxiliary_acl="true")
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
@@ -229,7 +226,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID3,
-                endpoints=endpoint1,
+                endpoints=[endpoint1],
                 keyID=keyID2,
                 key=inputKey3)
             )
@@ -245,7 +242,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID3,
-                endpoints=endpoint1,
+                endpoints=[endpoint1],
                 keyID=keyID3)
             )
             asserts.fail("JoinGroup command should have failed because no Key found, but it still succeeded")
@@ -259,7 +256,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID3,
-                endpoints=endpoint_invalid,
+                endpoints=[endpoint_invalid],
                 keyID=keyID1)
             )
             asserts.fail("JoinGroup command should have failed because endpoint is invalid (not in uint16 format), but it still succeeded")
@@ -294,7 +291,7 @@ class TC_GCAST_2_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                     groupID=groupID3,
-                    endpoints=endpoints_list_exceeds_DUT_endpoints,
+                    endpoints=[endpoints_list_exceeds_DUT_endpoints],
                     keyID=keyID2)
                 )
                 asserts.fail(
@@ -394,7 +391,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         await asyncio.sleep(gracePeriodWaitingTime)
 
         # TH awaits subscription report of new membership within max interval
-        self.step("16d")  # priyamal doc says G4, confirm should be G5
+        self.step("16d")
         membership_matcher = generate_membership_entry_matcher(
             groupID5, key_id=keyID5, expiring_key_id_must_not_exist=True)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
@@ -402,11 +399,11 @@ class TC_GCAST_2_2(MatterBaseTest):
         # Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to Group G5 (result: constraint error)
         self.step(17)
         if ln_enabled:
-            self.mark_step_range_skipped(18, 18)  # priyamal confirm This should skip to 19 right?
+            self.skip_step("18")
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID5,
-                endpoints=endpoint1,
+                endpoints=[endpoint1],
                 keyID=keyID5,
                 key=inputKey5)
             )
@@ -415,12 +412,12 @@ class TC_GCAST_2_2(MatterBaseTest):
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
-        # Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to ?? (result: constraint error)
+        # If Listener feature is not supported, attempt to join a group with AuxiliaryACL (result: constraint error)
         self.step(18)
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID5,
-                endpoints=endpoints_list_empty,  # priyamal check if preference to use [] or the empty_list
+                endpoints=endpoints_list_empty,
                 keyID=keyID5,
                 useAuxiliaryACL="true")
             )
@@ -460,7 +457,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID2,
-                endpoints=endpoint1,
+                endpoints=[endpoint1],
                 keyID=keyID2,
                 gracePeriod=gracePeriodSeconds,
                 key=inputKey2)
