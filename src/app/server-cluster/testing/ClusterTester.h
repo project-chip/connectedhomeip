@@ -357,7 +357,7 @@ private:
     // @returns CHIP_NO_ERROR if the command is found in AcceptedCommands.
     // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedCommand) if the command is not found in AcceptedCommands.
     // @returns error status if AcceptedCommands cannot be retrieved.
-    app::DataModel::ActionReturnStatus VerifyCommandInAcceptedCommandsList(CommandId command_id)
+    app::DataModel::ActionReturnStatus VerifyCommandInAcceptedCommandsList(CommandId commandId)
     {
         auto path = mCluster.GetPaths()[0];
 
@@ -371,7 +371,7 @@ private:
         // Check if the requested command ID is present in the accepted commands list
         for (const auto & entry : commandEntries)
         {
-            if (entry.commandId == command_id)
+            if (entry.commandId == commandId)
             {
                 return CHIP_NO_ERROR;
             }
