@@ -461,7 +461,8 @@ config CHIP_OPENTHREAD_FTD
 config CHIP_USE_OT_ENDPOINT
 	bool "Use OpenThread TCP/UDP stack directly"
 	help
-	  Use OpenThread TCP/UDP stack directly
+	  Use the OpenThread TCP/UDP stack directly instead of another networking stack like LwIP.
+	  This is useful for platforms that do not have LwIP but do have OpenThread.
 
 endif # NET_L2_OPENTHREAD
 
