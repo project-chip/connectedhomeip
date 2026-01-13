@@ -228,7 +228,7 @@ public:
             return result;
         }
 
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
         app::DataModel::InvokeRequest invokeRequest;
         invokeRequest.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
         invokeRequest.subjectDescriptor = &subjectDescriptor;
