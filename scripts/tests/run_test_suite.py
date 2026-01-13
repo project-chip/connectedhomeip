@@ -339,11 +339,6 @@ class Terminable(Protocol):
     help='Set path for a tool (run in tool network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
-    '--custom-path', multiple=True, metavar="<kind>:<key>:<path>",
-    help="Set path with a custom kind, valid kind values are "
-    f"{[v.value for v in SubprocessKind]}"
-)
-@click.option(
     '--discover-paths',
     is_flag=True,
     default=False,
@@ -386,7 +381,7 @@ class Terminable(Protocol):
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], tool_path: list[str], custom_path: list[str], discover_paths: bool, help_paths: bool,
+            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -443,11 +438,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
         except ValueError as e:
             raise click.BadOptionUsage("tool-path", f"Invalid tool path specifier '{p}': {e}")
-    for p in custom_path:
-        try:
-            subproc_info_repo.addSpec(p)
-        except ValueError as e:
-            raise click.BadOptionUsage("custom-path", f"Invalid custom path specifier '{p}': {e}")
 
     if discover_paths:
         subproc_info_repo.discover()

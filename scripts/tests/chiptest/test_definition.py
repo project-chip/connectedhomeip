@@ -300,12 +300,7 @@ class SubprocessInfoRepo(dict):
     def addSpec(self, spec: str, kind: SubprocessKind | None = None):
         """Add a path to the repo as specified on the command line"""
         el = spec.split(':')
-        if len(el) == 3:
-            # <kind>:<key>:<path>
-            kind_s, key, path_s = el
-            kind = SubprocessKind(kind_s)
-            path = Path(path_s)
-        elif len(el) == 2:
+        if len(el) == 2:
             # <key>:<path>
             key, path_s = el
             path = Path(path_s)

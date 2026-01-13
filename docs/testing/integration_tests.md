@@ -60,8 +60,7 @@ As an example:
 scripts/tests/run_test_suite.py --runner chip_tool_python \
     run \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
-    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
-    --custom-path app:new-app:out/new-app/chip-new-app
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app
 ```
 
 The distinction between applications and tools is not merely cosmetic. It is
@@ -72,6 +71,40 @@ In order to help with using the YAML tests for local usage the
 `--discover-paths` flag can be used to automatically discover paths to
 applications and tools. The root directory of the Matter SDK is used as the
 starting path of the search.
+
+You can also list the known keys for applications and tools by using the
+`--help-paths` option:
+
+```$ scripts/tests/run_test_suite.py run --help-paths
+…
+---
+# Known application and tool path keys:
+- key: all-clusters
+  kind: app
+- key: all-devices
+  kind: app
+- key: air-purifier
+  kind: app
+- key: bridge
+  kind: app
+- key: camera
+  kind: app
+- key: camera-controller
+  kind: app
+- key: closure
+  kind: app
+- key: energy-gateway
+  kind: app
+- key: energy-management
+  kind: app
+- key: fabric-bridge
+  kind: app
+- key: fabric-admin
+  kind: app
+- key: fabric-sync
+  kind: app
+…
+```
 
 ## Connectivity mocking for local testing
 
