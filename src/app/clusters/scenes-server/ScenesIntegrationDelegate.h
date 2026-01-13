@@ -47,7 +47,7 @@ public:
     /// This can be used to invalidate scenes that reference the given group.
     virtual CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) = 0;
 
-    // Marks all scenes on the associated endpoint as invalid for all fabrics.
+    /// Marks all scenes on the associated endpoint as invalid for all fabrics.
     virtual CHIP_ERROR MakeSceneInvalidForAllFabrics() = 0;
 };
 
