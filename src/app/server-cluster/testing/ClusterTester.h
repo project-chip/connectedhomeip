@@ -15,8 +15,7 @@
  */
 
 #pragma once
-#include "FabricTestFixture.h"
-#include "app/server-cluster/testing/ValidateGlobalAttributes.h"
+
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -31,8 +30,10 @@
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/shared/Attributes.h>
 #include <credentials/FabricTable.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -220,10 +221,9 @@ public:
 
         // Verify that the command is present in AcceptedCommands before attempting to invoke it.
         // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
-        auto checkStatus = IsCommandAnAcceptedCommand(commandId);
-        if (!checkStatus.IsSuccess())
+        if (!IsCommandAnAcceptedCommand(commandId))
         {
-            result.status = checkStatus;
+            result.status = CHIP_ERROR_INVALID_ARGUMENT;
             return result;
         }
 
