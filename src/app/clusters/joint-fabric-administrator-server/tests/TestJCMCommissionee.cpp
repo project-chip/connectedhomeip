@@ -381,6 +381,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
@@ -407,6 +409,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestSuccessfulProgressionAdvancesAllSta
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
@@ -449,6 +453,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestErrorDuringStagePropagatesToComplet
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_NO_ERROR;
@@ -498,6 +504,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestStoreEndpointIdError)
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     constexpr EndpointId kExpectedEndpointId{ 55 };
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kExpectedEndpointId);
@@ -520,6 +528,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadCommissionerAdminFabricIndexSuc
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 77 }, [](CHIP_ERROR) {});
     commissionee.mStageToRun = TrustVerificationStage::kReadingCommissionerAdminFabricIndex;
@@ -534,6 +544,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsPopulatesCommission
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 78 }, [](CHIP_ERROR) {});
     commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
@@ -565,6 +577,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissioner
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 79 }, [](CHIP_ERROR) {});
 
@@ -591,6 +605,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminNOCsPopulatesCommissionerC
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 80 }, [](CHIP_ERROR) {});
     commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
@@ -623,6 +639,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 92 }, [](CHIP_ERROR) {});
 
