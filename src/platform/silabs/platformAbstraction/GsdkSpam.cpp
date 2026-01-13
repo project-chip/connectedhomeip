@@ -311,8 +311,8 @@ void SilabsPlatform::WatchdogInit()
 {
     // Initialize WDOG with default configuration
     sl_hal_wdog_init_t wdogInit = SL_HAL_WDOG_INIT_DEFAULT;
-    wdogInit.reset_disable      = true;               // For debug, do not trigger a system reset on timeout
-    wdogInit.period_select      = SL_WDOG_PERIOD_32k; // Set timeout period. 1s with our default LF clock at 32.768kHz
+    wdogInit.reset_disable      = true;                // For debug, do not trigger a system reset on timeout
+    wdogInit.period_select      = SL_WDOG_PERIOD_128k; // Set timeout period. 4s with our default LF clock at 32.768kHz
 
     //  Initialize WDOG with our configuration
     sl_clock_manager_enable_bus_clock(SL_BUS_CLOCK_WDOG0);
