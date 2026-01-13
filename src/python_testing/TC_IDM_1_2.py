@@ -43,11 +43,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.discovery as Discovery
+import matter.testing.matchers as matchers
 from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-import matter.testing.matchers as matchers
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 

@@ -41,7 +41,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_VALCC_3_2(MatterBaseTest):

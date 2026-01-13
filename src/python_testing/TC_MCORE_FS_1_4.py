@@ -69,13 +69,13 @@ import tempfile
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
-import matter.testing.matchers as matchers
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)

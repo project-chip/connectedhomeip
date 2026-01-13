@@ -45,7 +45,7 @@ from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

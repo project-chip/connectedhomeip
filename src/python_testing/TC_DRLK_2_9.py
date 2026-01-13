@@ -42,12 +42,12 @@ from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-import matter.testing.matchers as matchers
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

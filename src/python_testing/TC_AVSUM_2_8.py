@@ -43,7 +43,7 @@ from matter.clusters import Globals
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):

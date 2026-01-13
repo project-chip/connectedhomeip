@@ -92,7 +92,7 @@ from matter.clusters.Attribute import EventReadResult
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)

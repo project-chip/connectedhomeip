@@ -64,7 +64,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TestAttrAvail(BasicCompositionTests):

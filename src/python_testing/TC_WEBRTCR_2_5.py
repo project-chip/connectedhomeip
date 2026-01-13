@@ -46,7 +46,7 @@ from TC_WEBRTCRTestBase import WEBRTCRTestBase
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

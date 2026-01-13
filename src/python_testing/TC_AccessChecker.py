@@ -62,7 +62,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster
 from matter.tlv import uint
 

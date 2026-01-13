@@ -25,7 +25,7 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
                                             UnknownProblemLocation)
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_PICS_Checker(BasicCompositionTests):

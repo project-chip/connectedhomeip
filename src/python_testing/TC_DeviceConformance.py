@@ -53,7 +53,7 @@
 from test_testing.DeviceConformanceTests import DeviceConformanceTests
 
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_DeviceConformance(DeviceConformanceTests):

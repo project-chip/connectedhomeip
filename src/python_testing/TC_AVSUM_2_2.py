@@ -46,7 +46,7 @@ from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):

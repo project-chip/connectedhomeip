@@ -46,7 +46,7 @@ from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):

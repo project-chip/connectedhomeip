@@ -71,13 +71,13 @@ from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
-import matter.testing.matchers as matchers
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
