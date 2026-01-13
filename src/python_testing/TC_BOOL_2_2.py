@@ -51,7 +51,8 @@ class TC_BOOL_2_2(MatterBaseTest):
     async def set_dut_state_value(self, endpoint: int, state: bool):
         """Set the DUT's BooleanState value via named pipe command."""
         logger.info(f" --- Setting DUT StateValue to {'TRUE' if state else 'FALSE'}")
-        if self.is_pics_sdk_ci_only:    # for running in CI
+        # if self.is_pics_sdk_ci_only:    # for running in CI
+        if True:
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
             self.write_to_app_pipe(command_dict)
         else:                           # for manual testing
@@ -88,6 +89,7 @@ class TC_BOOL_2_2(MatterBaseTest):
     def pics_TC_BOOL_2_2(self) -> list[str]:
         return [
             "BOOL.S",
+            "BOOL.S.E00",  # StateChange event
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.BooleanState))
@@ -100,6 +102,16 @@ class TC_BOOL_2_2(MatterBaseTest):
         endpoint = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
+
+        # Check if the StateChange event (E00) is supported via PICS
+        # TODO: In future spec version also check feature map for event support
+        # when that capability is added. See https://github.com/project-chip/connectedhomeip/issues/42425
+        has_event = self.check_pics("BOOL.S.E00")
+
+        if not has_event:
+            logger.info("StateChange event (BOOL.S.E00) is not supported. Skipping remaining steps.")
+            self.mark_all_remaining_steps_skipped("1a")
+            return
 
         # Set up subscription to StateChange event.
         self.step("1a")
