@@ -58,7 +58,7 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    /// Sets the on off value, however it is specific for needs other integrations.
+    /// Sets the OnOff value with special behavior for integration with other clusters.
     ///
     /// In particular, the 1.5.4.1 Lighting feature requires that if the Level Control cluster sets
     /// the OnOff value, then:
