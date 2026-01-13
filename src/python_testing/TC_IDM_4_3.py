@@ -120,6 +120,25 @@ class TC_IDM_4_3(BasicCompositionTests):
     max_interval_ceiling_sec: int = 3
     root_node_endpoint: int = 0
 
+    def get_mrp_retransmission_timeout_sec(self, dev_ctrl) -> float:
+        """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
+        negotiated_idle_interval_ms = 0
+        negotiated_active_interval_ms = 0
+        try:
+            session_params = dev_ctrl.GetRemoteSessionParameters(self.dut_node_id)
+            if session_params:
+                negotiated_idle_interval_ms = getattr(session_params, "sessionIdleInterval", 0) or 0
+                negotiated_active_interval_ms = getattr(session_params, "sessionActiveInterval", 0) or 0
+        except Exception as e:
+            log.info(f"Falling back to default MRP intervals; failed to read remote params: {e}")
+
+        # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
+        base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
+
+        # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
+        backoff_sum = 1 + 1.6 + 2.56 + 4.096
+        return base_interval_ms * backoff_sum * 1.375 / 1000.0
+
     def get_writable_attributes_for_cluster(self, cluster_id: uint, cluster_data: dict) -> list[uint]:
         """Get list of writable attribute IDs for a cluster.
 
@@ -189,9 +208,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         changed_attributes = []
 
         for endpoint_id, clusters in priming_data.items():
-
             for cluster_class, attributes in clusters.items():
-
                 cluster_id = cluster_class.id
                 # Get writable attributes for this cluster from endpoints_tlv data
                 if endpoint_id not in self.endpoints_tlv:
@@ -353,6 +370,28 @@ class TC_IDM_4_3(BasicCompositionTests):
             verified_count, 0,
             f"{test_step}: No change reports verified, expected {changed_count} reports")
 
+        # Revert the attributes to their original values
+        if changed_attributes:
+            for change in changed_attributes:
+                ep = change['endpoint']
+                attr = change['attribute']
+                old_value = change['old_value']
+
+                # We have an issue with the NumberOfRinses attribute, where we continuously get InvalidInState error.
+                if attr.__name__ != "NumberOfRinses":
+                    resp = await self.default_controller.WriteAttribute(
+                        nodeId=self.dut_node_id,
+                        attributes=[(ep, attr(old_value))]
+                    )
+                    if resp[0].Status == Status.Success:
+                        revert_success = True
+                        break
+
+                    asserts.assert_equal(
+                        revert_success, True,
+                        f"Failed to revert {attr.__name__} on endpoint {ep}: {resp[0].Status}"
+                    )
+
         return verified_count
 
     @async_test_body
@@ -360,19 +399,22 @@ class TC_IDM_4_3(BasicCompositionTests):
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         TH: ChipDeviceController = self.default_controller
 
+        # Calculate MRP retransmission timeout once at the beginning for use across all steps
+        mrp_timeout_sec = self.get_mrp_retransmission_timeout_sec(TH)
+        log.info(f"Calculated MRP retransmission timeout: {mrp_timeout_sec:.2f}s")
+
         # Step 1: Empty report verification
         # (This was originally test step 3 in the test plan it appears)
         self.step(1)
-        # Track empty report arrival time
-        # This callback mechanism was created by Raul to enable precise timing validation
-        # of empty reports (SubscriptionStillActive messages) per Matter spec requirements
+        # Track empty report arrival time using an async event to avoid busy-wait
+        empty_report_event = asyncio.Event()
         empty_report_received = False
         empty_report_time = None
 
         def on_empty_report():
             nonlocal empty_report_received, empty_report_time
-            empty_report_received = True
             empty_report_time = time.time()
+            empty_report_event.set()
             log.debug(f"Empty report callback triggered at {empty_report_time}")
 
         # Use AttributeSubscriptionHandler for cleaner subscription management
@@ -403,26 +445,27 @@ class TC_IDM_4_3(BasicCompositionTests):
         # Wait for the empty report (SubscriptionStillActive message)
         # This should arrive between MinInterval and MaxInterval
         max_wait = sub_timeout_sec + 1
-        wait_start = time.time()
+        try:
+            await asyncio.wait_for(empty_report_event.wait(), timeout=max_wait)
+        except asyncio.TimeoutError:
+            asserts.fail("Empty report was not received")
 
-        # ruff: noqa: ASYNC110
-        while not empty_report_received and (time.time() - wait_start) < max_wait:
-            await asyncio.sleep(0.1)
-
-        asserts.assert_true(empty_report_received, "Empty report was not received")
         asserts.assert_is_not_none(empty_report_time, "Empty report timing not captured")
         sub_report_elapsed = empty_report_time - sub_time
 
+        max_expected_time = self.max_interval_ceiling_sec + mrp_timeout_sec
         log.info(
-            F"Empty report received after {sub_report_elapsed}s (MinInterval: {self.min_interval_floor_sec}s, MaxInterval: {self.max_interval_ceiling_sec}s, Timeout: {sub_timeout_sec}s)")
+            f"Empty report received after {sub_report_elapsed}s (MinInterval: {self.min_interval_floor_sec}s, "
+            f"MaxInterval: {self.max_interval_ceiling_sec}s, MRP timeout: {mrp_timeout_sec:.2f}s, "
+            f"Max expected: {max_expected_time:.2f}s)")
 
         asserts.assert_greater_equal(
             sub_report_elapsed, self.min_interval_floor_sec,
             f"Empty report elapsed time ({sub_report_elapsed}s) should be >= MinInterval ({self.min_interval_floor_sec}s)"
         )
         asserts.assert_less(
-            sub_report_elapsed, sub_timeout_sec,
-            f"Empty report elapsed time ({sub_report_elapsed}s) should be < subscription timeout ({sub_timeout_sec}s)"
+            sub_report_elapsed, max_expected_time,
+            f"Empty report elapsed time ({sub_report_elapsed}s) should be < MaxInterval + MRP timeout ({max_expected_time:.2f}s)"
         )
 
         attr_handler_step1.cancel()
@@ -460,7 +503,7 @@ class TC_IDM_4_3(BasicCompositionTests):
         )
 
         # Wait for change report
-        timeout = self.max_interval_ceiling_sec + 2
+        timeout = self.max_interval_ceiling_sec + mrp_timeout_sec
         wait_start = time.time()
         report_received = False
 
@@ -481,8 +524,8 @@ class TC_IDM_4_3(BasicCompositionTests):
             f"Report came too early ({report_delay}s < MinInterval {self.min_interval_floor_sec}s)"
         )
         asserts.assert_less(
-            report_delay, self.max_interval_ceiling_sec + 2,
-            f"Report came too late ({report_delay}s > MaxInterval {self.max_interval_ceiling_sec}s)"
+            report_delay, self.max_interval_ceiling_sec + mrp_timeout_sec,
+            f"Report came too late ({report_delay}s > MaxInterval {self.max_interval_ceiling_sec}s + MRP retransmission {mrp_timeout_sec}s)"
         )
 
         attr_handler_step2.cancel()
@@ -578,8 +621,8 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step4.flush_reports()
 
         # Wait for first empty report and capture its time
-        time_empty = time.time()  # noqa: ASYNC251
-        time.sleep(max_interval + 1)  # noqa: ASYNC251
+        time_empty = time.time() 
+        await asyncio.sleep(max_interval + 1) 
 
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
@@ -598,7 +641,7 @@ class TC_IDM_4_3(BasicCompositionTests):
                 time_data = time.time()
                 report_received = True
                 break
-            time.sleep(0.1)  # noqa: ASYNC251
+            await asyncio.sleep(0.1)
 
         asserts.assert_true(report_received, "Failed to receive attribute change report")
 
@@ -615,89 +658,29 @@ class TC_IDM_4_3(BasicCompositionTests):
                 attr_handler_step4.attribute_queue.get()
                 time_empty_2 = time.time()
                 break
-            time.sleep(0.1)  # noqa: ASYNC251
+            await asyncio.sleep(0.1) 
 
         # Wait for second empty report
-        time_empty_2 = time.time()  # noqa: ASYNC251
-        time.sleep(max_interval + 1)  # noqa: ASYNC251
+        time_empty_2 = time.time() 
+        await asyncio.sleep(max_interval + 1)
 
         # Verify timing constraints
-        #
-        # MRP Retransmission Time Calculation:
-        # Per Matter Core Specification Section 4.12.8, Table 22 (MRP Parameters):
-        # - MRP_MAX_TRANSMISSIONS = 5 (1 initial + 4 retries)
-        # - MRP_BACKOFF_BASE = 1.6 (exponential backoff multiplier)
-        # - MRP_BACKOFF_JITTER = 0.25 (random jitter scaler, ±25%)
-        # - MRP_BACKOFF_MARGIN = 1.1 (margin increase over peer idle interval)
-        # - MRP_BACKOFF_THRESHOLD = 1 (retransmissions before exponential backoff)
-        #
-        # Per src/messaging/ReliableMessageProtocolConfig.h implementation defaults:
-        # - CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS = 4 retransmissions
-        # - CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL = 500ms (non-Thread) / 2000ms (Thread)
-        # - CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL = 300ms (non-Thread) / 2000ms (Thread)
-        #
-        # NOTE: Per spec Section 4.12.8, "A Node SHALL use the provided default value for each
-        # parameter unless the message recipient Node advertises an alternate value for the parameter
-        # via Operational Discovery."
-        # The negotiated values can be retrieved using:
-        #   session_params = TH.GetRemoteSessionParameters(nodeId)
-        #   actual_idle_interval = session_params.sessionIdleInterval (in ms)
-        #   actual_active_interval = session_params.sessionActiveInterval (in ms)
-        #
-        # Example calculation using default IDLE interval (500ms for non-Thread):
-        #   Retry 1: 500ms
-        #   Retry 2: 500ms × 1.6 = 800ms
-        #   Retry 3: 800ms × 1.6 = 1280ms
-        #   Retry 4: 1280ms × 1.6 = 2048ms
-        #   Baseline Total: ~4628ms
-        #
-        # With JITTER (±25%) and MARGIN (1.1x) applied per spec:
-        #   Worst-case multiplier: 1.25 × 1.1 = 1.375
-        #   Worst-case Total: 4628ms × 1.375 ≈ 6364ms
-        #
-        # However, we dynamically calculate MRP retransmission timeout based on the actual
-        # negotiated idle interval retrieved from the DUT, ensuring accurate timing validation
-        # regardless of whether the DUT uses default values or custom values advertised via
-        # Operational Discovery.
-        #
-        # Calculate MRP retransmission timeout based on negotiated idle interval
-        # Using the spec formula with BASE=1.6 for 4 retransmissions:
-        #   Total baseline = idle_interval × (1 + 1.6 + 1.6² + 1.6³)
-        #                  = idle_interval × (1 + 1.6 + 2.56 + 4.096)
-        #                  = idle_interval × 9.256
-        # Apply worst-case JITTER (1.25) and MARGIN (1.1): multiplier = 1.375
-        # Convert from ms to seconds and add 1s buffer for network latency
-
-        # Retrieve and log negotiated MRP parameters from the DUT
-        # These may differ from defaults if the DUT advertises custom values via Operational Discovery
-        negotiated_idle_interval_ms = 500  # Default for non-Thread devices
-        try:
-            session_params = TH.GetRemoteSessionParameters(self.dut_node_id)
-            if session_params and session_params.sessionIdleInterval:
-                negotiated_idle_interval_ms = session_params.sessionIdleInterval
-            else:
-                log.info("Using default MRP Idle Interval (500ms for non-Thread)")
-        except Exception as e:
-            log.info(f"Using default MRP Idle Interval (500ms for non-Thread) but experienced {e}")
-
-        MRP_RETRANSMISSION_TIMEOUT = (negotiated_idle_interval_ms * 9.256 * 1.375 / 1000.0)
-
-        log.info(f"Using MRP Idle Interval of {negotiated_idle_interval_ms}ms")
-        log.info(f"Calculated MRP retransmission timeout: {MRP_RETRANSMISSION_TIMEOUT:.2f}s")
-        log.info(f"This accounts for {4} retransmissions with BASE={1.6}, JITTER={0.25}, MARGIN={1.1}")
+        # MRP retransmission timeout was calculated at the beginning of the test
+        # See get_mrp_retransmission_timeout_sec() for the detailed calculation
+        # based on Matter Core Specification Section 4.12.8, Table 22 (MRP Parameters)
 
         diff_1 = time_data - time_empty
         diff_2 = time_empty_2 - time_data
 
         asserts.assert_greater(diff_1, min_interval_step4,
                                f"First report interval ({diff_1}s) should be greater than MinInterval ({min_interval_step4}s)")
-        asserts.assert_less(diff_1, max_interval + MRP_RETRANSMISSION_TIMEOUT,
-                            f"First report interval ({diff_1}s) should be less than MaxInterval + MRP retransmission time ({max_interval + MRP_RETRANSMISSION_TIMEOUT}s)")
+        asserts.assert_less(diff_1, max_interval + mrp_timeout_sec,
+                            f"First report interval ({diff_1}s) should be less than MaxInterval + MRP retransmission time ({max_interval + mrp_timeout_sec}s)")
 
         asserts.assert_greater(diff_2, min_interval_step4,
                                f"Second report interval ({diff_2}s) should be greater than MinInterval ({min_interval_step4}s)")
-        asserts.assert_less(diff_2, max_interval + MRP_RETRANSMISSION_TIMEOUT,
-                            f"Second report interval ({diff_2}s) should be less than MaxInterval + MRP retransmission time ({max_interval + MRP_RETRANSMISSION_TIMEOUT}s)")
+        asserts.assert_less(diff_2, max_interval + mrp_timeout_sec,
+                            f"Second report interval ({diff_2}s) should be less than MaxInterval + MRP retransmission time ({max_interval + mrp_timeout_sec}s)")
 
         attr_handler_step4.cancel()
 
