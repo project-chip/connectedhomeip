@@ -36,8 +36,7 @@ class ElementNotFoundError(Exception):
 def parseNumberString(n: str) -> int:
     if n.startswith('0x'):
         return int(n[2:], 16)
-    else:
-        return int(n)
+    return int(n)
 
 
 @dataclass
@@ -369,9 +368,8 @@ class Parser:
             propagate_positions=True, maybe_placeholders=True)
 
     def parse(self, file: str):
-        data = LintRulesTransformer().transform(
+        return LintRulesTransformer().transform(
             self.parser.parse(file))
-        return data
 
 
 def CreateParser():

@@ -25,7 +25,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class EEVSEBaseTestHelper:
@@ -50,7 +50,7 @@ class EEVSEBaseTestHelper:
         value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         if allow_null and value is NullValue:
             # skip the range check
-            logger.info("value is NULL - OK")
+            log.info("value is NULL - OK")
             return value
 
         self.check_value_in_range(attribute, value, lower_value, upper_value)
@@ -296,12 +296,12 @@ class EEVSEBaseTestHelper:
                              f"Fault event faultStateCurrentState was {event_data.faultStateCurrentState}, expected {current_fault}")
 
     def log_get_targets_response(self, get_targets_response):
-        logger.info(f" Rx'd: {get_targets_response}")
+        log.info(f" Rx'd: {get_targets_response}")
         for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
-            logger.info(
+            log.info(
                 f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
             for sub_index, sub_entry in enumerate(entry.chargingTargets):
-                logger.info(
+                log.info(
                     f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
 
     def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
@@ -331,7 +331,7 @@ class EEVSEBaseTestHelper:
         # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
         target_time = target_time.astimezone(timezone.utc)
 
-        logger.info(
+        log.info(
             f"minutesPastMidnight = {minutes_past_midnight} => "
             f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight % 60)}"
             f" Expected target_time = {target_time}")
@@ -341,5 +341,4 @@ class EEVSEBaseTestHelper:
 
         target_time_delta = target_time - matter_base_time
 
-        expected_target_time_epoch_s = int(target_time_delta.total_seconds())
-        return expected_target_time_epoch_s
+        return int(target_time_delta.total_seconds())

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/descriptor/descriptor-cluster.h>
+#include <app/clusters/descriptor/DescriptorCluster.h>
 #include <app/util/basic-types.h>
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>

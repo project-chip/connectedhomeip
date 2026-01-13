@@ -41,7 +41,9 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
@@ -50,7 +52,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.9] Validate SolicitOffer with ICEServers and ICETransportPolicy"
 
     def steps_TC_WEBRTCP_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
@@ -65,10 +67,9 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH sends the SolicitOffer command with both ICEServers and ICETransportPolicy fields",
                      "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and accepts both ICE servers and transport policy"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_9(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -76,7 +77,6 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     async def _send_and_test_solicit_offer_and_cleanup(self, solicit_offer_request, success_message, endpoint):
         """Helper method to test SolicitOffer request and clean up the session"""

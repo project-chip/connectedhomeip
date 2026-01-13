@@ -37,8 +37,10 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_CADMIN_1_25(MatterBaseTest):
@@ -47,8 +49,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
     async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
         OC_cluster = Clusters.OperationalCredentials
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabrics
+        return await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
 
     def steps_TC_CADMIN_1_25(self) -> list[TestStep]:
         return [

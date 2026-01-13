@@ -163,7 +163,8 @@ def main(
     if gh_api_token:
         gh_token = gh_api_token
     elif token_file:
-        gh_token = open(token_file, "rt").read().strip()
+        with open(token_file) as f:
+            gh_token = f.read().strip()
     else:
         raise Exception("Require a --gh-api-token or --token-file to access github")
 

@@ -26,7 +26,7 @@
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_testing_##CLASS_NAME##_##METHOD_NAME
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 JNI_METHOD(jlong, MessagingContext, newMessagingContext)
 (JNIEnv * env, jobject self, jboolean initializeNodes)

@@ -37,7 +37,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /**
  * @brief
@@ -398,5 +398,5 @@ private:
     std::vector<Message> mCapturedMessages;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

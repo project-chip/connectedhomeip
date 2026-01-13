@@ -92,9 +92,9 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
                                         bool allowInfiniteReads, const ConcreteReadAttributePath & aPath,
                                         AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
-    if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
+    if (aPath.mEndpointId >= chip::Testing::kMockEndpointMin)
     {
-        return chip::Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+        return chip::Testing::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
     if (gReadResponseDirective == ReadResponseDirective::kSendManyDataResponses ||

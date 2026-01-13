@@ -48,10 +48,12 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
@@ -67,7 +69,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S", "EEVSE.S.F00"]
 
     def steps_TC_EEVSE_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("1a", "TH reads from the DUT theFeatureMap_",
@@ -156,8 +158,6 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kChargingPreferences))
     async def test_TC_EEVSE_2_3(self):
 
@@ -176,7 +176,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         soc_reporting_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kSoCReporting) > 0
         charging_preferences_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences) > 0
 
-        logger.info(
+        log.info(
             f"Received FeatureMap: {feature_map:#x} = SoCReporting ({soc_reporting_supported}), ChargingPreferences ({charging_preferences_supported})")
 
         self.step("2")
@@ -233,7 +233,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         # since we are sending 'null' this should result in InvalidCommand.
         if soc_reporting_supported:
             await self.send_set_targets_command(chargingTargetSchedules=targets, expected_status=Status.InvalidCommand)
-            logger.info(
+            log.info(
                 "Skipping steps 8a-8d as SoCReporting is supported by the DUT and the TargetSoC is not sent in the SetTargets command which should result in InvalidCommand.")
             self.mark_step_range_skipped("8a", "8d")
 
@@ -256,7 +256,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_enable_charge_command(charge_until=NullValue, min_charge=6000, max_charge=60000)
 
         if soc_reporting_supported:
-            logger.info(
+            log.info(
                 "Skipping steps 9a-10 as SoCReporting is supported by the DUT and step 8 above will have failed.")
             self.mark_step_range_skipped("9a", "10")
 
@@ -296,12 +296,12 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("11a")
         next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-        logger.info(
+        log.info(
             f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
         self.step("11b")
         next_target_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeTargetTime")
-        logger.info(
+        log.info(
             f"Received NextChargeTargetTime: {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
 
         # This should be the next MinutesPastMidnight converted to realtime as epoch_s

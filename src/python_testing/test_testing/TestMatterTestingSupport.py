@@ -24,9 +24,10 @@ from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
-from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, matchers,
-                                           parse_matter_test_args)
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, matchers
 from matter.testing.pics import parse_pics, parse_pics_xml
+from matter.testing.runner import default_matter_test_main, parse_matter_test_args
 from matter.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
@@ -50,7 +51,7 @@ def get_raw_type_list():
     list_of_double_nested_struct_list_type = typing.List[double_nested_struct_list_type]
 
     # Create a list with all the types and a list of the values that should match for that type
-    vals = {uint: [1],
+    return {uint: [1],
             str: ["str"],
             struct_type: [struct],
             null_opt_struct_type: [null_opt_struct],
@@ -58,7 +59,6 @@ def get_raw_type_list():
             list_of_uints_type: [list_of_uints],
             list_of_structs_type: [list_of_structs],
             list_of_double_nested_struct_list_type: [list_of_double_nested_struct_list]}
-    return vals
 
 
 def test_type_matching_for_type(test_type, test_nullable: bool = False, test_optional: bool = False):
@@ -133,7 +133,7 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_type_checking(self):
         vals = get_raw_type_list()
-        for k in vals.keys():
+        for k in vals:
             run_all_match_tests_for_type(k)
 
     @async_test_body
@@ -571,8 +571,8 @@ class TestMatterTestingSupport(MatterBaseTest):
         problems = find_tag_list_problems(roots, device_types, simple)
         # expect this problem reported on both 2 and 3 endpoints
         expected_problem = TagProblem(root=1, missing_attribute=False, missing_feature=False, duplicates={2, 3}, same_tag={2, 3})
-        asserts.assert_true(2 in problems.keys(), "Missing problem report for ep2")
-        asserts.assert_true(3 in problems.keys(), "Missing problem report for ep3")
+        asserts.assert_true(2 in problems, "Missing problem report for ep2")
+        asserts.assert_true(3 in problems, "Missing problem report for ep3")
         asserts.assert_equal(problems[2], expected_problem, "Problem report for simple EP2 is not as expected")
         asserts.assert_equal(problems[3], expected_problem, "Problem report for simple EP3 is not as expected")
 

@@ -105,14 +105,14 @@ def version_update(log_level, update, new_version):
         #
         # This makes every group element (date section) to a base 10 integer,
         # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
-        zap_min_version = tuple((int(x, 10) for x in parsed.groups()[:3]))
+        zap_min_version = tuple(int(x, 10) for x in parsed.groups()[:3])
 
     files_to_update = []
     if UpdateChoice.USAGE in update:
         files_to_update += USAGE_FILES_DEPENDING_ON_ZAP_VERSION
 
     for name in files_to_update:
-        with open(os.path.join(CHIP_ROOT_DIR, name), 'rt') as f:
+        with open(os.path.join(CHIP_ROOT_DIR, name)) as f:
             file_data = f.read()
 
         # Write out any matches. Note that we only write distinct matches as
@@ -155,7 +155,7 @@ def version_update(log_level, update, new_version):
 
     # Finally, check zap_execution for any version update
     if UpdateChoice.USAGE in update:
-        with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'rt') as f:
+        with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT)) as f:
             file_data = f.read()
 
         m = ZAP_EXECUTION_MIN_RE.search(file_data)

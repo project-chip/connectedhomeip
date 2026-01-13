@@ -44,6 +44,7 @@
 #   good way to disambiguate
 #
 
+import contextlib
 import fnmatch
 import logging
 import re
@@ -136,11 +137,9 @@ def tree_display_name(name: str) -> list[str]:
     'emberAf' prefixes to make them common and uses 'vtable for' information
     """
 
-    try:
+    # Allow to display the name as-is in case of failure.
+    with contextlib.suppress(cxxfilt.InvalidName):
         name = cxxfilt.demangle(name)
-    except cxxfilt.InvalidName:
-        # Allow display of the name as-is
-        pass
 
     if name.startswith("non-virtual thunk to "):
         name = name[21:]
@@ -179,8 +178,7 @@ def tree_display_name(name: str) -> list[str]:
         log.debug("Ember callback found: '%s' -> %r", name, d)
         if 'command' in d:
             return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
-        else:
-            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+        return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
 
     if 'MatterPreAttributeChangeCallback' in name:
         return ["EMBER", "CALLBACKS", name]
@@ -767,8 +765,8 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
     result = []
 
     for path in unique_paths:
-        orig_symbol = orig_items.get(path, None)
-        base_symbol = base_items.get(path, None)
+        orig_symbol = orig_items.get(path)
+        base_symbol = base_items.get(path)
 
         if not orig_symbol:
             if not base_symbol:

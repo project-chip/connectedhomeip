@@ -16,6 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/soil-measurement-cluster.cpp"
-    "${CLUSTER_DIR}/soil-measurement-cluster.h"
+    "${CLUSTER_DIR}/SoilMeasurementCluster.cpp"
+    "${CLUSTER_DIR}/SoilMeasurementCluster.h"
 )

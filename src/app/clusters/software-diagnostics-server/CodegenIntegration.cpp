@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
@@ -75,7 +75,7 @@ void MatterSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -87,7 +87,7 @@ void MatterSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback() {}

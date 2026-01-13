@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Enums.h>
@@ -103,6 +103,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer) override
+    {
+        if (mManufacturingDateSuffix == nullptr)
+        {
+            suffixBuffer.reduce_size(0);
+            return CHIP_NO_ERROR;
+        }
+        return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(mManufacturingDateSuffix), suffixBuffer);
+    }
+
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kPartNumber); }
 
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kProductURL); }
@@ -124,6 +134,12 @@ public:
     }
 
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
+
+    // NOTE: suffix lifetime MUST be longer than this object lifetime as just a pointer is kept.
+    void SetManufacturingDateSuffix(const char * suffix) { mManufacturingDateSuffix = suffix; }
+
+private:
+    const char * mManufacturingDateSuffix = nullptr;
 };
 
 static constexpr size_t kCountryCodeLength = 2;
@@ -177,17 +193,24 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
 
-    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); }
+    void SetUp() override
+    {
+        // Enable optional attributes that are used in tests
+        basicInformationClusterInstance.OptionalAttributes()
+            .Set<Attributes::ManufacturingDate::Id>()
+            .Set<Attributes::LocalConfigDisabled::Id>();
+        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
+    }
 
-    void TearDown() override { basicInformationClusterInstance.Shutdown(); }
+    void TearDown() override { basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    chip::Test::TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     static BasicInformationCluster & basicInformationClusterInstance;
-    static chip::Test::ClusterTester tester;
+    static chip::Testing::ClusterTester tester;
 };
 
 BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
-chip::Test::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
+chip::Testing::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
@@ -204,7 +227,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    basicInformationClusterInstance.Shutdown();
+    basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
@@ -303,6 +326,16 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         CharSpan val(buf);
         ASSERT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal("20230615"_span));
+    }
+
+    // ManufacturingDate with suffix
+    {
+        char buf[32];
+        CharSpan val(buf);
+        gMockDeviceInstanceInfoProvider.SetManufacturingDateSuffix("ABCDEFGH");
+        ASSERT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
+        EXPECT_TRUE(val.data_equal("20230615ABCDEFGH"_span));
+        gMockDeviceInstanceInfoProvider.SetManufacturingDateSuffix(nullptr);
     }
 
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)

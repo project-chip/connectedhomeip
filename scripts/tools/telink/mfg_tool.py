@@ -140,8 +140,7 @@ def read_der_file(path: str):
     log.debug("Reading der file '%s'...", path)
     try:
         with open(path, 'rb') as f:
-            data = f.read()
-            return data
+            return f.read()
     except IOError as e:
         log.exception(e)
         raise e
@@ -150,9 +149,7 @@ def read_der_file(path: str):
 def read_key_bin_file(path: str):
     try:
         with open(path, 'rb') as file:
-            key_data = file.read()
-
-            return key_data
+            return file.read()
 
     except IOError or ValueError:
         return None
@@ -731,25 +728,23 @@ def main():
     out_dir_top = os.path.realpath(args.output)
     os.makedirs(out_dir_top, exist_ok=True)
 
-    dev_sn_file = open(os.sep.join([out_dir_top, "device_sn.csv"]), "w")
-    dev_sn_file.write(DEV_SN_CSV_HDR)
+    with open(os.sep.join([out_dir_top, "device_sn.csv"]), "w") as f:
+        f.write(DEV_SN_CSV_HDR)
 
-    for i in range(args.count):
-        pai_cert = {}
-        serial_num_str = format(serial_num_int + i, 'x')
-        log.info("Generating for '%s'", serial_num_str)
-        dev_sn_file.write(serial_num_str + '\n')
-        out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
-        add_additional_kv(args, serial_num_str)
-        generate_passcode(args, out_dirs)
-        generate_discriminator(args, out_dirs)
-        if args.paa or args.pai:
-            pai_cert = setup_root_certificates(args, out_dirs)
-        dacs_cert = write_device_unique_data(args, out_dirs, pai_cert)
-        generate_partition(args, out_dirs)
-        generate_json_summary(args, out_dirs, pai_cert, dacs_cert, serial_num_str)
-
-    dev_sn_file.close()
+        for i in range(args.count):
+            pai_cert = {}
+            serial_num_str = format(serial_num_int + i, 'x')
+            log.info("Generating for '%s'", serial_num_str)
+            f.write(serial_num_str + '\n')
+            out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
+            add_additional_kv(args, serial_num_str)
+            generate_passcode(args, out_dirs)
+            generate_discriminator(args, out_dirs)
+            if args.paa or args.pai:
+                pai_cert = setup_root_certificates(args, out_dirs)
+            dacs_cert = write_device_unique_data(args, out_dirs, pai_cert)
+            generate_partition(args, out_dirs)
+            generate_json_summary(args, out_dirs, pai_cert, dacs_cert, serial_num_str)
 
 
 if __name__ == "__main__":

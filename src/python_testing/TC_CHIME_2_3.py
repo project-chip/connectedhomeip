@@ -33,6 +33,20 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device chime
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
@@ -40,7 +54,9 @@ from TC_CHIMETestBase import CHIMETestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
@@ -49,7 +65,7 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
         return "[TC-CHIME-2.3] Verify that the SelectedChime can be changed"
 
     def steps_TC_CHIME_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the InstalledChimeSounds attribute, store as myChimeSounds."),
             TestStep(3, "Read the SelectedChime attribute, store as mySelectedChime"),
@@ -60,13 +76,11 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
             TestStep(8, "Read the SelectedChime attribute, verfy that it's unchanged"),
 
         ]
-        return steps
 
     def pics_TC_CHIME_2_3(self) -> list[str]:
-        pics = [
+        return [
             "CHIME.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_3(self):
