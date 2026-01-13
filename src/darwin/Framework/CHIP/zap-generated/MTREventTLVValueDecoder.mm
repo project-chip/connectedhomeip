@@ -5255,6 +5255,20 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             }
             value.activationReason = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            value.containerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.CMAFSessionNumber.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.CMAFSessionNumber.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.cmafSessionNumber = memberValue;
+        } while (0);
 
         return value;
     }
@@ -5271,6 +5285,20 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
             value.connectionID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            value.containerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.CMAFSessionNumber.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.CMAFSessionNumber.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.cmafSessionNumber = memberValue;
         } while (0);
 
         return value;
