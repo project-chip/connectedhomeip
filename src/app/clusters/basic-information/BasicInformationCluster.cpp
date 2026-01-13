@@ -158,11 +158,15 @@ inline CHIP_ERROR ReadSoftwareVersionString(DeviceLayer::ConfigurationManager & 
 
 inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
+    constexpr size_t kMaxLen        = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
+    constexpr size_t kMaxDateLength = 8; // YYYYMMDD
+    static_assert(kMaxLen > kMaxDateLength, "kMaxLen must be greater than kMaxDateLength");
     char manufacturingDateString[kMaxLen + 1] = { 0 };
     uint16_t manufacturingYear;
     uint8_t manufacturingMonth;
     uint8_t manufacturingDayOfMonth;
+    size_t totalManufacturingDateLen = 0;
+    MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, sizeof(manufacturingDateString) - kMaxDateLength);
     CHIP_ERROR status = deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
     // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
@@ -171,14 +175,25 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
         manufacturingYear       = 2020;
         manufacturingMonth      = 1;
         manufacturingDayOfMonth = 1;
-        status                  = CHIP_NO_ERROR;
+        vendorSuffixSpan.reduce_size(0);
+        status = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(status);
 
     // Format is YYYYMMDD
     snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear, manufacturingMonth,
              manufacturingDayOfMonth);
-    return aEncoder.Encode(CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
+
+    totalManufacturingDateLen = kMaxDateLength;
+    status                    = deviceInfoProvider->GetManufacturingDateSuffix(vendorSuffixSpan);
+    if (status == CHIP_NO_ERROR)
+    {
+        totalManufacturingDateLen += vendorSuffixSpan.size();
+    }
+
+    VerifyOrDie(totalManufacturingDateLen <= kMaxLen);
+
+    return aEncoder.Encode(CharSpan(manufacturingDateString, totalManufacturingDateLen));
 }
 
 inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)

@@ -335,12 +335,16 @@ config IEEE802154_TLX_OPTIMIZATION
     help
       Improve RF performance in IEEE 802.15.4 communication on TLX SoCs.
 
+config IEEE802154_TLX_ACTIVE_STAGE_OPTIMIZATION
+    bool "Active Stage Optimization"
+    default n if BOARD_TL3218X_RETENTION
+
 config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 440 if PM
-    default 608
+    default 496 if PM && ZEPHYR_VERSION_3_3
+    default 640
 
 config OPENTHREAD_SLAAC
     default y

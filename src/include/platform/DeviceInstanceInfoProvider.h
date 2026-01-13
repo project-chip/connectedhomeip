@@ -132,6 +132,28 @@ public:
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) = 0;
 
     /**
+     * @brief Retrieve the optional vendor-specific suffix of the manufacturing date
+     *        from the device's factory data.
+     *
+     * Per Matter spec 11.1.5.12:
+     *   - The first 8 characters of the ManufacturingDate SHALL be the ISO 8601 date (YYYYMMDD).
+     *   - The final 8 characters MAY contain optional vendor-specific information.
+     *
+     * @param[in,out] suffixBuffer A buffer to receive the vendor-defined suffix (up to 8 characters).
+     *                             On input, the span size indicates the available capacity.
+     *                             On success, the span is reduced to the actual suffix length (0..8).
+     *
+     * @returns CHIP_NO_ERROR if the vendor suffix was retrieved successfully (or is empty / not supported),
+     *          CHIP_ERROR_BUFFER_TOO_SMALL if the provided span is too small, or another CHIP_ERROR from the underlying
+     *          implementation if access fails.
+     */
+    virtual CHIP_ERROR GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
+    {
+        suffixBuffer.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * @brief Obtain a Hardware Version from the device's factory data.
      *
      * @param[out] hardwareVersion Reference to location where the hardware version integer will be copied
