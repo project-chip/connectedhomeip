@@ -34,7 +34,7 @@ public:
     // == Global Scene Methods ==
     // These methods interact with the Global Scene (Group ID 0, Scene ID 0).
 
-    /// Stores the current state of into the Global Scene for the fabric.
+    /// Stores the current state into the Global Scene for the fabric.
     virtual CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) = 0;
 
     /// Recalls the Global Scene for the given fabric.
