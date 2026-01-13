@@ -16110,6 +16110,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
   public Boolean metadataEnabled;
+  public Optional<ArrayList<Integer>> videoStreams;
+  public Optional<ArrayList<Integer>> audioStreams;
   public Integer fabricIndex;
   private static final long ID_ID = 0L;
   private static final long PEER_NODE_ID_ID = 1L;
@@ -16118,6 +16120,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   private static final long VIDEO_STREAM_ID_ID = 4L;
   private static final long AUDIO_STREAM_ID_ID = 5L;
   private static final long METADATA_ENABLED_ID = 6L;
+  private static final long VIDEO_STREAMS_ID = 7L;
+  private static final long AUDIO_STREAMS_ID = 8L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportProviderClusterWebRTCSessionStruct(
@@ -16128,6 +16132,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
     Boolean metadataEnabled,
+    Optional<ArrayList<Integer>> videoStreams,
+    Optional<ArrayList<Integer>> audioStreams,
     Integer fabricIndex
   ) {
     this.id = id;
@@ -16137,6 +16143,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
     this.metadataEnabled = metadataEnabled;
+    this.videoStreams = videoStreams;
+    this.audioStreams = audioStreams;
     this.fabricIndex = fabricIndex;
   }
 
@@ -16149,6 +16157,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
     values.add(new StructElement(METADATA_ENABLED_ID, new BooleanType(metadataEnabled)));
+    values.add(new StructElement(VIDEO_STREAMS_ID, videoStreams.<BaseTLVType>map((nonOptionalvideoStreams) -> ArrayType.generateArrayType(nonOptionalvideoStreams, (elementnonOptionalvideoStreams) -> new UIntType(elementnonOptionalvideoStreams))).orElse(new EmptyType())));
+    values.add(new StructElement(AUDIO_STREAMS_ID, audioStreams.<BaseTLVType>map((nonOptionalaudioStreams) -> ArrayType.generateArrayType(nonOptionalaudioStreams, (elementnonOptionalaudioStreams) -> new UIntType(elementnonOptionalaudioStreams))).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -16165,6 +16175,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
     Boolean metadataEnabled = null;
+    Optional<ArrayList<Integer>> videoStreams = Optional.empty();
+    Optional<ArrayList<Integer>> audioStreams = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
@@ -16202,6 +16214,16 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           metadataEnabled = castingValue.value(Boolean.class);
         }
+      } else if (element.contextTagNum() == VIDEO_STREAMS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          videoStreams = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAMS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          audioStreams = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -16217,6 +16239,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
       videoStreamID,
       audioStreamID,
       metadataEnabled,
+      videoStreams,
+      audioStreams,
       fabricIndex
     );
   }
@@ -16245,6 +16269,12 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tmetadataEnabled: ");
     output.append(metadataEnabled);
+    output.append("\n");
+    output.append("\tvideoStreams: ");
+    output.append(videoStreams);
+    output.append("\n");
+    output.append("\taudioStreams: ");
+    output.append(audioStreams);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -16504,6 +16534,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
   public Boolean metadataEnabled;
+  public Optional<ArrayList<Integer>> videoStreams;
+  public Optional<ArrayList<Integer>> audioStreams;
   public Integer fabricIndex;
   private static final long ID_ID = 0L;
   private static final long PEER_NODE_ID_ID = 1L;
@@ -16512,6 +16544,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   private static final long VIDEO_STREAM_ID_ID = 4L;
   private static final long AUDIO_STREAM_ID_ID = 5L;
   private static final long METADATA_ENABLED_ID = 6L;
+  private static final long VIDEO_STREAMS_ID = 7L;
+  private static final long AUDIO_STREAMS_ID = 8L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportRequestorClusterWebRTCSessionStruct(
@@ -16522,6 +16556,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
     Boolean metadataEnabled,
+    Optional<ArrayList<Integer>> videoStreams,
+    Optional<ArrayList<Integer>> audioStreams,
     Integer fabricIndex
   ) {
     this.id = id;
@@ -16531,6 +16567,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
     this.metadataEnabled = metadataEnabled;
+    this.videoStreams = videoStreams;
+    this.audioStreams = audioStreams;
     this.fabricIndex = fabricIndex;
   }
 
@@ -16543,6 +16581,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
     values.add(new StructElement(METADATA_ENABLED_ID, new BooleanType(metadataEnabled)));
+    values.add(new StructElement(VIDEO_STREAMS_ID, videoStreams.<BaseTLVType>map((nonOptionalvideoStreams) -> ArrayType.generateArrayType(nonOptionalvideoStreams, (elementnonOptionalvideoStreams) -> new UIntType(elementnonOptionalvideoStreams))).orElse(new EmptyType())));
+    values.add(new StructElement(AUDIO_STREAMS_ID, audioStreams.<BaseTLVType>map((nonOptionalaudioStreams) -> ArrayType.generateArrayType(nonOptionalaudioStreams, (elementnonOptionalaudioStreams) -> new UIntType(elementnonOptionalaudioStreams))).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -16559,6 +16599,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
     Boolean metadataEnabled = null;
+    Optional<ArrayList<Integer>> videoStreams = Optional.empty();
+    Optional<ArrayList<Integer>> audioStreams = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
@@ -16596,6 +16638,16 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           metadataEnabled = castingValue.value(Boolean.class);
         }
+      } else if (element.contextTagNum() == VIDEO_STREAMS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          videoStreams = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAMS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          audioStreams = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -16611,6 +16663,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
       videoStreamID,
       audioStreamID,
       metadataEnabled,
+      videoStreams,
+      audioStreams,
       fabricIndex
     );
   }
@@ -16639,6 +16693,12 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tmetadataEnabled: ");
     output.append(metadataEnabled);
+    output.append("\n");
+    output.append("\tvideoStreams: ");
+    output.append(videoStreams);
+    output.append("\n");
+    output.append("\taudioStreams: ");
+    output.append(audioStreams);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -16961,6 +17021,128 @@ public static class PushAvStreamTransportClusterTransportZoneOptionsStruct {
     output.append("\n");
     output.append("\tsensitivity: ");
     output.append(sensitivity);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterAudioStreamStruct {
+  public String audioStreamName;
+  public Integer audioStreamID;
+  private static final long AUDIO_STREAM_NAME_ID = 0L;
+  private static final long AUDIO_STREAM_ID_ID = 1L;
+
+  public PushAvStreamTransportClusterAudioStreamStruct(
+    String audioStreamName,
+    Integer audioStreamID
+  ) {
+    this.audioStreamName = audioStreamName;
+    this.audioStreamID = audioStreamID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AUDIO_STREAM_NAME_ID, new StringType(audioStreamName)));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, new UIntType(audioStreamID)));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterAudioStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String audioStreamName = null;
+    Integer audioStreamID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AUDIO_STREAM_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          audioStreamName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioStreamID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterAudioStreamStruct(
+      audioStreamName,
+      audioStreamID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterAudioStreamStruct {\n");
+    output.append("\taudioStreamName: ");
+    output.append(audioStreamName);
+    output.append("\n");
+    output.append("\taudioStreamID: ");
+    output.append(audioStreamID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PushAvStreamTransportClusterVideoStreamStruct {
+  public String videoStreamName;
+  public Integer videoStreamID;
+  private static final long VIDEO_STREAM_NAME_ID = 0L;
+  private static final long VIDEO_STREAM_ID_ID = 1L;
+
+  public PushAvStreamTransportClusterVideoStreamStruct(
+    String videoStreamName,
+    Integer videoStreamID
+  ) {
+    this.videoStreamName = videoStreamName;
+    this.videoStreamID = videoStreamID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(VIDEO_STREAM_NAME_ID, new StringType(videoStreamName)));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterVideoStreamStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String videoStreamName = null;
+    Integer videoStreamID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == VIDEO_STREAM_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          videoStreamName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterVideoStreamStruct(
+      videoStreamName,
+      videoStreamID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterVideoStreamStruct {\n");
+    output.append("\tvideoStreamName: ");
+    output.append(videoStreamName);
+    output.append("\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -17294,6 +17476,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public Integer ingestMethod;
   public ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions;
   public Optional<Long> expiryTime;
+  public Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterVideoStreamStruct>> videoStreams;
+  public Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterAudioStreamStruct>> audioStreams;
   private static final long STREAM_USAGE_ID = 0L;
   private static final long VIDEO_STREAM_ID_ID = 1L;
   private static final long AUDIO_STREAM_ID_ID = 2L;
@@ -17303,6 +17487,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   private static final long INGEST_METHOD_ID = 6L;
   private static final long CONTAINER_OPTIONS_ID = 7L;
   private static final long EXPIRY_TIME_ID = 8L;
+  private static final long VIDEO_STREAMS_ID = 9L;
+  private static final long AUDIO_STREAMS_ID = 10L;
 
   public PushAvStreamTransportClusterTransportOptionsStruct(
     Integer streamUsage,
@@ -17313,7 +17499,9 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions,
     Integer ingestMethod,
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions,
-    Optional<Long> expiryTime
+    Optional<Long> expiryTime,
+    Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterVideoStreamStruct>> videoStreams,
+    Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterAudioStreamStruct>> audioStreams
   ) {
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
@@ -17324,6 +17512,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     this.ingestMethod = ingestMethod;
     this.containerOptions = containerOptions;
     this.expiryTime = expiryTime;
+    this.videoStreams = videoStreams;
+    this.audioStreams = audioStreams;
   }
 
   public StructType encodeTlv() {
@@ -17337,6 +17527,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
     values.add(new StructElement(CONTAINER_OPTIONS_ID, containerOptions.encodeTlv()));
     values.add(new StructElement(EXPIRY_TIME_ID, expiryTime.<BaseTLVType>map((nonOptionalexpiryTime) -> new UIntType(nonOptionalexpiryTime)).orElse(new EmptyType())));
+    values.add(new StructElement(VIDEO_STREAMS_ID, videoStreams.<BaseTLVType>map((nonOptionalvideoStreams) -> ArrayType.generateArrayType(nonOptionalvideoStreams, (elementnonOptionalvideoStreams) -> elementnonOptionalvideoStreams.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(AUDIO_STREAMS_ID, audioStreams.<BaseTLVType>map((nonOptionalaudioStreams) -> ArrayType.generateArrayType(nonOptionalaudioStreams, (elementnonOptionalaudioStreams) -> elementnonOptionalaudioStreams.encodeTlv())).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -17354,6 +17546,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     Integer ingestMethod = null;
     ChipStructs.PushAvStreamTransportClusterContainerOptionsStruct containerOptions = null;
     Optional<Long> expiryTime = Optional.empty();
+    Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterVideoStreamStruct>> videoStreams = Optional.empty();
+    Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterAudioStreamStruct>> audioStreams = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -17400,6 +17594,16 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
           UIntType castingValue = element.value(UIntType.class);
           expiryTime = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == VIDEO_STREAMS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          videoStreams = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.PushAvStreamTransportClusterVideoStreamStruct.decodeTlv(elementcastingValue)));
+        }
+      } else if (element.contextTagNum() == AUDIO_STREAMS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          audioStreams = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.PushAvStreamTransportClusterAudioStreamStruct.decodeTlv(elementcastingValue)));
+        }
       }
     }
     return new PushAvStreamTransportClusterTransportOptionsStruct(
@@ -17411,7 +17615,9 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       triggerOptions,
       ingestMethod,
       containerOptions,
-      expiryTime
+      expiryTime,
+      videoStreams,
+      audioStreams
     );
   }
 
@@ -17445,6 +17651,12 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     output.append("\n");
     output.append("\texpiryTime: ");
     output.append(expiryTime);
+    output.append("\n");
+    output.append("\tvideoStreams: ");
+    output.append(videoStreams);
+    output.append("\n");
+    output.append("\taudioStreams: ");
+    output.append(audioStreams);
     output.append("\n");
     output.append("}\n");
     return output.toString();

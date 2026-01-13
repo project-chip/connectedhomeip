@@ -202,8 +202,14 @@ public:
      *  This only compares the error code. Under the CHIP_CONFIG_ERROR_SOURCE configuration, errors compare equal
      *  if they have the same error code, even if they have different source locations.
      */
-    __attribute__((always_inline)) inline bool operator==(const ChipError & other) const { return mError == other.mError; }
-    __attribute__((always_inline)) inline bool operator!=(const ChipError & other) const { return mError != other.mError; }
+    constexpr __attribute__((always_inline)) inline bool operator==(const ChipError & other) const
+    {
+        return mError == other.mError;
+    }
+    constexpr __attribute__((always_inline)) inline bool operator!=(const ChipError & other) const
+    {
+        return mError != other.mError;
+    }
 
     /**
      * Return an integer code for the error.
