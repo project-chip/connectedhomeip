@@ -68,7 +68,7 @@ tests:
       disabled: true
 
       - label: "Step 3: TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used_original."
-      PICS: DGSW.S.A0002
+        PICS: DGSW.S.A0002
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
