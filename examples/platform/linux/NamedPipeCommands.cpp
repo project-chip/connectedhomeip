@@ -21,9 +21,8 @@
 #include <chrono>
 #include <errno.h>
 #include <fcntl.h>
-#include <poll.h>
-#include <unistd.h>
 #include <lib/support/CodeUtils.h>
+#include <poll.h>
 #include <pthread.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -105,7 +104,7 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
     constexpr int kOpenTimeoutMs = 2000;
     constexpr int kRetrySleepMs  = 50;
 
-    int fd = -1;
+    int fd           = -1;
     const auto start = std::chrono::steady_clock::now();
 
     while (true)
