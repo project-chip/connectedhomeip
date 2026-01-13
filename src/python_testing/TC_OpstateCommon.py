@@ -30,8 +30,8 @@ from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import TestStep
 
+from matter.testing.runner import TestStep
 log = logging.getLogger(__name__)
 
 

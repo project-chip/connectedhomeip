@@ -70,8 +70,9 @@ from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
-from matter.testing.runner import default_matter_test_main
+import matter.testing.matchers as matchers
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main, TestStep
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)

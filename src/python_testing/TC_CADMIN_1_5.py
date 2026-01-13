@@ -42,8 +42,7 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError as IME
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import default_matter_test_main, TestStep
 
 log = logging.getLogger(__name__)
 

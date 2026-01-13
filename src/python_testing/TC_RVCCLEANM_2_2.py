@@ -43,8 +43,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
+import matter.testing.matchers as matchers
 
 
 class RvcStatusEnum(enum.IntEnum):

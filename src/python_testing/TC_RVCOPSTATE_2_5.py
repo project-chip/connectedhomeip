@@ -44,8 +44,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, matchers
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.runner import default_matter_test_main, TestStep
+import matter.testing.matchers as matchers
 
 log = logging.getLogger(__name__)
 
