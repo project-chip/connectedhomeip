@@ -226,7 +226,7 @@ public:
         // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
         if (!IsCommandAnAcceptedCommand(commandId))
         {
-            result.status = Protocols::InteractionModel::Status::InvalidCommand;
+            result.status = Protocols::InteractionModel::Status::UnsupportedCommand;
             return result;
         }
 
