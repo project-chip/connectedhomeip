@@ -132,8 +132,18 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
         usleep(kRetrySleepMs * 1000);
     }
 
-    (void) write(fd, json.data(), json.size());
-    (void) write(fd, "\n", 1);
+    ssize_t written = write(fd, json.data(), json.size());
+    if (written < 0 || static_cast<size_t>(written) != json.size())
+    {
+        ChipLogError(DeviceLayer, "Failed to write full JSON to out pipe");
+    }
+
+    written = write(fd, "\n", 1);
+    if (written != 1)
+    {
+        ChipLogError(DeviceLayer, "Failed to write newline to out pipe");
+    }
+
     close(fd);
 }
 
