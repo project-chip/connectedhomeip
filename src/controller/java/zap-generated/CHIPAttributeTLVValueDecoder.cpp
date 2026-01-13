@@ -45846,6 +45846,60 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
                     newElement_0_metadataEnabledClassName.c_str(), newElement_0_metadataEnabledCtorSignature.c_str(),
                     jninewElement_0_metadataEnabled, newElement_0_metadataEnabled);
+                jobject newElement_0_videoStreams;
+                if (!entry_0.videoStreams.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_videoStreams);
+                }
+                else
+                {
+                    jobject newElement_0_videoStreamsInsideOptional;
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
+                        newElement_0_videoStreamsInsideOptional);
+
+                    auto iter_newElement_0_videoStreamsInsideOptional_3 = entry_0.videoStreams.Value().begin();
+                    while (iter_newElement_0_videoStreamsInsideOptional_3.Next())
+                    {
+                        auto & entry_3 = iter_newElement_0_videoStreamsInsideOptional_3.GetValue();
+                        jobject newElement_3;
+                        std::string newElement_3ClassName     = "java/lang/Integer";
+                        std::string newElement_3CtorSignature = "(I)V";
+                        jint jninewElement_3                  = static_cast<jint>(entry_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), jninewElement_3, newElement_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
+                            newElement_0_videoStreamsInsideOptional, newElement_3);
+                    }
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_videoStreamsInsideOptional, newElement_0_videoStreams);
+                }
+                jobject newElement_0_audioStreams;
+                if (!entry_0.audioStreams.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_audioStreams);
+                }
+                else
+                {
+                    jobject newElement_0_audioStreamsInsideOptional;
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
+                        newElement_0_audioStreamsInsideOptional);
+
+                    auto iter_newElement_0_audioStreamsInsideOptional_3 = entry_0.audioStreams.Value().begin();
+                    while (iter_newElement_0_audioStreamsInsideOptional_3.Next())
+                    {
+                        auto & entry_3 = iter_newElement_0_audioStreamsInsideOptional_3.GetValue();
+                        jobject newElement_3;
+                        std::string newElement_3ClassName     = "java/lang/Integer";
+                        std::string newElement_3CtorSignature = "(I)V";
+                        jint jninewElement_3                  = static_cast<jint>(entry_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), jninewElement_3, newElement_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
+                            newElement_0_audioStreamsInsideOptional, newElement_3);
+                    }
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_audioStreamsInsideOptional, newElement_0_audioStreams);
+                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -45869,7 +45923,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Boolean;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -45878,10 +45932,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
-                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
-                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
-                                                  newElement_0_metadataEnabled, newElement_0_fabricIndex);
+                    newElement_0 =
+                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
+                                       newElement_0_peerNodeID, newElement_0_peerEndpointID, newElement_0_streamUsage,
+                                       newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataEnabled,
+                                       newElement_0_videoStreams, newElement_0_audioStreams, newElement_0_fabricIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -46082,6 +46137,60 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
                     newElement_0_metadataEnabledClassName.c_str(), newElement_0_metadataEnabledCtorSignature.c_str(),
                     jninewElement_0_metadataEnabled, newElement_0_metadataEnabled);
+                jobject newElement_0_videoStreams;
+                if (!entry_0.videoStreams.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_videoStreams);
+                }
+                else
+                {
+                    jobject newElement_0_videoStreamsInsideOptional;
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
+                        newElement_0_videoStreamsInsideOptional);
+
+                    auto iter_newElement_0_videoStreamsInsideOptional_3 = entry_0.videoStreams.Value().begin();
+                    while (iter_newElement_0_videoStreamsInsideOptional_3.Next())
+                    {
+                        auto & entry_3 = iter_newElement_0_videoStreamsInsideOptional_3.GetValue();
+                        jobject newElement_3;
+                        std::string newElement_3ClassName     = "java/lang/Integer";
+                        std::string newElement_3CtorSignature = "(I)V";
+                        jint jninewElement_3                  = static_cast<jint>(entry_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), jninewElement_3, newElement_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
+                            newElement_0_videoStreamsInsideOptional, newElement_3);
+                    }
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_videoStreamsInsideOptional, newElement_0_videoStreams);
+                }
+                jobject newElement_0_audioStreams;
+                if (!entry_0.audioStreams.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_audioStreams);
+                }
+                else
+                {
+                    jobject newElement_0_audioStreamsInsideOptional;
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
+                        newElement_0_audioStreamsInsideOptional);
+
+                    auto iter_newElement_0_audioStreamsInsideOptional_3 = entry_0.audioStreams.Value().begin();
+                    while (iter_newElement_0_audioStreamsInsideOptional_3.Next())
+                    {
+                        auto & entry_3 = iter_newElement_0_audioStreamsInsideOptional_3.GetValue();
+                        jobject newElement_3;
+                        std::string newElement_3ClassName     = "java/lang/Integer";
+                        std::string newElement_3CtorSignature = "(I)V";
+                        jint jninewElement_3                  = static_cast<jint>(entry_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), jninewElement_3, newElement_3);
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
+                            newElement_0_audioStreamsInsideOptional, newElement_3);
+                    }
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_audioStreamsInsideOptional, newElement_0_audioStreams);
+                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -46105,7 +46214,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Boolean;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -46114,10 +46223,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
-                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
-                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
-                                                  newElement_0_metadataEnabled, newElement_0_fabricIndex);
+                    newElement_0 =
+                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
+                                       newElement_0_peerNodeID, newElement_0_peerEndpointID, newElement_0_streamUsage,
+                                       newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataEnabled,
+                                       newElement_0_videoStreams, newElement_0_audioStreams, newElement_0_fabricIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -47074,6 +47184,134 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_0_transportOptionsInsideOptional_expiryTimeInsideOptional,
                             newElement_0_transportOptionsInsideOptional_expiryTime);
                     }
+                    jobject newElement_0_transportOptionsInsideOptional_videoStreams;
+                    if (!entry_0.transportOptions.Value().videoStreams.HasValue())
+                    {
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            nullptr, newElement_0_transportOptionsInsideOptional_videoStreams);
+                    }
+                    else
+                    {
+                        jobject newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional;
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
+                            newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional);
+
+                        auto iter_newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional_5 =
+                            entry_0.transportOptions.Value().videoStreams.Value().begin();
+                        while (iter_newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional_5.Next())
+                        {
+                            auto & entry_5 =
+                                iter_newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional_5.GetValue();
+                            jobject newElement_5;
+                            jobject newElement_5_videoStreamName;
+                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_5.videoStreamName,
+                                                                                                 newElement_5_videoStreamName));
+                            jobject newElement_5_videoStreamID;
+                            std::string newElement_5_videoStreamIDClassName     = "java/lang/Integer";
+                            std::string newElement_5_videoStreamIDCtorSignature = "(I)V";
+                            jint jninewElement_5_videoStreamID                  = static_cast<jint>(entry_5.videoStreamID);
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_5_videoStreamIDClassName.c_str(), newElement_5_videoStreamIDCtorSignature.c_str(),
+                                jninewElement_5_videoStreamID, newElement_5_videoStreamID);
+
+                            {
+                                jclass videoStreamStructStructClass_6;
+                                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                                    env, "chip/devicecontroller/ChipStructs$PushAvStreamTransportClusterVideoStreamStruct",
+                                    videoStreamStructStructClass_6);
+                                if (err != CHIP_NO_ERROR)
+                                {
+                                    ChipLogError(Zcl,
+                                                 "Could not find class ChipStructs$PushAvStreamTransportClusterVideoStreamStruct");
+                                    return nullptr;
+                                }
+
+                                jmethodID videoStreamStructStructCtor_6;
+                                err = chip::JniReferences::GetInstance().FindMethod(env, videoStreamStructStructClass_6, "<init>",
+                                                                                    "(Ljava/lang/String;Ljava/lang/Integer;)V",
+                                                                                    &videoStreamStructStructCtor_6);
+                                if (err != CHIP_NO_ERROR || videoStreamStructStructCtor_6 == nullptr)
+                                {
+                                    ChipLogError(
+                                        Zcl,
+                                        "Could not find ChipStructs$PushAvStreamTransportClusterVideoStreamStruct constructor");
+                                    return nullptr;
+                                }
+
+                                newElement_5 = env->NewObject(videoStreamStructStructClass_6, videoStreamStructStructCtor_6,
+                                                              newElement_5_videoStreamName, newElement_5_videoStreamID);
+                            }
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
+                                newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional, newElement_5);
+                        }
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_0_transportOptionsInsideOptional_videoStreamsInsideOptional,
+                            newElement_0_transportOptionsInsideOptional_videoStreams);
+                    }
+                    jobject newElement_0_transportOptionsInsideOptional_audioStreams;
+                    if (!entry_0.transportOptions.Value().audioStreams.HasValue())
+                    {
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            nullptr, newElement_0_transportOptionsInsideOptional_audioStreams);
+                    }
+                    else
+                    {
+                        jobject newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional;
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
+                            newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional);
+
+                        auto iter_newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional_5 =
+                            entry_0.transportOptions.Value().audioStreams.Value().begin();
+                        while (iter_newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional_5.Next())
+                        {
+                            auto & entry_5 =
+                                iter_newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional_5.GetValue();
+                            jobject newElement_5;
+                            jobject newElement_5_audioStreamName;
+                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_5.audioStreamName,
+                                                                                                 newElement_5_audioStreamName));
+                            jobject newElement_5_audioStreamID;
+                            std::string newElement_5_audioStreamIDClassName     = "java/lang/Integer";
+                            std::string newElement_5_audioStreamIDCtorSignature = "(I)V";
+                            jint jninewElement_5_audioStreamID                  = static_cast<jint>(entry_5.audioStreamID);
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_5_audioStreamIDClassName.c_str(), newElement_5_audioStreamIDCtorSignature.c_str(),
+                                jninewElement_5_audioStreamID, newElement_5_audioStreamID);
+
+                            {
+                                jclass audioStreamStructStructClass_6;
+                                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                                    env, "chip/devicecontroller/ChipStructs$PushAvStreamTransportClusterAudioStreamStruct",
+                                    audioStreamStructStructClass_6);
+                                if (err != CHIP_NO_ERROR)
+                                {
+                                    ChipLogError(Zcl,
+                                                 "Could not find class ChipStructs$PushAvStreamTransportClusterAudioStreamStruct");
+                                    return nullptr;
+                                }
+
+                                jmethodID audioStreamStructStructCtor_6;
+                                err = chip::JniReferences::GetInstance().FindMethod(env, audioStreamStructStructClass_6, "<init>",
+                                                                                    "(Ljava/lang/String;Ljava/lang/Integer;)V",
+                                                                                    &audioStreamStructStructCtor_6);
+                                if (err != CHIP_NO_ERROR || audioStreamStructStructCtor_6 == nullptr)
+                                {
+                                    ChipLogError(
+                                        Zcl,
+                                        "Could not find ChipStructs$PushAvStreamTransportClusterAudioStreamStruct constructor");
+                                    return nullptr;
+                                }
+
+                                newElement_5 = env->NewObject(audioStreamStructStructClass_6, audioStreamStructStructCtor_6,
+                                                              newElement_5_audioStreamName, newElement_5_audioStreamID);
+                            }
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
+                                newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional, newElement_5);
+                        }
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_0_transportOptionsInsideOptional_audioStreamsInsideOptional,
+                            newElement_0_transportOptionsInsideOptional_audioStreams);
+                    }
 
                     {
                         jclass transportOptionsStructStructClass_3;
@@ -47094,7 +47332,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             "String;Lchip/devicecontroller/"
                             "ChipStructs$PushAvStreamTransportClusterTransportTriggerOptionsStruct;Ljava/lang/Integer;Lchip/"
                             "devicecontroller/ChipStructs$PushAvStreamTransportClusterContainerOptionsStruct;Ljava/util/"
-                            "Optional;)V",
+                            "Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
                             &transportOptionsStructStructCtor_3);
                         if (err != CHIP_NO_ERROR || transportOptionsStructStructCtor_3 == nullptr)
                         {
@@ -47113,7 +47351,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                            newElement_0_transportOptionsInsideOptional_triggerOptions,
                                            newElement_0_transportOptionsInsideOptional_ingestMethod,
                                            newElement_0_transportOptionsInsideOptional_containerOptions,
-                                           newElement_0_transportOptionsInsideOptional_expiryTime);
+                                           newElement_0_transportOptionsInsideOptional_expiryTime,
+                                           newElement_0_transportOptionsInsideOptional_videoStreams,
+                                           newElement_0_transportOptionsInsideOptional_audioStreams);
                     }
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                         newElement_0_transportOptionsInsideOptional, newElement_0_transportOptions);
