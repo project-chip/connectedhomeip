@@ -16,6 +16,7 @@
 
 #pragma once
 #include "FabricTestFixture.h"
+#include "app/server-cluster/testing/ValidateGlobalAttributes.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -102,8 +103,7 @@ public:
 
         // Verify that the attribute is present in AttributeList before attempting to read it.
         // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-        auto checkStatus = VerifyAttributeInAttributeList(attr_id);
-        VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
+        VerifyOrReturnError(IsAttributeInAttributeList(attr_id), CHIP_ERROR_INVALID_ARGUMENT);
 
         auto path = mCluster.GetPaths()[0];
 
@@ -147,8 +147,7 @@ public:
 
         // Verify that the attribute is present in AttributeList before attempting to write it.
         // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-        auto checkStatus = VerifyAttributeInAttributeList(attr);
-        VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
+        VerifyOrReturnError(IsAttributeInAttributeList(attr), CHIP_ERROR_INVALID_ARGUMENT);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         chip::Testing::WriteOperation writeOp(path);
@@ -221,7 +220,7 @@ public:
 
         // Verify that the command is present in AcceptedCommands before attempting to invoke it.
         // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
-        auto checkStatus = VerifyCommandInAcceptedCommandsList(commandId);
+        auto checkStatus = IsCommandAnAcceptedCommand(commandId);
         if (!checkStatus.IsSuccess())
         {
             result.status = checkStatus;
@@ -325,21 +324,21 @@ private:
         return true;
     }
 
-    // Verifies that an attribute is present in the cluster's AttributeList.
-    // @returns CHIP_NO_ERROR if the attribute is found in AttributeList.
-    // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) if the attribute is not found in AttributeList.
-    // @returns error status if Attributes cannot be retrieved.
-    app::DataModel::ActionReturnStatus VerifyAttributeInAttributeList(AttributeId attr_id)
+    bool IsAttributeInAttributeList(AttributeId attr_id)
     {
         // These methods work IF AND ONLY IF cluster path contains exactly one path since
         // we get accepted commands by path.
-        VerifyOrReturnError(mCluster.GetPaths().size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrDie(mCluster.GetPaths().size() == 1);
         auto path = mCluster.GetPaths()[0];
 
         // Get the list of attributes from the cluster's metadata
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
         CHIP_ERROR err = mCluster.Attributes(path, builder);
-        ReturnErrorOnFailure(err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "Failed to get attribute list: %" CHIP_ERROR_FORMAT, err.Format());
+            return false;
+        }
 
         ReadOnlyBuffer<app::DataModel::AttributeEntry> attributeEntries = builder.TakeBuffer();
 
@@ -348,29 +347,28 @@ private:
         {
             if (entry.attributeId == attr_id)
             {
-                return CHIP_NO_ERROR;
+                return true;
             }
         }
 
-        // Attribute not found in AttributeList
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return false;
     }
 
-    // Verifies that a command is present in the cluster's AcceptedCommands list.
-    // @returns CHIP_NO_ERROR if the command is found in AcceptedCommands.
-    // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedCommand) if the command is not found in AcceptedCommands.
-    // @returns error status if AcceptedCommands cannot be retrieved.
-    app::DataModel::ActionReturnStatus VerifyCommandInAcceptedCommandsList(CommandId commandId)
+    bool IsCommandAnAcceptedCommand(CommandId commandId)
     {
         // These methods work IF AND ONLY IF cluster path contains exactly one path since
         // we get accepted commands by path.
-        VerifyOrReturnError(mCluster.GetPaths().size() == 1, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrDie(mCluster.GetPaths().size() == 1);
         auto path = mCluster.GetPaths()[0];
 
         // Get the list of accepted commands from the cluster
         ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> builder;
         CHIP_ERROR err = mCluster.AcceptedCommands(path, builder);
-        ReturnErrorOnFailure(err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "Failed to get accepted commands: %" CHIP_ERROR_FORMAT, err.Format());
+            return false;
+        }
 
         ReadOnlyBuffer<app::DataModel::AcceptedCommandEntry> commandEntries = builder.TakeBuffer();
 
@@ -379,12 +377,12 @@ private:
         {
             if (entry.commandId == commandId)
             {
-                return CHIP_NO_ERROR;
+                return true;
             }
         }
 
         // Command not found in AcceptedCommands
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedCommand);
+        return false;
     }
 
     TestServerClusterContext mTestServerClusterContext{};
