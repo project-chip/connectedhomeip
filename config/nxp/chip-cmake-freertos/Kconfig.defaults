@@ -57,7 +57,7 @@ config CHIP_TASK_PRIORITY
 	default 2
 
 config CHIP_USE_OT_ENDPOINT
-	default y if !HAVE_LWIP
+	default y if !CHIP_WITH_LWIP
 
 config CHIP_ENABLE_READ_CLIENT
 	default y
