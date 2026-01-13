@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "protocols/interaction_model/StatusCode.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -24,12 +23,12 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
+#include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/data-model/List.h>
-#include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
@@ -45,6 +44,8 @@
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 #include <memory>
 #include <optional>
 #include <type_traits>
