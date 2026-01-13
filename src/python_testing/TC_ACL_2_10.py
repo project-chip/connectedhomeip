@@ -32,10 +32,6 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-<< << << < HEAD
-
-== == == =
->>>>>> > 4478e39c69([Framework Update] Adding device reboot functionality to matter_testing module and providing documentation(  # 42310))
 import logging
 import random
 import time
