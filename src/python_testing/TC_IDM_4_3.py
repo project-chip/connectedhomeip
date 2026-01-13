@@ -621,8 +621,8 @@ class TC_IDM_4_3(BasicCompositionTests):
         attr_handler_step4.flush_reports()
 
         # Wait for first empty report and capture its time
-        time_empty = time.time() 
-        await asyncio.sleep(max_interval + 1) 
+        time_empty = time.time()
+        await asyncio.sleep(max_interval + 1)
 
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
@@ -658,10 +658,10 @@ class TC_IDM_4_3(BasicCompositionTests):
                 attr_handler_step4.attribute_queue.get()
                 time_empty_2 = time.time()
                 break
-            await asyncio.sleep(0.1) 
+            await asyncio.sleep(0.1)
 
         # Wait for second empty report
-        time_empty_2 = time.time() 
+        time_empty_2 = time.time()
         await asyncio.sleep(max_interval + 1)
 
         # Verify timing constraints
