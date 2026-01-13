@@ -18,6 +18,7 @@
 #include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
+#include "tls-client-management-instance.h"
 
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -76,6 +77,10 @@ void ApplicationShutdown()
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    // Initialize TLS Client Management delegate before server starts
+    // This must be called before ChipLinuxAppMainLoop() which initializes the server
+    InitializeTlsClientManagement();
 
     ChipLinuxAppMainLoop();
 
