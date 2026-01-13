@@ -75,7 +75,8 @@ starting path of the search.
 You can also list the known keys for applications and tools by using the
 `--help-paths` option:
 
-```$ scripts/tests/run_test_suite.py run --help-paths
+```shell
+scripts/tests/run_test_suite.py run --help-paths
 …
 ---
 # Known application and tool path keys:
