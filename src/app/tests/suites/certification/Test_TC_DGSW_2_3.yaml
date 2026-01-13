@@ -80,6 +80,7 @@ tests:
 
     - label: "Step 4: TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_original."
       PICS: DGSW.S.A0003
+      verification: |
 
           ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
 
@@ -144,6 +145,7 @@ tests:
 
     - label: "Step 6b: TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_current."
       PICS: DGSW.S.A0003 && DGSW.S.A0002
+      verification: |
 
           ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
 
