@@ -84,6 +84,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::TlsClientManagement::Id:
+        MatterTlsClientManagementClusterInitCallback(endpoint);
+        break;
     }
 }
 
@@ -147,6 +150,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::TlsClientManagement::Id:
+        MatterTlsClientManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     }
 }
