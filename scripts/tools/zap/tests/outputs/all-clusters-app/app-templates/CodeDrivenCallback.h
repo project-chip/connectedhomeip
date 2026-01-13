@@ -140,3 +140,7 @@ void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId, 
 void MatterChimeClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterChimeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
