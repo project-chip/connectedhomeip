@@ -439,12 +439,9 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("s", "o")
         async def GetInterface(self, name: str) -> str:
-            name_lower = name.lower()
-            if 'app' in name_lower:
-                return self.mock.interfaces[0].path
-            if 'tool' in name_lower and len(self.mock.interfaces) > 1:
-                return self.mock.interfaces[1].path
-            return self.mock.interfaces[0].path
+            # if the interface is not app, the last index is returned
+            idx = self.mock.get_interface_app_index(name, self.mock.num_interfaces)
+            return self.mock.interfaces[idx].path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
                        interface_name="fi.w1.wpa_supplicant1.Interface"):
@@ -799,6 +796,32 @@ class WpaSupplicantMock(threading.Thread):
             net = WpaSupplicantMock.WpaNetwork(self, i)
             net.export_to_dbus(net.path)
             self.networks.append(net)
+
+        self.nan_simulator = NANSimulator(discovery_delay=0.1)
+
+        # Assign interfaces to apps, and last one to chiptool
+        last_idx = self.num_interfaces - 1
+        for i in range(self.num_interfaces - 1):
+            self.nan_simulator.register_interface("app" + str(i), self.interfaces[i])
+
+        self.nan_simulator.register_interface("tool", self.interfaces[-1])
+
+        log.info("WiFi-PAF mode enabled with NAN simulator")
+
+    def get_interface_app_index(self, name: str, size: int) -> int:
+        """Return the index if 'app' is in the name and what follows is a valid number. Return -1 otherwise."""
+        name_lower = name.lower()
+        if 'app-' in name_lower:
+            # Find the position of 'app-'
+            app_index = name_lower.find('app-')
+            # Extract the part after 'app'
+            suffix = name_lower[app_index + 4:]
+            # Check if the suffix is a valid number
+            if suffix.isdigit() and int(suffix) < size:
+                return int(suffix)
+            return 0  # Default to first interface if no valid number found
+
+        return -1  # Default to last interface if no app found in the interface name
 
     def __init__(self, ssid: str, password: str, ns: IsolatedNetworkNamespace,
                  num_interfaces: int = 2):

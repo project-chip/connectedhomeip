@@ -388,8 +388,7 @@ class TestDefinition:
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: int | None = None,
             ble_controller_tool: int | None = None,
-            wifi_paf: bool = False,
-            nan_simulator: int | None = None):
+            wifi_paf: bool = False):
         """
         Executes the given test case using the provided runner for execution.
         """

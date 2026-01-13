@@ -453,8 +453,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     ble_controller_app = None
     ble_controller_tool = None
-    # WiFi-PAF mode variables
-    nan_simulator = None
+
     to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
@@ -488,16 +487,11 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
 
                 # Single mock with two interfaces (like real wpa_supplicant)
+                # One interface for app/publisher and one interface for tool/subscriber
                 wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns,
                                                         num_interfaces=2)
 
                 to_terminate.append(wifi)
-                # NANSimulator coordinates between interfaces
-                nan_simulator = chiptest.linux.NANSimulator(discovery_delay=0.1)
-                nan_simulator.register_interface("app", wifi.interfaces[0])   # For app/publisher
-                nan_simulator.register_interface("tool", wifi.interfaces[1])  # For tool/subscriber
-
-                log.info("WiFi-PAF mode enabled with NAN simulator")
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -528,8 +522,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
-                        wifi_paf=wifi_paf,
-                        nan_simulator=nan_simulator
+                        wifi_paf=wifi_paf
                     )
                     if not context.obj.dry_run:
                         test_end = time.monotonic()
