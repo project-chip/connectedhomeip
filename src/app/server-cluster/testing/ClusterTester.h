@@ -33,7 +33,6 @@
 #include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/shared/Attributes.h>
 #include <credentials/FabricTable.h>
 #include <credentials/PersistentStorageOpCertStore.h>
