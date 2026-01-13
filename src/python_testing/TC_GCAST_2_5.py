@@ -217,5 +217,6 @@ class TC_GCAST_2_5(MatterBaseTest):
         asserts.assert_equal(resp.endpoints, [],
                              f"LeaveGroupResponse endpoints list {resp.endpoints} must be empty.")
 
+
 if __name__ == "__main__":
     default_matter_test_main()

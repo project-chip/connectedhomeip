@@ -38,6 +38,7 @@ def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
     }
     return cluster_id in GROUPCAST_SUPPORTING_CLUSTERS
 
+
 async def get_feature_map(test) -> tuple:
     """Get supported features."""
     feature_map = await test.read_single_attribute_check_success(
@@ -51,6 +52,7 @@ async def get_feature_map(test) -> tuple:
                         "At least one of the following features must be enabled: Listener or Sender.")
     logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled}")
     return ln_enabled, sd_enabled
+
 
 async def valid_endpoints_list(test, ln_enabled: bool) -> list:
     """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender."""
@@ -75,19 +77,19 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
                     if is_groupcast_supporting_cluster(cluster) and endpoint not in endpoints_list:
                         endpoints_list.append(endpoint)
         asserts.assert_greater(len(endpoints_list), 0,
-                              "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
+                               "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
     return endpoints_list
 
 
 def generate_membership_entry_matcher(
-        group_id: int,
-        key_id: Optional[int] = None,
-        expiring_key_id: Optional[int] = None,
-        has_auxiliary_acl: Optional[str] = None,
-        endpoints: Optional[list] = None,
-        test_for_exists: bool = True,
-        expiring_key_id_must_not_exist: bool = False
-    ) -> AttributeMatcher:
+    group_id: int,
+    key_id: Optional[int] = None,
+    expiring_key_id: Optional[int] = None,
+    has_auxiliary_acl: Optional[str] = None,
+    endpoints: Optional[list] = None,
+    test_for_exists: bool = True,
+    expiring_key_id_must_not_exist: bool = False
+) -> AttributeMatcher:
     """Create a matcher that checks if Membership attribute contains (or does not contain) an entry matching the specified criteria.
 
     Args:

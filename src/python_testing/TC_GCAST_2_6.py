@@ -57,7 +57,8 @@ class TC_GCAST_2_6(MatterBaseTest):
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeyID on the DUT."),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s."),
-            TestStep("1d", "Join group G1 generating a new KeyID K1 with Key InputKey1: TH sends command JoinGroup (GroupID=G1, Endpoints=[EP1], KeyID=K1, Key=InputKey1)."),
+            TestStep(
+                "1d", "Join group G1 generating a new KeyID K1 with Key InputKey1: TH sends command JoinGroup (GroupID=G1, Endpoints=[EP1], KeyID=K1, Key=InputKey1)."),
             TestStep(2, "Enable Auxiliary ACL on group G1: TH sends command ConfigureAuxiliaryACL (GroupID=G1, Enable=true)."),
             TestStep(3, "TH awaits subscription report of new Membership within max interval."),
             TestStep(4, "Disable Auxiliary ACL on group G1: TH sends command ConfigureAuxiliaryACL (GroupID=G1, Enable=false)."),

@@ -141,5 +141,6 @@ class TC_GCAST_2_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.InvalidCommand,
                                  f"Send ExpireGracePeriod command error should be {Status.InvalidCommand} instead of {e.status}")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
