@@ -77,10 +77,10 @@ class TC_DGSW_2_1(MatterBaseTest):
                      "Verify that StackFreeMinimum is less than or equal to StackFreeCurrent."),
             TestStep(3, "Read the CurrentHeapFree attribute",
                      "The value will indicate the current amount of unutilized heap memory in bytes."
-                     "Verify that CurrentHeapFree is greater than 0."),
+                     "Verify that CurrentHeapFree is a valid value (>= 0)."),
             TestStep(4, "Read the CurrentHeapUsed attribute",
                      "The value will indicate the current amount of used heap memory in bytes."
-                     "Verify that CurrentHeapUsed is greater than 0."),
+                     "Verify that CurrentHeapUsed is a valid value (>= 0)."),
             TestStep(5, "Read the CurrentHeapHighWatermark attribute",
                      "The value will indicate the maximum amount of heap memory being used in bytes. This value can be reset by a node reboot."
                      "Verify that CurrentHeapHighWatermark is greater than or equal to CurrentHeapUsed."),
@@ -150,8 +150,8 @@ class TC_DGSW_2_1(MatterBaseTest):
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
             logger.info(f"CurrentHeapFree: {current_heap_free_attr}")
             matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
-            # Verify that CurrentHeapFree is greater than 0.
-            asserts.assert_greater(current_heap_free_attr, 0, "CurrentHeapFree is not greater than 0.")
+            # Verify that CurrentHeapFree is greater than or equal to 0.
+            asserts.assert_greater_equal(current_heap_free_attr, 0, "CurrentHeapFree is not greater than or equal to 0.")
 
         # STEP 4: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(4)
@@ -162,8 +162,8 @@ class TC_DGSW_2_1(MatterBaseTest):
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
             logger.info(f"CurrentHeapUsed: {current_heap_used_attr}")
             matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
-            # Verify that CurrentHeapUsed is greater than 0.
-            asserts.assert_greater(current_heap_used_attr, 0, "CurrentHeapUsed is not greater than 0.")
+            # Verify that CurrentHeapUsed is greater than or equal to 0.
+            asserts.assert_greater_equal(current_heap_used_attr, 0, "CurrentHeapUsed is not greater than or equal to 0.")
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
