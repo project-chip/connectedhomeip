@@ -41,7 +41,8 @@ public:
     }
 };
 
-OnOffValidator &GlobalOnOffValidator() {
+OnOffValidator & GlobalOnOffValidator()
+{
     static OnOffValidator sValidator;
     return sValidator;
 }
