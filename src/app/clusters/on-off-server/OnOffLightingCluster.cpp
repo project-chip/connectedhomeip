@@ -77,7 +77,15 @@ CHIP_ERROR OnOffLightingCluster::Startup(ServerClusterContext & context)
             // Invalid value, keep previous
             break;
         }
-        mOnOff = targetState;
+        if (mOnOff != targetState)
+        {
+            // If startup value modified the state, make sure we also persist it.
+            // In practice this means "toggle" will flip it on every reboot.
+            mOnOff = targetState;
+            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+                ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
+                ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+        }
     }
 
     for (auto & delegate : mDelegates)
