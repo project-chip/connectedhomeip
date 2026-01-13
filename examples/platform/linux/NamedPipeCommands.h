@@ -44,7 +44,6 @@ private:
     std::string mChipEventFifoPath;
     std::string mChipEventFifoPathOut;
     NamedPipeCommandDelegate * mDelegate = nullptr;
-    int mOutFd                           = -1;
 
     static void * EventCommandListenerTask(void * arg);
 };

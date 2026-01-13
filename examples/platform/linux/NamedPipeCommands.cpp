@@ -18,8 +18,11 @@
 
 #include "NamedPipeCommands.h"
 
+#include <chrono>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
+#include <unistd.h>
 #include <lib/support/CodeUtils.h>
 #include <pthread.h>
 #include <sys/stat.h>
@@ -82,12 +85,6 @@ CHIP_ERROR NamedPipeCommands::Stop()
     // Wait further for the thread to terminate if we had previously created it.
     VerifyOrReturnError(pthread_join(mChipEventCommandListener, nullptr) == 0, CHIP_ERROR_SHUT_DOWN);
 
-    if (mOutFd != -1)
-    {
-        close(mOutFd);
-        mOutFd = -1;
-    }
-
     VerifyOrReturnError(unlink(mChipEventFifoPath.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
     mChipEventFifoPath.clear();
 
@@ -102,19 +99,43 @@ CHIP_ERROR NamedPipeCommands::Stop()
 
 void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 {
-    mOutFd = open(mChipEventFifoPathOut.c_str(), O_WRONLY);
+    // Opening a FIFO for write blocks until a reader connects.
+    // Use non-blocking open with a bounded retry to avoid deadlocking the app
+    // if the test side has not opened the pipe yet.
+    constexpr int kOpenTimeoutMs = 2000;
+    constexpr int kRetrySleepMs  = 50;
 
-    VerifyOrReturn(mOutFd != -1 && !json.empty());
+    int fd = -1;
+    const auto start = std::chrono::steady_clock::now();
 
-    if (write(mOutFd, json.c_str(), json.size()) < 0)
+    while (true)
     {
-        ChipLogError(NotSpecified, "Failed to write to pipe");
+        fd = open(mChipEventFifoPathOut.c_str(), O_WRONLY | O_NONBLOCK);
+        if (fd >= 0)
+        {
+            break;
+        }
+
+        if (errno != ENXIO) // ENXIO == no reader
+        {
+            ChipLogError(NotSpecified, "Failed to open out FIFO '%s': errno=%d", mChipEventFifoPathOut.c_str(), errno);
+            return;
+        }
+
+        const auto elapsed =
+            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+        if (elapsed >= kOpenTimeoutMs)
+        {
+            ChipLogError(NotSpecified, "Timed out waiting for reader on out FIFO '%s'", mChipEventFifoPathOut.c_str());
+            return;
+        }
+
+        usleep(kRetrySleepMs * 1000);
     }
-    if (write(mOutFd, "\n", 1) < 0)
-    {
-        ChipLogError(NotSpecified, "Failed to write to pipe");
-    }
-    close(mOutFd);
+
+    (void) write(fd, json.data(), json.size());
+    (void) write(fd, "\n", 1);
+    close(fd);
 }
 
 void * NamedPipeCommands::EventCommandListenerTask(void * arg)
