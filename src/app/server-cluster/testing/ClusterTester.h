@@ -333,8 +333,7 @@ private:
 
     bool IsAttributeInAttributeList(AttributeId attr_id)
     {
-        // These methods work IF AND ONLY IF cluster path contains exactly one path since
-        // we get attributes by path.
+        // Attributes are listed by path, so this is only correct for single-path clusters.
         VerifyOrDie(mCluster.GetPaths().size() == 1);
 
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
@@ -351,8 +350,7 @@ private:
 
     bool IsCommandAnAcceptedCommand(CommandId commandId)
     {
-        // These methods work IF AND ONLY IF cluster path contains exactly one path since
-        // we get accepted commands by path.
+        // Commands are listed by path, so this is only correct for single-path clusters.
         VerifyOrDie(mCluster.GetPaths().size() == 1);
 
         ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> builder;
