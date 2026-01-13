@@ -17,7 +17,8 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS === priyamal, check what to put as the test arguments
+# # TODO: Enable CI Test arguments once cluster works
+# === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
@@ -34,13 +35,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import secrets
 import time
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 import matter.clusters as Clusters
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, has_cluster, run_if_endpoint_matches
 from matter.interaction_model import InteractionModelError, Status
 
 from src.python_testing.TC_GCAST_common import get_feature_map, valid_endpoints_list, generate_membership_entry_matcher
@@ -91,8 +93,7 @@ class TC_GCAST_2_2(MatterBaseTest):
                 TestStep(21, "JoinGroup with GracePeriod > 86400 (result: constraint error)")]
 
     def pics_TC_GCAST_2_2(self) -> list[str]:
-        pics = ["GCAST.S"]
-        return pics
+        return ["GCAST.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_2(self):
@@ -100,7 +101,6 @@ class TC_GCAST_2_2(MatterBaseTest):
             self.matter_test_config.endpoint = 0
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
-        max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
 
         # Commission DUT to TH (can be skipped if done in a preceding test)
         self.step("1a")
@@ -148,12 +148,8 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a.
         self.step("4a")
-        endpoint_1 = [endpoints_list[0]]
-        endpoint_2 = None
         if len(endpoints_list) == 1:
             self.mark_step_range_skipped("4b", "4c")
-        else:
-            endpoint_2 = [endpoints_list[1]]
 
         # Attempt to add EP2 to Group G1. {THcommand} JoinGroup (G1,[EP2],K1,Key omitted)
         self.step("4b")
@@ -216,7 +212,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("6c")
         gracePeriodWaitingTime = max(gracePeriodSeconds * 1.1, 30)
         logger.info(f"Waiting for {gracePeriodWaitingTime:.1f} seconds for grace period to make sure it expired.")
-        time.sleep(gracePeriodWaitingTime)
+        await asyncio.sleep(gracePeriodWaitingTime)
 
         # TH awaits subscription report of new membership within max interval
         self.step("6d")
@@ -395,7 +391,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("16c")
         gracePeriodWaitingTime = max(gracePeriodSeconds * 1.1, 30)
         logger.info(f"Waiting for {gracePeriodWaitingTime:.1f} seconds for grace period to make sure it expired.")
-        time.sleep(gracePeriodWaitingTime)
+        await asyncio.sleep(gracePeriodWaitingTime)
 
         # TH awaits subscription report of new membership within max interval
         self.step("16d")  # priyamal doc says G4, confirm should be G5
