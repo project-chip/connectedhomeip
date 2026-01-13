@@ -274,7 +274,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # If Sender is supported in DUT, skip this step. Else, attempt to join Group G3 with an empty endpoints list (result: constraint error)
         self.step(10)
         if sd_enabled:
-            self.mark_step_range_skipped(10, 10)  # How to just skip to 11?
+            self.skip_step("10")
 
         endpoints_list_empty = []
         try:
@@ -291,9 +291,10 @@ class TC_GCAST_2_2(MatterBaseTest):
         # If DUT has more than 20 endpoints, attempt to join Group G3 with 21 endpoints (result: constraint error)
         self.step(11)
         if len(endpoints_list) > 20:
-            endpoint21 = 21
-            # length of this list is now one more than the length of the list of endpoints in DUT
-            endpoints_list_exceeds_DUT_endpoints = endpoints_list.append(endpoint21)
+            exceeding_endpoint = 21
+            while exceeding_endpoint in endpoints_list:
+                exceeding_endpoint += 1
+            endpoints_list_exceeds_DUT_endpoints = endpoints_list.append(exceeding_endpoint)
             try:
                 await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                     groupID=groupID3,
