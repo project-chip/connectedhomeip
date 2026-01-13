@@ -36,11 +36,12 @@
 
 import logging
 import secrets
-from mobly import asserts
-import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from matter.interaction_model import InteractionModelError, Status
 
+from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from src.python_testing.TC_GCAST_common import get_feature_map, valid_endpoints_list
 
 logger = logging.getLogger(__name__)

@@ -19,6 +19,7 @@ import logging
 from typing import Optional
 
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.matter_testing import AttributeMatcher
 
