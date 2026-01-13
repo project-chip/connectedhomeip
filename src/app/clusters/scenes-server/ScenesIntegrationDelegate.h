@@ -24,9 +24,8 @@ namespace chip::scenes {
 
 /// Delegate interface for clusters to integrate with the Scenes cluster functionality.
 ///
-/// This allows other clusters (e.g., OnOff, LevelControl, ColorControl) to be notified of
-/// scene-related events or to trigger scene operations like storing/recalling the global scene.
-/// An instance of this delegate is expected to be endpoint-specific.
+/// This allows other clusters (e.g., OnOff, LevelControl, ColorControl) to interact with
+/// scenes: store/recall global scenes or invalidate scenes based on various conditions.
 class ScenesIntegrationDelegate
 {
 public:
