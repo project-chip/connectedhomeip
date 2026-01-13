@@ -30,7 +30,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Basic Information
     - Boolean State
     - Camera AV Settings User Level Management
-    - Camera AV Stream Management
     - Chime
     - Closure Control
     - Closure Dimension
@@ -148,6 +147,7 @@ CodeDrivenClusters:
     - Basic Information
     - Binding
     - Boolean State
+    - Camera AV Stream Management
     - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
