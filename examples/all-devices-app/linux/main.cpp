@@ -42,10 +42,10 @@ using namespace chip::app::Clusters;
 using namespace chip::ArgParser;
 
 namespace {
+
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
-
 DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
-
+Credentials::GroupDataProviderImpl gGropupDataProvider;
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -86,6 +86,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
+    static DefaultTimerDelegate timerDelegate;
+    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+        .timerDelegate     = timerDelegate,
+        .groupDataProvider = gGropupDataProvider,
+        .fabricTable       = Server::GetInstance().GetFabricTable(),
+    });
+
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
@@ -93,6 +100,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
+    initParams.groupDataProvider             = &gGropupDataProvider;
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");
@@ -137,6 +145,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
+
+    // This message is used as a marker for when the application process has started.
+    // See: scripts/tests/chiptest/test_definition.py
+    ChipLogProgress(DeviceLayer, "===== APP STATUS: Starting event loop =====");
 
     if (mainLoop != nullptr)
     {

@@ -297,6 +297,7 @@ jobs:
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -323,6 +324,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-app-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
