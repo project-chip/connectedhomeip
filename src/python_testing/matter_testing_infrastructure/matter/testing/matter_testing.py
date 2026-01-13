@@ -1006,46 +1006,24 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
-        """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
-
-        If `endpoint_id` is None, the default DUT endpoint for the test is selected.
-
-        If `expect_success` is True, a test assertion fails on error status codes
-
-        Status code is returned.
-        """
-        dev_ctrl = self.default_controller
-        node_id = self.dut_node_id
-        if endpoint_id is None:
-            endpoint_id = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
-
-        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
-        if expect_success:
-            asserts.assert_equal(write_result[0].Status, Status.Success,
-                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
-        return write_result[0].Status
-
-    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, ip_env_var: Optional[str] = None):
+    def read_from_app_pipe(
+        self,
+        app_pipe_out: Optional[str] = None,
+        timeout: float = 2.0,
+        max_bytes: int = 66536,
+        chunk: int = 4096,
+        ip_env_var: Optional[str] = None,
+    ) -> Any:
         """
         Read an out-of-band command from a Matter app.
+
         Args:
-            app_pipe_out (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441_out or /tmp/chip_rvc_fifo_11111_out). Raises
-            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe-out,  arg --app-pipe-out has his own file exists check.
-            ip_env_var (Optional[str]): is an optional argument. Name of the environment variable containing the DUT IP.
+            app_pipe_out: Name of the cluster pipe file (e.g. /tmp/..._out). If None, uses value from config (--app-pipe-out).
+            ip_env_var: Name of the environment variable containing the DUT IP. If not provided (or None), forces local FIFO read.
 
-        This method uses the following environment variables:
-
-         - LINUX_DUT_IP
-            * if not provided, the Matter app is assumed to run on the same machine as the test,
-              such as during CI, and the commands are sent to it using a local named pipe
-            * if provided, the commands for writing to the named pipe are forwarded to the DUT
-        - LINUX_DUT_USER
-            * if LINUX_DUT_IP is provided, use this for the DUT user name
-            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
-                 + Step 1: If you do not have a key, create one using ssh-keygen
-                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
-                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        Environment variables used when reading remotely:
+            - <ip_env_var> (typically LINUX_DUT_IP): if set, the FIFO is read on the remote DUT via SSH.
+            - LINUX_DUT_USER: required when <ip_env_var> is set.
         """
         if app_pipe_out is None:
             app_pipe_out = self.matter_test_config.pipe_name_out
@@ -1064,41 +1042,64 @@ class MatterBaseTest(base_test.BaseTestClass):
         # remotely via SSH from the target device.
         if dut_ip is None:
             # Use manual chunked reads instead of readline(): FIFO is opened non-blocking
-            # and we need explicit timeout handling and a hard size limit for safety.
+            # and we need explicit timeout handling and a hard size limit for safety. We also
+            # preserve any extra bytes (e.g. multiple queued messages) across calls.
+            if not hasattr(self, "_app_pipe_out_buf"):
+                self._app_pipe_out_buf = bytearray()
+
             fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
             try:
-                buf = bytearray()
+                buf: bytearray = self._app_pipe_out_buf
+
                 while True:
+                    if b"\n" in buf:
+                        line, _, rest = buf.partition(b"\n")
+                        self._app_pipe_out_buf = bytearray(rest)
+
+                        line = line.strip()
+                        if not line:
+                            continue
+                        return json.loads(line.decode("utf-8"))
+
+                    if buf:
+                        try:
+                            obj = json.loads(buf.decode("utf-8"))
+                            self._app_pipe_out_buf = bytearray()
+                            return obj
+                        except json.JSONDecodeError:
+                            pass
+
                     r, _, _ = select.select([fd], [], [], timeout)
                     if not r:
                         raise TimeoutError(f"No data within {timeout}")
 
                     chunk_bytes = os.read(fd, chunk)
                     if not chunk_bytes:
-                        break
-                    buf += chunk_bytes
+                        if buf:
+                            try:
+                                obj = json.loads(buf.decode("utf-8"))
+                                self._app_pipe_out_buf = bytearray()
+                                return obj
+                            except json.JSONDecodeError as ex:
+                                raise EOFError(f"Incomplete JSON response: {ex}") from ex
+                        raise EOFError("Empty command response")
 
+                    buf += chunk_bytes
                     if len(buf) > max_bytes:
                         raise ValueError("Command too large")
-
-                    if b"\n" in buf:
-                        line, _, _ = buf.partition(b"\n")
-                        return json.loads(line.decode("utf-8"))
-
-                if buf:
-                    return json.loads(buf.decode("utf-8"))
-                raise EOFError("Empty command response")
             finally:
                 os.close(fd)
 
-        else:
-            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+        LOGGER.info("Using DUT IP address: %s", dut_ip)
 
-            dut_uname = os.getenv('LINUX_DUT_USER')
-            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            LOGGER.info(f"Using DUT user name: {dut_uname}")
-            cmd_list = ["ssh", f"{dut_uname}@{dut_ip}", f"cat {app_pipe_out}"]
-            return subprocess.check_output(cmd_list)
+        dut_uname = os.getenv("LINUX_DUT_USER")
+        asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+        LOGGER.info("Using DUT user name: %s", dut_uname)
+
+        # `cat` returns the remote FIFO contents. Parse as JSON for consistency with local behavior.
+        out = subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
+        out_str = out.decode("utf-8").strip()
+        return json.loads(out_str)
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
         """
