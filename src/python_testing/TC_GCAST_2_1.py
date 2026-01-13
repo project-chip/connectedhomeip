@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
+# # TODO: Enable CI Test arguments once cluster works
 # test-runner-runs:
 #   run1:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
@@ -37,8 +37,7 @@
 import logging
 from mobly import asserts
 import matter.clusters as Clusters
-from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +52,7 @@ class TC_GCAST_2_1(MatterBaseTest):
                 TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute")]
 
     def pics_TC_GCAST_2_1(self) -> list[str]:
-        pics = ["GCAST.S"]
-        return pics
+        return ["GCAST.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_1(self):

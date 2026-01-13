@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
+# # TODO: Enable CI Test arguments once cluster works
 # test-runner-runs:
 #   run1:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
@@ -40,7 +40,7 @@ import secrets
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.interaction_model import InteractionModelError, Status
 
 from src.python_testing.TC_GCAST_common import get_feature_map, valid_endpoints_list, generate_membership_entry_matcher, \
@@ -76,8 +76,7 @@ class TC_GCAST_2_5(MatterBaseTest):
         ]
 
     def pics_TC_GCAST_2_5(self) -> list[str]:
-        pics = ["GCAST.S"]
-        return pics
+        return ["GCAST.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_5(self):

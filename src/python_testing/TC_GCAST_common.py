@@ -1,3 +1,19 @@
+#
+#    Copyright (c) 2025 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
 
 import logging
 from typing import Optional
@@ -50,15 +66,14 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
             for device_type in device_types:
                 if device_type.deviceType == 14:  # Aggregator
                     continue
-                else:
-                    server_list = await test.read_single_attribute_check_success(
-                        cluster=Clusters.Descriptor,
-                        attribute=Clusters.Descriptor.Attributes.ServerList,
-                        endpoint=endpoint)
-                    logger.info(f"Server List: {server_list}")
-                    for cluster in server_list:
-                        if is_groupcast_supporting_cluster(cluster) and endpoint not in endpoints_list:
-                            endpoints_list.append(endpoint)
+                server_list = await test.read_single_attribute_check_success(
+                    cluster=Clusters.Descriptor,
+                    attribute=Clusters.Descriptor.Attributes.ServerList,
+                    endpoint=endpoint)
+                logger.info(f"Server List: {server_list}")
+                for cluster in server_list:
+                    if is_groupcast_supporting_cluster(cluster) and endpoint not in endpoints_list:
+                        endpoints_list.append(endpoint)
         asserts.assert_greater(len(endpoints_list), 0,
                               "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
     return endpoints_list
