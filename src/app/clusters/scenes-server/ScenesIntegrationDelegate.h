@@ -35,23 +35,20 @@ public:
     // == Global Scene Methods ==
     // These methods interact with the Global Scene (Group ID 0, Scene ID 0).
 
-    // Stores the current state of the calling cluster into the Global Scene for the fabric.
-    // This operation is scoped to the endpoint associated with this delegate instance.
+    /// Stores the current state of into the Global Scene for the fabric.
     virtual CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) = 0;
 
-    // Recalls the Global Scene for the fabric, expecting the Scene Table to update the calling cluster.
-    // This operation is scoped to the endpoint associated with this delegate instance.
+    /// Recalls the Global Scene for the given fabric.
     virtual CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) = 0;
 
     // == General Scene Management Notifications ==
 
-    // Notifies that a group is about to be removed from the given fabric.
-    // Clusters using this delegate should remove any scene entries associated with this group and fabric on the endpoint
-    // associated with this delegate instance.
+    /// Notifies that a group is about to be removed from the given fabric.
+    ///
+    /// This can be used to invalidate scenes that reference the given group.
     virtual CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) = 0;
 
     // Marks all scenes on the associated endpoint as invalid for all fabrics.
-    // This is typically called when the cluster's state changes outside of a scene recall.
     virtual CHIP_ERROR MakeSceneInvalidForAllFabrics() = 0;
 };
 
