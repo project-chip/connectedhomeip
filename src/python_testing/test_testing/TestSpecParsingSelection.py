@@ -96,7 +96,9 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             spec_attributes = xml_clusters[cluster.id].attributes
             spec_accepted_commands = xml_clusters[cluster.id].accepted_commands
             spec_generated_commands = xml_clusters[cluster.id].generated_commands
-            info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
+            revision = xml_clusters[cluster.id].revision
+            info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[],
+                                             all_command_list=[], cluster_revision=revision)
             # Build just the lists - basic composition checks the wildcard against the lists, conformance just uses lists
             attributes = [id for id, a in spec_attributes.items() if a.conformance(
                 info).decision == ConformanceDecision.MANDATORY]
@@ -171,7 +173,13 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         # 1.5 is OK if TC is off
         self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=False,
                                              expect_success_conformance=True, expect_success_revisions=True)
+        # 1.5.1 is OK if TC is off
+        self._run_conformance_against_device(spec_version=0x01050100, tc_enabled=False,
+                                             expect_success_conformance=True, expect_success_revisions=True)
 
+        # 1.5.1 is OK if TC is on
+        self._run_conformance_against_device(spec_version=0x01050100, tc_enabled=True,
+                                             expect_success_conformance=True, expect_success_revisions=True)
         # 1.5 is OK if TC is on
         self._run_conformance_against_device(spec_version=0x01050000, tc_enabled=True,
                                              expect_success_conformance=True, expect_success_revisions=True)
