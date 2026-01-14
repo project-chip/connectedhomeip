@@ -599,8 +599,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     uint8_t presetIDAsInt = 2;
 
     removePresetCommandData.presetID = presetIDAsInt;
-    auto removeResponse =
-        server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
+    auto removeResponse = server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
 
     // The response should contain an ActionReturnStatus
     EXPECT_TRUE(removeResponse.has_value());
