@@ -107,7 +107,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestAttributes)
     CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
     server.SetDelegate(&mockDelegate);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(server, { 
+    ASSERT_TRUE(IsAttributesListEqualTo(server, {
                                                     Attributes::MPTZPosition::kMetadataEntry,
                                                     Attributes::MaxPresets::kMetadataEntry,
                                                     Attributes::MPTZPresets::kMetadataEntry,
@@ -182,22 +182,22 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClus
     int16_t tiltMin;
     ASSERT_EQ(tester.ReadAttribute(Attributes::TiltMin::Id, tiltMin), CHIP_NO_ERROR);
     ASSERT_LE(tiltMin, kTiltMinMaxValue);
-    ASSERT_GE(tiltMin, kTiltMinMinValue);   
+    ASSERT_GE(tiltMin, kTiltMinMinValue);
 
     int16_t tiltMax;
     ASSERT_EQ(tester.ReadAttribute(Attributes::TiltMax::Id, tiltMax), CHIP_NO_ERROR);
     ASSERT_LE(tiltMax, kTiltMaxMaxValue);
-    ASSERT_GE(tiltMax, kTiltMaxMinValue);   
+    ASSERT_GE(tiltMax, kTiltMaxMinValue);
 
     int16_t panMin;
     ASSERT_EQ(tester.ReadAttribute(Attributes::PanMin::Id, panMin), CHIP_NO_ERROR);
     ASSERT_LE(panMin, kPanMinMaxValue);
-    ASSERT_GE(panMin, kPanMinMinValue);   
+    ASSERT_GE(panMin, kPanMinMinValue);
 
     int16_t panMax;
     ASSERT_EQ(tester.ReadAttribute(Attributes::PanMax::Id, panMax), CHIP_NO_ERROR);
     ASSERT_LE(panMax, kPanMaxMaxValue);
-    ASSERT_GE(panMax, kPanMaxMinValue);   
+    ASSERT_GE(panMax, kPanMaxMinValue);
 
     Structs::MPTZStruct::DecodableType mptzPosition;
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
@@ -211,7 +211,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClus
     // No commands have been invoked, we should be Idle
     PhysicalMovementEnum movementState;
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);   
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 
     // On startup there should be no presets and no streams set
     Attributes::MPTZPresets::TypeInfo::DecodableType mptzPresets;
@@ -272,7 +272,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
     // Server should think the device is moving until the app callsback, verify that the MovementState is correct
     PhysicalMovementEnum movementState;
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);  
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);
 
     // Fake the delegate callback
     server.GetLogic().OnPhysicalMovementComplete(Status::Success);
@@ -286,7 +286,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
 
     // Verify that the MovementState has returned to Idle
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);  
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCommandTest)
@@ -338,7 +338,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     // Server should think the device is moving until the app callsback, verify that the MovementState is correct
     PhysicalMovementEnum movementState;
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);  
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);
 
     // Fake the delegate callback
     server.GetLogic().OnPhysicalMovementComplete(Status::Success);
@@ -352,7 +352,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
 
     // Verify that the MovementState has returned to Idle
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);  
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
 
@@ -409,10 +409,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     // Verify that there is a single saved preset. The values match those of the current MPTZ Position
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
-    ASSERT_EQ(presetsSize, static_cast<size_t>(1));   
-    
+    ASSERT_EQ(presetsSize, static_cast<size_t>(1));
+
     auto it = mptzPresets.begin();
-    while (it.Next()) 
+    while (it.Next())
     {
         ASSERT_EQ(*it.GetValue().name.data(), *presetName.data());
         ASSERT_EQ(it.GetValue().presetID, presetIDAsInt);
@@ -480,13 +480,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
 
     // Save the stored preset settings; we know there is only one entry
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
-    
+
     int16_t presetPan;
     int16_t presetTilt;
     uint8_t presetZoom;
 
     auto it = mptzPresets.begin();
-    while (it.Next()) 
+    while (it.Next())
     {
         presetPan = it.GetValue().settings.pan.Value();
         presetTilt = it.GetValue().settings.tilt.Value();
@@ -522,20 +522,20 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     // Ensure we're "moving"
     PhysicalMovementEnum movementState;
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);    
-    
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);
+
     // Fake the callback
     server.GetLogic().OnPhysicalMovementComplete(Status::Success);
 
     // Ensure we've reverted to idle
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
-    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);    
+    ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 
     // Ensure the values in MPTZPosition are those of the Preset
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(mptzPosition.pan.Value(), presetPan);
     ASSERT_EQ(mptzPosition.tilt.Value(), presetTilt);
-    ASSERT_EQ(mptzPosition.zoom.Value(), presetZoom);   
+    ASSERT_EQ(mptzPosition.zoom.Value(), presetZoom);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCommandTest)
@@ -594,7 +594,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     // Verify that there is a single saved preset. The values match those of the current MPTZ Position
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
-    ASSERT_EQ(presetsSize, static_cast<size_t>(1));    
+    ASSERT_EQ(presetsSize, static_cast<size_t>(1));
 
     // Try to remove again, verify success
     removePresetCommandData.presetID = presetIDAsInt;
@@ -604,7 +604,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     // Verify that there are no saved presets. The values match those of the current MPTZ Position
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
-    ASSERT_EQ(presetsSize, static_cast<size_t>(0));    
+    ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCommandTest)
@@ -661,27 +661,27 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     ASSERT_EQ(streamsSize, static_cast<size_t>(1));
 
     auto it = dptzStreams.begin();
-    while (it.Next()) 
+    while (it.Next())
     {
         ASSERT_EQ(it.GetValue().videoStreamID, videoStreamID);
         ASSERT_EQ(it.GetValue().viewport.x1, viewPort.x1);
         ASSERT_EQ(it.GetValue().viewport.x2, viewPort.x2);
         ASSERT_EQ(it.GetValue().viewport.y1, viewPort.y1);
         ASSERT_EQ(it.GetValue().viewport.y2, viewPort.y2);
-    }    
+    }
 
     // Try to set the viewport
     Globals::Structs::ViewportStruct::Type newViewPort = { 0, 0, 1280, 720 };
     commandData.viewport = newViewPort;
 
     response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData).value();
-    EXPECT_TRUE(response.IsSuccess());   
+    EXPECT_TRUE(response.IsSuccess());
 
     // Verify this new viewport is in DPTZStreams
     ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
 
     it = dptzStreams.begin();
-    while (it.Next()) 
+    while (it.Next())
     {
         ASSERT_EQ(it.GetValue().videoStreamID, videoStreamID);
         ASSERT_EQ(it.GetValue().viewport.x1, newViewPort.x1);
@@ -689,7 +689,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
         ASSERT_EQ(it.GetValue().viewport.y1, newViewPort.y1);
         ASSERT_EQ(it.GetValue().viewport.y2, newViewPort.y2);
 
-    }    
+    }
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCommandTest)
@@ -739,7 +739,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     commandData.videoStreamID = videoStreamID;
     commandData.deltaX.Emplace(deltaX);
     commandData.deltaY.Emplace(deltaY);
-    commandData.zoomDelta.Emplace(zoomDelta); 
+    commandData.zoomDelta.Emplace(zoomDelta);
 
     auto response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData).value();
     ASSERT_EQ(response.GetStatusCode().GetStatus(), Status::NotFound);
@@ -750,10 +750,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
 
     // Try to move the viewport
     response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData).value();
-    EXPECT_TRUE(response.IsSuccess());   
+    EXPECT_TRUE(response.IsSuccess());
 
     // The mock delegate has no means to verify the proposed change as the values needed are part of CameraAVStreams,
-    // as such, the command above should just be successful as long as the delta is in range.  
+    // as such, the command above should just be successful as long as the delta is in range.
 
     // Try to move the viewport with an out of range zoomDelta
     commandData.zoomDelta.Emplace(zoomDeltaFail);

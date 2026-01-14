@@ -314,7 +314,7 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     {
         ChipLogError(Camera, "Failed to initialize CameraAVStreamManagementServer on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
                      err.Format());
-    }                               
+    }
 }
 
 

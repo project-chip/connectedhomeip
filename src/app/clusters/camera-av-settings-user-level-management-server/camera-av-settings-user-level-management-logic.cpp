@@ -501,12 +501,12 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     //
     if (pan.HasValue())
     {
-        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), Status::InvalidCommand, 
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), Status::InvalidCommand,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Pan not supported although pan value provided",
                          mEndpointId));
 
         int16_t panValue = pan.Value();
-        VerifyOrReturnError((panValue <= mPanMax) && (panValue >= mPanMin), Status::ConstraintError, 
+        VerifyOrReturnError((panValue <= mPanMax) && (panValue >= mPanMin), Status::ConstraintError,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Pan value out of range", mEndpointId));
 
         hasAtLeastOneValue = true;
@@ -519,7 +519,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
                          mEndpointId));
 
         int16_t tiltValue = tilt.Value();
-        VerifyOrReturnError((tiltValue <= mTiltMax) && (tiltValue >= mTiltMin), Status::ConstraintError, 
+        VerifyOrReturnError((tiltValue <= mTiltMax) && (tiltValue >= mTiltMin), Status::ConstraintError,
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Received Tilt value out of range", mEndpointId));
 
         hasAtLeastOneValue = true;
@@ -540,14 +540,14 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     }
 
     // Was a value received in the command
-    VerifyOrReturnError(hasAtLeastOneValue, Status::InvalidCommand, 
+    VerifyOrReturnError(hasAtLeastOneValue, Status::InvalidCommand,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: MPTZSetPosition command contains no actionable fields",
                      mEndpointId));
 
     // If the camera is still in motion, then return Busy.  Subsequently check with the delegate that we're in a position to change
     // any of the PTZ values which may not be possible for other reasons
     //
-    VerifyOrReturnError(!IsMoving(), Status::Busy, 
+    VerifyOrReturnError(!IsMoving(), Status::Busy,
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
                      mEndpointId));
 
@@ -621,7 +621,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     if (tiltDelta.HasValue())
     {
-        VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), Status::InvalidCommand, 
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), Status::InvalidCommand,
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Tilt not supported although tiltDelta value provided",
                          mEndpointId));
@@ -651,7 +651,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     if (zoomDelta.HasValue())
     {
-        VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), Status::InvalidCommand, 
+        VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), Status::InvalidCommand,
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Zoom not supported although zoomDelta value provided",
                          mEndpointId));
