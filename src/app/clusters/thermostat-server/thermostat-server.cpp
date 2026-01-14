@@ -17,6 +17,7 @@
 
 #include "thermostat-server.h"
 #include "PresetStructWithOwnedMembers.h"
+#include "thermostat-server-events.h"
 
 #include <app/util/attribute-storage.h>
 
@@ -393,6 +394,7 @@ Status CheckCoolingSetpointDeadband(bool autoSupported, int16_t newHeatingSetpoi
     return Status::Success;
 }
 
+typedef Status (*SetpointGetter)(EndpointId endpoint, int16_t * value);
 typedef Status (*SetpointSetter)(EndpointId endpoint, int16_t value);
 
 /**
@@ -524,6 +526,19 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
         gDelegateTable[ep] = delegate;
         delegate->SetEndpointId(endpoint);
     }
+}
+
+void GenerateSetpointEvent(chip::EndpointId endpoint, SystemModeEnum systemMode, Optional<BitMask<OccupancyBitmap>> occupancy,
+                           SetpointGetter getter)
+{
+    int16_t setpoint;
+    auto status = getter(endpoint, &setpoint);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "GenerateSetpointEvent failed to queue event: could not get set point");
+        return;
+    }
+    GenerateSetpointChangeEvent(endpoint, systemMode, occupancy, NullOptional, setpoint);
 }
 
 CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -816,6 +831,93 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
     }
 }
 
+void ThermostatAttrAccess::GenerateEvents(const ConcreteAttributePath & attributePath)
+{
+    switch (attributePath.mAttributeId)
+    {
+    case SystemMode::Id: {
+        SystemModeEnum systemMode = SystemModeEnum::kOff;
+        if (SystemMode::Get(attributePath.mEndpointId, &systemMode) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to queue SystemModeChange event: could not get system mode");
+        }
+        else
+        {
+            GenerateSystemModeChangeEvent(attributePath.mEndpointId, NullOptional, systemMode);
+        }
+        break;
+    }
+    case OccupiedHeatingSetpoint::Id:
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, MakeOptional(OccupancyBitmap::kOccupied),
+                              OccupiedHeatingSetpoint::Get);
+        break;
+    case OccupiedCoolingSetpoint::Id:
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool,
+                              chip::Optional<chip::BitMask<OccupancyBitmap>>(OccupancyBitmap::kOccupied),
+                              OccupiedCoolingSetpoint::Get);
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
+                              UnoccupiedHeatingSetpoint::Get);
+
+        break;
+    case UnoccupiedCoolingSetpoint::Id:
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
+                              UnoccupiedCoolingSetpoint::Get);
+
+        break;
+    case LocalTemperature::Id: {
+        DataModel::Nullable<int16_t> local_temperature;
+        if (LocalTemperature::Get(attributePath.mEndpointId, local_temperature) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to queue LocalTemperatureChange event: could not get local temperature");
+        }
+        else
+        {
+            GenerateLocalTemperatureChangeEvent(attributePath.mEndpointId, local_temperature);
+        }
+        break;
+    }
+    case Occupancy::Id: {
+        BitMask<OccupancyBitmap, uint8_t> occupancy;
+        if (Occupancy::Get(attributePath.mEndpointId, &occupancy) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to queue OccupancyChange event: could not get occupancy");
+        }
+        else
+        {
+            GenerateOccupancyChangeEvent(attributePath.mEndpointId, chip::Optional<chip::BitMask<OccupancyBitmap>>(), occupancy);
+        }
+        break;
+    }
+    case ThermostatRunningState::Id: {
+        BitMask<RelayStateBitmap> running_state;
+        if (ThermostatRunningState::Get(attributePath.mEndpointId, &running_state) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to queue RunningStateChange event: could not get running state");
+        }
+        else
+        {
+            GenerateRunningStateChangeEvent(attributePath.mEndpointId, chip::Optional<chip::BitMask<RelayStateBitmap>>(),
+                                            running_state);
+        }
+        break;
+    }
+    case ThermostatRunningMode::Id: {
+        ThermostatRunningModeEnum running_mode;
+        if (ThermostatRunningMode::Get(attributePath.mEndpointId, &running_mode) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to queue RunningModeChange event: could not get running mode");
+        }
+        else
+        {
+            GenerateRunningModeChangeEvent(attributePath.mEndpointId, Optional<ThermostatRunningModeEnum>(), running_mode);
+        }
+        break;
+    }
+    }
+}
+
 void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
     uint32_t flags;
@@ -850,6 +952,10 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
         clearActivePreset = supportsPresets && !occupied;
         EnsureDeadband(attributePath);
         break;
+    }
+    if (featureMap.Has(Feature::kEvents))
+    {
+        gThermostatAttrAccess.GenerateEvents(attributePath);
     }
     if (clearActivePreset)
     {

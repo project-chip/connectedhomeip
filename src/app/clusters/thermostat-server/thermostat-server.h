@@ -83,6 +83,8 @@ private:
      */
     Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
 
+    void GenerateEvents(const ConcreteAttributePath & attributePath);
+
     /**
      * @brief Callback for when the server is removed from a given fabric; all associated atomic writes are reset
      *
