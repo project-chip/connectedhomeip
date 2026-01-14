@@ -384,7 +384,7 @@ void ValveConfigurationAndControlCluster::SetCurrentState(
 //   - Validate that the TargetLevel and LevelStep are compatible.
 CHIP_ERROR
 ValveConfigurationAndControlCluster::ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
-                                                            DataModel::Nullable<Percent> & validatedTargetLevel) const
+                                                                   DataModel::Nullable<Percent> & validatedTargetLevel) const
 {
     if (!targetLevel.HasValue())
     {

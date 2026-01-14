@@ -46,7 +46,7 @@ public:
     {
         const DataModel::Nullable<uint32_t> defaultOpenDuration;
         Percent defaultOpenLevel = kDefaultOpenLevel;
-        uint8_t levelStep = kDefaultLevelStep;
+        uint8_t levelStep        = kDefaultLevelStep;
     };
 
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
@@ -81,7 +81,7 @@ private:
                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler);
     std::optional<DataModel::ActionReturnStatus> HandleCloseCommand();
     CHIP_ERROR ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
-                                      DataModel::Nullable<Percent> & validatedTargetLevel) const;
+                                             DataModel::Nullable<Percent> & validatedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
