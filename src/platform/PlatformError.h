@@ -52,19 +52,17 @@ namespace Internal {
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 inline ::chip::ChipError MapPlatformError(int aError, std::source_location location)
 {
-    return aError == 0 ? CHIP_NO_ERROR
-                       : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError), location);
+    return CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError), location);
 }
 #elif CHIP_CONFIG_ERROR_SOURCE
 inline ::chip::ChipError MapPlatformError(int aError, const char * file, unsigned int line)
 {
-    return aError == 0 ? CHIP_NO_ERROR
-                       : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError), file, line);
+    return CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError), file, line);
 }
 #else
 inline ::chip::ChipError MapPlatformError(int aError)
 {
-    return aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError));
+    return CHIP_ERROR(ChipError::Range::kPlatform, static_cast<ChipError::ValueType>(aError));
 }
 #endif
 
