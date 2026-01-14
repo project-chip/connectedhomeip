@@ -49,10 +49,10 @@ void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::
     }
 }
 
-
-ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(
-    EndpointId endpoint, BitFlags<ValveConfigurationAndControl::Feature> features, OptionalAttributeSet optionalAttributeSet,
-    const StartupConfiguration & config) :
+ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(EndpointId endpoint,
+                                                                         BitFlags<ValveConfigurationAndControl::Feature> features,
+                                                                         OptionalAttributeSet optionalAttributeSet,
+                                                                         const StartupConfiguration & config) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
     mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr)
@@ -166,7 +166,8 @@ void ValveConfigurationAndControlCluster::startRemainingDurationTick()
 
     if (mRemainingDuration.value().Value() > 0)
     {
-        LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onValveConfigurationAndControlTick, this));
+        LogErrorOnFailure(
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onValveConfigurationAndControlTick, this));
     }
     else
     {
@@ -261,7 +262,6 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullabl
     // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
     SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
     SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
-
 
     if (mDelegate != nullptr)
     {

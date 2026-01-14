@@ -192,8 +192,8 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
+                                                     ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -315,8 +315,8 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
+                                                     ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -335,8 +335,8 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandWithoutFault)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, {}, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {},
+                                                     ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -378,8 +378,8 @@ TEST_F(TestValveConfigurationAndControlCluster, CloseCommandWithoutFault)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features,
+                                                     ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&instantDelegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
