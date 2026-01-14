@@ -88,13 +88,15 @@ class TC_DISHALM_2_1(MatterBaseTest):
             Bitmask with all valid alarm bits set
         """
         # Standard alarms defined in Matter 1.x specification
+        alarm_bitmap = self.cluster.Bitmaps.AlarmBitmap
+        
         STANDARD_ALARMS = (
-            0x00000001 |  # Bit 0: InflowError
-            0x00000002 |  # Bit 1: DrainError
-            0x00000004 |  # Bit 2: DoorError
-            0x00000008 |  # Bit 3: TempTooLow
-            0x00000010 |  # Bit 4: TempTooHigh
-            0x00000020    # Bit 5: WaterLevelError
+            alarm_bitmap.kInflowError |   # Bit 0: InflowError
+            alarm_bitmap.kDrainError |    # Bit 1: DrainError  
+            alarm_bitmap.kDoorError |     # Bit 2: DoorError
+            alarm_bitmap.kTempTooLow |    # Bit 3: TempTooLow
+            alarm_bitmap.kTempTooHigh |   # Bit 4: TempTooHigh  
+            alarm_bitmap.kWaterLevelError # Bit 5: WaterLevelError
         )
 
         # Provisional alarms (future spec versions, certification testing)
@@ -140,12 +142,12 @@ class TC_DISHALM_2_1(MatterBaseTest):
             if unsupported_bits != 0:
                 asserts_fail_msg = (
                     f"{attribute_name} attribute contains bits not present in Supported attribute."
-                    f"Value: 0x{bitmap_value:08X}, Supported:  0x{supported_value:08X}, "
+                    f"Value: 0x{bitmap_value:08X}, Supported: 0x{supported_value:08X}, "
                     f"Unsupported bits: 0x{unsupported_bits:08X}"
                 )
                 asserts.fail(asserts_fail_msg)
 
-        logger.info(f"{attribute_name} bitmap validation passed:  0x{bitmap_value:08X}")
+        logger.info(f"{attribute_name} bitmap validation passed: 0x{bitmap_value:08X}")
 
     async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: ClusterObjects.ClusterAttributeDescriptor):
         resp = await self.read_single_attribute_check_success(
