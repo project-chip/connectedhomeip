@@ -46,7 +46,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader)
 
     gImageProcessor.SetOTADownloader(downloader);
 
-    OtaHookInit();
+    TEMPORARY_RETURN_IGNORED OtaHookInit();
 
     return CHIP_NO_ERROR;
 }
@@ -58,30 +58,30 @@ void OTAMultiImageProcessorImpl::Clear()
     mParams.totalFileBytes  = 0;
     mParams.downloadedBytes = 0;
     mCurrentProcessor       = nullptr;
-    ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED ReleaseBlock();
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -99,7 +99,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -121,7 +121,7 @@ void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mAccumulator.Init(sizeof(OTATlvHeader));
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ProcessHeader(ByteSpan & block)
@@ -277,7 +277,7 @@ void OTAMultiImageProcessorImpl::AbortAllProcessors()
     {
         if (pair.second->WasSelected())
         {
-            pair.second->Clear();
+            TEMPORARY_RETURN_IGNORED pair.second->Clear();
             pair.second->SetWasSelected(false);
         }
     }
@@ -325,7 +325,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
@@ -358,7 +358,7 @@ void OTAMultiImageProcessorImpl::HandleFinalize(intptr_t context)
 
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     if (error != CHIP_NO_ERROR)
     {
@@ -374,7 +374,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ProcessFinalize()
 {
     for (auto const & pair : this->mProcessorMap)
     {
-        pair.second->FinalizeAction();
+        TEMPORARY_RETURN_IGNORED pair.second->FinalizeAction();
     }
     return CHIP_NO_ERROR;
 }
@@ -415,7 +415,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     for (auto const & pair : imageProcessor->mProcessorMap)
     {
-        pair.second->Clear();
+        TEMPORARY_RETURN_IGNORED pair.second->Clear();
         pair.second->SetWasSelected(false);
     }
 
@@ -426,7 +426,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     osDelay(500); // sl-temp: delay for uart print before reboot
 #endif
     // Write that we are rebooting after a software update and reboot the device
-    SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
 #ifdef SLI_SI91X_MCU_INTERFACE // 917 SoC reboot
     chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
 #else // EFR reboot
@@ -451,7 +451,7 @@ void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
         {
-            imageProcessor->mDownloader->FetchNextData();
+            TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
         }
     });
 }

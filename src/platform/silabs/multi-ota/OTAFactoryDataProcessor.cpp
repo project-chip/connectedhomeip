@@ -44,7 +44,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
             return CHIP_NO_ERROR;
         }
 
-        Clear();
+        TEMPORARY_RETURN_IGNORED Clear();
     }
 
     return error;
