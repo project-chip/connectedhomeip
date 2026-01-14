@@ -71,7 +71,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
     def _get_valid_alarm_bitmap_mask(self, allow_provisional:  bool = False) -> int:
         """
         Get the valid alarm bitmap mask from the DishwasherAlarm cluster specification.
-        
+
         According to Matter spec (Dishwasher Alarm cluster 0x005D), the AlarmBitmap defines: 
         - Bit 0 (0x01): InflowError
         - Bit 1 (0x02): DrainError
@@ -79,10 +79,10 @@ class TC_DISHALM_2_1(MatterBaseTest):
         - Bit 3 (0x08): TempTooLow
         - Bit 4 (0x10): TempTooHigh
         - Bit 5 (0x20): WaterLevelError
-        
+
         Args:
             allow_provisional:  If True, include provisional alarm bits (for testing/verification)
-        
+
         Returns:
             Bitmask with all valid alarm bits set
         """
@@ -110,17 +110,17 @@ class TC_DISHALM_2_1(MatterBaseTest):
                                valid_mask: int, supported_value: int = None):
         """
         Validate that an alarm bitmap only contains valid and supported bits.
-        
+
         Performs two checks:
         1. All set bits are defined in the AlarmBitmap specification
         2. For Mask/State/Latch:  all set bits are also set in Supported attribute
-        
+
         Args:
             attribute_name: Name of the attribute being validated (for error messages)
             bitmap_value: The bitmap value to validate
             valid_mask: Mask of bits defined in the specification
             supported_value: Value of Supported attribute (None for Supported itself)
-        
+
         Raises:
             AssertionError: If validation fails
         """
@@ -204,6 +204,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             self._validate_alarm_bitmap("Latch", latch_value, valid_mask, supported_value)
 
         logger.info("All alarm bitmap validations passed successfully")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
