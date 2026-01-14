@@ -97,7 +97,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             alarm_bitmap.kDoorError |     # Bit 2: DoorError
             alarm_bitmap.kTempTooLow |    # Bit 3: TempTooLow
             alarm_bitmap.kTempTooHigh |   # Bit 4: TempTooHigh
-            alarm_bitmap.kWaterLevelError # Bit 5: WaterLevelError
+            alarm_bitmap.kWaterLevelError  # Bit 5: WaterLevelError
         )
 
         # Provisional alarms (future spec versions, certification testing)
