@@ -44,9 +44,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    const FabricInfo * fabricInfo = mClusterContext.fabricTable.FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext        = mClusterContext.failSafeContext.GetFailSafeContext();
-    auto & commissionMgr          = mClusterContext.commissioningWindowManager;
+    const FabricInfo * fabricInfo = mContext.fabricTable.FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = mContext.failSafeContext;
+    auto & commissionMgr          = mContext.commissioningWindowManager;
 
     VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
     VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
@@ -83,9 +83,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissi
 
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
-    const FabricInfo * fabricInfo = mClusterContext.fabricTable.FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext        = mClusterContext.failSafeContext.GetFailSafeContext();
-    auto & commissionMgr          = mClusterContext.commissioningWindowManager;
+    const FabricInfo * fabricInfo = mContext.fabricTable.FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = mContext.failSafeContext;
+    auto & commissionMgr          = mContext.commissioningWindowManager;
 
     VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
 
@@ -113,8 +113,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
 
     if (!commissionMgr.IsCommissioningWindowOpen())
         mClusterContext.failSafeContext.ForceFailSafeTimerExpiry();
+    mContext.failSafeContext.ForceFailSafeTimerExpiry();
 
-    if (!mClusterContext.commissioningWindowManager.IsCommissioningWindowOpen())
+    if (!mContext.commissioningWindowManager.IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
         return ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen);

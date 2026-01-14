@@ -30,15 +30,11 @@ namespace Clusters {
 class AdministratorCommissioningCluster : public DefaultServerCluster
 {
 public:
-    struct Context
-    {
-        FabricTable & fabricTable;
-        CommissioningWindowManager & commissioningWindowManager;
-        FailSafeContext & failsafeContext;
-    };
+    using Context = AdministratorCommissioningLogic::Context;
+
     constexpr AdministratorCommissioningCluster(EndpointId endpointId,
-                                                BitFlags<AdministratorCommissioning::Feature> _unused_features) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id))
+                                                BitFlags<AdministratorCommissioning::Feature> _unused_features, Context context) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id)), mLogic(context)
     {}
 
     // Server cluster implementation
@@ -59,8 +55,9 @@ class AdministratorCommissioningWithBasicCommissioningWindowCluster : public Adm
 {
 public:
     AdministratorCommissioningWithBasicCommissioningWindowCluster(EndpointId endpointId,
-                                                                  BitFlags<AdministratorCommissioning::Feature> features) :
-        AdministratorCommissioningCluster(endpointId, features), mFeatures(features)
+                                                                  BitFlags<AdministratorCommissioning::Feature> features,
+                                                                  Context context) :
+        AdministratorCommissioningCluster(endpointId, features, context), mFeatures(features)
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -71,7 +68,6 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
 private:
-    Context mClusterContext;
     const BitFlags<AdministratorCommissioning::Feature> mFeatures;
 };
 
