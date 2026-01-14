@@ -42,6 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
@@ -131,7 +132,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         undefined_bits = bitmap_value & ~valid_mask
         if undefined_bits != 0:
             asserts_fail_msg = (
-                f"{attribute_name} attribute contains undefined alarm bits."
+                f"{attribute_name} attribute contains undefined alarm bits. "
                 f"Value: 0x{bitmap_value:08X}, Undefined bits: 0x{undefined_bits:08X}"
             )
             asserts.fail(asserts_fail_msg)
@@ -155,7 +156,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             attribute=attribute
         )
 
-        asserts.assert_valid_uint32(resp, attribute)
+        matter_asserts.assert_valid_uint32(resp, str(attribute))
 
         logger.info(f"Reading attribute: {attribute}, response: {resp}")
         return resp
