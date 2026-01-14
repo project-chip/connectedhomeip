@@ -145,6 +145,9 @@ endif # CHIP_FACTORY_DATA
 config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
 
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	default "g" if CHIP_NXP_PLATFORM_MCXW71
+
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
 	default y

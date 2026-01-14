@@ -60,6 +60,14 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	string "Debug optimization level"
+	depends on DEBUG
+	default "0"
+	help
+	  Set the optimization level to use when building with debug symbols.
+	  This value is used with the -O compiler flag (e.g., -Og, -O0, -O1, -O2, -O3, -Os, -Oz).
+
 config CHIP_STRIP_SYMBOLS
 	bool "Strip symbols"
 	help

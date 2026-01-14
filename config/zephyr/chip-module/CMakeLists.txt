@@ -106,7 +106,6 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
-    matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_OPENTHREAD_FTD)
 
     if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")
