@@ -92,8 +92,7 @@ class TC_CC_6_5(MatterBaseTest):
                      "Value has to be between a range of 0x00 to 0x03; Verify that the DUT response indicates that the EnhancedColorMode attribute has the expected value 2 (ColorTemperatureMireds)."),
         ]
 
-    @async_test_body
-    @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds), has_attribute(Clusters.ColorControl.Attributes.StartUpColorTemperatureMireds), has_command(Clusters.OnOff.Commands.On))
+    @run_if_endpoint_matches(has_attribute(Clusters.ColorControl.Attributes.ColorTemperatureMireds))
     async def test_TC_CC_6_5(self):
         cc_cluster = Clusters.Objects.ColorControl
         cc_attributes = cc_cluster.Attributes
@@ -106,7 +105,7 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("0a")
         self.TH1 = self.default_controller
         log.info(f"Writing Options attribute on endpoint {self.endpoint}")
-        await self.write_single_attribute(cc_attributes.Options(0x00), endpoint=self.endpoint, expect_success=True)
+        await self.write_single_attribute(cc_attributes.Options(0x00), expect_success=True)
 
         self.step("0b")
         log.info(f"Sending On command to endpoint {self.endpoint}")
