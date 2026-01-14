@@ -83,18 +83,20 @@ class TC_BOOL_2_2(MatterBaseTest):
     def steps_TC_BOOL_2_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commission DUT to TH", is_commissioning=True),
-            TestStep("1a", "Set up subscription to StateChange event."),
+            TestStep("1a", "Set up subscription to StateValue attribute and StateChange event."),
             TestStep("2a", "Bring the DUT into a state so StateValue is FALSE."),
             TestStep("2b", "TH reads the StateValue attribute from the DUT.",
-                     "Verify that value in the response is FALSE."),
-            TestStep("2c", "Bring the DUT into a state so StateValue is TRUE."),
-            TestStep("2d", "Verify StateChange event was received.",
-                     "Receive StateChange event with StateValue set to TRUE."),
-            TestStep("3a", "TH reads the StateValue attribute from the DUT.",
-                     "Verify that value in the response is TRUE."),
-            TestStep("3b", "Bring the DUT into a state so StateValue is FALSE."),
-            TestStep("3c", "Verify StateChange event was received.",
-                     "Receive StateChange event with StateValue set to FALSE."),
+                     "Verify that the value in the response is FALSE."),
+            TestStep("3a", "Bring the DUT into a state so StateValue is TRUE."),
+            TestStep("3b", "TH waits for a StateChange event report from the DUT.",
+                     "Verify that StateChange event has StateValue set to TRUE."),
+            TestStep("3c", "TH waits for a StateValue attribute report from the DUT.",
+                     "Verify that StateValue in the report is TRUE."),
+            TestStep("4a", "Bring the DUT into a state so StateValue is FALSE."),
+            TestStep("4b", "TH waits for a StateChange event report from the DUT.",
+                     "Verify that StateChange event has StateValue set to FALSE."),
+            TestStep("4c", "TH waits for a StateValue attribute report from the DUT.",
+                     "Verify that StateValue in the report is FALSE."),
         ]
 
     def pics_TC_BOOL_2_2(self) -> list[str]:
@@ -122,7 +124,7 @@ class TC_BOOL_2_2(MatterBaseTest):
             self.mark_all_remaining_steps_skipped("1a")
             return
 
-        # Set up subscription to StateChange event.
+        # Set up subscription to StateValue attribute and StateChange event.
         self.step("1a")
 
         event_listener = EventSubscriptionHandler(expected_cluster=cbool)
@@ -143,37 +145,30 @@ class TC_BOOL_2_2(MatterBaseTest):
         asserts.assert_false(state_value, " --- Step 2b: state_value should be False.")
 
         # Bring the DUT into a state so StateValue is TRUE.
-        self.step("2c")
+        self.step("3a")
 
         await self.set_dut_state_value(endpoint, state=True)
 
-        # Verify StateChange event was received.
-        self.step("2d")
+        # TH waits for a StateChange event report from the DUT.
+        self.step("3b")
 
         post_prompt_settle_delay_seconds = 1.0 if self.is_pics_sdk_ci_only else 10.0  # longer delay for manual testing
         event = event_listener.wait_for_event_report(
             cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
+        # Verify that StateChange event has StateValue set to TRUE.
         asserts.assert_true(event.stateValue, "Unexpected stateValue on StateChange")
 
-        # TH reads the StateValue attribute from the DUT.
-        self.step("3a")
-
-        state_value = await self.read_state_value_from_dut(endpoint)
-        logger.info(f" --- Step 3a: state_value: {state_value}")
-
-        # Verify that value in the response is TRUE.
-        asserts.assert_true(state_value, " --- Step 3a: state_value should be True.")
-
         # Bring the DUT into a state so StateValue is FALSE.
-        self.step("3b")
+        self.step("4a")
 
         await self.set_dut_state_value(endpoint, state=False)
 
-        # Verify StateChange event was received.
-        self.step("3c")
+        # TH waits for a StateChange event report from the DUT.
+        self.step("4b")
 
         event = event_listener.wait_for_event_report(
             cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
+        # Verify that StateChange event has StateValue set to FALSE.
         asserts.assert_false(event.stateValue, "Unexpected stateValue on StateChange")
 
 
