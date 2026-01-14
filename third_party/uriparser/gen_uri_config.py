@@ -21,6 +21,7 @@ Uses configurable parameters passed from GN build system.
 import sys
 import os
 
+
 def main():
     if len(sys.argv) != 6:
         print("Usage: gen_uri_config.py <input> <output> <version> <have_wprintf> <have_reallocarray>", file=sys.stderr)
@@ -66,6 +67,7 @@ def main():
         f.write(content)
 
     print(f"Generated {output_file} successfully")
+
 
 if __name__ == '__main__':
     main()
