@@ -44,6 +44,7 @@ def main():
     # ext should be IDENTICAL with base if we add a few things to base:
     base_data["xmlRoot"].append("./data-model/test")
     base_data["xmlFile"].append("mode-select-extensions.xml")
+    base_data["xmlFile"].append("test-hidden-mei-cluster.xml")
 
     # do not care about sorting. mainly do not check if extension xml
     # is at the end or in the middle
