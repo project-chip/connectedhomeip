@@ -12,13 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-        ${APP_TARGET}
-        PRIVATE
-        "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.cpp"
-        "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.h"
-        "${CLUSTER_DIR}/CodegenIntegration.cpp"
-        "${CLUSTER_DIR}/TlsClientManagementCluster.cpp"
-        "${CLUSTER_DIR}/TlsClientManagementCluster.h"
-)
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestCameraAVStreamManagementCluster"
+
+  test_sources = [ "TestCameraAVStreamManagementCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/camera-av-stream-management-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+  ]
+}
