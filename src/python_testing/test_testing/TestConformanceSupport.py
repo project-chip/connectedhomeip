@@ -655,28 +655,25 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'AB & !CD, P')
 
-    def _test_conformance_arithmetic(self, term: str):
-        # AB, [CD]
-        xml = ('<mandatoryConform>'
-               f'{term}'
-               '<attribute name="attr1" />'
-               '<literal value="1" />'
-               '</greaterTerm>'
-               '</mandatoryConform>')
+    def _test_conformance_arithmetic(self, term: str, symbol: str):
+        def create_xml(xml_mid: str) -> str:
+            return ('<mandatoryConform>'
+                    f'<{term}>'
+                    f'{xml_mid}'
+                    f'</{term}>'
+                    '</mandatoryConform>')
+        xml = create_xml(('<attribute name="attr1" />'
+                          '<literal value="1" />'))
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         # TODO: switch this to check greater than once the update to the base is done (#33422)
         asserts.assert_equal(xml_callable(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision, ConformanceDecision.OPTIONAL)
-        asserts.assert_equal(str(xml_callable), 'attr1 > 1')
+        asserts.assert_equal(str(xml_callable), f'attr1 {symbol} 1')
 
         # Ensure that we can only have greater terms with exactly 2 value
-        xml = ('<mandatoryConform>'
-               '<greaterTerm>'
-               '<attribute name="attr1" />'
-               '<attribute name="attr2" />'
-               '<literal value="1" />'
-               '</greaterTerm>'
-               '</mandatoryConform>')
+        xml = create_xml(('<attribute name="attr1" />'
+                          '<attribute name="attr2" />'
+                          '<literal value="1" />'))
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -684,11 +681,7 @@ class TestConformanceSupport(MatterBaseTest):
         except ConformanceException:
             pass
 
-        xml = ('<mandatoryConform>'
-               '<greaterTerm>'
-               '<attribute name="attr1" />'
-               '</greaterTerm>'
-               '</mandatoryConform>')
+        xml = create_xml(('<attribute name="attr1" />'))
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -697,12 +690,8 @@ class TestConformanceSupport(MatterBaseTest):
             pass
 
         # Only attributes and literals allowed because arithmetic operations require values
-        xml = ('<mandatoryConform>'
-               '<greaterTerm>'
-               '<feature name="AB" />'
-               '<literal value="1" />'
-               '</greaterTerm>'
-               '</mandatoryConform>')
+        xml = create_xml(('<feature name="AB" />'
+                          '<literal value="1" />'))
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
@@ -711,7 +700,19 @@ class TestConformanceSupport(MatterBaseTest):
             pass
 
     def test_conformance_greater(self):
-        self._test_conformance_arithmetic('<greaterTerm>')
+        self._test_conformance_arithmetic('greaterTerm', '>')
+
+    def test_conformance_greater_or_equal(self):
+        self._test_conformance_arithmetic('greaterOrEqualTerm', '>=')
+
+    def test_revision(self):
+        def create_xml(xml_mid: str) -> str:
+            return ('<mandatoryConform>'
+                    f'<greaterOrEqualTerm>'
+                    f'{xml_mid}'
+                    f'</greaterOrEqualTerm>'
+                    '</mandatoryConform>')
+        xml = create_xml(('<revision value="))
 
     def test_basic_conformance(self):
         basic_test('<mandatoryConform />', mandatory)
