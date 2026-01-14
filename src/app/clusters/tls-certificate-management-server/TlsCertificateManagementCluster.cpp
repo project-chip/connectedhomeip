@@ -71,9 +71,6 @@ TlsCertificateManagementCluster::TlsCertificateManagementCluster(EndpointId endp
     VerifyOrDieWithMsg(mMaxRootCertificates >= 5, NotSpecified, "Spec requires MaxRootCertificates be >= 5");
     VerifyOrDieWithMsg(mMaxClientCertificates >= 5, NotSpecified, "Spec requires MaxClientCertificates be >= 5");
     mDelegate.SetTlsCertificateManagementCluster(this);
-
-    VerifyOrDie(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()) == CHIP_NO_ERROR);
-    VerifyOrDie(Server::GetInstance().GetFabricTable().AddFabricDelegate(this) == CHIP_NO_ERROR);
 }
 
 TlsCertificateManagementCluster::~TlsCertificateManagementCluster()
