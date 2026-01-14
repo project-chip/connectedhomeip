@@ -66,7 +66,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(6, "Validate that supported alarms are within the defined set",
+            TestStep(6, "Validate that alarm attributes are within the defined set",
                      "Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
         ]
 
