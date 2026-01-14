@@ -61,10 +61,9 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import AttributeValue
+from matter.testing.runner import TestStep, default_matter_test_main
 
-# Create a logger
 logger = logging.getLogger(__name__)
 
 
