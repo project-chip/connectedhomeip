@@ -36,5 +36,6 @@ chip_inet_config_enable_ipv4 = false
 # Configure uriparser features
 # Enable wprintf support for wide character string formatting.
 uriparser_enable_wprintf = true
+
 # Enable reallocarray support for memory allocation.
 uriparser_enable_reallocarray = true

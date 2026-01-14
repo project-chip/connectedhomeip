@@ -39,7 +39,8 @@ action("gen_uri_config") {
   outputs = [ "${target_gen_dir}/UriConfig.h" ]
 
   args = [
-    rebase_path("${chip_root}/third_party/uriparser/repo/src/UriConfig.h.in", root_build_dir),
+    rebase_path("${chip_root}/third_party/uriparser/repo/src/UriConfig.h.in",
+                root_build_dir),
     rebase_path("${target_gen_dir}/UriConfig.h", root_build_dir),
     "1.0.0",
     _wprintf_value,
@@ -51,11 +52,11 @@ action("gen_uri_config") {
 static_library("uriparser") {
   # Public API header files
   public = [
+    "${chip_root}/third_party/uriparser/repo/include/uriparser/Uri.h",
     "${chip_root}/third_party/uriparser/repo/include/uriparser/UriBase.h",
     "${chip_root}/third_party/uriparser/repo/include/uriparser/UriDefsAnsi.h",
     "${chip_root}/third_party/uriparser/repo/include/uriparser/UriDefsConfig.h",
     "${chip_root}/third_party/uriparser/repo/include/uriparser/UriDefsUnicode.h",
-    "${chip_root}/third_party/uriparser/repo/include/uriparser/Uri.h",
     "${chip_root}/third_party/uriparser/repo/include/uriparser/UriIp4.h",
   ]
 
@@ -68,18 +69,18 @@ static_library("uriparser") {
     "${chip_root}/third_party/uriparser/repo/src/UriCopy.h",
     "${chip_root}/third_party/uriparser/repo/src/UriEscape.c",
     "${chip_root}/third_party/uriparser/repo/src/UriFile.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriIp4.c",
     "${chip_root}/third_party/uriparser/repo/src/UriIp4Base.c",
     "${chip_root}/third_party/uriparser/repo/src/UriIp4Base.h",
-    "${chip_root}/third_party/uriparser/repo/src/UriIp4.c",
     "${chip_root}/third_party/uriparser/repo/src/UriMemory.c",
     "${chip_root}/third_party/uriparser/repo/src/UriMemory.h",
-    "${chip_root}/third_party/uriparser/repo/src/UriNormalizeBase.c",
-    "${chip_root}/third_party/uriparser/repo/src/UriNormalizeBase.h",
     "${chip_root}/third_party/uriparser/repo/src/UriNormalize.c",
     "${chip_root}/third_party/uriparser/repo/src/UriNormalize.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriNormalizeBase.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriNormalizeBase.h",
+    "${chip_root}/third_party/uriparser/repo/src/UriParse.c",
     "${chip_root}/third_party/uriparser/repo/src/UriParseBase.c",
     "${chip_root}/third_party/uriparser/repo/src/UriParseBase.h",
-    "${chip_root}/third_party/uriparser/repo/src/UriParse.c",
     "${chip_root}/third_party/uriparser/repo/src/UriQuery.c",
     "${chip_root}/third_party/uriparser/repo/src/UriRecompose.c",
     "${chip_root}/third_party/uriparser/repo/src/UriResolve.c",
@@ -95,24 +96,20 @@ static_library("uriparser") {
     "${chip_root}/third_party/uriparser/repo/src/UriSetPath.c",
     "${chip_root}/third_party/uriparser/repo/src/UriSetPort.c",
     "${chip_root}/third_party/uriparser/repo/src/UriSetQuery.c",
-    "${chip_root}/third_party/uriparser/repo/src/UriSets.h",
     "${chip_root}/third_party/uriparser/repo/src/UriSetScheme.c",
     "${chip_root}/third_party/uriparser/repo/src/UriSetUserInfo.c",
+    "${chip_root}/third_party/uriparser/repo/src/UriSets.h",
     "${chip_root}/third_party/uriparser/repo/src/UriShorten.c",
     "${chip_root}/third_party/uriparser/repo/src/UriVersion.c",
   ]
 
-  deps = [
-    ":gen_uri_config",
-  ]
+  deps = [ ":gen_uri_config" ]
 
   # Public include directory for uriparser headers
   public_configs = [ ":uriparser_include" ]
 
   # Include directory for generated UriConfig.h
-  include_dirs = [
-    "${target_gen_dir}",
-  ]
+  include_dirs = [ "${target_gen_dir}" ]
 
   # Compile definitions
   defines = [
@@ -121,14 +118,10 @@ static_library("uriparser") {
   ]
 
   # C standard
-  cflags_c = [
-    "-std=c99",
-  ]
+  cflags_c = [ "-std=c99" ]
 }
 
 # Config for public include directories
 config("uriparser_include") {
-  include_dirs = [
-    "${chip_root}/third_party/uriparser/repo/include",
-  ]
+  include_dirs = [ "${chip_root}/third_party/uriparser/repo/include" ]
 }
