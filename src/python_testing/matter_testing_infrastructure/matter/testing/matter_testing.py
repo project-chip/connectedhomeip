@@ -31,11 +31,7 @@ from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from typing import Any, Callable, List, Optional, Type, Union
 
-import matter.testing.conversions as conversions
-import matter.testing.decorators as decorators
 import matter.testing.matchers as matchers
-import matter.testing.runner as runner
-import matter.testing.timeoperations as timeoperations
 
 # isort: off
 
@@ -52,10 +48,12 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                           get_setup_payload_info_config)
+from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
@@ -1369,6 +1367,97 @@ class MatterBaseTest(base_test.BaseTestClass):
             error_message='Push AV Stream validation failed'
         )
 
+    def _expire_sessions_on_all_controllers(self):
+        """Helper method to expire sessions on all active controllers via the fabric admin interface.
+
+        This method iterates through all certificate authorities and their fabric admins to expire
+        sessions on all active controllers. This ensures all controllers can reconnect after a device
+        reboot or factory reset.
+        """
+        LOGGER.info("Expiring sessions on all active controllers")
+        for ca in self.matter_stack.certificate_authorities:
+            for fabric_admin in ca.adminList:
+                for controller in fabric_admin._activeControllers:
+                    if controller.isActive:
+                        try:
+                            controller.ExpireSessions(self.dut_node_id)
+                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                        except ChipStackError as e:  # chipstack-ok
+                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+
+    async def request_device_reboot(self):
+        """Request a reboot of the Device Under Test (DUT).
+
+        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
+        to the DUT after the reboot.
+
+        Returns:
+            None
+        """
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                LOGGER.info("Created restart flag file to signal app reboot")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("App restart completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to reboot app: {e}")
+                asserts.fail(f"App reboot failed: {e}")
+
+    async def request_device_factory_reset(self):
+        """Request a factory reset of the Device Under Test (DUT).
+
+        This method handles factory resets in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input).
+        It will expire existing sessions to allow for controllers to reconnect to the DUT after the factory reset.
+        """
+        # Check if restart flag file is available (indicates test runner supports app reboot)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually factory reset
+            self.wait_for_user_input(prompt_msg="Factory reset the DUT. Press Enter when ready.\n")
+
+            # After manual factory reset, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device factory reset completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("reset")
+                    LOGGER.info("Created restart flag file to signal app factory reset")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("App factory reset completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to factory reset app: {e}")
+                asserts.fail(f"App factory reset failed: {e}")
+
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
@@ -1415,41 +1504,3 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     ])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
-
-
-# TODO(#37537): Remove these temporary aliases after transition period
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
-bytes_from_hex = conversions.bytes_from_hex
-hex_from_bytes = conversions.hex_from_bytes
-id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_with_name
-
-async_test_body = decorators.async_test_body
-run_if_endpoint_matches = decorators.run_if_endpoint_matches
-run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-has_cluster = decorators.has_cluster
-has_attribute = decorators.has_attribute
-has_command = decorators.has_command
-has_feature = decorators.has_feature
-should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-# autopep8: off
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
-# autopep8: on
-_has_feature = decorators._has_feature
-_has_command = decorators._has_command
-_has_attribute = decorators._has_attribute
-
-default_matter_test_main = runner.default_matter_test_main
-get_test_info = runner.get_test_info
-run_tests = runner.run_tests
-run_tests_no_exit = runner.run_tests_no_exit
-get_default_paa_trust_store = runner.get_default_paa_trust_store
-
-# Backward compatibility aliases for relocated functions
-parse_matter_test_args = runner.parse_matter_test_args
-
-# isort: off

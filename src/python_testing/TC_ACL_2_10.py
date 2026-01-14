@@ -21,7 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     app-ready-pattern: "Server initialization complete"
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -32,7 +32,6 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
 
@@ -42,7 +41,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -229,38 +230,7 @@ class TC_ACL_2_10(MatterBaseTest):
         self.step(9)
         # Reboot DUT
         # Check if restart flag file is available (indicates test runner supports app restart)
-        restart_flag_file = self.get_restart_flag_file()
-
-        if not restart_flag_file:
-            # No restart flag file: ask user to manually reboot
-            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
-
-            # After manual reboot, expire previous sessions so that we can re-establish connections
-            log.info("Expiring sessions after manual device reboot")
-            self.th1.ExpireSessions(self.dut_node_id)
-            self.th2.ExpireSessions(self.dut_node_id)
-            log.info("Manual device reboot completed")
-
-        else:
-            try:
-                # Create the restart flag file to signal the test runner
-                with open(restart_flag_file, "w") as f:
-                    f.write("restart")
-                log.info("Created restart flag file to signal app restart")
-
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
-                await asyncio.sleep(1)
-
-                # Expire sessions and re-establish connections
-                self.th1.ExpireSessions(self.dut_node_id)
-                self.th2.ExpireSessions(self.dut_node_id)
-
-                log.info("App restart completed successfully")
-
-            except Exception as e:
-                log.error(f"Failed to restart app: {e}")
-                asserts.fail(f"App restart failed: {e}")
+        await self.request_device_reboot()
 
         self.step(10)
         # TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute

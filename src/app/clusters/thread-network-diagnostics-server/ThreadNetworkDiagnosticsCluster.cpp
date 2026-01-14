@@ -24,7 +24,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-provider.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 #include <app/util/attribute-storage.h>
 #include <clusters/ThreadNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
