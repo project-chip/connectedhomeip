@@ -47,8 +47,7 @@ public:
     };
 
     constexpr AccessControlCluster(const Context & context) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)),
-        mClusterContext(context)
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mClusterContext(context)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
