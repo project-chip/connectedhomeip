@@ -70,7 +70,7 @@ OptionSet * AppOptions::GetOptions()
 
     static const std::string gHelpText = []() {
         // Device option - this is dynamic
-        std::string result = "-d, --device<";
+        std::string result = "--device <";
         for (auto & name : app::DeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             result.append(name);
@@ -80,7 +80,7 @@ OptionSet * AppOptions::GetOptions()
         result += "\n";
 
         // rest of the help
-        result += "-e, --endpoint <endpoint-number>\n";
+        result += "--endpoint <endpoint-number>\n";
         return result;
     }();
 
