@@ -46,9 +46,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader)
 
     gImageProcessor.SetOTADownloader(downloader);
 
-    TEMPORARY_RETURN_IGNORED OtaHookInit();
-
-    return CHIP_NO_ERROR;
+    return OtaHookInit();
 }
 
 void OTAMultiImageProcessorImpl::Clear()
@@ -63,26 +61,22 @@ void OTAMultiImageProcessorImpl::Clear()
 
 CHIP_ERROR OTAMultiImageProcessorImpl::PrepareDownload()
 {
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Finalize()
 {
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Apply()
 {
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Abort()
 {
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ProcessBlock(ByteSpan & block)
@@ -99,8 +93,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
 }
 
 void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
