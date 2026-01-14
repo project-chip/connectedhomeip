@@ -108,8 +108,8 @@ struct TestAccessControlCluster : public ::testing::Test
     }
     inline static AccessControlCluster::Context defaultContext{
         .persistentStorage = Server::GetInstance().GetPersistentStorage(),
-        .fabricTable      = Server::GetInstance().GetFabricTable(),
-        .accessControl    = Access::GetAccessControl(),
+        .fabricTable       = Server::GetInstance().GetFabricTable(),
+        .accessControl     = Access::GetAccessControl(),
     };
 };
 
@@ -120,12 +120,11 @@ struct TestAccessControlCluster : public ::testing::Test
 struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluster
 {
     TestAccessControlClusterWithMockProvider() :
-        mCluster(
-            AccessControlCluster::Context{
-                .persistentStorage = Server::GetInstance().GetPersistentStorage(),
-                .fabricTable      = Server::GetInstance().GetFabricTable(),
-                .accessControl    = Access::GetAccessControl(),
-            }),
+        mCluster(AccessControlCluster::Context{
+            .persistentStorage = Server::GetInstance().GetPersistentStorage(),
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .accessControl     = Access::GetAccessControl(),
+        }),
         mTester(mCluster)
     {}
 
