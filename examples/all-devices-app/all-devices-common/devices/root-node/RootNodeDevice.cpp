@@ -81,7 +81,13 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet{});
     ReturnErrorOnFailure(provider.AddCluster(mSoftwareDiagnosticsServerCluster.Registration()));
 
-    mAccessControlCluster.Create();
+    mAccessControlCluster.Create(
+        AccessControlCluster::Context{
+            .persistentStorage = Server::GetInstance().GetPersistentStorage(),
+            .fabricTable      = Server::GetInstance().GetFabricTable(),
+            .accessControl    = Access::GetAccessControl(),
+        }
+    );
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
     mOperationalCredentialsCluster.Create(endpointId,

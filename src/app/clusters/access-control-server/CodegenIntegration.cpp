@@ -39,7 +39,13 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create();
+        gServer.Create(
+            AccessControlCluster::Context{
+                .persistentStorage = Server::GetInstance().GetPersistentStorage(),
+                .fabricTable      = Server::GetInstance().GetFabricTable(),
+                .accessControl    = Access::GetAccessControl(),
+            }
+        );
         return gServer.Registration();
     }
 
