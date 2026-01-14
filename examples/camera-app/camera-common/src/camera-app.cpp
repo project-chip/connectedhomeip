@@ -88,24 +88,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
     uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
     uint8_t sensitivityMax                        = mCameraDevice->GetCameraHALInterface().GetSensitivityMax();
-    TwoDCartesianVertexStruct appTwoDCartesianMax = {};
-    appTwoDCartesianMax.x                         = sensorParams.sensorWidth - 1;
-    appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
-
-    // Instantiate the ZoneManagement Server
-    mZoneMgmtServerPtr = std::make_unique<ZoneMgmtServer>(mCameraDevice->GetZoneManagementDelegate(), mEndpoint, zoneMgmtFeatures,
-                                                          appMaxUserDefinedZones, appMaxZones, sensitivityMax, appTwoDCartesianMax);
-
-    TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
-
-    // Fetch all initialization parameters for the ZoneManagement Server
-    BitFlags<ZoneManagement::Feature, uint32_t> zoneMgmtFeatures(
-        ZoneManagement::Feature::kTwoDimensionalCartesianZone, ZoneManagement::Feature::kPerZoneSensitivity,
-        ZoneManagement::Feature::kUserDefined, ZoneManagement::Feature::kFocusZones);
-
-    uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
-    uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
-    uint8_t sensitivityMax                        = mCameraDevice->GetCameraHALInterface().GetSensitivityMax();
     VideoSensorParamsStruct sensorParams          = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
     TwoDCartesianVertexStruct appTwoDCartesianMax = {};
     appTwoDCartesianMax.x                         = sensorParams.sensorWidth - 1;
