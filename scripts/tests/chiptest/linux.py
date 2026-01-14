@@ -440,7 +440,7 @@ class WpaSupplicantMock(threading.Thread):
         @sdbus.dbus_method_async("s", "o")
         async def GetInterface(self, name: str) -> str:
             # if the interface is not app, the last index is returned
-            idx = self.mock.get_interface_app_index(name, self.mock.num_interfaces)
+            idx = self.mock.get_interface_index(name)
             return self.mock.interfaces[idx].path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
@@ -784,6 +784,7 @@ class WpaSupplicantMock(threading.Thread):
         sdbus.set_default_bus(bus)
         # Acquire name on the system bus.
         await bus.request_name_async("fi.w1.wpa_supplicant1", 0)
+
         # Expose main wpa_supplicant service
         self.wpa = WpaSupplicantMock.Wpa(self)
         self.wpa.export_to_dbus(self.wpa.path)
@@ -799,36 +800,29 @@ class WpaSupplicantMock(threading.Thread):
 
         self.nan_simulator = NANSimulator(discovery_delay=0.1)
 
-        # Assign interfaces to apps, and last one to chiptool
-        last_idx = self.num_interfaces - 1
-        for i in range(self.num_interfaces - 1):
-            self.nan_simulator.register_interface("app" + str(i), self.interfaces[i])
-
-        self.nan_simulator.register_interface("tool", self.interfaces[-1])
+        # Assign interfaces to given names
+        for i in range(self.num_interfaces):
+            self.nan_simulator.register_interface(self.interfaces_params[i]['name'], self.interfaces[i])
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
-    def get_interface_app_index(self, name: str, size: int) -> int:
-        """Return the index if 'app' is in the name and what follows is a valid number. Return -1 otherwise."""
+    def get_interface_index(self, name: str) -> int:
+        """Return the index of the inteface containing given 'name'. Return -1 otherwise."""
         name_lower = name.lower()
-        if 'app-' in name_lower:
-            # Find the position of 'app-'
-            app_index = name_lower.find('app-')
-            # Extract the part after 'app'
-            suffix = name_lower[app_index + 4:]
-            # Check if the suffix is a valid number
-            if suffix.isdigit() and int(suffix) < size:
-                return int(suffix)
-            return 0  # Default to first interface if no valid number found
+        for idx, param_dict in enumerate(self.interfaces_params):
+            if param_dict['name'] in name_lower:  # Case-insensitive match
+                log.info("DDEBUG1: " + param_dict['name'] + name_lower)
+                return idx
 
         return -1  # Default to last interface if no app found in the interface name
 
     def __init__(self, ssid: str, password: str, ns: IsolatedNetworkNamespace,
-                 num_interfaces: int = 2):
+                 interfaces_params: list = []):
         self.ssid = ssid
         self.password = password
         self.networking = ns
-        self.num_interfaces = num_interfaces
+        self.num_interfaces = len(interfaces_params)
+        self.interfaces_params = interfaces_params
         self.interfaces: list = []  # List of WpaInterface instances
         self.networks: list = []    # List of WpaNetwork instances
         self.loop = asyncio.new_event_loop()

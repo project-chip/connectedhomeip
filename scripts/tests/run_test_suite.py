@@ -467,29 +467,36 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     try:
         if sys.platform == 'linux':
+            app_name='wlx-app' if (ble_wifi or wifi_paf) else 'eth-app'
+            tool_name='wlx-tool' if wifi_paf else 'eth-tool'
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi or WiFi-PAF commissioning.
                 setup_app_link_up=not (ble_wifi or wifi_paf),
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if (ble_wifi or wifi_paf) else 'eth-app',
-                tool_link_name='wlx-tool' if wifi_paf else 'eth-tool'))
-
+                app_link_name=app_name,
+                tool_link_name=tool_name))
             if ble_wifi:
+                interfaces_params = [
+                    {"name": app_name}
+                ]
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, num_interfaces=1))
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
-
             if wifi_paf:
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
 
                 # Single mock with two interfaces (like real wpa_supplicant)
                 # One interface for app/publisher and one interface for tool/subscriber
+                interfaces_params = [
+                    {"name": app_name},
+                    {"name": tool_name}
+                ]
                 wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns,
-                                                        num_interfaces=2)
+                                                        interfaces_params)
 
                 to_terminate.append(wifi)
 
