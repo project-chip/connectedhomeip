@@ -37,9 +37,10 @@
 
 import logging
 
+from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects
-from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -68,7 +69,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
                      "Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
         ]
 
-    def _get_valid_alarm_bitmap_mask(self, allow_provisional:  bool = False) -> int:
+    def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = False) -> int:
         """
         Get the valid alarm bitmap mask from the DishwasherAlarm cluster specification.
 
@@ -103,7 +104,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         if allow_provisional:
             valid_mask |= PROVISIONAL_ALARMS
 
-        logger.info(f"Valid alarm bitmap mask:  0x{valid_mask: 08X} (allow_provisional={allow_provisional})")
+        logger.info(f"Valid alarm bitmap mask:  0x{valid_mask:08X} (allow_provisional={allow_provisional})")
         return valid_mask
 
     def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
@@ -131,7 +132,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
                 f"{attribute_name} attribute contains undefined alarm bits.  "
                 f"Value: 0x{bitmap_value:08X}, Undefined bits: 0x{undefined_bits:08X}"
             )
-            matter_asserts.fail(asserts_fail_msg)
+            asserts.fail(asserts_fail_msg)
 
         # Check 2: For attributes other than Supported, verify bits are in Supported
         if supported_value is not None and attribute_name != "Supported":
@@ -139,10 +140,10 @@ class TC_DISHALM_2_1(MatterBaseTest):
             if unsupported_bits != 0:
                 asserts_fail_msg = (
                     f"{attribute_name} attribute contains bits not present in Supported attribute. "
-                    f"Value: 0x{bitmap_value:08X}, Supported:  0x{supported_value: 08X}, "
+                    f"Value: 0x{bitmap_value:08X}, Supported:  0x{supported_value:08X}, "
                     f"Unsupported bits: 0x{unsupported_bits:08X}"
                 )
-                matter_asserts.fail(asserts_fail_msg)
+                asserts.fail(asserts_fail_msg)
 
         logger.info(f"{attribute_name} bitmap validation passed:  0x{bitmap_value:08X}")
 
@@ -152,7 +153,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             attribute=attribute
         )
 
-        matter_asserts.assert_valid_uint32(resp, attribute)
+        asserts.assert_valid_uint32(resp, attribute)
 
         logger.info(f"Reading attribute: {attribute}, response: {resp}")
         return resp
