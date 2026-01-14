@@ -18,8 +18,8 @@ Generate UriConfig.h from UriConfig.h.in template.
 Uses configurable parameters passed from GN build system.
 """
 
-import sys
 import os
+import sys
 
 
 def main():
