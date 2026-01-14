@@ -95,7 +95,8 @@ CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::Decoda
     return validationIterator.GetStatus();
 }
 
-CHIP_ERROR WriteAcl(Access::AccessControl & accessControl, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR WriteAcl(Access::AccessControl & accessControl, const ConcreteDataAttributePath & aPath,
+                    AttributeValueDecoder & aDecoder)
 {
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
@@ -125,12 +126,12 @@ CHIP_ERROR WriteAcl(Access::AccessControl & accessControl, const ConcreteDataAtt
             if (i < oldCount)
             {
                 ReturnErrorOnFailure(accessControl.UpdateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, i,
-                                                                    iterator.GetValue().GetEntry()));
+                                                               iterator.GetValue().GetEntry()));
             }
             else
             {
                 ReturnErrorOnFailure(accessControl.CreateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, nullptr,
-                                                                    iterator.GetValue().GetEntry()));
+                                                               iterator.GetValue().GetEntry()));
             }
             ++i;
         }
@@ -152,7 +153,7 @@ CHIP_ERROR WriteAcl(Access::AccessControl & accessControl, const ConcreteDataAtt
         ReturnErrorOnFailure(aDecoder.Decode(decodableEntry));
 
         return accessControl.CreateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, nullptr,
-                                              decodableEntry.GetEntry());
+                                         decodableEntry.GetEntry());
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -235,7 +236,8 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteExtension(PersistentStorageDelegate & storage, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, ServerClusterContext * context)
+CHIP_ERROR WriteExtension(PersistentStorageDelegate & storage, const ConcreteDataAttributePath & aPath,
+                          AttributeValueDecoder & aDecoder, ServerClusterContext * context)
 {
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
@@ -396,7 +398,8 @@ CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
     return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(statusOfErr);
 }
 
-CHIP_ERROR WriteImpl(Access::AccessControl & accessControl, PersistentStorageDelegate & storage, const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
+CHIP_ERROR WriteImpl(Access::AccessControl & accessControl, PersistentStorageDelegate & storage,
+                     const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
                      ServerClusterContext * context)
 {
     switch (request.path.mAttributeId)
@@ -513,7 +516,10 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
 DataModel::ActionReturnStatus AccessControlCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                    AttributeValueDecoder & decoder)
 {
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteImpl(mClusterContext.accessControl, mClusterContext.persistentStorage, request, decoder, mContext)));
+    return NotifyAttributeChangedIfSuccess(
+        request.path.mAttributeId,
+        ChipErrorToImErrorMap(
+            WriteImpl(mClusterContext.accessControl, mClusterContext.persistentStorage, request, decoder, mContext)));
 }
 
 CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,

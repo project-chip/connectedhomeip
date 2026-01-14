@@ -21,9 +21,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/Server.h>
-#include <credentials/FabricTable.h>
 #include <clusters/AccessControl/ClusterId.h>
 #include <clusters/AccessControl/Metadata.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
