@@ -43,4 +43,4 @@ particular:
 Tests in `src/python_testing` and `src/app/tests/suites` which verify expected failures
 should clearly indicate (either in the test name/label or in a failure output) why the
 failure is expected.  For example, if there is a specific section in the spec which
-requires the failure, that section can be referenced or the requirement spelled out.
+requires the failure, a summary of the section requirements should be included.
