@@ -41,7 +41,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.decorators import async_test_body, has_attribute, has_command, run_if_endpoint_matches
+from matter.testing.decorators import has_attribute, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
