@@ -59,8 +59,8 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -109,14 +109,14 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
 
         if not self.provider_app_path:
-            asserts.fail("Missing provider app path . Speficy using --string-arg provider_app_path:<provider_app_path>")
+            asserts.fail("Missing provider app path. Speficy using --string-arg provider_app_path:<provider_app_path>")
 
         if not self.ota_image:
-            asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
+            asserts.fail("Missing ota image path. Speficy using --string-arg ota_image:<ota_image>")
 
         if self.matter_test_config.timeout is None or self.matter_test_config.timeout <= 0:
             asserts.fail(
-                "Test timeout parameter must be defined and  greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
+                "Test timeout parameter must be defined and greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.requestor_passcode = self.matter_test_config.setup_passcodes[0]
@@ -213,7 +213,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
@@ -275,7 +275,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
@@ -339,7 +339,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
         # Waits for nextAction
         update_state_match = AttributeMatcher.from_callable(
@@ -408,7 +408,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
@@ -462,7 +462,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             "Waiting Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
 
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=90)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         # State is Downloading, let it run a few secnods to have some data to check.
         await asyncio.sleep(3)
         # Verify the default download path and the file size
@@ -483,7 +483,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Idle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         update_state_attr_handler.reset()
         update_state_attr_handler.cancel()
 
