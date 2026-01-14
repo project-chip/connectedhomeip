@@ -1224,7 +1224,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetMicrophoneAGCEnabled(bool aMicrop
 
 CHIP_ERROR CameraAVStreamManagementCluster::SetImageRotation(uint16_t aImageRotation)
 {
-    if (mImageRotation > kMaxImageRotationDegrees)
+    if (aImageRotation > kMaxImageRotationDegrees)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -1755,7 +1755,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreAllocatedStreams()
     size_t len = writer.GetLengthWritten();
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
-    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, ByteSpan(buffer, len)));
 
     ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
     return CHIP_NO_ERROR;
@@ -1772,7 +1772,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     auto path      = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
     auto & streams = (*this).*Traits::kStreamVectorMember;
 
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         streams.clear();

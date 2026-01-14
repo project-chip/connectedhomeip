@@ -189,6 +189,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
         ReturnErrorOnFailure(mServer.SetSoftRecordingPrivacyModeEnabled(true));
         ReturnErrorOnFailure(mServer.SetSoftLivestreamPrivacyModeEnabled(true));
         ReturnErrorOnFailure(mServer.SetHardPrivacyModeOn(true));
+        ReturnErrorOnFailure(mServer.SetNightVision(TriStateAutoEnum::kAuto));
         ReturnErrorOnFailure(mServer.SetViewport({ 0, 0, 1920, 1080 }));
         ReturnErrorOnFailure(mServer.SetSpeakerMuted(true));
         ReturnErrorOnFailure(mServer.SetSpeakerVolumeLevel(1));
@@ -215,7 +216,8 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
                     CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
                     CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
                     CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
-                    CameraAvStreamManagement::Feature::kWatermark),
+                    CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
+                    CameraAvStreamManagement::Feature::kNightVision),
                 chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
                     CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
                     CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
@@ -236,6 +238,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
         app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     }
 
     void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
@@ -257,6 +260,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
                                              CameraAvStreamManagement::Attributes::MaxConcurrentEncoders::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::VideoSensorParams::kMetadataEntry,
+                                             CameraAvStreamManagement::Attributes::NightVisionUsesInfrared::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::MinViewportResolution::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::MaxContentBufferSize::kMetadataEntry,
@@ -266,6 +270,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
                                              CameraAvStreamManagement::Attributes::SnapshotCapabilities::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::CurrentFrameRate::kMetadataEntry,
+                                             CameraAvStreamManagement::Attributes::HDRModeEnabled::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::SupportedStreamUsages::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::AllocatedVideoStreams::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::AllocatedAudioStreams::kMetadataEntry,
@@ -274,6 +279,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
                                              CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::HardPrivacyModeOn::kMetadataEntry,
+                                             CameraAvStreamManagement::Attributes::NightVision::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::Viewport::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::SpeakerMuted::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::SpeakerVolumeLevel::kMetadataEntry,
@@ -361,6 +367,13 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadVideoSensorParams)
     EXPECT_EQ(videoSensorParams.maxFPS, 120);
     EXPECT_TRUE(videoSensorParams.maxHDRFPS.HasValue());
     EXPECT_EQ(videoSensorParams.maxHDRFPS.Value(), 30);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestReadNightVisionUsesInfrared)
+{
+    bool usesInfrared = true; // Default Init is false
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::NightVisionUsesInfrared::Id, usesInfrared), CHIP_NO_ERROR);
+    EXPECT_FALSE(usesInfrared);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMinViewportResolution)
@@ -462,6 +475,21 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadCurrentFrameRate)
     EXPECT_EQ(currentFrameRate, 0);
 }
 
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteHDRModeEnabled)
+{
+    bool hdrModeEnabled = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
+    EXPECT_FALSE(hdrModeEnabled); // Default should be false
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::HDRModeEnabled::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
+    EXPECT_TRUE(hdrModeEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::HDRModeEnabled::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
+    EXPECT_FALSE(hdrModeEnabled);
+}
+
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSupportedStreamUsages)
 {
     Attributes::SupportedStreamUsages::TypeInfo::DecodableType supportedStreamUsages;
@@ -532,17 +560,37 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadStreamUsagePriorities)
     EXPECT_EQ(count, 2u);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadSoftRecordingPrivacyModeEnabled)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSoftRecordingPrivacyModeEnabled)
 {
     bool softRecordingPrivacyModeEnabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftRecordingPrivacyModeEnabled::Id, softRecordingPrivacyModeEnabled),
               CHIP_NO_ERROR);
     EXPECT_TRUE(softRecordingPrivacyModeEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SoftRecordingPrivacyModeEnabled::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftRecordingPrivacyModeEnabled::Id, softRecordingPrivacyModeEnabled),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(softRecordingPrivacyModeEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SoftRecordingPrivacyModeEnabled::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftRecordingPrivacyModeEnabled::Id, softRecordingPrivacyModeEnabled),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(softRecordingPrivacyModeEnabled);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadSoftLivestreamPrivacyModeEnabled)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSoftLivestreamPrivacyModeEnabled)
 {
     bool softLivestreamPrivacyModeEnabled = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftLivestreamPrivacyModeEnabled::Id, softLivestreamPrivacyModeEnabled),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(softLivestreamPrivacyModeEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SoftLivestreamPrivacyModeEnabled::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftLivestreamPrivacyModeEnabled::Id, softLivestreamPrivacyModeEnabled),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(softLivestreamPrivacyModeEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SoftLivestreamPrivacyModeEnabled::Id, true), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SoftLivestreamPrivacyModeEnabled::Id, softLivestreamPrivacyModeEnabled),
               CHIP_NO_ERROR);
     EXPECT_TRUE(softLivestreamPrivacyModeEnabled);
@@ -555,7 +603,24 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadHardPrivacyModeOn)
     EXPECT_TRUE(hardPrivacyModeOn);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadViewport)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteNightVision)
+{
+    TriStateAutoEnum nightVision = TriStateAutoEnum::kOff;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::NightVision::Id, nightVision), CHIP_NO_ERROR);
+    EXPECT_EQ(nightVision, TriStateAutoEnum::kAuto); // Default should be Auto
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::NightVision::Id, TriStateAutoEnum::kOn), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::NightVision::Id, nightVision), CHIP_NO_ERROR);
+    EXPECT_EQ(nightVision, TriStateAutoEnum::kOn);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::NightVision::Id, TriStateAutoEnum::kOff), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::NightVision::Id, nightVision), CHIP_NO_ERROR);
+
+    EXPECT_EQ(nightVision, TriStateAutoEnum::kOff);
+}
+
+
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 {
     Attributes::Viewport::TypeInfo::Type viewport = { 0, 0, 0, 0 };
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Viewport::Id, viewport), CHIP_NO_ERROR);
@@ -563,20 +628,82 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadViewport)
     EXPECT_EQ(viewport.y1, 0);
     EXPECT_EQ(viewport.x2, 1920);
     EXPECT_EQ(viewport.y2, 1080);
+
+    // Attempt to write an invalid value (too small)
+    Attributes::Viewport::TypeInfo::Type invalidViewport = { 10, 20, 640, 480 };
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::Viewport::Id, invalidViewport), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    // Read again to verify no change
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Viewport::Id, viewport), CHIP_NO_ERROR);
+    EXPECT_EQ(viewport.x1, 0);
+    EXPECT_EQ(viewport.y1, 0);
+    EXPECT_EQ(viewport.x2, 1920);
+    EXPECT_EQ(viewport.y2, 1080);
+
+    // Write a valid new value
+    Attributes::Viewport::TypeInfo::Type newViewport = { 0, 0, 1280, 720 };
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::Viewport::Id, newViewport), CHIP_NO_ERROR);
+
+    // Read again to verify
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Viewport::Id, viewport), CHIP_NO_ERROR);
+    EXPECT_EQ(viewport.x1, 0);
+    EXPECT_EQ(viewport.y1, 0);
+    EXPECT_EQ(viewport.x2, 1280);
+    EXPECT_EQ(viewport.y2, 720);
+
+    // Write back the original value
+    Attributes::Viewport::TypeInfo::Type originalViewport = { 0, 0, 1920, 1080 };
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::Viewport::Id, originalViewport), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::Viewport::Id, viewport), CHIP_NO_ERROR);
+    EXPECT_EQ(viewport.x1, 0);
+    EXPECT_EQ(viewport.y1, 0);
+    EXPECT_EQ(viewport.x2, 1920);
+    EXPECT_EQ(viewport.y2, 1080);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMuted)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSpeakerMuted)
 {
     bool speakerMuted = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMuted::Id, speakerMuted), CHIP_NO_ERROR);
     EXPECT_TRUE(speakerMuted);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerMuted::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMuted::Id, speakerMuted), CHIP_NO_ERROR);
+    EXPECT_FALSE(speakerMuted);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerMuted::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMuted::Id, speakerMuted), CHIP_NO_ERROR);
+    EXPECT_TRUE(speakerMuted);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerVolumeLevel)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSpeakerVolumeLevel)
 {
     uint8_t speakerVolumeLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
     EXPECT_EQ(speakerVolumeLevel, 1);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)100), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(speakerVolumeLevel, 100);
+
+    // Test boundaries
+    uint8_t minLevel = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMinLevel::Id, minLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, minLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(speakerVolumeLevel, minLevel);
+
+    uint8_t maxLevel = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerMaxLevel::Id, maxLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, maxLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(speakerVolumeLevel, maxLevel);
+
+    // Test out of bounds
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)(minLevel - 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)(maxLevel + 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)1), CHIP_NO_ERROR); // Restore default
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMaxLevel)
@@ -593,18 +720,49 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMinLevel)
     EXPECT_EQ(speakerMinLevel, 1);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneMuted)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteMicrophoneMuted)
 {
     bool microphoneMuted = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMuted::Id, microphoneMuted), CHIP_NO_ERROR);
     EXPECT_TRUE(microphoneMuted);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneMuted::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMuted::Id, microphoneMuted), CHIP_NO_ERROR);
+    EXPECT_FALSE(microphoneMuted);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneMuted::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMuted::Id, microphoneMuted), CHIP_NO_ERROR);
+    EXPECT_TRUE(microphoneMuted);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneVolumeLevel)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteMicrophoneVolumeLevel)
 {
     uint8_t microphoneVolumeLevel = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
     EXPECT_EQ(microphoneVolumeLevel, 1);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)50), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(microphoneVolumeLevel, 50);
+
+    // Test boundaries
+    uint8_t minLevel = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMinLevel::Id, minLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, minLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(microphoneVolumeLevel, minLevel);
+
+    uint8_t maxLevel = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneMaxLevel::Id, maxLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, maxLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(microphoneVolumeLevel, maxLevel);
+
+    // Test out of bounds
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)(minLevel - 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)(maxLevel + 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)1), CHIP_NO_ERROR); // Restore default
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneMaxLevel)
@@ -628,39 +786,94 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneAGCEnabled)
     EXPECT_TRUE(microphoneAGCEnabled);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadImageRotation)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteImageRotation)
 {
     uint16_t imageRotation = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
     EXPECT_EQ(imageRotation, 0);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)90), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
+    EXPECT_EQ(imageRotation, 90);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)180), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
+    EXPECT_EQ(imageRotation, 180);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)270), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
+    EXPECT_EQ(imageRotation, 270);
+
+    // Test invalid value
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)360), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)0), CHIP_NO_ERROR); // Restore default
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadImageFlipHorizontal)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteImageFlipHorizontal)
 {
     bool imageFlipHorizontal = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageFlipHorizontal::Id, imageFlipHorizontal), CHIP_NO_ERROR);
     EXPECT_FALSE(imageFlipHorizontal);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageFlipHorizontal::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageFlipHorizontal::Id, imageFlipHorizontal), CHIP_NO_ERROR);
+    EXPECT_TRUE(imageFlipHorizontal);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageFlipHorizontal::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageFlipHorizontal::Id, imageFlipHorizontal), CHIP_NO_ERROR);
+    EXPECT_FALSE(imageFlipHorizontal);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadImageFlipVertical)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteImageFlipVertical)
 {
     bool imageFlipVertical = true;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageFlipVertical::Id, imageFlipVertical), CHIP_NO_ERROR);
     EXPECT_FALSE(imageFlipVertical);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageFlipVertical::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageFlipVertical::Id, imageFlipVertical), CHIP_NO_ERROR);
+    EXPECT_TRUE(imageFlipVertical);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageFlipVertical::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageFlipVertical::Id, imageFlipVertical), CHIP_NO_ERROR);
+    EXPECT_FALSE(imageFlipVertical);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadStatusLightEnabled)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightEnabled)
 {
     bool statusLightEnabled = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightEnabled::Id, statusLightEnabled), CHIP_NO_ERROR);
     EXPECT_TRUE(statusLightEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightEnabled::Id, false), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightEnabled::Id, statusLightEnabled), CHIP_NO_ERROR);
+    EXPECT_FALSE(statusLightEnabled);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightEnabled::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightEnabled::Id, statusLightEnabled), CHIP_NO_ERROR);
+    EXPECT_TRUE(statusLightEnabled);
 }
 
-TEST_F(TestCameraAVStreamManagementCluster, TestReadStatusLightBrightness)
+TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
 {
     Attributes::StatusLightBrightness::TypeInfo::Type statusLightBrightness = Globals::ThreeLevelAutoEnum::kAuto;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
     EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kMedium);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kLow), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
+    EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kLow);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kHigh), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
+    EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kHigh);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kAuto), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
+    EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kAuto);
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kMedium), CHIP_NO_ERROR); // Restore default
 }
 
 } // namespace
