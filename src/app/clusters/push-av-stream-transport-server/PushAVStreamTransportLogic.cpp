@@ -30,6 +30,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
+#include <uriparser/Uri.h>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -227,51 +228,76 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
+std::string extractTextRange(const UriTextRangeA & range)
+{
+    if (range.first == nullptr || range.afterLast == nullptr || range.first >= range.afterLast)
+    {
+        return "";
+    }
+    return std::string(range.first, range.afterLast);
+}
+
+std::string extractPath(const UriPathSegmentA * pathHead)
+{
+    std::string path;
+    const UriPathSegmentA * segment = pathHead;
+
+    while (segment != nullptr)
+    {
+        path += "/";
+
+        if (segment->text.first != nullptr && segment->text.afterLast != nullptr)
+        {
+            path += std::string(segment->text.first, segment->text.afterLast);
+        }
+        segment = segment->next;
+    }
+
+    return path;
+}
+
 bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
 {
-    const std::string https = "https://";
+    UriUriA uri;
+    const char * errorPos;
+    int result = uriParseSingleUriA(&uri, url.c_str(), &errorPos);
 
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    // Check if URI parsing failed
+    if (result != URI_SUCCESS)
+    {
+        // No need to call uriFreeUriMembersA on failure
+        return false;
+    }
+
+    // Extract components
+    std::string scheme   = extractTextRange(uri.scheme);
+    std::string host     = extractTextRange(uri.hostText);
+    std::string path     = extractPath(uri.pathHead);
+    std::string query    = extractTextRange(uri.query);
+    std::string fragment = extractTextRange(uri.fragment);
+
+    // Free URI structure
+    uriFreeUriMembersA(&uri);
+
+    // Check if required components exist
+    if (scheme.empty() || host.empty())
     {
         return false;
     }
 
-    // Check that URL does not contain fragment character '#'
-    if (url.find('#') != std::string::npos)
+    // Convert scheme to lowercase for case-insensitive comparison
+    for (char & c : scheme)
     {
-        ChipLogError(Camera, "URL contains fragment character '#'");
-        return false;
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
-    // Check that URL does not contain query character '?'
-    if (url.find('?') != std::string::npos)
-    {
-        ChipLogError(Camera, "URL contains query character '?'");
-        return false;
-    }
+    bool pathEndsWithSlash = !path.empty() && path.back() == '/';
 
-    // Check that URL ends with a forward slash '/'
-    if (url.back() != '/')
-    {
-        ChipLogError(Camera, "URL does not end with '/'");
-        return false;
-    }
+    // Check if query and fragment are empty
+    bool noQuery    = query.empty();
+    bool noFragment = fragment.empty();
 
-    // Extract host part
-    size_t hostStart = https.size();
-    size_t hostEnd   = url.find('/', hostStart);
-    std::string host = url.substr(hostStart, hostEnd - hostStart);
-
-    // Basic host validation: ensure non-empty
-    if (host.empty())
-    {
-        ChipLogError(Camera, "URL does not contain a valid host.");
-        return false;
-    }
-
-    // Accept any host as long as non-empty
-    return true;
+    return scheme == "https" && noFragment && noQuery && pathEndsWithSlash && !host.empty();
 }
 
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
