@@ -61,7 +61,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Startup()
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
                                      "CameraAVSettingsUserLevelMgmt: Feature configuration error. At least one of "
-                                     "Mechanical Pan, Tilt, Zoom or Digital PTZ must be supported"));
+                                     "Mechanical Pan, Tilt, Zoom, or Digital PTZ must be supported"));
 
     // Set up our defaults
     SetPan(MakeOptional(kDefaultPan));
@@ -113,7 +113,6 @@ CameraAvSettingsUserLevelMgmtServerLogic::AcceptedCommands(ReadOnlyBufferBuilder
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: Attributes");
 
     // All attributes are set dependent on the Feature Flags
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
@@ -257,6 +256,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::SetZoomMax(uint8_t aZoomMax
  */
 void CameraAvSettingsUserLevelMgmtServerLogic::SetPan(Optional<int16_t> aPan)
 {
+    ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: SetPan");
+
     if (HasFeature(Feature::kMechanicalPan))
     {
         if (aPan.HasValue())
@@ -672,6 +673,8 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         {
             newZoomValue = 1;
         }
+
+        ChipLogProgress(Zcl, "New Zoom Value %d", newZoomValue);
 
         newZoom.Emplace(static_cast<uint8_t>(newZoomValue));
 

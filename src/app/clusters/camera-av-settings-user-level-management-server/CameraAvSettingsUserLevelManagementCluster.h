@@ -246,7 +246,7 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Attribute Accessors
+    // Attribute Mutators
     CHIP_ERROR SetTiltMin(int16_t aTiltMin);
 
     CHIP_ERROR SetTiltMax(int16_t aTiltMax);
