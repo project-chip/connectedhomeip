@@ -76,7 +76,8 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
-        outStreamID = 1;
+        outStreamID = static_cast<uint16_t>(mAllocatedAudioStreams->size() + 1);
+        mAllocatedAudioStreams->push_back(allocateArgs);
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -873,7 +874,86 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
     EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kAuto);
 
+
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kMedium), CHIP_NO_ERROR); // Restore default
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
+{
+    using Request = Commands::AudioStreamAllocate::Type;
+    using Response = Commands::AudioStreamAllocateResponse::DecodableType;
+
+    mAudioStreams.clear();
+
+    Request request;
+
+    // Happy path
+    request.streamUsage = StreamUsageEnum::kLiveView;
+    request.audioCodec = AudioCodecEnum::kOpus;
+    request.channelCount = 2;
+    request.sampleRate = 48000;
+    request.bitRate = 128000;
+    request.bitDepth = 24;
+
+    auto result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->audioStreamID, 1);
+
+    // Invalid streamUsage
+    request.streamUsage = StreamUsageEnum::kUnknownEnumValue;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.streamUsage = StreamUsageEnum::kLiveView; // Restore
+
+    // audioCodec unknown
+    request.audioCodec = AudioCodecEnum::kUnknownEnumValue;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.audioCodec = AudioCodecEnum::kOpus; // Restore
+
+    // channelCount out of bounds
+    request.channelCount = 0;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+
+    request.channelCount = 9;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.channelCount = 2; // Restore
+
+    // sampleRate 0
+    request.sampleRate = 0;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.sampleRate = 48000; // Restore
+
+    // bitRate 0
+    request.bitRate = 0;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.bitRate = 128000; // Restore
+
+    // Invalid bitDepth
+    request.bitDepth = 12;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.bitDepth = 24; // Restore
+
+    // streamUsage not supported by test fixture priorities
+    request.streamUsage = StreamUsageEnum::kAnalysis;
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    request.streamUsage = StreamUsageEnum::kLiveView; // Restore
 }
 
 } // namespace
