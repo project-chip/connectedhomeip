@@ -811,7 +811,6 @@ class WpaSupplicantMock(threading.Thread):
         name_lower = name.lower()
         for idx, param_dict in enumerate(self.interfaces_params):
             if param_dict['name'] in name_lower:  # Case-insensitive match
-                log.info("DDEBUG1: " + param_dict['name'] + name_lower)
                 return idx
 
         return -1  # Default to last interface if no app found in the interface name

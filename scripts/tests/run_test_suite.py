@@ -490,7 +490,6 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
 
                 # Single mock with two interfaces (like real wpa_supplicant)
-                # One interface for app/publisher and one interface for tool/subscriber
                 interfaces_params = [
                     {"name": app_name},
                     {"name": tool_name}
