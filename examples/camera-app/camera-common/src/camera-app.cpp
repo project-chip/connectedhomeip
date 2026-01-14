@@ -52,7 +52,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     Clusters::PushAvStreamTransport::SetTlsCertificateManagementDelegate(
         mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
 
-
     // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
         CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
@@ -316,7 +315,6 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
                      err.Format());
     }
 }
-
 
 void CameraApp::InitCameraDeviceClusters()
 {

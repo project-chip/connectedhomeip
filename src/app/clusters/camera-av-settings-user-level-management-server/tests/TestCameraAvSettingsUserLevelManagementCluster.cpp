@@ -16,15 +16,15 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/CommandHandler.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
-#include <app/InteractionModelEngine.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Attributes.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Commands.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Enums.h>
@@ -54,39 +54,45 @@ class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsU
 public:
     void ShutdownApp() {}
 
-    bool CanChangeMPTZ() {return true; }
+    bool CanChangeMPTZ() { return true; }
 
     void VideoStreamAllocated(uint16_t aStreamID) {}
     void VideoStreamDeallocated(uint16_t aStreamID) {}
     void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) {}
 
-    Status
-    MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                    PhysicalPTZCallback * callback) {return Status::Success; }
+    Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+    {
+        return Status::Success;
+    }
 
-    Status
-    MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                     PhysicalPTZCallback * callback) {return Status::Success; }
+    Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                            PhysicalPTZCallback * callback)
+    {
+        return Status::Success;
+    }
 
-    Status
-    MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                     PhysicalPTZCallback * callback) {return Status::Success; }
+    Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                            PhysicalPTZCallback * callback)
+    {
+        return Status::Success;
+    }
 
-    Status MPTZSavePreset(uint8_t aPreset) {return Status::Success; }
+    Status MPTZSavePreset(uint8_t aPreset) { return Status::Success; }
 
-    Status MPTZRemovePreset(uint8_t aPreset) {return Status::Success; }
+    Status MPTZRemovePreset(uint8_t aPreset) { return Status::Success; }
 
-    Status DPTZSetViewport(uint16_t aVideoStreamID,
-                                                                Globals::Structs::ViewportStruct::Type aViewport) {return Status::Success; }
+    Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) { return Status::Success; }
 
-    Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                                 Globals::Structs::ViewportStruct::Type & aViewport) {return Status::Success; }
+    Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
+                            Optional<int8_t> aZoomDelta, Globals::Structs::ViewportStruct::Type & aViewport)
+    {
+        return Status::Success;
+    }
 
-    virtual CHIP_ERROR PersistentAttributesLoadedCallback() {return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) {return CHIP_NO_ERROR; }
-    CHIP_ERROR LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams) {return CHIP_NO_ERROR; }
+    CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) { return CHIP_NO_ERROR; }
+    CHIP_ERROR LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams) { return CHIP_NO_ERROR; }
 };
 
 struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
@@ -98,35 +104,34 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestAttributes)
 {
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt, Feature::kMechanicalZoom,
-        Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
     CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
     server.SetDelegate(&mockDelegate);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(server, {
-                                                    Attributes::MPTZPosition::kMetadataEntry,
-                                                    Attributes::MaxPresets::kMetadataEntry,
-                                                    Attributes::MPTZPresets::kMetadataEntry,
-                                                    Attributes::DPTZStreams::kMetadataEntry,
-                                                    Attributes::ZoomMax::kMetadataEntry,
-                                                    Attributes::TiltMin::kMetadataEntry,
-                                                    Attributes::TiltMax::kMetadataEntry,
-                                                    Attributes::PanMin::kMetadataEntry,
-                                                    Attributes::PanMax::kMetadataEntry,
-                                                    Attributes::MovementState::kMetadataEntry,
-                                                   }));
+    ASSERT_TRUE(IsAttributesListEqualTo(server,
+                                        {
+                                            Attributes::MPTZPosition::kMetadataEntry,
+                                            Attributes::MaxPresets::kMetadataEntry,
+                                            Attributes::MPTZPresets::kMetadataEntry,
+                                            Attributes::DPTZStreams::kMetadataEntry,
+                                            Attributes::ZoomMax::kMetadataEntry,
+                                            Attributes::TiltMin::kMetadataEntry,
+                                            Attributes::TiltMax::kMetadataEntry,
+                                            Attributes::PanMin::kMetadataEntry,
+                                            Attributes::PanMax::kMetadataEntry,
+                                            Attributes::MovementState::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestCommands)
 {
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-        Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -156,9 +161,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClus
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan,
-        Feature::kMechanicalTilt, Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -238,9 +242,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan,
-        Feature::kMechanicalTilt, Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -258,9 +261,9 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
     Commands::MPTZSetPosition::DecodableType commandData;
 
     // Set new values of pan, tilt, zoom to be the mid-point of their allowed ranges
-    int16_t testPan = (kPanMaxMaxValue - kPanMinMinValue)/2;
-    int16_t testTilt = (kTiltMaxMaxValue - kTiltMinMinValue)/2;
-    uint8_t testZoom = (kZoomMaxMaxValue - kZoomMinValue)/2;
+    int16_t testPan  = (kPanMaxMaxValue - kPanMinMinValue) / 2;
+    int16_t testTilt = (kTiltMaxMaxValue - kTiltMinMinValue) / 2;
+    uint8_t testZoom = (kZoomMaxMaxValue - kZoomMinValue) / 2;
 
     commandData.pan.Emplace(testPan);
     commandData.tilt.Emplace(testTilt);
@@ -300,9 +303,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan,
-        Feature::kMechanicalTilt, Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -324,9 +326,9 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, startingMptzPosition), CHIP_NO_ERROR);
 
     // Set relative values of pan, tilt, zoom to be the +10
-    int16_t relativePan = 10;
+    int16_t relativePan  = 10;
     int16_t relativeTilt = 10;
-    int8_t relativeZoom = 10;
+    int8_t relativeZoom  = 10;
 
     commandData.panDelta.Emplace(relativePan);
     commandData.tiltDelta.Emplace(relativeTilt);
@@ -346,15 +348,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     // Verify that the values in the attribute are the values set by the command
     Structs::MPTZStruct::DecodableType movedMptzPosition;
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, movedMptzPosition), CHIP_NO_ERROR);
-    ASSERT_EQ(movedMptzPosition.pan.Value(), startingMptzPosition.pan.Value()+relativePan);
-    ASSERT_EQ(movedMptzPosition.tilt.Value(), startingMptzPosition.tilt.Value()+relativeTilt);
-    ASSERT_EQ(movedMptzPosition.zoom.Value(), startingMptzPosition.zoom.Value()+relativeZoom);
+    ASSERT_EQ(movedMptzPosition.pan.Value(), startingMptzPosition.pan.Value() + relativePan);
+    ASSERT_EQ(movedMptzPosition.tilt.Value(), startingMptzPosition.tilt.Value() + relativeTilt);
+    ASSERT_EQ(movedMptzPosition.zoom.Value(), startingMptzPosition.zoom.Value() + relativeZoom);
 
     // Verify that the MovementState has returned to Idle
     ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
-
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetCommandTest)
 {
@@ -367,9 +368,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan,
-        Feature::kMechanicalTilt, Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -422,7 +422,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     ASSERT_EQ(server.GetLogic().mCurrentPresetID, 1);
 }
 
-
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCommandTest)
 {
     TestServerClusterContext context;
@@ -434,9 +433,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-        Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -488,15 +486,15 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     auto it = mptzPresets.begin();
     while (it.Next())
     {
-        presetPan = it.GetValue().settings.pan.Value();
+        presetPan  = it.GetValue().settings.pan.Value();
         presetTilt = it.GetValue().settings.tilt.Value();
         presetZoom = it.GetValue().settings.zoom.Value();
     }
 
     // Set the MPTZ position to be the mid-points of the allowed ranges
-    int16_t testPan = (kPanMaxMaxValue - kPanMinMinValue)/2;
-    int16_t testTilt = (kTiltMaxMaxValue - kTiltMinMinValue)/2;
-    uint8_t testZoom = (kZoomMaxMaxValue - kZoomMinValue)/2;
+    int16_t testPan  = (kPanMaxMaxValue - kPanMinMinValue) / 2;
+    int16_t testTilt = (kTiltMaxMaxValue - kTiltMinMinValue) / 2;
+    uint8_t testZoom = (kZoomMaxMaxValue - kZoomMinValue) / 2;
 
     mptzSetCommandData.pan.Emplace(testPan);
     mptzSetCommandData.tilt.Emplace(testTilt);
@@ -549,9 +547,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-        Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -581,7 +578,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     uint8_t presetIDAsInt = 2;
 
     removePresetCommandData.presetID = presetIDAsInt;
-    auto removeResponse = server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData).value();
+    auto removeResponse =
+        server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData).value();
     ASSERT_EQ(removeResponse.GetStatusCode().GetStatus(), Status::NotFound);
 
     // Save the current values of MPTZ as a preset
@@ -618,9 +616,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-        Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -645,10 +642,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
 
     // Try to set the viewport when no streams exist, this should fail with NOT FOUND
-    uint8_t videoStreamID = 1;
+    uint8_t videoStreamID                           = 1;
     Globals::Structs::ViewportStruct::Type viewPort = { 0, 0, 1920, 1080 };
-    commandData.videoStreamID = videoStreamID;
-    commandData.viewport = viewPort;
+    commandData.videoStreamID                       = videoStreamID;
+    commandData.viewport                            = viewPort;
     auto response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData).value();
     ASSERT_EQ(response.GetStatusCode().GetStatus(), Status::NotFound);
 
@@ -672,7 +669,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
 
     // Try to set the viewport
     Globals::Structs::ViewportStruct::Type newViewPort = { 0, 0, 1280, 720 };
-    commandData.viewport = newViewPort;
+    commandData.viewport                               = newViewPort;
 
     response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData).value();
     EXPECT_TRUE(response.IsSuccess());
@@ -688,7 +685,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
         ASSERT_EQ(it.GetValue().viewport.x2, newViewPort.x2);
         ASSERT_EQ(it.GetValue().viewport.y1, newViewPort.y1);
         ASSERT_EQ(it.GetValue().viewport.y2, newViewPort.y2);
-
     }
 }
 
@@ -703,9 +699,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     SetAttributePersistenceProvider(&provider);
 
     MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(
-        Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-        Feature::kMechanicalZoom, Feature::kMechanicalPresets);
+    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
 
     const uint8_t testMaxPresets = 5;
 
@@ -731,10 +726,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
 
     // Try to move the viewport when no streams exist, this should fail with NOT FOUND
     uint8_t videoStreamID = 1;
-    int16_t deltaX = 100;
-    int16_t deltaY = 100;
-    int8_t zoomDelta = -50;
-    int8_t zoomDeltaFail = 120;
+    int16_t deltaX        = 100;
+    int16_t deltaY        = 100;
+    int8_t zoomDelta      = -50;
+    int8_t zoomDeltaFail  = 120;
 
     commandData.videoStreamID = videoStreamID;
     commandData.deltaX.Emplace(deltaX);

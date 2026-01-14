@@ -75,7 +75,8 @@ public:
     // Accessors and Mutators
     //
     std::string GetName() const { return mName; }
-    void SetName(chip::CharSpan aName) {
+    void SetName(chip::CharSpan aName)
+    {
         mName = std::string(aName.begin(), aName.end());
         ChipLogProgress(Zcl, "My preset name being set %s", mName.c_str());
     }
