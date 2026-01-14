@@ -72,7 +72,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         """
         Get the valid alarm bitmap mask from the DishwasherAlarm cluster specification.
 
-        According to Matter spec (Dishwasher Alarm cluster 0x005D), the AlarmBitmap defines: 
+        According to Matter spec (Dishwasher Alarm cluster 0x005D), the AlarmBitmap defines:
         - Bit 0 (0x01): InflowError
         - Bit 1 (0x02): DrainError
         - Bit 2 (0x04): DoorError
