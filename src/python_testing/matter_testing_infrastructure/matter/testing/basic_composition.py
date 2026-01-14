@@ -136,11 +136,7 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
         return converter.convert_dump_to_cache(json_tlv)
 
 
-<<<<<<< HEAD
-class BasicCompositionTests:
-=======
 class BasicCompositionTests(MatterBaseTest):
->>>>>>> upstream/master
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
@@ -174,15 +170,9 @@ class BasicCompositionTests(MatterBaseTest):
         self.test_from_file = self.user_params.get("test_from_file", None)
 
         def log_test_start():
-<<<<<<< HEAD
-            logging.info("###########################################################")
-            logging.info("Start of actual tests")
-            logging.info("###########################################################")
-=======
             LOGGER.info("###########################################################")
             LOGGER.info("Start of actual tests")
             LOGGER.info("###########################################################")
->>>>>>> upstream/master
 
         if self.test_from_file:
             cache = JsonToMatterTlv(self.test_from_file)
