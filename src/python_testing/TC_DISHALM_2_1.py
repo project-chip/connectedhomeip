@@ -64,7 +64,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(6, "Validate that supported alarms are within the defined set", 
+            TestStep(6, "Validate that supported alarms are within the defined set",
                      "Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
         ]
 
@@ -95,18 +95,18 @@ class TC_DISHALM_2_1(MatterBaseTest):
             0x00000010 |  # Bit 4: TempTooHigh
             0x00000020    # Bit 5: WaterLevelError
         )
-        
+
         # Provisional alarms (future spec versions, certification testing)
         PROVISIONAL_ALARMS = 0x00000000  # No provisional alarms currently defined
-        
+
         valid_mask = STANDARD_ALARMS
         if allow_provisional:
             valid_mask |= PROVISIONAL_ALARMS
-            
+
         logger.info(f"Valid alarm bitmap mask:  0x{valid_mask: 08X} (allow_provisional={allow_provisional})")
         return valid_mask
 
-    def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int, 
+    def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
                                valid_mask: int, supported_value: int = None):
         """
         Validate that an alarm bitmap only contains valid and supported bits.
@@ -132,9 +132,9 @@ class TC_DISHALM_2_1(MatterBaseTest):
                 f"Value: 0x{bitmap_value:08X}, Undefined bits: 0x{undefined_bits:08X}"
             )
             matter_asserts.fail(asserts_fail_msg)
-        
+
         # Check 2: For attributes other than Supported, verify bits are in Supported
-        if supported_value is not None and attribute_name != "Supported": 
+        if supported_value is not None and attribute_name != "Supported":
             unsupported_bits = bitmap_value & ~supported_value
             if unsupported_bits != 0:
                 asserts_fail_msg = (
@@ -143,7 +143,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
                     f"Unsupported bits: 0x{unsupported_bits:08X}"
                 )
                 matter_asserts.fail(asserts_fail_msg)
-        
+
         logger.info(f"{attribute_name} bitmap validation passed:  0x{bitmap_value:08X}")
 
     async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: ClusterObjects.ClusterAttributeDescriptor):
@@ -156,7 +156,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
 
         logger.info(f"Reading attribute: {attribute}, response: {resp}")
         return resp
-    
+
     @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))
     async def test_TC_DISHALM_2_1(self):
 
@@ -186,23 +186,23 @@ class TC_DISHALM_2_1(MatterBaseTest):
         self.step(5)
         supported_attribute = Clusters.DishwasherAlarm.Attributes.Supported
         supported_value = await self.read_and_check_attributes_from_dishwasher_alarm(supported_attribute)
-        
+
         self.step(6)
         valid_mask = self._get_valid_alarm_bitmap_mask(allow_provisional)
-        
+
         # Validate Supported attribute contains only spec-defined bits
         self._validate_alarm_bitmap("Supported", supported_value, valid_mask, supported_value=None)
-        
+
         # Validate Mask attribute
         self._validate_alarm_bitmap("Mask", mask_value, valid_mask, supported_value)
-        
+
         # Validate State attribute
         self._validate_alarm_bitmap("State", state_value, valid_mask, supported_value)
-        
+
         # Validate Latch attribute (if present)
         if latch_value is not None:
             self._validate_alarm_bitmap("Latch", latch_value, valid_mask, supported_value)
-        
+
         logger.info("All alarm bitmap validations passed successfully")
 
 if __name__ == "__main__":
