@@ -162,7 +162,6 @@ CodeDrivenClusters:
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
-    - TLS Client Management
     - Time Format Localization
     - User Label
     - Wi-Fi Network Diagnostics

@@ -21,6 +21,7 @@ chip_data_model("all-clusters-common") {
     "${chip_root}/src/app/clusters/bindings:binding-manager",
     "${chip_root}/src/app/clusters/tls-certificate-management-server",
     "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
+    "${chip_root}/src/app/clusters/tls-client-management-server",
     "${chip_root}/src/crypto",
   ]
   zap_file = "all-clusters-app.zap"

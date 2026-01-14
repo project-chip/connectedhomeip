@@ -105,7 +105,7 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void MatterTlsClientManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+void MatterTlsClientManagementClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(gClusterInstance.IsConstructed());
     VerifyOrReturn(gClusterInstance.Cluster().GetEndpointId() == endpointId);

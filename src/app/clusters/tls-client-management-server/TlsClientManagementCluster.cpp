@@ -79,14 +79,14 @@ CHIP_ERROR TlsClientManagementCluster::Startup(ServerClusterContext & context)
     return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
-void TlsClientManagementCluster::Shutdown(ClusterShutdownType)
+void TlsClientManagementCluster::Shutdown()
 {
     ChipLogProgress(DataManagement, "TlsClientManagementCluster: shutdown");
 
     mCertificateTable.Finish();
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 
-    DefaultServerCluster::Shutdown(ClusterShutdownType::kClusterShutdown);
+    DefaultServerCluster::Shutdown();
 }
 
 DataModel::ActionReturnStatus TlsClientManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
