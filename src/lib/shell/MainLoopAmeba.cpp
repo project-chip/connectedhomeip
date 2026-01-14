@@ -141,7 +141,7 @@ void Engine::RunMainLoop()
         if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) > 0u)
         {
 #if CONFIG_DEVICE_LAYER
-            DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
 #else
             ProcessShellLine(reinterpret_cast<intptr_t>(line));
 #endif

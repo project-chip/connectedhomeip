@@ -176,7 +176,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     const chip::Inet::IPAddress * ipAddresses = player->GetIPAddresses();
     if (ipAddresses != nullptr)
     {
-        chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
         for (size_t i = 0; i < player->GetNumIPs() && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
         {
             char addrCString[chip::Inet::IPAddress::kMaxStringLength];
@@ -188,7 +188,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
                 env->GetStaticMethodID(jIPAddressClass, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
             jobject jIPAddress = env->CallStaticObjectMethod(jIPAddressClass, jGetByNameMid, jIPAddressStr);
 
-            chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
         }
     }
 
@@ -448,6 +448,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
     jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
     jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
+    jfieldID passcodeLengthField            = env->GetFieldID(idOptionsClass, "passcodeLength", "I");
     VerifyOrReturnValue(
         noPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));
@@ -467,6 +468,9 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     VerifyOrReturnValue(
         targetAppInfosField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() targetAppInfosField not found!"));
+    VerifyOrReturnValue(
+        passcodeLengthField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() passcodeLengthField not found!"));
 
     matter::casting::core::IdentificationDeclarationOptions * cppIdOptions =
         new matter::casting::core::IdentificationDeclarationOptions();
@@ -476,6 +480,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     cppIdOptions->mCommissionerPasscode      = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
     cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
     cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
+    cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
 
     jobject targetAppInfosList = env->GetObjectField(jIdOptions, targetAppInfosField);
     VerifyOrReturnValue(
@@ -529,7 +534,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
                                                                          jCommissionerDeclarationClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
-    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZ)V");
+    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZI)V");
     if (jCommissionerDeclarationConstructor == nullptr)
     {
         ChipLogError(AppServer,
@@ -541,7 +546,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
     return env->NewObject(jCommissionerDeclarationClass, jCommissionerDeclarationConstructor,
                           static_cast<jint>(cppCd.GetErrorCode()), cppCd.GetNeedsPasscode(), cppCd.GetNoAppsFound(),
                           cppCd.GetPasscodeDialogDisplayed(), cppCd.GetCommissionerPasscode(), cppCd.GetQRCodeDisplayed(),
-                          cppCd.GetCancelPasscode());
+                          cppCd.GetCancelPasscode(), cppCd.GetPasscodeLength());
 }
 
 }; // namespace support

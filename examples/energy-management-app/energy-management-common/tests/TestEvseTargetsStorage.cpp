@@ -27,6 +27,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include "EnergyEvseTargetsStore.h"
 
@@ -200,7 +201,7 @@ void TestEvseTargetsStorage::SetTargets()
 {
     if (!mEtdInitialised)
     {
-        mEtd.Init(&mStorageDelegate);
+        EXPECT_SUCCESS(mEtd.Init(&mStorageDelegate));
 
         mEtdInitialised = true;
     }

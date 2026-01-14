@@ -82,7 +82,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
         err = Internal::ESP32Utils::EnableStationMode();
         SuccessOrExit(err);
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 
     if (mWiFiStationMode != val)
@@ -112,7 +112,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
             ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return;
         }
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 }
 
@@ -408,7 +408,7 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 break;
             case WIFI_EVENT_STA_DISCONNECTED:
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_DISCONNECTED");
-                NetworkCommissioning::ESPWiFiDriver::GetInstance().SetLastDisconnectReason(event);
+                TEMPORARY_RETURN_IGNORED NetworkCommissioning::ESPWiFiDriver::GetInstance().SetLastDisconnectReason(event);
                 if (mWiFiStationState == kWiFiStationState_Connecting)
                 {
                     ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
@@ -455,13 +455,13 @@ void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
     // Schedule a call to DriveStationState method in case a station connect attempt was
     // deferred because the scan was in progress.
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::DriveStationState()

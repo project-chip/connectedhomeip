@@ -24,11 +24,18 @@ declare_args() {
       current_os == "ios"
 }
 
-buildconfig_header("processing-config") {
-  header = "CodegenProcessingConfig.h"
+buildconfig_header("processing-buildconfig") {
+  header = "CodegenProcessingBuildConfig.h"
   header_dir = "codegen"
 
   defines = [ "CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS=${chip_enable_codegen_integration_lookup_errors}" ]
+
+  visibility = [ ":processing-config" ]
+}
+
+source_set("processing-config") {
+  sources = [ "CodegenProcessingConfig.h" ]
+  deps = [ ":processing-buildconfig" ]
 }
 
 # This source set is TIGHLY coupled with code-generated data models

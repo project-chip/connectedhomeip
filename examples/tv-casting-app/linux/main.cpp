@@ -33,6 +33,7 @@
 
 #include "LinuxCommissionableDataProvider.h"
 #include "Options.h"
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -97,6 +98,8 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 ExampleCredentialIssuerCommands gCredIssuerCommands;
 Commands gCommands;
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
     if (!CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
@@ -110,7 +113,8 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 void StopMainEventLoop()
 {
     Server::GetInstance().GenerateShutDownEvent();
-    DeviceLayer::SystemLayer().ScheduleLambda([]() { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        []() { TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask(); });
 }
 
 void StopSignalHandler(int /* signal */)
@@ -159,7 +163,7 @@ int main(int argc, char * argv[])
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.
@@ -179,6 +183,10 @@ int main(int argc, char * argv[])
     }
 
     SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
+
+    // DeviceInfoProvider is needed by localization configuration cluster, so we set it before Server::Init to set up the storage of
+    // DeviceInfoProvider properly.
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -200,9 +208,12 @@ int main(int argc, char * argv[])
         SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
 
         // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-        DeviceLayer::SystemLayer().StartTimer(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
             chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-            [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+            [](System::Layer *, void *) {
+                TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow);
+            },
+            nullptr);
     }
 
     registerClusters(gCommands, &gCredIssuerCommands);
@@ -211,13 +222,13 @@ int main(int argc, char * argv[])
     if (argc > 1)
     {
         // if there are command-line arguments, then automatically start server
-        ProcessClusterCommand(argc, argv);
+        TEMPORARY_RETURN_IGNORED ProcessClusterCommand(argc, argv);
     }
 
     {
         struct sigaction sa = {};
         sa.sa_handler       = StopSignalHandler;
-        sa.sa_flags         = SA_RESETHAND;
+        sa.sa_flags         = static_cast<int>(SA_RESETHAND);
         sigaction(SIGINT, &sa, nullptr);
         sigaction(SIGTERM, &sa, nullptr);
     }

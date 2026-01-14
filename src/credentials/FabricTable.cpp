@@ -154,7 +154,7 @@ void FabricInfo::operator=(FabricInfo && other)
     mVendorId                = other.mVendorId;
     mShouldAdvertiseIdentity = other.mShouldAdvertiseIdentity;
 
-    SetFabricLabel(other.GetFabricLabel());
+    TEMPORARY_RETURN_IGNORED SetFabricLabel(other.GetFabricLabel());
 
     // Transfer ownership of operational keypair (if it was nullptr, it stays that way).
     mOperationalKey                         = other.mOperationalKey;
@@ -911,7 +911,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
     ReturnErrorOnFailure(fabricEntry->Init(newFabricInfo));
 
     // Set the label, matching add/update semantics of empty/existing.
-    fabricEntry->SetFabricLabel(fabricLabel);
+    TEMPORARY_RETURN_IGNORED fabricEntry->SetFabricLabel(fabricLabel);
 
     if (isAddition)
     {
@@ -1018,7 +1018,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         // If StoreFabricIndexInfo fails here, that's probably OK.  When we try to
         // read things from storage later we will realize there is nothing for this
         // index.
-        StoreFabricIndexInfo();
+        TEMPORARY_RETURN_IGNORED StoreFabricIndexInfo();
 
         // If we ever start moving the FabricInfo entries around in the array on
         // delete, we should update DeleteAllFabrics to handle that.
@@ -1067,7 +1067,7 @@ void FabricTable::DeleteAllFabrics()
 
     for (auto & fabric : *this)
     {
-        Delete(fabric.GetFabricIndex());
+        TEMPORARY_RETURN_IGNORED Delete(fabric.GetFabricIndex());
     }
 }
 
@@ -1096,7 +1096,7 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
     // Time is unknown during incoming certificate validation for CASE and
     // current time is also unknown, the certificate validity policy will see
     // this condition and can act appropriately.
-    mLastKnownGoodTime.Init(mStorage);
+    TEMPORARY_RETURN_IGNORED mLastKnownGoodTime.Init(mStorage);
 
     uint8_t buf[IndexInfoTLVMaxSize()];
     uint16_t size  = sizeof(buf);
@@ -1328,11 +1328,11 @@ CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
 
     if (mNextAvailableFabricIndex.HasValue())
     {
-        writer.Put(kNextAvailableFabricIndexTag, mNextAvailableFabricIndex.Value());
+        TEMPORARY_RETURN_IGNORED writer.Put(kNextAvailableFabricIndexTag, mNextAvailableFabricIndex.Value());
     }
     else
     {
-        writer.PutNull(kNextAvailableFabricIndexTag);
+        TEMPORARY_RETURN_IGNORED writer.PutNull(kNextAvailableFabricIndexTag);
     }
 
     TLV::TLVType innerContainerType;
@@ -1340,7 +1340,7 @@ CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
     // Only enumerate the fabrics that are initialized.
     for (const auto & fabric : *this)
     {
-        writer.Put(TLV::AnonymousTag(), fabric.GetFabricIndex());
+        TEMPORARY_RETURN_IGNORED writer.Put(TLV::AnonymousTag(), fabric.GetFabricIndex());
     }
     ReturnErrorOnFailure(writer.EndContainer(innerContainerType));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
@@ -1500,7 +1500,7 @@ CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
 
 void FabricTable::ClearCommitMarker()
 {
-    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricTableCommitMarkerKey().KeyName());
+    TEMPORARY_RETURN_IGNORED mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricTableCommitMarkerKey().KeyName());
 }
 
 bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const
@@ -1760,7 +1760,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
 
     // Notify that NOC was added (at least transiently)
     *outNewFabricIndex = fabricIndexToUse;
-    NotifyFabricUpdated(fabricIndexToUse);
+    TEMPORARY_RETURN_IGNORED NotifyFabricUpdated(fabricIndexToUse);
 
     return CHIP_NO_ERROR;
 }
@@ -1845,7 +1845,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     mStateFlags.Set(StateFlags::kIsPendingFabricDataPresent);
 
     // Notify that NOC was updated (at least transiently)
-    NotifyFabricUpdated(fabricIndex);
+    TEMPORARY_RETURN_IGNORED NotifyFabricUpdated(fabricIndex);
 
     return CHIP_NO_ERROR;
 }
@@ -2061,13 +2061,13 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     {
         // Blow-away everything if we got past any storage, even on Update: system state is broken
         // TODO: Develop a way to properly revert in the future, but this is very difficult
-        Delete(fabricIndexBeingCommitted);
+        TEMPORARY_RETURN_IGNORED Delete(fabricIndexBeingCommitted);
 
         RevertPendingFabricData();
     }
     else
     {
-        NotifyFabricCommitted(fabricIndexBeingCommitted);
+        TEMPORARY_RETURN_IGNORED NotifyFabricCommitted(fabricIndexBeingCommitted);
     }
 
     // Clear commit marker no matter what: if we got here, there was no reboot and previous clean-ups
@@ -2094,7 +2094,7 @@ void FabricTable::RevertPendingFabricData()
         mOpCertStore->RevertPendingOpCerts();
     }
 
-    mLastKnownGoodTime.RevertPendingLastKnownGoodChipEpochTime();
+    TEMPORARY_RETURN_IGNORED mLastKnownGoodTime.RevertPendingLastKnownGoodChipEpochTime();
 
     mStateFlags.ClearAll();
     mFabricIndexWithPendingState = kUndefinedFabricIndex;
@@ -2119,7 +2119,7 @@ void FabricTable::RevertPendingOpCertsExceptRoot()
     if (mStateFlags.Has(StateFlags::kIsAddPending))
     {
         // If we have a pending add, let's make sure to kill the pending fabric metadata and return it to viable state.
-        Delete(mFabricIndexWithPendingState);
+        TEMPORARY_RETURN_IGNORED Delete(mFabricIndexWithPendingState);
     }
 
     mStateFlags.Clear(StateFlags::kIsAddPending);

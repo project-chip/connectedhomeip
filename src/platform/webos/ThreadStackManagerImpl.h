@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>
@@ -28,6 +29,13 @@
 #include <platform/webos/dbus/openthread/DBusOpenthread.h>
 
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<OpenthreadBorderRouter>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 
 class ThreadStackManagerImpl : public ThreadStackManager
@@ -90,19 +98,13 @@ public:
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-    bool _HaveMeshConnectivity();
-
-    CHIP_ERROR _GetAndLogThreadStatsCounters();
-
-    CHIP_ERROR _GetAndLogThreadTopologyMinimal();
-
-    CHIP_ERROR _GetAndLogThreadTopologyFull();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     void _ResetThreadNetworkDiagnosticsCounts();
 
@@ -137,9 +139,12 @@ private:
         uint8_t lqi;
     };
 
-    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
+    GAutoPtr<OpenthreadBorderRouter> mProxy;
 
-    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+    static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
+    static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
+    static CHIP_ERROR GLibMatterContextCallScan(ThreadStackManagerImpl * self);
+    static void OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
     void ThreadDeviceRoleChangedHandler(const gchar * role);
 
@@ -150,6 +155,7 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
+    uint8_t mExtendedAddress[8];
 };
 
 inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)

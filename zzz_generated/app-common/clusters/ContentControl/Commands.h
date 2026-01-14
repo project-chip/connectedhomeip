@@ -102,6 +102,36 @@ struct Type;
 struct DecodableType;
 } // namespace SetScheduledContentRatingThreshold
 
+namespace AddBlockChannels {
+struct Type;
+struct DecodableType;
+} // namespace AddBlockChannels
+
+namespace RemoveBlockChannels {
+struct Type;
+struct DecodableType;
+} // namespace RemoveBlockChannels
+
+namespace AddBlockApplications {
+struct Type;
+struct DecodableType;
+} // namespace AddBlockApplications
+
+namespace RemoveBlockApplications {
+struct Type;
+struct DecodableType;
+} // namespace RemoveBlockApplications
+
+namespace SetBlockContentTimeWindow {
+struct Type;
+struct DecodableType;
+} // namespace SetBlockContentTimeWindow
+
+namespace RemoveBlockContentTimeWindow {
+struct Type;
+struct DecodableType;
+} // namespace RemoveBlockContentTimeWindow
+
 } // namespace Commands
 
 namespace Commands {
@@ -119,14 +149,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UpdatePIN::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
 
-    Optional<chip::CharSpan> oldPIN;
+    chip::CharSpan oldPIN;
     chip::CharSpan newPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -136,7 +166,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Optional<chip::CharSpan> oldPIN;
+    chip::CharSpan oldPIN;
     chip::CharSpan newPIN;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -158,7 +188,7 @@ public:
 
     using ResponseType = Clusters::ContentControl::Commands::ResetPINResponse::DecodableType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -220,7 +250,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -249,7 +279,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -277,7 +307,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
 
     Optional<chip::CharSpan> PINCode;
-    Optional<uint32_t> bonusTime;
+    uint32_t bonusTime = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -294,7 +324,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::CharSpan> PINCode;
-    Optional<uint32_t> bonusTime;
+    uint32_t bonusTime = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -459,6 +489,210 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetScheduledContentRatingThreshold
+namespace AddBlockChannels {
+enum class Fields : uint8_t
+{
+    kChannels = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddBlockChannels::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+
+    DataModel::List<const Structs::BlockChannelStruct::Type> channels;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddBlockChannels::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::DecodableList<Structs::BlockChannelStruct::DecodableType> channels;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddBlockChannels
+namespace RemoveBlockChannels {
+enum class Fields : uint8_t
+{
+    kChannelIndexes = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBlockChannels::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+
+    DataModel::List<const uint16_t> channelIndexes;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBlockChannels::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::DecodableList<uint16_t> channelIndexes;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveBlockChannels
+namespace AddBlockApplications {
+enum class Fields : uint8_t
+{
+    kApplications = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddBlockApplications::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+
+    DataModel::List<const Structs::AppInfoStruct::Type> applications;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddBlockApplications::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::DecodableList<Structs::AppInfoStruct::DecodableType> applications;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddBlockApplications
+namespace RemoveBlockApplications {
+enum class Fields : uint8_t
+{
+    kApplications = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBlockApplications::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+
+    DataModel::List<const Structs::AppInfoStruct::Type> applications;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBlockApplications::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::DecodableList<Structs::AppInfoStruct::DecodableType> applications;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveBlockApplications
+namespace SetBlockContentTimeWindow {
+enum class Fields : uint8_t
+{
+    kTimeWindow = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetBlockContentTimeWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+
+    Structs::TimeWindowStruct::Type timeWindow;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetBlockContentTimeWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::TimeWindowStruct::DecodableType timeWindow;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetBlockContentTimeWindow
+namespace RemoveBlockContentTimeWindow {
+enum class Fields : uint8_t
+{
+    kTimeWindowIndexes = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBlockContentTimeWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+
+    DataModel::List<const uint16_t> timeWindowIndexes;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBlockContentTimeWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::DecodableList<uint16_t> timeWindowIndexes;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveBlockContentTimeWindow
 } // namespace Commands
 } // namespace ContentControl
 } // namespace Clusters

@@ -53,8 +53,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TlsCer
             return LookupRootCertificate::kMetadataEntry;
         case RemoveRootCertificate::Id:
             return RemoveRootCertificate::kMetadataEntry;
-        case TLSClientCSR::Id:
-            return TLSClientCSR::kMetadataEntry;
+        case ClientCSR::Id:
+            return ClientCSR::kMetadataEntry;
         case ProvisionClientCertificate::Id:
             return ProvisionClientCertificate::kMetadataEntry;
         case FindClientCertificate::Id:

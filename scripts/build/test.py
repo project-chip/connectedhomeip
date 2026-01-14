@@ -25,7 +25,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 
 
 def build_expected_output(source: str, root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, source), 'rt') as f:
+    with open(os.path.join(SCRIPT_ROOT, source)) as f:
         for line in f.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
@@ -49,7 +49,6 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
         'JAVA_HOME': 'TEST_JAVA_HOME',
         'GSDK_ROOT': 'TEST_GSDK_ROOT',
-        'WISECONNECT_SDK_ROOT': 'TEST_WISECONNECT_SDK_ROOT',
         'WIFI_SDK_ROOT': 'TEST_WIFI_SDK_ROOT',
     })
 

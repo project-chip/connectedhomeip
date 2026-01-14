@@ -36,6 +36,7 @@ executable("chip-energy-management-app") {
   sources = [
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/Identify.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
@@ -144,6 +145,7 @@ source_set("test-evse-targets-store") {
 
   deps = [
     "${chip_root}/examples/energy-management-app/energy-management-common",
+    "${chip_root}/src/app/clusters/electrical-energy-measurement-server:electrical-energy-measurement-server",
     "${chip_root}/src/lib",
   ]
 }

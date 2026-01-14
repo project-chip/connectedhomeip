@@ -38,6 +38,8 @@
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRCommissionableBrowserResult.h>
 #import <Matter/MTRCommissioneeInfo.h>
+#import <Matter/MTRCommissioningDelegate.h>
+#import <Matter/MTRCommissioningOperation.h>
 #import <Matter/MTRCommissioningParameters.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h>
@@ -61,6 +63,7 @@
 #import <Matter/MTRLogging.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
 #import <Matter/MTRMetrics.h>
+#import <Matter/MTRNetworkInterfaceInfo.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>

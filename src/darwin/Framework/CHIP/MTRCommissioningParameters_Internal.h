@@ -19,4 +19,17 @@
  * as public API yet.
  */
 @interface MTRCommissioningParameters () <NSCopying>
+
+/**
+ * Whether to prevent network scans, even in cases when we do not have network
+ * credentials.
+ *
+ * This is needed to support the old commissioning API, which does not have a
+ * way to respond to those network scans and continue commissioning once they
+ * complete.
+ *
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL preventNetworkScans;
+
 @end

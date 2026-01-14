@@ -71,7 +71,7 @@ void OTAHelpers::InitOTARequestor()
     {
         SetRequestorInstance(&gRequestorCore);
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-        gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+        TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
         gImageProcessor.SetOTADownloader(&gDownloader);
         gDownloader.SetImageProcessorDelegate(&gImageProcessor);
         gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

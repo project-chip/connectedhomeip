@@ -25,10 +25,6 @@ extern "C" {
 #include "ELSFactoryData.h"
 #include "mflash_drv.h"
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-#include "els_pkc_mbedtls.h"
-#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-
 #include "fsl_adapter_flash.h"
 
 /* mbedtls */
@@ -75,7 +71,6 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     CHIP_ERROR err               = CHIP_ERROR_NOT_FOUND;
     uint8_t type                 = 0;
     uint32_t index               = 0;
-    uint8_t * addrContent        = NULL;
     uint8_t * factoryDataAddress = &factoryDataRamBuffer[0];
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
@@ -165,7 +160,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint32_t hashId;
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     CHIP_ERROR res;
 
@@ -232,10 +226,6 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
         return res;
     }
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_lock();
-#endif
-
     /* Read DAC key from EL2GO data*/
     status =
         read_el2go_blob((uint8_t *) Addr, (size_t) BlobSize, el2go_dac_key_id, el2go_blob, EL2GO_MAX_BLOB_SIZE, &el2go_blob_size);
@@ -256,24 +246,13 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     status = els_delete_key(key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_auth failed", status);
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CHIP_NO_ERROR;
 exit:
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
-    uint16_t len;
-    uint8_t type;
-    uint16_t keySize = 0;
-    status_t status  = STATUS_SUCCESS;
-
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
 
     els_enable();

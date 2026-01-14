@@ -324,7 +324,7 @@ class AttributeCache:
     _attributeCache: Dict[int, List[Cluster]] = field(
         default_factory=lambda: {})
 
-    def UpdateTLV(self, path: AttributePath, dataVersion: int,  data: Union[bytes, ValueDecodeFailure]):
+    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: Union[bytes, ValueDecodeFailure]):
         ''' Store data in TLV since that makes it easiest to eventually convert to either the
             cluster or attribute view representations (see below in GetUpdatedAttributeCache()).
         '''
@@ -440,6 +440,8 @@ class SubscriptionTransaction:
             EventReadResult, SubscriptionTransaction], None] = DefaultEventChangeCallback
         self._onErrorCb: Callable[[
             int, SubscriptionTransaction], None] = DefaultErrorCallback
+        self._onReportBeginCb: Callable[[SubscriptionTransaction], None] = DefaultReportBeginCallback
+        self._onReportEndCb: Callable[[SubscriptionTransaction], None] = DefaultReportEndCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
@@ -462,8 +464,7 @@ class SubscriptionTransaction:
 
         if (self._readTransaction._cache.returnClusterObject):
             return eval(f'data[path.Path.EndpointId][path.ClusterType].{path.AttributeName}')
-        else:
-            return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
+        return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
 
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
@@ -545,10 +546,30 @@ class SubscriptionTransaction:
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
         Sets the callback function for the attribute value change event,
-        accepts a Callable accepts an attribute path and the cached data.
+        accepts a Callable that accepts an attribute path and the cached data.
         '''
         if callback is not None:
             self._onAttributeChangeCb = callback
+
+    def SetReportBeginCallback(self, callback: Callable[[SubscriptionTransaction], None]):
+        '''
+        Sets the callback function for when a subscription report with at least one path starts,
+        accepts a Callable that accepts the transaction. If set to None, disable the callback.
+        '''
+        if callback is not None:
+            self._onReportBeginCb = callback
+        else:
+            self._onReportBeginCb = DefaultReportBeginCallback
+
+    def SetReportEndCallback(self, callback: Callable[[SubscriptionTransaction], None]):
+        '''
+        Sets the callback function for when a subscription report with at least one path ends,
+        accepts a Callable that accepts the transaction. If set to None, disable the callback.
+        '''
+        if callback is not None:
+            self._onReportEndCb = callback
+        else:
+            self._onReportEndCb = DefaultReportEndCallback
 
     def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
         if callback is not None:
@@ -565,6 +586,14 @@ class SubscriptionTransaction:
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
+
+    @property
+    def OnReportBeginCb(self) -> Callable[[SubscriptionTransaction], None]:
+        return self._onReportBeginCb
+
+    @property
+    def OnReportEndCb(self) -> Callable[[SubscriptionTransaction], None]:
+        return self._onReportEndCb
 
     @property
     def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
@@ -622,6 +651,14 @@ def DefaultErrorCallback(chipError: int, transaction: SubscriptionTransaction):
     print(f"Error during Subscription: Matter Stack Error {chipError}")
 
 
+def DefaultReportBeginCallback(transaction: SubscriptionTransaction):
+    pass
+
+
+def DefaultReportEndCallback(transaction: SubscriptionTransaction):
+    pass
+
+
 def _BuildEventIndex():
     ''' Build internal event index for locating the corresponding cluster object by path in the future.
     We do this because this operation will take a long time when there are lots of events, it takes about 300ms for a single query.
@@ -630,7 +667,7 @@ def _BuildEventIndex():
     for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
         if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Events' == objName)):
+                if inspect.isclass(subclass) and objName == "Events":
                     for eventName, event in inspect.getmembers(subclass):
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)
@@ -775,7 +812,8 @@ class AsyncReadTransaction:
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
-        pass
+        if self._subscription_handler is not None:
+            self._subscription_handler.OnReportBeginCb(self._subscription_handler)
 
     def _handleReportEnd(self):
         if self._subscription_handler is not None:
@@ -789,6 +827,7 @@ class AsyncReadTransaction:
                 self._subscription_handler.OnAttributeChangeCb(
                     attribute_path, self._subscription_handler)
 
+            self._subscription_handler.OnReportEndCb(self._subscription_handler)
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()
 
@@ -823,7 +862,8 @@ class AsyncReadTransaction:
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
     def handleReportBegin(self):
-        pass
+        # self._event_loop.call_soon_threadsafe(self._handleReportBegin)
+        self._handleReportBegin()
 
     def handleReportEnd(self):
         # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
@@ -969,34 +1009,38 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def WriteAttributes(future: Future, eventLoop, device,
-                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: bool = False) -> PyChipError:
-    handle = GetLibraryHandle()
-
+def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: Union[None, int] = None) -> Tuple[ctypes.Array[PyWriteAttributeData], int]:
+    """Helper function to prepare PyWriteAttributeData array from AttributeWriteRequest list."""
     numberOfAttributes = len(attributes)
     pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
     pyWriteAttributes = pyWriteAttributesArrayType()
+
     for idx, attr in enumerate(attributes):
-        if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+        if must_use_timed_write_check and attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise InteractionModelError(
                 InteractionModelStatus.NeedsTimedInteraction)
 
         tlv = attr.Attribute.ToTLV(None, attr.Data)
 
-        pyWriteAttributes[idx].attributePath.endpointId = c_uint16(
-            attr.EndpointId)
-        pyWriteAttributes[idx].attributePath.clusterId = c_uint32(
-            attr.Attribute.cluster_id)
-        pyWriteAttributes[idx].attributePath.attributeId = c_uint32(
-            attr.Attribute.attribute_id)
-        pyWriteAttributes[idx].attributePath.dataVersion = c_uint32(
-            attr.DataVersion)
-        pyWriteAttributes[idx].attributePath.hasDataVersion = c_uint8(
-            attr.HasDataVersion)
-        pyWriteAttributes[idx].tlvData = cast(
-            ctypes.c_char_p(bytes(tlv)), c_void_p)
+        pyWriteAttributes[idx].attributePath.endpointId = c_uint16(attr.EndpointId)
+        pyWriteAttributes[idx].attributePath.clusterId = c_uint32(attr.Attribute.cluster_id)
+        pyWriteAttributes[idx].attributePath.attributeId = c_uint32(attr.Attribute.attribute_id)
+        pyWriteAttributes[idx].attributePath.dataVersion = c_uint32(attr.DataVersion)
+        pyWriteAttributes[idx].attributePath.hasDataVersion = c_uint8(attr.HasDataVersion)
+        pyWriteAttributes[idx].tlvData = cast(ctypes.c_char_p(bytes(tlv)), c_void_p)
         pyWriteAttributes[idx].tlvLength = c_size_t(len(tlv))
+
+    return pyWriteAttributes, numberOfAttributes
+
+
+def WriteAttributes(future: Future, eventLoop, device,
+                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
+                    forceLegacyListEncoding: bool = False) -> PyChipError:
+    handle = GetLibraryHandle()
+
+    pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
+        attributes, must_use_timed_write_check=True, timedRequestTimeoutMs=timedRequestTimeoutMs)
 
     transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
@@ -1010,6 +1054,43 @@ def WriteAttributes(future: Future, eventLoop, device,
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
             pyWriteAttributes, ctypes.c_size_t(numberOfAttributes),
             ctypes.c_bool(forceLegacyListEncoding))
+    )
+    if not res.is_success:
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+    return res
+
+
+def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventLoop, device,
+                                                          attributes: List[AttributeWriteRequest],
+                                                          timedRequestTimeoutMs: int,
+                                                          timedRequestFieldValue: bool,
+                                                          interactionTimeoutMs: Union[None, int] = None,
+                                                          busyWaitMs: Union[None, int] = None) -> PyChipError:
+    '''
+    ONLY TO BE USED FOR TEST: Writes attributes with decoupled Timed Request action and TimedRequest field.
+    This allows testing TIMED_REQUEST_MISMATCH scenarios:
+    - timedRequestTimeoutMs=0, timedRequestFieldValue=True: No action, but field=true (MISMATCH)
+    - timedRequestTimeoutMs>0, timedRequestFieldValue=False: Action sent, but field=false (MISMATCH)
+    '''
+    handle = GetLibraryHandle()
+
+    # Note: We skip the timed write check here to allow testing the TIMED_REQUEST_MISMATCH scenario
+    # In normal WriteAttributes, this would check for must_use_timed_write
+    pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
+        attributes, must_use_timed_write_check=False)
+
+    transaction = AsyncWriteTransaction(future, eventLoop)
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+
+    # Call the TestOnly C++ function that decouples action and field
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField(
+            ctypes.py_object(transaction), device,
+            ctypes.c_size_t(timedRequestTimeoutMs),
+            ctypes.c_bool(timedRequestFieldValue),
+            ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
+            ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
+            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
@@ -1063,7 +1144,7 @@ def Read(transaction: AsyncReadTransaction, device,
          attributes: Optional[List[AttributePath]] = None, dataVersionFilters: Optional[List[DataVersionFilter]] = None,
          events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None,
          subscriptionParameters: Optional[SubscriptionParameters] = None,
-         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
+         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: Union[None, bool] = None) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1166,7 +1247,8 @@ def Read(transaction: AsyncReadTransaction, device,
                 0 if dataVersionFilters is None else len(dataVersionFilters)),
             eventPathsForCffi,
             ctypes.c_size_t(0 if events is None else len(events)),
-            eventNumberFilterPtr))
+            eventNumberFilterPtr,
+            ctypes.c_bool(allowLargePayload or False)))
 
     transaction.SetClientObjPointers(readClientObj)
 
@@ -1185,6 +1267,9 @@ def Init():
 
         handle.pychip_WriteClient_WriteAttributes.restype = PyChipError
         handle.pychip_WriteClient_WriteGroupAttributes.restype = PyChipError
+        handle.pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField.restype = PyChipError
+        handle.pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField.argtypes = [py_object, c_void_p,
+                                                                                                     c_size_t, c_bool, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 
         # Both WriteAttributes and WriteGroupAttributes are variadic functions. As per ctype documentation
         # https://docs.python.org/3/library/ctypes.html#calling-varadic-functions, it is critical that we

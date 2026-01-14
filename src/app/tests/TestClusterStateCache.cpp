@@ -33,6 +33,7 @@
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
@@ -112,7 +113,7 @@ uint8_t AttributeInstruction::sInstructionId = 0;
 
 using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
-using TestClusterStateCache = chip::Test::AppContext;
+using TestClusterStateCache = chip::Testing::AppContext;
 
 class ForwardedDataCallbackValidator final
 {
@@ -259,7 +260,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             }
 
             uint32_t writtenLength = writer.GetLengthWritten();
-            writer.Finalize(handle);
+            EXPECT_SUCCESS(writer.Finalize(handle));
             TLV::ScopedBufferTLVReader reader;
             reader.Init(std::move(handle), writtenLength);
             EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
@@ -599,7 +600,8 @@ void RunAndValidateSequence(AttributeInstructionListType list)
     {
         AttributeInstructionListType listCopy(list);
         ConcreteClusterPath clusterPath = listCopy[0].GetAttributePath();
-        cache.ForEachAttribute(clusterPath.mEndpointId, clusterPath.mClusterId, newInstructionRemovalFunction(listCopy));
+        EXPECT_SUCCESS(
+            cache.ForEachAttribute(clusterPath.mEndpointId, clusterPath.mClusterId, newInstructionRemovalFunction(listCopy)));
 
         // Should have removed all instructions matching this cluster instance.
         for (auto & instruction : listCopy)
@@ -612,7 +614,7 @@ void RunAndValidateSequence(AttributeInstructionListType list)
     {
         AttributeInstructionListType listCopy(list);
         ClusterId cluster = listCopy[0].GetAttributePath().mClusterId;
-        cache.ForEachAttribute(cluster, newInstructionRemovalFunction(listCopy));
+        EXPECT_SUCCESS(cache.ForEachAttribute(cluster, newInstructionRemovalFunction(listCopy)));
 
         // Should have removed all instructions matching this cluster id.
         for (auto & instruction : listCopy)
@@ -623,7 +625,7 @@ void RunAndValidateSequence(AttributeInstructionListType list)
 
     {
         AttributeInstructionListType listCopy(list);
-        cache.ForEachAttribute(newInstructionRemovalFunction(listCopy));
+        EXPECT_SUCCESS(cache.ForEachAttribute(newInstructionRemovalFunction(listCopy)));
 
         // We should have had things in the cache for all our instructions.
         EXPECT_EQ(listCopy.size(), 0u);

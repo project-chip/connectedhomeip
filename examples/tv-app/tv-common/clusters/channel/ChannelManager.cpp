@@ -173,13 +173,13 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     if (matchedChannels.size() > 1)
     {
         response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
     else if (matchedChannels.size() == 0)
     {
         // Error: Found no match
         response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
     else
     {
@@ -187,7 +187,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = matchedChannels[0];
         mCurrentChannelIndex = index;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
 }
 
@@ -290,7 +290,7 @@ void ChannelManager::HandleGetProgramGuide(
 
     ProgramGuideResponseType response;
     response.programList = DataModel::List<const ProgramType>(matches.data(), matches.size());
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,

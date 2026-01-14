@@ -51,7 +51,7 @@ CHIP_ERROR RvcRunModeDelegate::Init()
 
 void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
 
     // Our business logic states that we can only switch into the mapping state from the idle state.
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
@@ -195,7 +195,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcRunModeDelegate = std::make_unique<RvcRunModeDelegate>();
     gRvcRunModeInstance =
         std::make_unique<ModeBase::Instance>(gRvcRunModeDelegate.get(), endpointId, RvcRunMode::Id, 0 /* No feature bits */);
-    gRvcRunModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
 }
 
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
@@ -331,6 +331,6 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeDelegate = std::make_unique<RvcCleanModeDelegate>();
     gRvcCleanModeInstance =
         std::make_unique<ModeBase::Instance>(gRvcCleanModeDelegate.get(), endpointId, RvcCleanMode::Id, 0 /* No feature bits */);
-    gRvcCleanModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER

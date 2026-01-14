@@ -197,7 +197,7 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
                                       Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, aesKeyHandle, aead,
                                       Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, reinterpret_cast<uint8_t *>(&data));
     }
-    tempEntry.DeleteKey();
+    TEMPORARY_RETURN_IGNORED tempEntry.DeleteKey();
 
     if (err != CHIP_NO_ERROR)
     {
@@ -299,7 +299,7 @@ CHIP_ERROR ICDMonitoringTable::Remove(uint16_t index)
 
     // Retrieve entry and delete the keyHandle first as to not
     // cause any key leaks.
-    this->Get(index, entry);
+    ReturnErrorOnFailure(this->Get(index, entry));
     ReturnErrorOnFailure(entry.DeleteKey());
 
     // Shift remaining entries down one position

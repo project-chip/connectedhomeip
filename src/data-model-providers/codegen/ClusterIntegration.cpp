@@ -16,13 +16,11 @@
  */
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-
-#include <codegen/CodegenProcessingConfig.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
 #include <limits>
 
@@ -30,17 +28,17 @@ namespace chip::app {
 
 namespace {
 
-bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fixedClusterServerEndpointCount,
-                         uint16_t maxEndpointCount, uint16_t & emberEndpointIndex)
+bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fixedClusterInstanceCount,
+                         uint16_t maxClusterInstanceCount, uint16_t & clusterInstanceIndex)
 {
-    emberEndpointIndex = emberAfGetClusterServerEndpointIndex(endpointId, clusterId, fixedClusterServerEndpointCount);
+    clusterInstanceIndex = emberAfGetClusterServerEndpointIndex(endpointId, clusterId, fixedClusterInstanceCount);
 
-    if (emberEndpointIndex >= maxEndpointCount)
+    if (clusterInstanceIndex >= maxClusterInstanceCount)
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer,
                      "Could not find a valid endpoint index for endpoint %u/" ChipLogFormatMEI " (Index %u was not valid)",
-                     endpointId, ChipLogValueMEI(clusterId), emberEndpointIndex);
+                     endpointId, ChipLogValueMEI(clusterId), clusterInstanceIndex);
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         return false;
     }
@@ -69,13 +67,26 @@ uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
     return Traits::StorageToWorking(temp);
 }
 
+ClusterShutdownType ToServerClusterInterfaceShutdown(MatterClusterShutdownType t)
+{
+    switch (t)
+    {
+    case MatterClusterShutdownType::kPermanentRemove:
+        return ClusterShutdownType::kPermanentRemove;
+    case MatterClusterShutdownType::kClusterShutdown:
+        return ClusterShutdownType::kClusterShutdown;
+    }
+    // we are handling all cases above, but compiler does not seem to detect this...
+    return ClusterShutdownType::kClusterShutdown;
+}
+
 } // namespace
 
 void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & options, Delegate & delegate)
 {
-    uint16_t emberEndpointIndex;
-    if (!findEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
-                             options.maxEndpointCount, emberEndpointIndex))
+    uint16_t clusterInstanceIndex;
+    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
+                             options.maxClusterInstanceCount, clusterInstanceIndex))
     {
         return;
     }
@@ -95,7 +106,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     //   - Thermostat and DoorLock have more than 32 attributes in general
     //   - ColorControl has a lot of high-ID attributes
     //
-    // The above examples however are few compared to the large number of clusters that matter supports,
+    // The above examples however are few compared to the large number of clusters that Matter supports,
     // so this optimization is considered worth it at this time.
     uint32_t optionalAttributes = 0;
     if (options.fetchOptionalAttributes)
@@ -110,7 +121,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     }
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(
-        delegate.CreateRegistration(options.endpointId, emberEndpointIndex, optionalAttributes, featureMap));
+        delegate.CreateRegistration(options.endpointId, clusterInstanceIndex, optionalAttributes, featureMap));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -121,16 +132,18 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     }
 }
 
-void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate)
+void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate,
+                                                 MatterClusterShutdownType shutdownType)
 {
-    uint16_t emberEndpointIndex;
-    if (!findEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
-                             options.maxEndpointCount, emberEndpointIndex))
+    uint16_t clusterInstanceIndex;
+    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
+                             options.maxClusterInstanceCount, clusterInstanceIndex))
     {
         return;
     }
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&delegate.FindRegistration(emberEndpointIndex));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(delegate.FindRegistration(clusterInstanceIndex),
+                                                                                ToServerClusterInterfaceShutdown(shutdownType));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
@@ -145,7 +158,30 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
        // However, this should never happen in practice.
     }
 
-    delegate.ReleaseRegistration(emberEndpointIndex);
+    delegate.ReleaseRegistration(clusterInstanceIndex);
+}
+
+ServerClusterInterface * CodegenClusterIntegration::FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options,
+                                                                          Delegate & delegate)
+{
+    uint16_t clusterInstanceIndex;
+    if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
+                             options.maxClusterInstanceCount, clusterInstanceIndex))
+    {
+        return nullptr;
+    }
+
+    ServerClusterInterface * interface = delegate.FindRegistration(clusterInstanceIndex);
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+    if (interface == nullptr)
+    {
+        ChipLogError(AppServer,
+                     "No endpoint interface available on %u/" ChipLogFormatMEI ". Code may try to use an uninitialized cluster",
+                     options.endpointId, ChipLogValueMEI(options.clusterId));
+    }
+#endif
+
+    return interface;
 }
 
 } // namespace chip::app

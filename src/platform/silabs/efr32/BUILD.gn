@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${matter_support_root}/provision/args.gni")
@@ -62,59 +63,30 @@ static_library("efr32") {
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
     "${silabs_platform_dir}/platformAbstraction/GsdkSpam.cpp",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.cpp",
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
   ]
 
-  if (chip_enable_ble_rs911x) {
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+    "${silabs_platform_dir}/platformAbstraction:gsdk",
+  ]
+
+  # BLE implementation selection: use SiWx BLE wrapper or local EFR32 implementation
+  if (sl_matter_enable_siwx_ble) {
+    public_deps += [ "${silabs_platform_dir}/SiWx/ble:siwx-ble" ]
     sources += [
-      "../rs911x/BLEManagerImpl.cpp",
-      "../rs911x/rsi_ble_config.h",
-      "../rs911x/wfx_sl_ble_init.cpp",
-      "../rs911x/wfx_sl_ble_init.h",
+      "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
+      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.cpp",
+      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.h",
     ]
   } else {
     sources += [ "BLEManagerImpl.cpp" ]
   }
-
-  if (chip_enable_multi_ota_requestor) {
-    if (chip_enable_multi_ota_encryption) {
-      sources += [
-        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp",
-        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.h",
-      ]
-    }
-
-    if (chip_enable_ota_custom_tlv_testing) {
-      sources += [
-        "${silabs_platform_dir}/multi-ota/OTACustomProcessor.cpp",
-        "${silabs_platform_dir}/multi-ota/OTACustomProcessor.h",
-      ]
-    }
-    sources += [
-      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAFactoryDataProcessor.h",
-      "${silabs_platform_dir}/multi-ota/OTAFirmwareProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAFirmwareProcessor.h",
-      "${silabs_platform_dir}/multi-ota/OTAHooks.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.cpp",
-      "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
-      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
-    ]
-  } else if (chip_enable_ota_requestor) {
-    sources += [
-      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
-      "OTAImageProcessorImpl.cpp",
-    ]
-  }
-
-  public_deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
-  ]
   deps = [
     "${chip_root}/src/app/common:ids",
     "${sl_provision_root}:headers",
@@ -170,5 +142,14 @@ static_library("efr32") {
     ]
 
     public_deps += [ "${silabs_platform_dir}/wifi:wifi-platform" ]
+  }
+
+  if (chip_enable_multi_ota_requestor) {
+    public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32" ]
+  } else if (chip_enable_ota_requestor) {
+    sources += [
+      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.cpp",
+    ]
   }
 }

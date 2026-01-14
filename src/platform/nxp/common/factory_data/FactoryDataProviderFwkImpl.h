@@ -43,9 +43,6 @@ public:
     CHIP_ERROR Init(void);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
-
-private:
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 };
 
 FactoryDataProvider & FactoryDataPrvdImpl();

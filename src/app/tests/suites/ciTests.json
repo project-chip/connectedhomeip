@@ -8,6 +8,7 @@
         "Test_TC_ACL_2_6",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
+        "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
     "ContentAppObserver": [],
@@ -57,7 +58,6 @@
     ],
     "FlowMeasurement": ["Test_TC_FLW_2_1"],
     "FanControl": ["Test_TC_FAN_3_6"],
-    "GeneralCommissioning": ["Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": [],
     "GroupKeyManagement": ["Test_TC_GRPKEY_2_2"],
     "IcdManagement": [
@@ -172,13 +172,7 @@
         "Test_TC_TCCM_3_2",
         "Test_TC_TCCM_3_3"
     ],
-    "TemperatureControl": [
-        "Test_TC_TCTL_1_1",
-        "Test_TC_TCTL_2_1",
-        "Test_TC_TCTL_2_2",
-        "Test_TC_TCTL_3_2",
-        "Test_TC_TCTL_3_3"
-    ],
+    "TemperatureControl": [],
     "TemperatureMeasurement": ["Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
     "ThermostatUserConfiguration": ["Test_TC_TSUIC_2_1", "Test_TC_TSUIC_2_2"],

@@ -24,16 +24,15 @@
 namespace chip {
 namespace webrtc {
 
-constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
-constexpr int kVideoBitRate         = 3000;
-
-constexpr const char * kStreamDestIp    = "127.0.0.1";
-constexpr uint16_t kVideoStreamDestPort = 5000;
+// Forward declaration of utils used to extract information from sdp
+std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
+int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type, const std::string & mediaType,
+                              const std::string & codec);
+const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state);
 
 WebRTCClient::WebRTCClient()
 {
-    mPeerConnection          = nullptr;
-    mTransportProviderClient = std::make_unique<WebRTCTransportProviderClient>();
+    mPeerConnection = nullptr;
 }
 
 WebRTCClient::~WebRTCClient()
@@ -84,7 +83,7 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
         if (mStateChangeCallback)
-            mStateChangeCallback(static_cast<int>(state));
+            mStateChangeCallback(GetPeerConnectionStateStr(state));
         if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
             state == rtc::PeerConnection::State::Closed)
         {
@@ -100,34 +99,86 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
         }
     });
 
-    // Create UDP socket for RTP forwarding
-    mRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
-    if (mRTPSocket == -1)
+    // Create UDP sockets for RTP forwarding
+    mVideoRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mVideoRTPSocket == -1)
     {
         ChipLogError(Camera, "Failed to create RTP socket: %s", strerror(errno));
         return CHIP_ERROR_POSIX(errno);
     }
+
+    mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mAudioRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP Audio socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void WebRTCClient::addVideoTrack(std::string mid, int payloadType)
+{
+    if (mVideoTrack != nullptr)
+    {
+        ChipLogProgress(Camera, "Video track already added");
+        return;
+    }
+
+    std::string vMid = mid.empty() ? kVideoMid : mid;
+    ChipLogProgress(Camera, "Adding Video Track with mid=%s and payload type=%d", vMid.c_str(), payloadType);
+    rtc::Description::Video video(vMid, rtc::Description::Direction::RecvOnly);
+    video.addH264Codec(payloadType);
+    video.setBitrate(kVideoBitRate);
+    mVideoTrack = mPeerConnection->addTrack(video);
+
+    auto videoSession      = std::make_shared<rtc::RtcpReceivingSession>();
+    auto videoDepacketizer = std::make_shared<rtc::H264RtpDepacketizer>(rtc::NalUnit::Separator::StartSequence);
+    videoDepacketizer->addToChain(videoSession);
+    mVideoTrack->setMediaHandler(videoDepacketizer);
 
     sockaddr_in addr     = {};
     addr.sin_family      = AF_INET;
     addr.sin_addr.s_addr = inet_addr(kStreamDestIp);
     addr.sin_port        = htons(kVideoStreamDestPort);
 
-    rtc::Description::Video media("video", rtc::Description::Direction::RecvOnly);
-    media.addH264Codec(kVideoH264PayloadType);
-    media.setBitrate(kVideoBitRate);
-    mTrack = mPeerConnection->addTrack(media);
-
-    auto depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
-    mTrack->setMediaHandler(depacketizer);
-
-    mTrack->onFrame([this, addr](rtc::binary message, rtc::FrameInfo frameInfo) {
+    mVideoTrack->onFrame([this, addr](rtc::binary message, rtc::FrameInfo frameInfo) {
         // send H264 frames to sock so that a client can pick it up to dispaly it.
-        sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
+        sendto(this->mVideoRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
     });
+}
 
-    return CHIP_NO_ERROR;
+void WebRTCClient::addAudioTrack(std::string mid, int payloadType)
+{
+    if (mAudioTrack != nullptr)
+    {
+        ChipLogProgress(Camera, "Audio track already added");
+        return;
+    }
+
+    std::string aMid = mid.empty() ? kAudioMid : mid;
+    ChipLogProgress(Camera, "Adding Audio Track with mid=%s and payload type=%d", aMid.c_str(), payloadType);
+    rtc::Description::Audio audioMedia(aMid, rtc::Description::Direction::RecvOnly);
+    audioMedia.addOpusCodec(payloadType);
+    audioMedia.setBitrate(kAudioBitRate);
+    mAudioTrack = mPeerConnection->addTrack(audioMedia);
+
+    auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
+    mAudioTrack->setMediaHandler(audioSession);
+
+    sockaddr_in audioAddr     = {};
+    audioAddr.sin_family      = AF_INET;
+    audioAddr.sin_addr.s_addr = inet_addr(kStreamDestIp);
+    audioAddr.sin_port        = htons(kAudioStreamDestPort);
+
+    mAudioTrack->onMessage(
+        [this, audioAddr](rtc::binary message) {
+            // send audio RTP packets to sock so that a client can pick it up to play it.
+            sendto(this->mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
+        },
+        nullptr);
 }
 
 void WebRTCClient::CreateOffer()
@@ -137,6 +188,10 @@ void WebRTCClient::CreateOffer()
         ChipLogError(NotSpecified, "Peerconnection is null");
         return;
     }
+
+    // Controller is the offerer. Add tracks with the default values
+    addVideoTrack();
+    addAudioTrack();
 
     mPeerConnection->setLocalDescription();
 }
@@ -160,6 +215,20 @@ void WebRTCClient::SetRemoteDescription(const std::string & sdp, const std::stri
         return;
     }
 
+    if (type == "offer")
+    {
+        // Controller is the answerer. Extract values from offer SDP and add tracks accordingly
+        std::string videoMid = ExtractMidFromSdp(sdp, "video");
+        int videoPayloadType = ExtractDynamicPayloadType(sdp, type, "video", "H264");
+        videoPayloadType     = videoPayloadType == -1 ? kVideoH264PayloadType : videoPayloadType;
+        addVideoTrack(videoMid, videoPayloadType);
+
+        std::string audioMid = ExtractMidFromSdp(sdp, "audio");
+        int audioPayloadType = ExtractDynamicPayloadType(sdp, type, "audio", "opus");
+        audioPayloadType     = audioPayloadType == -1 ? kOpusPayloadType : audioPayloadType;
+        addAudioTrack(audioMid, audioPayloadType);
+    }
+
     mPeerConnection->setRemoteDescription(rtc::Description(sdp, type));
 }
 
@@ -176,11 +245,17 @@ void WebRTCClient::AddIceCandidate(const std::string & candidate, const std::str
 
 void WebRTCClient::CloseRTPSocket()
 {
-    if (mRTPSocket != -1)
+    ChipLogProgress(Camera, "Closing RTP sockets");
+    if (mVideoRTPSocket != -1)
     {
-        ChipLogProgress(Camera, "Closing RTP socket");
-        close(mRTPSocket);
-        mRTPSocket = -1;
+        close(mVideoRTPSocket);
+        mVideoRTPSocket = -1;
+    }
+
+    if (mAudioRTPSocket != -1)
+    {
+        close(mAudioRTPSocket);
+        mAudioRTPSocket = -1;
     }
 }
 
@@ -198,7 +273,8 @@ void WebRTCClient::Disconnect()
     CloseRTPSocket();
 
     // Reset track
-    mTrack.reset();
+    mVideoTrack.reset();
+    mAudioTrack.reset();
 
     // Clear local states
     mLocalDescription.clear();
@@ -221,14 +297,14 @@ const char * WebRTCClient::GetLocalSessionDescriptionInternal()
     return mLocalDescription.c_str();
 }
 
-int WebRTCClient::GetPeerConnectionState()
+const char * WebRTCClient::GetPeerConnectionState()
 {
     if (mPeerConnection == nullptr)
     {
-        return -1; // Invalid state
+        return "Invalid";
     }
 
-    return static_cast<int>(mPeerConnection->state());
+    return GetPeerConnectionStateStr(mPeerConnection->state());
 }
 
 void WebRTCClient::OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback)
@@ -246,28 +322,114 @@ void WebRTCClient::OnGatheringComplete(std::function<void()> callback)
     mGatheringCompleteCallback = callback;
 }
 
-void WebRTCClient::OnStateChange(std::function<void(int)> callback)
+void WebRTCClient::OnStateChange(std::function<void(const char *)> callback)
 {
     mStateChangeCallback = callback;
 }
 
-void WebRTCClient::WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
-    mTransportProviderClient->Init(nodeId, fabricIndex, endpoint);
+    switch (state)
+    {
+    case rtc::PeerConnection::State::New:
+        return "New";
+
+    case rtc::PeerConnection::State::Connecting:
+        return "Connecting";
+
+    case rtc::PeerConnection::State::Connected:
+        return "Connected";
+
+    case rtc::PeerConnection::State::Disconnected:
+        return "Disconnected";
+
+    case rtc::PeerConnection::State::Failed:
+        return "Failed";
+
+    case rtc::PeerConnection::State::Closed:
+        return "Closed";
+    }
+    return "Invalid";
+};
+
+std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType)
+{
+    if (sdp.empty() || mediaType.empty())
+    {
+        ChipLogError(Camera, "ExtractMidFromSdp: empty SDP or media type");
+        return "";
+    }
+
+    const std::string mediaPrefix = "m=" + mediaType;
+    const std::string midPrefix   = "a=mid:";
+
+    std::istringstream stream(sdp);
+    std::string line;
+    bool inTargetBlock = false;
+
+    while (std::getline(stream, line))
+    {
+        // Trim possible Windows carriage return
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        if (inTargetBlock)
+        {
+            if (line.rfind(midPrefix, 0) == 0) // line starts with "a=mid:"
+                return line.substr(midPrefix.length());
+
+            if (line.rfind("m=", 0) == 0) // next media block – stop searching
+                break;
+        }
+        else if (line.rfind(mediaPrefix, 0) == 0) // found the desired media block
+        {
+            inTargetBlock = true;
+        }
+    }
+
+    // No MID found for the requested media type
+    return "";
 }
 
-PyChipError WebRTCClient::SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId,
-                                      const uint8_t * payload, size_t length)
+int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type, const std::string & mediaType,
+                              const std::string & codec)
 {
-    return mTransportProviderClient->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
-}
+    rtc::Description desc(sdp, type);
+    for (int mid = 0; mid < desc.mediaCount(); mid++)
+    {
+        auto media = desc.media(mid);
+        if (!std::holds_alternative<rtc::Description::Media *>(media))
+            continue;
 
-void WebRTCClient::WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
-                                                     OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                                     OnCommandSenderDoneCallback onCommandSenderDoneCallback)
-{
-    mTransportProviderClient->InitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback,
-                                            onCommandSenderDoneCallback);
+        rtc::Description::Media * mediaDesc = std::get<rtc::Description::Media *>(media);
+
+        if (mediaDesc == nullptr)
+        {
+            ChipLogError(Camera, "Media Description is null at index=%d", mid);
+            continue;
+        }
+        if (mediaDesc->type() != mediaType)
+        {
+            continue;
+        }
+
+        for (int pt : mediaDesc->payloadTypes())
+        {
+            auto * map = mediaDesc->rtpMap(pt);
+            if (map == nullptr)
+            {
+                ChipLogError(Camera, "No RTP map found for payload type: %d", pt);
+                continue;
+            }
+            if (map->format == codec)
+            {
+                ChipLogProgress(Camera, "%s codec has payload type: %d", codec.c_str(), pt);
+                return pt;
+            }
+        }
+    }
+    ChipLogError(Camera, "Payload type for codec %s not found", codec.c_str());
+    return -1;
 }
 
 } // namespace webrtc

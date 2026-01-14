@@ -30,6 +30,7 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -364,12 +365,12 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_GT(GetResourceWaitCount(), 0);
     // Resource is available now
     mResourceAvailable = true;
-    // PAF packets shoudl be sent within a second
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock        = &System::SystemClock();
+    // PAF packets should be sent within a second
+
+    System::Clock::Internal::RAIIMockClock clock;
+
     constexpr System::Clock::Seconds64 pauseSec = System::Clock::Seconds64(2);
     clock.SetMonotonic(pauseSec);
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
     // PAF packet has been sent
     EXPECT_EQ(isSendQueueNull(), true);
@@ -378,8 +379,6 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     // Close the session
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 }; // namespace WiFiPAF
 }; // namespace chip

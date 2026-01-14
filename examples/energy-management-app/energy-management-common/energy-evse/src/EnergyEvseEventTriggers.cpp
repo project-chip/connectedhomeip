@@ -62,7 +62,7 @@ void SetTestEventTrigger_BasicFunctionality()
     dg->HwSetMaxHardwareChargeCurrentLimit(32000);
     dg->HwSetMaxHardwareDischargeCurrentLimit(32000);
     dg->HwSetCircuitCapacity(32000);
-    dg->SetUserMaximumChargeCurrent(32000);
+    TEMPORARY_RETURN_IGNORED dg->SetUserMaximumChargeCurrent(32000);
     dg->HwSetState(StateEnum::kNotPluggedIn);
 }
 void SetTestEventTrigger_BasicFunctionalityClear()
@@ -72,7 +72,7 @@ void SetTestEventTrigger_BasicFunctionalityClear()
     dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
     dg->HwSetMaxHardwareDischargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit);
     dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
-    dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
+    TEMPORARY_RETURN_IGNORED dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
 }
 void SetTestEventTrigger_EVPluggedIn()
@@ -145,15 +145,15 @@ void SetTestEventTrigger_EVSESetSoCLow()
 {
     // Set SoC 20%, 70kWh BatterySize
     EnergyEvseDelegate * dg = GetEvseDelegate();
-    dg->SetStateOfCharge(20);
-    dg->SetBatteryCapacity(70000000);
+    TEMPORARY_RETURN_IGNORED dg->SetStateOfCharge(20);
+    TEMPORARY_RETURN_IGNORED dg->SetBatteryCapacity(70000000);
 }
 void SetTestEventTrigger_EVSESetSoCHigh()
 {
     // Set SoC 95%, 70kWh BatterySize
     EnergyEvseDelegate * dg = GetEvseDelegate();
-    dg->SetStateOfCharge(95);
-    dg->SetBatteryCapacity(70000000);
+    TEMPORARY_RETURN_IGNORED dg->SetStateOfCharge(95);
+    TEMPORARY_RETURN_IGNORED dg->SetBatteryCapacity(70000000);
 }
 void SetTestEventTrigger_EVSESetSoCClear()
 {
@@ -161,8 +161,8 @@ void SetTestEventTrigger_EVSESetSoCClear()
     EnergyEvseDelegate * dg = GetEvseDelegate();
     DataModel::Nullable<uint8_t> noSoC;
     DataModel::Nullable<int64_t> noBatteryCapacity;
-    dg->SetStateOfCharge(noSoC);
-    dg->SetBatteryCapacity(noBatteryCapacity);
+    TEMPORARY_RETURN_IGNORED dg->SetStateOfCharge(noSoC);
+    TEMPORARY_RETURN_IGNORED dg->SetBatteryCapacity(noBatteryCapacity);
 }
 void SetTestEventTrigger_EVSESetVehicleID()
 {

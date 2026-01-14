@@ -88,7 +88,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -128,14 +128,6 @@ if (wifi_soc) {
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -168,6 +160,7 @@ silabs_executable("energy-management-app") {
   sources = [
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/Identify.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
@@ -196,6 +189,7 @@ silabs_executable("energy-management-app") {
   deps = [
     ":sdk",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/electrical-energy-measurement-server:electrical-energy-measurement-server",
     app_data_model,
   ]
 

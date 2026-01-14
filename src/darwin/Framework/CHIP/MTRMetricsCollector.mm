@@ -23,6 +23,7 @@
 #import <MTRUnfairLock.h>
 #include <controller/CommissioningDelegate.h>
 #import <os/lock.h>
+#include <os/signpost.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
@@ -38,6 +39,7 @@ using MetricEvent = chip::Tracing::MetricEvent;
 @implementation MTRMetricData {
     chip::System::Clock::Microseconds64 _timePoint;
     MetricEvent::Type _type;
+    os_signpost_id_t _signpostid;
 }
 
 - (instancetype)init
@@ -83,6 +85,8 @@ using MetricEvent = chip::Tracing::MetricEvent;
         break;
     }
 
+    _signpostid = OS_SIGNPOST_ID_NULL;
+
     MTR_METRICS_LOG_DEBUG("Initializing metric event data %s, type: %d, with time point %llu", event.key(), _type, _timePoint.count());
     return self;
 }
@@ -100,6 +104,14 @@ using MetricEvent = chip::Tracing::MetricEvent;
 {
     return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us>",
                      static_cast<int>(_type), self.value, self.errorCode, self.duration];
+}
+
+- (os_signpost_id_t)signpostID
+{
+    if (_signpostid == OS_SIGNPOST_ID_NULL) {
+        _signpostid = os_signpost_id_generate(__DARWIN_MATTER_SIGNPOST_LOGGER());
+    }
+    return _signpostid;
 }
 
 @end
@@ -230,12 +242,19 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(event)];
     MTRMetricData * data = [[MTRMetricData alloc] initWithMetricEvent:event];
 
+    if (event.type() == MetricEvent::Type::kBeginEvent) {
+        os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), [data signpostID], "MetricEvent", "%s", event.key());
+    } else if (event.type() == MetricEvent::Type::kInstantEvent) {
+        os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, "MetricEvent", "%s", event.key());
+    }
+
     // If End event, compute its duration using the Begin event
     if (event.type() == MetricEvent::Type::kEndEvent) {
         auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetricType(MetricEvent::Type::kBeginEvent)];
         MTRMetricData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
             [data setDurationFromMetricData:beginMetric];
+            os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), [beginMetric signpostID], "MetricEvent", "%s", event.key());
         } else {
             // Unbalanced end
             MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key());

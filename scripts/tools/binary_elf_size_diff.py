@@ -40,6 +40,7 @@
 #     ./out/master_build.elf
 #
 
+import contextlib
 import csv
 import logging
 import os
@@ -72,7 +73,7 @@ class Symbol:
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -105,11 +106,9 @@ def get_sizes(p: Path, no_demangle: bool):
         size = int(size, 10)
 
         if not no_demangle:
-            try:
+            # Keep non-demangled name if we cannot have a nice name.
+            with contextlib.suppress(cxxfilt.InvalidName):
                 name = cxxfilt.demangle(name)
-            except cxxfilt.InvalidName:
-                # Keep non-demangled name if we cannot have a nice name
-                pass
 
         result[name] = Symbol(symbol_type=t, name=name, size=size)
 
@@ -244,18 +243,18 @@ class SankeyData:
             value.append(link.value)
 
         return go.Sankey(
-            node=dict(
-                pad=15,
-                thickness=20,
-                line=dict(color="black", width=0.5),
-                label=self.labels,
-                color=self.colors,
-            ),
-            link=dict(
-                source=source,
-                target=target,
-                value=value,
-            ),
+            node={
+                "pad": 15,
+                "thickness": 20,
+                "line": {"color": "black", "width": 0.5},
+                "label": self.labels,
+                "color": self.colors,
+            },
+            link={
+                "source": source,
+                "target": target,
+                "value": value,
+            },
         )
 
 

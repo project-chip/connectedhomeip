@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <AppMainLoop.h>
 #include <app/server/Server.h>
 #include <controller/CommissionerDiscoveryController.h>
 #include <crypto/RawKeySessionKeystore.h>
@@ -35,40 +36,6 @@
 int ChipLinuxAppInit(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr,
                      const chip::Optional<chip::EndpointId> secondaryNetworkCommissioningEndpoit = chip::NullOptional);
 
-/**
- * A main loop implementation describes how an application main loop is to be
- * run:
- *    - how to execute the main loop
- *    - what to do to stop it (inside a signal handler - CTRL+C is captured
- *      by the main loop function)
- */
-class AppMainLoopImplementation
-{
-public:
-    virtual ~AppMainLoopImplementation() = default;
-    /**
-     * Execute main loop. Generally should have at least some
-     * `DeviceLayer::PlatformMgr().RunEventLoop();` or equivalent setup
-     *
-     * This is expected to RUN and BLOCK until SignalSafeStopMainLoop is
-     * called or some internal close logic is run (e.g. a UI may
-     * stop when the window close button is clicked.)
-     */
-    virtual void RunMainLoop() = 0;
-
-    /**
-     * Stop the above `RunMainLoop` function.
-     *
-     * Generally should contain at least a
-     *
-     *    Server::GetInstance().GenerateShutDownEvent()
-     *
-     * and then call StopEventLoopTask() in whatever way is appropriate for the
-     * way the event loop was started.
-     */
-    virtual void SignalSafeStopMainLoop() = 0;
-};
-
 class DefaultAppMainLoopImplementation : public AppMainLoopImplementation
 {
 public:
@@ -76,17 +43,39 @@ public:
     void SignalSafeStopMainLoop() override
     {
         chip::Server::GetInstance().GenerateShutDownEvent();
-        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     }
 };
 
 /**
- * Start up the Linux app and use the provided main loop for event processing.
+ * Get default server initialization parameters for Linux example apps.
  *
- * If no main loop implementation is provided, an equivalent of
- * DefaultAppMainLoopImplementation will be used.
+ * Returns a reference to a static CommonCaseDeviceServerInitParams instance that has been
+ * initialized with default resources, including the CodegenDataModelProvider.
+ *
+ * This is suitable for most Linux example applications. Apps that need to customize
+ * initialization can create their own ServerInitParams and pass it to ChipLinuxAppMainLoop().
  */
-void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl = nullptr);
+chip::CommonCaseDeviceServerInitParams & ChipLinuxDefaultServerInitParams();
+
+/**
+ * Start up the Linux app, optionally with custom server initialization parameters
+ * and/or main loop implementation.
+ *
+ * This overload allows apps to provide their own ServerInitParams for cases where
+ * custom configuration is needed before server initialization.
+ *
+ * @param initParams Server initialization parameters to use
+ * @param impl Optional main loop implementation
+ */
+void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams = ChipLinuxDefaultServerInitParams(),
+                          AppMainLoopImplementation * impl    = nullptr);
+
+inline void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
+{
+    ChipLinuxAppMainLoop(ChipLinuxDefaultServerInitParams(), impl);
+}
 
 // For extra init calls, the function will be called right before running Matter main loop.
 void ApplicationInit();

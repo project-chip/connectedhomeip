@@ -35,14 +35,22 @@ typedef struct UploadDataInfo
 class PushAVUploader
 {
 public:
-    typedef struct CertificatesInfo
+    typedef struct CertificatesPathInfo
     {
         std::string mRootCert;
         std::string mDevCert;
         std::string mDevKey;
     } PushAVCertPath;
 
-    PushAVUploader(PushAVCertPath certPath);
+    typedef struct CertificatesInfo
+    {
+        std::vector<uint8_t> mRootCertBuffer;
+        std::vector<uint8_t> mClientCertBuffer;
+        std::vector<uint8_t> mClientKeyBuffer;
+        std::vector<std::vector<uint8_t>> mIntermediateCertBuffer;
+    } PushAVCertBuffer;
+
+    PushAVUploader();
     ~PushAVUploader();
 
     void Start();
@@ -54,12 +62,20 @@ public:
         return mAvData.size();
     }
 
+    void setCertificateBuffer(const PushAVCertBuffer & certBuffer) { mCertBuffer = certBuffer; }
+    void setCertificatePath(const PushAVCertPath & certPath) { mCertPath = certPath; }
+
+    void setMPDPath(const std::pair<std::string, std::string> & path) { mMPDPath = path; }
+    std::pair<std::string, std::string> getMPDPath() const { return mMPDPath; }
+
 private:
     void ProcessQueue();
     void UploadData(std::pair<std::string, std::string> data);
     PushAVCertPath mCertPath;
+    PushAVCertBuffer mCertBuffer;
     std::queue<std::pair<std::string, std::string>> mAvData;
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
+    std::pair<std::string, std::string> mMPDPath;
 };

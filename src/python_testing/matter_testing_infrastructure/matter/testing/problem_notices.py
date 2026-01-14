@@ -33,9 +33,8 @@ class ClusterMapper:
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Cluster Unknown ({cluster_id}, 0x{cluster_id:08X})"
-        else:
-            name = mapping["clusterName"]
-            return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
+        name = mapping["clusterName"]
+        return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
 
     def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
         global_attrs = [item.value for item in GlobalAttributeIds]
@@ -44,14 +43,12 @@ class ClusterMapper:
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-        else:
-            attribute_mapping = mapping["attributes"].get(attribute_id, None)
+        attribute_mapping = mapping["attributes"].get(attribute_id, None)
 
-            if not attribute_mapping:
-                return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-            else:
-                attribute_name = attribute_mapping["attributeName"]
-                return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
+        if not attribute_mapping:
+            return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
+        attribute_name = attribute_mapping["attributeName"]
+        return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
 
 
 @dataclass
@@ -118,12 +115,31 @@ class FeaturePathLocation(ClusterPathLocation):
 class DeviceTypePathLocation:
     device_type_id: int
     cluster_id: Optional[int] = None
+    endpoint_id: Optional[int] = None
 
     def __str__(self):
-        msg = f'\n       DeviceType: {self.device_type_id}'
+        msg = ""
+        if self.endpoint_id is not None:
+            msg += f'\n       Endpoint ID: {self.endpoint_id}'
+        msg += f'\n       DeviceType: 0x{self.device_type_id:04X}'
         if self.cluster_id:
-            msg += f'\n       ClusterID: {self.cluster_id}'
+            msg += f'\n       ClusterID: 0x{self.cluster_id:04X}'
         return msg
+
+
+@dataclass
+class NamespacePathLocation:
+    """Location in a namespace definition"""
+    namespace_id: Optional[int] = None
+    tag_id: Optional[int] = None
+
+    def __str__(self) -> str:
+        result = "Namespace"
+        if self.namespace_id is not None:
+            result += f" 0x{self.namespace_id:04X}"
+        if self.tag_id is not None:
+            result += f" Tag 0x{self.tag_id:04X}"
+        return result
 
 
 class UnknownProblemLocation:
@@ -131,7 +147,7 @@ class UnknownProblemLocation:
         return '\n      Unknown Locations - see message for more details'
 
 
-ProblemLocation = Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
+ProblemLocation = Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation, NamespacePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance

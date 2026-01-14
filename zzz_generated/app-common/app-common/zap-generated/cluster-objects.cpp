@@ -47,6 +47,10 @@
 #include <clusters/AirQuality/Commands.ipp>
 #include <clusters/AirQuality/Events.ipp>
 #include <clusters/AirQuality/Structs.ipp>
+#include <clusters/AmbientContextSensing/Attributes.ipp>
+#include <clusters/AmbientContextSensing/Commands.ipp>
+#include <clusters/AmbientContextSensing/Events.ipp>
+#include <clusters/AmbientContextSensing/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>
@@ -239,6 +243,10 @@
 #include <clusters/GroupKeyManagement/Commands.ipp>
 #include <clusters/GroupKeyManagement/Events.ipp>
 #include <clusters/GroupKeyManagement/Structs.ipp>
+#include <clusters/Groupcast/Attributes.ipp>
+#include <clusters/Groupcast/Commands.ipp>
+#include <clusters/Groupcast/Events.ipp>
+#include <clusters/Groupcast/Structs.ipp>
 #include <clusters/Groups/Attributes.ipp>
 #include <clusters/Groups/Commands.ipp>
 #include <clusters/Groups/Events.ipp>
@@ -559,6 +567,10 @@
 #include <clusters/WaterHeaterMode/Commands.ipp>
 #include <clusters/WaterHeaterMode/Events.ipp>
 #include <clusters/WaterHeaterMode/Structs.ipp>
+#include <clusters/WaterTankLevelMonitoring/Attributes.ipp>
+#include <clusters/WaterTankLevelMonitoring/Commands.ipp>
+#include <clusters/WaterTankLevelMonitoring/Events.ipp>
+#include <clusters/WaterTankLevelMonitoring/Structs.ipp>
 #include <clusters/WebRTCTransportProvider/Attributes.ipp>
 #include <clusters/WebRTCTransportProvider/Commands.ipp>
 #include <clusters/WebRTCTransportProvider/Events.ipp>
@@ -684,6 +696,18 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::ContentControl::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ContentControl::Commands::UpdatePIN::Id:
+        case Clusters::ContentControl::Commands::ResetPIN::Id:
+        case Clusters::ContentControl::Commands::Enable::Id:
+        case Clusters::ContentControl::Commands::Disable::Id:
             return true;
         default:
             return false;
@@ -1037,6 +1061,25 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::Groupcast::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Groupcast::Commands::JoinGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
+            return true;
+        case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         switch (aCommand)
         {
@@ -1045,6 +1088,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
         switch (aCommand)
         {
         default:
@@ -1404,7 +1454,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+        case Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return true;
@@ -1590,12 +1640,12 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSR::Id))
     {
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id))
     {
         return true;
     }

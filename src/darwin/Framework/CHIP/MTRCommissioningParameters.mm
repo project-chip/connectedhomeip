@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommissioningParameters.h"
+#import "MTRCommissioningParameters_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,6 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
     other.acceptedTermsAndConditions = self.acceptedTermsAndConditions;
     other.acceptedTermsAndConditionsVersion = self.acceptedTermsAndConditionsVersion;
     other.extraAttributesToRead = self.extraAttributesToRead;
+    other.forceWiFiScan = self.forceWiFiScan;
+    other.forceThreadScan = self.forceThreadScan;
+
+    other.preventNetworkScans = self.preventNetworkScans;
+
     return other;
 }
 
@@ -66,7 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>, accepted terms: %@, accepted terms version: %@", self,
+    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>, accepted terms: %@, accepted terms version: %@>", self,
                      self.wifiSSID != nil, self.threadOperationalDataset != nil,
                      self.acceptedTermsAndConditions, self.acceptedTermsAndConditionsVersion];
 }

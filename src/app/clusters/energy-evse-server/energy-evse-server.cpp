@@ -47,7 +47,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -449,6 +449,12 @@ Status Instance::ValidateTargets(
             innerIdx++;
         }
 
+        if (innerIdx > kEvseTargetsMaxTargetsPerDay)
+        {
+            ChipLogError(AppServer, "Too many targets in a single ChargingTargetScheduleStruct (%d)", innerIdx);
+            return Status::ResourceExhausted;
+        }
+
         if (iterInner.GetStatus() != CHIP_NO_ERROR)
         {
             return Status::InvalidCommand;
@@ -475,7 +481,6 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)

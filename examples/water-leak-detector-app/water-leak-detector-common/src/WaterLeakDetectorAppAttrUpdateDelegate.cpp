@@ -66,7 +66,8 @@ void WaterLeakDetectorAppAttrUpdateDelegate::OnEventCommandReceived(const char *
     auto * handler = WaterLeakAttrUpdateHandler::FromJSON(json);
     if (handler)
     {
-        PlatformMgr().ScheduleWork(WaterLeakAttrUpdateHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(WaterLeakAttrUpdateHandler::HandleCommand,
+                                                            reinterpret_cast<intptr_t>(handler));
     }
     else
     {

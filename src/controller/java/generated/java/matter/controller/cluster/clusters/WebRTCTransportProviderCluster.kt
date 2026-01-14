@@ -107,6 +107,7 @@ class WebRTCTransportProviderCluster(
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
     ICETransportPolicy: String?,
     metadataEnabled: Boolean?,
+    SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
     timedInvokeTimeout: Duration? = null,
   ): SolicitOfferResponse {
     val commandId: UInt = 0u
@@ -144,6 +145,9 @@ class WebRTCTransportProviderCluster(
     metadataEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_METADATA_ENABLED_REQ), metadataEnabled)
     }
+
+    val TAG_S_FRAME_CONFIG_REQ: Int = 7
+    SFrameConfig?.let { SFrameConfig.toTlv(ContextSpecificTag(TAG_S_FRAME_CONFIG_REQ), tlvWriter) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -175,13 +179,9 @@ class WebRTCTransportProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEFERRED_OFFER)) {
+      } else if (tag == ContextSpecificTag(TAG_DEFERRED_OFFER)) {
         deferredOffer_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
         videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -198,9 +198,7 @@ class WebRTCTransportProviderCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
         audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -250,6 +248,7 @@ class WebRTCTransportProviderCluster(
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
     ICETransportPolicy: String?,
     metadataEnabled: Boolean?,
+    SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
     timedInvokeTimeout: Duration? = null,
   ): ProvideOfferResponse {
     val commandId: UInt = 2u
@@ -295,6 +294,9 @@ class WebRTCTransportProviderCluster(
     metadataEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_METADATA_ENABLED_REQ), metadataEnabled)
     }
+
+    val TAG_S_FRAME_CONFIG_REQ: Int = 9
+    SFrameConfig?.let { SFrameConfig.toTlv(ContextSpecificTag(TAG_S_FRAME_CONFIG_REQ), tlvWriter) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -323,9 +325,7 @@ class WebRTCTransportProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
         videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -342,9 +342,7 @@ class WebRTCTransportProviderCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
         audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

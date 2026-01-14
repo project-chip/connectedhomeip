@@ -228,7 +228,7 @@ void WiFiPAFEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR 
     mSendQueue = nullptr;
     // Clear the session information
     ChipLogProgress(WiFiPAF, "Shutdown PAF session (%u, %u)", mSessionInfo.id, mSessionInfo.role);
-    mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFCloseSession(mSessionInfo);
+    TEMPORARY_RETURN_IGNORED mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFCloseSession(mSessionInfo);
     memset(&mSessionInfo, 0, sizeof(mSessionInfo));
     // Fire application's close callback if we haven't already, and it's not suppressed.
     if (oldState != kState_Closing && (flags & kWiFiPAFCloseFlag_SuppressCallback) == 0)
@@ -562,7 +562,7 @@ CHIP_ERROR WiFiPAFEndPoint::DoSendStandAloneAck()
     ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "sending stand-alone ack");
 
     // Encode and transmit stand-alone ack.
-    mPafTP.EncodeStandAloneAck(mAckToSend);
+    ReturnErrorOnFailure(mPafTP.EncodeStandAloneAck(mAckToSend));
     ReturnErrorOnFailure(SendCharacteristic(mAckToSend.Retain()));
 
     // Reset local receive window counter.
@@ -605,8 +605,7 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
     if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
     {
         // Resource is currently unavailable, send packets later
-        StartWaitResourceTimer();
-        return CHIP_NO_ERROR;
+        return StartWaitResourceTimer();
     }
     mResourceWaitCount = 0;
 
@@ -974,7 +973,7 @@ CHIP_ERROR WiFiPAFEndPoint::RxPacketProcess(PacketBufferHandle && data)
     bool didReceiveAck           = false;
     BitFlags<WiFiPAFTP::HeaderFlags> rx_flags;
     Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
-    DebugPktAckSn(PktDirect_t::kRx, reader, data->Start());
+    TEMPORARY_RETURN_IGNORED DebugPktAckSn(PktDirect_t::kRx, reader, data->Start());
 
     { // This is a special handling on the first CHIPoPAF data packet, the CapabilitiesRequest.
         // If we're receiving the first inbound packet of a PAF transport connection handshake...
@@ -1133,10 +1132,8 @@ CHIP_ERROR WiFiPAFEndPoint::SendWrite(PacketBufferHandle && buf)
 
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, buf);
     Encoding::LittleEndian::Reader reader(buf->Start(), buf->DataLength());
-    DebugPktAckSn(PktDirect_t::kTx, reader, buf->Start());
-    mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFMessageSend(mSessionInfo, std::move(buf));
-
-    return CHIP_NO_ERROR;
+    TEMPORARY_RETURN_IGNORED DebugPktAckSn(PktDirect_t::kTx, reader, buf->Start());
+    return mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFMessageSend(mSessionInfo, std::move(buf));
 }
 
 CHIP_ERROR WiFiPAFEndPoint::StartConnectTimer()

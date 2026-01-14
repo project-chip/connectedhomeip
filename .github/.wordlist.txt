@@ -90,6 +90,7 @@ ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -374,6 +375,9 @@ DCL
 DCMAKE
 DCONF
 DCONFIG
+deallocate
+deallocated
+deallocation
 debianutils
 debugText
 decrypt
@@ -394,6 +398,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+Depacketization
 deployable
 depottools
 deps
@@ -594,6 +599,7 @@ forkpty
 formatter
 formatters
 FOTA
+framerate
 FreeRTOS
 FreeRTOSConfig
 FRDM
@@ -773,6 +779,7 @@ JCM
 JDK
 jf
 jinja
+jitter
 JLink
 JLinkExe
 JLinkRTTClient
@@ -849,6 +856,7 @@ LightingState
 LinkSoftwareAndDocumentationPack
 linter
 linters
+Livestream
 lladdr
 LocalConfigDisabled
 localedef
@@ -856,6 +864,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -908,6 +917,7 @@ mcumgr
 MCUs
 mcux
 MCUXpresso
+MCXW
 mdash
 MDNS
 MediaInput
@@ -961,6 +971,7 @@ MTR
 MTU
 Multiband
 Multicast
+multicasts
 multilib
 Multiprotocol
 multithreaded
@@ -968,6 +979,7 @@ Murata
 mutex
 mutexes
 mv
+mve
 MX
 mydir
 MyPASSWORD
@@ -1105,6 +1117,7 @@ PASE
 Passcode
 passRetained
 passwd
+Pausable
 PBKDF
 pbuf
 pbufs
@@ -1260,6 +1273,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs
@@ -1411,6 +1425,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1554,6 +1569,7 @@ UnitLocalization
 unittest
 unpair
 unprovisioned
+unregistration
 Unsecure
 Unselect
 untrusted
@@ -1594,6 +1610,7 @@ Verifier
 Verifiers
 VID
 vids
+viewport
 virtualenv
 visualstudio
 vlatest
@@ -1607,6 +1624,7 @@ VSC
 VSCode
 WaitNewInputEvent
 WakeOnLan
+Walkthrough
 WantedBy
 watchdogTimeout
 watchOS
@@ -1690,6 +1708,7 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread

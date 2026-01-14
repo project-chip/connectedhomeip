@@ -50,6 +50,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, panMin);
     case Attributes::PanMax::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, panMax);
+    case Attributes::MovementState::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, movementState);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

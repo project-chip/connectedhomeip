@@ -394,6 +394,7 @@ private:
 
     void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release)
     {
+        // NOLINTNEXTLINE(clang-analyzer-core.StackAddressEscape): TODO #41631
         this->DequeueConnectionCallbacks(error, SessionEstablishmentStage::kNotInKeyExchange, releaseBehavior);
     }
 

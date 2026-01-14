@@ -49,6 +49,8 @@ inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
 
 // This is NOT the same as the auto-generated attributes:
 // see comment below about UniqueID (which we make behave as optional)
+//
+// TLDR: DO NOT USE kMandatoryMetadata (because unique ID is special for backwards compat builds)
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     DataModelRevision::kMetadataEntry,
     VendorName::kMetadataEntry,
@@ -404,6 +406,7 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 
     AttributeListBuilder listBuilder(builder);
 
+    // NOTE: do NOT use kMandatoryMetadata (see comment on kMandatoryAttributes: UniqueID is special)
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), mEnabledOptionalAttributes);
 }
 
@@ -427,13 +430,13 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void BasicInformationCluster::Shutdown()
+void BasicInformationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     if (PlatformMgr().GetDelegate() == this)
     {
         PlatformMgr().SetDelegate(nullptr);
     }
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
@@ -448,7 +451,6 @@ void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
 
     DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
     eventsGenerator.GenerateEvent(event, kRootEndpointId);
-    eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
 void BasicInformationCluster::OnShutDown()

@@ -43,7 +43,7 @@ declare chip_mdns
 
 help() {
 
-    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ]"
+    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging true|false  ] [ -chip_mdns ChipMDNSValue  ]"
 
     echo "General Options:
   -h, --help                Display this information.
@@ -86,22 +86,26 @@ echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 
+gn_args=(
+    "chip_support_commissioning_in_controller=false"
+    "chip_data_model=\"///examples/lighting-app/lighting-common\""
+    "chip_detail_logging=$chip_detail_logging"
+)
+if [[ -n "$chip_mdns" ]]; then
+    gn_args+=("chip_mdns=\"$chip_mdns\"")
+fi
+
 # Generates ninja files
-[[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
-
-chip_data_model_arg="chip_data_model=\"///examples/lighting-app/lighting-common\""
-
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging $chip_mdns_arg chip_controller=false $chip_data_model_arg"
-
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
 # Compiles python files
-ninja -v -C "$OUTPUT_ROOT" matter-core
+ninja -v -C "$OUTPUT_ROOT" matter-clusters matter-core
 
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new environment to register the python WHL
 
-WHEEL=("$OUTPUT_ROOT"/controller/python/matter_core*.whl)
+WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
 
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade

@@ -57,12 +57,6 @@ Use the ZAP GUI tool to edit the file above:
 7. Click `File->Save` to save the configuration.
 8. Close the GUI.
 
-**Add entries for your new cluster to
-[BUILD.gn](c/src/controller/data_model/BUILD.gn)** in the outputs section of the
-java-jni-generate bits. The entries should look like
-"jni/YourClusterNameClient-InvokeSubscribeImpl.cpp" and
-"jni/YourClusterNameClient-ReadImpl.cpp".
-
 **Add an entry to the ClientDirectories** section of
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json).
 

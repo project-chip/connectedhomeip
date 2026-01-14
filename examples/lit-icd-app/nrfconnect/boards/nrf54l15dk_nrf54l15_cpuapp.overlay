@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2025 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+/ {
+	aliases {
+		// Use watchdog wdt31 as the application watchdog
+		watchdog0 = &wdt31;
+	};
+
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+};
+
+// restore full RRAM and SRAM space - by default some parts are dedicated to FLRP
+&cpuapp_rram {
+	reg = <0x0 DT_SIZE_K(1524)>;
+};
+
+&cpuapp_sram {
+	reg = <0x20000000 DT_SIZE_K(256)>;
+	ranges = <0x0 0x20000000 0x40000>;
+};
+
+// TODO: re-enable HWFC once it's fixed
+&uart20 {
+	/delete-property/ hw-flow-control;
+};
+
+&mx25r64 {
+	status = "okay";
+};
+
+&wdt31 {
+	status = "okay";
+};

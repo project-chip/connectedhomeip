@@ -33,6 +33,6 @@ gcc_toolchain("bee") {
     current_os = "freertos"
     current_cpu = bee_cpu
     is_clang = false
-    import("${chip_root}/src/platform/realtek/BEE/args.gni")
+    import("${chip_root}/src/platform/realtek/freertos/args.gni")
   }
 }

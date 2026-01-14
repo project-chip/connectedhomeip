@@ -4,6 +4,10 @@
 #
 #    pip-compile --allow-unsafe --output-file=constraints.txt --strip-extras requirements.all.txt
 #
+about-time==4.2.1
+    # via alive-progress
+alive-progress==3.3.0
+    # via -r ../tests/requirements.txt
 anytree==2.8.0
     # via -r requirements.memory.txt
 appdirs==1.4.4
@@ -16,88 +20,69 @@ attrs==22.2.0
     # via jsonschema
 backcall==0.2.0
     # via ipython
-bitstring==3.1.9
-    # via
-    #   -r requirements.esp32.txt
-    #   esptool
+bluezoo==1.0.2 ; sys_platform == "linux"
+    # via -r ../tests/requirements.txt
 build==0.8.0
     # via
     #   -r requirements.all.txt
     #   pip-tools
-cachecontrol==0.12.11
-    # via idf-component-manager
 cbor==1.0.0
     # via -r requirements.zephyr.txt
 cbor2==5.4.6
     # via -r requirements.zephyr.txt
 certifi==2022.12.7
     # via requests
+cffi==1.15.0 ; python_version < "3.13"
+    # via
+    #   -r requirements.all.txt
+    #   cryptography
 charset-normalizer==3.0.1
     # via requests
 click==8.1.6
     # via
+    #   -r ../tests/requirements.txt
     #   -r requirements.build.txt
-    #   -r requirements.esp32.txt
-    #   idf-component-manager
+    #   click-option-group
+    #   matter-idl
     #   pip-tools
+click-option-group==0.5.9
+    # via -r requirements.all.txt
 colorama==0.4.6
     # via
+    #   -r ../tests/requirements.txt
     #   -r requirements.all.txt
-    #   idf-component-manager
     #   west
 coloredlogs==15.0.1
-    # via -r requirements.all.txt
-construct==2.10.70
     # via
-    #   -r requirements.esp32.txt
-    #   esp-coredump
-contextlib2==21.6.0
-    # via
-    #   idf-component-manager
-    #   schema
-cryptography==43.0.0
-    # via
-    #   -c constraints.esp32.txt
+    #   -r ../tests/requirements.txt
     #   -r requirements.all.txt
-    #   esptool
+    #   -r requirements.build.txt
+    #   bluezoo
+    #   matter-idl
+cryptography==43.0.0
+    # via -r requirements.all.txt
 cxxfilt==0.3.0
     # via -r requirements.memory.txt
 decorator==5.1.1
     # via ipython
 diskcache==5.4.0
-    # via -r requirements.all.txt
+    # via -r ../tests/requirements.txt
 distlib==0.3.6
     # via virtualenv
 docopt==0.6.2
     # via pykwalify
-ecdsa==0.19.0
-    # via
-    #   -r requirements.esp32.txt
-    #   esptool
-esp-coredump==1.7.0
-    # via esp-idf-monitor
-esp-idf-kconfig==1.2.0
-    # via -r requirements.esp32.txt
-esp-idf-monitor==1.1.1
-    # via -r requirements.esp32.txt
-esptool==4.6.2
-    # via esp-coredump
 executing==1.2.0
     # via stack-data
 fastcore==1.5.28
     # via ghapi
 filelock==3.9.0
     # via virtualenv
-future==0.18.3
-    # via
-    #   -r requirements.esp32.txt
-    #   idf-component-manager
 ghapi==1.0.3
     # via -r requirements.memory.txt
+graphemeu==0.7.2
+    # via alive-progress
 humanfriendly==10.0
     # via coloredlogs
-idf-component-manager==1.5.2
-    # via -r requirements.esp32.txt
 idna==3.4
     # via requests
 intelhex==2.3.0
@@ -107,27 +92,26 @@ ipython==8.11.0
 jedi==0.18.2
     # via ipython
 jinja2==3.0.3
-    # via -r requirements.build.txt
+    # via
+    #   -r requirements.build.txt
+    #   matter-idl
 jsonschema==4.17.3
     # via -r requirements.zephyr.txt
-kconfiglib==13.7.1
-    # via esp-idf-kconfig
 lark==1.1.5
     # via
-    #   -r requirements.all.txt
     #   -r requirements.build.txt
-lockfile==0.12.2
-    # via cachecontrol
+    #   matter-idl
+    #   matter-yamltests
 markupsafe==2.1.2
     # via jinja2
 matplotlib-inline==0.1.6
     # via ipython
 mobly==1.12.1
     # via -r requirements.all.txt
-msgpack==1.0.4
-    # via cachecontrol
-mypy==1.10.1
-    # via -r requirements.all.txt
+mypy==1.16.0
+    # via
+    #   -r ../tests/requirements.txt
+    #   -r requirements.all.txt
 mypy-extensions==1.0.0
     # via mypy
 mypy-protobuf==3.5.0
@@ -139,12 +123,13 @@ packaging==23.0
     #   build
     #   fastcore
     #   ghapi
-    #   idf-component-manager
     #   west
 pandas==2.2.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi
+pathspec==0.12.1
+    # via mypy
 pep517==0.13.0
     # via build
 pexpect==4.8.0
@@ -175,80 +160,50 @@ pure-eval==0.2.2
     # via stack-data
 pycparser==2.21
     # via cffi
-pyelftools==0.30
-    # via
-    #   -c constraints.esp32.txt
-    #   esp-idf-monitor
-pygdbmi==0.9.0.2
-    # via
-    #   -r requirements.esp32.txt
-    #   esp-coredump
 pygments==2.14.0
     # via ipython
 pykwalify==1.8.0
     # via west
 pyparsing==3.0.9
-    # via -r requirements.esp32.txt
+    # via bluezoo
 pyrsistent==0.19.3
     # via jsonschema
-pyserial==3.5
-    # via
-    #   -c constraints.esp32.txt
-    #   esp-idf-monitor
-    #   esptool
 python-dateutil==2.8.2
     # via
     #   pandas
     #   pykwalify
-python-engineio==3.14.2
-    # via python-socketio
-python-socketio==4.6.1
-    # via -r requirements.esp32.txt
+python-path==0.1.3
+    # via -r requirements.build.txt
 pytz==2022.7.1
     # via pandas
+pyventus==0.7.1
+    # via bluezoo
 pyyaml==6.0.1
     # via
-    #   esptool
-    #   idf-component-manager
+    #   matter-yamltests
     #   mobly
     #   west
-reedsolo==1.5.4
-    # via
-    #   -r requirements.esp32.txt
-    #   esptool
 requests==2.28.2
-    # via
-    #   -r requirements.cirque.txt
-    #   cachecontrol
-    #   idf-component-manager
-    #   requests-file
-    #   requests-toolbelt
-requests-file==1.5.1
-    # via idf-component-manager
-requests-toolbelt==0.10.1
-    # via idf-component-manager
+    # via -r requirements.cirque.txt
 ruamel-yaml==0.17.21
     # via pykwalify
-schema==0.7.5
-    # via idf-component-manager
+sdbus==0.14.1.post0 ; sys_platform == "linux"
+    # via
+    #   -r ../tests/requirements.txt
+    #   bluezoo
 six==1.16.0
     # via
     #   anytree
     #   asttokens
-    #   ecdsa
-    #   idf-component-manager
     #   python-dateutil
-    #   python-engineio
-    #   python-socketio
-    #   requests-file
 stack-data==0.6.2
     # via ipython
 tabulate==0.9.0
-    # via -r requirements.memory.txt
+    # via
+    #   -r ../tests/requirements.txt
+    #   -r requirements.memory.txt
 tornado==6.2
     # via -r requirements.all.txt
-tqdm==4.64.1
-    # via idf-component-manager
 traitlets==5.9.0
     # via
     #   ipython
@@ -257,8 +212,14 @@ types-protobuf==5.29.1.20250208
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
-typing-extensions==4.6.1
-    # via mypy
+types-pyyaml==6.0.12.20250915
+    # via -r ../tests/requirements.txt
+typing-extensions==4.8.0
+    # via
+    #   mypy
+    #   pyventus
+tzdata==2025.2
+    # via pandas
 urllib3==1.26.14
     # via requests
 virtualenv==20.20.0
@@ -268,7 +229,7 @@ watchdog==2.3.1
 wcwidth==0.2.6
     # via prompt-toolkit
 websockets==10.4
-    # via -r requirements.all.txt
+    # via matter-yamltests
 west==1.2.0
     # via -r requirements.zephyr.txt
 wheel==0.38.4 ; sys_platform == "linux"

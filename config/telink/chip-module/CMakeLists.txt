@@ -114,6 +114,7 @@ matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_EN
 matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_W91)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
@@ -209,6 +210,19 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
     add_dependencies(chip-ota-image process_binaries)
+endif()
+
+# ==============================================================================
+# Define 'dfu-smp-image' target for building DFU over BT SMP image
+# ==============================================================================
+
+if (CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD)
+    file(WRITE "${PROJECT_BINARY_DIR}/empty.txt" "")
+    chip_ota_image(dfu-smp-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/empty.txt
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/dfu.data
+    )
+    add_dependencies(process_binaries dfu-smp-image)
 endif()
 
 # ==============================================================================

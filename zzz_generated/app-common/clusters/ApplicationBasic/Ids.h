@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ApplicationBasic (cluster code: 1293/0x0450D)
+// Identifier constant values for cluster ApplicationBasic (cluster code: 1293/0x050D)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

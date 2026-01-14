@@ -261,7 +261,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
-    encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
+    encoder.Encode(to_underlying(Fields::kTLSEndpointID), TLSEndpointID);
     encoder.Encode(to_underlying(Fields::kUrl), url);
     encoder.Encode(to_underlying(Fields::kTriggerOptions), triggerOptions);
     encoder.Encode(to_underlying(Fields::kIngestMethod), ingestMethod);
@@ -292,9 +292,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        else if (__context_tag == to_underlying(Fields::kTLSEndpointID))
         {
-            err = DataModel::Decode(reader, endpointID);
+            err = DataModel::Decode(reader, TLSEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kUrl))
         {

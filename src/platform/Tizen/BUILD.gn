@@ -22,7 +22,6 @@ import("${chip_root}/src/platform/device.gni")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
 }
 
 assert(chip_device_platform == "tizen")

@@ -89,12 +89,12 @@ void OTAConfig::Init()
     SetRequestorInstance(&gRequestorCore);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
 
     // Periodic query timeout must be set prior to requestor being initialized
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR
+#if SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
     auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
 #else
     auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();

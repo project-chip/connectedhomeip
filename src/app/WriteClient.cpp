@@ -54,7 +54,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     ReturnErrorOnFailure(writeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeResponse.PrettyPrint();
 #endif
 
     err = writeResponse.GetWriteResponses(&attributeStatusesParser);
@@ -171,7 +171,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Do not allow timed request with chunks.
+    // Per Matter specification: a Write Request that is part of a Timed Write Interaction SHALL NOT be chunked.
     VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
@@ -201,7 +201,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
+    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
@@ -281,7 +281,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         {
 
             dataReader.Init(data);
-            dataReader.OpenContainer(valueReader);
+            TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
             bool chunkingNeeded = false;
 
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
@@ -302,7 +302,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         // We will restart iterating on ValueReader, only appending the items we need to append.
         dataReader.Init(data);
-        dataReader.OpenContainer(valueReader);
+        TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
 
         CHIP_ERROR err            = CHIP_NO_ERROR;
         uint16_t currentItemCount = 0;
@@ -615,7 +615,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (mState != State::AwaitingResponse)

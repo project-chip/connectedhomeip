@@ -37,6 +37,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/nrfconnect/FactoryResetTestEventTriggerHandler.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
 
@@ -170,9 +171,9 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 #elif defined(CONFIG_CHIP_WIFI)
-    sWiFiCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiCommissioningInstance.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD
@@ -234,8 +235,11 @@ CHIP_ERROR AppTask::Init()
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    static DeviceLayer::FactoryResetTestEventTriggerHandler sFactoryResetEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFactoryResetEventTriggerHandler) == CHIP_NO_ERROR);
+    LOG_INF("Factory Reset Test Event Trigger Handler registered");
 #ifdef CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
@@ -263,7 +267,7 @@ CHIP_ERROR AppTask::Init()
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     // Disable auto-relock time feature.
     DoorLockServer::Instance().SetAutoRelockTime(kLockEndpointId, 0);
@@ -573,7 +577,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            TEMPORARY_RETURN_IGNORED NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
@@ -681,7 +685,7 @@ void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::
         break;
     }
 
-    SystemLayer().ScheduleLambda([newLockState, source] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newLockState, source] {
         chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
         chip::app::Clusters::DoorLock::Attributes::LockState::Get(kLockEndpointId, currentLockState);
 

@@ -27,7 +27,68 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerTopology {
-namespace Structs {} // namespace Structs
+namespace Structs {
+
+namespace CircuitNodeStruct {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    encoder.Encode(to_underlying(Fields::kNode), node);
+    encoder.Encode(to_underlying(Fields::kEndpoint), endpoint);
+    encoder.Encode(to_underlying(Fields::kLabel), label);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kNode))
+        {
+            err = DataModel::Decode(reader, node);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpoint))
+        {
+            err = DataModel::Decode(reader, endpoint);
+        }
+        else if (__context_tag == to_underlying(Fields::kLabel))
+        {
+            err = DataModel::Decode(reader, label);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace CircuitNodeStruct
+} // namespace Structs
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

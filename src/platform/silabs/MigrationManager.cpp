@@ -16,6 +16,13 @@
  */
 
 #include "MigrationManager.h"
+#include "sl_component_catalog.h"
+#include "sl_core.h"
+#include <headers/ProvisionManager.h>
+#include <headers/ProvisionStorage.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <stdio.h>
@@ -35,7 +42,6 @@ typedef struct
     func_ptr migrationFunc;
 } migrationData_t;
 
-#define COUNT_OF(A) (sizeof(A) / sizeof((A)[0]))
 static migrationData_t migrationTable[] = {
     { .migrationGroup = 1, .migrationFunc = MigrateKvsMap },
     { .migrationGroup = 2, .migrationFunc = MigrateDacProvider },
@@ -47,13 +53,13 @@ static migrationData_t migrationTable[] = {
 
 } // namespace
 
-void MigrationManager::applyMigrations()
+void MigrationManager::ApplyMigrations()
 {
     uint32_t lastMigationGroupDone = 0;
-    SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_MigrationCounter, lastMigationGroupDone);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_MigrationCounter, lastMigationGroupDone);
 
     uint32_t completedMigrationGroup = lastMigationGroupDone;
-    for (uint32_t i = 0; i < COUNT_OF(migrationTable); i++)
+    for (uint32_t i = 0; i < MATTER_ARRAY_SIZE(migrationTable); i++)
     {
         if (lastMigationGroupDone < migrationTable[i].migrationGroup)
         {
@@ -61,18 +67,18 @@ void MigrationManager::applyMigrations()
             completedMigrationGroup = std::max(migrationTable[i].migrationGroup, completedMigrationGroup);
         }
     }
-    SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
 }
 
 void MigrationManager::MigrateUint16(uint32_t old_key, uint32_t new_key)
 {
     uint16_t value = 0;
-    if (SilabsConfig::ConfigValueExists(old_key) && (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value)))
+    if (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value))
     {
         if (CHIP_NO_ERROR == SilabsConfig::WriteConfigValue(new_key, value))
         {
             // Free memory of old key location
-            SilabsConfig::ClearConfigValue(old_key);
+            TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(old_key);
         }
     }
 }
@@ -80,12 +86,12 @@ void MigrationManager::MigrateUint16(uint32_t old_key, uint32_t new_key)
 void MigrationManager::MigrateUint32(uint32_t old_key, uint32_t new_key)
 {
     uint32_t value = 0;
-    if (SilabsConfig::ConfigValueExists(old_key) && (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value)))
+    if (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value))
     {
         if (CHIP_NO_ERROR == SilabsConfig::WriteConfigValue(new_key, value))
         {
             // Free memory of old key location
-            SilabsConfig::ClearConfigValue(old_key);
+            TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(old_key);
         }
     }
 }

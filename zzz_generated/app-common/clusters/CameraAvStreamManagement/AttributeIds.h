@@ -32,9 +32,9 @@ namespace NightVisionUsesInfrared {
 inline constexpr AttributeId Id = 0x00000003;
 } // namespace NightVisionUsesInfrared
 
-namespace MinViewport {
+namespace MinViewportResolution {
 inline constexpr AttributeId Id = 0x00000004;
-} // namespace MinViewport
+} // namespace MinViewportResolution
 
 namespace RateDistortionTradeOffPoints {
 inline constexpr AttributeId Id = 0x00000005;

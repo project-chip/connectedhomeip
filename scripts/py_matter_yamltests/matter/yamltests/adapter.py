@@ -24,7 +24,7 @@ class TestAdapter(ABC):
     between the format used by the matter_yamltests package and the format used by the
     adapter target.
 
-    Some examples of adapters includes chip-repl, chip-tool and the placeholder applications.
+    Some examples of adapters includes matter-repl, chip-tool and the placeholder applications.
     """
 
     @abstractmethod

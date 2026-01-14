@@ -52,16 +52,18 @@ namespace System {
 
 constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 24 * 30); // Month [sec]
 
-CHIP_ERROR LayerImplSelect::Init()
+CriticalFailure LayerImplSelect::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
     {
         w.Clear();
     }
+#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
@@ -69,7 +71,7 @@ CHIP_ERROR LayerImplSelect::Init()
 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    ReturnErrorOnFailure(mWakeEvent.Open(*this));
+    ReturnErrorOnFailure(mWakeEvent.Open());
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -91,18 +93,17 @@ void LayerImplSelect::Shutdown()
     }
     mTimerPool.ReleaseAll();
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
     {
         w.DisableAndClear();
     }
+#endif
 #else
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
+    mWakeEvent.Close();
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
-
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    mWakeEvent.Close(*this);
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
 }
@@ -138,7 +139,7 @@ void LayerImplSelect::Signal()
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
-CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -247,7 +248,7 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 #endif
 }
 
-CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -303,6 +304,7 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
     // Find a free slot.
@@ -441,6 +443,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 
 CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
+    VerifyOrReturnError(tokenInOut != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
     *tokenInOut         = InvalidSocketWatchToken();
 
@@ -489,6 +493,7 @@ SocketEvents LayerImplSelect::SocketEventsFromFDs(int socket, const fd_set & rea
 
     return res;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 enum : intptr_t
 {
@@ -556,6 +561,12 @@ void LayerImplSelect::PrepareEvents()
     FD_ZERO(&mSelected.mErrorSet);
     // NOLINTEND(clang-analyzer-security.insecureAPI.bzero)
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    FD_SET(mWakeEvent.GetReadFD(), &mSelected.mReadSet);
+    mMaxFd = mWakeEvent.GetReadFD();
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     for (auto & w : mSocketWatchPool)
     {
         if (w.mFD != kInvalidFd)
@@ -574,6 +585,7 @@ void LayerImplSelect::PrepareEvents()
             }
         }
     }
+#endif
 }
 
 void LayerImplSelect::WaitForEvents()
@@ -587,9 +599,17 @@ void LayerImplSelect::HandleEvents()
 
     if (!IsSelectResultValid())
     {
+        VerifyOrReturn(errno != EINTR); // EINTR is not really an error (and we don't use it for signal handling)
         ChipLogError(DeviceLayer, "Select failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
         return;
     }
+
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    if (mSelectResult > 0 && FD_ISSET(mWakeEvent.GetReadFD(), &mSelected.mReadSet))
+    {
+        mWakeEvent.Confirm();
+    }
+#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = pthread_self();
@@ -605,6 +625,7 @@ void LayerImplSelect::HandleEvents()
         mTimerPool.Invoke(timer);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Process socket events, if any
     if (mSelectResult > 0)
     {
@@ -620,6 +641,7 @@ void LayerImplSelect::HandleEvents()
             }
         }
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // Call HandleEvents for active loop handlers
     auto loopIter = mLoopHandlers.begin();
@@ -672,6 +694,7 @@ void LayerImplSelect::HandleLibEvIoWatcher(EV_P_ struct ev_io * i, int revents)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 void LayerImplSelect::SocketWatch::Clear()
 {
     mFD = kInvalidFd;
@@ -693,6 +716,7 @@ void LayerImplSelect::SocketWatch::DisableAndClear()
     Clear();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace System
 } // namespace chip

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@
  *
  *         The ephemeral partition should be erased during factory reset.
  *
- *         ChipLinuxStorage wraps the storage class ChipLinuxStorageIni with mutex.
+ *         ChipWebosStorage wraps the storage class ChipWebosStorageIni with mutex.
  *
  */
 
@@ -63,11 +63,11 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class ChipLinuxStorage : private ChipLinuxStorageIni
+class ChipWebOSStorage : private ChipWebOSStorageIni
 {
 public:
-    ChipLinuxStorage();
-    ~ChipLinuxStorage();
+    ChipWebOSStorage();
+    ~ChipWebOSStorage();
 
     CHIP_ERROR Init(const char * configFile);
     CHIP_ERROR ReadValue(const char * key, bool & val);

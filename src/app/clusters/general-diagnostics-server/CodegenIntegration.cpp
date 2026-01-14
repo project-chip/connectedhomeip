@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
@@ -46,10 +47,11 @@ LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         const GeneralDiagnosticsFunctionsConfig functionsConfig
@@ -61,57 +63,61 @@ public:
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime      = false,
+            .enablePosixTime       = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-            .enablePayloadSnaphot = true,
+            .enablePayloadSnapshot = true,
 #else
-            .enablePayloadSnaphot = false,
+            .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, functionsConfig);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel, functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel);
 #endif
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
 
-void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralDiagnostics::Id,
+            .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
 
-void MatterGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralDiagnostics::Id,
+            .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGeneralDiagnosticsPluginServerInitCallback() {}

@@ -27,6 +27,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
@@ -157,7 +158,7 @@ TEST_F(TestSessionKeystore, TestDeriveKey)
     {
         P256ECDHDerivedSecret secret;
         memcpy(secret.Bytes(), test.secret, strlen(test.secret));
-        secret.SetLength(strlen(test.secret));
+        EXPECT_SUCCESS(secret.SetLength(strlen(test.secret)));
 
         Aes128KeyHandle keyHandle;
         EXPECT_EQ(keystore.DeriveKey(secret, ToSpan(test.salt), ToSpan(test.info), keyHandle), CHIP_NO_ERROR);
@@ -179,7 +180,7 @@ TEST_F(TestSessionKeystore, TestDeriveSessionKeys)
     {
         P256ECDHDerivedSecret secret;
         memcpy(secret.Bytes(), test.secret, strlen(test.secret));
-        secret.SetLength(strlen(test.secret));
+        EXPECT_SUCCESS(secret.SetLength(strlen(test.secret)));
 
         Aes128KeyHandle i2r;
         Aes128KeyHandle r2i;

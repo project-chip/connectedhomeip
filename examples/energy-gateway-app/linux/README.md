@@ -25,10 +25,10 @@ details.
     -   [Device Tracing](#device-tracing)
     -   [Python Test Cases](#python-test-cases)
         -   [Running the test cases:](#running-the-test-cases)
-    -   [CHIP-REPL Interaction](#chip-repl-interaction)
-        -   [Building chip-repl:](#building-chip-repl)
+    -   [MATTER-REPL Interaction](#matter-repl-interaction)
+        -   [Building matter-repl:](#building-matter-repl)
         -   [Activating python virtual env](#activating-python-virtual-env)
-        -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
+        -   [Interacting with matter-repl and the example app](#interacting-with-matter-repl-and-the-example-app)
             -   [CommodityPrice cluster](#commodityprice-cluster)
             -   [ElectricalGridConditions cluster](#electricalgridconditions-cluster)
 
@@ -38,20 +38,26 @@ details.
 
 -   Install tool chain
 
-          $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+    ```bash
+    sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+    ```
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/energy-gateway-app/linux
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ gn gen out/debug
-          $ ninja -C out/debug
+    ```bash
+    cd ~/connectedhomeip/examples/energy-gateway-app/linux
+    git submodule update --init
+    source third_party/connectedhomeip/scripts/activate.sh
+    gn gen out/debug
+    ninja -C out/debug
+    ```
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/energy-gateway-app/linux
-          $ rm -rf out/
+    ```bash
+    cd ~/connectedhomeip/examples/energy-gateway-app/linux
+    rm -rf out
+    ```
 
 ## Commandline arguments
 
@@ -94,10 +100,12 @@ details.
 
     -   Run Linux Energy Gateway Example App
 
-              $ cd ~/connectedhomeip/examples/energy-gateway-app/linux
-              $ sudo out/debug/chip-energy-gateway-app --ble-controller [bluetooth controller number]
-              # In this example, the device we want to use is hci1
-              $ sudo out/debug/chip-energy-gateway-app --ble-controller 1
+        ```bash
+        cd ~/connectedhomeip/examples/energy-gateway-app/linux
+        sudo out/debug/chip-energy-gateway-app --ble-controller [bluetooth controller number]
+        # In this example, the device we want to use is hci1
+        sudo out/debug/chip-energy-gateway-app --ble-controller 1
+        ```
 
     -   Test the device using ChipDeviceController on your laptop / workstation
         etc.
@@ -109,15 +117,15 @@ tracing, build with RPC enabled. See [Building with RPC enabled](#building).
 
 Obtain tracing json file.
 
-```
-    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
-     -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```bash
+{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
+    -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
 ```
 
 ## Python Test Cases
 
-When you want to test this cluster you can use chip-repl or chip-tool by hand.
-CHIP-REPL is slightly easier to interact with when dealing with some of the
+When you want to test this cluster you can use matter-repl or chip-tool by hand.
+MATTER-REPL is slightly easier to interact with when dealing with some of the
 complex structures.
 
 There are several test scripts provided for Commodity Price cluster (in
@@ -148,7 +156,9 @@ on these platforms.**
 Once the application is built you also need to tell it at runtime what the
 chosen enable key is using the `--enable-key` command line option.
 
-       $ ./chip-energy-gateway-app --enable-key 000102030405060708090a0b0c0d0e0f
+```bash
+./chip-energy-gateway-app --enable-key 000102030405060708090a0b0c0d0e0f
+```
 
 ### Running the test cases:
 
@@ -157,13 +167,13 @@ From the top-level of the connectedhomeip repo type:
 Start the chip-energy-gateway-app:
 
 ```bash
-     rm -f /tmp/chip_*; out/debug/chip-energy-gateway-app --enable-key 000102030405060708090a0b0c0d0e0f
+rm -f /tmp/chip_*; out/debug/chip-energy-gateway-app --enable-key 000102030405060708090a0b0c0d0e0f
 ```
 
 Then run the test:
 
 ```bash
-     $ python src/python_testing/TC_SEPR_2_1.py --endpoint 1 -m on-network -n 1234 -p 20202021 -d 3840 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+python src/python_testing/TC_SEPR_2_1.py --endpoint 1 -m on-network -n 1234 -p 20202021 -d 3840 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 ```
 
 -   Note that the `--endpoint 1` must be used with the example, since the SEPR
@@ -176,16 +186,16 @@ That is also why the `/tmp/chip_*` files are deleted before running
 chip-energy-gateway-app as this is where the app stores the matter persistent
 data (e.g. fabric info).
 
-## CHIP-REPL Interaction
+## MATTER-REPL Interaction
 
--   See chip-repl documentation in:
-    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
-    -   [Matter_REPL_Intro](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
+-   See matter-repl documentation in:
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/matter-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb)
 
-### Building chip-repl:
+### Building matter-repl:
 
 ```bash
-    $ ./build_python.sh -i out/python
+./build_python.sh -i out/python
 ```
 
 ### Activating python virtual env
@@ -193,40 +203,40 @@ data (e.g. fabric info).
 -   You need to repeat this step each time you start a new shell.
 
 ```bash
-    $ source out/python/bin/activate
+source out/python/bin/activate
 ```
 
-### Interacting with CHIP-REPL and the example app
+### Interacting with matter-repl and the example app
 
 -   Step 1: Launch the example app in shell 1
 
 ```bash
-    $ ./chip-energy-gateway-app --enable-key 000102030405060708090a0b0c0d0e0f
+./chip-energy-gateway-app --enable-key 000102030405060708090a0b0c0d0e0f
 ```
 
--   Step 2: Launch CHIP-REPL in shell 2 (where you have previously run
+-   Step 2: Launch matter-repl in shell 2 (where you have previously run
     `source out/python/bin/activate`)
 
 ```bash
-    $ chip-repl
+matter-repl
 ```
 
--   Step 3: (In chip-repl) Commissioning OnNetwork
+-   Step 3: (In matter-repl) Commissioning OnNetwork
 
 ```python
-    await devCtrl.CommissionOnNetwork(200,20202021)   # Commission with NodeID 200
-    Out[1]: 200
+await devCtrl.CommissionOnNetwork(200,20202021)   # Commission with NodeID 200
+Out[1]: 200
 ```
 
 #### CommodityPrice cluster
 
 This allows you to get current and forecast energy prices.
 
--   Step 4: (In chip-repl) Read `Commodity Price` attributes
+-   Step 4: (In matter-repl) Read `Commodity Price` attributes
 
 ```python
-    # Read from NodeID 200, Endpoint 1, all attributes on CommodityPrice cluster
-    await devCtrl.ReadAttribute(200,[(1, chip.clusters.CommodityPrice)])
+# Read from NodeID 200, Endpoint 1, all attributes on CommodityPrice cluster
+await devCtrl.ReadAttribute(200,[(1, chip.clusters.CommodityPrice)])
 ```
 
 The response in the default app is a null `CurrentPrice` and an empty
@@ -271,17 +281,17 @@ The response in the default app is a null `CurrentPrice` and an empty
     │   }
 ```
 
--   Step 5: (In chip-repl) Using TestEvent trigger
+-   Step 5: (In matter-repl) Using TestEvent trigger
     `eventTrigger=0x0095000000000000` we can generate a test `CurrentPrice` with
     sample data
 
 ```python
-    # Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x0095000000000000
-    await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0095000000000000))
+# Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x0095000000000000
+await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0095000000000000))
 ```
 
--   Step 6: (In chip-repl) Re-Read `CurrentPrice` attribute (see the values have
-    changed)
+-   Step 6: (In matter-repl) Re-Read `CurrentPrice` attribute (see the values
+    have changed)
 
 ```
     await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.CurrentPrice)])
@@ -319,10 +329,10 @@ i.e.
     -   details = 2 (Components ONLY)
     -   details = 3 (Description & Components)
 
--   Step 7: (In chip-repl) Send `GetDetailedPriceRequest()`
+-   Step 7: (In matter-repl) Send `GetDetailedPriceRequest()`
 
 ```
-In [15]: await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedPriceRequest(3))
+await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedPriceRequest(3))
 Out[15]:
 
 GetDetailedPriceResponse(
@@ -350,21 +360,21 @@ GetDetailedPriceResponse(
 )
 ```
 
--   Step 8: (In chip-repl) Using TestEvent trigger
+-   Step 8: (In matter-repl) Using TestEvent trigger
     `eventTrigger=0x0095000000000001` we can generate a test `PriceForecast`
     containing the price values for the next few hours
 
 ```python
-    # Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x0095000000000001
-    await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0095000000000001))
+# Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x0095000000000001
+await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0095000000000001))
 ```
 
--   Step 9: (In chip-repl) Read `PriceForecast` attributes (see the values have
-    changed)
+-   Step 9: (In matter-repl) Read `PriceForecast` attributes (see the values
+    have changed)
 
 ```
-    await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.PriceForecast)])
-    Out[21]:
+await devCtrl.ReadAttribute(200,[(1,chip.clusters.CommodityPrice.Attributes.PriceForecast)])
+Out[21]:
 
     {
     │   1: {
@@ -431,18 +441,18 @@ b0 = Description b1 = Components
 i.e. details = 1 (Description ONLY) details = 2 (Components ONLY) details = 3
 (Description & Components)
 
--   Step 10: (In chip-repl) Send `GetDetailedForecastRequest()`
+-   Step 10: (In matter-repl) Send `GetDetailedForecastRequest()`
 -   Step 10a: First we need to ensure we connect with TCP (only needed once):
 
 ```python
-    dev = await devCtrl.GetConnectedDevice(200, allowPASE=False, timeoutMs=1000, payloadCapability=chip.ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+dev = await devCtrl.GetConnectedDevice(200, allowPASE=False, timeoutMs=1000, payloadCapability=chip.ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 ```
 
 -   Step 10b: Send the `GetDetailedForecastRequest()` command:
 
 ```
-    await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedForecastRequest(3))
-    Out[24]:
+await devCtrl.SendCommand(200, 1, chip.clusters.CommodityPrice.Commands.GetDetailedForecastRequest(3))
+Out[24]:
 
     GetDetailedForecastResponse(
     │   priceForecast=[
@@ -520,11 +530,11 @@ i.e. details = 1 (Description ONLY) details = 2 (Components ONLY) details = 3
 This allows you to get current and forecast electrical grid conditions. This
 assumes you have already commissioned the app (see above).
 
--   Step 1: (In chip-repl) Read `Electrical Grid Conditions` attributes
+-   Step 1: (In matter-repl) Read `Electrical Grid Conditions` attributes
 
 ```
-    # Read from NodeID 200, Endpoint 1, all attributes on ElectricalGridConditions cluster
-    await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions)])
+# Read from NodeID 200, Endpoint 1, all attributes on ElectricalGridConditions cluster
+await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions)])
 Out[2]:
 
 {
@@ -551,46 +561,45 @@ Out[2]:
 │   │   }
 │   }
 }
-
 ```
 
 The response in the default app is a null `CurrentConditions` and an empty
 `ForecastConditions` attribute.
 
--   Step 2: (In chip-repl) Using TestEvent trigger
+-   Step 2: (In matter-repl) Using TestEvent trigger
     `eventTrigger=0x00A0000000000000` we can generate a test `CurrentConditions`
     with sample data
 
 ```python
-    # Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x00A0000000000000
-    await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x00A0000000000000))
+# Send a test event trigger NodeID 200, Endpoint 0, with eventTrigger=0x00A0000000000000
+await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x00A0000000000000))
 ```
 
--   Step 3: (In chip-repl) Re-Read `CurrentConditions` attribute (see the values
-    have changed)
+-   Step 3: (In matter-repl) Re-Read `CurrentConditions` attribute (see the
+    values have changed)
 
 ```
-    await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.CurrentConditions)])
-    Out[7]:
+await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.CurrentConditions)])
+Out[7]:
 
-    {
-    │   1: {
-    │   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
-    │   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 488127616,
-    │   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.CurrentConditions'>: ElectricalGridConditionsStruct(
-    │   │   │   │   periodStart=799154050,
-    │   │   │   │   periodEnd=799155850,
-    │   │   │   │   gridCarbonIntensity=230,
-    │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
-    │   │   │   │   localCarbonIntensity=0,
-    │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kLow: 0>
-    │   │   │   )
-    │   │   }
-    │   }
-    }
+{
+│   1: {
+│   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
+│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 488127616,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.CurrentConditions'>: ElectricalGridConditionsStruct(
+│   │   │   │   periodStart=799154050,
+│   │   │   │   periodEnd=799155850,
+│   │   │   │   gridCarbonIntensity=230,
+│   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
+│   │   │   │   localCarbonIntensity=0,
+│   │   │   │   localCarbonLevel=<ThreeLevelEnum.kLow: 0>
+│   │   │   )
+│   │   }
+│   }
+}
 ```
 
--   Step 4: (In chip-repl) Using TestEvent trigger
+-   Step 4: (In matter-repl) Using TestEvent trigger
     `eventTrigger=0x00A0000000000001` we can generate a test
     `ForecastConditions` with sample data
 
@@ -599,53 +608,53 @@ The response in the default app is a null `CurrentConditions` and an empty
     await devCtrl.SendCommand(200, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x00A0000000000001))
 ```
 
--   Step 5: (In chip-repl) Re-Read `ForecastConditions` attribute (see the
+-   Step 5: (In matter-repl) Re-Read `ForecastConditions` attribute (see the
     values have changed)
 
 ```
-    await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.ForecastConditions)])
-    Out[9]:
+await devCtrl.ReadAttribute(200,[(1, chip.clusters.ElectricalGridConditions.Attributes.ForecastConditions)])
+Out[9]:
 
-    {
-    │   1: {
-    │   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
-    │   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 488127617,
-    │   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.ForecastConditions'>: [
-    │   │   │   │   ElectricalGridConditionsStruct(
-    │   │   │   │   │   periodStart=799154301,
-    │   │   │   │   │   periodEnd=799156100,
-    │   │   │   │   │   gridCarbonIntensity=18,
-    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kLow: 0>,
-    │   │   │   │   │   localCarbonIntensity=18,
-    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kLow: 0>
-    │   │   │   │   ),
-    │   │   │   │   ElectricalGridConditionsStruct(
-    │   │   │   │   │   periodStart=799156101,
-    │   │   │   │   │   periodEnd=799157900,
-    │   │   │   │   │   gridCarbonIntensity=399,
-    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kHigh: 2>,
-    │   │   │   │   │   localCarbonIntensity=399,
-    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kHigh: 2>
-    │   │   │   │   ),
-    │   │   │   │   ElectricalGridConditionsStruct(
-    │   │   │   │   │   periodStart=799157901,
-    │   │   │   │   │   periodEnd=799159700,
-    │   │   │   │   │   gridCarbonIntensity=165,
-    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
-    │   │   │   │   │   localCarbonIntensity=165,
-    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kMedium: 1>
-    │   │   │   │   ),
-    ...
-    │   │   │   │   ElectricalGridConditionsStruct(
-    │   │   │   │   │   periodStart=799238901,
-    │   │   │   │   │   periodEnd=799240700,
-    │   │   │   │   │   gridCarbonIntensity=130,
-    │   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
-    │   │   │   │   │   localCarbonIntensity=130,
-    │   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kMedium: 1>
-    │   │   │   │   )
-    │   │   │   ]
-    │   │   }
-    │   }
-    }
+{
+│   1: {
+│   │   <class 'chip.clusters.Objects.ElectricalGridConditions'>: {
+│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 488127617,
+│   │   │   <class 'chip.clusters.Objects.ElectricalGridConditions.Attributes.ForecastConditions'>: [
+│   │   │   │   ElectricalGridConditionsStruct(
+│   │   │   │   │   periodStart=799154301,
+│   │   │   │   │   periodEnd=799156100,
+│   │   │   │   │   gridCarbonIntensity=18,
+│   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kLow: 0>,
+│   │   │   │   │   localCarbonIntensity=18,
+│   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kLow: 0>
+│   │   │   │   ),
+│   │   │   │   ElectricalGridConditionsStruct(
+│   │   │   │   │   periodStart=799156101,
+│   │   │   │   │   periodEnd=799157900,
+│   │   │   │   │   gridCarbonIntensity=399,
+│   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kHigh: 2>,
+│   │   │   │   │   localCarbonIntensity=399,
+│   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kHigh: 2>
+│   │   │   │   ),
+│   │   │   │   ElectricalGridConditionsStruct(
+│   │   │   │   │   periodStart=799157901,
+│   │   │   │   │   periodEnd=799159700,
+│   │   │   │   │   gridCarbonIntensity=165,
+│   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
+│   │   │   │   │   localCarbonIntensity=165,
+│   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kMedium: 1>
+│   │   │   │   ),
+...
+│   │   │   │   ElectricalGridConditionsStruct(
+│   │   │   │   │   periodStart=799238901,
+│   │   │   │   │   periodEnd=799240700,
+│   │   │   │   │   gridCarbonIntensity=130,
+│   │   │   │   │   gridCarbonLevel=<ThreeLevelEnum.kMedium: 1>,
+│   │   │   │   │   localCarbonIntensity=130,
+│   │   │   │   │   localCarbonLevel=<ThreeLevelEnum.kMedium: 1>
+│   │   │   │   )
+│   │   │   ]
+│   │   }
+│   }
+}
 ```

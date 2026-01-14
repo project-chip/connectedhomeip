@@ -57,7 +57,7 @@ void asr_matter_reset(Reset_t type)
     {
         ConnectivityMgr().ClearWiFiStationProvision();
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else if (type == FACTORY_RESET)
     {
@@ -67,15 +67,15 @@ void asr_matter_reset(Reset_t type)
     {
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
-        commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                   CommissioningWindowAdvertisement::kDnssdOnly);
+        TEMPORARY_RETURN_IGNORED commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                                            CommissioningWindowAdvertisement::kDnssdOnly);
     }
 }
 
 void ShutdownChip()
 {
     Server::GetInstance().Shutdown();
-    PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask();
     PlatformMgr().Shutdown();
 }
 

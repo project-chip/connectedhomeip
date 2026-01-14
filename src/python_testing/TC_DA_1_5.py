@@ -50,7 +50,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
 
@@ -71,7 +73,7 @@ class TC_DA_1_5(MatterBaseTest):
         self.print_step(3, "Send CertificateChainRequest for DAC")
         certtype = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=certtype))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "Certificate request returned incorrect type")
         der_dac = dac_resp.certificate
         # This throws an exception for a non-x509 cert
@@ -99,11 +101,11 @@ class TC_DA_1_5(MatterBaseTest):
         vendor1 = None
         vendor2 = None
         vendor3 = None
-        if 3 in decoded.keys():
+        if 3 in decoded:
             vendor1 = decoded[3]
-        if 4 in decoded.keys():
+        if 4 in decoded:
             vendor2 = decoded[4]
-        if 5 in decoded.keys():
+        if 5 in decoded:
             vendor3 = decoded[5]
 
         # Verify that length of nocsr_elements is <= 900
@@ -187,7 +189,7 @@ class TC_DA_1_5(MatterBaseTest):
 
         self.print_step(13, "Open commissioning window")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(14, "Commission to TH2")
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()

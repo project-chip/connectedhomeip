@@ -32,11 +32,12 @@ declare_args() {
   ota_periodic_query_timeout_sec = 86400
 }
 
+chip_detail_logging = sl_verbose_mode
+
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs9116 && chip_enable_openthread))
 assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 
@@ -111,10 +112,6 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  if (chip_enable_multi_ota_requestor) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
-  }
-
   ldflags = [
     "-Wl,--no-warn-rwx-segment",
     "-fno-lto",
@@ -135,17 +132,14 @@ source_set("efr32-common") {
     ":chip_examples_project_config",
   ]
 
-  # DIC
-  if (enable_dic) {
-    public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  # MATTER_AWS
+  if (enable_matter_aws) {
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws" ]
   }
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
-    ]
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws-sdk-ota" ]
   }
 
   include_dirs = [ "." ]
@@ -191,8 +185,8 @@ source_set("efr32-common") {
   }
 
   if (sl_enable_rgb_led) {
-    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
-    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
+    sources += [ "${silabs_common_plat_dir}/rgb_led/RGBLEDWidget.cpp" ]
+    include_dirs += [ "${silabs_common_plat_dir}/rgb_led" ]
   }
 
   if (chip_build_libshell) {

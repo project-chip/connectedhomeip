@@ -45,9 +45,10 @@ namespace Dnssd {
 static constexpr size_t kDnssdProtocolTextMaxSize = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
 static constexpr size_t kDnssdTypeMaxSize =
     std::max({ sizeof(kCommissionableServiceName), sizeof(kOperationalServiceName), sizeof(kCommissionerServiceName) }) - 1;
-static constexpr uint8_t kDnssdTypeAndProtocolMaxSize     = kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1; // <type>.<protocol>
-static constexpr uint16_t kDnssdTextMaxSize               = 64;
-static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = Common::kSubTypeMaxLength + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
+static constexpr uint8_t kDnssdTypeAndProtocolMaxSize = kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1; // <type>.<protocol>
+static constexpr uint16_t kDnssdTextMaxSize           = 64;
+static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize =
+    Common::kSubTypeMaxLength + /* '.' */ 1 + sizeof(kSubtypeServiceNamePart) + kDnssdTypeAndProtocolMaxSize;
 
 enum class DnssdServiceProtocol : uint8_t
 {

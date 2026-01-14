@@ -19,11 +19,11 @@
 #pragma once
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
@@ -71,8 +71,8 @@ struct AudioStream
     bool IsCompatible(const AudioStreamStruct & inputParams) const
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
-                audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
+                audioStreamParams.channelCount >= inputParams.channelCount &&
+                audioStreamParams.sampleRate >= inputParams.sampleRate && audioStreamParams.bitDepth >= inputParams.bitDepth);
     }
 };
 
@@ -83,10 +83,12 @@ struct SnapshotStream
     void * snapshotContext; // Platform-specific context object associated with
                             // snapshot stream;
 
-    bool IsCompatible(const SnapshotStreamStruct & inputParams) const
+    bool
+    IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs &
+                     inputParams) const
     {
-        return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
-                snapshotStreamParams.frameRate == inputParams.frameRate &&
+        return (snapshotStreamParams.imageCodec == inputParams.imageCodec &&
+                snapshotStreamParams.frameRate <= inputParams.maxFrameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
@@ -123,14 +125,19 @@ public:
     // Getter for WebRTCProvider Delegate
     virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 
+    // Set the WebRTC Transport Provider server instance
+    virtual void
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) = 0;
+
     // Getter for CameraAVStreamManagement Delegate
-    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() = 0;
 
     // Getter for CameraAVStreamManagement Controller
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
-    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
+    GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
 
     // Getter for ZoneManagement Delegate
     virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;
@@ -166,7 +173,7 @@ public:
         virtual CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                             const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot) = 0;
         // Start video stream
-        virtual CameraError StartVideoStream(uint16_t streamID) = 0;
+        virtual CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) = 0;
 
         // Stop video stream
         virtual CameraError StopVideoStream(uint16_t streamID) = 0;
@@ -176,6 +183,12 @@ public:
 
         // Stop audio stream
         virtual CameraError StopAudioStream(uint16_t streamID) = 0;
+
+        // Allocate snapshot stream
+        virtual CameraError AllocateSnapshotStream(
+            const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs &
+                args,
+            uint16_t & outStreamID) = 0;
 
         // Start snapshot stream
         virtual CameraError StartSnapshotStream(uint16_t streamID) = 0;
@@ -235,7 +248,7 @@ public:
         // Get snapshot capabilities
         virtual std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() = 0;
 
-        // Get the maximum network bandwidth(mbps) that the camera would consume
+        // Get the maximum network bandwidth(bps) that the camera would consume
         // for transmission of its media streams.
         virtual uint32_t GetMaxNetworkBandwidth() = 0;
 
@@ -252,9 +265,9 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get stream usage priorities as an ordered list. This is expected to
-        // be a subset of the SupportedStreamUsages.
-        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
+        // Get/Set stream usage priorities as an ordered list. This is a subset of the SupportedStreamUsages.
+        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities()                                = 0;
+        virtual CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) = 0;
 
         // Get/Set soft recording privacy mode
         virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
@@ -267,8 +280,9 @@ public:
         // Does camera have a hard privacy switch
         virtual bool HasHardPrivacySwitch() = 0;
 
-        // Get whether hard privacy mode is on
-        virtual bool GetHardPrivacyMode() = 0;
+        // Get/Set hard privacy mode
+        virtual CameraError SetHardPrivacyMode(bool hardPrivacyMode) = 0;
+        virtual bool GetHardPrivacyMode()                            = 0;
 
         // Get/Set night vision
         virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;
@@ -340,9 +354,11 @@ public:
         virtual bool GetStatusLightEnabled()                               = 0;
 
         // Set Pan, Tilt, and Zoom
-        virtual CameraError SetPan(int16_t aPan)   = 0;
-        virtual CameraError SetTilt(int16_t aTilt) = 0;
-        virtual CameraError SetZoom(uint8_t aZoom) = 0;
+        virtual CameraError SetPan(int16_t aPan)                          = 0;
+        virtual CameraError SetTilt(int16_t aTilt)                        = 0;
+        virtual CameraError SetZoom(uint8_t aZoom)                        = 0;
+        virtual CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt,
+                                           chip::Optional<uint8_t> aZoom) = 0;
 
         // Get device defined limits for Pan, Tilt, and Zoom
         virtual int16_t GetPanMin()  = 0;
@@ -373,7 +389,7 @@ public:
         UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
 
         // Remove a zone trigger
-        virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
+        virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
 
         class ZoneEventCallback
         {

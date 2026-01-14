@@ -22,12 +22,16 @@
 #include "RpcClientProcessor.h"
 #include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 
+#include <app/CommandSender.h>
 #include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <controller/InvokeInteraction.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/dnssd/Advertiser.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -40,10 +44,11 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 using namespace chip::Credentials;
 
-using JCMDeviceCommissioner     = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationStage = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo  = chip::Controller::JCM::TrustVerificationInfo;
+using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationStateMachine = chip::Credentials::JCM::TrustVerificationStateMachine;
+using JCMTrustVerificationStage        = chip::Credentials::JCM::TrustVerificationStage;
+using JCMTrustVerificationError        = chip::Credentials::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo         = chip::Credentials::JCM::TrustVerificationInfo;
 
 NodeId PairingCommand::GetAnchorNodeId()
 {
@@ -68,7 +73,7 @@ CHIP_ERROR PairingCommand::SetAnchorNodeId(NodeId value)
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
-    chip::Controller::JCM::DeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
+    JCMDeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
 
@@ -281,7 +286,8 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
+                                                            sizeof(mRandomGeneratedICDSymmetricKey));
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -654,7 +660,7 @@ void OnGetStreamOnNext(const RequestOptions & requestOptions)
 
     if (options)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(GenerateReplyWork, reinterpret_cast<intptr_t>(options));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenerateReplyWork, reinterpret_cast<intptr_t>(options));
     }
 }
 
@@ -679,7 +685,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         if (!mSkipCommissioningComplete.ValueOr(false))
         {
             ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
-            SetAnchorNodeId(nodeId);
+            TEMPORARY_RETURN_IGNORED SetAnchorNodeId(nodeId);
 
             _pw_protobuf_Empty request;
 
@@ -719,10 +725,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             memcpy(request.trustedIcacPublicKeyB.bytes, adminICACPKSpan.data(), adminICACPKSpan.size());
             request.trustedIcacPublicKeyB.size = Crypto::kP256_PublicKey_Length;
 
-            for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
-            {
-                ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i, request.trustedIcacPublicKeyB.bytes[i]);
-            }
+            request.peerAdminJFAdminClusterEndpointId = info.adminEndpointId;
 
             auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
@@ -794,8 +797,9 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.check_in_node     = ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
@@ -910,22 +914,29 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     }
 }
 
-void PairingCommand::OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage,
+void PairingCommand::OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage,
                                       JCMTrustVerificationInfo & info, JCMTrustVerificationError error)
 {
+    mRemoteAdminTrustedRoot = info.adminRCAC.Span();
     ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
 }
 
-void PairingCommand::OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
+void PairingCommand::OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
 
-    commissioner.ContinueAfterUserConsent(true);
+    stateMachine.ContinueAfterUserConsent(true);
 }
 
-void PairingCommand::OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
+// TODO: Complete DCL lookup implementation
+CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                          ByteSpan & globallyTrustedRootSpan)
 {
-    ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    commissioner.ContinueAfterVendorIDVerification(true);
+    // Perform DCL Lookup https://zigbee-alliance.github.io/distributed-compliance-ledger/#/Query/NocCertificatesByVidAndSkid
+    // temporarily return the already known remote admin trusted root certificate
+    globallyTrustedRootSpan = mRemoteAdminTrustedRoot;
+
+    return err;
 }

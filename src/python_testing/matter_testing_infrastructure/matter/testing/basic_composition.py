@@ -31,11 +31,14 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.tlv
-from matter.ChipDeviceCtrl import ChipDeviceController, TLVJsonConverter
+from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
+from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
-from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
+from matter.testing.matter_testing import MatterBaseTest, MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -86,7 +89,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
         if isinstance(value, bytes):
             return base64.b64encode(value).decode("UTF-8")
-        elif isinstance(value, list):
+        if isinstance(value, list):
             value = [ConvertValue(item) for item in value]
         elif isinstance(value, dict):
             value = MatterTlvToJson(value)
@@ -133,7 +136,11 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
         return converter.convert_dump_to_cache(json_tlv)
 
 
+<<<<<<< HEAD
 class BasicCompositionTests:
+=======
+class BasicCompositionTests(MatterBaseTest):
+>>>>>>> upstream/master
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
@@ -146,25 +153,13 @@ class BasicCompositionTests:
     xml_clusters: dict[int, Any]
     xml_device_types: dict[int, Any]
 
-    def get_code(self, dev_ctrl):
-        created_codes = []
-        for idx, discriminator in enumerate(self.matter_test_config.discriminators):
-            created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
-
-        setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
-        if not setup_codes:
-            return None
-        asserts.assert_equal(len(setup_codes), 1,
-                             "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
-        return setup_codes[0]
-
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
             Returns the json and txt as strings.
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
         json_dump_string = json.dumps(node_dump_dict, indent=2)
-        logging.debug(f"Raw TLV contents of Node: {json_dump_string}")
+        LOGGER.debug(f"Raw TLV contents of Node: {json_dump_string}")
 
         if dump_device_composition_path is not None:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
@@ -179,9 +174,15 @@ class BasicCompositionTests:
         self.test_from_file = self.user_params.get("test_from_file", None)
 
         def log_test_start():
+<<<<<<< HEAD
             logging.info("###########################################################")
             logging.info("Start of actual tests")
             logging.info("###########################################################")
+=======
+            LOGGER.info("###########################################################")
+            LOGGER.info("Start of actual tests")
+            LOGGER.info("###########################################################")
+>>>>>>> upstream/master
 
         if self.test_from_file:
             cache = JsonToMatterTlv(self.test_from_file)
@@ -195,12 +196,11 @@ class BasicCompositionTests:
         node_id = self.dut_node_id
 
         task_list = []
-        if allow_pase and self.get_code(dev_ctrl):
-            setup_code = self.get_code(dev_ctrl)
-            pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
+        if allow_pase and self.first_setup_code:
+            pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
 
-        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
         task_list.append(asyncio.create_task(case_future))
 
         for task in task_list:
@@ -256,7 +256,7 @@ class BasicCompositionTests:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
             # For now, assume we're looking at a 1.2 device (this is as close as we can get before the 1.1 and 1.0 DM files are populated)
-            logging.info("No specification version attribute found in the Basic Information cluster - assuming 1.2 as closest match")
+            LOGGER.info("No specification version attribute found in the Basic Information cluster - assuming 1.2 as closest match")
             return PrebuiltDataModelDirectory.k1_2
         try:
             dm = dm_from_spec_version(spec_version)
@@ -269,9 +269,9 @@ class BasicCompositionTests:
 
     def build_spec_xmls(self):
         dm = self._get_dm()
-        logging.info("----------------------------------------------------------------------------------")
-        logging.info(f"-- Running tests against Specification version {dm.dirname}")
-        logging.info("----------------------------------------------------------------------------------")
+        LOGGER.info("----------------------------------------------------------------------------------")
+        LOGGER.info(f"-- Running tests against Specification version {dm.dirname}")
+        LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)

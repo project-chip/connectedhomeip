@@ -268,7 +268,8 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                               reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }

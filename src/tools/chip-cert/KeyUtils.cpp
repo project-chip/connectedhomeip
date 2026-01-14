@@ -181,7 +181,7 @@ bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
                             kP256_PrivateKey_Length,
                         false);
 
-    serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
+    TEMPORARY_RETURN_IGNORED serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
 
     return true;
 }

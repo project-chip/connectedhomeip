@@ -263,5 +263,5 @@ void emberAfActionsClusterInitCallback(EndpointId endpoint)
 
     gLinuxActionsDelegateImpl.SetEndpointId(endpoint);
     sActionsServer = std::make_unique<Actions::ActionsServer>(endpoint, gLinuxActionsDelegateImpl);
-    sActionsServer->Init();
+    TEMPORARY_RETURN_IGNORED sActionsServer->Init();
 }

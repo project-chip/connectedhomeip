@@ -19,6 +19,7 @@
 #include <AppMain.h>
 #include <EnergyManagementAppCmdLineOptions.h>
 #include <EnergyManagementAppCommonMain.h>
+#include <Identify.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/BitMask.h>
@@ -108,6 +109,7 @@ static uint32_t ParseNumber(const char * pString)
 void ApplicationInit()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
+    SuccessOrDie(IdentifyInit());
     if (strcmp(spApp, kEvseApp) == 0)
     {
         // Disable Water Heater Endpoint

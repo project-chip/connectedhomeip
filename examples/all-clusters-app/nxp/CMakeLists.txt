@@ -105,5 +105,6 @@ else()
     chip_configure_data_model(app
         INCLUDE_SERVER
         ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/all-clusters-app.zap
+        ZCL_PATH ${CHIP_ROOT}/src/app/zap-templates/zcl/zcl-with-test-extensions.json
     )
 endif()

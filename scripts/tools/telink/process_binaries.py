@@ -133,9 +133,11 @@ if build_conf.getboolean('CONFIG_SOC_RISCV_TELINK_W91'):
 
 # Merge MCUBoot binary if configured
 if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
-    merge_binaries('mcuboot.bin', 'zephyr.signed.bin', 'merged.bin', build_conf['CONFIG_FLASH_LOAD_OFFSET'])
+    zephyr_image_name = 'zephyr.signed.bin'
+    merge_binaries('mcuboot.bin', zephyr_image_name, 'merged.bin', build_conf['CONFIG_FLASH_LOAD_OFFSET'])
+
     if build_conf.getboolean('CONFIG_COMPRESS_LZMA'):
-        compress_lzma_firmware('zephyr.signed.bin', 'zephyr.signed.lzma.bin')
+        compress_lzma_firmware(zephyr_image_name, 'zephyr.signed.lzma.bin')
 
         sign_command = [
             'python3',
@@ -153,8 +155,31 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
 
         try:
             subprocess.run(sign_command, check=True)
+            zephyr_image_name = build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME']
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Error signing the image: {e}")
+
+    if build_conf.getboolean('CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD'):
+        dfu_output_name = 'merged_dfu.bin'
+        if build_conf.getboolean('CONFIG_COMPRESS_LZMA'):
+            dfu_output_name = 'merged_dfu.lzma.bin'
+
+        if os.path.exists('dfu.data'):
+            print("Start preparing image for DFU over BLE SMP")
+            with open(dfu_output_name, "wb") as output:
+                with open(zephyr_image_name, "rb") as input1:
+                    output.write(input1.read())
+                    print(f"{zephyr_image_name} is written to {dfu_output_name}")
+
+                footer_size = os.path.getsize('dfu.data')
+                output.write(footer_size.to_bytes(1, 'little'))
+
+                with open('dfu.data', "rb") as input2:
+                    output.write(input2.read())
+                    print(f"Image footer is written to {dfu_output_name}")
+
+                print("Image for DFU over BLE SMP is ready!")
+                os.remove('empty.txt')
 
     if build_conf.getboolean('CONFIG_TELINK_OTA_BUTTON_TEST'):
         merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'],

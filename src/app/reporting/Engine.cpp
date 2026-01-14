@@ -550,7 +550,7 @@ exit:
     //
     if (err == CHIP_NO_ERROR)
     {
-        attributeReportIBs.GetWriter()->UnreserveBuffer(kReservedSizeEndOfReportIBs);
+        TEMPORARY_RETURN_IGNORED attributeReportIBs.GetWriter()->UnreserveBuffer(kReservedSizeEndOfReportIBs);
 
         err = attributeReportIBs.EndOfAttributeReportIBs();
 
@@ -767,13 +767,14 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     reportDataWriter.Init(std::move(bufHandle));
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    reportDataWriter.ReserveBuffer(mReservedSize);
+    SuccessOrExit(err = reportDataWriter.ReserveBuffer(mReservedSize));
 #endif
 
     // Always limit the size of the generated packet to fit within the max size returned by the ReadHandler regardless
     // of the available buffer capacity.
     // Also, we need to reserve some extra space for the MIC field.
-    reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    SuccessOrExit(
+        err = reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES)));
 
     // Create a report data.
     err = reportDataBuilder.Init(&reportDataWriter);
@@ -836,21 +837,19 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.SuppressResponse(true);
     }
 
-    reportDataBuilder.EndOfReportDataMessage();
-
     //
     // Since we've already reserved space for both the MoreChunked/SuppressResponse flags, as well as
     // the end-of-container flag for the end of the report, we should never hit an error closing out the message.
     //
-    VerifyOrDie(reportDataBuilder.GetError() == CHIP_NO_ERROR);
+    SuccessOrDie(reportDataBuilder.EndOfReportDataMessage());
 
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);
 
     ChipLogDetail(DataManagement, "<RE> Sending report (payload has %" PRIu32 " bytes)...", reportDataWriter.GetLengthWritten());
     err = SendReport(apReadHandler, std::move(bufHandle), hasMoreChunks);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err.Format()));
+    SuccessOrExitAction(
+        err, ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err.Format()));
 
     ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
                   mCurReadHandlerIdx, hasMoreChunks ? "more messages" : "no more messages");
@@ -1158,7 +1157,7 @@ void Engine::OnReportConfirm()
     {
         // We could have other things waiting to go now that this report is no
         // longer in flight.
-        ScheduleRun();
+        TEMPORARY_RETURN_IGNORED ScheduleRun();
     }
     mNumReportsInFlight--;
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);

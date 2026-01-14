@@ -83,7 +83,6 @@ buildconfig_header("system_buildconfig") {
   config_device_layer = chip_device_platform != "none"
   chip_system_config_posix_locking = chip_system_config_locking == "posix"
   chip_system_config_freertos_locking = chip_system_config_locking == "freertos"
-  chip_system_config_mbed_locking = chip_system_config_locking == "mbed"
   chip_system_config_cmsis_rtos_locking =
       chip_system_config_locking == "cmsis-rtos"
   chip_system_config_zephyr_locking = chip_system_config_locking == "zephyr"
@@ -104,7 +103,6 @@ buildconfig_header("system_buildconfig") {
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=${chip_system_config_use_network_framework}",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
     "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
-    "CHIP_SYSTEM_CONFIG_MBED_LOCKING=${chip_system_config_mbed_locking}",
     "CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING=${chip_system_config_cmsis_rtos_locking}",
     "CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING=${chip_system_config_zephyr_locking}",
     "CHIP_SYSTEM_CONFIG_NO_LOCKING=${chip_system_config_no_locking}",
@@ -220,6 +218,7 @@ static_library("system") {
 
   sources = [
     "PlatformEventSupport.h",
+    "RAIIMockClock.h",
     "SystemAlignSize.h",
     "SystemClock.cpp",
     "SystemClock.h",
@@ -241,8 +240,6 @@ static_library("system") {
     "TLVPacketBufferBackingStore.cpp",
     "TLVPacketBufferBackingStore.h",
     "TimeSource.h",
-    "WakeEvent.cpp",
-    "WakeEvent.h",
   ]
 
   if (chip_system_layer_impl_config_file == "") {
@@ -267,6 +264,13 @@ static_library("system") {
         "SystemLayerImpl${chip_system_config_event_loop}.h",
       ]
     }
+  }
+
+  if (chip_system_config_event_loop == "Select") {
+    sources += [
+      "WakeEvent.cpp",
+      "WakeEvent.h",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

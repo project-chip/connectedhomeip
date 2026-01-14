@@ -135,8 +135,8 @@ ChefResourceMonitorInstance::ExternalAttributeWrite(const EmberAfAttributeMetada
         uint32_t newValue = 0;
         chip::TLV::TLVReader tlvReader;
         tlvReader.Init(buffer + sizeof(uint16_t), tlvLen);
-        tlvReader.Next();
-        tlvReader.Get(newValue);
+        TEMPORARY_RETURN_IGNORED tlvReader.Next();
+        TEMPORARY_RETURN_IGNORED tlvReader.Get(newValue);
         DataModel::Nullable<uint32_t> newLastChangedTime = DataModel::MakeNullable(newValue);
         ret                                              = UpdateLastChangedTime(newLastChangedTime);
     }
@@ -162,7 +162,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
         gActivatedCarbonFilterDelegate.get(), endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.Raw()), ResourceMonitoring::DegradationDirectionEnum::kDown,
         bResetConditionCommandSupported);
-    gActivatedCarbonFilterInstance->Init();
+    TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
 }
 
 chip::Protocols::InteractionModel::Status
@@ -271,7 +271,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance                  = std::make_unique<ResourceMonitoring::ChefResourceMonitorInstance>(
         gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.Raw()),
         ResourceMonitoring::DegradationDirectionEnum::kDown, bResetConditionCommandSupported);
-    gHepaFilterInstance->Init();
+    TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();
 }
 
 CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
@@ -285,23 +285,23 @@ CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct
     {
     case 0:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
         break;
     case 1:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
         break;
     case 2:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
         break;
     case 3:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
         break;
     case 4:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
         break;
     default:
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;

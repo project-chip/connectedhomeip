@@ -88,7 +88,7 @@ menu "Platform Diagnostics"
 
     config END_USER_BUFFER_SIZE
         int "Set buffer size for end user diagnostic data"
-        depends on ENABLE_ESP_DIAGNOSTICS_TRACE
+        depends on ENABLE_ESP_DIAGNOSTICS
         default 4096
         help
             Defines the buffer size (in bytes) for storing diagnostic data related to end user activity.
@@ -96,7 +96,7 @@ menu "Platform Diagnostics"
 
     config RETRIEVAL_BUFFER_SIZE
         int "Set buffer size for retrieval of diagnostics from diagnostic storage"
-        depends on ENABLE_ESP_DIAGNOSTICS_TRACE
+        depends on ENABLE_ESP_DIAGNOSTICS
         default 4096
         help
             Defines the buffer size (in bytes) for retrieval of diagnostic data.

@@ -29,9 +29,6 @@ config("openthread_mcxw71_config") {
   defines = [
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
     "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
-    "MBEDTLS_ENTROPY_HARDWARE_ALT=1",
-    "MBEDTLS_THREADING_C=1",
-    "MBEDTLS_THREADING_ALT=1",
   ]
 
   if (chip_mdns == "platform") {

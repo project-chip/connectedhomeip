@@ -16,23 +16,16 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PushAvStreamTransportClusterPushTransportEndEvent(
-  val connectionID: UShort,
-  val triggerType: UByte,
-  val activationReason: Optional<UByte>,
-) {
+class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UShort) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
     append("\tconnectionID : $connectionID\n")
-    append("\ttriggerType : $triggerType\n")
-    append("\tactivationReason : $activationReason\n")
     append("}\n")
   }
 
@@ -40,19 +33,12 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CONNECTION_ID), connectionID)
-      put(ContextSpecificTag(TAG_TRIGGER_TYPE), triggerType)
-      if (activationReason.isPresent) {
-        val optactivationReason = activationReason.get()
-        put(ContextSpecificTag(TAG_ACTIVATION_REASON), optactivationReason)
-      }
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_CONNECTION_ID = 0
-    private const val TAG_TRIGGER_TYPE = 1
-    private const val TAG_ACTIVATION_REASON = 2
 
     fun fromTlv(
       tlvTag: Tag,
@@ -60,21 +46,10 @@ class PushAvStreamTransportClusterPushTransportEndEvent(
     ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
-      val triggerType = tlvReader.getUByte(ContextSpecificTag(TAG_TRIGGER_TYPE))
-      val activationReason =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACTIVATION_REASON))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ACTIVATION_REASON)))
-        } else {
-          Optional.empty()
-        }
 
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterPushTransportEndEvent(
-        connectionID,
-        triggerType,
-        activationReason,
-      )
+      return PushAvStreamTransportClusterPushTransportEndEvent(connectionID)
     }
   }
 }

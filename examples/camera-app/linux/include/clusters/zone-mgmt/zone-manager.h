@@ -89,6 +89,7 @@ private:
         uint32_t prevTriggerDetectedDuration = 0;
         TriggerState triggerState            = TriggerState::Idle;
         uint16_t triggerCount                = 0;
+        uint16_t remainingBlindDuration      = 0;
         ZoneTriggerControlStruct triggerCtrl;
     };
 

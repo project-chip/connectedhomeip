@@ -294,7 +294,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReadRequestMessage::Builder request;
     System::PacketBufferTLVWriter writer;
 
-    InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
+    TEMPORARY_RETURN_IGNORED InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
     ReturnErrorOnFailure(request.Init(&writer));
 
     if (!attributePaths.empty())
@@ -569,7 +569,7 @@ exit:
         {
             status = Status::InvalidSubscription;
         }
-        StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
@@ -607,7 +607,7 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
             status = Status::InvalidAction;
         }
 
-        StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
         Close(err);
     }
 }
@@ -628,7 +628,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     if (aReportType != ReportType::kUnsolicited)
     {
-        report.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED report.PrettyPrint();
     }
 #endif
 
@@ -1102,7 +1102,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    subscribeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED subscribeResponse.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;
@@ -1209,7 +1209,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
     SubscribeRequestMessage::Builder request;
-    InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
+    TEMPORARY_RETURN_IGNORED InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
 
     ReturnErrorOnFailure(request.Init(&writer));
 

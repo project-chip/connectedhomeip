@@ -102,8 +102,8 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
         idOptions->LogDetail();
     }
 
-    MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
-    MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
+    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
+    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
 
     // jCommissionerDeclarationCallback is optional
     if (jCommissionerDeclarationCallback == nullptr)
@@ -114,7 +114,8 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     }
     else
     {
-        MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(env, jCommissionerDeclarationCallback);
+        TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(
+            env, jCommissionerDeclarationCallback);
     }
 
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
@@ -163,6 +164,19 @@ JNI_METHOD(void, disconnect)
                    ChipLogError(AppServer, "MatterCastingPlayer-JNI::disconnect() castingPlayer == nullptr"));
 
     castingPlayer->Disconnect();
+}
+
+JNI_METHOD(void, removeFabric)
+(JNIEnv * env, jobject thiz)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::removeFabric()");
+
+    core::CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturn(castingPlayer != nullptr,
+                   ChipLogError(AppServer, "MatterCastingPlayer-JNI::removeFabric() castingPlayer == nullptr"));
+
+    castingPlayer->RemoveFabric();
 }
 
 JNI_METHOD(jstring, getConnectionStateNative)
@@ -216,13 +230,13 @@ JNI_METHOD(jobject, getEndpoints)
 
     const std::vector<memory::Strong<Endpoint>> endpoints = castingPlayer->GetEndpoints();
     jobject jEndpointList                                 = nullptr;
-    chip::JniReferences::GetInstance().CreateArrayList(jEndpointList);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(jEndpointList);
     for (memory::Strong<Endpoint> endpoint : endpoints)
     {
         jobject matterEndpointJavaObject = support::convertEndpointFromCppToJava(endpoint);
         VerifyOrReturnValue(matterEndpointJavaObject != nullptr, jEndpointList,
                             ChipLogError(AppServer, "MatterCastingPlayer-JNI::getEndpoints(): Could not create Endpoint jobject"));
-        chip::JniReferences::GetInstance().AddToList(jEndpointList, matterEndpointJavaObject);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(jEndpointList, matterEndpointJavaObject);
     }
     return jEndpointList;
 }

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster LocalizationConfiguration (cluster code: 43/0x042B)
+// Identifier constant values for cluster LocalizationConfiguration (cluster code: 43/0x002B)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

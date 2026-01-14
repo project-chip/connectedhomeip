@@ -304,6 +304,7 @@ if [ "$GENERATE_XML" == true ]; then
         --exclude=".*testing/.*" \
         --include=src/ \
         --gcov-ignore-parse-errors \
+        --merge-mode-functions=merge-use-line-min \
         --xml="$COVERAGE_ROOT"/coverage.xml
 
     XML_INDEX=$(_abspath "$COVERAGE_ROOT/coverage.xml")

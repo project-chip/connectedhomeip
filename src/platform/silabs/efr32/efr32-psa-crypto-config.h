@@ -18,12 +18,12 @@
 
 #pragma once
 
-// DIC Specific Configurations
-#ifdef DIC_ENABLE
+// MATTER AWS Specific Configurations
+#ifdef SL_MATTER_ENABLE_AWS
 #define PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
 #define PSA_WANT_ALG_CBC_NO_PADDING
 #define PSA_WANT_ALG_RSA_PKCS1V15_SIGN
-#endif // DIC_ENABLE
+#endif // SL_MATTER_ENABLE_AWS
 
 // Configurations necessary for ot coap cert libs
 #if SL_USE_COAP_CONFIG

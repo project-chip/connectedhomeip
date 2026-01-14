@@ -48,7 +48,7 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(DeviceLayer, "ChipFabricProvider JNI_OnLoad() called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/appserver/ChipFabricProvider");
@@ -101,7 +101,7 @@ CHIP_ERROR ReadFabricList(JNIEnv * env, jobject & self)
         UtfString jLabelStr(env, fabricInfo.GetFabricLabel());
         env->SetObjectField(jFabric, jlabel, jLabelStr.jniValue());
 
-        JniReferences::GetInstance().AddToList(self, jFabric);
+        TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().AddToList(self, jFabric);
     }
 
 exit:
@@ -117,7 +117,7 @@ JNI_METHOD(jint, getFabricCount)(JNIEnv * env, jobject self)
 JNI_METHOD(jobject, getFabricList)(JNIEnv * env, jobject self)
 {
     jobject jFabricList;
-    JniReferences::GetInstance().CreateArrayList(jFabricList);
-    ReadFabricList(env, jFabricList);
+    TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().CreateArrayList(jFabricList);
+    TEMPORARY_RETURN_IGNORED ReadFabricList(env, jFabricList);
     return jFabricList;
 }

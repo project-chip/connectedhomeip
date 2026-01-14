@@ -212,4 +212,10 @@ menu "Energy Gateway Example App Configuration"
         help
             Enable test triggers used by the Commodity Metering tests
 
+    config CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+        bool "Enable SETRF (CommodityTariff) triggers"
+        default "n"
+        help
+            Enable test triggers used by the Commodity Tariff tests
+
 endmenu

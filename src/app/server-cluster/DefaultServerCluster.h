@@ -39,7 +39,13 @@ namespace app {
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster(const ConcreteClusterPath & path);
+    DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
+
+    constexpr DefaultServerCluster(ConcreteClusterPath && path) :
+        mPath(std::move(path)),
+        mDataVersion(0) // data version will be initialized in startup, however constexpr requires initialization
+    {}
+
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
@@ -50,7 +56,7 @@ public:
     ///
     /// Call Shutdown to de-initialize the object.
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType) override;
 
     [[nodiscard]] Span<const ConcreteClusterPath> GetPaths() const override { return { &mPath, 1 }; }
 

@@ -223,7 +223,7 @@ void Engine::RunMainLoop()
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
         ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE);
 #if CONFIG_DEVICE_LAYER
-        DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
 #else
         ProcessShellLine(reinterpret_cast<intptr_t>(line));
 #endif

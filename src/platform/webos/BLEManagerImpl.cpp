@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,28 +21,33 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for webOS platforms.
  */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/Ble.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <new>
-#include <platform/CommissionableDataProvider.h>
-#include <platform/internal/BLEManager.h>
+/**
+ * Note: BLEManager requires ConnectivityManager to be defined beforehand,
+ *       otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
+
+/**
+ * Note: Use public include for BLEManager which includes our local
+ *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
+#include "platform/internal/BLEManager.h"
 
 #include <cassert>
-#include <iomanip>
-#include <string>
 #include <type_traits>
 #include <utility>
 
-#include "MainLoop.h"
-#include <pbnjson.h>
-#include <pbnjson.hpp>
+#include <ble/Ble.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 
-using namespace pbnjson;
+#include "wbs/WbsConnection.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/DeviceControlServer.h>
+#endif
 
 using namespace ::nl;
 using namespace ::chip::Ble;
@@ -53,45 +58,28 @@ namespace Internal {
 
 namespace {
 
-static constexpr unsigned kNewConnectionScanTimeoutMs   = 10000;
-static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+    System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+// The CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS specifies the transition time
+// starting from advertisement commencement. Since the extended advertisement timer is started after
+// the fast-to-slow transition, we have to subtract the time spent in fast advertising.
+static constexpr System::Clock::Timeout kSlowAdvertiseTimeout = System::Clock::Milliseconds32(
+    CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS >=
+                  CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME,
+              "The extended advertising interval change time must be greater than the fast advertising interval change time");
+#endif
 
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-void BLEManagerImpl::InitConnectionData()
-{
-    /* Initialize Hashmap */
-    if (!mConnectionMap)
-    {
-        mConnectionMap = g_hash_table_new(g_str_hash, g_str_equal);
-        ChipLogProgress(DeviceLayer, "GATT Connection HashMap created");
-    }
-}
-
-gboolean BLEManagerImpl::_BleInitialize(void * userData)
-{
-    if (sInstance.mFlags.Has(Flags::kWebOSBLELayerInitialized))
-    {
-        ChipLogProgress(DeviceLayer, "BLE Already Initialized");
-        return true;
-    }
-
-    sInstance.InitConnectionData();
-
-    // Should add BT callback
-
-    sInstance.mFlags.Set(Flags::kWebOSBLELayerInitialized);
-    ChipLogProgress(DeviceLayer, "BLE Initialized");
-    sInstance.mMainContext = g_main_context_get_thread_default();
-    return true;
-}
-
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    bool ret;
 
     err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
@@ -102,13 +90,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
-    ret = MainLoop::Instance().Init(_BleInitialize);
-    VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);
-
-    ret = MainLoop::Instance().StartLSMainLoop();
-    VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);
-
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 
 exit:
     return err;
@@ -116,8 +98,15 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    // ensure scan resources are cleared (e.g. timeout timers)
-    mDeviceScanner.reset();
+    // Make sure that timers are stopped before shutting down the BLE layer.
+    DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
+
+    mDeviceScanner.Shutdown();
+    // Release BLE connection resources
+    // ShutdownWbsLayer(mEndpoint);
+    mFlags.Clear(Flags::kWBSManagerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -129,7 +118,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
         mFlags.Set(Flags::kAdvertisingEnabled, val);
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 
     return err;
 }
@@ -148,7 +137,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
     return CHIP_NO_ERROR;
 }
 
@@ -196,20 +185,9 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mIsCentral     = aIsCentral;
-
-    return err;
-}
-
-CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    mAdapterId = aAdapterId;
+    mIsCentral = aIsCentral;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -219,8 +197,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe:
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         {
-            ChipDeviceEvent connectionEvent;
-            connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
+            ChipDeviceEvent connectionEvent{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
             PlatformMgr().PostEventOrDie(&connectionEvent);
         }
         break;
@@ -255,11 +232,38 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    bool controlOpComplete = false;
-    ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
+    case DeviceEventType::kPlatformWebOSBLEAdapterAdded:
+        ChipLogDetail(DeviceLayer, "BLE adapter added: id=%u address=%s", apEvent->Platform.BLEAdapter.mAdapterId,
+                      apEvent->Platform.BLEAdapter.mAdapterAddress);
+        if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
+        {
+            mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+            DriveBLEState();
+        }
+        break;
+    case DeviceEventType::kPlatformWebOSBLEAdapterRemoved:
+        ChipLogDetail(DeviceLayer, "BLE adapter removed: id=%u address=%s", apEvent->Platform.BLEAdapter.mAdapterId,
+                      apEvent->Platform.BLEAdapter.mAdapterAddress);
+        if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
+        {
+            // Shutdown all BLE operations and release resources
+            mDeviceScanner.Shutdown();
+            // mEndpoint->Shutdown();
+            //  Clear all flags related to WBS BLE operations
+            mFlags.Clear(Flags::kWBSAdapterAvailable);
+            mFlags.Clear(Flags::kWBSBLELayerInitialized);
+            mFlags.Clear(Flags::kAdvertisingConfigured);
+            mFlags.Clear(Flags::kAppRegistered);
+            mFlags.Clear(Flags::kAdvertising);
+            CleanScanConfig();
+            // Indicate that the adapter is no longer available
+            err = BLE_ERROR_ADAPTER_UNAVAILABLE;
+        }
+        break;
     case DeviceEventType::kPlatformWebOSBLECentralConnected:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
@@ -290,38 +294,39 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
-    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvConfiguredComplete:
-        VerifyOrExit(apEvent->Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        sInstance.mFlags.Set(Flags::kAdvertisingConfigured).Clear(Flags::kControlOpInProgress);
-        controlOpComplete = true;
-        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising config complete");
-        break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete:
-        VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
-
-        if (!sInstance.mFlags.Has(Flags::kAdvertising))
+        SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStartComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        // Do not restart the timer if it is still active. This is to avoid the timer from being restarted
+        // if the advertising is stopped due to a premature release.
+        if (!DeviceLayer::SystemLayer().IsTimerActive(HandleAdvertisingTimer, this))
         {
-            sInstance.mFlags.Set(Flags::kAdvertising);
+            // Start a timer to make sure that the fast advertising is stopped after specified timeout.
+            SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
         }
-
+        mFlags.Set(Flags::kAdvertising);
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete:
-        VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStopComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
-
+        SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStopComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         // Transition to the not Advertising state...
-        if (sInstance.mFlags.Has(Flags::kAdvertising))
+        if (mFlags.Has(Flags::kAdvertising))
         {
-            sInstance.mFlags.Clear(Flags::kAdvertising);
+            mFlags.Clear(Flags::kAdvertising);
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
         }
         break;
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvReleased:
+        // If the advertising was stopped due to a premature release, check if it needs to be restarted.
+        mFlags.Clear(Flags::kAdvertising);
+        DriveBLEState();
+        break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete:
-        VerifyOrExit(apEvent->Platform.BLEPeripheralRegisterAppComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = apEvent->Platform.BLEPeripheralRegisterAppComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress);
         mFlags.Set(Flags::kAppRegistered);
-        controlOpComplete = true;
+        DriveBLEState();
         break;
     default:
         break;
@@ -330,344 +335,121 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress);
-    }
-
-    if (controlOpComplete)
-    {
+        DisableBLEService(err);
         mFlags.Clear(Flags::kControlOpInProgress);
-        DriveBLEState();
     }
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    return 20;
-}
-
-bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void * userData)
-{
-    BLEConnection * conn = nullptr;
-    conn                 = (BLEConnection *) userData;
-
-    jvalue_ref parsedObj     = { 0 };
-    jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
-
-    if (!input_schema)
-        return false;
-
-    JSchemaInfo schemaInfo;
-    jschema_info_init(&schemaInfo, input_schema, NULL, NULL);
-    parsedObj = jdom_parse(j_cstr_to_buffer(LSMessageGetPayload(message)), DOMOPT_NOOPT, &schemaInfo);
-    jschema_release(&input_schema);
-
-    if (jis_null(parsedObj))
-        return true;
-
-    const char * payload = jvalue_tostring(parsedObj, input_schema);
-
-    pbnjson::JValue jvalue = pbnjson::JDomParser::fromString(std::string(payload));
-
-    if (jvalue.hasKey("returnValue"))
-    {
-        ChipLogProgress(DeviceLayer, "gattMonitorCharateristicsCb payload returnValue is %d", jvalue["returnValue"].asBool());
-
-        if (jvalue["changed"]["value"].hasKey("bytes") == true)
-        {
-            ChipLogProgress(DeviceLayer, "received read value is %s", jvalue["changed"]["value"].stringify().c_str());
-
-            pbnjson::JValue value = jvalue["changed"]["value"];
-
-            uint8_t * values = (uint8_t *) malloc(sizeof(uint8_t) * value["bytes"].arraySize());
-            if (values == nullptr)
-            {
-                ChipLogError(DeviceLayer, "Failed to allocate memory for values");
-                return false;
-            }
-            for (int i = 0; i < value["bytes"].arraySize(); i++)
-            {
-                values[i] = value["bytes"][i].asNumber<int32_t>();
-            }
-
-            sInstance.HandleTXCharChanged(conn, values, value["bytes"].arraySize());
-        }
-    }
-
-    return true;
-}
-
-bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle * sh, LSMessage * message, void * userData)
-{
-    BLEConnection * conn = nullptr;
-    conn                 = (BLEConnection *) userData;
-
-    jvalue_ref parsedObj     = { 0 };
-    jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
-
-    if (!input_schema)
-        return false;
-
-    JSchemaInfo schemaInfo;
-    jschema_info_init(&schemaInfo, input_schema, NULL, NULL);
-    parsedObj = jdom_parse(j_cstr_to_buffer(LSMessageGetPayload(message)), DOMOPT_NOOPT, &schemaInfo);
-    jschema_release(&input_schema);
-
-    if (jis_null(parsedObj))
-        return false;
-
-    const char * payload = jvalue_tostring(parsedObj, input_schema);
-
-    ChipLogProgress(DeviceLayer, "gattWriteDescriptorValueCb payload is %s", payload);
-    sInstance.HandleSubscribeOpComplete(conn, true);
-
-    return true;
-}
-
-CHIP_ERROR BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId)
-{
-    pbnjson::JValue valueForMonitor = pbnjson::JObject();
-
-    valueForMonitor.put("clientId", std::string(mClientId));
-    valueForMonitor.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
-    pbnjson::JValue bytesJArray = pbnjson::JArray();
-    bytesJArray.append(std::string(Ble::CHIP_BLE_CHAR_2_UUID_STR));
-
-    valueForMonitor.put("characteristics", bytesJArray);
-    valueForMonitor.put("subscribe", true);
-
-    int ret = 0;
-
-    if (mLSHandle == nullptr)
-    {
-        ChipLogError(DeviceLayer, "LS handle is null");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/monitorCharacteristics", valueForMonitor.stringify().c_str(),
-                 gattMonitorCharateristicsCb, bleConnObj, NULL, NULL);
-
-    sleep(2);
-
-    pbnjson::JValue valueForDescriptor = pbnjson::JObject();
-    valueForDescriptor.put("clientId", std::string(mClientId));
-    valueForDescriptor.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
-    valueForDescriptor.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_2_UUID_STR));
-
-    valueForDescriptor.put("descriptor", std::string("00002902-0000-1000-8000-00805f9b34fb"));
-
-    bool subscribe = true; // current is true.
-
-    pbnjson::JValue valueParam               = pbnjson::JObject();
-    pbnjson::JValue bytesForDescriptorJArray = pbnjson::JArray(); // "bytes": [ ]
-    if (subscribe)
-    {
-        bytesForDescriptorJArray.append(2);
-        bytesForDescriptorJArray.append(0);
-    }
-    else
-    {
-        bytesForDescriptorJArray.append(0);
-        bytesForDescriptorJArray.append(0);
-    }
-
-    valueParam.put("bytes", bytesForDescriptorJArray);
-    valueForDescriptor.put("value", valueParam);
-
-    ChipLogProgress(Ble, "SubscribeCharacteristicToWebOS Param : valueForDescriptor  %s", valueForDescriptor.stringify().c_str());
-
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeDescriptorValue", valueForDescriptor.stringify().c_str(),
-                 gattWriteDescriptorValueCb, bleConnObj, NULL, NULL);
-
-    if (ret != 1)
-        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
-
-    return CHIP_NO_ERROR;
+    uint16_t mtu = 0;
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    mtu = conId->GetMTU();
+exit:
+    return mtu;
 }
 
 CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
                                                    const ChipBleUUID * charId)
 {
-    return SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                          static_cast<const uint8_t *>(charId->bytes));
+    CHIP_ERROR err = BLE_ERROR_GATT_SUBSCRIBE_FAILED;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
+                 ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
+    err = conId->SubscribeCharacteristic();
+
+exit:
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
                                                      const ChipBleUUID * charId)
 {
-    ChipLogError(Ble, "UnsubscribeCharacteristic: Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
+    err = conId->UnsubscribeCharacteristic();
+
+exit:
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogError(Ble, "CloseConnection: Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
+    err = conId->CloseConnection();
+
+exit:
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                           chip::System::PacketBufferHandle pBuf)
 {
-    ChipLogError(Ble, "SendIndication: Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
+    CHIP_ERROR err = BLE_ERROR_GATT_INDICATE_FAILED;
 
-bool BLEManagerImpl::gattWriteValueCb(LSHandle * sh, LSMessage * message, void * userData)
-{
-    BLEConnection * conn = nullptr;
-    conn                 = (BLEConnection *) userData;
-
-    jvalue_ref parsedObj     = { 0 };
-    jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
-
-    if (!input_schema)
-        return false;
-
-    JSchemaInfo schemaInfo;
-    jschema_info_init(&schemaInfo, input_schema, NULL, NULL);
-    parsedObj = jdom_parse(j_cstr_to_buffer(LSMessageGetPayload(message)), DOMOPT_NOOPT, &schemaInfo);
-    jschema_release(&input_schema);
-
-    if (jis_null(parsedObj))
-        return true;
-
-    const char * payload = jvalue_tostring(parsedObj, input_schema);
-
-    ChipLogProgress(DeviceLayer, "gattWriteValueCb payload is %s", payload);
-    sInstance.HandleWriteComplete(conn);
-
-    return true;
-}
-
-CHIP_ERROR BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId,
-                                                   const uint8_t * pBuf, uint32_t pBufDataLen)
-{
-    BLEConnection * conn = (BLEConnection *) bleConnObj;
-    std::ostringstream cvt;
-
-    for (int i = 0; i < (int) pBufDataLen; i++)
-    {
-        cvt << std::hex << std::setfill('0') << std::setw(2) << (int) pBuf[i];
-    }
-
-    pbnjson::JValue values = pbnjson::JObject();
-    values.put("clientId", std::string(mClientId));
-    values.put("data", cvt.str().c_str());
-
-    ChipLogProgress(Ble, "SendWriteRequestToWebOS Param : value %s", values.stringify().c_str());
-
-    std::string clientId  = values["clientId"].asString();
-    std::string valueType = "bytes";
-    std::string value     = values["data"].asString();
-
-    pbnjson::JValue param      = pbnjson::JObject();
-    pbnjson::JValue valueParam = pbnjson::JObject();
-    param.put("clientId", clientId);
-    param.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
-    param.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_1_UUID_STR));
-
-    if (valueType == "byte")
-    {
-        valueParam.put("bytes", pbnjson::JArray{ std::stoi(value) });
-    }
-    else if (valueType == "bytes")
-    {
-        pbnjson::JValue bytesJArray = JArray(); // "bytes": [ ]
-        std::vector<char> bytes;
-        for (int i = 0; i < (int) value.length(); i += 2)
-        {
-            std::string byteString = value.substr(i, 2);
-            char c                 = (char) strtol(byteString.c_str(), NULL, 16);
-            bytesJArray.append(c);
-        }
-        valueParam.put("bytes", bytesJArray);
-    }
-    else if (valueType == "string")
-    {
-        valueParam.put("string", value);
-    }
-    else
-    {
-    }
-    param.put("value", valueParam);
-
-    ChipLogProgress(Ble, "SendWriteRequestToWebOS Param : param  %s", param.stringify().c_str());
-
-    int ret = 0;
-
-    if (mLSHandle == nullptr)
-    {
-        ChipLogError(DeviceLayer, "LS handle is null");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeCharacteristicValue", param.stringify().c_str(),
-                 gattWriteValueCb, conn, NULL, NULL);
-
-    VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "Failed to write characteristic . ret [%d]", ret));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    err = conId->SendIndication(std::move(pBuf));
 
 exit:
-    if (ret != 1)
-        return BLE_ERROR_GATT_WRITE_FAILED;
-
-    return CHIP_NO_ERROR;
+    return err;
 }
+
+/*CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                            const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
+{
+    CHIP_ERROR err = BLE_ERROR_GATT_WRITE_FAILED;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+    err = conId->SendWriteRequest(std::move(pBuf));
+
+exit:
+    return err;
+}*/
 
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
                                             const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
 {
-    return SendWriteRequestToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes), static_cast<const uint8_t *>(charId->bytes),
-                                   pBuf->Start(), pBuf->DataLength());
-}
+    CHIP_ERROR err = BLE_ERROR_GATT_WRITE_FAILED;
 
-void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
-{
-    BLEConnection * conn;
-    ChipLogProgress(DeviceLayer, "AddConnectionData for [%s]", remoteAddr);
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
+                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+    err = conId->SendWriteRequest(std::move(pBuf));
 
-    if (!g_hash_table_lookup(mConnectionMap, remoteAddr))
-    {
-        ChipLogProgress(DeviceLayer, "Not Found in Map");
-        conn           = (BLEConnection *) g_malloc0(sizeof(BLEConnection));
-        conn->peerAddr = g_strdup(remoteAddr);
-
-        if (sInstance.mIsCentral)
-        {
-            g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
-            ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", remoteAddr);
-            HandleNewConnection(conn);
-        }
-        else
-        {
-            /* Local Device is BLE Peripheral Role, assume remote is CHIP Central */
-            conn->isChipDevice = true;
-            g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
-            ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", remoteAddr);
-        }
-    }
-}
-
-void BLEManagerImpl::HandleConnectionEvent(bool connected, const char * remoteAddress)
-{
-    if (connected)
-    {
-        ChipLogProgress(DeviceLayer, "Device Connected [%s]", remoteAddress);
-        AddConnectionData(remoteAddress);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Device DisConnected [%s]", remoteAddress);
-    }
+exit:
+    return err;
 }
 
 void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
 {
     if (sInstance.mIsCentral)
     {
-        ChipDeviceEvent event;
-        event.Type                                     = DeviceEventType::kPlatformWebOSBLECentralConnected;
-        event.Platform.BLECentralConnected.mConnection = conId;
+        ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLECentralConnected,
+                               .Platform = { .BLECentralConnected = { .mConnection = conId } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
@@ -676,84 +458,80 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
 {
     if (sInstance.mIsCentral)
     {
-        ChipDeviceEvent event;
-        event.Type                                    = DeviceEventType::kPlatformWebOSBLECentralConnectFailed;
-        event.Platform.BLECentralConnectFailed.mError = error;
+        ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLECentralConnectFailed,
+                               .Platform = { .BLECentralConnectFailed = { .mError = error } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
 
 void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
 {
-    ChipDeviceEvent event;
-    event.Type                                  = DeviceEventType::kPlatformWebOSBLEWriteComplete;
-    event.Platform.BLEWriteComplete.mConnection = conId;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEWriteComplete,
+                           .Platform = { .BLEWriteComplete = { .mConnection = conId } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed)
 {
-    ChipDeviceEvent event;
-    event.Type                                          = DeviceEventType::kPlatformWebOSBLESubscribeOpComplete;
-    event.Platform.BLESubscribeOpComplete.mConnection   = conId;
-    event.Platform.BLESubscribeOpComplete.mIsSubscribed = subscribed;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLESubscribeOpComplete,
+                           .Platform = { .BLESubscribeOpComplete = { .mConnection = conId, .mIsSubscribed = subscribed } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(value, len);
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
-    ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
+    // ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
 
-    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
-    ChipDeviceEvent event;
-    event.Type                                       = DeviceEventType::kPlatformWebOSBLEIndicationReceived;
-    event.Platform.BLEIndicationReceived.mConnection = conId;
-    event.Platform.BLEIndicationReceived.mData       = std::move(buf).UnsafeRelease();
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEIndicationReceived,
+                           .Platform = {
+                               .BLEIndicationReceived = { .mConnection = conId, .mData = std::move(buf).UnsafeRelease() } } };
     PlatformMgr().PostEventOrDie(&event);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf;
-
     // Copy the data to a packet buffer.
-    buf = System::PacketBufferHandle::NewWithData(value, len);
-    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
+
+    ChipLogProgress(Ble, "Write request received, conn = %p", conId);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
-    {
-        ChipDeviceEvent event;
-        event.Type = DeviceEventType::kCHIPoBLEWriteReceived;
-        ChipLogProgress(Ble, "Write request received debug %p", conId);
-        event.CHIPoBLEWriteReceived.ConId = conId;
-        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEventOrDie(&event);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    ChipDeviceEvent event{ .Type                  = DeviceEventType::kCHIPoBLEWriteReceived,
+                           .CHIPoBLEWriteReceived = { .ConId = conId, .Data = std::move(buf).UnsafeRelease() } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId) {}
+void BLEManagerImpl::HandleConnectionClosed(BLE_CONNECTION_OBJECT conId)
+{
+    // If this was a CHIPoBLE connection, post an event to deliver a connection error to the CHIPoBLE layer.
+    ChipDeviceEvent event{ .Type                    = DeviceEventType::kCHIPoBLEConnectionError,
+                           .CHIPoBLEConnectionError = { .ConId = conId, .Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
+{
+    VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
+                   ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", conId->IsNotifyAcquired() ? "subscribe" : "unsubscribe");
+
+    // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
+    // whether the client is enabling or disabling indications.
+    ChipDeviceEvent event{ .Type = conId->IsNotifyAcquired() ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
+                                                             : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
+                           .CHIPoBLESubscribe = { .ConId = conId } };
+    PlatformMgr().PostEventOrDie(&event);
+}
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
 {
     // Post an event to the Chip queue to process the indicate confirmation.
-    ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-    event.CHIPoBLEIndicateConfirm.ConId = conId;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEIndicateConfirm, .CHIPoBLEIndicateConfirm = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -771,73 +549,160 @@ void BLEManagerImpl::DriveBLEState()
     // If there's already a control operation in progress, wait until it completes.
     VerifyOrExit(!mFlags.Has(Flags::kControlOpInProgress), /* */);
 
-    // Initializes the Bluez BLE layer if needed.
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kWebOSBLELayerInitialized))
+    // Initializes the WBS BLE layer if needed.
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
     {
-        mFlags.Set(Flags::kWebOSBLELayerInitialized);
+        if (!mFlags.Has(Flags::kWBSManagerInitialized))
+        {
+            // SuccessOrExit(err = mBluezObjectManager.Init());
+            mFlags.Set(Flags::kWBSManagerInitialized);
+        }
+        if (!mFlags.Has(Flags::kWBSAdapterAvailable))
+        {
+            // mAdapter.reset(mBluezObjectManager.GetAdapter(mAdapterId));
+            // VerifyOrExit(mAdapter, err = BLE_ERROR_ADAPTER_UNAVAILABLE);
+            mFlags.Set(Flags::kWBSAdapterAvailable);
+        }
+        if (!mFlags.Has(Flags::kWBSBLELayerInitialized))
+        {
+            SuccessOrExit(err = mConnection.InitConnectionData(mIsCentral, mEndpoint));
+            mFlags.Set(Flags::kWBSBLELayerInitialized);
+        }
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        DisableBLEService(err);
     }
 }
 
-void BLEManagerImpl::DriveBLEState(intptr_t arg)
+void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)
 {
-    sInstance.DriveBLEState();
+    ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+    // Stop all timers if the error is other than BLE adapter unavailable. In case of BLE adapter
+    // beeing unavailable, we will keep timers running, as the adapter might become available in
+    // the nearest future (e.g. WBS restart due to crash). By doing that we will ensure that BLE
+    // adapter reappearance will not extend timeouts for the ongoing operations.
+    if (err != BLE_ERROR_ADAPTER_UNAVAILABLE)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
+    }
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mState == kState_NotInitialized)
+    {
+        // Close BLE GATT connections to disconnect WBS
+        CloseConnection(conId);
+        // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
+        DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+    }
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+}
+
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mState == kState_Disconnecting)
+    {
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    }
+#endif
+}
+
+/*
+BluezAdvertisement::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() const
+{
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+        return { CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX };
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+    if (mFlags.Has(Flags::kExtAdvertisingEnabled))
+        return { CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX };
+#endif
+    return { CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX };
+}
+*/
+void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appState)
+{
+    auto * self = static_cast<BLEManagerImpl *>(appState);
+
+    if (self->mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+        self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+        self->mFlags.Clear(Flags::kExtAdvertisingEnabled);
+        DeviceLayer::SystemLayer().StartTimer(kSlowAdvertiseTimeout, HandleAdvertisingTimer, self);
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
+        self->mFlags.Set(Flags::kExtAdvertisingEnabled);
+        // This will trigger advertising intervals update in the DriveBLEState() function.
+        self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+#endif
+    }
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
+    CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
+
     DriveBLEState();
 
-    if (scanType == BleScanState::kNotScanning)
-    {
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
-        ChipLogError(Ble, "Invalid scan type requested");
-        return;
-    }
+    VerifyOrExit(scanType != BleScanState::kNotScanning,
+                 ChipLogError(Ble, "Invalid scan type requested: %d", to_underlying(scanType)));
+    VerifyOrExit(!mDeviceScanner.IsScanning(), ChipLogError(Ble, "BLE scan already in progress"));
+    VerifyOrExit(mFlags.Has(Flags::kWBSAdapterAvailable), err = BLE_ERROR_ADAPTER_UNAVAILABLE);
 
-    mDeviceScanner               = Internal::ChipDeviceScanner::Create(this);
     mBLEScanConfig.mBleScanState = scanType;
 
-    if (!mDeviceScanner)
-    {
+    err = mDeviceScanner.Init(this);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
-        ChipLogError(Ble, "Failed to create a BLE device scanner");
-        return;
-    }
+        ChipLogError(Ble, "Failed to create BLE device scanner: %" CHIP_ERROR_FORMAT, err.Format());
+    });
 
-    CHIP_ERROR err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeoutMs);
+    err = mDeviceScanner.StartScan();
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format());
+    });
 
+    err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimer, this);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        mDeviceScanner.StopScan();
+        ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
+    });
+
+exit:
     if (err != CHIP_NO_ERROR)
     {
-        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to start a BLE can: %" CHIP_ERROR_FORMAT, err.Format());
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-        return;
     }
+}
 
-    ChipLogError(DeviceLayer, "BLE Scan Initiation Successful");
+void BLEManagerImpl::HandleScanTimer(chip::System::Layer *, void * appState)
+{
+    auto * manager = static_cast<BLEManagerImpl *>(appState);
+    manager->OnScanError(CHIP_ERROR_TIMEOUT);
+    manager->mDeviceScanner.StopScan();
 }
 
 void BLEManagerImpl::CleanScanConfig()
 {
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-}
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
 
-void BLEManagerImpl::InitiateScan(intptr_t arg)
-{
-    sInstance.InitiateScan(static_cast<BleScanState>(arg));
+    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
@@ -846,48 +711,122 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     mBLEScanConfig.mAppState      = appState;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+    {
+        ChipLogProgress(Ble, "CancelConnection BleScanState::kConnecting");
+        mConnection.CancelConnect();
+    }
+    // If in discovery mode, stop scan.
+    else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
+    {
+        ChipLogProgress(Ble, "CancelConnection  != BleScanState::kNotScanning");
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+        mDeviceScanner.StopScan();
+    }
+    return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress)
 {
-    ChipDeviceEvent event;
-    event.Type                                                 = DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete;
-    event.Platform.BLEPeripheralRegisterAppComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralRegisterAppComplete.mpAppstate = apAppstate;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEAdapterAdded,
+                           .Platform = { .BLEAdapter = { .mAdapterId = aAdapterId } } };
+    Platform::CopyString(event.Platform.BLEAdapter.mAdapterAddress, aAdapterAddress);
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress)
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kPlatformWebOSBLEPeripheralAdvConfiguredComplete;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mpAppstate = apAppstate;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEAdapterRemoved,
+                           .Platform = { .BLEAdapter = { .mAdapterId = aAdapterId } } };
+    Platform::CopyString(event.Platform.BLEAdapter.mAdapterAddress, aAdapterAddress);
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error)
 {
-    ChipDeviceEvent event;
-    event.Type                                              = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete;
-    event.Platform.BLEPeripheralAdvStartComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvStartComplete.mpAppstate = apAppstate;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete,
+                           .Platform = { .BLEPeripheralRegisterAppComplete = { .mError = error } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error)
 {
-    ChipDeviceEvent event;
-    event.Type                                             = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete;
-    event.Platform.BLEPeripheralAdvStopComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvStopComplete.mpAppstate = apAppstate;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete,
+                           .Platform = { .BLEPeripheralAdvStartComplete = { .mError = error } } };
     PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error)
+{
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete,
+                           .Platform = { .BLEPeripheralAdvStopComplete = { .mError = error } } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEPeripheralAdvReleased()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kPlatformWebOSBLEPeripheralAdvReleased };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
+{
+    ChipLogProgress(Ble, "New device scanned: %s discriminator : %u", device["address"].asString().c_str(),
+                    info.GetDeviceDiscriminator());
+
+    if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
+    {
+        auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator());
+        VerifyOrReturn(
+            isMatch,
+            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", info.GetDeviceDiscriminator(),
+                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
+        ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
+    }
+    else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
+    {
+        auto isMatch = strcmp(device["address"].asString().c_str(), mBLEScanConfig.mAddress.c_str()) == 0;
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: Device address does not match: %s != %s",
+                                    device["address"].asString().c_str(), mBLEScanConfig.mAddress.c_str()));
+        ChipLogProgress(Ble, "Device address match. Attempting to connect.");
+    }
+    else
+    {
+        // Internal consistency error
+        ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
+        return;
+    }
+    ChipLogProgress(Ble, "Device address match. Attempting to connect.");
+    mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+    mBLEScanConfig.mAddress      = device["address"].asString();
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // We StartScan in the ChipStack thread.
+    // StopScan should also be performed in the ChipStack thread.
+    // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
+    DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+    mDeviceScanner.StopScan();
+    // Stop scanning and then start connecting timer
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    CHIP_ERROR err = mConnection.ConnectDevice(mBLEScanConfig.mAddress, mEndpoint);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    ChipLogProgress(Ble, "New device connected: %s", mBLEScanConfig.mAddress.c_str());
+}
+
+void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)
+{
+    ChipLogProgress(Ble, "HandleConnectTimer ");
+    auto * manager = static_cast<BLEManagerImpl *>(appState);
+    manager->mConnection.CancelConnect();
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
 void BLEManagerImpl::OnScanComplete()
@@ -909,199 +848,10 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
-    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
-}
-
-bool BLEManagerImpl::gattGetServiceCb(LSHandle * sh, LSMessage * message, void * userData)
-{
-    jvalue_ref parsedObj     = { 0 };
-    jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
-
-    if (!input_schema)
-        return false;
-
-    JSchemaInfo schemaInfo;
-    jschema_info_init(&schemaInfo, input_schema, NULL, NULL);
-    parsedObj = jdom_parse(j_cstr_to_buffer(LSMessageGetPayload(message)), DOMOPT_NOOPT, &schemaInfo);
-    jschema_release(&input_schema);
-
-    if (jis_null(parsedObj))
-        return true;
-
-    const char * payload = jvalue_tostring(parsedObj, input_schema);
-
-    ChipLogProgress(DeviceLayer, "gattGetServiceCb payload is %s", payload);
-
-    sInstance.HandleConnectionEvent(true, sInstance.mRemoteAddress);
-
-    return true;
-}
-
-bool BLEManagerImpl::gattConnectCb(LSHandle * sh, LSMessage * message, void * userData)
-{
-    jvalue_ref parsedObj     = { 0 };
-    jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
-
-    if (!input_schema)
-        return false;
-
-    JSchemaInfo schemaInfo;
-    jschema_info_init(&schemaInfo, input_schema, NULL, NULL);
-    parsedObj = jdom_parse(j_cstr_to_buffer(LSMessageGetPayload(message)), DOMOPT_NOOPT, &schemaInfo);
-    jschema_release(&input_schema);
-
-    if (jis_null(parsedObj))
-        return true;
-
-    const char * payload = jvalue_tostring(parsedObj, input_schema);
-
-    ChipLogProgress(DeviceLayer, "gattConnectCb payload is %s", payload);
-
-    jvalue_ref clientIdObj = { 0 };
-    if (jobject_get_exists(parsedObj, J_CSTR_TO_BUF("clientId"), &clientIdObj))
-    {
-        raw_buffer clientId_buf = jstring_get(clientIdObj);
-        char * clientId         = g_strdup(clientId_buf.m_str);
-        jstring_free_buffer(clientId_buf);
-
-        printf("clientId : %s \n", clientId);
-
-        if (sInstance.mClientId != nullptr)
-        {
-            g_free(sInstance.mClientId);
-        }
-        sInstance.mClientId = g_strdup(clientId);
-
-        g_free(clientId);
-    }
-
-    jvalue_ref addressObj = { 0 };
-    if (jobject_get_exists(parsedObj, J_CSTR_TO_BUF("address"), &addressObj))
-    {
-        raw_buffer address_buf = jstring_get(addressObj);
-        char * address         = g_strdup(address_buf.m_str);
-        jstring_free_buffer(address_buf);
-
-        printf("address : %s \n", address);
-
-        if (sInstance.mRemoteAddress != nullptr)
-        {
-            g_free(sInstance.mRemoteAddress);
-        }
-        sInstance.mRemoteAddress = g_strdup(address);
-
-        g_free(address);
-    }
-
-    if (sInstance.mLSHandle == nullptr)
-    {
-        ChipLogError(DeviceLayer, "LS handle is null");
-        return false;
-    }
-    sleep(1);
-    char ls2Param[100];
-    snprintf(ls2Param, 100, "{\"address\":\"%s\"}", sInstance.mRemoteAddress);
-
-    ChipLogProgress(DeviceLayer, "getService: Addr [%s]", sInstance.mRemoteAddress);
-
-    int ret = 0;
-
-    ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/getServices", ls2Param, gattGetServiceCb, NULL,
-                 NULL, NULL);
-
-    VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "Failed to get GATT service . ret [%d]", ret));
-
-exit:
-    if (ret != 1)
-        sInstance.HandleConnectFailed(CHIP_ERROR_INTERNAL);
-
-    return true;
-}
-
-gboolean BLEManagerImpl::ConnectChipThing(gpointer userData)
-{
-    int ret = 0;
-
-    if (sInstance.mLSHandle == nullptr)
-    {
-        ChipLogError(DeviceLayer, "LS handle is null");
-        return false;
-    }
-
-    char * address = (char *) userData;
-    ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", address);
-
-    char ls2Param[100];
-    snprintf(ls2Param, 100, "{\"address\":\"%s\"}", address);
-
-    ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/connect", ls2Param, gattConnectCb, userData, NULL,
-                 NULL);
-
-    VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "Failed to create GATT client. ret [%d]", ret));
-
-    ChipLogProgress(DeviceLayer, "GATT Connect Issued");
-exit:
-    if (ret != 1)
-        sInstance.HandleConnectFailed(CHIP_ERROR_INTERNAL);
-
-    g_free(address);
-    return G_SOURCE_REMOVE;
-}
-
-void BLEManagerImpl::ConnectHandler(const char * address)
-{
-    ChipLogProgress(DeviceLayer, "Try to connect New device scanned: %s", address);
-
-    mLSHandle = MainLoop::Instance().mLSHandle;
-
-    if (mLSHandle == nullptr)
-    {
-        ChipLogError(DeviceLayer, "LS handle is null");
-        return;
-    }
-
-    GSource * idleSource;
-
-    idleSource = g_idle_source_new();
-    g_source_set_callback(idleSource, ConnectChipThing, g_strdup(address), nullptr);
-    g_source_set_priority(idleSource, G_PRIORITY_HIGH_IDLE);
-    g_source_attach(idleSource, sInstance.mMainContext);
-    g_source_unref(idleSource);
-}
-
-void BLEManagerImpl::OnChipDeviceScanned(char * address)
-{
-    ChipLogProgress(DeviceLayer, "New device scanned: %s", address);
-
-    if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
-    {
-        ChipLogProgress(DeviceLayer, "Device discriminator match. Attempting to connect.");
-    }
-    else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
-    {
-        if (strcmp(address, "e4:5f:01:20:49:c0") == 0)
-        {
-            ChipLogProgress(DeviceLayer, "SSH Ignore : %s", address);
-            return;
-        }
-        ChipLogProgress(DeviceLayer, "Device address match. Attempting to connect.");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknown discovery type. Ignoring scanned device.");
-        return;
-    }
-
-    /* Set CHIP Connecting state */
-    mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    mDeviceScanner->StopChipScan();
-
-    /* Initiate Connect */
-    ConnectHandler(address);
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

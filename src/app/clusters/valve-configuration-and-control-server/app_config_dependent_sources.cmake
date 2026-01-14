@@ -17,6 +17,6 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
-    "${CLUSTER_DIR}/valve-configuration-and-control-server.cpp"
-    "${CLUSTER_DIR}/valve-configuration-and-control-server.h"
+    "${CLUSTER_DIR}/valve-configuration-and-control-cluster.cpp"
+    "${CLUSTER_DIR}/valve-configuration-and-control-cluster.h"
 )

@@ -112,12 +112,11 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
             return CHIP_ERROR_INTERNAL;
         }
     }
-    if (signature.length > out_signature.Capacity()) {
+    if (out_signature.SetLength(signature.length) != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %llu vs %llu", static_cast<uint64_t>(signature.length),
             static_cast<uint64_t>(out_signature.Capacity()));
         return CHIP_ERROR_NO_MEMORY;
     }
-    out_signature.SetLength(signature.length);
     std::memcpy(out_signature.Bytes(), signature.bytes, signature.length);
     return CHIP_NO_ERROR;
 }
