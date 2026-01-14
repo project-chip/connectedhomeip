@@ -45,8 +45,8 @@ public:
     struct StartupConfiguration
     {
         const DataModel::Nullable<uint32_t> defaultOpenDuration;
-        Percent defaultOpenLevel;
-        uint8_t levelStep;
+        Percent defaultOpenLevel = kDefaultOpenLevel;
+        uint8_t levelStep = kDefaultLevelStep;
     };
 
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
@@ -80,8 +80,8 @@ private:
     std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request,
                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler);
     std::optional<DataModel::ActionReturnStatus> HandleCloseCommand();
-    CHIP_ERROR GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
-                                      DataModel::Nullable<Percent> & adjustedTargetLevel) const;
+    CHIP_ERROR ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
+                                      DataModel::Nullable<Percent> & validatedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);

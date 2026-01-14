@@ -65,8 +65,9 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
         { mPath.mEndpointId, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id },
         mDefaultOpenDuration, defaultOpenDuration);
 
-    // If Level feature is enabled, try to get the DefaultOpenLevel value.
-    if (mFeatures.Has(Feature::kLevel))
+    // If Level feature is enabled and optional attribute is set, try to get value for
+    // DefaultOpenLevel
+    if (mFeatures.Has(Feature::kLevel) && mOptionalAttributeSet.IsSet(Attributes::DefaultOpenLevel::Id))
     {
         Percent defaultOpenLevel = mDefaultOpenLevel;
         attrPersistence.LoadNativeEndianValue(
@@ -276,7 +277,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // Check rules for TargetLevel if enabled
     if (mFeatures.Has(Feature::kLevel))
     {
-        ReturnErrorOnFailure(GetAdjustedTargetLevel(commandData.targetLevel, openTargetLevel));
+        ReturnErrorOnFailure(ValidateAndResolveTargetLevel(commandData.targetLevel, openTargetLevel));
     }
 
     // Use the SetValveLevel function to handle the setting of internal values.
@@ -382,23 +383,23 @@ void ValveConfigurationAndControlCluster::SetCurrentState(
 // - if the TargetLevel is provided
 //   - Validate that the TargetLevel and LevelStep are compatible.
 CHIP_ERROR
-ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
-                                                            DataModel::Nullable<Percent> & adjustedTargetLevel) const
+ValveConfigurationAndControlCluster::ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
+                                                            DataModel::Nullable<Percent> & validatedTargetLevel) const
 {
     if (!targetLevel.HasValue())
     {
         if (mOptionalAttributeSet.IsSet(Attributes::DefaultOpenLevel::Id))
         {
-            adjustedTargetLevel = mDefaultOpenLevel;
+            validatedTargetLevel = mDefaultOpenLevel;
             return CHIP_NO_ERROR;
         }
-        adjustedTargetLevel = kMaxLevelValuePercent;
+        validatedTargetLevel = kMaxLevelValuePercent;
         return CHIP_NO_ERROR;
     }
 
     // targetLevel has a value
     VerifyOrReturnError(ValueCompliesWithLevelStep(targetLevel.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    adjustedTargetLevel = targetLevel.Value();
+    validatedTargetLevel = targetLevel.Value();
     return CHIP_NO_ERROR;
 }
 
@@ -422,7 +423,7 @@ void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigur
 {
     SetCurrentState(DataModel::MakeNullable(currentState));
 
-    if (mTargetState.ValueOr(ValveStateEnum::kUnknownEnumValue) == currentState)
+    if (mTargetState == currentState)
     {
         SaveAndReportIfChanged(mTargetState, DataModel::NullNullable, Attributes::TargetState::Id);
     }
@@ -433,7 +434,7 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(Percent currentLeve
     VerifyOrReturn(mFeatures.Has(Feature::kLevel));
     SaveAndReportIfChanged(mCurrentLevel, currentLevel, Attributes::CurrentLevel::Id);
 
-    if (!mTargetLevel.IsNull() && mCurrentLevel == mTargetLevel)
+    if (mCurrentLevel == mTargetLevel)
     {
         SaveAndReportIfChanged(mTargetLevel, DataModel::NullNullable, Attributes::TargetLevel::Id);
         UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
@@ -443,16 +444,16 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(Percent currentLeve
 CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullable<Percent> level,
                                                               DataModel::Nullable<uint32_t> openDuration)
 {
-    // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
-    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
-
     // Check for the AutoCloseTime feature
     if (mFeatures.Has(Feature::kTimeSync))
     {
         VerifyOrReturnValue(mTsTracker->IsTimeSyncClusterSupported(), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
     }
+
+    // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
+    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
+    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
 
     // Set OpenDuration to the provided value (can be null).
     SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
