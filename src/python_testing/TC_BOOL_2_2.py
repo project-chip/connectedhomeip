@@ -39,7 +39,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
@@ -127,6 +127,9 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Set up subscription to StateValue attribute and StateChange event.
         self.step("1a")
 
+        attribute_listener = AttributeSubscriptionHandler(expected_cluster=cbool, expected_attribute=cbool.Attributes.StateValue)
+        await attribute_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+
         event_listener = EventSubscriptionHandler(expected_cluster=cbool)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint)
 
@@ -158,6 +161,18 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Verify that StateChange event has StateValue set to TRUE.
         asserts.assert_true(event.stateValue, "Unexpected stateValue on StateChange")
 
+        # TH waits for a StateValue attribute report from the DUT.
+        self.step("3c")
+
+        attribute_listener.wait_for_attribute_report(timeout_sec=post_prompt_settle_delay_seconds)
+        # Get the most recent StateValue attribute report
+        state_value_reports = attribute_listener.attribute_reports.get(cbool.Attributes.StateValue, [])
+        asserts.assert_greater(len(state_value_reports), 0, "No StateValue attribute reports received")
+        latest_report = state_value_reports[-1]
+        logger.info(f" --- Step 3c: latest_report.value: {latest_report.value}")
+        # Verify that StateValue in the report is TRUE.
+        asserts.assert_true(latest_report.value, "Expected StateValue attribute report to be TRUE")
+
         # Bring the DUT into a state so StateValue is FALSE.
         self.step("4a")
 
@@ -170,6 +185,18 @@ class TC_BOOL_2_2(MatterBaseTest):
             cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
         # Verify that StateChange event has StateValue set to FALSE.
         asserts.assert_false(event.stateValue, "Unexpected stateValue on StateChange")
+
+        # TH waits for a StateValue attribute report from the DUT.
+        self.step("4c")
+
+        attribute_listener.wait_for_attribute_report(timeout_sec=post_prompt_settle_delay_seconds)
+        # Get the most recent StateValue attribute report
+        state_value_reports = attribute_listener.attribute_reports.get(cbool.Attributes.StateValue, [])
+        asserts.assert_greater(len(state_value_reports), 0, "No StateValue attribute reports received")
+        latest_report = state_value_reports[-1]
+        logger.info(f" --- Step 4c: latest_report.value: {latest_report.value}")
+        # Verify that StateValue in the report is FALSE.
+        asserts.assert_false(latest_report.value, "Expected StateValue attribute report to be FALSE")
 
 
 if __name__ == "__main__":
