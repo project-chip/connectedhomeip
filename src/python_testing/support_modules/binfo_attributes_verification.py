@@ -173,9 +173,16 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                 # Allow 2020-01-01 as a valid date (SDK default value)
                 first_matter_release = datetime(2022, 10, 4)
                 sdk_default_date = datetime(2020, 1, 1)
-                is_valid_date = parsed_date >= first_matter_release or parsed_date == sdk_default_date
-                asserts.assert_true(
-                    is_valid_date, "ManufacturingDate should not be before the first Matter release date (2022-10-04), except for SDK default value (2020-01-01)")
+                is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+                if is_ci:
+                    is_valid_date = parsed_date >= first_matter_release or parsed_date == sdk_default_date
+                    asserts.assert_true(
+                        is_valid_date, 
+                        "ManufacturingDate should not be before the first Matter release date (2022-10-04), except for SDK default value (2020-01-01)")
+                else:
+                    asserts.assert_greater_equal(
+                        parsed_date, first_matter_release, 
+                        "ManufacturingDate should not be before the first Matter release date (2022-10-04)")                    
             except ValueError:
                 asserts.fail(f"ManufacturingDate '{date_str}' is not a valid date in YYYYMMDD format")
 
