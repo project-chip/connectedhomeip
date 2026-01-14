@@ -17,6 +17,7 @@
  */
 
 #include <app_options/AppOptions.h>
+#include <devices/device-factory/DeviceFactory.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -64,15 +65,29 @@ OptionSet * AppOptions::GetOptions()
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
         { "endpoint", kArgumentRequired, kOptionEndpoint },
+        {}, // need empty terminator
     };
 
-    // TODO: This message on supported device types needs to be updated to scale
-    //  better once new devices are added.
+    static const std::string gHelpText = []() {
+        // Device option - this is dynamic
+        std::string result = "-d, --device<";
+        for (auto & name : app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        {
+            result.append(name);
+            result.append("|");
+        }
+        result.replace(result.length() - 1, 1, ">");
+        result += "\n";
+
+        // rest of the help
+        result += "-e, --endpoint <endpoint-number>\n";
+        return result;
+    }();
+
     static OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
                                          sAllDevicesAppOptionDefs,   // array of option definitions
                                          "PROGRAM OPTIONS",          // help group
-                                         "-d, --device <contact-sensor|water-leak-detector|occupancy-sensor|chime>\n"
-                                         "-e, --endpoint <endpoint-number>\n" };
+                                         gHelpText.c_str() };
 
     return &sCmdLineOptions;
 }
