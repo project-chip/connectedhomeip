@@ -27,5 +27,4 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/valve-configuration-and-control-cluster.cpp"
     "${CLUSTER_DIR}/valve-configuration-and-control-cluster.h"
     "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
-    "${CLUSTER_DIR}/TimeSyncTracker.h"
 )

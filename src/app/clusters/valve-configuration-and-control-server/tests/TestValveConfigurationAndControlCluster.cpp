@@ -69,12 +69,6 @@ public:
 
     void HandleRemainingDurationTick(uint32_t duration) override {}
 };
-class DummyTimeSyncTracker : public TimeSyncTracker
-{
-public:
-    bool IsTimeSyncClusterSupported() override { return true; }
-    bool IsValidUTCTime() override { return false; }
-};
 
 struct TestValveConfigurationAndControlCluster : public ::testing::Test
 {
@@ -86,7 +80,6 @@ struct TestValveConfigurationAndControlCluster : public ::testing::Test
     TestServerClusterContext testContext;
     DummyDelegate delegate;
     InstantDelegate instantDelegate;
-    DummyTimeSyncTracker timeSyncTracker;
 };
 
 // Base configuration with no features or optional attributes
@@ -95,7 +88,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestEmptyOptional)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, {}, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, {}, config);
 
     ASSERT_TRUE(
         IsAttributesListEqualTo(valveCluster,
@@ -111,7 +104,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestValveFault)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, {}, optionalAttributeSet, config);
 
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster,
                                         { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry,
@@ -128,7 +121,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestLevelStep)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config);
 
     ASSERT_TRUE(
         IsAttributesListEqualTo(valveCluster,
@@ -146,7 +139,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestDefaultOpenLevel)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config);
 
     ASSERT_TRUE(
         IsAttributesListEqualTo(valveCluster,
@@ -162,7 +155,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestTimeSync)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, {}, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, {}, config);
     ASSERT_TRUE(IsAttributesListEqualTo(valveCluster,
                                         {
                                             OpenDuration::kMetadataEntry,
@@ -183,7 +176,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTestAll)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config);
     ASSERT_TRUE(
         IsAttributesListEqualTo(valveCluster,
                                 { OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, AutoCloseTime::kMetadataEntry,
@@ -200,7 +193,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestMandatory)
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
     ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config, &timeSyncTracker);
+        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -246,7 +239,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -272,7 +265,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestValveFault)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -294,7 +287,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestLevel)
     ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
-    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config, &timeSyncTracker);
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, features, optionalAttributeSet, config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -323,7 +316,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
     ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config, &timeSyncTracker);
+        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -343,7 +336,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandWithoutFault)
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
     ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, {}, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config, &timeSyncTracker);
+        kRootEndpointId, {}, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&delegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -386,7 +379,7 @@ TEST_F(TestValveConfigurationAndControlCluster, CloseCommandWithoutFault)
                                                                       ValveConfigurationAndControlCluster::kDefaultOpenLevel,
                                                                       ValveConfigurationAndControlCluster::kDefaultLevelStep };
     ValveConfigurationAndControlCluster valveCluster(
-        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config, &timeSyncTracker);
+        kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), config);
     valveCluster.SetDelegate(&instantDelegate);
     ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 

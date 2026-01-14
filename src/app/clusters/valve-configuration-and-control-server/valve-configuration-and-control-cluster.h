@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "TimeSyncTracker.h"
 #include "valve-configuration-and-control-delegate.h"
 
 #include <app/cluster-building-blocks/QuieterReporting.h>
@@ -50,8 +49,7 @@ public:
     };
 
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
-                                        OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
-                                        ValveConfigurationAndControl::TimeSyncTracker * tsTracker);
+                                        OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -66,13 +64,13 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     void SetDelegate(ValveConfigurationAndControl::Delegate * delegate);
-    static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
+    static void onValveConfigurationAndControlTick(System::Layer * systemLayer, void * context);
 
     CHIP_ERROR CloseValve();
     CHIP_ERROR SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
     void UpdateCurrentLevel(Percent currentLevel);
     void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
-    void EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+    void emitValveFaultEvent(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
     void UpdateAutoCloseTime(uint64_t epochTime);
 
 private:
@@ -80,14 +78,10 @@ private:
     std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request,
                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler);
     std::optional<DataModel::ActionReturnStatus> HandleCloseCommand();
-    CHIP_ERROR ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
-                                             DataModel::Nullable<Percent> & validatedTargetLevel) const;
-    bool ValueCompliesWithLevelStep(const uint8_t value) const;
-    void HandleUpdateRemainingDurationInternal();
+    void startRemainingDurationTick();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
     void SetCurrentState(const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState);
-    CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
-    void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState);
+    void emitValveStateChangedEvent(ValveConfigurationAndControl::ValveStateEnum newState);
 
     template <typename T, typename U>
     inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, AttributeId attributeId)
@@ -114,6 +108,5 @@ private:
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault;
     uint8_t mLevelStep{ kDefaultLevelStep };
     ValveConfigurationAndControl::Delegate * mDelegate{ nullptr };
-    ValveConfigurationAndControl::TimeSyncTracker * mTsTracker{ nullptr };
 };
 } // namespace chip::app::Clusters

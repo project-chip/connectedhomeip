@@ -42,32 +42,6 @@ constexpr size_t kValveConfigurationAndControlMaxClusterCount =
 
 LazyRegisteredServerCluster<ValveConfigurationAndControlCluster> gServers[kValveConfigurationAndControlMaxClusterCount];
 
-class CodegenTimeSyncTracker : public TimeSyncTracker
-{
-public:
-    bool IsTimeSyncClusterSupported() override
-    {
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-        return (nullptr != TimeSynchronization::GetClusterInstance());
-#else
-        return false;
-#endif
-    }
-
-    bool IsValidUTCTime() override
-    {
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-        if (IsTimeSyncClusterSupported())
-        {
-            return TimeSynchronization::GetClusterInstance()->GetGranularity() !=
-                TimeSynchronization::GranularityEnum::kNoTimeGranularity;
-        }
-#endif
-        return false;
-    }
-};
-
-CodegenTimeSyncTracker codegenTracker;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -99,8 +73,7 @@ public:
             endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
             ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
             ValveConfigurationAndControlCluster::StartupConfiguration{
-                .defaultOpenDuration = defaultOpenDuration, .defaultOpenLevel = defaultOpenLevel, .levelStep = levelStep },
-            &codegenTracker);
+                .defaultOpenDuration = defaultOpenDuration, .defaultOpenLevel = defaultOpenLevel, .levelStep = levelStep });
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -208,7 +181,7 @@ CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::V
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
-    interface->EmitValveFault(fault);
+    interface->emitValveFaultEvent(fault);
     return CHIP_NO_ERROR;
 }
 
