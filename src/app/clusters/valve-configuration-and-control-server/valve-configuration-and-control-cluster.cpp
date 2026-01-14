@@ -145,7 +145,7 @@ void ValveConfigurationAndControlCluster::emitValveFaultEvent(BitMask<ValveConfi
 void ValveConfigurationAndControlCluster::onValveConfigurationAndControlTick(System::Layer * systemLayer, void * context)
 {
     auto * instance = static_cast<ValveConfigurationAndControlCluster *>(context);
-    
+
     if (instance->mRemainingDuration.value().Value() > 0)
     {
         instance->SetRemainingDuration(instance->mRemainingDuration.value().Value() - 1);
