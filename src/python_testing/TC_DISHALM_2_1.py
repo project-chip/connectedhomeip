@@ -82,7 +82,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         - Bit 5 (0x20): WaterLevelError
 
         Args:
-            allow_provisional:  If True, include provisional alarm bits (for testing/verification)
+            allow_provisional: If True, include provisional alarm bits (for testing/verification)
 
         Returns:
             Bitmask with all valid alarm bits set
@@ -114,7 +114,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
 
         Performs two checks:
         1. All set bits are defined in the AlarmBitmap specification
-        2. For Mask/State/Latch:  all set bits are also set in Supported attribute
+        2. For Mask/State/Latch: all set bits are also set in Supported attribute
 
         Args:
             attribute_name: Name of the attribute being validated (for error messages)
@@ -129,7 +129,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         undefined_bits = bitmap_value & ~valid_mask
         if undefined_bits != 0:
             asserts_fail_msg = (
-                f"{attribute_name} attribute contains undefined alarm bits.  "
+                f"{attribute_name} attribute contains undefined alarm bits."
                 f"Value: 0x{bitmap_value:08X}, Undefined bits: 0x{undefined_bits:08X}"
             )
             asserts.fail(asserts_fail_msg)
@@ -139,7 +139,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             unsupported_bits = bitmap_value & ~supported_value
             if unsupported_bits != 0:
                 asserts_fail_msg = (
-                    f"{attribute_name} attribute contains bits not present in Supported attribute. "
+                    f"{attribute_name} attribute contains bits not present in Supported attribute."
                     f"Value: 0x{bitmap_value:08X}, Supported:  0x{supported_value:08X}, "
                     f"Unsupported bits: 0x{unsupported_bits:08X}"
                 )
@@ -165,7 +165,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         self.endpoint = self.get_endpoint()
 
         # Get test parameter for allowing provisional alarms (default: False for certification)
-        allow_provisional = self.user_params. get("allow_provisional", False)
+        allow_provisional = self.user_params.get("allow_provisional", False)
         logger.info(f"Test running with allow_provisional={allow_provisional}")
 
         self.step(1)
