@@ -706,13 +706,70 @@ class TestConformanceSupport(MatterBaseTest):
         self._test_conformance_arithmetic('greaterOrEqualTerm', '>=')
 
     def test_revision(self):
-        def create_xml(xml_mid: str) -> str:
+        def create_xml(revision: int) -> str:
             return ('<mandatoryConform>'
-                    f'<greaterOrEqualTerm>'
-                    f'{xml_mid}'
-                    f'</greaterOrEqualTerm>'
+                    '<greaterOrEqualTerm>'
+                    '<revision value="current"/>'
+                    f'<revision value="{revision}"/>'
+                    '</greaterOrEqualTerm>'
                     '</mandatoryConform>')
-        xml = create_xml(('<revision value="))
+
+        conformance_assessment_data = EMPTY_CLUSTER_GLOBAL_ATTRIBUTES
+
+        xml = create_xml(1)
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        asserts.assert_equal(str(xml_callable), f'Rev >= v1')
+
+        conformance_assessment_data.cluster_revision = 1
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
+        conformance_assessment_data.cluster_revision = 2
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
+
+        xml = create_xml(5)
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        asserts.assert_equal(str(xml_callable), f'Rev >= v5')
+
+        conformance_assessment_data.cluster_revision = 1
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.NOT_APPLICABLE)
+        conformance_assessment_data.cluster_revision = 2
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.NOT_APPLICABLE)
+        conformance_assessment_data.cluster_revision = 4
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.NOT_APPLICABLE)
+        conformance_assessment_data.cluster_revision = 5
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
+        conformance_assessment_data.cluster_revision = 6
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
+
+        too_many_terms = ('<mandatoryConform>'
+                          '<greaterOrEqualTerm>'
+                          '<revision value="current"/>'
+                          '<revision value="1"/>'
+                          '<revision value="1"/>'
+                          '</greaterOrEqualTerm>'
+                          '</mandatoryConform>')
+        et = ElementTree.fromstring(too_many_terms)
+        with asserts.assert_raises(ConformanceException):
+            xml_callable = parse_callable_from_xml(et, self.params)
+
+        too_few_terms_current = ('<mandatoryConform>'
+                                 '<greaterOrEqualTerm>'
+                                 '<revision value="current"/>'
+                                 '</greaterOrEqualTerm>'
+                                 '</mandatoryConform>')
+        et = ElementTree.fromstring(too_few_terms_current)
+        with asserts.assert_raises(ConformanceException):
+            xml_callable = parse_callable_from_xml(et, self.params)
+
+        too_few_terms_value = ('<mandatoryConform>'
+                               '<greaterOrEqualTerm>'
+                               '<revision value="1"/>'
+                               '</greaterOrEqualTerm>'
+                               '</mandatoryConform>')
+        et = ElementTree.fromstring(too_few_terms_value)
+        with asserts.assert_raises(ConformanceException):
+            xml_callable = parse_callable_from_xml(et, self.params)
 
     def test_basic_conformance(self):
         basic_test('<mandatoryConform />', mandatory)
