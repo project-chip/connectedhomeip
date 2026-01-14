@@ -338,7 +338,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     commandData.zoomDelta.Emplace(relativeZoom);
 
     auto response = server.GetLogic().HandleMPTZRelativeMove(commandHandler, kCommandPath, commandData);
-        
+
     // The response should contain an ActionReturnStatus
     EXPECT_TRUE(response.has_value());
     EXPECT_TRUE(response.value().IsSuccess());
@@ -516,7 +516,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     mptzSetCommandData.zoom.Emplace(testZoom);
 
     auto setResponse = server.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPathMPTZSet, mptzSetCommandData);
-    
+
     // The response should contain an ActionReturnStatus
     EXPECT_TRUE(setResponse.has_value());
     EXPECT_TRUE(setResponse.value().IsSuccess());
