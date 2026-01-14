@@ -18,10 +18,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/CodegenIntegration.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <tls-certificate-management-instance.h>
 #include <tls-client-management-instance.h>
 
@@ -136,9 +135,6 @@ struct InlineEncodableClientCert : RefEncodableClientCert
 
     InlineEncodableClientCert() : RefEncodableClientCert(inlineCertificate) {}
 };
-
-static constexpr uint8_t kMaxRootCerts   = kMaxRootCertificatesPerFabric;
-static constexpr uint8_t kMaxClientCerts = kMaxClientCertificatesPerFabric;
 
 CHIP_ERROR FingerprintMatch(const ByteSpan & fingerprint, const ByteSpan & cert, bool & outMatch)
 {
@@ -445,29 +441,17 @@ Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matt
 static CertificateTableImpl gCertificateTableInstance;
 TlsCertificateManagementCommandDelegate TlsCertificateManagementCommandDelegate::instance(gCertificateTableInstance);
 
-static LazyRegisteredServerCluster<TlsCertificateManagementCluster> sTlsCertificateManagementClusterServer;
+namespace chip {
+namespace app {
+namespace Clusters {
 
-void emberAfTlsCertificateManagementClusterInitCallback(EndpointId matterEndpoint)
+void InitializeTlsCertificateManagement()
 {
-    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-
-    sTlsCertificateManagementClusterServer.Create(EndpointId(1), TlsCertificateManagementCommandDelegate::GetInstance(),
-                                                  TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance,
-                                                  kMaxRootCerts, kMaxClientCerts);
-    CHIP_ERROR err =
-        CodegenDataModelProvider::Instance().Registry().Register(sTlsCertificateManagementClusterServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to register TLS Certificate Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT,
-                     EndpointId(1), err.Format());
-    }
+    MatterTlsCertificateManagementSetDelegate(TlsCertificateManagementCommandDelegate::GetInstance());
+    MatterTlsCertificateManagementSetDependencyChecker(TlsClientManagementCommandDelegate::GetInstance());
+    MatterTlsCertificateManagementSetCertificateTable(gCertificateTableInstance);
 }
 
-void emberAfTlsCertificateManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&sTlsCertificateManagementClusterServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "TLS Certificate Management Cluster unregister error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
