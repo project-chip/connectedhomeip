@@ -90,13 +90,13 @@ class TC_DISHALM_2_1(MatterBaseTest):
         """
         # Standard alarms defined in Matter 1.x specification
         alarm_bitmap = self.cluster.Bitmaps.AlarmBitmap
-        
+
         STANDARD_ALARMS = (
             alarm_bitmap.kInflowError |   # Bit 0: InflowError
-            alarm_bitmap.kDrainError |    # Bit 1: DrainError  
+            alarm_bitmap.kDrainError |    # Bit 1: DrainError
             alarm_bitmap.kDoorError |     # Bit 2: DoorError
             alarm_bitmap.kTempTooLow |    # Bit 3: TempTooLow
-            alarm_bitmap.kTempTooHigh |   # Bit 4: TempTooHigh  
+            alarm_bitmap.kTempTooHigh |   # Bit 4: TempTooHigh
             alarm_bitmap.kWaterLevelError # Bit 5: WaterLevelError
         )
 
