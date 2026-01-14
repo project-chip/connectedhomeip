@@ -87,7 +87,7 @@ CHIP_ERROR TlsCertificateManagementCluster::Startup(ServerClusterContext & conte
     ChipLogProgress(DataManagement, "TlsCertificateManagementCluster: initializing");
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(mCertificateTable.Init(context.storage));
 
     return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
@@ -108,26 +108,25 @@ DataModel::ActionReturnStatus TlsCertificateManagementCluster::ReadAttribute(con
 {
     VerifyOrDie(request.path.mClusterId == TlsCertificateManagement::Id);
 
+    TlsCertificateManagementCluster * server = this;
+    auto matterEndpoint                      = request.path.mEndpointId;
+    auto fabric                              = request.GetAccessingFabricIndex();
+    bool largePayload                        = request.readFlags.Has(DataModel::ReadFlags::kAllowsLargePayload);
+
     switch (request.path.mAttributeId)
     {
     case MaxRootCertificates::Id:
         return encoder.Encode(mMaxRootCertificates);
     case ProvisionedRootCertificates::Id: {
-        TlsCertificateManagementCluster * server = this;
-        auto matterEndpoint                      = request.path.mEndpointId;
-        auto fabric                              = request.GetAccessingFabricIndex();
-        return encoder.EncodeList([server, matterEndpoint, fabric](const auto & listEncoder) -> CHIP_ERROR {
-            return server->EncodeProvisionedRootCertificates(matterEndpoint, fabric, false, listEncoder);
+        return encoder.EncodeList([server, matterEndpoint, fabric, largePayload](const auto & listEncoder) -> CHIP_ERROR {
+            return server->EncodeProvisionedRootCertificates(matterEndpoint, fabric, largePayload, listEncoder);
         });
     }
     case MaxClientCertificates::Id:
         return encoder.Encode(mMaxClientCertificates);
     case ProvisionedClientCertificates::Id: {
-        TlsCertificateManagementCluster * server = this;
-        auto matterEndpoint                      = request.path.mEndpointId;
-        auto fabric                              = request.GetAccessingFabricIndex();
-        return encoder.EncodeList([server, matterEndpoint, fabric](const auto & listEncoder) -> CHIP_ERROR {
-            return server->EncodeProvisionedClientCertificates(matterEndpoint, fabric, false, listEncoder);
+        return encoder.EncodeList([server, matterEndpoint, fabric, largePayload](const auto & listEncoder) -> CHIP_ERROR {
+            return server->EncodeProvisionedClientCertificates(matterEndpoint, fabric, largePayload, listEncoder);
         });
     }
     case ClusterRevision::Id:
@@ -143,7 +142,18 @@ CHIP_ERROR
 TlsCertificateManagementCluster::EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
                                                                    const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    return mDelegate.LoadedRootCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR { return encoder.Encode(cert); });
+    return mDelegate.LoadedRootCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
+        if (largePayload)
+        {
+            return encoder.Encode(cert);
+        }
+
+        // Drop the certificate payload if transport doesn't support large payload
+        TLSCertStruct::Type idOnlyCert;
+        idOnlyCert.fabricIndex = cert.fabricIndex;
+        idOnlyCert.caid        = cert.caid;
+        return encoder.Encode(idOnlyCert);
+    });
 }
 
 CHIP_ERROR
@@ -151,7 +161,18 @@ TlsCertificateManagementCluster::EncodeProvisionedClientCertificates(EndpointId 
                                                                      bool largePayload,
                                                                      const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    return mDelegate.LoadedClientCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR { return encoder.Encode(cert); });
+    return mDelegate.LoadedClientCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
+        if (largePayload)
+        {
+            return encoder.Encode(cert);
+        }
+
+        // Drop the certificate payload if transport doesn't support large payload
+        TLSClientCertificateDetailStruct::Type idOnlyCert;
+        idOnlyCert.fabricIndex = cert.fabricIndex;
+        idOnlyCert.ccdid       = cert.ccdid;
+        return encoder.Encode(idOnlyCert);
+    });
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -330,7 +351,7 @@ TlsCertificateManagementCluster::HandleFindRootCertificate(CommandHandler & comm
     {
         return Status::NotFound;
     }
-    else if (result != CHIP_NO_ERROR)
+    if (result != CHIP_NO_ERROR)
     {
         return Status::Failure;
     }
@@ -359,7 +380,7 @@ TlsCertificateManagementCluster::HandleLookupRootCertificate(CommandHandler & co
     {
         return Status::NotFound;
     }
-    else if (result != CHIP_NO_ERROR)
+    if (result != CHIP_NO_ERROR)
     {
         return Status::Failure;
     }
@@ -428,6 +449,11 @@ TlsCertificateManagementCluster::HandleGenerateClientCsr(CommandHandler & comman
         commandHandler.AddResponse(responsePath, response);
         return Status::Success;
     });
+
+    if (status == Status::Success)
+    {
+        return std::nullopt;
+    }
 
     return status;
 }
