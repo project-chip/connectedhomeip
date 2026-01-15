@@ -15,17 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <!--
-  Test cluster for MEI handling validation.
+  Test cluster for manufacturer-specific cluster handling validation.
   
   This cluster is intentionally NOT included in controller-clusters.matter
   to simulate a real-world scenario where a device has a vendor-specific 
-  MEI cluster that the controller/test harness has no knowledge of.
+  cluster that the controller/test harness has no knowledge of.
   
-  Used to validate TC_IDM_2_2 and other tests correctly handle unknown MEI clusters.
+  Used to validate TC_IDM_2_2 and other tests correctly handle unknown manufacturer-specific clusters.
   
   Cluster ID: 0xFFF1FC21 (4294048801)
-  - Prefix 0xFFF1: Test vendor ID range
-  - Suffix 0xFC21: MEI cluster range
+  - Vendor ID: 0xFFF1 (test vendor)
+  - Cluster suffix: 0xFC21 (within manufacturer-specific range 0xFC00-0xFFFE per spec)
 -->
 <configurator>
   <domain name="CHIP"/>
@@ -35,7 +35,7 @@ limitations under the License.
     <name>Test Hidden Manufacturer Specific</name>
     <code>0xFFF1FC21</code>
     <define>TEST_HIDDEN_MEI_CLUSTER</define>
-    <description>Test cluster for validating MEI handling without controller-side implementation</description>
+    <description>Test cluster for validating manufacturer-specific cluster handling without controller-side implementation</description>
 
     <attribute side="server" code="0x0000" define="TEST_ATTRIBUTE" type="boolean" writable="false" default="true" optional="false">TestAttribute</attribute>
   </cluster>
