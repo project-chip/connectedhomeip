@@ -31,7 +31,6 @@ class TimeSyncTracker
 {
 public:
     virtual ~TimeSyncTracker()                = default;
-    virtual bool IsTimeSyncClusterSupported() = 0;
     virtual bool IsValidUTCTime()             = 0;
 };
 

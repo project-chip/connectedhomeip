@@ -33,11 +33,10 @@ using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using chip::Protocols::InteractionModel::Status;
 
 ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(
-    EndpointId endpoint, BitFlags<ValveConfigurationAndControl::Feature> features, OptionalAttributeSet optionalAttributeSet,
-    const StartupConfiguration & config, ValveConfigurationAndControl::TimeSyncTracker * tsTracker) :
+    EndpointId endpoint, ValveContext context) :
     DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mDefaultOpenDuration(config.defaultOpenDuration),
-    mDefaultOpenLevel(config.defaultOpenLevel), mLevelStep(config.levelStep), mDelegate(nullptr), mTsTracker(tsTracker)
+    mFeatures(context.features), mOptionalAttributeSet(context.optionalAttributeSet), mDefaultOpenDuration(context.config.defaultOpenDuration),
+    mDefaultOpenLevel(context.config.defaultOpenLevel), mLevelStep(context.config.levelStep), mDelegate(context.delegate), mTsTracker(context.tsTracker)
 {}
 
 CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & context)
@@ -47,7 +46,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
     // This feature shall not be supported if the node doesn't support the TimeSync cluster.
     if (mFeatures.Has(Feature::kTimeSync))
     {
-        VerifyOrReturnError((mTsTracker != nullptr && mTsTracker->IsTimeSyncClusterSupported()), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((mTsTracker != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // The RemainingDuration attribute shall be reported when:
@@ -208,23 +207,21 @@ std::optional<DataModel::ActionReturnStatus> ValveConfigurationAndControlCluster
 
 CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // OpenDuration and RemainingDuration should be set to null
+    // OpenDuration and RemainingDuration shall be set to null.
     SaveAndReportIfChanged(mOpenDuration, DataModel::NullNullable, Attributes::OpenDuration::Id);
     SetRemainingDuration(DataModel::NullNullable);
 
-    // TargetState should be set to Closed and CurrentState to Transitioning
-    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
-
-    // If TimeSync is enabled, AutoCloseTime should be set to null
+    // If TimeSync feature is supported, AutoCloseTime shall be set to null.
     if (mFeatures.Has(Feature::kTimeSync))
     {
         SaveAndReportIfChanged(mAutoCloseTime, DataModel::NullNullable, Attributes::AutoCloseTime::Id);
     }
 
-    // Set the TargetLevel to 0
+    // TargetState shall be set to Closed and CurrentState to Transitioning.
+    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
+    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
+
+    // If Level feature is supported, TargetLevel shall be set to 0.
     if (mFeatures.Has(Feature::kLevel))
     {
         SaveAndReportIfChanged(mTargetLevel, Percent(0), Attributes::TargetLevel::Id);
@@ -233,12 +230,8 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
     // Cancel timer if running.
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
 
-    if (mDelegate != nullptr)
-    {
-        err = mDelegate->HandleCloseValve();
-    }
-
-    return err;
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_NO_ERROR);
+    return mDelegate->HandleCloseValve();;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -252,14 +245,13 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     // Verify "min 1" constraint on TargetLevel field.
-    VerifyOrReturnValue(commandData.targetLevel.HasValue() ? commandData.targetLevel.Value() > 0 : true, Status::ConstraintError);
+    VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
 
     if (commandData.openDuration.HasValue())
     {
         // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
         // Save the duration if provided, it can be null or an actual value.
-        VerifyOrReturnValue(commandData.openDuration.Value().IsNull() ? true : commandData.openDuration.Value().Value() > 0,
-                            Status::ConstraintError);
+        VerifyOrReturnValue(commandData.openDuration.Value().ValueOr(1) > 0, Status::ConstraintError);
         openDuration = commandData.openDuration.Value();
     }
     else
@@ -281,12 +273,54 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     }
 
     // Use the SetValveLevel function to handle the setting of internal values.
-    return SetValveLevel(openTargetLevel, openDuration);
+    return OpenValve(openTargetLevel, openDuration);
+}
+
+CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Percent> targetLevel,
+                                                              DataModel::Nullable<uint32_t> openDuration)
+{
+    // Check for the AutoCloseTime feature and set it to the UTC time plus OpenDuration.
+    if (mFeatures.Has(Feature::kTimeSync))
+    {
+        ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
+    }
+
+    // Set TargetState to Open and CurrentState to Transitioning
+    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
+    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
+
+    // Set OpenDuration to the provided value (can be null).
+    SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
+
+    // Set the RemainingDuration to the value of OpenDuration (either a value or null)
+    SetRemainingDuration(mOpenDuration);
+
+    // Set target level
+    if (mFeatures.Has(Feature::kLevel) && !targetLevel.IsNull())
+    {
+        SaveAndReportIfChanged(mTargetLevel, targetLevel, Attributes::TargetLevel::Id);
+    }
+
+    if (mDelegate != nullptr)
+    {
+        DataModel::Nullable<Percent> cLevel = mDelegate->HandleOpenValve(targetLevel);
+        if (mFeatures.Has(Feature::kLevel) && !cLevel.IsNull())
+        {
+            // Update CurrentLevel to the one returned from the Delegate
+            UpdateCurrentLevel(cLevel.Value());
+        }
+    }
+
+    // Start countdown if applicable (e.g. OpenDuration is not null).
+    HandleUpdateRemainingDurationInternal();
+
+    return CHIP_NO_ERROR;
 }
 
 // Internal functions.
 CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration)
 {
+    VerifyOrReturnValue(mTsTracker != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (!openDuration.IsNull() && mTsTracker->IsValidUTCTime())
     {
         // We have a synchronized UTC time in the TimeSync cluster, we can proceed to set the AutoCloseTime attribute
@@ -439,48 +473,6 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(Percent currentLeve
         SaveAndReportIfChanged(mTargetLevel, DataModel::NullNullable, Attributes::TargetLevel::Id);
         UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
     }
-}
-
-CHIP_ERROR ValveConfigurationAndControlCluster::SetValveLevel(DataModel::Nullable<Percent> level,
-                                                              DataModel::Nullable<uint32_t> openDuration)
-{
-    // Check for the AutoCloseTime feature
-    if (mFeatures.Has(Feature::kTimeSync))
-    {
-        VerifyOrReturnValue(mTsTracker->IsTimeSyncClusterSupported(), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
-    }
-
-    // Set the states accordingly, TargetState to Open and CurrentState to Transitioning
-    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
-
-    // Set OpenDuration to the provided value (can be null).
-    SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
-
-    // Set the RemainingDuration to the value of OpenDuration (either a value or null)
-    SetRemainingDuration(mOpenDuration);
-
-    // Set target level
-    if (mFeatures.Has(Feature::kLevel) && !level.IsNull())
-    {
-        SaveAndReportIfChanged(mTargetLevel, level, Attributes::TargetLevel::Id);
-    }
-
-    if (mDelegate != nullptr)
-    {
-        DataModel::Nullable<Percent> cLevel = mDelegate->HandleOpenValve(level);
-        if (mFeatures.Has(Feature::kLevel) && !cLevel.IsNull())
-        {
-            // Update CurrentLevel to the one returned from the Delegate
-            UpdateCurrentLevel(cLevel.Value());
-        }
-    }
-
-    // Start countdown if applicable (e.g. OpenDuration is not null).
-    HandleUpdateRemainingDurationInternal();
-
-    return CHIP_NO_ERROR;
 }
 
 void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState)

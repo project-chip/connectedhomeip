@@ -49,9 +49,16 @@ public:
         uint8_t levelStep        = kDefaultLevelStep;
     };
 
-    ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
-                                        OptionalAttributeSet optionalAttributeSet, const StartupConfiguration & config,
-                                        ValveConfigurationAndControl::TimeSyncTracker * tsTracker);
+    struct ValveContext
+    {
+        BitFlags<ValveConfigurationAndControl::Feature> features;
+        OptionalAttributeSet optionalAttributeSet;
+        StartupConfiguration config;
+        ValveConfigurationAndControl::TimeSyncTracker * tsTracker;
+        ValveConfigurationAndControl::Delegate * delegate;
+    };
+
+    ValveConfigurationAndControlCluster(EndpointId endpointId, ValveContext context);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -69,7 +76,7 @@ public:
     static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
 
     CHIP_ERROR CloseValve();
-    CHIP_ERROR SetValveLevel(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
+    CHIP_ERROR OpenValve(DataModel::Nullable<Percent> targetLevel, DataModel::Nullable<uint32_t> openDuration);
     void UpdateCurrentLevel(Percent currentLevel);
     void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
     void EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);

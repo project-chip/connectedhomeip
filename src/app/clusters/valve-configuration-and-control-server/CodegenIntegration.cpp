@@ -45,26 +45,19 @@ LazyRegisteredServerCluster<ValveConfigurationAndControlCluster> gServers[kValve
 class CodegenTimeSyncTracker : public TimeSyncTracker
 {
 public:
-    bool IsTimeSyncClusterSupported() override
-    {
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-        return (nullptr != TimeSynchronization::GetClusterInstance());
-#else
-        return false;
-#endif
-    }
-
     bool IsValidUTCTime() override
     {
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-        if (IsTimeSyncClusterSupported())
+        if (TimeSynchronization::GetClusterInstance() != nullptr)
         {
             return TimeSynchronization::GetClusterInstance()->GetGranularity() !=
                 TimeSynchronization::GranularityEnum::kNoTimeGranularity;
         }
-#endif
         return false;
     }
+#else
+    bool IsValidUTCTime() override { return false; }
+#endif
 };
 
 CodegenTimeSyncTracker codegenTracker;
@@ -95,12 +88,17 @@ public:
             levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
         }
 
+        ValveConfigurationAndControlCluster::StartupConfiguration startupConfig { .defaultOpenDuration = defaultOpenDuration, .defaultOpenLevel = defaultOpenLevel, .levelStep = levelStep};
+        ValveConfigurationAndControlCluster::ValveContext context = {
+            .config = startupConfig,
+            .delegate = nullptr,
+            .features = BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
+            .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
+            .tsTracker = &codegenTracker,
+        };
+
         gServers[clusterInstanceIndex].Create(
-            endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
-            ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
-            ValveConfigurationAndControlCluster::StartupConfiguration{
-                .defaultOpenDuration = defaultOpenDuration, .defaultOpenLevel = defaultOpenLevel, .levelStep = levelStep },
-            &codegenTracker);
+            endpointId, context);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -185,7 +183,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
-    return interface->SetValveLevel(level, openDuration);
+    return interface->OpenValve(level, openDuration);
 }
 
 CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
