@@ -486,6 +486,14 @@ public:
     void Shutdown();
 
     /**
+     * @brief Reset the FabricTable to its initial state, clearing all delegates and fabrics.
+     *
+     * This is primarily useful for unit tests to reset the global state between tests.
+     * Clears the delegate list root and calls Shutdown().
+     */
+    void Reset();
+
+    /**
      * @brief If `Init()` caused a Delete due to partial commit, the fabric index at play is returned.
      *
      * Allows caller to schedule more clean-up. This is because at Init() time, none of the delegates

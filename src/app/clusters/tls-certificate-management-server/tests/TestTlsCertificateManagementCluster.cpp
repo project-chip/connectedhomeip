@@ -25,7 +25,9 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server/Server.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TimeUtils.h>
@@ -454,6 +456,7 @@ struct TestTlsCertificateManagementCluster : public ::testing::Test
 
     void SetUp() override
     {
+        Server::GetInstance().GetFabricTable().Reset();
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
 

@@ -1181,6 +1181,12 @@ void FabricTable::Shutdown()
     mStorage = nullptr;
 }
 
+void FabricTable::Reset()
+{
+    Shutdown();
+    mDelegateListRoot = nullptr;
+}
+
 FabricIndex FabricTable::GetDeletedFabricFromCommitMarker()
 {
     FabricIndex retVal = mDeletedFabricIndexFromInit;
