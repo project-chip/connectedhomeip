@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -54,15 +53,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -72,8 +71,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
-                                      InteractionModelEngine::GetInstance(), GeneralDiagnostics::GetTestEventTriggerDelegate(),
-                                      GeneralDiagnostics::GetNodeStartupTimestamp());
+                                      InteractionModelEngine::GetInstance(), Server::GetInstance().GetTestEventTriggerDelegate(),
+                                      Server::GetInstance().GetNodeStartupTimestamp());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create();
