@@ -65,6 +65,16 @@ public:
         return nullptr;
     }
 
+    std::vector<std::string> SupportedDeviceTypes() const
+    {
+        std::vector<std::string> result;
+        for (auto & item : mRegistry)
+        {
+            result.push_back(item.first);
+        }
+        return result;
+    }
+
 private:
     std::map<std::string, DeviceCreator> mRegistry;
     DefaultTimerDelegate timer;

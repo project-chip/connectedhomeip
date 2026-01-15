@@ -25,7 +25,6 @@ CommandHandlerInterfaceOnlyClusters:
     # keep-sorted start
     - Actions
     - Camera AV Settings User Level Management
-    - Camera AV Stream Management
     - Closure Control
     - Closure Dimension
     - Commissioner Control
@@ -123,6 +122,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Camera AV Stream Management
     - Chime
     - Descriptor
     - Device Energy Management
@@ -145,8 +145,10 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Scenes Management
     - Software Diagnostics
+    - TLS Client Management
     - Time Format Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
