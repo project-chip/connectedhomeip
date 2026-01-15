@@ -44,6 +44,45 @@ using namespace chip::Testing;
 
 static constexpr chip::EndpointId kTestEndpointId = 1;
 
+static AudioCapabilitiesStruct & GetAudioCapabilities()
+{
+    static std::array<AudioCodecEnum, 2> audioCodecs = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
+    static std::array<uint32_t, 2> sampleRates       = { 48000, 32000 }; // Sample rates in Hz
+    static std::array<uint8_t, 2> bitDepths          = { 24, 32 };
+    static AudioCapabilitiesStruct audioCapabilities = { 2, chip::Span<AudioCodecEnum>(audioCodecs),
+                                                         chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
+    return audioCapabilities;
+}
+static VideoSensorParamsStruct & GetVideoSensorParams()
+{
+    static VideoSensorParamsStruct videoSensorParams = { 1920, 1080, 120,
+                                                         chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
+    return videoSensorParams;
+}
+
+static std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints()
+{
+    static std::vector<RateDistortionTradeOffStruct> rateDistTradeOffs = {
+        { VideoCodecEnum::kH264, { 640, 480 }, 10000 /* bitrate */ }
+    };
+    return rateDistTradeOffs;
+}
+
+static std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities()
+{
+    static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {
+        { { 640, 480 }, 30, ImageCodecEnum::kJpeg, false, chip::MakeOptional(static_cast<bool>(false)) },
+        { { 1280, 720 }, 30, ImageCodecEnum::kJpeg, true, chip::MakeOptional(static_cast<bool>(true)) },
+    };
+    return snapshotCapabilities;
+}
+
+static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
+{
+    static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    return supportedStreamUsage;
+}
+
 // Mock delegate for testing CameraAVStreamManagement
 class MockCameraAVStreamManagementDelegate : public CameraAVStreamManagementDelegate
 {
@@ -52,7 +91,7 @@ public:
                                          std::vector<AudioStreamStruct> * audioStreams,
                                          std::vector<SnapshotStreamStruct> * snapshotStreams) :
         mAllocatedVideoStreams(videoStreams),
-        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams)
+        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams), mAudioStreamCount(0)
     {}
 
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID) override
@@ -76,13 +115,64 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
+        if (mAudioStreamCount >= 1)
+        {
+            return Protocols::InteractionModel::Status::ResourceExhausted;
+        }
+
+        auto & audioCapabilities = GetAudioCapabilities();
+
+        bool codecSupported = false;
+        for (auto & codec : audioCapabilities.supportedCodecs)
+        {
+            if (codec == allocateArgs.audioCodec)
+            {
+                codecSupported = true;
+                break;
+            }
+        }
+        if (!codecSupported)
+        {
+            return Protocols::InteractionModel::Status::DynamicConstraintError;
+        }
+
+        bool sampleRateSupported = false;
+        for (auto & sampleRate : audioCapabilities.supportedSampleRates)
+        {
+            if (sampleRate == allocateArgs.sampleRate)
+            {
+                sampleRateSupported = true;
+                break;
+            }
+        }
+        if (!sampleRateSupported)
+        {
+            return Protocols::InteractionModel::Status::DynamicConstraintError;
+        }
+
+        bool bitDepthSupported = false;
+        for (auto & bitDepth : audioCapabilities.supportedBitDepths)
+        {
+            if (bitDepth == allocateArgs.bitDepth)
+            {
+                bitDepthSupported = true;
+                break;
+            }
+        }
+        if (!bitDepthSupported)
+        {
+            return Protocols::InteractionModel::Status::DynamicConstraintError;
+        }
+
         outStreamID = static_cast<uint16_t>(mAllocatedAudioStreams->size() + 1);
         mAllocatedAudioStreams->push_back(allocateArgs);
+        mAudioStreamCount++;
         return Protocols::InteractionModel::Status::Success;
     }
 
     Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) override
     {
+        mAudioStreamCount--;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -137,6 +227,7 @@ private:
     std::vector<VideoStreamStruct> * mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> * mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> * mAllocatedSnapshotStreams;
+    uint8_t mAudioStreamCount;
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
@@ -144,46 +235,6 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-    static VideoSensorParamsStruct & GetVideoSensorParams()
-    {
-        static VideoSensorParamsStruct videoSensorParams = { 1920, 1080, 120,
-                                                             chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
-        return videoSensorParams;
-    }
-
-    static std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints()
-    {
-        static std::vector<RateDistortionTradeOffStruct> rateDistTradeOffs = {
-            { VideoCodecEnum::kH264, { 640, 480 }, 10000 /* bitrate */ }
-        };
-        return rateDistTradeOffs;
-    }
-
-    static AudioCapabilitiesStruct & GetAudioCapabilities()
-    {
-        static std::array<AudioCodecEnum, 2> audioCodecs = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
-        static std::array<uint32_t, 2> sampleRates       = { 48000, 32000 }; // Sample rates in Hz
-        static std::array<uint8_t, 2> bitDepths          = { 24, 32 };
-        static AudioCapabilitiesStruct audioCapabilities = { 2, chip::Span<AudioCodecEnum>(audioCodecs),
-                                                             chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
-        return audioCapabilities;
-    }
-
-    static std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities()
-    {
-        static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {
-            { { 640, 480 }, 30, ImageCodecEnum::kJpeg, false, chip::MakeOptional(static_cast<bool>(false)) },
-            { { 1280, 720 }, 30, ImageCodecEnum::kJpeg, true, chip::MakeOptional(static_cast<bool>(true)) },
-        };
-        return snapshotCapabilities;
-    }
-
-    static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
-    {
-        static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
-        return supportedStreamUsage;
-    }
 
     static CHIP_ERROR InitializeCameraAVSMDefaults(CameraAvStreamManagement::CameraAVStreamManagementCluster & mServer)
     {
@@ -620,7 +671,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteNightVision)
     EXPECT_EQ(nightVision, TriStateAutoEnum::kOff);
 }
 
-
 TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 {
     Attributes::Viewport::TypeInfo::Type viewport = { 0, 0, 0, 0 };
@@ -683,7 +733,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSpeakerVolumeLevel)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
     EXPECT_EQ(speakerVolumeLevel, 1);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)100), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) 100), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
     EXPECT_EQ(speakerVolumeLevel, 100);
 
@@ -701,10 +751,12 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSpeakerVolumeLevel)
     EXPECT_EQ(speakerVolumeLevel, maxLevel);
 
     // Test out of bounds
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)(minLevel - 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)(maxLevel + 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) (minLevel - 1)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) (maxLevel + 1)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t)1), CHIP_NO_ERROR); // Restore default
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) 1), CHIP_NO_ERROR); // Restore default
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadSpeakerMaxLevel)
@@ -742,7 +794,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteMicrophoneVolumeLevel)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
     EXPECT_EQ(microphoneVolumeLevel, 1);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)50), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) 50), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MicrophoneVolumeLevel::Id, microphoneVolumeLevel), CHIP_NO_ERROR);
     EXPECT_EQ(microphoneVolumeLevel, 50);
 
@@ -760,10 +812,12 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteMicrophoneVolumeLevel)
     EXPECT_EQ(microphoneVolumeLevel, maxLevel);
 
     // Test out of bounds
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)(minLevel - 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)(maxLevel + 1)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) (minLevel - 1)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) (maxLevel + 1)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t)1), CHIP_NO_ERROR); // Restore default
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) 1), CHIP_NO_ERROR); // Restore default
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadMicrophoneMaxLevel)
@@ -793,22 +847,22 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteImageRotation)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
     EXPECT_EQ(imageRotation, 0);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)90), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t) 90), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
     EXPECT_EQ(imageRotation, 90);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)180), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t) 180), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
     EXPECT_EQ(imageRotation, 180);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)270), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t) 270), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
     EXPECT_EQ(imageRotation, 270);
 
     // Test invalid value
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)360), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t) 360), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t)0), CHIP_NO_ERROR); // Restore default
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::ImageRotation::Id, (uint16_t) 0), CHIP_NO_ERROR); // Restore default
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteImageFlipHorizontal)
@@ -862,25 +916,28 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
     EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kMedium);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kLow), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kLow),
+              CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
     EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kLow);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kHigh), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kHigh),
+              CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
     EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kHigh);
 
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kAuto), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kAuto),
+              CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, statusLightBrightness), CHIP_NO_ERROR);
     EXPECT_EQ(statusLightBrightness, Globals::ThreeLevelAutoEnum::kAuto);
 
-
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kMedium), CHIP_NO_ERROR); // Restore default
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kMedium),
+              CHIP_NO_ERROR); // Restore default
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
 {
-    using Request = Commands::AudioStreamAllocate::Type;
+    using Request  = Commands::AudioStreamAllocate::Type;
     using Response = Commands::AudioStreamAllocateResponse::DecodableType;
 
     mAudioStreams.clear();
@@ -888,12 +945,12 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
     Request request;
 
     // Happy path
-    request.streamUsage = StreamUsageEnum::kLiveView;
-    request.audioCodec = AudioCodecEnum::kOpus;
+    request.streamUsage  = StreamUsageEnum::kLiveView;
+    request.audioCodec   = AudioCodecEnum::kOpus;
     request.channelCount = 2;
-    request.sampleRate = 48000;
-    request.bitRate = 128000;
-    request.bitDepth = 24;
+    request.sampleRate   = 48000;
+    request.bitRate      = 128000;
+    request.bitDepth     = 24;
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
@@ -901,59 +958,72 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
     ASSERT_TRUE(result.response.has_value());
     EXPECT_EQ(result.response->audioStreamID, 1);
 
-    // Invalid streamUsage
-    request.streamUsage = StreamUsageEnum::kUnknownEnumValue;
-    result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
-    request.streamUsage = StreamUsageEnum::kLiveView; // Restore
-
-    // audioCodec unknown
-    request.audioCodec = AudioCodecEnum::kUnknownEnumValue;
-    result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
-    request.audioCodec = AudioCodecEnum::kOpus; // Restore
-
     // channelCount out of bounds
     request.channelCount = 0;
-    result = mClusterTester.Invoke<Request, Response>(request);
+    result               = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
 
     request.channelCount = 9;
-    result = mClusterTester.Invoke<Request, Response>(request);
+    result               = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
     request.channelCount = 2; // Restore
 
     // sampleRate 0
     request.sampleRate = 0;
-    result = mClusterTester.Invoke<Request, Response>(request);
+    result             = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
     request.sampleRate = 48000; // Restore
 
     // bitRate 0
     request.bitRate = 0;
-    result = mClusterTester.Invoke<Request, Response>(request);
+    result          = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
     request.bitRate = 128000; // Restore
 
     // Invalid bitDepth
     request.bitDepth = 12;
-    result = mClusterTester.Invoke<Request, Response>(request);
+    result           = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
     request.bitDepth = 24; // Restore
 
     // streamUsage not supported by test fixture priorities
     request.streamUsage = StreamUsageEnum::kAnalysis;
-    result = mClusterTester.Invoke<Request, Response>(request);
+    result              = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
     request.streamUsage = StreamUsageEnum::kLiveView; // Restore
+
+    // Attempt to allocate a second stream, expecting ResourceExhausted
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommandUnsupportedBitDepth)
+{
+    using Request  = Commands::AudioStreamAllocate::Type;
+    using Response = Commands::AudioStreamAllocateResponse::DecodableType;
+
+    mAudioStreams.clear();
+
+    Request request;
+
+    // Unsupported bitDepth
+    request.streamUsage  = StreamUsageEnum::kLiveView;
+    request.audioCodec   = AudioCodecEnum::kOpus;
+    request.channelCount = 2;
+    request.sampleRate   = 48000;
+    request.bitRate      = 128000;
+    request.bitDepth     = 8; // Unsupported bitDepth
+
+    auto result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
 }
 
 } // namespace
