@@ -30,8 +30,8 @@ namespace chip::app::Clusters::ValveConfigurationAndControl {
 class TimeSyncTracker
 {
 public:
-    virtual ~TimeSyncTracker()                = default;
-    virtual bool IsValidUTCTime()             = 0;
+    virtual ~TimeSyncTracker()    = default;
+    virtual bool IsValidUTCTime() = 0;
 };
 
 } // namespace chip::app::Clusters::ValveConfigurationAndControl

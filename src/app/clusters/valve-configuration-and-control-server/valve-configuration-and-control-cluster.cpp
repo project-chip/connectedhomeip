@@ -32,11 +32,11 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using chip::Protocols::InteractionModel::Status;
 
-ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(
-    EndpointId endpoint, ValveContext context) :
-    DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }),
-    mFeatures(context.features), mOptionalAttributeSet(context.optionalAttributeSet), mDefaultOpenDuration(context.config.defaultOpenDuration),
-    mDefaultOpenLevel(context.config.defaultOpenLevel), mLevelStep(context.config.levelStep), mDelegate(context.delegate), mTsTracker(context.tsTracker)
+ValveConfigurationAndControlCluster::ValveConfigurationAndControlCluster(EndpointId endpoint, ValveContext context) :
+    DefaultServerCluster({ endpoint, ValveConfigurationAndControl::Id }), mFeatures(context.features),
+    mOptionalAttributeSet(context.optionalAttributeSet), mDefaultOpenDuration(context.config.defaultOpenDuration),
+    mDefaultOpenLevel(context.config.defaultOpenLevel), mLevelStep(context.config.levelStep), mDelegate(context.delegate),
+    mTsTracker(context.tsTracker)
 {}
 
 CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & context)
@@ -231,7 +231,8 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
 
     VerifyOrReturnError(mDelegate != nullptr, CHIP_NO_ERROR);
-    return mDelegate->HandleCloseValve();;
+    return mDelegate->HandleCloseValve();
+    ;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -277,7 +278,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
 }
 
 CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Percent> targetLevel,
-                                                              DataModel::Nullable<uint32_t> openDuration)
+                                                          DataModel::Nullable<uint32_t> openDuration)
 {
     // Check for the AutoCloseTime feature and set it to the UTC time plus OpenDuration.
     if (mFeatures.Has(Feature::kTimeSync))

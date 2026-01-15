@@ -88,17 +88,18 @@ public:
             levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
         }
 
-        ValveConfigurationAndControlCluster::StartupConfiguration startupConfig { .defaultOpenDuration = defaultOpenDuration, .defaultOpenLevel = defaultOpenLevel, .levelStep = levelStep};
+        ValveConfigurationAndControlCluster::StartupConfiguration startupConfig{ .defaultOpenDuration = defaultOpenDuration,
+                                                                                 .defaultOpenLevel    = defaultOpenLevel,
+                                                                                 .levelStep           = levelStep };
         ValveConfigurationAndControlCluster::ValveContext context = {
-            .config = startupConfig,
-            .delegate = nullptr,
-            .features = BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
+            .config               = startupConfig,
+            .delegate             = nullptr,
+            .features             = BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
             .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
-            .tsTracker = &codegenTracker,
+            .tsTracker            = &codegenTracker,
         };
 
-        gServers[clusterInstanceIndex].Create(
-            endpointId, context);
+        gServers[clusterInstanceIndex].Create(endpointId, context);
         return gServers[clusterInstanceIndex].Registration();
     }
 
