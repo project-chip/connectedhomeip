@@ -121,9 +121,14 @@ static_library("uriparser") {
   # C standard
   cflags_c = [ "-std=c99" ]
 
-  if (is_clang) {
-    cflags = [ "-Wno-sign-conversion" ]
+  if (current_os == "mac" || current_os == "ios") {
+    configs += [ ":uriparser_disable_sign_conversion" ]
   }
+}
+
+# Config to disable sign-conversion warnings for uriparser
+config("uriparser_disable_sign_conversion") {
+  cflags = [ "-Wno-sign-conversion" ]
 }
 
 # Config for public include directories

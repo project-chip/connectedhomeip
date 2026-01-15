@@ -292,10 +292,8 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     }
 
     bool pathEndsWithSlash = !path.empty() && path.back() == '/';
-
-    // Check if query and fragment are empty
-    bool noQuery    = query.empty();
-    bool noFragment = fragment.empty();
+    bool noQuery    = query.empty() && url.find('?') == std::string::npos;
+    bool noFragment = fragment.empty() && url.find('#') == std::string::npos;
 
     return scheme == "https" && noFragment && noQuery && pathEndsWithSlash && !host.empty();
 }
