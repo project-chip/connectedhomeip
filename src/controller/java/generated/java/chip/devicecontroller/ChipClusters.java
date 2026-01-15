@@ -62700,14 +62700,18 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void playChimeSound(DefaultClusterCallback callback) {
-      playChimeSound(callback, 0);
+    public void playChimeSound(DefaultClusterCallback callback, Optional<Integer> chimeID) {
+      playChimeSound(callback, chimeID, 0);
     }
 
-    public void playChimeSound(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+    public void playChimeSound(DefaultClusterCallback callback, Optional<Integer> chimeID, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long chimeIDFieldID = 0L;
+      BaseTLVType chimeIDtlvValue = chimeID.<BaseTLVType>map((nonOptionalchimeID) -> new UIntType(nonOptionalchimeID)).orElse(new EmptyType());
+      elements.add(new StructElement(chimeIDFieldID, chimeIDtlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
