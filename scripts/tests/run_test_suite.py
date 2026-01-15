@@ -479,8 +479,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            app_name='wlx-app' if (ble_wifi or wifi_paf) else 'eth-app'
-            tool_name='wlx-tool' if wifi_paf else 'eth-tool'
+            app_name = 'wlx-app' if (ble_wifi or wifi_paf) else 'eth-app'
+            tool_name = 'wlx-tool' if wifi_paf else 'eth-tool'
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi or WiFi-PAF commissioning.
