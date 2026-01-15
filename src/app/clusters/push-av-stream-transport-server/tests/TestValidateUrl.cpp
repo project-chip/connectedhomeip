@@ -216,14 +216,12 @@ public:
         {
             return result == std::nullopt && commandHandler.HasResponse();
         }
-        else
+
+        if (result == std::nullopt && commandHandler.HasStatus())
         {
-            if (result == std::nullopt && commandHandler.HasStatus())
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
+        return false;
     }
 };
 
