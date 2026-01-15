@@ -57,7 +57,7 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
-}
+} // namespace
 
 UnitLocalizationServer & UnitLocalizationServer::Instance()
 {
