@@ -13930,6 +13930,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PlayChimeSound",
                 "args": {
+                    "chimeID": "int",
                 },
             },
         },

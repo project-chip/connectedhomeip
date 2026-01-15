@@ -11659,6 +11659,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Chime::Events::ChimeStartedPlaying::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ChimeID", indent + 1, value.chimeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ChimeID'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const CommissionerControl::Events::CommissioningRequestResult::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -25322,6 +25338,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::PushAvStreamTransport::Events::PushTransportEnd::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PushTransportEnd", 1, value);
+        }
+        }
+        break;
+    }
+    case Chime::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case Chime::Events::ChimeStartedPlaying::Id: {
+            chip::app::Clusters::Chime::Events::ChimeStartedPlaying::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChimeStartedPlaying", 1, value);
         }
         }
         break;

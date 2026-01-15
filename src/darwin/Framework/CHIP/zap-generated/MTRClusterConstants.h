@@ -6979,6 +6979,9 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportBeginID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
+    // Cluster Chime events
+    MTREventIDTypeClusterChimeEventChimeStartedPlayingID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+
     // Cluster CommissionerControl events
     MTREventIDTypeClusterCommissionerControlEventCommissioningRequestResultID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
 

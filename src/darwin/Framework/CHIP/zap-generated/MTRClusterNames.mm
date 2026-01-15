@@ -16357,6 +16357,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         switch (eventID) {
 
+            // Cluster Chime events
+        case MTREventIDTypeClusterChimeEventChimeStartedPlayingID:
+            result = @"ChimeStartedPlaying";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
