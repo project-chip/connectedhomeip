@@ -8613,6 +8613,51 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRCommissioningProxyClusterScanResultStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _address = nil;
+
+        _transport = @(0);
+
+        _discriminator = @(0);
+
+        _vendorId = @(0);
+
+        _productId = @(0);
+
+        _extendedData = nil;
+
+        _wiFiBand = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCommissioningProxyClusterScanResultStruct alloc] init];
+
+    other.address = self.address;
+    other.transport = self.transport;
+    other.discriminator = self.discriminator;
+    other.vendorId = self.vendorId;
+    other.productId = self.productId;
+    other.extendedData = self.extendedData;
+    other.wiFiBand = self.wiFiBand;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorId:%@; productId:%@; extendedData:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorId, _productId, [_extendedData base64EncodedStringWithOptions:0], _wiFiBand];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRChannelClusterProgramCastStruct
 - (instancetype)init
 {

@@ -46,6 +46,7 @@
 #include <clusters/ClosureDimension/EventIds.h>
 #include <clusters/ColorControl/EventIds.h>
 #include <clusters/CommissionerControl/EventIds.h>
+#include <clusters/CommissioningProxy/EventIds.h>
 #include <clusters/CommodityMetering/EventIds.h>
 #include <clusters/CommodityPrice/EventIds.h>
 #include <clusters/CommodityTariff/EventIds.h>

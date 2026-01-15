@@ -5477,6 +5477,74 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDirectory
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.address", "address", value.isMember("address")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.transport", "transport", value.isMember("transport")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.discriminator", "discriminator",
+                                                                  value.isMember("discriminator")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.vendorId", "vendorId", value.isMember("vendorId")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.productId", "productId", value.isMember("productId")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScanResultStruct.extendedData", "extendedData", value.isMember("extendedData")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "address");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.address, value["address"]));
+    valueCopy.removeMember("address");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transport");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transport, value["transport"]));
+    valueCopy.removeMember("transport");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "discriminator");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.discriminator, value["discriminator"]));
+    valueCopy.removeMember("discriminator");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vendorId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.vendorId, value["vendorId"]));
+    valueCopy.removeMember("vendorId");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "productId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.productId, value["productId"]));
+    valueCopy.removeMember("productId");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extendedData");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extendedData, value["extendedData"]));
+    valueCopy.removeMember("extendedData");
+
+    if (value.isMember("wiFiBand"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "wiFiBand");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.wiFiBand, value["wiFiBand"]));
+    }
+    valueCopy.removeMember("wiFiBand");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.address);
+    ComplexArgumentParser::Finalize(request.transport);
+    ComplexArgumentParser::Finalize(request.discriminator);
+    ComplexArgumentParser::Finalize(request.vendorId);
+    ComplexArgumentParser::Finalize(request.productId);
+    ComplexArgumentParser::Finalize(request.extendedData);
+    ComplexArgumentParser::Finalize(request.wiFiBand);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                                         Json::Value & value)
 {

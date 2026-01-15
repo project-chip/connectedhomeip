@@ -48,6 +48,7 @@
 #include <clusters/ClosureDimension/EnumsCheck.h>
 #include <clusters/ColorControl/EnumsCheck.h>
 #include <clusters/CommissionerControl/EnumsCheck.h>
+#include <clusters/CommissioningProxy/EnumsCheck.h>
 #include <clusters/CommodityMetering/EnumsCheck.h>
 #include <clusters/CommodityPrice/EnumsCheck.h>
 #include <clusters/CommodityTariff/EnumsCheck.h>

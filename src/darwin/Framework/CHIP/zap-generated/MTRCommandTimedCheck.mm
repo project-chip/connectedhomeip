@@ -1070,6 +1070,15 @@ static BOOL CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(AttributeId a
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommissioningProxyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissioningProxy;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -1712,6 +1721,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(commandID);
+    }
+    case Clusters::CommissioningProxy::Id: {
+        return CommandNeedsTimedInvokeInCommissioningProxyCluster(commandID);
     }
     case Clusters::WakeOnLan::Id: {
         return CommandNeedsTimedInvokeInWakeOnLANCluster(commandID);

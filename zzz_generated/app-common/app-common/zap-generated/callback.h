@@ -1137,6 +1137,16 @@ void emberAfThreadNetworkDirectoryClusterShutdownCallback(chip::EndpointId endpo
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfCommissioningProxyClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCommissioningProxyClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5716,6 +5726,44 @@ chip::Protocols::InteractionModel::Status MatterThreadNetworkDirectoryClusterSer
 void emberAfThreadNetworkDirectoryClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Commissioning Proxy Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommissioningProxyClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCommissioningProxyClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommissioningProxyClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCommissioningProxyClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCommissioningProxyClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCommissioningProxyClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Wake on LAN Cluster
 //
 
@@ -7556,6 +7604,42 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(
 bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
+/**
+ * @brief Commissioning Proxy Cluster ProxyConnectRequest Command callback (from client)
+ */
+bool emberAfCommissioningProxyClusterProxyConnectRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::DecodableType & commandData);
+/**
+ * @brief Commissioning Proxy Cluster ProxyDisconnectRequest Command callback (from client)
+ */
+bool emberAfCommissioningProxyClusterProxyDisconnectRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::DecodableType & commandData);
+/**
+ * @brief Commissioning Proxy Cluster ProxyScanRequest Command callback (from client)
+ */
+bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::DecodableType & commandData);
+/**
+ * @brief Commissioning Proxy Cluster ProxyBackGroundScanStartRequest Command callback (from client)
+ */
+bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::DecodableType & commandData);
+/**
+ * @brief Commissioning Proxy Cluster ProxyBackGroundScanStopRequest Command callback (from client)
+ */
+bool emberAfCommissioningProxyClusterProxyBackGroundScanStopRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::DecodableType & commandData);
+/**
+ * @brief Commissioning Proxy Cluster ProxyMessageRequest Command callback (from client)
+ */
+bool emberAfCommissioningProxyClusterProxyMessageRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::DecodableType & commandData);
 /**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */

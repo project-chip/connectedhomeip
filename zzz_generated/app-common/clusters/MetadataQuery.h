@@ -62,6 +62,8 @@
 #include <clusters/ColorControl/MetadataProvider.h>
 #include <clusters/CommissionerControl/Ids.h>
 #include <clusters/CommissionerControl/MetadataProvider.h>
+#include <clusters/CommissioningProxy/Ids.h>
+#include <clusters/CommissioningProxy/MetadataProvider.h>
 #include <clusters/CommodityMetering/Ids.h>
 #include <clusters/CommodityMetering/MetadataProvider.h>
 #include <clusters/CommodityPrice/Ids.h>
@@ -443,6 +445,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == CommissionerControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissionerControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommissioningProxy::Id) || ...))
+    {
+        if (id == CommissioningProxy::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissioningProxy::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityMetering::Id) || ...))
     {

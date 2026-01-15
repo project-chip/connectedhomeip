@@ -67,6 +67,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x0000007C, MTRDeviceTypeClass::Simple, @"Laundry Dryer" },
     { 0x00000090, MTRDeviceTypeClass::Simple, @"Network Infrastructure Manager" },
     { 0x00000091, MTRDeviceTypeClass::Simple, @"Thread Border Router" },
+    { 0x00000092, MTRDeviceTypeClass::Simple, @"Commissioning Proxy" },
     { 0x00000100, MTRDeviceTypeClass::Simple, @"On/Off Light" },
     { 0x00000101, MTRDeviceTypeClass::Simple, @"Dimmable Light" },
     { 0x00000103, MTRDeviceTypeClass::Simple, @"On/Off Light Switch" },

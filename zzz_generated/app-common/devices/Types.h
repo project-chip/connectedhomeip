@@ -244,6 +244,11 @@ constexpr DataModel::DeviceTypeEntry kThreadBorderRouter = {
     .deviceTypeRevision = kThreadBorderRouterDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kCommissioningProxy = {
+    .deviceTypeId       = kCommissioningProxyDeviceTypeId,
+    .deviceTypeRevision = kCommissioningProxyDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kOnOffLight = {
     .deviceTypeId       = kOnOffLightDeviceTypeId,
     .deviceTypeRevision = kOnOffLightDeviceTypeRevision,
