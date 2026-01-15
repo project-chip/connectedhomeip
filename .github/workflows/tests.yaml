@@ -371,7 +371,7 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --ble-wifi \
+                     --commissioning ble-wifi \
                   "
 
             - name: Run WiFiPAF-WiFi commissioning test
@@ -392,7 +392,7 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --wifi-paf\
+                     --commissioning wifi-paf\
                   "
 
             - name: Run Tests using matter-repl (skip slow)

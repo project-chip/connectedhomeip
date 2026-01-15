@@ -363,24 +363,17 @@ class Terminable(Protocol):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
-    '--ble-wifi',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
-@click.option(
-    '--wifi-paf',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Use WiFi-PAF (NAN/USD) mock for commissioning without real WiFi hardware. This option is available on Linux platform only.')
+    '--commissioning',
+    type=click.Choice(['ble-wifi', 'wifi-paf'], case_sensitive=False),
+    default=None,
+    help='Commissioning method to use. "ble-wifi" uses Bluetooth and WiFi mock servers. "wifi-paf" uses WiFi-PAF (NAN/USD) mock. Both options are Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | None, lock_app: Path | None,
             ota_provider_app: Path | None, ota_requestor_app: Path | None, fabric_bridge_app: Path | None, tv_app: Path | None,
             bridge_app: Path | None, lit_icd_app: Path | None, microwave_oven_app: Path | None, rvc_app: Path | None,
             network_manager_app: Path | None, energy_gateway_app: Path | None, energy_management_app: Path | None,
             closure_app: Path | None, matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None, pics_file: Path,
-            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool, wifi_paf: bool) -> None:
+            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, commissioning: str | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -421,14 +414,12 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
     if chip_tool_with_python_info is not None:
         chip_tool_with_python_info = chip_tool_with_python_info.wrap_with('python3')
 
-    if ble_wifi and sys.platform != "linux":
-        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
+    # Derive boolean flags from commissioning parameter
+    ble_wifi = commissioning == 'ble-wifi'
+    wifi_paf = commissioning == 'wifi-paf'
 
-    if wifi_paf and sys.platform != "linux":
-        raise click.BadOptionUsage("wifi-paf", "Option --wifi-paf is available on Linux platform only")
-
-    if ble_wifi and wifi_paf:
-        raise click.BadOptionUsage("wifi-paf", "Options --ble-wifi and --wifi-paf are mutually exclusive")
+    if commissioning and sys.platform != "linux":
+        raise click.BadOptionUsage("commissioning", f"Option --commissioning={commissioning} is available on Linux platform only")
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
