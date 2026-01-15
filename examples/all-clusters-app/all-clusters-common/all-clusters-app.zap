@@ -22326,7 +22326,7 @@
           "name": "Test Hidden Manufacturer Specific",
           "code": 4294048801,
           "mfgCode": null,
-          "define": "TEST_HIDDEN_MEI_CLUSTER",
+          "define": "TEST_HIDDEN_MANUFACTURER_SPECIFIC",
           "side": "server",
           "enabled": 1,
           "apiMaturity": "internal",

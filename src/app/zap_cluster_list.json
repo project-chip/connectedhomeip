@@ -135,7 +135,7 @@
         "TIMER_CLUSTER": [],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
         "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
-        "TEST_HIDDEN_MEI_CLUSTER": [],
+        "TEST_HIDDEN_MANUFACTURER_SPECIFIC": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -348,7 +348,7 @@
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "TEST_HIDDEN_MEI_CLUSTER": [],
+        "TEST_HIDDEN_MANUFACTURER_SPECIFIC": [],
         "UNIT_LOCALIZATION_CLUSTER": ["unit-localization-server"],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],

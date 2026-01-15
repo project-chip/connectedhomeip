@@ -129,7 +129,6 @@
 #include <clusters/RvcOperationalState/ClusterId.h>
 #include <clusters/RvcRunMode/ClusterId.h>
 #include <clusters/SampleMei/ClusterId.h>
-#include <clusters/TestHiddenManufacturerSpecific/ClusterId.h>
 #include <clusters/ScenesManagement/ClusterId.h>
 #include <clusters/ServiceArea/ClusterId.h>
 #include <clusters/SmokeCoAlarm/ClusterId.h>
