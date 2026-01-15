@@ -87,8 +87,6 @@ private:
     std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request,
                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler);
     std::optional<DataModel::ActionReturnStatus> HandleCloseCommand();
-    CHIP_ERROR ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
-                                             DataModel::Nullable<Percent> & validatedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);

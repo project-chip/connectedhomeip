@@ -239,19 +239,30 @@ std::optional<DataModel::ActionReturnStatus>
 ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                        CommandHandler * handler)
 {
-    Commands::Open::DecodableType commandData;
-    DataModel::Nullable<Percent> openTargetLevel;
-    DataModel::Nullable<uint32_t> openDuration;
+    // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault. 
+    if (mValveFault.HasAny())
+    {
+        return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
+    }
 
+    Commands::Open::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     // Verify "min 1" constraint on TargetLevel field.
     VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
 
+    // In the spec, the setting of the TargetState and Current state goes before the validation of the
+    // fields of the command, however this was deferred to the OpenValve function to keep backwards compatibility.
+    // Also this avoids setting the attributes if some of the command fields is not correct.
+        
+    // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
+    // This value will be used to set the OpenDuration attribute, initialize the RemainingDuration attribute and
+    // calculate the AutoCloseTime attribute (if supported in) the OpenValve function
+    DataModel::Nullable<uint32_t> openDuration;
     if (commandData.openDuration.HasValue())
     {
-        // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
-        // Save the duration if provided, it can be null or an actual value.
+        // Save the duration if provided, this field is nullable and if a value is provided
+        // there is a "min 1" contstraint in that value.
         VerifyOrReturnValue(commandData.openDuration.Value().ValueOr(1) > 0, Status::ConstraintError);
         openDuration = commandData.openDuration.Value();
     }
@@ -261,16 +272,34 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
         openDuration = mDefaultOpenDuration;
     }
 
-    // Check if there is any Fault registered
-    if (mValveFault.HasAny())
-    {
-        return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
-    }
-
-    // Check rules for TargetLevel if enabled
+    // Check rules for TargetLevel, if enabled
+    // After validation and if the value is correct, the TargetLevel and CurrentLevel attributes
+    // will be set in the OpenValve function.
+    DataModel::Nullable<Percent> openTargetLevel;
     if (mFeatures.Has(Feature::kLevel))
     {
-        ReturnErrorOnFailure(ValidateAndResolveTargetLevel(commandData.targetLevel, openTargetLevel));
+        // The rules to get the TargetLevel from the command data
+        // If no value is provided
+        if (!commandData.targetLevel.HasValue())
+        {
+            // Use the DefaultOpenLevel attribute if implemented.
+            if (mOptionalAttributeSet.IsSet(Attributes::DefaultOpenLevel::Id))
+            {
+                openTargetLevel = mDefaultOpenLevel;
+            }
+            else
+            {
+                // If DefaultOpenLevel is not implemented, set it to 100
+                openTargetLevel = kMaxLevelValuePercent;
+            }
+        }
+        else
+        {
+            // If TargetLevel is provided
+            // Validate that the TargetLevel and LevelStep are compatible.
+            VerifyOrReturnError(ValueCompliesWithLevelStep(commandData.targetLevel.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            openTargetLevel = commandData.targetLevel.Value();
+        }
     }
 
     // Use the SetValveLevel function to handle the setting of internal values.
@@ -409,33 +438,6 @@ void ValveConfigurationAndControlCluster::SetCurrentState(
     {
         EmitValveChangeEvent(mCurrentState.Value());
     }
-}
-
-// The rules to get the TargetLevel from the command data
-// - if no value is provided
-//   - Use the DefaultOpenLevel attribute if implemented.
-//   - If DefaultOpenLevel is not implemented, set it to 100
-// - if the TargetLevel is provided
-//   - Validate that the TargetLevel and LevelStep are compatible.
-CHIP_ERROR
-ValveConfigurationAndControlCluster::ValidateAndResolveTargetLevel(const Optional<Percent> & targetLevel,
-                                                                   DataModel::Nullable<Percent> & validatedTargetLevel) const
-{
-    if (!targetLevel.HasValue())
-    {
-        if (mOptionalAttributeSet.IsSet(Attributes::DefaultOpenLevel::Id))
-        {
-            validatedTargetLevel = mDefaultOpenLevel;
-            return CHIP_NO_ERROR;
-        }
-        validatedTargetLevel = kMaxLevelValuePercent;
-        return CHIP_NO_ERROR;
-    }
-
-    // targetLevel has a value
-    VerifyOrReturnError(ValueCompliesWithLevelStep(targetLevel.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    validatedTargetLevel = targetLevel.Value();
-    return CHIP_NO_ERROR;
 }
 
 // According to the spec, when using a TargetLevel while the attribute LevelStep is set
