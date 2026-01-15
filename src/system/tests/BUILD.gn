@@ -43,7 +43,10 @@ chip_test_suite("tests") {
   }
 
   if (chip_system_config_event_loop == "Select") {
-    test_sources += [ "TestSystemWakeEvent.cpp" ]
+    test_sources += [
+      "TestSystemEventSource.cpp",
+      "TestSystemWakeEvent.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]
