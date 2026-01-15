@@ -112,7 +112,12 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     mThreadTask = NULL;
 
 #if WATCH_DOG_ENABLE
-    os_msg_queue_create(&matter_wdt_io_queue_handle, "wdtQ", WATCH_DOG_MSG_MAX_NUM, sizeof(T_IO_MSG));
+    if (os_msg_queue_create(&matter_wdt_io_queue_handle, "wdtQ", WATCH_DOG_MSG_MAX_NUM, sizeof(T_IO_MSG)) == false)
+    {
+        ChipLogError(DeviceLayer, "Failed to create watchdog message queue");
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
     matter_wdt_init(matter_wdt_io_queue_handle);
 #endif
 
