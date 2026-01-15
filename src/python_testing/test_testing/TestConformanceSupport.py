@@ -695,7 +695,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
-            asserts.fail("Incorrectly parsed greater term with feature value")
+            asserts.fail(f"Incorrectly parsed {term} with feature value")
         except ConformanceException:
             pass
 
