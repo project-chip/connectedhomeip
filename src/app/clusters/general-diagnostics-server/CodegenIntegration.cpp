@@ -50,29 +50,23 @@ LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate,
-                                 System::Clock::Microseconds64 nodeStartupTimestamp) :
-        mTestEventTriggerDelegate(testEventTriggerDelegate),
-        mNodeStartupTimestamp(nodeStartupTimestamp)
-    {}
-
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
+        Server & server                           = Server::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+      ղ  Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -81,12 +75,12 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel), mTestEventTriggerDelegate, mNodeStartupTimestamp,
-                       functionsConfig);
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), server.GetTestEventTriggerDelegate(),
+                       server.GetNodeStartupTimestamp(), functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel), mNodeStartupTimestamp);
-        gServer.Cluster().SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), server.GetNodeStartupTimestamp());
+        gServer.Cluster().SetTestEventTriggerDelegate(server.GetTestEventTriggerDelegate());
 #endif
         return gServer.Registration();
     }
@@ -97,18 +91,13 @@ public:
         return &gServer.Cluster();
     }
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
-
-private:
-    TestEventTriggerDelegate * mTestEventTriggerDelegate;
-    System::Clock::Microseconds64 mNodeStartupTimestamp;
 };
 
 } // namespace
 
 void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    Server & server = Server::GetInstance();
-    IntegrationDelegate integrationDelegate(server.GetTestEventTriggerDelegate(), server.GetNodeStartupTimestamp());
+    IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
@@ -125,8 +114,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 
 void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    Server & server = Server::GetInstance();
-    IntegrationDelegate integrationDelegate(server.GetTestEventTriggerDelegate(), server.GetNodeStartupTimestamp());
+    IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
