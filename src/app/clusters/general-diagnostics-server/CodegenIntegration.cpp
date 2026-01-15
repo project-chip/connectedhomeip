@@ -73,8 +73,9 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel), Server::GetInstance().GetTestEventTriggerDelegate(),
-                       Server::GetInstance().GetNodeStartupTimestamp(), functionsConfig);
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel),
+                       Server::GetInstance().GetTestEventTriggerDelegate(), Server::GetInstance().GetNodeStartupTimestamp(),
+                       functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
                        static_cast<DeviceLoadStatusProvider *>(interactionModel), Server::GetInstance().GetNodeStartupTimestamp());
