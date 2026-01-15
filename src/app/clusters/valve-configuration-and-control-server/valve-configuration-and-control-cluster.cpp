@@ -297,7 +297,8 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
         {
             // If TargetLevel is provided
             // Validate that the TargetLevel and LevelStep are compatible.
-            VerifyOrReturnError(ValueCompliesWithLevelStep(commandData.targetLevel.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            VerifyOrReturnError(ValueCompliesWithLevelStep(commandData.targetLevel.Value()),
+                                CHIP_IM_GLOBAL_STATUS(ConstraintError));
             openTargetLevel = commandData.targetLevel.Value();
         }
     }
