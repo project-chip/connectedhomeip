@@ -1,8 +1,7 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
- *    Copyright 2023-2024 Morse Micro
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -157,20 +156,6 @@ bool CommissioningProxyCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId c
 
     return (enabledEndpoints.begin() != enabledEndpoints.end());
 }
-
-#if 0
-void CommissioningProxyCommandHandler::OnLightOnHandler(chip::EndpointId endpoint)
-{
-    Clusters::OnOff::Attributes::OnOff::Set(endpoint, true);
-    ChipLogProgress(NotSpecified, "%s", __func__);
-}
-
-void CommissioningProxyCommandHandler::OnLightOffHandler(chip::EndpointId endpoint)
-{
-    Clusters::OnOff::Attributes::OnOff::Set(endpoint, false);
-    ChipLogProgress(NotSpecified, "%s", __func__);
-}
-#endif
 
 void CommissioningProxyCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
 {

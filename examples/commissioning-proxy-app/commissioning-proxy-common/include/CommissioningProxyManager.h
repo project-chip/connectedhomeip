@@ -26,24 +26,21 @@
 
 #include <lib/core/CHIPError.h>
 
-// The CommissioningProxyManager class primarily represents the illumination of the
-// On/Off light device.  However, it currently also manages the secondary
-// 'status' visible indicator, which may be the same light if no other option
-// is available.
+// The CommissioningProxyManager class primarily represents the state of the commissioning Proxy
 class CommissioningProxyManager
 {
 public:
     enum Action_t
     {
-        ON_ACTION = 0,
-        OFF_ACTION,
+        CONNECT_ACTION = 0,
+        DISCONNECT_ACTION,
         INVALID_ACTION
     } Action;
 
     enum State_t
     {
-        kState_Off = 0,
-        kState_On
+        kState_CPDisconnected = 0,
+        kState_CPConnected
     } State;
 
     CHIP_ERROR Init();
@@ -53,18 +50,18 @@ public:
 
     void SetCallbacks(CommissioningProxyCallback_fn aActionInitiated_CB, CommissioningProxyCallback_fn aActionCompleted_CB);
 
+
+    // IsCPConnected() is usefully locally for retrieving the logical
+    // state of the Commissioning Proxy
+    bool IsCPConnected(void);
+
+    // SetCPState() is used to set the state of the CP
+    void SetCPState(uint8_t level);
+    
+#if 0
     // RestoreMainLight() is used if we are not sure what state the physical
     // main light is in, for example, after the Identify function may have used it
     void RestoreMainLight(void);
-
-    // IsMainLightTurnedOn() is usefully locally for retrieving the logical
-    // state of the main light in order to switch it the opposite way without
-    // using the On/Off cluster toggle command.
-    bool IsMainLightTurnedOn(void);
-
-    // SetMainLightLevel() is used to set the intensity of the main light
-    void SetMainLightLevel(uint8_t level);
-
     // SetIdentifyLight() is for use by the Identify function, generally to
     // ensure the indication is turned off at the end of an Identify sequence.
     void SetIdentifyLight(bool aOn);
@@ -73,14 +70,13 @@ public:
     // indication.
     void ToggleIdentifyLight(void);
     void ToggleIdentifyLight(uint32_t color);
+#endif
 
 private:
     friend CommissioningProxyManager & CommissioningProxyMgr(void);
 
     // MainLightState is the on/off state of the main light
-    State_t mMainLightState;
-    // MainLightColor is the preferred color of the main light when on
-    uint32_t mMainLightColor;
+    State_t mMainCommissioningProxyState;
 
     // StatusLightState is the on/off state of the secondary visible indicator
     State_t mStatusLightState;
@@ -97,7 +93,7 @@ private:
 
     CommissioningProxyCallback_fn mActionInitiated_CB;
     CommissioningProxyCallback_fn mActionCompleted_CB;
-
+#if 0
     // SetMainLight() has a legacy bool interface and a later color interface
     // to support simple color selection when available externally
     void SetMainLight(bool aOn);
@@ -113,7 +109,7 @@ private:
     // SetIdentifyLight() has a color interface to support simple color
     // selection when available externally
     void SetIdentifyLight(uint32_t color);
-
+#endif
     // There is a single static instance of the CommissioningProxyManager since the
     // physical light hardware is static as well
     static CommissioningProxyManager sCommissioningProxy;

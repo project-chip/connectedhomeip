@@ -24,19 +24,11 @@ chip_data_model("commissioning-proxy-common") {
   is_server = true
 }
 
-source_set("color-format") {
-  public_configs = [ ":config" ]
-  sources = [
-    "include/ColorFormat.h",
-    "src/ColorFormat.cpp",
-  ]
-}
-
 source_set("commissioning-proxy-manager") {
   deps = [ "${chip_root}/src/lib" ]
   public_configs = [ ":config" ]
   sources = [
-    "include/LightingManager.h",
-    "src/LightingManager.cpp",
+    "include/CommissioningProxyManager.h",
+    "src/CommissioningProxyManager.cpp",
   ]
 }

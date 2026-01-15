@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "LightingAppCommandDelegate.h"
-#include "LightingManager.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -48,7 +46,6 @@ using namespace chip::app::Clusters;
 namespace {
 
 NamedPipeCommands sChipNamedPipeCommands;
-LightingAppCommandDelegate sLightingAppCommandDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 CommissioningProxyAppCommandDelegate sCommissioningProxyAppCommandDelegate;
@@ -58,9 +55,38 @@ CommissioningProxyAppCommandDelegate sCommissioningProxyAppCommandDelegate;
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
+
+    switch (attributePath.mClusterId)
     {
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+        case Clusters::CommissioningProxy::Id:
+        {
+            switch (attributePath.mAttributeId)
+            {
+                case Clusters::CommissioningProxy::Attributes::ScanMaxTime::Id:
+                {
+                    CommissioningProxyMgr().InitiateAction(CommissioningProxyManager::DISCONNECT_ACTION);
+                    break;
+                }
+
+                default:
+                {
+                    ChipLogDetail(NotSpecified, "%s: Commissioning Proxy attribute %#x (%u) (type %#x size %u) updated",
+                        __func__,
+                        attributePath.mAttributeId, attributePath.mAttributeId,
+                        type, size);
+                    break;
+                }
+            }
+            break;
+        }
+
+        default:
+        {
+            ChipLogDetail(NotSpecified, "%s: cluster %#x (%u) attribute %#x (%u) (type %#x size %u) updated",
+                __func__, attributePath.mClusterId, attributePath.mClusterId,
+                attributePath.mAttributeId, attributePath.mAttributeId, type, size);
+            break;
+        }
     }
 }
 
@@ -229,11 +255,14 @@ void ApplicationInit()
 {
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR))
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sCommissioningProxyAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
+
+    ChipLogProgress(AppServer, "%s: Main function is Proxy Commissioner on endpoint %u",
+            __func__, CommissioningProxyEndpoint);
 }
 
 void ApplicationShutdown()
@@ -258,10 +287,10 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    CHIP_ERROR err = LightingMgr().Init();
+    CHIP_ERROR err = CommissioningProxyMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to initialize lighting manager: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Failed to initialize Commissioning Proxy manager: %" CHIP_ERROR_FORMAT, err.Format());
         chip::DeviceLayer::PlatformMgr().Shutdown();
         return -1;
     }
