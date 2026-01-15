@@ -19,11 +19,11 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
-      "description": "Matter SDK ZCL data"
+      "description": "Matter SDK ZCL data with some extensions"
     },
     {
       "pathRelativity": "relativeToZap",
@@ -8445,6 +8445,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ManufacturerExtension",
+              "code": 4293984257,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "255",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

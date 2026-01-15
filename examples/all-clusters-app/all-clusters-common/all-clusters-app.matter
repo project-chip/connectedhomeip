@@ -3208,6 +3208,7 @@ cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute optional int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -3215,6 +3216,8 @@ cluster ModeSelect = 80 {
 
   /** On receipt of this command, if the NewMode field indicates a valid mode transition within the supported list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** Sample manufacturer specific extension command */
+  command SampleMfgExtensionCommand(): DefaultSuccess = 4293984257;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -7759,6 +7762,7 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
+    ram      attribute manufacturerExtension default = 255;
 
     handle command ChangeToMode;
   }
