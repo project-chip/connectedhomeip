@@ -218,7 +218,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp ExpirationInMinutes is set to 30 minutes.
+            # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes set to 30 minutes.
             existing_handles = {p.presetHandle for p in supported_presets}
             # Use the maximum length of existing handles as an upper bound, with a conservative default if none exist.
             max_handle_length = max((len(h) for h in existing_handles), default=32)
