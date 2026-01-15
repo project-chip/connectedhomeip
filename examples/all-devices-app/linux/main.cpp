@@ -64,16 +64,8 @@ void StopSignalHandler(int /* signal */)
     }
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate,
-                                                                     chip::TestEventTriggerDelegate * testEventTriggerDelegate)
+chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
 {
-    // Set the TestEventTriggerDelegate and NodeStartupTimestamp for GeneralDiagnostics cluster dependency injection
-    // This MUST be done before creating clusters to ensure delegates are available during cluster initialization
-#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
-    chip::app::Clusters::GeneralDiagnostics::SetTestEventTriggerDelegate(testEventTriggerDelegate);
-    chip::app::Clusters::GeneralDiagnostics::SetNodeStartupTimestamp(chip::System::SystemClock().GetMonotonicMicroseconds64());
-#endif // defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER)
-
     static chip::app::DefaultAttributePersistenceProvider attributePersistenceProvider;
     SuccessOrDie(attributePersistenceProvider.Init(delegate));
 
@@ -97,8 +89,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
-    initParams.dataModelProvider =
-        PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
+    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
