@@ -14,11 +14,12 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
 
 # Configurable parameters for uriparser features
 declare_args() {
-  uriparser_enable_wprintf = true
-  uriparser_enable_reallocarray = true
+  uriparser_enable_wprintf = false
+  uriparser_enable_reallocarray = false
 }
 
 # Generate UriConfig.h from template
@@ -119,6 +120,10 @@ static_library("uriparser") {
 
   # C standard
   cflags_c = [ "-std=c99" ]
+
+  if (is_clang) {
+    cflags = [ "-Wno-sign-conversion" ]
+  }
 }
 
 # Config for public include directories
