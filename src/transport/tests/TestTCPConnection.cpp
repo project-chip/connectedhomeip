@@ -53,7 +53,7 @@ using namespace chip::Testing;
 
 namespace {
 
-// Use only 1 active connection to easily detect leaks (exhaustion)
+// Use only 2 active connections (1 outgoing, 1 incoming) to easily detect leaks (exhaustion)
 constexpr size_t kMaxTcpActiveConnectionCount = 2;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr int kMaxPortBindRetries             = 100;
