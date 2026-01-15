@@ -271,9 +271,17 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
 
     auto response = server.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPath, commandData);
 
-    // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    EXPECT_TRUE(response.value().IsSuccess());
+    // The response should contain an ActionReturnStatus. We're explicitly checking as clang complains on use
+    // of Optional without checking if a form ASSERT_TRUE(response.has_value()) is used. 
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        // Fail the test case
+        FAIL();
+    }
 
     // Server should think the device is moving until the app callsback, verify that the MovementState is correct
     PhysicalMovementEnum movementState;
@@ -340,8 +348,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     auto response = server.GetLogic().HandleMPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    EXPECT_TRUE(response.value().IsSuccess());
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Server should think the device is moving until the app callsback, verify that the MovementState is correct
     PhysicalMovementEnum movementState;
@@ -412,8 +426,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     auto response = server.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    EXPECT_TRUE(response.value().IsSuccess());
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Verify that there is a single saved preset. The values match those of the current MPTZ Position
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
@@ -478,8 +498,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     auto moveResponse = server.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(moveResponse.has_value());
-    ASSERT_EQ(moveResponse.value().GetStatusCode().GetStatus(), Status::NotFound);
+    if (moveResponse.has_value())
+    {
+        ASSERT_EQ(moveResponse.value().GetStatusCode().GetStatus(), Status::NotFound);
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Save the current values of MPTZ as a preset
     chip::CharSpan presetName("DefaultPreset"_span);
@@ -488,8 +514,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     auto saveResponse = server.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPathMPTZSave, savePresetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(saveResponse.has_value());
-    EXPECT_TRUE(saveResponse.value().IsSuccess());
+    if (saveResponse.has_value())
+    {
+        ASSERT_TRUE(saveResponse.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Save the stored preset settings; we know there is only one entry
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
@@ -518,8 +550,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     auto setResponse = server.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPathMPTZSet, mptzSetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(setResponse.has_value());
-    EXPECT_TRUE(setResponse.value().IsSuccess());
+    if (setResponse.has_value())
+    {
+        ASSERT_TRUE(setResponse.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Fake the delegate callback
     server.GetLogic().OnPhysicalMovementComplete(Status::Success);
@@ -532,11 +570,17 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);
 
     // Move to the preset
-    moveResponse = server.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData).value();
+    moveResponse = server.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(moveResponse.has_value());
-    EXPECT_TRUE(moveResponse.value().IsSuccess());
+    if (moveResponse.has_value())
+    {
+        ASSERT_TRUE(moveResponse.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Ensure we're "moving"
     PhysicalMovementEnum movementState;
@@ -602,8 +646,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     auto removeResponse = server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(removeResponse.has_value());
-    ASSERT_EQ(removeResponse.value().GetStatusCode().GetStatus(), Status::NotFound);
+    if (removeResponse.has_value())
+    {
+        ASSERT_EQ(removeResponse.value().GetStatusCode().GetStatus(), Status::NotFound);
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Save the current values of MPTZ as a preset
     chip::CharSpan presetName("DefaultPreset"_span);
@@ -612,8 +662,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     auto saveResponse = server.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPathMPTZSave, savePresetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(saveResponse.has_value());
-    EXPECT_TRUE(saveResponse.value().IsSuccess());
+    if (saveResponse.has_value())
+    {
+        ASSERT_TRUE(saveResponse.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Verify that there is a single saved preset. The values match those of the current MPTZ Position
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
@@ -625,8 +681,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     removeResponse = server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(removeResponse.has_value());
-    EXPECT_TRUE(removeResponse.value().IsSuccess());
+    if (removeResponse.has_value())
+    {
+        ASSERT_TRUE(removeResponse.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Verify that there are no saved presets. The values match those of the current MPTZ Position
     ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
@@ -678,8 +740,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     auto response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::NotFound);
+    if (response.has_value())
+    {
+        ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::NotFound);
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Allocate a video stream
     server.GetLogic().AddMoveCapableVideoStream(videoStreamID, viewPort);
@@ -706,8 +774,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    EXPECT_TRUE(response.value().IsSuccess());
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Verify this new viewport is in DPTZStreams
     ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
@@ -774,8 +848,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     auto response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::NotFound);
+    if (response.has_value())
+    {
+        ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::NotFound);
+    }
+    else
+    {
+        FAIL();
+    }
 
     // Allocate a video stream
     Globals::Structs::ViewportStruct::Type viewPort = { 0, 0, 1920, 1080 };
@@ -785,8 +865,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
-    EXPECT_TRUE(response.has_value());
-    EXPECT_TRUE(response.value().IsSuccess());
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 
     // The mock delegate has no means to verify the proposed change as the values needed are part of CameraAVStreams,
     // as such, the command above should just be successful as long as the delta is in range.
@@ -794,8 +880,15 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     // Try to move the viewport with an out of range zoomDelta
     commandData.zoomDelta.Emplace(zoomDeltaFail);
     response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
-    EXPECT_TRUE(response.has_value());
-    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+
+    if (response.has_value())
+    {
+        ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
 }
 
 } // namespace
