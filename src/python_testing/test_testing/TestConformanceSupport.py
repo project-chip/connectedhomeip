@@ -677,7 +677,7 @@ class TestConformanceSupport(MatterBaseTest):
         et = ElementTree.fromstring(xml)
         try:
             xml_callable = parse_callable_from_xml(et, self.params)
-            asserts.fail("Incorrectly parsed bad greaterTerm XML with > 2 values")
+            asserts.fail(f"Incorrectly parsed bad {term} XML with > 2 values")
         except ConformanceException:
             pass
 
