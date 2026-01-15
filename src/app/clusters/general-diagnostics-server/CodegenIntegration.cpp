@@ -52,8 +52,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 public:
     explicit IntegrationDelegate(TestEventTriggerDelegate * testEventTriggerDelegate,
                                  System::Clock::Microseconds64 nodeStartupTimestamp) :
-        mTestEventTriggerDelegate(testEventTriggerDelegate),
-        mNodeStartupTimestamp(nodeStartupTimestamp)
+        mTestEventTriggerDelegate(testEventTriggerDelegate), mNodeStartupTimestamp(nodeStartupTimestamp)
     {}
 
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
@@ -63,16 +62,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -81,10 +79,12 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate, mNodeStartupTimestamp, functionsConfig);
+                       mNodeStartupTimestamp, functionsConfig);
+        gServer.Cluster().SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate, mNodeStartupTimestamp);
+                       mNodeStartupTimestamp);
+        gServer.Cluster().SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
 #endif
         return gServer.Registration();
     }
@@ -103,8 +103,10 @@ private:
 
 IntegrationDelegate MakeIntegrationDelegate()
 {
-    TestEventTriggerDelegate * testEventTriggerDelegate = GeneralDiagnostics::GetTestEventTriggerDelegate();
-    System::Clock::Microseconds64 nodeStartupTimestamp  = GeneralDiagnostics::GetNodeStartupTimestamp();
+    Server & server                                     = Server::GetInstance();
+    TestEventTriggerDelegate * testEventTriggerDelegate = server.GetTestEventTriggerDelegate();
+    System::Clock::Microseconds64 nodeStartupTimestamp =
+        System::SystemClock().GetMonotonicMicroseconds64() - server.TimeSinceNodeStartup();
     return IntegrationDelegate(testEventTriggerDelegate, nodeStartupTimestamp);
 }
 
