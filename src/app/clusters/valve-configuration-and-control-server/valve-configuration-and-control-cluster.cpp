@@ -232,7 +232,6 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 
     VerifyOrReturnError(mDelegate != nullptr, CHIP_NO_ERROR);
     return mDelegate->HandleCloseValve();
-    ;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -262,7 +261,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     if (commandData.openDuration.HasValue())
     {
         // Save the duration if provided, this field is nullable and if a value is provided
-        // there is a "min 1" contstraint in that value.
+        // there is a "min 1" constraint in that value.
         VerifyOrReturnValue(commandData.openDuration.Value().ValueOr(1) > 0, Status::ConstraintError);
         openDuration = commandData.openDuration.Value();
     }
