@@ -272,7 +272,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
     auto response = server.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus. We're explicitly checking as clang complains on use
-    // of Optional without checking if a form ASSERT_TRUE(response.has_value()) is used. 
+    // of Optional without checking if a form ASSERT_TRUE(response.has_value()) is used.
     if (response.has_value())
     {
         ASSERT_TRUE(response.value().IsSuccess());
