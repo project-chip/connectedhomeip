@@ -32,57 +32,57 @@
 #include <clusters/shared/Enums.h>
 #include <clusters/shared/Structs.h>
 
-#include <clusters/TestHiddenMei/AttributeIds.h>
-#include <clusters/TestHiddenMei/ClusterId.h>
-#include <clusters/TestHiddenMei/Enums.h>
-#include <clusters/TestHiddenMei/Structs.h>
+#include <clusters/SampleMei/AttributeIds.h>
+#include <clusters/SampleMei/ClusterId.h>
+#include <clusters/SampleMei/Enums.h>
+#include <clusters/SampleMei/Structs.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TestHiddenMei {
+namespace SampleMei {
 namespace Attributes {
 
-namespace TestAttribute {
+namespace FlipFlop {
 struct TypeInfo
 {
     using Type             = bool;
     using DecodableType    = bool;
     using DecodableArgType = bool;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TestAttribute::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FlipFlop::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace TestAttribute
+} // namespace FlipFlop
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 };
 } // namespace AcceptedCommandList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 };
 } // namespace ClusterRevision
 
@@ -90,11 +90,11 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::TestHiddenMei::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::TestAttribute::TypeInfo::DecodableType testAttribute = static_cast<bool>(0);
+        Attributes::FlipFlop::TypeInfo::DecodableType flipFlop = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -103,7 +103,7 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace TestHiddenMei
+} // namespace SampleMei
 } // namespace Clusters
 } // namespace app
 } // namespace chip

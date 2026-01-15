@@ -83,7 +83,7 @@ source_set("metadata") {
   ]
 }
 
-source_set("TestHiddenMei") {
+source_set("SampleMei") {
   public_deps = [
     ":ids",
     ":metadata",

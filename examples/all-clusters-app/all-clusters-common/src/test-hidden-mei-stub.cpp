@@ -32,19 +32,19 @@
 using namespace chip;
 
 // Plugin server init callback - called when the plugin is initialized
-void MatterTestHiddenMeiPluginServerInitCallback()
+void MatterTestHiddenManufacturerSpecificPluginServerInitCallback()
 {
     // No plugin initialization required for this test cluster
 }
 
 // Cluster init callback - called when cluster is initialized on an endpoint
-void emberAfTestHiddenMeiClusterInitCallback(EndpointId endpoint)
+void emberAfTestHiddenManufacturerSpecificClusterInitCallback(EndpointId endpoint)
 {
     // No initialization required for this test cluster
 }
 
 // Cluster shutdown callback - called when cluster is shut down on an endpoint
-void emberAfTestHiddenMeiClusterShutdownCallback(EndpointId endpoint)
+void emberAfTestHiddenManufacturerSpecificClusterShutdownCallback(EndpointId endpoint)
 {
     // No shutdown actions required for this test cluster
 }

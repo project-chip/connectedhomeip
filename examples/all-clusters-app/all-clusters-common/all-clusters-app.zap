@@ -22323,7 +22323,7 @@
           ]
         },
         {
-          "name": "Test Hidden MEI",
+          "name": "Test Hidden Manufacturer Specific",
           "code": 4294048801,
           "mfgCode": null,
           "define": "TEST_HIDDEN_MEI_CLUSTER",

@@ -34,7 +34,7 @@ limitations under the License.
     <domain>CHIP</domain>
     <name>Test Hidden Manufacturer Specific</name>
     <code>0xFFF1FC21</code>
-    <define>TEST_HIDDEN_MEI_CLUSTER</define>
+    <define>Test Hidden Manufacturer Specific</define>
     <description>Test cluster for validating manufacturer-specific cluster handling without controller-side implementation</description>
 
     <attribute side="server" code="0x0000" define="TEST_ATTRIBUTE" type="boolean" writable="false" default="true" optional="false">TestAttribute</attribute>

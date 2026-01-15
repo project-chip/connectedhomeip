@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster TestHiddenMei (cluster code: 4294048801/0xFFF1FC21)
+// Cluster metadata information for cluster SampleMei (cluster code: 4294048800/0xFFF1FC20)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
@@ -8,23 +8,23 @@
 
 #include <app/data-model-provider/ClusterMetadataProvider.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <clusters/TestHiddenMei/Ids.h>
-#include <clusters/TestHiddenMei/Metadata.h>
+#include <clusters/SampleMei/Ids.h>
+#include <clusters/SampleMei/Metadata.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
 template <>
-struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TestHiddenMei::Id>
+struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::SampleMei::Id>
 {
     static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
-        using namespace Clusters::TestHiddenMei::Attributes;
+        using namespace Clusters::SampleMei::Attributes;
         switch (attributeId)
         {
-        case TestAttribute::Id:
-            return TestAttribute::kMetadataEntry;
+        case FlipFlop::Id:
+            return FlipFlop::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -32,13 +32,17 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TestHiddenMe
 };
 
 template <>
-struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TestHiddenMei::Id>
+struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::SampleMei::Id>
 {
     static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
-        using namespace Clusters::TestHiddenMei::Commands;
+        using namespace Clusters::SampleMei::Commands;
         switch (commandId)
         {
+        case Ping::Id:
+            return Ping::kMetadataEntry;
+        case AddArguments::Id:
+            return AddArguments::kMetadataEntry;
 
         default:
             return std::nullopt;

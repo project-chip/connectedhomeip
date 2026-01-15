@@ -7450,8 +7450,8 @@ internal cluster FaultInjection = 4294048774 {
   command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
 }
 
-/** Test cluster for validating MEI handling without controller-side implementation */
-internal cluster TestHiddenMei = 4294048801 {
+/** Test cluster for validating manufacturer-specific cluster handling without controller-side implementation */
+internal cluster TestHiddenManufacturerSpecific = 4294048801 {
   revision 1; // NOTE: Default/not specifically set
 
   readonly attribute boolean testAttribute = 0;
@@ -9217,7 +9217,7 @@ endpoint 1 {
     handle command TestDifferentVendorMeiRequest;
   }
 
-  server cluster TestHiddenMei {
+  server cluster TestHiddenManufacturerSpecific {
     ram      attribute testAttribute default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
