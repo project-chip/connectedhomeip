@@ -48,13 +48,14 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
   class InstalledChimeSoundsAttribute(val value: List<ChimeClusterChimeSoundStruct>)
 
   sealed class InstalledChimeSoundsAttributeSubscriptionState {
-    data class Success(val value: List<ChimeClusterChimeSoundStruct>) : 
+    data class Success(val value: List<ChimeClusterChimeSoundStruct>) :
       InstalledChimeSoundsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : InstalledChimeSoundsAttributeSubscriptionState()
 
     object SubscriptionEstablished : InstalledChimeSoundsAttributeSubscriptionState()
-  }  
+  }
+
 class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -63,7 +64,8 @@ class GeneratedCommandListAttribute(val value: List<UInt>)
     data class Error(val exception: Exception) : GeneratedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
-  }  
+  }
+
 class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
@@ -73,6 +75,7 @@ class AcceptedCommandListAttribute(val value: List<UInt>)
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
+
 class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
@@ -90,7 +93,7 @@ class AttributeListAttribute(val value: List<UInt>)
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_CHIME_ID_REQ: Int = 0
-    chimeID?.let { tlvWriter.put(ContextSpecificTag(TAG_CHIME_ID_REQ), chimeID) }    
+    chimeID?.let { tlvWriter.put(ContextSpecificTag(TAG_CHIME_ID_REQ), chimeID) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -103,10 +106,11 @@ class AttributeListAttribute(val value: List<UInt>)
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
+
   suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
@@ -138,7 +142,6 @@ class AttributeListAttribute(val value: List<UInt>)
         tlvReader.exitContainer()
       }
 
-
     return InstalledChimeSoundsAttribute(decodedValue)
   }
 
@@ -152,7 +155,7 @@ class AttributeListAttribute(val value: List<UInt>)
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
@@ -175,8 +178,8 @@ class AttributeListAttribute(val value: List<UInt>)
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Installedchimesounds attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
@@ -303,7 +306,7 @@ class AttributeListAttribute(val value: List<UInt>)
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID } 
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { "Selectedchime attribute not found in Node State update" }
 
@@ -440,6 +443,7 @@ class AttributeListAttribute(val value: List<UInt>)
       }
     }
   }
+
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65528u
 
@@ -461,7 +465,7 @@ class AttributeListAttribute(val value: List<UInt>)
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
       }
-       
+
     requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -513,7 +517,9 @@ class AttributeListAttribute(val value: List<UInt>)
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Generatedcommandlist attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Generatedcommandlist attribute not found in Node State update" 
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -538,7 +544,7 @@ class AttributeListAttribute(val value: List<UInt>)
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65529u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
@@ -556,7 +562,7 @@ class AttributeListAttribute(val value: List<UInt>)
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
       }
-  
+
     requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -581,7 +587,7 @@ class AttributeListAttribute(val value: List<UInt>)
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
@@ -608,7 +614,9 @@ class AttributeListAttribute(val value: List<UInt>)
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Acceptedcommandlist attribute not found in Node State update" 
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -633,7 +641,7 @@ class AttributeListAttribute(val value: List<UInt>)
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
     val ATTRIBUTE_ID: UInt = 65531u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
@@ -665,7 +673,6 @@ class AttributeListAttribute(val value: List<UInt>)
         tlvReader.exitContainer()
       }
 
-
     return AttributeListAttribute(decodedValue)
   }
 
@@ -677,7 +684,7 @@ class AttributeListAttribute(val value: List<UInt>)
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
@@ -729,7 +736,7 @@ class AttributeListAttribute(val value: List<UInt>)
   suspend fun readFeatureMapAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 65532u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
@@ -873,7 +880,9 @@ class AttributeListAttribute(val value: List<UInt>)
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Clusterrevision attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Clusterrevision attribute not found in Node State update" 
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
