@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChimeClusterChimeStartedPlayingEvent(
-  val chimeID: UByte
-) {
+class ChimeClusterChimeStartedPlayingEvent(val chimeID: UByte) {
   override fun toString(): String = buildString {
     append("ChimeClusterChimeStartedPlayingEvent {\n")
     append("\tchimeID : $chimeID\n")
@@ -44,10 +40,10 @@ class ChimeClusterChimeStartedPlayingEvent(
   companion object {
     private const val TAG_CHIME_ID = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChimeClusterChimeStartedPlayingEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChimeClusterChimeStartedPlayingEvent {
       tlvReader.enterStructure(tlvTag)
       val chimeID = tlvReader.getUByte(ContextSpecificTag(TAG_CHIME_ID))
-      
+
       tlvReader.exitContainer()
 
       return ChimeClusterChimeStartedPlayingEvent(chimeID)
