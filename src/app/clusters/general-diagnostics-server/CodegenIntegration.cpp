@@ -78,11 +78,12 @@ public:
             .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mTestEventTriggerDelegate, mNodeStartupTimestamp, functionsConfig);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), mTestEventTriggerDelegate, mNodeStartupTimestamp,
+                       functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mNodeStartupTimestamp);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), mNodeStartupTimestamp);
         gServer.Cluster().SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
 #endif
         return gServer.Registration();
@@ -100,20 +101,11 @@ private:
     System::Clock::Microseconds64 mNodeStartupTimestamp;
 };
 
-IntegrationDelegate MakeIntegrationDelegate()
-{
-    Server & server                                     = Server::GetInstance();
-    TestEventTriggerDelegate * testEventTriggerDelegate = server.GetTestEventTriggerDelegate();
-    System::Clock::Microseconds64 nodeStartupTimestamp =
-        System::SystemClock().GetMonotonicMicroseconds64() - server.TimeSinceNodeStartup();
-    return IntegrationDelegate(testEventTriggerDelegate, nodeStartupTimestamp);
-}
-
 } // namespace
 
 void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    IntegrationDelegate integrationDelegate = MakeIntegrationDelegate();
+    IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
@@ -130,7 +122,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 
 void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    IntegrationDelegate integrationDelegate = MakeIntegrationDelegate();
+    IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
