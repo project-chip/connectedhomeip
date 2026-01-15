@@ -34,17 +34,23 @@ public:
         switch (effectId)
         {
         case OnOff::EffectIdentifierEnum::kDelayedAllOff:
-            return TriggerDelayedAllOff();
+            return TriggerDelayedAllOff(static_cast<OnOff::DelayedAllOffEffectVariantEnum>(effectVariant));
         case OnOff::EffectIdentifierEnum::kDyingLight:
-            return TriggerDyingLight();
+            return TriggerDyingLight(static_cast<OnOff::DyingLightEffectVariantEnum>(effectVariant));
         default:
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
     }
 
-    virtual DataModel::ActionReturnStatus TriggerDelayedAllOff() { return Protocols::InteractionModel::Status::UnsupportedCommand; }
+    virtual DataModel::ActionReturnStatus TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 
-    virtual DataModel::ActionReturnStatus TriggerDyingLight() { return Protocols::InteractionModel::Status::UnsupportedCommand; }
+    virtual DataModel::ActionReturnStatus TriggerDyingLight(OnOff::DyingLightEffectVariantEnum)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 };
 
 } // namespace chip::app::Clusters

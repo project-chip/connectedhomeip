@@ -138,14 +138,14 @@ public:
     bool mCalled                                = false;
     DataModel::ActionReturnStatus mReturnStatus = Status::Success;
 
-    DataModel::ActionReturnStatus TriggerDelayedAllOff() override
+    DataModel::ActionReturnStatus TriggerDelayedAllOff(DelayedAllOffEffectVariantEnum) override
     {
         mEffectId = EffectIdentifierEnum::kDelayedAllOff;
         mCalled   = true;
         return mReturnStatus;
     }
 
-    DataModel::ActionReturnStatus TriggerDyingLight() override
+    DataModel::ActionReturnStatus TriggerDyingLight(DyingLightEffectVariantEnum) override
     {
         mEffectId = EffectIdentifierEnum::kDyingLight;
         mCalled   = true;
