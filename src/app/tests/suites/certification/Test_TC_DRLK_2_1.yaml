@@ -300,14 +300,144 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 5a: TH reads DoorOpenEvents attribute from DUT"
-      PICS: "!DRLK.S.A0004"
+      PICS: DRLK.S.F05 && !DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 5b: TH writes DoorOpenEvents attribute as 0"
+      PICS: DRLK.S.F05 && DRLK.S.A0004
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 0
+
+    - label: "Step 5b: TH writes DoorOpenEvents attribute as 0"
+      PICS: DRLK.S.F05 && !DRLK.S.A0004
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          value: 0
+
+    - label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 5d: TH writes DoorOpenEvents attribute as 1"
+      PICS: DRLK.S.F05 && DRLK.S.A0004
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 1
+
+    - label: "Step 5d: TH writes DoorOpenEvents attribute as 1"
+      PICS: DRLK.S.F05 && !DRLK.S.A0004
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 5e: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          value: 1
+
+    - label: "Step 5e: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0004
       command: "readAttribute"
       attribute: "DoorOpenEvents"
       response:
           error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
-      PICS: "!DRLK.S.A0005"
+      PICS: DRLK.S.F05 && DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
+      PICS: DRLK.S.F05 && DRLK.S.A0005
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 0
+
+    - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
+      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          value: 0
+
+    - label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 6d: TH writes DoorClosedEvents attribute as 1"
+      PICS: DRLK.S.F05 && DRLK.S.A0005
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 1
+
+    - label: "Step 6d: TH writes DoorClosedEvents attribute as 1"
+      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 6e: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          value: 1
+
+    - label: "Step 6e: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0005
       command: "readAttribute"
       attribute: "DoorClosedEvents"
       response:
@@ -323,19 +453,42 @@ tests:
               minValue: 0
               maxValue: 65534
 
+    - label: "Step 7a: TH reads OpenPeriod attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0006
+      command: "readAttribute"
+      attribute: "OpenPeriod"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 7b: TH writes OpenPeriod attribute as 2 minutes"
-      PICS: DRLK.S.A0006
+      PICS: DRLK.S.F05 && DRLK.S.A0006
       command: "writeAttribute"
       attribute: "OpenPeriod"
       arguments:
           value: 2
 
+    - label: "Step 7b: TH writes OpenPeriod attribute as 2 minutes"
+      PICS: DRLK.S.F05 && !DRLK.S.A0006
+      command: "writeAttribute"
+      attribute: "OpenPeriod"
+      arguments:
+          value: 2
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 7c: TH reads OpenPeriod attribute from DUT"
-      PICS: DRLK.S.A0006
+      PICS: DRLK.S.F05 && DRLK.S.A0006
       command: "readAttribute"
       attribute: "OpenPeriod"
       response:
           value: 2
+
+    - label: "Step 7c: TH reads OpenPeriod attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0006
+      command: "readAttribute"
+      attribute: "OpenPeriod"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 8a: TH reads NumberOfTotal UsersSupported attribute from DUT"
       PICS: DRLK.S.F08 && DRLK.S.A0011
@@ -1187,7 +1340,7 @@ tests:
     - label:
           "Step 30g: TH sends a write message to change any one of the bits of
           the LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && !DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+      PICS: DRLK.S.A002c
       command: "writeAttribute"
       attribute: "LocalProgrammingFeatures"
       arguments:
@@ -1246,25 +1399,23 @@ tests:
       response:
           value: Current_WrongCode_EntryLimit
 
-    - label: "Step 31d: TH writes WrongCodeEntryLimit attribute as 0"
+    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
           DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
-          value: 0
-      response:
-          error: CONSTRAINT_ERROR
+          value: 8
 
-    - label: "Step 31d: TH writes WrongCodeEntryLimit attribute as 0"
+    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
       PICS:
           " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
           !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
-          value: 0
+          value: 8
       response:
           error: UNSUPPORTED_WRITE
 
@@ -1318,28 +1469,6 @@ tests:
       attribute: "UserCodeTemporaryDisableTime"
       response:
           value: Current_UserCode_TemporaryDisableTime
-
-    - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0"
-      PICS:
-          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
-          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
-      command: "writeAttribute"
-      attribute: "UserCodeTemporaryDisableTime"
-      arguments:
-          value: 0
-      response:
-          error: CONSTRAINT_ERROR
-
-    - label: "Step 32d: TH writes UserCodeTemporaryDisableTime attribute as 0"
-      PICS:
-          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
-          !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
-      command: "writeAttribute"
-      attribute: "UserCodeTemporaryDisableTime"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
 
     - label:
           "Step 33a: TH reads RequirePINfor RemoteOperation attribute from DUT"
@@ -1552,7 +1681,6 @@ tests:
       attribute: "AliroReaderGroupIdentifier"
       response:
           value: aliroreadergrpidentifier
-
     - label:
           "Step 40a: TH reads AliroReaderGroupSubIdentifier attribute from DUT"
       PICS: DRLK.S.F0d && DRLK.S.A0082
@@ -1572,7 +1700,7 @@ tests:
       command: "writeAttribute"
       attribute: "AliroReaderGroupSubIdentifier"
       arguments:
-          value: "047a4c992d753968"
+          value: "047a4c992d75368"
       response:
           error: UNSUPPORTED_WRITE
 
@@ -1617,7 +1745,7 @@ tests:
           value: aliroprotocolversion
 
     - label: "Step 42a: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0e && DRLK.S.A0084
+      PICS: DRLK.S.F0d && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
@@ -1630,16 +1758,16 @@ tests:
     - label:
           "Step 42b: TH writes AliroGroupResolvingKey attribute as octstr value
           of length 16 which is different from alirogrpresolvingkey"
-      PICS: DRLK.S.F0e && DRLK.S.A0084
+      PICS: DRLK.S.F0d && DRLK.S.A0084
       command: "writeAttribute"
       attribute: "AliroGroupResolvingKey"
       arguments:
-          value: "047a4c992d753968"
+          value: "047a4c992d75368"
       response:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 42c: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0e && DRLK.S.A0084
+      PICS: DRLK.S.F0d && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
@@ -1648,7 +1776,7 @@ tests:
     - label:
           "Step 43a: TH reads AliroSupportedBLEUWBProtocolVersions attribute
           from DUT"
-      PICS: DRLK.S.F0e && DRLK.S.A0085
+      PICS: DRLK.S.F0d && DRLK.S.A0085
       command: "readAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       response:
@@ -1660,7 +1788,7 @@ tests:
     - label:
           "Step 43b: TH writes AliroSupportedBLEUWBProtocolVersions attribute as
           list which is different from alirobleuwbprotocolversion"
-      PICS: DRLK.S.F0e && DRLK.S.A0085
+      PICS: DRLK.S.F0d && DRLK.S.A0085
       command: "writeAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       arguments:
@@ -1669,14 +1797,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 43c: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0e && DRLK.S.A0085
+      PICS: DRLK.S.F0d && DRLK.S.A0085
       command: "readAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       response:
           value: alirobleuwbprotocolversion
 
     - label: "Step 44a: TH reads AliroBLEAdvertisingVersion attribute from DUT"
-      PICS: DRLK.S.F0e && DRLK.S.A0086
+      PICS: DRLK.S.F0d && DRLK.S.A0086
       command: "readAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       response:
@@ -1689,7 +1817,7 @@ tests:
     - label:
           "Step 44b: TH writes AliroBLEAdvertisingVersion attribute as any value
           different from alirobleadvversion"
-      PICS: DRLK.S.F0e && DRLK.S.A0086
+      PICS: DRLK.S.F0d && DRLK.S.A0086
       command: "writeAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       arguments:
@@ -1698,7 +1826,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 44c: TH reads AliroBLEAdvertisingVersion attribute from DUT"
-      PICS: DRLK.S.F0e && DRLK.S.A0086
+      PICS: DRLK.S.F0d && DRLK.S.A0086
       command: "readAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       response:
