@@ -73,7 +73,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
     auto & fabricTable = Server::GetInstance().GetFabricTable();
-    static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver,fabricTable);
+    static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver, fabricTable);
     static std::unique_ptr<DeviceInterface> constructedDevice;
 
     TEMPORARY_RETURN_IGNORED rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
