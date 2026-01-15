@@ -16,7 +16,6 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server/Server.h>
@@ -24,7 +23,6 @@
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
