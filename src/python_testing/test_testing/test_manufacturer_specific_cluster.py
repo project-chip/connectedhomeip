@@ -59,7 +59,7 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
     @async_test_body
     async def test_manufacturer_specific_cluster_handling(self):
         """Test that controller gracefully handles manufacturer-specific clusters without codegen."""
-        
+
         # Test 1: Verify TestHiddenMei is NOT in controller's codegen
         self.print_step(1, "Verify TestHiddenMei cluster is NOT in controller's ALL_CLUSTERS")
         asserts.assert_not_in(
@@ -67,20 +67,20 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
             ClusterObjects.ALL_CLUSTERS,
             f"TestHiddenMei cluster (0x{TEST_HIDDEN_MEI_CLUSTER_ID:08X}) should NOT be in controller's ALL_CLUSTERS"
         )
-        print(f"TestHiddenMei correctly NOT in controller codegen")
-        
+        print("TestHiddenMei correctly NOT in controller codegen")
+
         # Test 2: Verify cluster ID structure is spec-compliant
         self.print_step(2, "Verify cluster ID structure per Matter spec")
         vendor_id = (TEST_HIDDEN_MEI_CLUSTER_ID >> 16) & 0xFFFF
         cluster_suffix = TEST_HIDDEN_MEI_CLUSTER_ID & 0xFFFF
-        
+
         asserts.assert_equal(vendor_id, 0xFFF1, "Expected test vendor ID 0xFFF1")
         asserts.assert_true(
             0xFC00 <= cluster_suffix <= 0xFFFE,
             f"Cluster suffix 0x{cluster_suffix:04X} must be in manufacturer-specific range (0xFC00-0xFFFE)"
         )
         print(f"Cluster ID structure valid: vendor=0x{vendor_id:04X}, suffix=0x{cluster_suffix:04X}")
-        
+
         # Test 3: Verify cluster is correctly classified
         self.print_step(3, "Verify cluster ID is correctly classified as kTest")
         cluster_type = global_attribute_ids.cluster_id_type(TEST_HIDDEN_MEI_CLUSTER_ID)
@@ -90,14 +90,14 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
             f"TestHiddenMei cluster should be classified as kTest, got {cluster_type}"
         )
         print(f"TestHiddenMei correctly classified as {cluster_type}")
-        
+
         # Test 4: Read all attributes from device (wildcard read)
         self.print_step(4, "Perform wildcard read to get all clusters and attributes")
         read_response = await self.default_controller.Read(self.dut_node_id, [()])
         asserts.assert_is_not_none(read_response, "Read response should not be None")
         asserts.assert_is_not_none(read_response.tlvAttributes, "tlvAttributes should not be None")
-        print(f"Wildcard read successful")
-        
+        print("Wildcard read successful")
+
         # Test 5: Verify endpoint exists
         self.print_step(5, f"Verify endpoint {TEST_HIDDEN_MEI_ENDPOINT} exists in response")
         asserts.assert_in(
@@ -106,7 +106,7 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
             f"Endpoint {TEST_HIDDEN_MEI_ENDPOINT} not found in response"
         )
         print(f"Endpoint {TEST_HIDDEN_MEI_ENDPOINT} found")
-        
+
         # Test 6: Verify TestHiddenMei is in ServerList
         self.print_step(6, "Verify TestHiddenMei appears in ServerList on endpoint 1")
         server_list = read_response.tlvAttributes[TEST_HIDDEN_MEI_ENDPOINT][Clusters.Descriptor.id][
@@ -118,7 +118,7 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
             f"TestHiddenMei cluster (0x{TEST_HIDDEN_MEI_CLUSTER_ID:08X}) should be in server list on endpoint {TEST_HIDDEN_MEI_ENDPOINT}"
         )
         print(f"TestHiddenMei (0x{TEST_HIDDEN_MEI_CLUSTER_ID:08X}) found in ServerList")
-        
+
         # Test 7: Verify cluster is readable via tlvAttributes
         self.print_step(7, "Verify TestHiddenMei cluster is readable via tlvAttributes")
         asserts.assert_in(
@@ -126,8 +126,8 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
             read_response.tlvAttributes[TEST_HIDDEN_MEI_ENDPOINT],
             f"TestHiddenMei cluster (0x{TEST_HIDDEN_MEI_CLUSTER_ID:08X}) should be readable via tlvAttributes"
         )
-        print(f"TestHiddenMei readable via tlvAttributes")
-        
+        print("TestHiddenMei readable via tlvAttributes")
+
         # Test 8: Read specific attribute from manufacturer-specific cluster using raw path
         self.print_step(8, "Read TestAttribute from TestHiddenMei using raw AttributePath")
         mei_attribute_path = AttributePath(
@@ -135,14 +135,14 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
             ClusterId=TEST_HIDDEN_MEI_CLUSTER_ID,
             AttributeId=TEST_HIDDEN_MEI_ATTRIBUTE_ID
         )
-        
+
         specific_read_response = await self.default_controller.Read(self.dut_node_id, [mei_attribute_path])
         raw_value = specific_read_response.tlvAttributes[TEST_HIDDEN_MEI_ENDPOINT][TEST_HIDDEN_MEI_CLUSTER_ID][TEST_HIDDEN_MEI_ATTRIBUTE_ID]
-        
+
         # Verify the default value from XML definition
         asserts.assert_equal(raw_value, True, "TestAttribute default value should be True per XML definition")
         print(f" TestAttribute value: {raw_value} (correctly read via raw path)")
-        
+
         print("\n" + "=" * 20)
         print("All manufacturer-specific cluster handling tests passed!")
         print("=" * 20)
