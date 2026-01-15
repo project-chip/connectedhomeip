@@ -121,22 +121,41 @@ config CHIP_TASK_STACK_SIZE
 	help
 	  Configures the stack size available for the CHIP (Matter) thread.
 
-config CHIP_FACTORY_DATA
-	bool "Factory data provider"
-	select ZCBOR
+choice CHIP_FACTORY_DATA_BACKEND
+	prompt "Factory data provider implementation"
+	default CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
+
+config CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
+	bool "nRF Connect factory data provider"
+	select CHIP_FACTORY_DATA
 	help
 	  Enables the default nRF Connect factory data provider implementation that
+	  supports reading the factory data encoded in the CBOR format from the
+	  flash memory partition.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Custom factory data provider"
+	select CHIP_FACTORY_DATA
+	help
+	  Enables user's custom factory data provider implementation.
+
+config CHIP_FACTORY_DATA_NONE
+	bool "No factory data provider"
+	help
+	  Disables factory data support and does not provide any factory data provider implementation.
+
+endchoice
+
+config CHIP_FACTORY_DATA
+	bool "Factory data for nRF Connect"
+	select ZCBOR
+	help
+	  Default nRF Connect factory data provider implementation that
 	  supports reading the factory data encoded in the CBOR format from the
 	  flash memory partition. This option requires the factory_data partition in
 	  Partition Manager configuration file (pm_static.yml).
 
-config CHIP_FACTORY_DATA_CUSTOM_BACKEND
-	bool "Custom factory data provider"
-	depends on !CHIP_FACTORY_DATA
-	help
-	  Enables user's custom factory data provider implementation. This option
-	  cannot be used with the CHIP_FACTORY_DATA, which enables the default nRF
-	  Connect factory data provider implementation.
+if CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 
 config CHIP_FACTORY_DATA_BUILD
 	bool "Generate factory data contents"
@@ -264,6 +283,8 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	  Enables the generation of a random Rotating device ID unique ID.
 
 endif # CHIP_FACTORY_DATA_BUILD
+
+endif # CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_SETTINGS

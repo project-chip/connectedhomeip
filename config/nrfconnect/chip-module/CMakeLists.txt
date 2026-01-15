@@ -156,7 +156,7 @@ matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MA
 matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
-matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA)
+matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA_NRFCONNECT_BACKEND)
 matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_ENABLE_READ_CLIENT)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_config_enable_groupcast"           CONFIG_CHIP_ENABLE_GROUPCAST)

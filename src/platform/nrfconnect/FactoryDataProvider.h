@@ -21,6 +21,8 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
+#include "FactoryDataProviderBase.h"
+
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/CHIPCryptoPALPSA.h>
 #endif
@@ -132,51 +134,6 @@ struct ExternalFlashFactoryData
 };
 #endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_SPI_NOR) ||
        // defined(CONFIG_NORDIC_QSPI_NOR))
-
-class FactoryDataProviderBase : public chip::Credentials::DeviceAttestationCredentialsProvider,
-                                public CommissionableDataProvider,
-                                public DeviceInstanceInfoProvider
-{
-public:
-    /**
-     * @brief Perform all operations needed to initialize factory data provider.
-     *
-     * @returns CHIP_NO_ERROR in case of a success, specific error code otherwise
-     */
-    virtual CHIP_ERROR Init() = 0;
-
-    /**
-     * @brief Get the EnableKey as MutableByteSpan
-     *
-     * @param enableKey MutableByteSpan object to obtain EnableKey
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain enable_key field, or the value cannot be read
-     * out. CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
-     */
-    virtual CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey) = 0;
-
-    /**
-     * @brief Get the user data in CBOR format as MutableByteSpan
-     *
-     * @param userData MutableByteSpan object to obtain all user data in CBOR format
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
-     * CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
-     */
-    virtual CHIP_ERROR GetUserData(MutableByteSpan & userData) = 0;
-
-    /**
-     * @brief Try to find user data key and return its value
-     *
-     * @param userKey A key name to be found
-     * @param buf Buffer to store value of found key
-     * @param len Length of the buffer. This value will be updated to the actual value if the key is read.
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user key field, or the value cannot be read
-     * out. CHIP_ERROR_BUFFER_TOO_SMALL if provided buffer length is too small
-     */
-    virtual CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len) = 0;
-};
 
 template <class FlashFactoryData>
 class FactoryDataProvider : public FactoryDataProviderBase
