@@ -31,7 +31,7 @@ using namespace chip::app::Clusters::UnitLocalization;
 static_assert((UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
                UnitLocalization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
                   (UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 0),
-              "UnitLocalization MAY be present only in root endpoint");
+              "UnitLocalization MAY be present only in the root endpoint");
 
 namespace {
 
