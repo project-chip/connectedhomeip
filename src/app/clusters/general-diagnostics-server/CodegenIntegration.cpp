@@ -79,8 +79,7 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
-                       mNodeStartupTimestamp, functionsConfig);
-        gServer.Cluster().SetTestEventTriggerDelegate(mTestEventTriggerDelegate);
+                       mTestEventTriggerDelegate, mNodeStartupTimestamp, functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
                        mNodeStartupTimestamp);
