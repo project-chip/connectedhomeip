@@ -21,7 +21,6 @@
 #include <app/server/Server.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
-// #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {

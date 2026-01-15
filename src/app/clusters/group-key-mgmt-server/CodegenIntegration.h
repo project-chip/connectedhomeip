@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#pragma once
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 

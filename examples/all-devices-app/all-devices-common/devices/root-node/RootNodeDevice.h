@@ -46,10 +46,13 @@ public:
 
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
-    RootNodeDevice() : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
+    RootNodeDevice(FabricTable & fabricTable) :
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mFabricTable(fabricTable)
+    {}
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
+    FabricTable & mFabricTable;
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;
@@ -63,7 +66,9 @@ private:
 class WifiRootNodeDevice : public RootNodeDevice
 {
 public:
-    WifiRootNodeDevice(DeviceLayer::NetworkCommissioning::WiFiDriver * wifiDriver) : RootNodeDevice(), mWifiDriver(wifiDriver) {}
+    WifiRootNodeDevice(DeviceLayer::NetworkCommissioning::WiFiDriver * wifiDriver, FabricTable & fabricTable) :
+        RootNodeDevice(fabricTable), mWifiDriver(wifiDriver)
+    {}
 
     ~WifiRootNodeDevice() override = default;
 
