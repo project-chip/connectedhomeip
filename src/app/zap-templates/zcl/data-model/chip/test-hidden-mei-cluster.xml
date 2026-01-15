@@ -32,7 +32,7 @@ limitations under the License.
 
   <cluster apiMaturity="internal">
     <domain>CHIP</domain>
-    <name>Test Hidden MEI</name>
+    <name>Test Hidden Manufacturer Specific</name>
     <code>0xFFF1FC21</code>
     <define>TEST_HIDDEN_MEI_CLUSTER</define>
     <description>Test cluster for validating MEI handling without controller-side implementation</description>
