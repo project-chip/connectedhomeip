@@ -1026,4 +1026,48 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommandUnsupp
     EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
 }
 
+TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
+{
+    using AllocateRequest  = Commands::AudioStreamAllocate::Type;
+    using AllocateResponse = Commands::AudioStreamAllocateResponse::DecodableType;
+    using DeallocateRequest  = Commands::AudioStreamDeallocate::Type;
+
+    mAudioStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.streamUsage  = StreamUsageEnum::kLiveView;
+    allocRequest.audioCodec   = AudioCodecEnum::kOpus;
+    allocRequest.channelCount = 2;
+    allocRequest.sampleRate   = 48000;
+    allocRequest.bitRate      = 128000;
+    allocRequest.bitDepth     = 24;
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.status.has_value());
+    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->audioStreamID;
+    EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 1u);
+
+    // Deallocate the stream
+    DeallocateRequest deallocRequest;
+    deallocRequest.audioStreamID = streamId;
+    auto deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_TRUE(deallocResult.status->IsSuccess());
+    EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 0u);
+
+    // Attempt to deallocate again, should fail
+    deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+
+    // Attempt to deallocate a non-existent ID
+    deallocRequest.audioStreamID = 999;
+    deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
 } // namespace
