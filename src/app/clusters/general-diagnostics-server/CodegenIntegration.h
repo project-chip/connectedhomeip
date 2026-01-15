@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
- #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 
- namespace chip::app::Clusters::GeneralDiagnostics {
- void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
+namespace chip::app::Clusters::GeneralDiagnostics {
+void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
- void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
- void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                                    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                                   const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
- void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
- } // namespace chip::app::Clusters::GeneralDiagnostics
+void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+} // namespace chip::app::Clusters::GeneralDiagnostics
