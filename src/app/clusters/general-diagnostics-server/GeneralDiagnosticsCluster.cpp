@@ -152,8 +152,9 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(chip::app::Clust
  (that can be determined statically) where we don't want to record posix time and pay the codesize cost for it.
  */
 std::optional<DataModel::ActionReturnStatus>
-HandleTimeSnapshotWithPosixTime(chip::app::Clusters::GeneralDiagnosticsCluster * cluster, CommandHandler & handler,
-                                const ConcreteCommandPath & commandPath, const Commands::TimeSnapshot::DecodableType & commandData)
+HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                const Commands::TimeSnapshot::DecodableType & commandData,
+                                System::Clock::Microseconds64 timeSinceNodeStartup)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -168,8 +169,7 @@ HandleTimeSnapshotWithPosixTime(chip::app::Clusters::GeneralDiagnosticsCluster *
         posix_time_ms = System::Clock::Milliseconds64{ 0 };
     }
 
-    System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceNodeStartup());
+    System::Clock::Milliseconds64 system_time_ms = std::chrono::duration_cast<System::Clock::Milliseconds64>(timeSinceNodeStartup);
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     if (posix_time_ms.count() != 0)
@@ -481,7 +481,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         if (mFunctionConfig.enablePosixTime)
         {
-            return HandleTimeSnapshotWithPosixTime(this, *handler, request.path, request_data);
+            return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data, TimeSinceNodeStartup());
         }
         return HandleTimeSnapshot(this, *handler, request.path, request_data);
     }
@@ -502,7 +502,6 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 namespace chip::app::Clusters::GeneralDiagnostics {
 
 namespace {
