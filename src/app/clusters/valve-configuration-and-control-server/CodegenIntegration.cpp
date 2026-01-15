@@ -92,11 +92,11 @@ public:
                                                                                  .defaultOpenLevel    = defaultOpenLevel,
                                                                                  .levelStep           = levelStep };
         ValveConfigurationAndControlCluster::ValveContext context = {
-            .config               = startupConfig,
-            .delegate             = nullptr,
             .features             = BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
             .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
+            .config               = startupConfig,
             .tsTracker            = &codegenTracker,
+            .delegate             = nullptr,
         };
 
         gServers[clusterInstanceIndex].Create(endpointId, context);
