@@ -30,14 +30,12 @@ config CHIP_TELINK_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
-	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C
 	imply ST25DVXXKC
 	imply NFC
-	help
-	  Enables sharing the onboarding payload in the NFC tag.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
@@ -107,10 +105,6 @@ config CHIP_ROTATING_DEVICE_ID
 	  Enables the rotating device identifier that provides a non-trackable
 	  identifier. The identifier is unique per device and rotates at pre-defined
 	  moments.
-
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
 
 config CHIP_FACTORY_DATA
 	bool "Enable Factory Data support"
@@ -195,15 +189,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default n
 
 endif
-
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n
-	depends on NET_IPV4
-	help
-	  If disabled, it allows to build Telink SDK application
-	  with IPv4 support independently of the Matter stack still
-	  running over IPv6.
 
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
