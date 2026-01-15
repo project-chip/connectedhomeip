@@ -27,13 +27,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 
-LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
+static_assert((UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               UnitLocalization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+              (UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 0));
 
-UnitLocalizationServer & UnitLocalizationServer::Instance()
-{
-    VerifyOrDie(gServer.IsConstructed());
-    return gServer.Cluster();
-}
+namespace {
+
+LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -55,6 +55,14 @@ public:
     // Nothing to destroy: separate singleton class without constructor/destructor is used
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
+
+}
+
+UnitLocalizationServer & UnitLocalizationServer::Instance()
+{
+    VerifyOrDie(gServer.IsConstructed());
+    return gServer.Cluster();
+}
 
 void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 {
