@@ -27,8 +27,6 @@ import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
 import matter.controller.ReadData
-import matter.controller.ReadFailure
-import matter.controller.ReadResponse
 import matter.controller.ReadRequest
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
@@ -51,49 +49,48 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
 
   sealed class InstalledChimeSoundsAttributeSubscriptionState {
     data class Success(val value: List<ChimeClusterChimeSoundStruct>) : 
-    InstalledChimeSoundsAttributeSubscriptionState()
-    
+      InstalledChimeSoundsAttributeSubscriptionState()
+
     data class Error(val exception: Exception) : InstalledChimeSoundsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : InstalledChimeSoundsAttributeSubscriptionState()    
+    object SubscriptionEstablished : InstalledChimeSoundsAttributeSubscriptionState()
   }  
 class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : GeneratedCommandListAttributeSubscriptionState()
-    
+
     data class Error(val exception: Exception) : GeneratedCommandListAttributeSubscriptionState()
 
-    object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()    
+    object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
   }  
 class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
-    
+
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
-    object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()    
-  }  
+    object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
+  }
 class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AttributeListAttributeSubscriptionState()
-    
+
     data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
 
-    object SubscriptionEstablished : AttributeListAttributeSubscriptionState()    
-  }  
+    object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
+  }
 
-  suspend fun playChimeSound(chimeID: UByte?,timedInvokeTimeout: Duration? = null) {
+  suspend fun playChimeSound(chimeID: UByte?, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_CHIME_ID_REQ: Int = 0
-    chimeID?.let { tlvWriter.put(ContextSpecificTag(TAG_CHIME_ID_REQ), chimeID)
-    }    
+    chimeID?.let { tlvWriter.put(ContextSpecificTag(TAG_CHIME_ID_REQ), chimeID) }    
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -106,36 +103,36 @@ class AttributeListAttribute(val value: List<UInt>)
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
-suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
-  val ATTRIBUTE_ID: UInt = 0u
+  suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
+    val ATTRIBUTE_ID: UInt = 0u
 
-  val attributePath = 
-    AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath = 
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")     
-    }    
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Installedchimesounds attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<ChimeClusterChimeSoundStruct> = 
+    val decodedValue: List<ChimeClusterChimeSoundStruct> =
       buildList<ChimeClusterChimeSoundStruct> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(ChimeClusterChimeSoundStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
@@ -150,16 +147,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<InstalledChimeSoundsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
     val subscribeRequest: SubscribeRequest = 
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -180,16 +177,14 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
              
-          requireNotNull(attributeData) { 
-            "Installedchimesounds attribute not found in Node State update" 
-          }
+          requireNotNull(attributeData) { "Installedchimesounds attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<ChimeClusterChimeSoundStruct> = 
+          val decodedValue: List<ChimeClusterChimeSoundStruct> =
             buildList<ChimeClusterChimeSoundStruct> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(ChimeClusterChimeSoundStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
@@ -203,34 +198,34 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       }
     }
   }
+
   suspend fun readSelectedChimeAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 1u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")     
-    }    
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Selectedchime attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
 
     return decodedValue
   }
@@ -243,10 +238,10 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
 
     val writeRequests: WriteRequests =
       WriteRequests(
-        requests = 
+        requests =
           listOf(
             WriteRequest(
-              attributePath = 
+              attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
@@ -272,7 +267,7 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
       }
-    }  
+    }
   }
 
   suspend fun subscribeSelectedChimeAttribute(
@@ -280,16 +275,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -308,8 +303,8 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID } 
+
           requireNotNull(attributeData) { "Selectedchime attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
@@ -324,28 +319,29 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       }
     }
   }
+
   suspend fun readEnabledAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 2u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Enabled attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -363,10 +359,10 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
 
     val writeRequests: WriteRequests =
       WriteRequests(
-        requests = 
+        requests =
           listOf(
             WriteRequest(
-              attributePath = 
+              attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
@@ -400,16 +396,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -428,8 +424,8 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Enabled attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
@@ -447,38 +443,37 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65528u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
+      }
        
     requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> = 
+    val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
       }
-
 
     return GeneratedCommandListAttribute(decodedValue)
   }
@@ -488,16 +483,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -514,18 +509,18 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }        
-             
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Generatedcommandlist attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> = 
+          val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -539,19 +534,21 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       }
     }
   }
+
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65529u
 
-    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath = 
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
@@ -559,20 +556,19 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
       }
-       
+  
     requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> = 
+    val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
       }
-
 
     return AcceptedCommandListAttribute(decodedValue)
   }
@@ -582,16 +578,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
     )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -608,18 +604,18 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }        
-             
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> = 
+          val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -633,35 +629,37 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       }
     }
   }
+
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
     val ATTRIBUTE_ID: UInt = 65531u
 
-    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath = 
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Attributelist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> = 
+    val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -676,16 +674,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
     )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -704,18 +702,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull {
-                it.path.attributeId == ATTRIBUTE_ID
-              }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> = 
+          val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -729,27 +725,29 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       }
     }
   }
+
   suspend fun readFeatureMapAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 65532u
 
-    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath = 
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Featuremap attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -764,16 +762,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -790,10 +788,10 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }        
-             
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Featuremap attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
@@ -808,27 +806,29 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
       }
     }
   }
+
   suspend fun readClusterRevisionAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 65533u
 
-    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath = 
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -843,16 +843,16 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
     maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
-    val attributePaths = 
+    val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
       )
 
-    val subscribeRequest: SubscribeRequest = 
+    val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
@@ -869,10 +869,10 @@ suspend fun readInstalledChimeSoundsAttribute(): InstalledChimeSoundsAttribute {
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }        
-             
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) { "Clusterrevision attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type

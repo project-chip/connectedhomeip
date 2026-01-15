@@ -22,8 +22,8 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChimeClusterChimeStartedPlayingEvent (val chimeID: UInt) {
-  override fun toString(): String  = buildString {
+class ChimeClusterChimeStartedPlayingEvent(val chimeID: UInt) {
+  override fun toString(): String = buildString {
     append("ChimeClusterChimeStartedPlayingEvent {\n")
     append("\tchimeID : $chimeID\n")
     append("}\n")
@@ -43,7 +43,7 @@ class ChimeClusterChimeStartedPlayingEvent (val chimeID: UInt) {
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChimeClusterChimeStartedPlayingEvent {
       tlvReader.enterStructure(tlvTag)
       val chimeID = tlvReader.getUInt(ContextSpecificTag(TAG_CHIME_ID))
-      
+
       tlvReader.exitContainer()
 
       return ChimeClusterChimeStartedPlayingEvent(chimeID)
