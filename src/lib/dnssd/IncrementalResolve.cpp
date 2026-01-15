@@ -20,9 +20,9 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
-#include <minmdns/MinMdnsConfig.h>
 #include <tracing/macros.h>
 
 namespace chip {
