@@ -148,6 +148,7 @@ CodeDrivenClusters:
     - TLS Client Management
     - Time Format Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
