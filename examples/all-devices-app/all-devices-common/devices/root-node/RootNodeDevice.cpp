@@ -51,11 +51,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mBasicInformationCluster.Create(optionalAttributeSet);
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
-
     mGeneralCommissioningCluster.Create(
         GeneralCommissioningCluster::Context {
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                         //                 //
+                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
                 .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
                 .fabricTable            = Server::GetInstance().GetFabricTable(),                //
                 .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
