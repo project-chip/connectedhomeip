@@ -239,7 +239,7 @@ std::optional<DataModel::ActionReturnStatus>
 ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                        CommandHandler * handler)
 {
-    // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault. 
+    // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
     if (mValveFault.HasAny())
     {
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
@@ -254,7 +254,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // In the spec, the setting of the TargetState and Current state goes before the validation of the
     // fields of the command, however this was deferred to the OpenValve function to keep backwards compatibility.
     // Also this avoids setting the attributes if some of the command fields is not correct.
-        
+
     // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
     // This value will be used to set the OpenDuration attribute, initialize the RemainingDuration attribute and
     // calculate the AutoCloseTime attribute (if supported in) the OpenValve function
