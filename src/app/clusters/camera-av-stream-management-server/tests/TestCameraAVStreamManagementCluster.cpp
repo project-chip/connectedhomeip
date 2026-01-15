@@ -1028,9 +1028,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommandUnsupp
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
 {
-    using AllocateRequest  = Commands::AudioStreamAllocate::Type;
-    using AllocateResponse = Commands::AudioStreamAllocateResponse::DecodableType;
-    using DeallocateRequest  = Commands::AudioStreamDeallocate::Type;
+    using AllocateRequest   = Commands::AudioStreamAllocate::Type;
+    using AllocateResponse  = Commands::AudioStreamAllocateResponse::DecodableType;
+    using DeallocateRequest = Commands::AudioStreamDeallocate::Type;
 
     mAudioStreams.clear();
 
@@ -1053,7 +1053,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
     // Deallocate the stream
     DeallocateRequest deallocRequest;
     deallocRequest.audioStreamID = streamId;
-    auto deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
     ASSERT_TRUE(deallocResult.status.has_value());
     EXPECT_TRUE(deallocResult.status->IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 0u);
@@ -1065,7 +1065,86 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
 
     // Attempt to deallocate a non-existent ID
     deallocRequest.audioStreamID = 999;
+    deallocResult                = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamAllocateCommand)
+{
+    using Request  = Commands::VideoStreamAllocate::Type;
+    using Response = Commands::VideoStreamAllocateResponse::DecodableType;
+
+    mVideoStreams.clear();
+
+    Request request;
+
+    // Happy path
+    request.streamUsage      = StreamUsageEnum::kLiveView;
+    request.videoCodec       = VideoCodecEnum::kH264;
+    request.minFrameRate     = 30;
+    request.maxFrameRate     = GetVideoSensorParams().maxFPS;
+    request.minResolution    = { 640, 480 };
+    request.maxResolution    = { 1280, 720 };
+    request.minBitRate       = 10000;
+    request.maxBitRate       = 10000;
+    request.keyFrameInterval = 4;
+    request.watermarkEnabled = chip::MakeOptional(false);
+
+    auto result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->videoStreamID, 1);
+    EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
+
+    // TODO: Add more failure cases for VideoStreamAllocate
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
+{
+    using AllocateRequest   = Commands::VideoStreamAllocate::Type;
+    using AllocateResponse  = Commands::VideoStreamAllocateResponse::DecodableType;
+    using DeallocateRequest = Commands::VideoStreamDeallocate::Type;
+
+    mVideoStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.streamUsage      = StreamUsageEnum::kLiveView;
+    allocRequest.videoCodec       = VideoCodecEnum::kH264;
+    allocRequest.minFrameRate     = 30;
+    allocRequest.maxFrameRate     = 120;
+    allocRequest.minResolution    = { 640, 480 };
+    allocRequest.maxResolution    = { 1280, 720 };
+    allocRequest.minBitRate       = 10000;
+    allocRequest.maxBitRate       = 10000;
+    allocRequest.keyFrameInterval = 4;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.status.has_value());
+    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->videoStreamID;
+    EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
+
+    // Deallocate the stream
+    DeallocateRequest deallocRequest;
+    deallocRequest.videoStreamID = streamId;
+    auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_TRUE(deallocResult.status->IsSuccess());
+    EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 0u);
+
+    // Attempt to deallocate again, should fail
     deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+
+    // Attempt to deallocate a non-existent ID
+    deallocRequest.videoStreamID = 999;
+    deallocResult                = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
     ASSERT_TRUE(deallocResult.status.has_value());
     EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 }
