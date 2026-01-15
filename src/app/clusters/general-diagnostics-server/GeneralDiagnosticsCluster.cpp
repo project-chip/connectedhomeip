@@ -130,16 +130,15 @@ DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTr
     return (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(chip::app::Clusters::GeneralDiagnosticsCluster * cluster,
-                                                                CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                                                const Commands::TimeSnapshot::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                                const Commands::TimeSnapshot::DecodableType & commandData,
+                                                                System::Clock::Microseconds64 timeSinceNodeStartup)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
     Commands::TimeSnapshotResponse::Type response;
 
-    System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<System::Clock::Milliseconds64>(cluster->TimeSinceNodeStartup());
+    System::Clock::Milliseconds64 system_time_ms = std::chrono::duration_cast<System::Clock::Milliseconds64>(timeSinceNodeStartup);
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     handler.AddResponse(commandPath, response);
@@ -325,7 +324,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTimeSnapshot(this, *handler, request.path, request_data);
+        return HandleTimeSnapshot(*handler, request.path, request_data, TimeSinceNodeStartup());
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
@@ -483,7 +482,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         {
             return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data, TimeSinceNodeStartup());
         }
-        return HandleTimeSnapshot(this, *handler, request.path, request_data);
+        return HandleTimeSnapshot(*handler, request.path, request_data, TimeSinceNodeStartup());
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
         if (mFunctionConfig.enablePayloadSnapshot)
