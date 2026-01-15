@@ -455,7 +455,9 @@ class ArithmeticConformance(Conformance):
     ''' Base class for arithmetic operations - do not use directly.'''
 
     def _type_ok(self, op1: Conformance, op2: Conformance):
-        return ((issubclass(type(op1), ValueConformance) or (type(op1) == attribute)) and issubclass(type(op2), ValueConformance))
+        def _is_valid_operand(op: Conformance) -> bool:
+            return issubclass(type(op), ValueConformance) or type(op) == attribute
+        return _is_valid_operand(op1) and _is_valid_operand(op2)
 
     def __init__(self, op1: Conformance, op2: Conformance):
         if not self._type_ok(op1, op2):
