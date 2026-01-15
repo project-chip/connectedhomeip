@@ -55,13 +55,12 @@ public:
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
-        Server & server                           = Server::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         const GeneralDiagnosticsFunctionsConfig functionsConfig
         {
             /*
-          ղ  Only consider real time if time sync cluster is actually enabled. If it's not
+            Only consider real time if time sync cluster is actually enabled. If it's not
             enabled, this avoids likelihood of frequently reporting unusable unsynched time.
             */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
@@ -76,12 +75,12 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel), server.GetTestEventTriggerDelegate(),
-                       server.GetNodeStartupTimestamp(), functionsConfig);
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), Server::GetInstance().GetTestEventTriggerDelegate(),
+                       Server::GetInstance().GetNodeStartupTimestamp(), functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel), server.GetNodeStartupTimestamp());
-        gServer.Cluster().SetTestEventTriggerDelegate(server.GetTestEventTriggerDelegate());
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), Server::GetInstance().GetNodeStartupTimestamp());
+        gServer.Cluster().SetTestEventTriggerDelegate(Server::GetInstance().GetTestEventTriggerDelegate());
 #endif
         return gServer.Registration();
     }
