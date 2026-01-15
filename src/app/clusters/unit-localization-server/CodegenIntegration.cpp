@@ -27,6 +27,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 
+// UnitLocalization may be present in the root endpoint and shall not be present in any other endpoint.
 static_assert((UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
                UnitLocalization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
               (UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 0));
