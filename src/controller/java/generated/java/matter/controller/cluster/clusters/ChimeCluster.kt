@@ -56,7 +56,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
     object SubscriptionEstablished : InstalledChimeSoundsAttributeSubscriptionState()
   }
 
-class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : GeneratedCommandListAttributeSubscriptionState()
@@ -66,7 +66,7 @@ class GeneratedCommandListAttribute(val value: List<UInt>)
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
   }
 
-class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
@@ -76,7 +76,7 @@ class AcceptedCommandListAttribute(val value: List<UInt>)
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AttributeListAttributeSubscriptionState()
@@ -180,7 +180,9 @@ class AttributeListAttribute(val value: List<UInt>)
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Installedchimesounds attribute not found in Node State update" }
+          requireNotNull(attributeData) { 
+            "Installedchimesounds attribute not found in Node State update" 
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -518,7 +520,7 @@ class AttributeListAttribute(val value: List<UInt>)
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { 
-            "Generatedcommandlist attribute not found in Node State update" 
+            "Generatedcommandlist attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -615,7 +617,7 @@ class AttributeListAttribute(val value: List<UInt>)
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { 
-            "Acceptedcommandlist attribute not found in Node State update" 
+            "Acceptedcommandlist attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -817,7 +819,7 @@ class AttributeListAttribute(val value: List<UInt>)
   suspend fun readClusterRevisionAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 65533u
 
-    val attributePath = 
+    val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
@@ -881,7 +883,7 @@ class AttributeListAttribute(val value: List<UInt>)
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { 
-            "Clusterrevision attribute not found in Node State update" 
+            "Clusterrevision attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
