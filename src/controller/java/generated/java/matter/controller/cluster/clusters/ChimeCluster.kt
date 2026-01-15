@@ -180,8 +180,8 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
-            "Installedchimesounds attribute not found in Node State update" 
+          requireNotNull(attributeData) {
+            "Installedchimesounds attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -519,7 +519,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Generatedcommandlist attribute not found in Node State update"
           }
 
@@ -616,7 +616,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Acceptedcommandlist attribute not found in Node State update"
           }
 
@@ -882,7 +882,7 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Clusterrevision attribute not found in Node State update"
           }
 
