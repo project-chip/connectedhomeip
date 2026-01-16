@@ -144,7 +144,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     # Both the tests in this suite are potentially long-running if there are a large number of attributes on the DUT
     # and the network is slow. TC_ACE_2_4 (subscription test) is especially long as it tests ALL attributes.
-    # Set the default to 10 minutes to account for comprehensive subscription testing.
+    # Set the default to 25 minutes to account for comprehensive subscription testing.
     @property
     def default_timeout(self) -> int:
         return 1500  # 25 minutes for comprehensive subscription testing
