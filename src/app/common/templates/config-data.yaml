@@ -162,6 +162,7 @@ CodeDrivenClusters:
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
+    - TLS Certificate Management
     - TLS Client Management
     - Time Format Localization
     - User Label
