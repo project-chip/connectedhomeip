@@ -196,7 +196,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     gDataModelProvider = &dataModelProvider;
 
     auto & fabricTable = Server::GetInstance().GetFabricTable();
-    gRootNodeDevice    = std::make_unique<WifiRootNodeDevice>(fabricTable, &sWiFiDriver);
+    gRootNodeDevice    = std::make_unique<WifiRootNodeDevice>(&sWiFiDriver, fabricTable);
     err                = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
