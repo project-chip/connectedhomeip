@@ -20,7 +20,6 @@
  * Any implementation of the OTA Requestor must implement this interface.
  */
 
-#include <app/clusters/ota-requestor/OTARequestorEventHandler.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
@@ -217,12 +216,6 @@ public:
 
     // Retrieve an iterator to the cached default OTA provider list
     virtual ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) = 0;
-
-    // Register a handler for generated cluster events
-    virtual CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandler * eventHandler) = 0;
-
-    // Unregister a previously-registered event handler
-    virtual CHIP_ERROR UnregisterEventHandler(app::OTARequestorEventHandler * eventHandler) = 0;
 };
 
 // The instance of the class implementing OTARequestorInterface must be managed through

@@ -18,13 +18,12 @@
 
 #pragma once
 
-#include <app/clusters/ota-requestor/OTARequestorEventHandler.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip::app::Clusters {
 
-class OTARequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
+class OTARequestorCluster : public DefaultServerCluster
 {
 public:
     OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
@@ -33,8 +32,6 @@ public:
     bool GetUpdatePossible() const { return mUpdatePossible; }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-
-    void Shutdown() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -50,15 +47,6 @@ public:
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
-    void OnStateTransition(OTARequestorEventHandler::UpdateStateEnum previousState,
-                           OTARequestorEventHandler::UpdateStateEnum newState, OTARequestorEventHandler::ChangeReasonEnum reason,
-                           DataModel::Nullable<uint32_t> const & targetSoftwareVersion) override;
-
-    void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) override;
-
-    void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded, DataModel::Nullable<uint8_t> progressPercent,
-                         DataModel::Nullable<int64_t> platformCode) override;
 
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);

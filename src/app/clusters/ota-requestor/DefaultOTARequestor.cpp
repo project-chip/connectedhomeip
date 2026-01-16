@@ -570,7 +570,20 @@ void DefaultOTARequestor::NotifyUpdateApplied()
         return;
     }
 
-    SendVersionAppliedEvent(mCurrentVersion, productId);
+    DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrDie(dataModelProvider != nullptr);
+    OtaSoftwareUpdateRequestor::Events::VersionApplied::Type event{ mCurrentVersion, productId };
+
+    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+    {
+        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
+        {
+            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+            {
+                static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
+            }
+        }
+    }
 
     ConnectToProvider(kNotifyUpdateApplied);
 }
@@ -661,11 +674,28 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
-    SendStateTransitionEvent(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
     OTAUpdateStateEnum prevState = mCurrentUpdateState;
     // Update the new state before handling the state transition
     mCurrentUpdateState = newState;
+
+    if (prevState != newState)
+    {
+        DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+        VerifyOrDie(dataModelProvider != nullptr);
+        OtaSoftwareUpdateRequestor::Events::StateTransition::Type event{ prevState, newState, reason, targetSoftwareVersion };
+
+        for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+        {
+            for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
+            {
+                if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+                {
+                    static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
+                }
+            }
+        }
+    }
 
     if ((newState == OTAUpdateStateEnum::kIdle) && (prevState != OTAUpdateStateEnum::kIdle))
     {
@@ -685,7 +715,21 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
     VerifyOrDie(imageProcessor != nullptr);
     Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
-    SendDownloadErrorEvent(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
+
+    DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrDie(dataModelProvider != nullptr);
+    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event{ mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode };
+
+    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+    {
+        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
+        {
+            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+            {
+                static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
+            }
+        }
+    }
 
     // Whenever an error occurs, always reset to Idle state
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason, error);
@@ -934,71 +978,24 @@ void DefaultOTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::Ch
     driver->OTACommissioningCallback();
 }
 
-CHIP_ERROR DefaultOTARequestor::RegisterEventHandler(app::OTARequestorEventHandler * eventHandler)
+#if 0
+void DefaultOTARequestor::FindOtaSoftwareClusters(void (*callback)(EndpointId endpoint))
 {
-    VerifyOrReturnError(eventHandler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrDie(mServer != nullptr);
+    DataModel::Provider * dataModelProvider = mServer->dataModelProvider;
+    VerifyOrDie(dataModelProvider != nullptr);
 
-    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
+    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
     {
-        if (!mEventHandlers[i])
+        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
         {
-            mEventHandlers[i] = eventHandler;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NO_MEMORY;
-}
-
-CHIP_ERROR DefaultOTARequestor::UnregisterEventHandler(app::OTARequestorEventHandler * eventHandler)
-{
-    VerifyOrReturnError(eventHandler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
-    {
-        if (mEventHandlers[i] == eventHandler)
-        {
-            mEventHandlers[i] = nullptr;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
-}
-
-void DefaultOTARequestor::SendStateTransitionEvent(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState,
-                                                   OTAChangeReasonEnum reason,
-                                                   DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
-{
-    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
-    {
-        if (mEventHandlers[i])
-        {
-            mEventHandlers[i]->OnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+            {
+                callback(endpoint.id);
+            }
         }
     }
 }
-
-void DefaultOTARequestor::SendVersionAppliedEvent(uint32_t softwareVersion, uint16_t productId)
-{
-    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
-    {
-        if (mEventHandlers[i])
-        {
-            mEventHandlers[i]->OnVersionApplied(softwareVersion, productId);
-        }
-    }
-}
-
-void DefaultOTARequestor::SendDownloadErrorEvent(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                                 DataModel::Nullable<uint8_t> progressPercent,
-                                                 DataModel::Nullable<int64_t> platformCode)
-{
-    for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
-    {
-        if (mEventHandlers[i])
-        {
-            mEventHandlers[i]->OnDownloadError(softwareVersion, bytesDownloaded, progressPercent, platformCode);
-        }
-    }
-}
+#endif
 
 } // namespace chip

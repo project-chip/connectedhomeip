@@ -37,12 +37,7 @@ namespace chip {
 class DefaultOTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    DefaultOTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {
-        for (int i = 0; i < CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS; ++i)
-        {
-            mEventHandlers[i] = nullptr;
-        }
-    }
+    DefaultOTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
     void Reset(void) override;
@@ -106,12 +101,6 @@ public:
 
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
-
-    // Register a handler for generated cluster events
-    CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandler * eventHandler) override;
-
-    // Unregister a previously-registered event handler
-    CHIP_ERROR UnregisterEventHandler(app::OTARequestorEventHandler * eventHandler) override;
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -298,23 +287,6 @@ private:
     void LoadCurrentUpdateInfo();
 
     /**
-     * Send a StateTransition event to all registered event handlers
-     */
-    void SendStateTransitionEvent(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
-                                  app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion);
-
-    /**
-     * Send a VersionApplied event to all registered event handlers
-     */
-    void SendVersionAppliedEvent(uint32_t softwareVersion, uint16_t productId);
-
-    /**
-     * Send a StateTransition event to all registered event handlers
-     */
-    void SendDownloadErrorEvent(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                app::DataModel::Nullable<uint8_t> progressPercent, app::DataModel::Nullable<int64_t> platformCode);
-
-    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -367,7 +339,6 @@ private:
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
-    app::OTARequestorEventHandler * mEventHandlers[CHIP_CONFIG_MAX_NUM_OTA_REQUESTOR_EVENT_HANDLERS];
 };
 
 } // namespace chip

@@ -47,15 +47,7 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
     ChipLogError(SoftwareUpdate, "Initializing OTA requestor on endpoint %u with flag 'chip_enable_ota_requestor' disabled",
                  mPath.mEndpointId);
 #endif
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return mOtaRequestor.RegisterEventHandler(this);
-}
-
-void OTARequestorCluster::Shutdown()
-{
-    SuccessOrLog(mOtaRequestor.UnregisterEventHandler(this), SoftwareUpdate,
-                 "Unable to unregister event handling for endpoint %u during shutdown", mPath.mEndpointId);
-    DefaultServerCluster::Shutdown();
+    return DefaultServerCluster::Startup(context);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -142,34 +134,6 @@ CHIP_ERROR OTARequestorCluster::AcceptedCommands(const ConcreteClusterPath & pat
                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
-}
-
-void OTARequestorCluster::OnStateTransition(OTARequestorEventHandler::UpdateStateEnum previousState,
-                                            OTARequestorEventHandler::UpdateStateEnum newState,
-                                            OTARequestorEventHandler::ChangeReasonEnum reason,
-                                            DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
-{
-    if (previousState == newState)
-    {
-        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
-        return;
-    }
-    OtaSoftwareUpdateRequestor::Events::StateTransition::Type event = { previousState, newState, reason, targetSoftwareVersion };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-}
-
-void OTARequestorCluster::OnVersionApplied(uint32_t softwareVersion, uint16_t productId)
-{
-    OtaSoftwareUpdateRequestor::Events::VersionApplied::Type event = { softwareVersion, productId };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-}
-
-void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                          DataModel::Nullable<uint8_t> progressPercent, DataModel::Nullable<int64_t> platformCode)
-{
-    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event = { softwareVersion, bytesDownloaded, progressPercent,
-                                                                      platformCode };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
