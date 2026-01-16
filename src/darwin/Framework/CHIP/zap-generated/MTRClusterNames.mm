@@ -10737,10 +10737,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"UpdateGroupKey";
             break;
 
-        case MTRCommandIDTypeClusterGroupcastCommandExpireGracePeriodID:
-            result = @"ExpireGracePeriod";
-            break;
-
         case MTRCommandIDTypeClusterGroupcastCommandConfigureAuxiliaryACLID:
             result = @"ConfigureAuxiliaryACL";
             break;
