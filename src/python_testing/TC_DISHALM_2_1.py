@@ -39,14 +39,14 @@ import logging
 
 from mobly import asserts
 
-from matter.clusters import ClusterObjects
 import matter.clusters as Clusters
+from matter.clusters import ClusterObjects
 from matter.testing import matter_asserts
 from matter.testing.conformance import is_provisional
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main, TestStep
-from matter.testing.spec_parsing import build_xml_clusters, PrebuiltDataModelDirectory
+from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
 from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,8 @@ class TC_DISHALM_2_1(MatterBaseTest):
             TestStep(2, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value. Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
+            TestStep(5, "TH reads from the DUT the Supported attribute",
+                     "Verify that the DUT response contains a 32-bit value. Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
         ]
 
     def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = False) -> int:
