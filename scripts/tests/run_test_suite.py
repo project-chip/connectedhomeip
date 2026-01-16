@@ -377,7 +377,7 @@ class Terminable(Protocol):
     '--commissioning',
     type=click.Choice(['ble-wifi'], case_sensitive=False),
     default=None,
-    help='Commissioning method to use. "ble-wifi" uses Bluetooth and WiFi mock servers. Option is Linux-only.')
+    help='Commissioning method to use. "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. This option is Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
