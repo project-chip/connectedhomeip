@@ -233,7 +233,7 @@ class TestTarget:
 
 
 def _standard_ci_target(app_placeholder: str):
-    """Returns a command taylored for a standard CI execution.
+    """Returns a command tailored for a standard CI execution.
 
     Generally this is just the given command without any arguments.
     """
