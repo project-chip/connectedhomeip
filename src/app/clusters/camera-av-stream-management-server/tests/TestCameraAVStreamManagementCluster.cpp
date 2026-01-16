@@ -91,12 +91,34 @@ public:
                                          std::vector<AudioStreamStruct> * audioStreams,
                                          std::vector<SnapshotStreamStruct> * snapshotStreams) :
         mAllocatedVideoStreams(videoStreams),
-        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams), mAudioStreamCount(0)
+        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams), mAudioStreamCount(0),
+        mVideoStreamCount(0), mSnapshotStreamCount(0)
     {}
 
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
-        outStreamID = 1;
+        bool codecSupported = false;
+        for (const auto & tradeOffPoint : GetRateDistortionTradeOffPoints())
+        {
+            if (tradeOffPoint.codec == allocateArgs.videoCodec)
+            {
+                codecSupported = true;
+                break;
+            }
+        }
+        if (!codecSupported)
+        {
+            return Protocols::InteractionModel::Status::DynamicConstraintError;
+        }
+
+        if (mVideoStreamCount >= 1)
+        {
+            return Protocols::InteractionModel::Status::ResourceExhausted;
+        }
+
+        outStreamID = static_cast<uint16_t>(mAllocatedVideoStreams->size() + 1);
+        mAllocatedVideoStreams->push_back(allocateArgs);
+        mVideoStreamCount++;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -110,6 +132,7 @@ public:
 
     Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID) override
     {
+        mVideoStreamCount--;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -179,7 +202,42 @@ public:
     Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                uint16_t & outStreamID) override
     {
-        outStreamID = 1;
+        if (mSnapshotStreamCount >= 1)
+        {
+            return Protocols::InteractionModel::Status::ResourceExhausted;
+        }
+
+        bool codecSupported = false;
+        for (const auto & capability : GetSnapshotCapabilities())
+        {
+            if (capability.imageCodec == allocateArgs.imageCodec)
+            {
+                codecSupported = true;
+                break;
+            }
+        }
+        if (!codecSupported)
+        {
+            return Protocols::InteractionModel::Status::DynamicConstraintError;
+        }
+
+        outStreamID = static_cast<uint16_t>(mAllocatedSnapshotStreams->size() + 1);
+
+        SnapshotStreamStruct newStream;
+        newStream.snapshotStreamID = outStreamID;
+        newStream.imageCodec       = allocateArgs.imageCodec;
+        newStream.frameRate        = allocateArgs.maxFrameRate;
+        newStream.minResolution    = allocateArgs.minResolution;
+        newStream.maxResolution    = allocateArgs.maxResolution;
+        newStream.quality          = allocateArgs.quality;
+        newStream.encodedPixels    = allocateArgs.encodedPixels;
+        newStream.hardwareEncoder  = allocateArgs.hardwareEncoder;
+        newStream.watermarkEnabled = allocateArgs.watermarkEnabled;
+        newStream.OSDEnabled       = allocateArgs.OSDEnabled;
+        newStream.referenceCount   = 1;
+
+        mAllocatedSnapshotStreams->push_back(newStream);
+        mSnapshotStreamCount++;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -191,6 +249,7 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override
     {
+        mSnapshotStreamCount--;
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -202,6 +261,20 @@ public:
                                                         const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override
     {
+
+        outImageSnapshot.imageCodec    = ImageCodecEnum::kJpeg;
+        outImageSnapshot.imageRes      = resolution;
+        const uint8_t dummyImageData[] = { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00,
+                                           0x01, 0x00, 0x01, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                           0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                           0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                           0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC0, 0x00, 0x11, 0x08,
+                                           0x00, 0x01, 0x00, 0x01, 0x03, 0x01, 0x22, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xFF,
+                                           0xC4, 0x00, 0x1F, 0x00, 0x00, 0x01, 0x05, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
+                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+                                           0x0A, 0x0B, 0xFF, 0xDA, 0x00, 0x0C, 0x03, 0x01, 0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3F,
+                                           0x00, 0xF2, 0x8A, 0x28, 0xFF, 0xD9 };
+        outImageSnapshot.data.assign(dummyImageData, dummyImageData + sizeof(dummyImageData));
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -228,6 +301,8 @@ private:
     std::vector<AudioStreamStruct> * mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> * mAllocatedSnapshotStreams;
     uint8_t mAudioStreamCount;
+    uint8_t mVideoStreamCount;
+    uint8_t mSnapshotStreamCount;
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
@@ -1098,7 +1173,52 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamAllocateCommand)
     EXPECT_EQ(result.response->videoStreamID, 1);
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
 
-    // TODO: Add more failure cases for VideoStreamAllocate
+    // Invalid streamUsage
+    request.streamUsage = StreamUsageEnum::kAnalysis;
+    result              = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    request.streamUsage = StreamUsageEnum::kLiveView; // Restore
+
+    // minFrameRate > maxFrameRate
+    request.minFrameRate = 121;
+    result               = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.minFrameRate = 30; // Restore
+
+    // minResolution > maxResolution
+    request.minResolution = { 1281, 720 };
+    result                = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.minResolution = { 640, 480 }; // Restore
+
+    // minBitRate > maxBitRate
+    request.minBitRate = 10001;
+    result             = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.minBitRate = 10000; // Restore
+
+    // keyFrameInterval 65501
+    request.keyFrameInterval = 65501;
+    result                   = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.keyFrameInterval = 4; // Restore
+
+    // Unsupported videoCodec
+    request.videoCodec = VideoCodecEnum::kHevc;
+    result             = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+    request.videoCodec = VideoCodecEnum::kH264; // Restore
+
+    // Attempt to allocate a second stream, expecting ResourceExhausted
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
@@ -1218,6 +1338,363 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
     modifyResult                = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
     ASSERT_TRUE(modifyResult.status.has_value());
     EXPECT_EQ(modifyResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamAllocateCommand)
+{
+    using Request  = Commands::SnapshotStreamAllocate::Type;
+    using Response = Commands::SnapshotStreamAllocateResponse::DecodableType;
+
+    mSnapshotStreams.clear();
+
+    Request request;
+
+    // Happy path
+    request.imageCodec       = ImageCodecEnum::kJpeg;
+    request.maxFrameRate     = 30;
+    request.minResolution    = { 640, 480 };
+    request.maxResolution    = { 1280, 720 };
+    request.quality          = 80;
+    request.watermarkEnabled = chip::MakeOptional(false);
+
+    auto result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_EQ(result.response->snapshotStreamID, 1);
+    EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
+
+    // maxFrameRate 0
+    request.maxFrameRate = 0;
+    result               = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.maxFrameRate = 30; // Restore
+
+    // minResolution > maxResolution
+    request.minResolution = { 1281, 720 };
+    result                = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.minResolution = { 640, 480 }; // Restore
+
+    // quality 0
+    request.quality = 0;
+    result          = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.quality = 80; // Restore
+
+    // quality 101
+    request.quality = 101;
+    result          = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    request.quality = 80; // Restore
+
+    // Unsupported maxFrameRate
+    request.maxFrameRate = 200;
+    result               = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+    request.maxFrameRate = 30; // Restore
+
+    // Attempt to allocate a second stream, expecting ResourceExhausted
+    result = mClusterTester.Invoke<Request, Response>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocateCommand)
+{
+    using AllocateRequest   = Commands::SnapshotStreamAllocate::Type;
+    using AllocateResponse  = Commands::SnapshotStreamAllocateResponse::DecodableType;
+    using DeallocateRequest = Commands::SnapshotStreamDeallocate::Type;
+
+    mSnapshotStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.imageCodec       = ImageCodecEnum::kJpeg;
+    allocRequest.maxFrameRate     = 30;
+    allocRequest.minResolution    = { 640, 480 };
+    allocRequest.maxResolution    = { 640, 480 };
+    allocRequest.quality          = 80;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.status.has_value());
+    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->snapshotStreamID;
+    EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
+
+    // Deallocate the stream
+    DeallocateRequest deallocRequest;
+    deallocRequest.snapshotStreamID = streamId;
+    auto deallocResult              = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_TRUE(deallocResult.status->IsSuccess());
+    EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 0u);
+
+    // Attempt to deallocate again, should fail
+    deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+
+    // Attempt to deallocate a non-existent ID
+    deallocRequest.snapshotStreamID = 999;
+    deallocResult                   = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+    ASSERT_TRUE(deallocResult.status.has_value());
+    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
+{
+    using AllocateRequest  = Commands::SnapshotStreamAllocate::Type;
+    using AllocateResponse = Commands::SnapshotStreamAllocateResponse::DecodableType;
+    using ModifyRequest    = Commands::SnapshotStreamModify::Type;
+
+    mSnapshotStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.imageCodec       = ImageCodecEnum::kJpeg;
+    allocRequest.maxFrameRate     = 30;
+    allocRequest.minResolution    = { 1280, 720 };
+    allocRequest.maxResolution    = { 1280, 720 };
+    allocRequest.quality          = 80;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.status.has_value());
+    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->snapshotStreamID;
+    EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
+
+    // Modify the stream
+    ModifyRequest modifyRequest;
+    modifyRequest.snapshotStreamID = streamId;
+    modifyRequest.watermarkEnabled = chip::MakeOptional(true);
+
+    auto modifyResult = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
+    ASSERT_TRUE(modifyResult.status.has_value());
+    EXPECT_TRUE(modifyResult.status->IsSuccess());
+
+    // Verify the changes
+    Attributes::AllocatedSnapshotStreams::TypeInfo::DecodableType allocatedSnapshotStreams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
+    auto it = allocatedSnapshotStreams.begin();
+    ASSERT_TRUE(it.Next());
+    const auto & stream = it.GetValue();
+    EXPECT_EQ(stream.snapshotStreamID, streamId);
+    EXPECT_TRUE(stream.watermarkEnabled.Value());
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+    // Modify watermark
+    modifyRequest.watermarkEnabled = chip::MakeOptional(false);
+    modifyRequest.OSDEnabled       = chip::Optional<bool>::Missing();
+    modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
+    ASSERT_TRUE(modifyResult.status.has_value());
+    EXPECT_TRUE(modifyResult.status->IsSuccess());
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
+    it = allocatedSnapshotStreams.begin();
+    ASSERT_TRUE(it.Next());
+    const auto & stream2 = it.GetValue();
+    EXPECT_EQ(stream2.snapshotStreamID, streamId);
+    EXPECT_FALSE(stream2.watermarkEnabled.Value());
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+    // Attempt to modify a non-existent ID
+    modifyRequest.snapshotStreamID = 999;
+    modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
+    ASSERT_TRUE(modifyResult.status.has_value());
+    EXPECT_EQ(modifyResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
+{
+    using Request = Commands::SetStreamPriorities::Type;
+
+    mVideoStreams.clear();
+    mAudioStreams.clear();
+    mSnapshotStreams.clear();
+
+    Request request;
+    std::vector<StreamUsageEnum> priorities;
+
+    // Happy path
+    priorities.push_back(StreamUsageEnum::kRecording);
+    priorities.push_back(StreamUsageEnum::kLiveView);
+    request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
+    auto result              = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsSuccess());
+
+    Attributes::StreamUsagePriorities::TypeInfo::DecodableType readPriorities;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StreamUsagePriorities::Id, readPriorities), CHIP_NO_ERROR);
+    auto it = readPriorities.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue(), StreamUsageEnum::kRecording);
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue(), StreamUsageEnum::kLiveView);
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+    // Invalid enum value
+    priorities.clear();
+    priorities.push_back(static_cast<StreamUsageEnum>(0xFF));
+    request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
+    result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+
+    // Duplicate enum value
+    priorities.clear();
+    priorities.push_back(StreamUsageEnum::kLiveView);
+    priorities.push_back(StreamUsageEnum::kLiveView);
+    request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
+    result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::AlreadyExists);
+
+    // Unsupported enum value
+    priorities.clear();
+    priorities.push_back(StreamUsageEnum::kAnalysis);
+    request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
+    result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+
+    // Invalid state - stream allocated
+    {
+        using AllocateRequest  = Commands::VideoStreamAllocate::Type;
+        using AllocateResponse = Commands::VideoStreamAllocateResponse::DecodableType;
+
+        mVideoStreams.clear();
+
+        AllocateRequest allocRequest;
+        allocRequest.streamUsage      = StreamUsageEnum::kLiveView;
+        allocRequest.videoCodec       = VideoCodecEnum::kH264;
+        allocRequest.minFrameRate     = 30;
+        allocRequest.maxFrameRate     = 120;
+        allocRequest.minResolution    = { 640, 480 };
+        allocRequest.maxResolution    = { 1280, 720 };
+        allocRequest.minBitRate       = 10000;
+        allocRequest.maxBitRate       = 10000;
+        allocRequest.keyFrameInterval = 4;
+        allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+        auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+        ASSERT_TRUE(allocResult.status.has_value());
+        ASSERT_TRUE(allocResult.status->IsSuccess());
+        EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
+    }
+
+    priorities.clear();
+    priorities.push_back(StreamUsageEnum::kLiveView);
+    request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
+    result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+
+    // Clean up
+    {
+        using DeallocateRequest = Commands::VideoStreamDeallocate::Type;
+        DeallocateRequest deallocRequest;
+        deallocRequest.videoStreamID = 1;
+        auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
+        ASSERT_TRUE(deallocResult.status.has_value());
+        EXPECT_TRUE(deallocResult.status->IsSuccess());
+        EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 0u);
+
+        mVideoStreams.clear();
+    }
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand)
+{
+    using AllocateRequest  = Commands::SnapshotStreamAllocate::Type;
+    using AllocateResponse = Commands::SnapshotStreamAllocateResponse::DecodableType;
+    using CaptureRequest   = Commands::CaptureSnapshot::Type;
+    using CaptureResponse  = Commands::CaptureSnapshotResponse::DecodableType;
+
+    mSnapshotStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.imageCodec       = ImageCodecEnum::kJpeg;
+    allocRequest.maxFrameRate     = 30;
+    allocRequest.minResolution    = { 640, 480 };
+    allocRequest.maxResolution    = { 1280, 720 };
+    allocRequest.quality          = 80;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.status.has_value());
+    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->snapshotStreamID;
+    EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
+
+    // Disable privacy modes to allow capture
+    EXPECT_EQ(mServer.SetSoftLivestreamPrivacyModeEnabled(false), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.SetHardPrivacyModeOn(false), CHIP_NO_ERROR);
+
+    CaptureRequest request;
+    request.snapshotStreamID.SetNonNull(streamId);
+    request.requestedResolution = { 640, 480 };
+
+    auto result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+
+    EXPECT_EQ(result.response->imageCodec, ImageCodecEnum::kJpeg);
+    EXPECT_EQ(result.response->resolution.width, 640);
+    EXPECT_EQ(result.response->resolution.height, 480);
+    EXPECT_GT(result.response->data.size(), 0u);
+    EXPECT_EQ(result.response->data.data()[0], 0xFF); // Basic check on dummy data
+    EXPECT_EQ(result.response->data.data()[1], 0xD8); // Basic check on dummy data
+
+    // Restore privacy modes
+    EXPECT_EQ(mServer.SetSoftLivestreamPrivacyModeEnabled(true), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.SetHardPrivacyModeOn(true), CHIP_NO_ERROR);
+
+    // Check for InvalidInState error
+    result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+
+    // Check for NotFound error with invalid stream ID
+    request.snapshotStreamID.SetNonNull(999);
+    result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand_NoStreamAllocated)
+{
+    using CaptureRequest  = Commands::CaptureSnapshot::Type;
+    using CaptureResponse = Commands::CaptureSnapshotResponse::DecodableType;
+
+    mSnapshotStreams.clear();
+
+    // Disable privacy modes to allow capture
+    EXPECT_EQ(mServer.SetSoftLivestreamPrivacyModeEnabled(false), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.SetHardPrivacyModeOn(false), CHIP_NO_ERROR);
+
+    CaptureRequest request;
+    request.snapshotStreamID.SetNull();
+    request.requestedResolution = { 640, 480 };
+
+    auto result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 }
 
 } // namespace

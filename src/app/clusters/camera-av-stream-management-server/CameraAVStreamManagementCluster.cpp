@@ -2059,6 +2059,13 @@ CameraAVStreamManagementCluster::HandleVideoStreamAllocate(CommandHandler & hand
 
     VerifyOrReturnError(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1, Status::ConstraintError);
 
+    if (commandData.minResolution.width > commandData.maxResolution.width ||
+        commandData.minResolution.height > commandData.maxResolution.height)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: minResolution cannot be greater than maxResolution", mPath.mEndpointId);
+        return Status::ConstraintError;
+    }
+
     VerifyOrReturnError(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate &&
                             commandData.maxBitRate >= 1,
                         Status::ConstraintError);
@@ -2343,6 +2350,13 @@ CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(CommandHandler & h
     VerifyOrReturnError(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1, Status::ConstraintError);
 
     VerifyOrReturnError(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1, Status::ConstraintError);
+
+    if (commandData.minResolution.width > commandData.maxResolution.width ||
+        commandData.minResolution.height > commandData.maxResolution.height)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: minResolution cannot be greater than maxResolution", mPath.mEndpointId);
+        return Status::ConstraintError;
+    }
 
     if (!(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric))
     {
