@@ -17,7 +17,11 @@
  */
 
 #include "OtaProviderAppCommandDelegate.h"
+<<<<<<< HEAD
 #include <lib/support/CodeUtils.h>
+=======
+#include <lib/support/Defer.h>
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -59,6 +63,7 @@ static std::string ToString(const Json::Value & v)
     return Json::writeString(w, v);
 }
 
+<<<<<<< HEAD
 Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
@@ -72,6 +77,8 @@ Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16
     return payload;
 }
 
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
@@ -104,7 +111,11 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
+<<<<<<< HEAD
     auto cleanup = ScopeExit([&]() { Platform::Delete(self); });
+=======
+    auto cleanup = MakeDefer([&]() { Platform::Delete(self); });
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     std::string name;
     std::string cluster;
@@ -145,6 +156,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
+<<<<<<< HEAD
     if (name == "GetApplyUpdateRequestStatus")
     {
         Json::Value out(Json::objectValue);
@@ -160,6 +172,8 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     ChipLogError(NotSpecified, "Unhandled command: Should never happen");
 }
 

@@ -50,6 +50,11 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
+<<<<<<< HEAD
+=======
+#include <ota-provider-common/OTAProviderExample.h>
+
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 namespace {
 OTAProviderExample gOtaProvider;
 }
@@ -376,6 +381,7 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
+<<<<<<< HEAD
     memset(mLocation, 0, sizeof(mLocation));
     if (commandData.location.HasValue())
     {
@@ -391,6 +397,17 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
         }
     }
 
+=======
+    chip::CharSpan loc = commandData.location.Value();
+    if (loc.size() >= sizeof(mLocation))
+    {
+        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
+        return;
+    }
+
+    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
+
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     size_t i  = 0;
     auto iter = commandData.protocolsSupported.begin();
     while (iter.Next())

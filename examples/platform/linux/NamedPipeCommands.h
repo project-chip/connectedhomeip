@@ -70,6 +70,7 @@ public:
 class NamedPipeCommands
 {
 public:
+<<<<<<< HEAD
     /**
      * @brief Start listening for named pipe commands.
      *
@@ -90,7 +91,13 @@ public:
     /**
      * @brief Stop listening for commands and shut down the listener thread.
      */
+=======
+    CHIP_ERROR Start(const std::string & path, NamedPipeCommandDelegate * delegate);
+    CHIP_ERROR Start(const std::string & path, const std::string & path_out, NamedPipeCommandDelegate * delegate);
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     CHIP_ERROR Stop();
+    void WriteToOutPipe(const std::string & json);
+    const std::string & OutPath() const { return mChipEventFifoPathOut; }
 
     /**
      * @brief Write a JSON string to the output pipe.
@@ -106,11 +113,18 @@ public:
     const std::string & OutPath() const { return mFifoOutPath; }
 
 private:
+<<<<<<< HEAD
     std::atomic<bool> mRunning{ false };
     std::atomic<bool> mDone{ false };
     pthread_t mChipEventCommandListener{};
     std::string mFifoInPath;
     std::string mFifoOutPath;
+=======
+    bool mStarted = false;
+    pthread_t mChipEventCommandListener;
+    std::string mChipEventFifoPath;
+    std::string mChipEventFifoPathOut;
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     NamedPipeCommandDelegate * mDelegate = nullptr;
 
     void Unlink();

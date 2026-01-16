@@ -40,8 +40,13 @@ class MatterTestConfig:
     timeout: int | None = None
     endpoint: int | None = 0
     app_pid: int = 0
+<<<<<<< HEAD
     pipe_name: str | None = None
     pipe_name_out: str | None = None
+=======
+    pipe_name: typing.Union[str, None] = None
+    pipe_name_out: typing.Union[str, None] = None
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None

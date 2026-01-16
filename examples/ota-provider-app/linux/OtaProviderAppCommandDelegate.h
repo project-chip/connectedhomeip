@@ -51,7 +51,10 @@ public:
 
     static void HandleCommand(intptr_t context);
 
+<<<<<<< HEAD
     Json::Value BuildApplyUpdateRequestSnapshot(uint16_t endpoint);
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
     struct PrivateCtorTag
