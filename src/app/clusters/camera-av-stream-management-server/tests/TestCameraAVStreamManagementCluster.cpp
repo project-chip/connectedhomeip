@@ -1149,4 +1149,75 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
     EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
 }
 
+TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
+{
+    using AllocateRequest  = Commands::VideoStreamAllocate::Type;
+    using AllocateResponse = Commands::VideoStreamAllocateResponse::DecodableType;
+    using ModifyRequest    = Commands::VideoStreamModify::Type;
+
+    mVideoStreams.clear();
+
+    // First, allocate a stream
+    AllocateRequest allocRequest;
+    allocRequest.streamUsage      = StreamUsageEnum::kLiveView;
+    allocRequest.videoCodec       = VideoCodecEnum::kH264;
+    allocRequest.minFrameRate     = 30;
+    allocRequest.maxFrameRate     = 120;
+    allocRequest.minResolution    = { 640, 480 };
+    allocRequest.maxResolution    = { 1280, 720 };
+    allocRequest.minBitRate       = 10000;
+    allocRequest.maxBitRate       = 10000;
+    allocRequest.keyFrameInterval = 4;
+    allocRequest.watermarkEnabled = chip::MakeOptional(false);
+
+    auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
+    ASSERT_TRUE(allocResult.status.has_value());
+    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.response.has_value());
+    uint16_t streamId = allocResult.response->videoStreamID;
+    EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
+
+    // Modify the stream
+    ModifyRequest modifyRequest;
+    modifyRequest.videoStreamID    = streamId;
+    modifyRequest.watermarkEnabled = chip::MakeOptional(true);
+
+    auto modifyResult = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
+    ASSERT_TRUE(modifyResult.status.has_value());
+    EXPECT_TRUE(modifyResult.status->IsSuccess());
+
+    // Verify the changes
+    Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+    auto it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    const auto & stream = it.GetValue();
+    EXPECT_EQ(stream.videoStreamID, streamId);
+    EXPECT_TRUE(stream.watermarkEnabled.Value());
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+    // Modify only watermark
+    modifyRequest.watermarkEnabled = chip::MakeOptional(false);
+    modifyRequest.OSDEnabled       = chip::Optional<bool>::Missing();
+    modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
+    ASSERT_TRUE(modifyResult.status.has_value());
+    EXPECT_TRUE(modifyResult.status->IsSuccess());
+
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+    it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    const auto & stream2 = it.GetValue();
+    EXPECT_EQ(stream2.videoStreamID, streamId);
+    EXPECT_FALSE(stream2.watermarkEnabled.Value());
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+    // Attempt to modify a non-existent ID
+    modifyRequest.videoStreamID = 999;
+    modifyResult                = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
+    ASSERT_TRUE(modifyResult.status.has_value());
+    EXPECT_EQ(modifyResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+}
+
 } // namespace
