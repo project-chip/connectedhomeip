@@ -618,6 +618,12 @@ class TC_SC_4_1(MatterBaseTest):
             # text, omitting any leading zeros, and value different than '0'
             assert_valid_ph_key(ph_key)
 
+            # Verify that if any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set, then the PI key is present
+            ph_val = int(ph_key)
+            mandatory_pi_bits = [4, 8, 10, 12, 15, 17, 19, 20, 21, 22]
+            if any((ph_val & (1 << bit)) for bit in mandatory_pi_bits):
+                asserts.assert_in('PI', txt_record.txt, "'PI' key must be present if any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set in 'PH' key.")
+
         # *** PI KEY ***
         # If the PI key is present
         if 'PI' in txt_record.txt:
@@ -628,6 +634,14 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify it is encoded as a valid UTF-8 string
             # with a maximum length of 128 bytes
             assert_valid_pi_key(pi_key)
+
+            # Verify that the PH key is present and has at least one of the bits 4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, or 22 set
+            asserts.assert_in('PH', txt_record.txt, "'PH' key must be present if 'PI' key is present.")
+            ph_key = txt_record.txt['PH']
+            ph_val = int(ph_key)
+            pi_related_bits = [4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22]
+            asserts.assert_true(any((ph_val & (1 << bit)) for bit in pi_related_bits),
+                                "'PH' key must have at least one of bits 4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, or 22 set if 'PI' key is present.")
 
     def verify_t_key(self, txt_record) -> None:
         # If 'supports_tcp' is False and T key is not present, nothing to check

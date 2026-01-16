@@ -746,7 +746,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
     - Encoded as a variable-length decimal number in ASCII text
     - Omitting any leading zeroes
     - Must be greater than 0
-    - Only bits 0-19 are valid
+    - Only bits 0-22 are valid
 
     Example:
         "33"
@@ -760,7 +760,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
     constraints = [
         "Must be a decimal integer without leading zeroes",
         "Value must be greater than 0",
-        "Only bits 0-19 may be set (value must fit in 20 bits)",
+        "Only bits 0-22 may be set (value must fit in 23 bits)",
     ]
 
     failed: list[str] = []
@@ -777,7 +777,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
             if v <= 0:
                 failed.append(constraints[1])
             # Bit-mask validity only meaningful for positive integers
-            allowed_mask = (1 << 20) - 1
+            allowed_mask = (1 << 23) - 1
             if v > 0 and (v & ~allowed_mask):
                 failed.append(constraints[2])
         except ValueError:
