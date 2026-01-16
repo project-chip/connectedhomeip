@@ -45,7 +45,7 @@
 #if WATCH_DOG_ENABLE
 #include "matter_wdt.h"
 
-#define WATCH_DOG_MSG_MAX_NUM 5
+#define WATCHDOG_MSG_MAX_NUM 5
 static void * matter_wdt_io_queue_handle;
 #endif
 
@@ -112,7 +112,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     mThreadTask = NULL;
 
 #if WATCH_DOG_ENABLE
-    if (os_msg_queue_create(&matter_wdt_io_queue_handle, "wdtQ", WATCH_DOG_MSG_MAX_NUM, sizeof(T_IO_MSG)) == false)
+    if (os_msg_queue_create(&matter_wdt_io_queue_handle, "wdtQ", WATCHDOG_MSG_MAX_NUM, sizeof(T_IO_MSG)) == false)
     {
         ChipLogError(DeviceLayer, "Failed to create watchdog message queue");
         err = CHIP_ERROR_INTERNAL;
@@ -186,8 +186,22 @@ void ThreadStackManagerImpl::ExecuteThreadTask(void)
     AllocateThreadTaskSecureContext();
 #endif
 
+#if WATCH_DOG_ENABLE
+    matter_wdt_watchdog_open();
+#endif
+
     while (true)
     {
+#if WATCH_DOG_ENABLE
+        while (os_msg_recv(matter_wdt_io_queue_handle, &io_msg, 0) == true)
+        {
+            if (io_msg.type == IO_MSG_TYPE_RESET_WDG_TIMER)
+            {
+                matter_wdt_watchdog_feed();
+            }
+        }
+#endif
+
         LockThreadStack();
         ProcessThreadActivity();
         UnlockThreadStack();
@@ -216,10 +230,6 @@ void ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 {
-#if WATCH_DOG_ENABLE
-    matter_wdt_watchdog_open();
-#endif
-
     if (os_task_create(&mThreadTask, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, ThreadTaskMain, this,
                        CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY))
     {
@@ -233,6 +243,11 @@ void ThreadStackManagerImpl::ExecuteThreadTask(void)
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
     AllocateThreadTaskSecureContext();
 #endif
+
+#if WATCH_DOG_ENABLE
+    matter_wdt_watchdog_open();
+#endif
+
     uint32_t notify;
     T_IO_MSG io_msg;
 
