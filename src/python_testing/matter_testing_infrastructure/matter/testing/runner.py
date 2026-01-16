@@ -805,7 +805,11 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
+<<<<<<< HEAD
         LOGGER.error("Named pipe %r does NOT exist", config.pipe_name_out)
+=======
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
 
     config.fail_on_skipped_tests = args.fail_on_skipped

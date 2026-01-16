@@ -22,7 +22,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
+<<<<<<< HEAD
 #include <lib/support/logging/CHIPLogging.h>
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
@@ -37,13 +40,24 @@ namespace {
 constexpr size_t kChipEventCmdBufSize = 256;
 } // namespace
 
+<<<<<<< HEAD
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::string & outPath, NamedPipeCommandDelegate * delegate)
+=======
+CHIP_ERROR NamedPipeCommands::Start(const std::string & path, NamedPipeCommandDelegate * delegate)
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!mDone, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mRunning.exchange(true), CHIP_ERROR_INCORRECT_STATE);
 
+<<<<<<< HEAD
     CHIP_ERROR err = CHIP_NO_ERROR;
+=======
+    mStarted              = true;
+    mDelegate             = delegate;
+    mChipEventFifoPath    = path;
+    mChipEventFifoPathOut = "";
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     mDelegate    = delegate;
     mFifoInPath  = inPath;
@@ -73,6 +87,27 @@ exit:
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, NamedPipeCommandDelegate * delegate)
 {
     return Start(inPath, /*outPath=*/"", delegate);
+}
+
+CHIP_ERROR NamedPipeCommands::Start(const std::string & path, const std::string & path_out, NamedPipeCommandDelegate * delegate)
+{
+    VerifyOrReturnError(!mStarted, CHIP_NO_ERROR);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mStarted              = true;
+    mDelegate             = delegate;
+    mChipEventFifoPath    = path;
+    mChipEventFifoPathOut = path_out;
+
+    // Creating the named file(FIFO)
+    VerifyOrReturnError((mkfifo(path.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
+    VerifyOrReturnError(
+        pthread_create(&mChipEventCommandListener, nullptr, EventCommandListenerTask, reinterpret_cast<void *>(this)) == 0,
+        CHIP_ERROR_UNEXPECTED_EVENT);
+
+    VerifyOrReturnError((mkfifo(path_out.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NamedPipeCommands::Stop()
@@ -115,6 +150,12 @@ CHIP_ERROR NamedPipeCommands::Stop()
     mDelegate = nullptr;
     Unlink();
 
+    if (!mChipEventFifoPathOut.empty())
+    {
+        VerifyOrReturnError(unlink(mChipEventFifoPathOut.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
+        mChipEventFifoPathOut.clear();
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -131,7 +172,11 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 
     while (true)
     {
+<<<<<<< HEAD
         fd = open(mFifoOutPath.c_str(), O_WRONLY | O_NONBLOCK);
+=======
+        fd = open(mChipEventFifoPathOut.c_str(), O_WRONLY | O_NONBLOCK);
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
         if (fd >= 0)
         {
             break;
@@ -139,7 +184,11 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 
         if (errno != ENXIO) // ENXIO == no reader
         {
+<<<<<<< HEAD
             ChipLogError(NotSpecified, "Failed to open out FIFO '%s': errno=%d", mFifoOutPath.c_str(), errno);
+=======
+            ChipLogError(NotSpecified, "Failed to open out FIFO '%s': errno=%d", mChipEventFifoPathOut.c_str(), errno);
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
             return;
         }
 
@@ -147,6 +196,7 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
             std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
         if (elapsed >= kOpenTimeoutMs)
         {
+<<<<<<< HEAD
             ChipLogError(NotSpecified, "Timed out waiting for reader on out FIFO '%s'", mFifoOutPath.c_str());
             return;
         }
@@ -159,11 +209,31 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
     if (written < 0 || static_cast<size_t>(written) != payload.size())
     {
         ChipLogError(DeviceLayer, "Failed to write JSON payload to out pipe");
+=======
+            ChipLogError(NotSpecified, "Timed out waiting for reader on out FIFO '%s'", mChipEventFifoPathOut.c_str());
+            return;
+        }
+
+        usleep(kRetrySleepMs * 1000);
+    }
+
+    ssize_t written = write(fd, json.data(), json.size());
+    if (written < 0 || static_cast<size_t>(written) != json.size())
+    {
+        ChipLogError(DeviceLayer, "Failed to write full JSON to out pipe");
+    }
+
+    written = write(fd, "\n", 1);
+    if (written != 1)
+    {
+        ChipLogError(DeviceLayer, "Failed to write newline to out pipe");
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     }
 
     close(fd);
 }
 
+<<<<<<< HEAD
 void NamedPipeCommands::Unlink()
 {
     if (!mFifoInPath.empty())
@@ -179,6 +249,8 @@ void NamedPipeCommands::Unlink()
     }
 }
 
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 void * NamedPipeCommands::EventCommandListenerTask(void * arg)
 {
     char readbuf[kChipEventCmdBufSize];

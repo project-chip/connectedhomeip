@@ -47,6 +47,11 @@ public:
     static constexpr size_t kUriMaxLen               = 256;
     static constexpr size_t kMaxLocation             = 3;
     static constexpr size_t kMaxProtocolsSupported   = 4;
+<<<<<<< HEAD
+=======
+
+    size_t kProtocolsSupportedCount = 0;
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     size_t kProtocolsSupportedCount = 0;
 
@@ -61,8 +66,12 @@ public:
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
         char otaURL[kOtaUrlMaxLen];
+<<<<<<< HEAD
         std::string otaFileDesignator;
     };
+=======
+    } DeviceSoftwareVersionModel;
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     //////////// OTAProviderDelegate Implementation ///////////////
     void HandleQueryImage(
@@ -111,8 +120,11 @@ public:
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
     const char * GetLocation() const { return mLocation; }
 
+<<<<<<< HEAD
     const char * GetFilePathForDesignator(const char * designator) const;
 
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
@@ -133,8 +145,11 @@ private:
                            const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
     void
     SaveCommandSnapshot(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+<<<<<<< HEAD
 
     std::string MapFileToDesignator(const std::string & filePath);
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;

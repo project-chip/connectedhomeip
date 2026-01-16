@@ -17,7 +17,11 @@
  */
 
 #include "OtaProviderAppCommandDelegate.h"
+<<<<<<< HEAD
 #include <lib/support/CodeUtils.h>
+=======
+#include <lib/support/Defer.h>
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -91,7 +95,11 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         return;
     }
 
+<<<<<<< HEAD
     auto cleanup = ScopeExit([&]() { Platform::Delete(self); });
+=======
+    auto cleanup = MakeDefer([&]() { Platform::Delete(self); });
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     std::string name;
     std::string cluster;

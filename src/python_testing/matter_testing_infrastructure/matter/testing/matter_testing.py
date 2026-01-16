@@ -26,7 +26,10 @@ import queue
 import random
 import select
 import shlex
+<<<<<<< HEAD
 import socket
+=======
+>>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 import subprocess
 import textwrap
 import time
