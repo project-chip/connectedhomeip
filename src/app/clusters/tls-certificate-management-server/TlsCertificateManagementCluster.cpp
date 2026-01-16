@@ -242,10 +242,7 @@ TlsCertificateManagementCluster::HandleProvisionRootCertificate(CommandHandler &
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ProvisionRootCertificate");
 
-    if (req.certificate.size() > kSpecMaxCertBytes)
-    {
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError(req.certificate.size() <= kSpecMaxCertBytes, Status::ConstraintError);
 
     auto fabric = commandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCAID> foundId;
