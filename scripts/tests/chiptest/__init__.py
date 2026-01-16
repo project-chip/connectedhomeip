@@ -23,8 +23,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Set
 
+import yaml
+
 from . import runner
-from .test_definition import TestDefinition, TestTag, TestTarget, StandardTargets
+from .test_definition import StandardTargets, TestDefinition, TestTag, TestTarget
 
 log = logging.getLogger(__name__)
 
@@ -278,6 +280,26 @@ def _AllYamlTests():
         yield path
 
 
+def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
+    targets = []
+
+    with open(yaml_path, 'rt') as f:
+        data = yaml.safe_load(f)
+        if 'CI' in data:
+            for item in data['CI']:
+                targets.append(TestTarget(
+                    name=item['name'],
+                    command=item['app'],
+                    arguments=item.get('args', [])
+                ))
+
+    # default to a 'standard app name' if nothing set in the yaml file
+    if not targets:
+        targets.append(StandardTargets.for_test_name(yaml_path.name))
+
+    return targets
+
+
 def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
     """
     use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
@@ -329,13 +351,10 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if treat_chip_tool_unsupported_as_in_development and run_name in chip_tool_unsupported_as_in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
-        # TODO: figure out the targets
-        targets = [StandardTargets.for_test_name(path.name)]
-
         yield TestDefinition(
             run_name=run_name,
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
-            targets=targets,
+            targets=_TargetsForYaml(path),
             tags=tags,
         )
 
@@ -353,4 +372,3 @@ def AllChipToolYamlTests(use_short_run_name: bool = True):
 def AllDarwinFrameworkToolYamlTests():
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
-

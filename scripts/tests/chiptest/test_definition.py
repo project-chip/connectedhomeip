@@ -14,9 +14,7 @@
 #    limitations under the License.
 
 import logging
-import itertools
 import os
-import re
 import shlex
 import shutil
 import subprocess
@@ -225,6 +223,8 @@ class App:
 
 @dataclass
 class TestTarget:
+    name: str
+
     # command to execute. MUST be a placeholder like tv or lock
     command: str
 
@@ -235,9 +235,9 @@ class TestTarget:
 def _standard_ci_target(app_placeholder: str):
     """Returns a command taylored for a standard CI execution.
 
-    Generaly this is just the given command without any arguments.
+    Generally this is just the given command without any arguments.
     """
-    return TestTarget(command=app_placeholder, arguments=[])
+    return TestTarget(name=app_placeholder, command=app_placeholder, arguments=[])
 
 
 class StandardTargets:
@@ -264,7 +264,7 @@ class StandardTargets:
             name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
             name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
             name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
-            name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
+                name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
             return StandardTargets.TV
         if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
             return StandardTargets.LOCK
@@ -290,7 +290,6 @@ class StandardTargets:
         if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
             return StandardTargets.CLOSURE
         return StandardTargets.ALL_CLUSTERS
-
 
 
 @dataclass
@@ -521,14 +520,15 @@ class TestDefinition:
         Will iterate and execute every target.
         """
         for target in self.targets:
+            log.info('Executing %s::%s', self.name, target.name)
             self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
-                     test_runtime, ble_controller_app, ble_controller_tool)
+                          test_runtime, ble_controller_app, ble_controller_tool)
 
     def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
-            pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
-            test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
-            ble_controller_app: int | None = None,
-            ble_controller_tool: int | None = None):
+                 pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
+                 test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
+                 ble_controller_app: int | None = None,
+                 ble_controller_tool: int | None = None):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
@@ -547,9 +547,8 @@ class TestDefinition:
                     # For the app indicated by target, give it the 'default' key to add to the register
                     if key == target.command:
                         key = 'default'
-
-                    for arg in target.arguments:
-                        subproc = subproc.with_args(arg)
+                        for arg in target.arguments:
+                            subproc = subproc.with_args(arg)
 
                     if ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app), "--wifi")
