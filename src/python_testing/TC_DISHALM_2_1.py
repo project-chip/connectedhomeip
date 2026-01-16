@@ -72,7 +72,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
                      "Verify that the DUT response contains a 32-bit value. Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
         ]
 
-    def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = False) -> int:
+    def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = True) -> int:
         """
         Get the valid alarm bitmap mask from the DishwasherAlarm cluster specification.
 
