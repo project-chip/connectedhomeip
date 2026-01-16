@@ -503,7 +503,7 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
                                                          int64_t aCumulativeEnergyExported)
 {
-    MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
@@ -576,7 +576,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aPeriodicEnergyImported,
                                                        int64_t aPeriodicEnergyExported)
 {
-    MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;

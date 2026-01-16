@@ -31,6 +31,8 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from zeroconf import ServiceInfo, Zeroconf
 
+log = logging.getLogger(__name__)
+
 module_dir_path = os.path.dirname(os.path.realpath(__file__))
 templates_path = os.path.join(module_dir_path, "templates")
 static_path = os.path.join(module_dir_path, "static")
@@ -169,10 +171,10 @@ class CAHierarchy:
                 self.root_key_path.read_bytes(), None
             )
 
-            logging.info(f"CA Hierarchy loaded from disk: {self.name}")
+            log.info(f"CA Hierarchy loaded from disk: {self.name}")
         elif self.root_key_path.exists() or self.root_cert_path.exists():
             # Only one of the two file exists, bailing out
-            logging.error("root certificate partially exist on disk, stopping early")
+            log.error("root certificate partially exist on disk, stopping early")
             sys.exit(1)
         else:
             # Start generating the root certificate
@@ -229,7 +231,7 @@ class CAHierarchy:
 
             self._save_cert("root", self.root_cert, self.root_key, False)
 
-            logging.info(f"CA Hierarchy generated: {self.name}")
+            log.info(f"CA Hierarchy generated: {self.name}")
 
     def _save_cert(
         self,
@@ -367,7 +369,7 @@ class CAHierarchy:
             dns, cert, None, bundle_root=True
         )
 
-        logging.debug("leaf generated. dns=%s; path=%s", dns, cert_bundle_path)
+        log.debug("leaf generated. dns=%s; path=%s", dns, cert_bundle_path)
 
         return (key_path, cert_bundle_path, False)
 
@@ -394,7 +396,7 @@ class CAHierarchy:
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
 
-        logging.debug("leaf generated. dns=%s; path=%s", dns, cert_bundle_path)
+        log.debug("leaf generated. dns=%s; path=%s", dns, cert_bundle_path)
 
         return (key_path, cert_bundle_path, False)
 
@@ -600,13 +602,13 @@ class PushAvServer:
         extended_path = f"{file_path}.{ext}"
 
         # Add file to the appropriate list in the stream files map
-        logging.debug(f"Upload received: {extended_path}")
+        log.debug(f"Upload received: {extended_path}")
         stream_id_str = str(stream_id)
         if stream_id_str in self.stream_files_map:
             if is_valid and extended_path not in self.stream_files_map[stream_id_str]["valid_files"]:
                 self.stream_files_map[stream_id_str]["valid_files"].append(extended_path)
             if not is_valid:
-                logging.error(f"{extended_path}: {validation_error_reason}")
+                log.error(f"{extended_path}: {validation_error_reason}")
                 if extended_path not in self.stream_files_map[stream_id_str]["invalid_files"]:
                     self.stream_files_map[stream_id_str]["invalid_files"].append({
                         "file_path": extended_path,
@@ -751,13 +753,19 @@ class PushAvContext:
                 content={"detail": exc.detail}
             )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.cleanup()
+
     async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
         """
         Start the PUSH AV server. Note that method do not check if a server is already running.
         """
         # Advertise over mDNS
         if self.svc_info:
-            logging.info("Advertising the service as %s", self.svc_info)
+            log.info("Advertising the service as %s", self.svc_info)
             self.zeroconf.register_service(self.svc_info)
 
         # Start the web server
@@ -814,16 +822,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode)
+    with PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode) as ctx:
 
-    shutdown_event = asyncio.Event()
+        shutdown_event = asyncio.Event()
 
-    def _signal_handler():
-        print("SIGINT received. Shutting down web server.")
-        shutdown_event.set()
+        def _signal_handler():
+            print("SIGINT received. Shutting down web server.")
+            shutdown_event.set()
 
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(signal.SIGINT, _signal_handler)
-    loop.run_until_complete(ctx.start(shutdown_trigger=shutdown_event.wait))
-
-    ctx.cleanup()
+        with asyncio.Runner() as runner:
+            runner.get_loop().add_signal_handler(signal.SIGINT, _signal_handler)
+            runner.run(ctx.start(shutdown_trigger=shutdown_event.wait))

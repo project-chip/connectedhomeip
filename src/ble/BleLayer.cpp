@@ -431,7 +431,7 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    endPoint->Init(this, connObj, role, autoClose);
+    TEMPORARY_RETURN_IGNORED endPoint->Init(this, connObj, role, autoClose);
     endPoint->mBleTransport = mBleTransport;
 
     *retEndPoint = endPoint;

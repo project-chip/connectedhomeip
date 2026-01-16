@@ -12,26 +12,23 @@ class GenioApp(Enum):
     def ExampleName(self):
         if self == GenioApp.LIGHT:
             return 'lighting-app'
-        elif self == GenioApp.SHELL:
+        if self == GenioApp.SHELL:
             return 'shell'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == GenioApp.LIGHT:
             return 'chip-mt793x-lighting-app-example'
-        elif self == GenioApp.SHELL:
+        if self == GenioApp.SHELL:
             return 'chip-mt793x-shell-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == GenioApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        elif self == GenioApp.SHELL:
+        if self == GenioApp.SHELL:
             return 'shell.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'genio')

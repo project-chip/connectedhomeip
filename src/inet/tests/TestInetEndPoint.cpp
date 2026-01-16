@@ -185,7 +185,8 @@ TEST_F(TestInetEndPoint, TestInetInterface)
                intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
                intIterator.HasBroadcastAddress() ? "has" : "no");
 
-        intId.GetLinkLocalAddr(&addr);
+        err = intId.GetLinkLocalAddr(&addr);
+        EXPECT_TRUE(err == CHIP_NO_ERROR || err == INET_ERROR_ADDRESS_NOT_FOUND);
         InterfaceId::MatchLocalIPv6Subnet(addr);
 
         // Not all platforms support getting interface type and hardware address

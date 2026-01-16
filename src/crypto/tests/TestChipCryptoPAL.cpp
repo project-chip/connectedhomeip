@@ -43,6 +43,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -637,7 +638,7 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
 
     // Put data in the buffer and test all accessors
     memcpy(buffer.Bytes(), testVector, kCapacity);
-    buffer.SetLength(kLength);
+    EXPECT_SUCCESS(buffer.SetLength(kLength));
 
     EXPECT_EQ(buffer.ConstBytes(), (const uint8_t *) buffer.Bytes());
     EXPECT_EQ(buffer.ConstBytes(), buffer.Span().data());
@@ -948,7 +949,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256)
     {
         hash_sha256_vector v = hash_sha256_test_vectors[numOfTestsExecuted];
         uint8_t out_buffer[kSHA256_Hash_Length];
-        Hash_SHA256(v.data, v.data_length, out_buffer);
+        EXPECT_SUCCESS(Hash_SHA256(v.data, v.data_length, out_buffer));
         bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
         EXPECT_TRUE(success);
     }
@@ -1033,7 +1034,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
             EXPECT_EQ(partial_digest_span1.size(), kSHA256_Hash_Length);
 
             // Validate partial digest matches expectations
-            Hash_SHA256(&source_buf[0], block1_size, &partial_digest_ref[0]);
+            EXPECT_SUCCESS(Hash_SHA256(&source_buf[0], block1_size, &partial_digest_ref[0]));
             EXPECT_EQ(0, memcmp(partial_digest_span1.data(), partial_digest_ref, partial_digest_span1.size()));
 
             // Compute partial digest and total digest after second block
@@ -1046,7 +1047,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
             EXPECT_EQ(total_digest_span.size(), kSHA256_Hash_Length);
 
             // Validate second partial digest matches final digest
-            Hash_SHA256(&source_buf[0], block1_size + block2_size, &total_digest_ref[0]);
+            EXPECT_SUCCESS(Hash_SHA256(&source_buf[0], block1_size + block2_size, &total_digest_ref[0]));
             EXPECT_EQ(0, memcmp(partial_digest_span2.data(), total_digest_ref, partial_digest_span2.size()));
             EXPECT_EQ(0, memcmp(total_digest_span.data(), total_digest_ref, total_digest_span.size()));
         }
@@ -1061,7 +1062,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
         MutableByteSpan digest_span_too_small(digest_buf_too_small);
         MutableByteSpan digest_span_ok(digest_buf_ok);
 
-        Hash_SHA256(&source_buf2[0], sizeof(source_buf2), &digest_buf_ref[0]);
+        EXPECT_SUCCESS(Hash_SHA256(&source_buf2[0], sizeof(source_buf2), &digest_buf_ref[0]));
 
         Hash_SHA256_stream sha256;
         EXPECT_EQ(sha256.Begin(), CHIP_NO_ERROR);
@@ -1097,7 +1098,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
         EXPECT_TRUE(out_buffer);
-        mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
+        EXPECT_SUCCESS(mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length));
         bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
         EXPECT_TRUE(success);
     }
@@ -1127,7 +1128,7 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
         Hmac128KeyHandle keyHandle;
         EXPECT_EQ(keystore.CreateKey(keyMaterial, keyHandle), CHIP_NO_ERROR);
 
-        mHMAC.HMAC_SHA256(keyHandle, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
+        EXPECT_SUCCESS(mHMAC.HMAC_SHA256(keyHandle, v.message, v.message_length, out_buffer.Get(), v.output_hash_length));
         bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
         EXPECT_TRUE(success);
 
@@ -1151,8 +1152,8 @@ TEST_F(TestChipCryptoPAL, TestHKDF_SHA256)
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
         EXPECT_TRUE(out_buffer);
-        mHKDF.HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info, v.info_length,
-                          out_buffer.Get(), v.output_key_material_length);
+        EXPECT_SUCCESS(mHKDF.HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info,
+                                         v.info_length, out_buffer.Get(), v.output_key_material_length));
         bool success = memcmp(v.output_key_material, out_buffer.Get(), out_length) == 0;
         EXPECT_TRUE(success);
     }

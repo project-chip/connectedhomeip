@@ -75,7 +75,7 @@ JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParamet
     chip::MutableByteSpan * uniqueId = uniqueIdProvider->Get();
     if (uniqueId != nullptr)
     {
-        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(*uniqueId);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(*uniqueId);
     }
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 

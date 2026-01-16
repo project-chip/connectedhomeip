@@ -44,11 +44,6 @@
 #include "silabs_utils.h"
 #include "sl_si91x_ncp_utility.h"
 
-#if SL_MX25CTRL_MUX
-sl_status_t sl_wfx_host_spiflash_cs_assert(void);
-sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
-#endif
-
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
 #endif // SL_BTLCTRL_MUX

@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <app/DefaultTimerDelegate.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#include <platform/DefaultTimerDelegate.h>
 
 namespace chip {
 namespace app {

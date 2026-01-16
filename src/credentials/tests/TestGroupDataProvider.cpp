@@ -29,6 +29,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/KeyValueStoreManager.h>
 
 using namespace chip::Credentials;
@@ -164,8 +165,8 @@ static TestListener sListener;
 
 void ResetProvider(GroupDataProvider * provider)
 {
-    provider->RemoveFabric(kFabric1);
-    provider->RemoveFabric(kFabric2);
+    EXPECT_SUCCESS(provider->RemoveFabric(kFabric1).NoErrorIf(CHIP_ERROR_NOT_FOUND));
+    EXPECT_SUCCESS(provider->RemoveFabric(kFabric2).NoErrorIf(CHIP_ERROR_NOT_FOUND));
 }
 
 bool CompareKeySets(const KeySet & retrievedKeySet, const KeySet & keyset2)
@@ -296,12 +297,12 @@ TEST_F(TestGroupDataProvider, TestGroupInfo)
     // Out-of-order
     EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_1));
 
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric1, 0, kGroupInfo1_1), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric1, 1, kGroupInfo1_2), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_3), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric2, 0, kGroupInfo2_1), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric2, 1, kGroupInfo2_2), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->SetGroupInfoAt(kFabric2, 2, kGroupInfo2_3), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric1, 0, kGroupInfo1_1));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric1, 1, kGroupInfo1_2));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_3));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric2, 0, kGroupInfo2_1));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric2, 1, kGroupInfo2_2));
+    EXPECT_SUCCESS(provider->SetGroupInfoAt(kFabric2, 2, kGroupInfo2_3));
 
     // Duplicated
     EXPECT_EQ(CHIP_ERROR_DUPLICATE_KEY_ID, provider->SetGroupInfoAt(kFabric1, 3, kGroupInfo1_1));
@@ -331,8 +332,8 @@ TEST_F(TestGroupDataProvider, TestGroupInfo)
 
     // Remove Groups
 
-    EXPECT_EQ(provider->RemoveGroupInfo(kFabric1, kGroup3), CHIP_NO_ERROR);
-    EXPECT_EQ(provider->RemoveGroupInfoAt(kFabric2, 0), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(provider->RemoveGroupInfo(kFabric1, kGroup3));
+    EXPECT_SUCCESS(provider->RemoveGroupInfoAt(kFabric2, 0));
     EXPECT_EQ(sListener.latest, kGroupInfo2_1);
     EXPECT_EQ(sListener.added_count, 6u);
     EXPECT_EQ(sListener.removed_count, 2u);

@@ -183,7 +183,7 @@ bdx::TestBdxTransferServer gBdxTransferServer(&gBdxTransferDelegate);
 
 void ReleaseTransfer(System::Layer * systemLayer, bdx::BdxTransfer * transfer)
 {
-    systemLayer->ScheduleWork(
+    TEMPORARY_RETURN_IGNORED systemLayer->ScheduleWork(
         [](auto * theSystemLayer, auto * appState) -> void {
             auto * theTransfer = static_cast<bdx::BdxTransfer *>(appState);
             gBdxTransferServer.Release(theTransfer);
@@ -212,7 +212,7 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
     chip::System::Layer * systemLayer                   = factory.GetSystemState()->SystemLayer();
     gBdxTransferDelegate.Init(systemLayer);
-    gBdxTransferServer.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
+    TEMPORARY_RETURN_IGNORED gBdxTransferServer.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
 }
 
 void pychip_Bdx_Shutdown()

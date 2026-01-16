@@ -61,9 +61,9 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
     mMediaController = mediaController;
 }
 
-void WebRTCProviderManager::SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> aWebRTCTransportProvider)
+void WebRTCProviderManager::SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider)
 {
-    mWebRTCTransportProvider = std::move(aWebRTCTransportProvider);
+    mWebRTCTransportProvider = webRTCTransportProvider;
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
@@ -911,7 +911,7 @@ CHIP_ERROR WebRTCProviderManager::SendOfferCommand(Messaging::ExchangeManager & 
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        ChipLogError(Camera, "SendOfferCommand failed, WebTransport not found for sessionId: %u", sessionId);
+        ChipLogError(Camera, "Offer command failed, WebTransport not found for sessionId: %u", sessionId);
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -935,7 +935,7 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        ChipLogError(Camera, "SendOfferCommand failed, WebTransport not found for sessionId: %u", sessionId);
+        ChipLogError(Camera, "OnLocalDescription: WebTransport not found for sessionId: %u", sessionId);
         return;
     }
 
@@ -944,7 +944,7 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
     {
         return;
     }
-    // std::string localSdp            = transport->GetLocalDescription();
+
     const char * typeStr = (type == SDPType::Offer) ? "offer" : "answer";
     std::string localSdp = sdp;
     ChipLogProgress(Camera, "Local Description (%s):", typeStr);
@@ -1029,7 +1029,7 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        ChipLogError(Camera, "SendOfferCommand failed, WebTransport not found for sessionId: %u", sessionId);
+        ChipLogError(Camera, "Answer command failed, WebTransport not found for sessionId: %u", sessionId);
         return CHIP_ERROR_INTERNAL;
     }
 

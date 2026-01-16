@@ -230,7 +230,7 @@ if (current_os == "zephyr") {
       public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
       sources += [
-        "${lwip_platform}/lwipopts-rs911x.h",
+        "${lwip_platform}/lwipopts-siwx.h",
         "${lwip_platform}/lwipopts-wf200.h",
       ]
     } else if (lwip_platform == "standalone") {

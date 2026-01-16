@@ -65,7 +65,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 
     mHeaderParser.Init();
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -127,7 +127,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -153,7 +153,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -180,7 +180,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -213,7 +213,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     imageProcessor->mParams.downloadedBytes = 0;
     ChipLogProgress(SoftwareUpdate, "reset downloadedbytes to 0");
 
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -227,7 +227,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "Q: HandleFinalize");
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     // Call processor finalize method
     qvOta_Status_t result = imageProcessor->mProcessor->Finalize();
@@ -249,7 +249,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "Q: HandleAbort");
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     // Start from scratch
     imageProcessor->mParams.downloadedBytes = 0;
 
@@ -315,7 +315,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     else
 #endif
     {
-        imageProcessor->mDownloader->FetchNextData();
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
     }
 }
 
@@ -323,14 +323,14 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if (block.empty())
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
         return CHIP_NO_ERROR;
     }
     if (mBlock.size() < block.size())
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)

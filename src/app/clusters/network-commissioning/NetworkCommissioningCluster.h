@@ -110,27 +110,6 @@ public:
     void OnFinished(DeviceLayer::NetworkCommissioning::Status err, CharSpan debugText,
                     DeviceLayer::NetworkCommissioning::ThreadScanResponseIterator * networks) override;
 
-    // Actual handlers of the commands
-    std::optional<DataModel::ActionReturnStatus>
-    HandleScanNetworks(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                       const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                 const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                   const NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleRemoveNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                        const NetworkCommissioning::Commands::RemoveNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleConnectNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                         const NetworkCommissioning::Commands::ConnectNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                         const NetworkCommissioning::Commands::ReorderNetwork::DecodableType & req);
-    std::optional<DataModel::ActionReturnStatus> HandleNonConcurrentConnectNetwork();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     std::optional<DataModel::ActionReturnStatus>
     HandleQueryIdentity(CommandHandler & handler, const ConcreteCommandPath & commandPath,
@@ -206,8 +185,13 @@ public:
 
 private:
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     void OnCommissioningComplete();
     void OnFailSafeTimerExpired();
+
+    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
+    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
+
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     void SendNonConcurrentConnectNetworkResponse();
 #endif
@@ -262,8 +246,26 @@ private:
     // cluster. Will set mCurrentOperationBreadcrumb to NullOptional.
     void CommitSavedBreadcrumb();
 
-    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
-    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
+    // Actual handlers of the commands
+    std::optional<DataModel::ActionReturnStatus>
+    HandleScanNetworks(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                       const NetworkCommissioning::Commands::ScanNetworks::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAddOrUpdateWiFiNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                 const NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAddOrUpdateThreadNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                   const NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleRemoveNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                        const NetworkCommissioning::Commands::RemoveNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleConnectNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                         const NetworkCommissioning::Commands::ConnectNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                         const NetworkCommissioning::Commands::ReorderNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleNonConcurrentConnectNetwork();
 };
 
 } // namespace Clusters

@@ -17,6 +17,7 @@
 import json
 import logging
 import os
+import shlex
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,8 @@ from typing import Iterator, Set
 
 from . import runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+
+log = logging.getLogger(__name__)
 
 __all__ = [
     "TestTarget",
@@ -76,7 +79,7 @@ def _IsValidYamlTest(name: str) -> bool:
 
 
 def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
-    with open(json_file_path, 'rt') as f:
+    with open(json_file_path) as f:
         data = json.load(f)
         for c in data["collection"]:
             for name in data[c]:
@@ -84,7 +87,7 @@ def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
 
 
 def _GetManualTests() -> Set[str]:
-    manualtests = set()
+    manualtests: set[str] = set()
 
     # Flagged as manual from: src/app/tests/suites/manualTests.json
     for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
@@ -315,19 +318,19 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     """Executes `chip_tool` binary to see what tests are available, using cmd
     to get the list.
     """
-    cmd = "list"
+    cmd_list = "list"
     if is_manual:
-        cmd += "-manual"
+        cmd_list += "-manual"
 
-    cmd = [chip_tool, "tests", cmd]
+    cmd = [chip_tool, "tests", cmd_list]
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
     if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
+        log.error("Failed to run %s:", shlex.join(cmd))
+        log.error("STDOUT: %s", result.stdout)
+        log.error("STDERR: %s", result.stderr)
         result.check_returncode()
 
-    test_tags = set()
+    test_tags: set[TestTag] = set()
     if is_manual:
         test_tags.add(TestTag.MANUAL)
 
@@ -365,7 +368,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if not _IsValidYamlTest(path.name):
             continue
 
-        tags = set()
+        tags: set[TestTag] = set()
         if path.name in manual_tests:
             tags.add(TestTag.MANUAL)
 

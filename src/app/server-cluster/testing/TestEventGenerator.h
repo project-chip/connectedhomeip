@@ -23,7 +23,7 @@
 #include <deque>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// Keeps a queue of generated events that can be acquired later for testing purposes
 class LogOnlyEvents : public app::DataModel::EventsGenerator
@@ -121,5 +121,5 @@ private:
     EventNumber mCurrentEventNumber = 0;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

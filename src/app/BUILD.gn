@@ -175,8 +175,7 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "CommandSender.cpp",
     "CommandSender.h",
-    "DefaultTimerDelegate.cpp",
-    "DefaultTimerDelegate.h",
+    "DeviceLoadStatusProvider.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
@@ -194,6 +193,7 @@ static_library("interaction-model") {
                      # fixing
     "ReadPrepareParams.h",
     "SubscriptionResumptionStorage.h",
+    "SubscriptionStats.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
     "TimedRequest.cpp",
@@ -238,6 +238,7 @@ static_library("interaction-model") {
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
+    "${chip_root}/src/transport",
   ]
 
   if (chip_enable_icd_server) {

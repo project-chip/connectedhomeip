@@ -30,8 +30,8 @@
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/scenes-server.h>
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/scenes-server.h> // nogncheck
+#endif                                                // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -344,7 +344,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
     }
 #endif
 
-    provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
+    TEMPORARY_RETURN_IGNORED provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
     status = Status::Success;
     MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
 exit:

@@ -115,17 +115,17 @@ the BRD4187C DK is
 ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/ ./out/lighting-app BRD4187C
 ```
 
-To build the lighting app as an Wi-Fi MG24 + SiWx917 NCP, the default build
-command for the BRD4187C is
+To build the lighting app as an Wi-Fi MG24 + SiWx NCP, the default build command
+for the BRD4187C is
 
 ```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_siwx917 BRD4187C use_external_flash=false chip_enable_ble_rs911x=true --wifi SiWx917
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_siwx917 BRD4187C use_external_flash=false sl_matter_enable_siwx_ble=true --wifi SiWx917
 ```
 
 > **Note**: The build argument `--wifi SiWx917` is necessary to build BRD4187C
-> image with the necessary code for the NCP combo. `chip_enable_ble_rs911x=true`
-> enables the SiWx917 NCP bluetooth. The MG24 + SiWx917 NCP combo does not yet
-> support external flash.
+> image with the necessary code for the NCP combo. `chip_enable_ble_siwx=true`
+> enables the SiWx NCP bluetooth. The MG24 + SiWx NCP combo does not yet support
+> external flash.
 
 To build the lighting app as an Wi-Fi MG24 + wf200 NCP, the default build
 command for the BRD4187C is

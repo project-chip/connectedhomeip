@@ -138,7 +138,7 @@ static void UseStdoutLineBuffering()
 
 void InitTestInetCommon()
 {
-    chip::Platform::MemoryInit();
+    SuccessOrDie(chip::Platform::MemoryInit());
     UseStdoutLineBuffering();
 }
 
@@ -152,13 +152,13 @@ void InitSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
     // The CHIP stack initialization is required then.
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().InitChipStack();
 #ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
 #endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    gSystemLayer.Init();
+    SuccessOrDie(gSystemLayer.Init());
 }
 
 void ShutdownSystemLayer()
@@ -184,7 +184,7 @@ static void PrintNetworkState()
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
         struct netif * netIF = &(sNetIFs[j]);
-        InterfaceId(netIF).GetInterfaceName(intfName, sizeof(intfName));
+        TEMPORARY_RETURN_IGNORED InterfaceId(netIF).GetInterfaceName(intfName, sizeof(intfName));
 
         printf("LwIP interface ready\n");
         printf("  Interface Name: %s\n", intfName);
@@ -335,10 +335,10 @@ void InitNetwork()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    gTCP.Init(gSystemLayer);
+    SuccessOrDie(gTCP.Init(gSystemLayer));
 #endif
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    gUDP.Init(gSystemLayer);
+    SuccessOrDie(gUDP.Init(gSystemLayer));
 #endif
 }
 
@@ -360,8 +360,8 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
 #if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
-    gSystemLayer.StartTimer(
-        System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
+    SuccessOrDie(gSystemLayer.StartTimer(
+        System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr));
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -394,7 +394,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         else
             sRemainingSystemLayerEventDelay--;
 
-        gSystemLayer.HandlePlatformTimer();
+        TEMPORARY_RETURN_IGNORED gSystemLayer.HandlePlatformTimer();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 }

@@ -60,7 +60,7 @@ void StopSignalHandler(int /* signal */)
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        SystemLayer().ScheduleLambda([]() { PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
 }
 
@@ -73,9 +73,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver);
     static std::unique_ptr<DeviceInterface> constructedDevice;
 
-    rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+    TEMPORARY_RETURN_IGNORED rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-    constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId);
+    TEMPORARY_RETURN_IGNORED constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId);
 
     return &dataModelProvider;
 }

@@ -18,7 +18,7 @@
 
 #include "Globals.h"
 #include "DeviceCallbacks.h"
-#include <app/DefaultTimerDelegate.h>
+#include <platform/DefaultTimerDelegate.h>
 
 LEDWidget statusLED1;
 LEDWidget statusLED2;

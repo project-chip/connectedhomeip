@@ -136,7 +136,7 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
     }
     else
     {
-        ReturnErrorOnFailure(mpICDClientStorage->StoreEntry(clientInfo));
+        TEMPORARY_RETURN_IGNORED mpICDClientStorage->StoreEntry(clientInfo);
         mpCheckInDelegate->OnCheckInComplete(clientInfo);
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
         mpImEngine->OnActiveModeNotification(clientInfo.peer_node, clientInfo.monitored_subject);

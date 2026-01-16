@@ -163,6 +163,13 @@ PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
 struct IcdRegistrationParameters;
 PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+PyChipError pychip_DeviceController_SetLocalMRPConfig(uint32_t idleRetransIntervalMillis, uint32_t activeRetransIntervalMillis,
+                                                      uint16_t activeThresholdMillis);
+PyChipError pychip_DeviceController_ResetLocalMRPConfig();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl);
@@ -291,7 +298,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     factoryParams.sessionKeystore          = &sSessionKeystore;
     factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance(storageAdapter);
 
-    sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
+    TEMPORARY_RETURN_IGNORED sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
     sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
@@ -708,32 +715,50 @@ PyChipError pychip_DeviceController_ResetCommissioningParameters()
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+PyChipError pychip_DeviceController_SetLocalMRPConfig(uint32_t idleRetransIntervalMillis, uint32_t activeRetransIntervalMillis,
+                                                      uint16_t activeThresholdMillis)
+{
+    chip::ReliableMessageProtocolConfig config{ chip::System::Clock::Milliseconds32(idleRetransIntervalMillis),
+                                                chip::System::Clock::Milliseconds32(activeRetransIntervalMillis),
+                                                chip::System::Clock::Milliseconds16(activeThresholdMillis) };
+    chip::ReliableMessageProtocolConfig::SetLocalMRPConfig(chip::MakeOptional(config));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_ResetLocalMRPConfig()
+{
+    chip::ReliableMessageProtocolConfig::SetLocalMRPConfig(chip::NullOptional);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     //
     // Since we permit multiple controllers per fabric and each is associated with a unique fabric index, closing a session
     // requires us to do so across all controllers on the same logical fabric.
     //
-    devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()),
-                                                                 [](auto * session) {
-                                                                     if (session->IsActiveSession())
-                                                                     {
-                                                                         session->MarkAsDefunct();
-                                                                     }
-                                                                 });
+    TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(
+        ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto * session) {
+            if (session->IsActiveSession())
+            {
+                session->MarkAsDefunct();
+            }
+        });
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()),
-                                                                 [](auto * session) {
-                                                                     if (session->IsActiveSession())
-                                                                     {
-                                                                         session->MarkForEviction();
-                                                                     }
-                                                                 });
+    TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(
+        ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto * session) {
+            if (session->IsActiveSession())
+            {
+                session->MarkForEviction();
+            }
+        });
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -1047,13 +1072,14 @@ PyChipError pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl
     //
     // Stop any active pairing sessions to this node.
     //
-    devCtrl->StopPairing(nodeId);
+    TEMPORARY_RETURN_IGNORED devCtrl->StopPairing(nodeId);
 
     //
     // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session
     // needs to correctly expire sessions on other controllers on matching fabrics as well.
     //
-    devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
+    TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(
+        ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -1078,8 +1104,7 @@ PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFun
     {
         return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
-    PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
-    return ToPyChipError(CHIP_NO_ERROR);
+    return ToPyChipError(PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext)));
 }
 
 void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)

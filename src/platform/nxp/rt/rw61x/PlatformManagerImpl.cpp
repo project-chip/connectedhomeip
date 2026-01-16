@@ -340,7 +340,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -363,5 +364,5 @@ void PlatformManagerImpl::_Shutdown()
 
 extern "C" void mt_wipe(void)
 {
-    chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
 }

@@ -130,7 +130,7 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
     bool connected;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // If device is already connected to WiFi, then disconnect the WiFi,
-    chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
     if (connected)
     {
         ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Disconnecting);
@@ -155,9 +155,9 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
     }
 
     DeviceLayer::ConnectivityManager::WiFiStationState state = DeviceLayer::ConnectivityManager::kWiFiStationState_Connecting;
-    DeviceLayer::SystemLayer().ScheduleLambda([state, ssid, key]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([state, ssid, key]() {
         ConnectivityMgrImpl().ChangeWiFiStationState(state);
-        chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
     });
 #endif
     return err;

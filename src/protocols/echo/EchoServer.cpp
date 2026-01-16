@@ -38,16 +38,14 @@ CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
     OnEchoRequestReceived = nullptr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
-    mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest, this);
-
-    return CHIP_NO_ERROR;
+    return mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest, this);
 }
 
 void EchoServer::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest);
+        TEMPORARY_RETURN_IGNORED mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest);
         mExchangeMgr = nullptr;
     }
 }

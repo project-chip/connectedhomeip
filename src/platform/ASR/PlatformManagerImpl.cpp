@@ -165,7 +165,7 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask(void)
 {
     lega_task_config_t cfg;
 
-    MatterInitializer::Matter_Task_Config(&cfg);
+    ReturnErrorOnFailure(MatterInitializer::Matter_Task_Config(&cfg));
 
     OSStatus result = lega_rtos_create_thread(&mThread, cfg.task_priority, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
                                               (lega_thread_function_t) EventLoopTaskMain, cfg.stack_size, (lega_thread_arg_t) this);
@@ -256,7 +256,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {

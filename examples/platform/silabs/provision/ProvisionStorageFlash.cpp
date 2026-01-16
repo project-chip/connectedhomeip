@@ -675,7 +675,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 #ifdef SL_MBEDTLS_USE_TINYCRYPT
     uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
     MutableByteSpan private_key(key_buffer);
-    AttestationKey::Unwrap(temp, size, private_key);
+    TEMPORARY_RETURN_IGNORED AttestationKey::Unwrap(temp, size, private_key);
     return AttestationKey::SignMessageWithKey((const uint8_t *) key_buffer, message, signature);
 #else
     AttestationKey key;

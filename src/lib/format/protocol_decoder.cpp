@@ -576,27 +576,27 @@ void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
     switch (data->type)
     {
     case ItemType::kProtocolClusterId:
-        mReader.Get(mClusterId);
+        TEMPORARY_RETURN_IGNORED mReader.Get(mClusterId);
         mIMContentPosition.ResetToTop();
         mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
         info = mIMContentPosition.Get();
         break;
     case ItemType::kProtocolAttributeId:
-        mReader.Get(mAttributeId);
+        TEMPORARY_RETURN_IGNORED mReader.Get(mAttributeId);
         mIMContentPosition.ResetToTop();
         mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
         mIMContentPosition.Enter(ByTag(AttributeTag(mAttributeId)));
         info = mIMContentPosition.Get();
         break;
     case ItemType::kProtocolCommandId:
-        mReader.Get(mCommandId);
+        TEMPORARY_RETURN_IGNORED mReader.Get(mCommandId);
         mIMContentPosition.ResetToTop();
         mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
         mIMContentPosition.Enter(ByTag(CommandTag(mCommandId)));
         info = mIMContentPosition.Get();
         break;
     case ItemType::kProtocolEventId:
-        mReader.Get(mEventId);
+        TEMPORARY_RETURN_IGNORED mReader.Get(mEventId);
         mIMContentPosition.ResetToTop();
         mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
         mIMContentPosition.Enter(ByTag(EventTag(mEventId)));

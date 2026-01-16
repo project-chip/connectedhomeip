@@ -42,7 +42,7 @@ static bool sSwitchOnOffState = false;
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)

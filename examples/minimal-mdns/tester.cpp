@@ -284,7 +284,7 @@ int main(int argc, char ** args)
             // attempts to free UDP sockets with system layer down will segfault
             gMdnsServer.Shutdown();
 
-            DeviceLayer::PlatformMgr().StopEventLoopTask();
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask();
         },
         nullptr);
     if (err != CHIP_NO_ERROR)

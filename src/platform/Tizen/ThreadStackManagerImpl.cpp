@@ -305,8 +305,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
                  ChipLogError(DeviceLayer, "FAIL: Thread get active dataset TLVs: %s", get_error_message(threadErr)));
 
     ChipLogProgress(DeviceLayer, "Thread get active dataset TLVs size [%u]", tlvsLen);
-    mDataset.Init(ByteSpan(tlvsData, tlvsLen));
-    dataset.Init(mDataset.AsByteSpan());
+    TEMPORARY_RETURN_IGNORED mDataset.Init(ByteSpan(tlvsData, tlvsLen));
+    TEMPORARY_RETURN_IGNORED dataset.Init(mDataset.AsByteSpan());
 
     return CHIP_NO_ERROR;
 
@@ -354,7 +354,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val && !isEnabled)
     {
         threadErr = thread_network_attach(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr && threadErr != THREAD_ERROR_NONE)
             {
                 this->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
@@ -365,7 +365,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
                      ChipLogError(DeviceLayer, "FAIL: Attach Thread network: %s", get_error_message(threadErr)));
 
         threadErr = thread_start(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr)
             {
                 this->mpConnectCallback->OnResult(threadErr == THREAD_ERROR_NONE ? NetworkCommissioning::Status::kSuccess

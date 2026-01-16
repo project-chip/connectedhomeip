@@ -79,7 +79,7 @@ int main(int argc, char * argv[])
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
-    AppTvInit();
+    TEMPORARY_RETURN_IGNORED AppTvInit();
 
 #if defined(ENABLE_CHIP_SHELL)
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

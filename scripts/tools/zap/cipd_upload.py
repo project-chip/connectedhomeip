@@ -12,6 +12,7 @@ import click
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from zap_download import DownloadReleasedZap  # noqa: E402 isort:skip
 
+log = logging.getLogger(__name__)
 
 try:
     import coloredlogs
@@ -21,12 +22,7 @@ except ImportError:
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 # A list of things to copy. Tuples of
 #  (zap_platform, zap_architecture, cipd_platform)
@@ -60,12 +56,12 @@ def main(log_level: str, version: str, no_temp_clean: bool):
         )
 
     with tempfile.TemporaryDirectory(prefix="zap_", suffix="_cipd", delete=(not no_temp_clean)) as tmpdir:
-        logging.info("Temporary Directory: %s", tmpdir)
+        log.info("Temporary Directory: '%s'", tmpdir)
 
         for platform, arch, cipd_dir in __ZAP_ARCHITECTURES__:
             download_dir = f"zap-{platform}-{arch}"
             download_path = os.path.join(tmpdir, download_dir)
-            logging.info("Downloading %s-%s into %s", platform, arch, download_path)
+            log.info("Downloading '%s-%s' into '%s'", platform, arch, download_path)
             DownloadReleasedZap(download_path, version, platform, arch)
 
             # Release downloaded, create a CIPD definition and upload it
@@ -84,7 +80,7 @@ def main(log_level: str, version: str, no_temp_clean: bool):
                 "-tag",
                 f"version:{version}.2",
             ]
-            logging.info("Creating CIPD: %s", shlex.join(cmd))
+            log.info("Creating CIPD: %s", shlex.join(cmd))
 
             subprocess.check_call(cmd, cwd=download_path)
 

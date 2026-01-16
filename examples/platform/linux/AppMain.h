@@ -43,17 +43,39 @@ public:
     void SignalSafeStopMainLoop() override
     {
         chip::Server::GetInstance().GenerateShutDownEvent();
-        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     }
 };
 
 /**
- * Start up the Linux app and use the provided main loop for event processing.
+ * Get default server initialization parameters for Linux example apps.
  *
- * If no main loop implementation is provided, an equivalent of
- * DefaultAppMainLoopImplementation will be used.
+ * Returns a reference to a static CommonCaseDeviceServerInitParams instance that has been
+ * initialized with default resources, including the CodegenDataModelProvider.
+ *
+ * This is suitable for most Linux example applications. Apps that need to customize
+ * initialization can create their own ServerInitParams and pass it to ChipLinuxAppMainLoop().
  */
-void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl = nullptr);
+chip::CommonCaseDeviceServerInitParams & ChipLinuxDefaultServerInitParams();
+
+/**
+ * Start up the Linux app, optionally with custom server initialization parameters
+ * and/or main loop implementation.
+ *
+ * This overload allows apps to provide their own ServerInitParams for cases where
+ * custom configuration is needed before server initialization.
+ *
+ * @param initParams Server initialization parameters to use
+ * @param impl Optional main loop implementation
+ */
+void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams = ChipLinuxDefaultServerInitParams(),
+                          AppMainLoopImplementation * impl    = nullptr);
+
+inline void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
+{
+    ChipLinuxAppMainLoop(ChipLinuxDefaultServerInitParams(), impl);
+}
 
 // For extra init calls, the function will be called right before running Matter main loop.
 void ApplicationInit();

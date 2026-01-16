@@ -37,8 +37,9 @@ def main():
     base_name = os.path.join(sys.argv[1], "src", "app", "zap-templates", "zcl", "zcl.json")
     ext_name = os.path.join(sys.argv[1], "src", "app", "zap-templates", "zcl", "zcl-with-test-extensions.json")
 
-    base_data = json.load(open(base_name))
-    ext_data = json.load(open(ext_name))
+    with open(base_name) as f_base, open(ext_name) as f_ext:
+        base_data = json.load(f_base)
+        ext_data = json.load(f_ext)
 
     # ext should be IDENTICAL with base if we add a few things to base:
     base_data["xmlRoot"].append("./data-model/test")

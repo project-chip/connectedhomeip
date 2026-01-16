@@ -129,7 +129,7 @@ public:
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse)
+        mSuppressResponse(aSuppressResponse), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -138,7 +138,53 @@ public:
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize),
+        mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
+    {
+        assertChipStackLockedByCurrentThread();
+    }
+
+    // Tag type to distinguish the test constructor from the normal constructor
+    struct TestOnlyOverrideTimedRequestFieldTag
+    {
+    };
+
+    /**
+     * TestOnly constructor that decouples the Timed Request action from the TimedRequest field value.
+     *
+     * IMPORTANT: Understanding the distinction between two concepts:
+     * 1. TIMED REQUEST ACTION: A preceding TimedRequest protocol message sent before the actual Write Request.
+     *                          This establishes a time window during which the server will accept the write.
+     *                          This is controlled by the mTimedWriteTimeoutMs field.
+     *
+     * 2. TIMEDREQUEST FIELD: A boolean field in the WriteRequest message itself that indicates whether
+     *                       the write was preceded by a Timed Request action.
+     *                       This is controlled by the mTimedRequestFieldValue field.
+     *
+     * Normal behavior: When you provide a timeout value to the standard constructor, both happen together:
+     *   - A Timed Request action is sent (controlled by mTimedWriteTimeoutMs)
+     *   - The TimedRequest field in WriteRequest is set to true (mTimedRequestFieldValue = true)
+     *
+     * This test constructor allows you to decouple these for testing all edge cases:
+     *
+     * Test scenarios enabled by this constructor:
+     * 1. Normal write (both false):              Action = No,  Field = False  [aTimedWriteTimeoutMs = Missing,
+     * aTimedRequestFieldValue = false]
+     * 2. Normal timed write (both true):         Action = Yes, Field = True   [aTimedWriteTimeoutMs = value,
+     * aTimedRequestFieldValue = true]
+     * 3. Field true, no action (invalid):        Action = No,  Field = True   [aTimedWriteTimeoutMs = Missing,
+     * aTimedRequestFieldValue = true]
+     * 4. Action present, field false (invalid):  Action = Yes, Field = False  [aTimedWriteTimeoutMs = value,
+     * aTimedRequestFieldValue = false]
+     *
+     * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (if provided, action WILL be sent)
+     * @param[in] aTimedRequestFieldValue The value of the TimedRequest field in WriteRequest (can mismatch the action for testing)
+     */
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                bool aTimedRequestFieldValue, TestOnlyOverrideTimedRequestFieldTag) :
+        mpExchangeMgr(apExchangeMgr),
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mTimedRequestFieldValue(aTimedRequestFieldValue)
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -524,6 +570,15 @@ private:
     // #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint16_t mReservedSize = 0;
     // #endif
+
+    /**
+     * The value of the TimedRequest field in the WriteRequest message.
+     *
+     * This tells the server whether this write was preceded by a Timed Request action.
+     * Normally this matches whether mTimedWriteTimeoutMs has a value, but test constructors
+     * can decouple these to test protocol mismatch scenarios.
+     */
+    bool mTimedRequestFieldValue = false;
 
     /**
      * Below we define several const variables for encoding overheads.

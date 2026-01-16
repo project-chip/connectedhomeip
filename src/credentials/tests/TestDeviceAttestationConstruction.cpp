@@ -28,6 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -73,8 +74,8 @@ TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Roundtrip)
     attestationElementsLen = sizeof(certificationDeclaration) + sizeof(attestationNonce) + sizeof(timestamp) +
         sizeof(vendorReserved1) + sizeof(vendorReserved3) + sizeof(uint64_t) * 5;
     attestationElements.Alloc(attestationElementsLen);
-    vendorReservedConstructor.addVendorReservedElement(vendorId, profileNum, 1, ByteSpan(vendorReserved1));
-    vendorReservedConstructor.addVendorReservedElement(vendorId, profileNum, 3, ByteSpan(vendorReserved3));
+    EXPECT_SUCCESS(vendorReservedConstructor.addVendorReservedElement(vendorId, profileNum, 1, ByteSpan(vendorReserved1)));
+    EXPECT_SUCCESS(vendorReservedConstructor.addVendorReservedElement(vendorId, profileNum, 3, ByteSpan(vendorReserved3)));
     EXPECT_TRUE(attestationElements);
 
     {
@@ -177,8 +178,8 @@ TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Construction)
     static constexpr uint16_t profileNum = 0x003E;
     VendorReservedElement vendorReservedArray[2];
     DeviceAttestationVendorReservedConstructor vendorReserved(vendorReservedArray, 2);
-    vendorReserved.addVendorReservedElement(vendorId, profileNum, 1, ByteSpan(vendorReserved1));
-    vendorReserved.addVendorReservedElement(vendorId, profileNum, 3, ByteSpan(vendorReserved3));
+    EXPECT_SUCCESS(vendorReserved.addVendorReservedElement(vendorId, profileNum, 1, ByteSpan(vendorReserved1)));
+    EXPECT_SUCCESS(vendorReserved.addVendorReservedElement(vendorId, profileNum, 3, ByteSpan(vendorReserved3)));
 
     attestationElementsLen = sizeof(certificationDeclaration) + sizeof(attestationNonce) + sizeof(timestamp) +
         sizeof(vendorReserved1) + sizeof(vendorReserved3) + sizeof(uint64_t) * 5;

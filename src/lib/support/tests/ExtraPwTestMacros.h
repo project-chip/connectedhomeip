@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
 /**
@@ -61,7 +62,6 @@
  *
  * This macro does not define the body of the test function. It can be used to
  * run a single test case which needs to be run against different fixtures.
- *
  */
 #define TEST_F_FROM_FIXTURE_NO_BODY(test_fixture, test_name)                                                                       \
     TEST_F(test_fixture, test_name)                                                                                                \
@@ -70,17 +70,11 @@
     }
 
 /**
- *  @def EXPECT_SUCCESS(expr)
- *
- *  @brief
- *    Shorthand for EXPECT_EQ(expr, CHIP_NO_ERROR)
- *
- *  Example usage:
- *
- *  @code
- *    EXPECT_SUCCESS(channel->SendMsg(msg));
- *  @endcode
- *
- *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ * Shorthand for EXPECT_EQ(expr, CHIP_NO_ERROR)
  */
 #define EXPECT_SUCCESS(expr) EXPECT_EQ((expr), CHIP_NO_ERROR)
+
+/**
+ * Shorthand for ASSERT_EQ(expr, CHIP_NO_ERROR)
+ */
+#define ASSERT_SUCCESS(expr) ASSERT_EQ((expr), CHIP_NO_ERROR)

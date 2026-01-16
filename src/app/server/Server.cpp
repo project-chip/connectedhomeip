@@ -27,6 +27,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -835,24 +836,5 @@ void Server::ResumeSubscriptions()
 #endif
 
 Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
-
-KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
-PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
-Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
-Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
-app::reporting::ReportSchedulerImpl
-    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
-#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
-#endif
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
-#endif
-app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
-Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
-#endif
 
 } // namespace chip

@@ -266,7 +266,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::
     ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
 
     ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
-    reader.ExitContainer(containerType);
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
 
     chip::Crypto::P256PublicKey pubkey;
     ReturnErrorOnFailure(chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));

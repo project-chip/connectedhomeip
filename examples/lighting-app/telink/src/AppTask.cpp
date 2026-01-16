@@ -71,7 +71,7 @@ void AppTask::PowerOnFactoryReset(void)
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LightingActionEventHandler);
-    InitCommonParts();
+    TEMPORARY_RETURN_IGNORED InitCommonParts();
 
     Protocols::InteractionModel::Status status;
 

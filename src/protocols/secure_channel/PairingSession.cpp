@@ -301,7 +301,7 @@ void PairingSession::OnSessionReleased()
         return;
     }
 
-    mSessionManager->SystemLayer()->ScheduleWork(
+    TEMPORARY_RETURN_IGNORED mSessionManager->SystemLayer()->ScheduleWork(
         [](auto * systemLayer, auto * appState) -> void {
             ChipLogError(Inet, "ASYNC CASE Session establishment failed");
             auto * _this = static_cast<PairingSession *>(appState);

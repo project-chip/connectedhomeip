@@ -125,7 +125,7 @@ int AppTask::Init()
 
     // Init Chip memory management before the stack
     PLAT_LOG("Initialize Memory");
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -166,7 +166,7 @@ int AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     PLAT_LOG("Initialize device attestation config");
@@ -178,10 +178,10 @@ int AppTask::Init()
 #endif
 
     // init air purifier stuff
-    SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
-    SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
-    SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
-    SetParentEndpointForEndpoint(THERMOSTAT_ENDPOINT, AIR_PURIFIER_ENDPOINT);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(THERMOSTAT_ENDPOINT, AIR_PURIFIER_ENDPOINT);
 
     AirPurifierManager::InitInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
                                      EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT),

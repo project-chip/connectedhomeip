@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("../system.gni")
 
 chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
@@ -27,7 +28,6 @@ chip_test_suite("tests") {
     "TestSystemPacketBuffer.cpp",
     "TestSystemScheduleLambda.cpp",
     "TestSystemTimer.cpp",
-    "TestSystemWakeEvent.cpp",
     "TestTimeSource.cpp",
   ]
 
@@ -40,6 +40,10 @@ chip_test_suite("tests") {
   #  which tries to size-limit the buffers, does not work correctly there.
   if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
+  }
+
+  if (chip_system_config_event_loop == "Select") {
+    test_sources += [ "TestSystemWakeEvent.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

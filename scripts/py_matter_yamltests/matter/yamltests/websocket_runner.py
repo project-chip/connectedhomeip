@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import asyncio
 import logging
 import re
 import select
@@ -92,7 +93,7 @@ class WebSocketRunner(TestRunner):
                 duration = round((time.time() - start) * 1000, 0)
                 self._hooks.failure(duration)
                 self._hooks.retry(interval_between_retries)
-                time.sleep(interval_between_retries)
+                await asyncio.sleep(interval_between_retries)
                 return await self._start_client(url, max_retries - 1, interval_between_retries + 1)
 
         self._hooks.abort(url)
@@ -107,7 +108,7 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            instance = subprocess.Popen(
+            instance = subprocess.Popen(    # noqa: ASYNC220
                 command,
                 bufsize=0,                  # unbuffered
                 text=False,                 # keep output as bytes
@@ -155,7 +156,6 @@ class WebSocketRunner(TestRunner):
     def _make_server_startup_command(self, path: str, arguments: str, port: int):
         if path is None:
             return None
-        elif arguments is None:
+        if arguments is None:
             return [path] + ['--port', str(port)]
-        else:
-            return [path] + [arg.strip() for arg in arguments.split(' ')] + ['--port', str(port)]
+        return [path] + [arg.strip() for arg in arguments.split(' ')] + ['--port', str(port)]

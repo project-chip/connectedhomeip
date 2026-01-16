@@ -13,8 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import asyncio
 import sys
-import time
 
 from ..pseudo_cluster import PseudoCluster
 from .accessory_server_bridge import AccessoryServerBridge
@@ -59,7 +59,7 @@ class DelayCommands(PseudoCluster):
                 duration_in_ms = argument['value']
 
         sys.stdout.flush()
-        time.sleep(int(duration_in_ms) / 1000)
+        await asyncio.sleep(int(duration_in_ms) / 1000)
 
     async def WaitForMessage(self, request):
         AccessoryServerBridge.waitForMessage(request)

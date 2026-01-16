@@ -34,7 +34,7 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     // Initialize ToggleMoveType timer
     k_timer_init(&sToggleMoveTypeTimer, &AppTask::OpenTimerTimeoutCallback, nullptr);

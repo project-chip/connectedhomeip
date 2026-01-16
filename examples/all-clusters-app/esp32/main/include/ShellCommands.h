@@ -180,7 +180,8 @@ private:
         streamer_printf(streamer_get(), "Try to establish CaseSession to NodeId:0x" ChipLogFormatX64 " on fabric index %d\r\n",
                         ChipLogValueX64(GetInstance().GetNodeId()), fabricIndex);
         GetInstance().SetOnConnecting(true);
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(ConnectToNode, reinterpret_cast<intptr_t>(&GetInstance()));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(ConnectToNode,
+                                                                               reinterpret_cast<intptr_t>(&GetInstance()));
         return CHIP_NO_ERROR;
     }
 

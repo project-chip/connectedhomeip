@@ -294,7 +294,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     {
         NetworkInterface * ifp = new NetworkInterface();
 
-        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        TEMPORARY_RETURN_IGNORED interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
         ifp->name = CharSpan::fromCharString(ifp->Name);
         Inet::InterfaceType interfaceType;
         if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)

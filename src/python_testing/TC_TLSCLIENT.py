@@ -42,7 +42,9 @@ from TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
 
@@ -62,7 +64,7 @@ class TC_TLSCLIENT(MatterBaseTest):
 
     async def common_setup(self):
         self.step(1)
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cr1_cmd = TLSUtils(self, endpoint=endpoint)
         cr1 = self.default_controller
 
@@ -107,7 +109,7 @@ class TC_TLSCLIENT(MatterBaseTest):
     async def test_TC_TLSCLIENT_2_1(self):
         self.step(1)
         attributes = Clusters.TlsClientManagement.Attributes
-        cr1_cmd = TLSUtils(self, endpoint=self.get_endpoint(default=1))
+        cr1_cmd = TLSUtils(self, endpoint=self.get_endpoint())
 
         self.step(2)
         max_provisioned = await cr1_cmd.read_tls_client_attribute(attributes.MaxProvisioned)

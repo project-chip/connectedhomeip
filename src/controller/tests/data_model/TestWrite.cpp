@@ -30,6 +30,7 @@
 #include <controller/WriteInteraction.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -39,7 +40,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -145,22 +146,22 @@ private:
     StatusIB mPathStatus;
 };
 
-class TestWrite : public chip::Test::AppContext
+class TestWrite : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        chip::Testing::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
-        chip::Test::AppContext::TearDown();
+        chip::Testing::AppContext::TearDown();
     }
 
     void ResetCallback() { mSingleWriteCallback.reset(); }
@@ -202,8 +203,8 @@ TEST_F(TestWrite, TestDataResponse)
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -243,9 +244,9 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
-    chip::Test::SetVersionTo(kAcceptedDataVersion);
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion));
 
     DrainAndServiceIO();
 
@@ -283,11 +284,11 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
-    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
     static_assert(kAcceptedDataVersion != kRejectedDataVersion);
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion));
 
     DrainAndServiceIO();
 
@@ -325,8 +326,8 @@ TEST_F(TestWrite, TestAttributeError)
         onFailureCbInvoked = true;
     };
 
-    Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value, onSuccessCb,
-                                                                            onFailureCb);
+    EXPECT_SUCCESS(Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value,
+                                                                                           onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -362,8 +363,8 @@ TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -388,8 +389,8 @@ TEST_F(TestWrite, TestMultipleSuccessResponses)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
-                                                                                           onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        sessionHandle, kTestEndpointId, true, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -415,8 +416,8 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
-                                                                                           onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        sessionHandle, kTestEndpointId, true, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 

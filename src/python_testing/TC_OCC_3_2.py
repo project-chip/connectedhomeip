@@ -34,6 +34,20 @@
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device occupancy-sensor --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 #  There are CI integration for the test cases below that implements manually controlling sensor device for
@@ -46,8 +60,12 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_OCC_3_2(MatterBaseTest):
@@ -64,7 +82,7 @@ class TC_OCC_3_2(MatterBaseTest):
         return "[TC-OCC-3.2] Subscription Report Verification with server as DUT"
 
     def steps_TC_OCC_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
             TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds."),
             TestStep("3a", "Prepare DUT to be unoccupied state."),
@@ -76,13 +94,11 @@ class TC_OCC_3_2(MatterBaseTest):
             TestStep("4c", "TH clears its report history and writes HoldTimeMax to HoldTime attribute."),
             TestStep("4d", "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute and all legacy attributes supported."),
         ]
-        return steps
 
     def pics_TC_OCC_3_2(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_3_2(self):
@@ -102,17 +118,17 @@ class TC_OCC_3_2(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        logging.info(
+        log.info(
             f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
-        logging.info(f"Attribute list: {attribute_list}")
-        logging.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
-        logging.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
-        logging.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
+        log.info(f"Attribute list: {attribute_list}")
+        log.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
+        log.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
+        log.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
 
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)
@@ -147,7 +163,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
-            logging.info("No HoldTime attribute supports. Terminate this test case")
+            log.info("No HoldTime attribute supports. Terminate this test case")
             self.mark_all_remaining_steps_skipped("4b")
             return
 

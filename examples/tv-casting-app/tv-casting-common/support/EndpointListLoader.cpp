@@ -120,10 +120,10 @@ CHIP_ERROR EndpointListLoader::Load()
                                 endpointId, binding.fabricIndex);
                 isLoadingRequired                            = true;
                 mEndpointAttributesList[++endpointIndex].mId = endpointId;
-                ReadVendorId(&mEndpointAttributesList[endpointIndex]);
-                ReadProductId(&mEndpointAttributesList[endpointIndex]);
-                ReadDeviceTypeList(&mEndpointAttributesList[endpointIndex]);
-                ReadServerList(&mEndpointServerLists[endpointIndex], endpointId);
+                TEMPORARY_RETURN_IGNORED ReadVendorId(&mEndpointAttributesList[endpointIndex]);
+                TEMPORARY_RETURN_IGNORED ReadProductId(&mEndpointAttributesList[endpointIndex]);
+                TEMPORARY_RETURN_IGNORED ReadDeviceTypeList(&mEndpointAttributesList[endpointIndex]);
+                TEMPORARY_RETURN_IGNORED ReadServerList(&mEndpointServerLists[endpointIndex], endpointId);
             }
         }
     }

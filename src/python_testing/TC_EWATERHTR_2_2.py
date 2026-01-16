@@ -42,18 +42,16 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
-import logging
-import time
+import asyncio
 
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
 
 import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
@@ -68,7 +66,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "Set up a subscription to all WaterHeaterManagement cluster events"),
@@ -202,8 +200,6 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EWATERHTR_2_2(self):
 
@@ -282,7 +278,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("10")
-        time.sleep(6)
+        await asyncio.sleep(6)
         event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
 
         self.step("10a")

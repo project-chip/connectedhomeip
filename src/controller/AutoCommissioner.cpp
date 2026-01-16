@@ -35,7 +35,7 @@ using chip::app::DataModel::NullNullable;
 
 AutoCommissioner::AutoCommissioner()
 {
-    SetCommissioningParameters(CommissioningParameters());
+    TEMPORARY_RETURN_IGNORED SetCommissioningParameters(CommissioningParameters());
 }
 
 AutoCommissioner::~AutoCommissioner() {}
@@ -143,7 +143,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting attestation nonce to random value");
-        Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
@@ -156,7 +156,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting CSR nonce to random value");
-        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
@@ -184,7 +184,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
                 // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never
                 // fail.
-                CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
+                TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
             }
             else
@@ -203,7 +203,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         {
             // The buffer backing "span" is statically allocated and is of size kMaxDefaultNtpSize.
             auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
-            CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
+            TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
             auto default_ntp = MakeNullable(CharSpan(mDefaultNtp, params.GetDefaultNTP().Value().Value().size()));
             mParams.SetDefaultNTP(default_ntp);
         }
@@ -970,9 +970,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)
             {
-                MutableByteSpan nonce(mCSRNonce);
-                ReturnErrorOnFailure(mOperationalCredentialsDelegate->ObtainCsrNonce(nonce));
-                mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+                uint8_t csrNonceBytes[sizeof(mCSRNonce)];
+                MutableByteSpan nonce(csrNonceBytes);
+                CHIP_ERROR csrError = mOperationalCredentialsDelegate->ObtainCsrNonce(nonce);
+                if (csrError != CHIP_ERROR_NOT_IMPLEMENTED)
+                {
+                    ReturnErrorOnFailure(csrError);
+
+                    MutableByteSpan savedCSRNonce(mCSRNonce);
+                    ReturnErrorOnFailure(CopySpanToMutableSpan(nonce, savedCSRNonce));
+                    mParams.SetCSRNonce(savedCSRNonce);
+                }
             }
             break;
         }

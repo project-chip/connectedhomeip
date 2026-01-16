@@ -25,6 +25,8 @@ from os.path import exists
 
 import click
 
+log = logging.getLogger(__name__)
+
 
 def convert_ini_to_json(ini_dir: str, json_path: str):
     """ Converts chip-tool INI files found in 'ini_dir' into the JSON format expected by the matter python REPL
@@ -41,13 +43,13 @@ def convert_ini_to_json(ini_dir: str, json_path: str):
     for path in ini_file_paths:
         full_path = ini_dir + path
         if (exists(full_path)):
-            logging.critical(f"Found chip tool INI file at: {full_path} - Converting...")
+            log.critical("Found chip tool INI file at: '%s' - Converting...", full_path)
             create_repl_config_from_init(ini_file=full_path,
                                          json_dict=python_json_store, replace_suffix=str(counter))
         counter = counter + 1
 
-    json_file = open(json_path, 'w')
-    json.dump(python_json_store, json_file, ensure_ascii=True, indent=4)
+    with open(json_path, 'w') as f:
+        json.dump(python_json_store, f, ensure_ascii=True, indent=4)
 
 
 def create_repl_config_from_init(ini_file: str, json_dict: typing.Dict, replace_suffix: str):

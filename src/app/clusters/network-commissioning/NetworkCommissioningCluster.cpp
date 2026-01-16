@@ -243,7 +243,7 @@ void NetworkCommissioningCluster::SendNonConcurrentConnectNetworkResponse()
 #endif // CONFIG_NETWORK_LAYER_BLE
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
-    response.networkingStatus = NetworkCommissioning::Status::kSuccess;
+    response.networkingStatus = Status::kSuccess;
     commandHandle->AddResponse(mAsyncCommandPath, response);
 }
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -253,7 +253,7 @@ void NetworkCommissioningCluster::SetLastNetworkingStatusValue(
 {
     if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
-        NotifyAttributeChanged(Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
+        NotifyAttributeChanged(Attributes::LastNetworkingStatus::Id);
     }
 }
 
@@ -261,7 +261,7 @@ void NetworkCommissioningCluster::SetLastConnectErrorValue(Attributes::LastConne
 {
     if (mLastConnectErrorValue.Update(connectErrorValue))
     {
-        NotifyAttributeChanged(Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
+        NotifyAttributeChanged(Attributes::LastConnectErrorValue::Id);
     }
 }
 
@@ -273,12 +273,12 @@ void NetworkCommissioningCluster::SetLastNetworkId(ByteSpan lastNetworkId)
 
     memcpy(mLastNetworkID, lastNetworkId.data(), lastNetworkId.size());
     mLastNetworkIDLen = static_cast<uint8_t>(lastNetworkId.size());
-    NotifyAttributeChanged(Attributes::LastNetworkID::TypeInfo::GetAttributeId());
+    NotifyAttributeChanged(Attributes::LastNetworkID::Id);
 }
 
 void NetworkCommissioningCluster::ReportNetworksListChanged()
 {
-    NotifyAttributeChanged(Attributes::Networks::TypeInfo::GetAttributeId());
+    NotifyAttributeChanged(Attributes::Networks::Id);
 }
 
 void NetworkCommissioningCluster::OnNetworkingStatusChange(Status aCommissioningError, Optional<ByteSpan> aNetworkId,
@@ -837,7 +837,7 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     }
     if (commissioningError == Status::kSuccess)
     {
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
             ByteSpan(mLastNetworkID, mLastNetworkIDLen));
         SetLastConnectErrorValue(NullNullable);
     }
@@ -950,7 +950,7 @@ void NetworkCommissioningCluster::OnCommissioningComplete()
     VerifyOrReturn(mpWirelessDriver != nullptr);
 
     ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
-    mpWirelessDriver->CommitConfiguration();
+    TEMPORARY_RETURN_IGNORED mpWirelessDriver->CommitConfiguration();
 }
 
 void NetworkCommissioningCluster::OnFailSafeTimerExpired()
@@ -958,7 +958,7 @@ void NetworkCommissioningCluster::OnFailSafeTimerExpired()
     VerifyOrReturn(mpWirelessDriver != nullptr);
 
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
-    mpWirelessDriver->RevertConfiguration();
+    TEMPORARY_RETURN_IGNORED mpWirelessDriver->RevertConfiguration();
     mAsyncCommandHandle.Release();
 
     // Mark the network list changed since `mpWirelessDriver->RevertConfiguration()` may have updated it.
@@ -1081,10 +1081,18 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
     {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, SetInterfaceEnabled(value));
+        CHIP_ERROR err = SetInterfaceEnabled(value);
+
+        // Spec. 11.9.6.5 -- "If not supported, a write to this attribute with a value of false SHALL fail with a status of
+        // INVALID_ACTION."
+        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            return Protocols::InteractionModel::Status::InvalidAction;
+        }
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, err);
     }
 
-    return Protocols::InteractionModel::Status::InvalidAction;
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::InvokeCommand(const DataModel::InvokeRequest & request,

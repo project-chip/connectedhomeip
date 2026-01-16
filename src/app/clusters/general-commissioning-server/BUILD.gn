@@ -24,8 +24,8 @@ source_set("bread-crumb-tracker") {
 
 source_set("general-commissioning-server") {
   sources = [
-    "general-commissioning-cluster.cpp",
-    "general-commissioning-cluster.h",
+    "GeneralCommissioningCluster.cpp",
+    "GeneralCommissioningCluster.h",
   ]
 
   public_deps = [

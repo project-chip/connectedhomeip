@@ -17,7 +17,7 @@
 #include "CodegenInstance.h"
 
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -45,8 +45,8 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-    mCluster.Cluster().Shutdown();
+    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+    mCluster.Cluster().Deinit();
 }
 
 } // namespace NetworkCommissioning

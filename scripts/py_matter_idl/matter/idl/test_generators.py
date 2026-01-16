@@ -79,7 +79,7 @@ class TestCaseStorage(GeneratorStorage):
             if REGENERATE_GOLDEN_IMAGES and not os.path.exists(path):
                 return ""
 
-            with open(path, 'rt') as golden:
+            with open(path) as golden:
                 return golden.read()
 
         # This will attempt a new write, causing a unit test failure
@@ -135,15 +135,14 @@ class GeneratorTest:
                 os.path.join(os.path.dirname(__file__), '../../examples')))
             from matter_idl_plugin import CustomGenerator
             return CustomGenerator(storage, idl, package='com.matter.example.proto')
-        else:
-            raise Exception("Unknown generator for testing: %s",
-                            self.generator_name.lower())
+        raise Exception("Unknown generator for testing: %s",
+                        self.generator_name.lower())
 
     def run_test_cases(self, checker: unittest.TestCase):
         for test in self.test_cases:
             with checker.subTest(idl=test.input_idl):
                 storage = TestCaseStorage(test, checker)
-                with open(os.path.join(TESTS_DIR, test.input_idl), 'rt') as stream:
+                with open(os.path.join(TESTS_DIR, test.input_idl)) as stream:
                     idl = CreateParser().parse(stream.read(), file_name=test.input_idl)
 
                 generator = self._create_generator(storage, idl)
@@ -170,7 +169,7 @@ def build_tests(yaml_data) -> List[GeneratorTest]:
 class TestGenerators(unittest.TestCase):
     def test_generators(self):
         self.maxDiff = None
-        with open(os.path.join(TESTS_DIR, "available_tests.yaml"), 'rt') as stream:
+        with open(os.path.join(TESTS_DIR, "available_tests.yaml")) as stream:
             yaml_data = yaml.safe_load(stream)
 
         for test in build_tests(yaml_data):

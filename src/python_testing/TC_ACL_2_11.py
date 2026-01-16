@@ -50,8 +50,12 @@ from matter.clusters.Objects import AccessControl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import arls_populated
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_11(MatterBaseTest):
@@ -63,7 +67,7 @@ class TC_ACL_2_11(MatterBaseTest):
         return "[TC-ACL-2.11] Verification of Managed Device feature"
 
     def steps_TC_ACL_2_11(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning (already done) and precondition checks", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 AccessControl cluster CommissioningARL attribute"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute"),
@@ -77,7 +81,6 @@ class TC_ACL_2_11(MatterBaseTest):
                      "AccessRestrictionReviewUpdate event is received"),
             TestStep(8, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute", "ARL is empty")
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_11(self):
@@ -196,7 +199,7 @@ class TC_ACL_2_11(MatterBaseTest):
                             "Result is not of type ReviewFabricRestrictionsResponse")
 
         self.step(7)
-        logging.info("Please follow instructions provided by the product maker to remove all ARL entries")
+        log.info("Please follow instructions provided by the product maker to remove all ARL entries")
         arru_cb.wait_for_event_report(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
 
         self.step(8)

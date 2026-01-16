@@ -738,23 +738,13 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER
+ * @def CHIP_CONFIG_MAX_TRACING_BACKENDS
  *
- * @brief Enable support functions for parsing command-line arguments
+ * @brief The maximum number of tracing backends that can be registered.
+ * This value only takes effect if tracing is enabled at all.
  */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 0
-#endif
-
-/**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
- *
- * @brief Enable validity checking of command-line argument definitions.
- *
- * // TODO: Determine why we wouldn't need this
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
+#ifndef CHIP_CONFIG_MAX_TRACING_BACKENDS
+#define CHIP_CONFIG_MAX_TRACING_BACKENDS 4
 #endif
 
 /**
@@ -1709,6 +1699,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+ *
+ * The CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC is a configuration for shorter idle mode interval for LIT capable devices
+ * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availability status with their
+ * subscribers.
+ *
+ * The short idleMode duration SHALL be lesser than or equal to the IdleModeDuration.
+ *
+ * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+ */
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#endif
+
+/**
  * @def CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
  *
  * @brief Default value for the ICD Management cluster ActiveModeDuration attribute, in milliseconds
@@ -1885,10 +1890,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
  * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
- *        Two are used in the default implementation. Users can increase it to register more observers.
+ *        Three are used in the default implementation. Users can increase it to register more observers.
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
 #endif
 
 /**
@@ -2007,6 +2012,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+ *
+ * @brief The default maximum number of TLS endpoints that can be provisioned in the
+ *        TLS Client Management cluster when using the code-driven implementation. The Matter spec
+ *        requires this to be between 5 and 254. Applications can override this by providing a custom delegate.
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+#define CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS 5
+#endif // CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
 
 /**
  * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS

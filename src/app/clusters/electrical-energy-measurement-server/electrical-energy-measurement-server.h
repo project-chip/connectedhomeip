@@ -17,38 +17,4 @@
  */
 #pragma once
 
-#include <lib/core/Optional.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ElectricalEnergyMeasurement {
-
-struct MeasurementData
-{
-    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
-    Optional<Structs::CumulativeEnergyResetStruct::Type> cumulativeReset;
-};
-
-bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
-                                    const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
-
-bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
-                                  const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
-
-CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
-
-CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
-
-MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
-
-} // namespace ElectricalEnergyMeasurement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <app/clusters/electrical-energy-measurement-server/CodegenIntegration.h>

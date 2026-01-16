@@ -35,7 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
+import contextlib
 import typing
 from datetime import datetime, timedelta, timezone
 
@@ -44,7 +45,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
@@ -100,10 +103,8 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         self.print_step(3, "Send SetUTCCommand")
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
-        try:
+        with contextlib.suppress(InteractionModelError):
             await self.send_set_utc_cmd(utc_time_in_matter_epoch())
-        except InteractionModelError:
-            pass
 
         self.print_step(4, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
@@ -127,7 +128,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(9, "Wait 15s")
-        time.sleep(15)
+        await asyncio.sleep(15)
 
         self.print_step(10, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)
@@ -146,7 +147,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(14, "Wait 15s")
-        time.sleep(15)
+        await asyncio.sleep(15)
 
         self.print_step(15, "Read LocalTime")
         local = await self.read_ts_attribute_expect_success(local_attr)
@@ -169,7 +170,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(19, "Wait 15s")
         if dst_list_size > 1:
-            time.sleep(15)
+            await asyncio.sleep(15)
 
         self.print_step(20, "Read LocalTime")
         if dst_list_size > 1:
@@ -178,7 +179,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(21, "Wait 15s")
         if dst_list_size > 1:
-            time.sleep(15)
+            await asyncio.sleep(15)
 
         self.print_step(22, "Read LocalTime")
         if dst_list_size > 1:
@@ -187,7 +188,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(23, "Wait 15s")
         if dst_list_size > 1:
-            time.sleep(15)
+            await asyncio.sleep(15)
 
         self.print_step(24, "Read LocalTime")
         if dst_list_size > 1:
@@ -212,7 +213,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=0), tolerance=timedelta(seconds=5))
 
         self.print_step(29, "Wait 15s")
-        time.sleep(15)
+        await asyncio.sleep(15)
 
         self.print_step(30, "Read Localtime")
         local = await self.read_ts_attribute_expect_success(local_attr)

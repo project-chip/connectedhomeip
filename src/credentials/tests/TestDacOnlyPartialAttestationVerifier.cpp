@@ -32,6 +32,7 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -147,11 +148,11 @@ CHIP_ERROR TestDacOnlyPartialAttestationVerifier::ConstructAttestationElementsTL
     // Reference: Matter 1.4 Core Specification — 11.18.4.6. Attestation Elements
 
     ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType));
-    writer.Put(chip::TLV::ContextTag(1), cdData);
-    writer.Put(chip::TLV::ContextTag(2), nonceData);
-    writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
-    writer.Put(chip::TLV::ContextTag(4), ByteSpan());
-    writer.Put(chip::TLV::ContextTag(5), ByteSpan());
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(1), cdData));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(2), nonceData));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0)));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(4), ByteSpan()));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(5), ByteSpan()));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
     tlvLen = writer.GetLengthWritten();

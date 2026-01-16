@@ -645,7 +645,7 @@ void CastingStore::OnFabricRemoved(const chip::FabricTable & fabricTable, chip::
             ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved() deleting CastingPlayer %s from CastingStore cache",
                             it->GetId());
             castingPlayers.erase(it);
-            WriteAll(castingPlayers);
+            TEMPORARY_RETURN_IGNORED WriteAll(castingPlayers);
         }
     }
     CHIP_ERROR err = chip::Server::GetInstance().GetSessionResumptionStorage()->DeleteAll(fabricIndex);

@@ -40,6 +40,7 @@ class MatterTestConfig:
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
     pipe_name: typing.Union[str, None] = None
+    pipe_name_out: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
@@ -94,3 +95,6 @@ class MatterTestConfig:
 
     # Restart flag file for rebooting the DUT during test runs
     restart_flag_file: Optional[pathlib.Path] = None
+
+    # Debug mode to capture attribute dump at end of test modules
+    debug: bool = False

@@ -264,7 +264,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
