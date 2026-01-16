@@ -35,11 +35,11 @@ namespace {
 
 CertificateTableImpl gDefaultCertificateTable;
 
-TlsClientManagementDelegate * gDelegate           = nullptr;
+TlsCertificateManagementDelegate * gDelegate      = nullptr;
+CertificateDependencyChecker * gDependencyChecker = nullptr;
 CertificateTableImpl * gCertificateTable          = &gDefaultCertificateTable;
-constexpr uint8_t kDefaultMaxProvisionedEndpoints = CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS;
 
-LazyRegisteredServerCluster<TlsClientManagementCluster> gClusterInstance;
+LazyRegisteredServerCluster<TlsCertificateManagementCluster> gClusterInstance;
 
 } // anonymous namespace
 
@@ -47,32 +47,37 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate)
+void MatterTlsCertificateManagementSetDelegate(TlsCertificateManagementDelegate & delegate)
 {
     gDelegate = &delegate;
 }
 
-void MatterTlsClientManagementSetCertificateTable(Tls::CertificateTableImpl & certificateTable)
+void MatterTlsCertificateManagementSetCertificateTable(Tls::CertificateTableImpl & certificateTable)
 {
     gCertificateTable = &certificateTable;
+}
+
+void MatterTlsCertificateManagementSetDependencyChecker(Tls::CertificateDependencyChecker & dependencyChecker)
+{
+    gDependencyChecker = &dependencyChecker;
 }
 
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
-void MatterTlsClientManagementPluginServerInitCallback()
+void MatterTlsCertificateManagementPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Initializing TLS Client Management cluster.");
+    ChipLogProgress(Zcl, "Initializing TLS Certificate Management cluster.");
 }
 
-void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
+void MatterTlsCertificateManagementClusterInitCallback(EndpointId endpointId)
 {
     // TODO:(#42638) This cluster SHALL be present on the root node endpoint (endpoint 0) when required, and SHALL NOT be present on
     // any other endpoint. if (endpointId != kRootEndpointId)
     // {
     //     ChipLogError(Zcl,
-    //                  "TLS Client Management Cluster can only be initialized on root endpoint (0). "
+    //                  "TLS Certificate Management Cluster can only be initialized on root endpoint (0). "
     //                  "Ignoring initialization on endpoint %u.",
     //                  endpointId);
     //     return;
@@ -81,7 +86,7 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
     // Only create once - avoid double initialization if callback is called multiple times
     if (gClusterInstance.IsConstructed())
     {
-        ChipLogError(Zcl, "TLS Client Management Cluster already initialized on endpoint 0. Ignoring duplicate initialization.");
+        ChipLogError(Zcl, "TLS Certificate Management Cluster already initialized. Ignoring duplicate initialization.");
         return;
     }
 
@@ -89,23 +94,33 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
     if (gDelegate == nullptr)
     {
         ChipLogError(Zcl,
-                     "TLS Client Management Cluster cannot be initialized without a delegate. "
-                     "Call MatterTlsClientManagementSetDelegate() before ServerInit().");
+                     "TLS Certificate Management Cluster cannot be initialized without a delegate. "
+                     "Call MatterTlsCertificateManagementSetDelegate() before ServerInit().");
+        return;
+    }
+
+    if (gDependencyChecker == nullptr)
+    {
+        ChipLogError(Zcl,
+                     "TLS Certificate Management Cluster cannot be initialized without a dependency checker. "
+                     "Call MatterTlsCertificateManagementSetDependencyChecker() before ServerInit().");
         return;
     }
 
     LogErrorOnFailure(gCertificateTable->SetEndpoint(endpointId));
 
-    gClusterInstance.Create(endpointId, *gDelegate, *gCertificateTable, kDefaultMaxProvisionedEndpoints);
+    gClusterInstance.Create(endpointId, *gDelegate, *gDependencyChecker, *gCertificateTable,
+                            static_cast<uint8_t>(kMaxRootCertificatesPerFabric),
+                            static_cast<uint8_t>(kMaxClientCertificatesPerFabric));
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gClusterInstance.Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to register TLS Client Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+        ChipLogError(Zcl, "Failed to register TLS Certificate Management Cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
                      err.Format());
     }
 }
 
-void MatterTlsClientManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+void MatterTlsCertificateManagementClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(gClusterInstance.IsConstructed());
     VerifyOrReturn(gClusterInstance.Cluster().GetEndpointId() == endpointId);
