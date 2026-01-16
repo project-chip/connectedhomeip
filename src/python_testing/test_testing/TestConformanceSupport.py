@@ -719,7 +719,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml = create_xml(1)
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
-        asserts.assert_equal(str(xml_callable), f'Rev >= v1')
+        asserts.assert_equal(str(xml_callable), 'Rev >= v1')
 
         conformance_assessment_data.cluster_revision = 1
         asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
@@ -729,7 +729,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml = create_xml(5)
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
-        asserts.assert_equal(str(xml_callable), f'Rev >= v5')
+        asserts.assert_equal(str(xml_callable), 'Rev >= v5')
 
         conformance_assessment_data.cluster_revision = 1
         asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.NOT_APPLICABLE)

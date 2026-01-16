@@ -464,7 +464,7 @@ class ArithmeticConformance(Conformance):
             raise ConformanceException('Arithmetic operations can only have attribute + literal or revision children')
         self.op1 = op1
         self.op2 = op2
-        self.operator = operator.eq
+        self.operator = operator.gt
         self.opstr = "???"
 
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
@@ -473,7 +473,7 @@ class ArithmeticConformance(Conformance):
         # For now, this is fully optional, need to implement this properly later, but it requires access to the actual attribute values
         # We need to reach into the attribute, but can't use it directly because the attribute callable is an EXISTENCE check and
         # the arithmetic functions require a value.
-        if issubclass(type(self.op1), ValueConformance) and issubclass(type(self.op2), ValueConformance):
+        if hasattr(self.op1, 'get_value') and hasattr(self.op2, 'get_value'):
             if self.operator(self.op1.get_value(conformance_assessment_data), self.op2.get_value(conformance_assessment_data)):
                 return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
             return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
