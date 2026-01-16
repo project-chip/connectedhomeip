@@ -242,35 +242,18 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderCluster::Inv
                                                                                            TLV::TLVReader & input_arguments,
                                                                                            CommandHandler * handler)
 {
-    FabricIndex accessingFabricIndex = handler->GetAccessingFabricIndex();
-
     switch (request.path.mCommandId)
     {
-    case Commands::SolicitOffer::Id: {
-        Commands::SolicitOffer::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleSolicitOffer(*handler, req);
-    }
-    case Commands::ProvideOffer::Id: {
-        Commands::ProvideOffer::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleProvideOffer(*handler, req);
-    }
-    case Commands::ProvideAnswer::Id: {
-        Commands::ProvideAnswer::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleProvideAnswer(*handler, req);
-    }
-    case Commands::ProvideICECandidates::Id: {
-        Commands::ProvideICECandidates::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleProvideICECandidates(*handler, req);
-    }
-    case Commands::EndSession::Id: {
-        Commands::EndSession::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleEndSession(*handler, req);
-    }
+    case Commands::SolicitOffer::Id:
+        return Handle(request, input_arguments, &WebRTCTransportProviderCluster::HandleSolicitOffer, *handler);
+    case Commands::ProvideOffer::Id:
+        return Handle(request, input_arguments, &WebRTCTransportProviderCluster::HandleProvideOffer, *handler);
+    case Commands::ProvideAnswer::Id:
+        return Handle(request, input_arguments, &WebRTCTransportProviderCluster::HandleProvideAnswer, *handler);
+    case Commands::ProvideICECandidates::Id:
+        return Handle(request, input_arguments, &WebRTCTransportProviderCluster::HandleProvideICECandidates, *handler);
+    case Commands::EndSession::Id:
+        return Handle(request, input_arguments, &WebRTCTransportProviderCluster::HandleEndSession, *handler);
     default:
         return Status::UnsupportedCommand;
     }
@@ -494,8 +477,8 @@ Status WebRTCTransportProviderCluster::CheckTurnsOrStunsRequiresUTCTime(
 
 // Command Handlers
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandler,
-                                                   const Commands::SolicitOffer::DecodableType & req)
+WebRTCTransportProviderCluster::HandleSolicitOffer(const Commands::SolicitOffer::DecodableType & req,
+                                                   CommandHandler & commandHandler)
 {
     auto videoStreamID = req.videoStreamID;
     auto audioStreamID = req.audioStreamID;
@@ -738,8 +721,8 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandler,
-                                                   const Commands::ProvideOffer::DecodableType & req)
+WebRTCTransportProviderCluster::HandleProvideOffer(const Commands::ProvideOffer::DecodableType & req,
+                                                   CommandHandler & commandHandler)
 {
     auto webRTCSessionID = req.webRTCSessionID;
     auto videoStreamID   = req.videoStreamID;
@@ -1002,8 +985,8 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderCluster::HandleProvideAnswer(CommandHandler & commandHandler,
-                                                    const Commands::ProvideAnswer::DecodableType & req)
+WebRTCTransportProviderCluster::HandleProvideAnswer(const Commands::ProvideAnswer::DecodableType & req,
+                                                    CommandHandler & commandHandler)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
@@ -1019,8 +1002,8 @@ WebRTCTransportProviderCluster::HandleProvideAnswer(CommandHandler & commandHand
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & commandHandler,
-                                                           const Commands::ProvideICECandidates::DecodableType & req)
+WebRTCTransportProviderCluster::HandleProvideICECandidates(const Commands::ProvideICECandidates::DecodableType & req,
+                                                           CommandHandler & commandHandler)
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
@@ -1061,7 +1044,7 @@ WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & comm
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderCluster::HandleEndSession(CommandHandler & commandHandler, const Commands::EndSession::DecodableType & req)
+WebRTCTransportProviderCluster::HandleEndSession(const Commands::EndSession::DecodableType & req, CommandHandler & commandHandler)
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
