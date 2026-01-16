@@ -82,6 +82,7 @@ from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
+
 class AccessTestType(Enum):
     READ = auto()
     WRITE = auto()
