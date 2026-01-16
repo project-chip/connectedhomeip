@@ -160,8 +160,8 @@ _ci_tree = SchemaTree(schema=_CI_SCHEMA)
 yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
     'tests': _test_step_tree, 'config': _config_tree, 'CI': _ci_tree})
 
- class YamlLoader:
-     """This class loads a file from the disk and validates that the content is a well formed yaml test."""
+class YamlLoader:
+    """This class loads a file from the disk and validates that the content is a well formed yaml test."""
 
     def load(self, yaml_file: str) -> Tuple[str, Union[list, str], dict, list]:
         filename = ''
