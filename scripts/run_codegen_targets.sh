@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-# This script runs all targets taht are generating code
+# This script runs all targets that are generating code
 # in the given output directory
 # CHIP_ROOT with a build environment activated.
 
@@ -49,7 +49,7 @@ for name in $(ninja -C "$OUT_DIR" -t targets | grep -E -v '_no_codegen:' | grep 
     ninja -C "$OUT_DIR" "$name"
 done
 
-# Linus targets: dbus generate hdeaders
+# Linux targets: dbus generate headers
 for name in $(ninja -C "$OUT_DIR" -t targets | grep -E 'dbus.*codegen:' | sed 's/: .*//'); do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
