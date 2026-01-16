@@ -56,7 +56,8 @@ for name in $(ninja -C "$OUT_DIR" -t targets | grep -E 'dbus.*codegen:' | sed 's
 done
 
 # TLV decoding metadata
-for name in $(ninja -C "$OUT_DIR" -t targets | grep -E '_generate' | sed 's/: .*//'); do
+for name in $(ninja -C "$OUT_DIR" -t targets | grep -E 'lib/format.*_generate' | sed 's/: .*//'); do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done
+
