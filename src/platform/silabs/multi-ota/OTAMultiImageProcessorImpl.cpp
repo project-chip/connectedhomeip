@@ -318,7 +318,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            TEMPORARY_RETURN_IGNORED ReleaseBlock();
+            ReturnErrorOnFailure(ReleaseBlock());
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
@@ -367,7 +367,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ProcessFinalize()
 {
     for (auto const & pair : this->mProcessorMap)
     {
-        TEMPORARY_RETURN_IGNORED pair.second->FinalizeAction();
+        ReturnErrorOnFailure(pair.second->FinalizeAction());
     }
     return CHIP_NO_ERROR;
 }
