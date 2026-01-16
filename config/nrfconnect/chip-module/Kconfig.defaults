@@ -46,7 +46,7 @@ config HW_STACK_PROTECTION
     default y
 
 config ZVFS_OPEN_MAX
-    default 16
+    default 30
 
 config MAIN_STACK_SIZE
     default 6144

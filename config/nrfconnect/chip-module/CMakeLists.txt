@@ -59,8 +59,6 @@ if (CHIP_CFLAGS)
     matter_add_flags("${CHIP_CFLAGS}")
 endif()
 
-matter_add_flags(-D_POSIX_C_SOURCE=200809)
-
 if (CONFIG_ARM)
     matter_add_cflags(--specs=nosys.specs)
 endif()
@@ -260,8 +258,6 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
 target_sources(matter-data-model PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
 
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
-# Enable visibility of POSIX.1-2008 functions, such as strnlen
-target_compile_definitions(chip INTERFACE _POSIX_C_SOURCE=200809)
 # Make sure that kernel symbols that are only referenced by the Matter libraries are resolved.
 target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 
