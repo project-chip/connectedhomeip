@@ -1464,16 +1464,6 @@ void emberAfSampleMeiClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfSampleMeiClusterShutdownCallback(chip::EndpointId endpoint);
 
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfTestHiddenManufacturerSpecificClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void emberAfTestHiddenManufacturerSpecificClusterShutdownCallback(chip::EndpointId endpoint);
-
 // Cluster Server/Client Init Functions
 
 //
