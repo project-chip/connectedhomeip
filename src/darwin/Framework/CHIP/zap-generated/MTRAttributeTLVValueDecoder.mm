@@ -7383,13 +7383,8 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
                     }
                     newElement_0.endpoints = array_2;
                 }
-                newElement_0.keyID = [NSNumber numberWithUnsignedInt:entry_0.keyID];
+                newElement_0.keySetID = [NSNumber numberWithUnsignedShort:entry_0.keySetID];
                 newElement_0.hasAuxiliaryACL = [NSNumber numberWithBool:entry_0.hasAuxiliaryACL];
-                if (entry_0.expiringKeyID.HasValue()) {
-                    newElement_0.expiringKeyID = [NSNumber numberWithUnsignedInt:entry_0.expiringKeyID.Value()];
-                } else {
-                    newElement_0.expiringKeyID = nil;
-                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }

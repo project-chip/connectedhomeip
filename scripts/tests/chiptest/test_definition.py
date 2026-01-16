@@ -221,20 +221,75 @@ class App:
         return True
 
 
-class TestTarget(StrEnum):
-    ALL_CLUSTERS = 'all-clusters'
-    TV = 'tv'
-    LOCK = 'lock'
-    OTA = 'ota-requestor'
-    BRIDGE = 'bridge'
-    LIT_ICD = 'lit-icd'
-    FABRIC_SYNC = 'fabric-sync'
-    MWO = 'microwave-oven'
-    RVC = 'rvc'
-    NETWORK_MANAGER = 'network-manager'
-    ENERGY_GATEWAY = 'energy-gateway'
-    ENERGY_MANAGEMENT = 'energy-management'
-    CLOSURE = 'closure'
+@dataclass
+class TestTarget:
+    name: str
+
+    # command to execute. MUST be a placeholder like tv or lock
+    command: str
+
+    # arguments to pass in to the command to execute
+    arguments: list[str] = field(default_factory=list)
+
+
+def _standard_ci_target(app_placeholder: str):
+    """Returns a command tailored for a standard CI execution.
+
+    Generally this is just the given command without any arguments.
+    """
+    return TestTarget(name=app_placeholder, command=app_placeholder, arguments=[])
+
+
+class StandardTargets:
+    """Defines some commonly used run targets (app placeholders)"""
+    ALL_CLUSTERS = _standard_ci_target('all-clusters')
+    TV = _standard_ci_target('tv')
+    LOCK = _standard_ci_target('lock')
+    OTA = _standard_ci_target('ota-requestor')
+    BRIDGE = _standard_ci_target('bridge')
+    LIT_ICD = _standard_ci_target('lit-icd')
+    FABRIC_SYNC = _standard_ci_target('fabric-sync')
+    MWO = _standard_ci_target('microwave-oven')
+    RVC = _standard_ci_target('rvc')
+    NETWORK_MANAGER = _standard_ci_target('network-manager')
+    ENERGY_GATEWAY = _standard_ci_target('energy-gateway')
+    ENERGY_MANAGEMENT = _standard_ci_target('energy-management')
+    CLOSURE = _standard_ci_target('closure')
+
+    @classmethod
+    def for_test_name(cls, name) -> TestTarget:
+        if (name.startswith("TV_") or name.startswith("Test_TC_MC_") or
+            name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or
+            name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or
+            name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
+            name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
+            name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
+                name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
+            return StandardTargets.TV
+        if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
+            return StandardTargets.LOCK
+        if name.startswith("TestFabricSync"):
+            return StandardTargets.FABRIC_SYNC
+        if name.startswith("OTA_"):
+            return StandardTargets.OTA
+        if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
+            return StandardTargets.BRIDGE
+        if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
+            return StandardTargets.LIT_ICD
+        if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
+            return StandardTargets.MWO
+        if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
+            return StandardTargets.RVC
+        if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
+            return StandardTargets.NETWORK_MANAGER
+        if name.startswith("Test_TC_MTRID_"):
+            return StandardTargets.ENERGY_GATEWAY
+        if (name.startswith("Test_TC_DEM_") or name.startswith("Test_TC_DEMM_") or
+                name.startswith("Test_TC_EEVSE_") or name.startswith("Test_TC_EEVSEM_")):
+            return StandardTargets.ENERGY_MANAGEMENT
+        if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
+            return StandardTargets.CLOSURE
+        return StandardTargets.ALL_CLUSTERS
 
 
 @dataclass
@@ -436,7 +491,7 @@ class TestRunTime(Enum):
 class TestDefinition:
     name: str
     run_name: str
-    target: TestTarget
+    targets: list[TestTarget]
     tags: set[TestTag] = field(default_factory=set)
 
     @property
@@ -462,25 +517,39 @@ class TestDefinition:
             ble_controller_tool: int | None = None):
         """
         Executes the given test case using the provided runner for execution.
+        Will iterate and execute every target.
         """
+        for target in self.targets:
+            log.info('Executing %s::%s', self.name, target.name)
+            self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
+                          test_runtime, ble_controller_app, ble_controller_tool)
+
+    def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
+                 pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
+                 test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
+                 ble_controller_app: int | None = None,
+                 ble_controller_tool: int | None = None):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
 
         loggedCapturedLogs = False
         try:
-            if self.target.value not in subproc_info_repo:
+            if target.command not in subproc_info_repo:
                 log.warning("Path to default target '%s' for test '%s' is not known, test will likely fail",
-                            self.target.value, self.name)
+                            target.command, self.name)
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
                     # Do not add tools to the register
                     if subproc.kind == SubprocessKind.TOOL:
                         continue
 
-                    # For the app indicated by self.target, give it the 'default' key to add to the register
-                    if key == self.target.value:
+                    # For the app indicated by target, give it the 'default' key to add to the register
+                    if key == target.command:
                         key = 'default'
+                        for arg in target.arguments:
+                            subproc = subproc.with_args(arg)
+
                     if ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app), "--wifi")
                     app = App(runner, subproc)
@@ -540,7 +609,7 @@ class TestDefinition:
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
-                if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                if target.command == 'lit-icd' and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                     pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
                 test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))

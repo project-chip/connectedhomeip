@@ -27,13 +27,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 
-LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
+// UnitLocalization may be present in the root endpoint and shall not be present in any other endpoint.
+static_assert((UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               UnitLocalization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+                  (UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size() == 0),
+              "UnitLocalization MAY be present only in the root endpoint");
 
-UnitLocalizationServer & UnitLocalizationServer::Instance()
-{
-    VerifyOrDie(gServer.IsConstructed());
-    return gServer.Cluster();
-}
+namespace {
+
+LazyRegisteredServerCluster<UnitLocalizationServer> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -55,6 +57,14 @@ public:
     // Nothing to destroy: separate singleton class without constructor/destructor is used
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
+
+} // namespace
+
+UnitLocalizationServer & UnitLocalizationServer::Instance()
+{
+    VerifyOrDie(gServer.IsConstructed());
+    return gServer.Cluster();
+}
 
 void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 {
