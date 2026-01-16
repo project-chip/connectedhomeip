@@ -423,8 +423,8 @@ up examples apps, PICS and PIXIT values for use in the CI.
 Generally YAML auto-selects an application to run the test against based on the
 YAML name. You may need more control in cases when you want the same test to
 apply to multiple applications or provide custom arguments. In that case, the
-YAML file supports a `CI` entry that contains a list of `name`, `app` and
-`args` (optional) to execute.
+YAML file supports a `CI` entry that contains a list of `name`, `app` and `args`
+(optional) to execute.
 
 ```yaml
 CI:

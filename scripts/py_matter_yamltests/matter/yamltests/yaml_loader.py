@@ -154,11 +154,12 @@ _test_step_tree = SchemaTree(schema=_TEST_STEP_SCHEMA, children={
 _config_variable_tree = SchemaTree(schema=_CONFIG_VARIABLE_SCHEMA)
 
 _config_tree = SchemaTree(schema=_CONFIG_SCHEMA, children={
-                           '_variableName_': _config_variable_tree})
+    '_variableName_': _config_variable_tree})
 _ci_tree = SchemaTree(schema=_CI_SCHEMA)
 
 yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
     'tests': _test_step_tree, 'config': _config_tree, 'CI': _ci_tree})
+
 
 class YamlLoader:
     """This class loads a file from the disk and validates that the content is a well formed yaml test."""
