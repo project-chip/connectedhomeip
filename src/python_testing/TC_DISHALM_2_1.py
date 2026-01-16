@@ -29,6 +29,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
+#       --int-arg allow_provisional_alarms:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
