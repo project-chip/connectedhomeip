@@ -26,6 +26,7 @@ source_set("app-options") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-options",
     "${chip_root}/src/lib",

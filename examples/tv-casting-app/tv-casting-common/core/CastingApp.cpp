@@ -23,12 +23,17 @@
 #include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
+namespace {
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+}
 namespace matter {
 namespace casting {
 namespace core {
@@ -110,6 +115,10 @@ CHIP_ERROR CastingApp::Start()
 {
     ChipLogProgress(Discovery, "CastingApp::Start()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
+
+    // DeviceInfoProvider is needed by localization configuration cluster, so we set it before Server::Init to set up the storage of
+    // DeviceInfoProvider properly.
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();

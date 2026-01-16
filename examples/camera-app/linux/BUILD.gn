@@ -49,6 +49,7 @@ config("config") {
     "${chip_root}/examples/camera-app/camera-common/include/camera-avstream-controller",
     "${chip_root}/examples/camera-app/camera-common/include/webrtc-provider-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 }
