@@ -4843,11 +4843,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _endpoints = [NSArray array];
 
-        _keyID = @(0);
+        _keySetID = @(0);
 
         _hasAuxiliaryACL = @(0);
-
-        _expiringKeyID = nil;
 
         _fabricIndex = @(0);
     }
@@ -4860,9 +4858,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.keyID = self.keyID;
+    other.keySetID = self.keySetID;
     other.hasAuxiliaryACL = self.hasAuxiliaryACL;
-    other.expiringKeyID = self.expiringKeyID;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -4870,7 +4867,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; hasAuxiliaryACL:%@; expiringKeyID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, _hasAuxiliaryACL, _expiringKeyID, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; hasAuxiliaryACL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, _hasAuxiliaryACL, _fabricIndex];
     return descriptionString;
 }
 
