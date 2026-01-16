@@ -178,7 +178,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
                 // Continue the state machine (will enter kRefreshingEndpoints branch
                 // when successful and process mRefreshingEndpointsList).
-                (void) ContinueRefresh();
+                if (ContinueRefresh() != CHIP_NO_ERROR)
+                {
+                    // Ignore errors in continuation from within the callback.
+                }
             }));
     }
     break;
@@ -294,7 +297,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     }
 
                     // Continue to process next endpoint or move to syncing phase
-                    (void) ContinueRefresh();
+                    if (ContinueRefresh() != CHIP_NO_ERROR)
+                    {
+                        // Ignore errors in continuation from within the callback.
+                    }
                 }));
 
             // Return here - the callback will call ContinueRefresh() again
@@ -396,7 +402,11 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                 newEntry.nodeID     = mRefreshingNodeId;
                                 newEntry.endpointID = endpointBinding.endpointID;
                                 newEntry.binding    = endpointBinding.binding;
-                                TEMPORARY_RETURN_IGNORED GenerateAndAssignAUniqueListID(newEntry.listID);
+                                if (GenerateAndAssignAUniqueListID(newEntry.listID) != CHIP_NO_ERROR)
+                                {
+                                    // Unable to generate a unique List ID; skip this entry.
+                                    continue;
+                                }
                                 newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
                                 mEndpointBindingEntries.push_back(newEntry);
                             }
@@ -435,7 +445,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     }
 
                     // Continue the state machine to let the kRefreshingBindings branch process mEndpointBindingList.
-                    (void) ContinueRefresh();
+                    if (ContinueRefresh() != CHIP_NO_ERROR)
+                    {
+                        // Ignore errors in continuation from within the callback.
+                    }
                 }));
 
             // Return here - the callback will call ContinueRefresh() again
@@ -499,7 +512,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
             // After syncing bindings, move to fetching group key sets
             mRefreshState = kFetchingGroupKeySets;
-            (void) ContinueRefresh();
+            if (ContinueRefresh() != CHIP_NO_ERROR)
+            {
+                // Ignore errors in continuation from within the callback.
+            }
         }));
     }
     break;
@@ -555,7 +571,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
 
                 // Continue the state machine to let the kRefreshingGroupKeySets branch process mGroupKeySetList.
-                (void) ContinueRefresh();
+                if (ContinueRefresh() != CHIP_NO_ERROR)
+                {
+                    // Ignore errors in continuation from within the callback.
+                }
             }));
     }
     break;
@@ -707,7 +726,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
 
                 // Continue the state machine to let the kRefreshingACLs branch process mACLList.
-                (void) ContinueRefresh();
+                if (ContinueRefresh() != CHIP_NO_ERROR)
+                {
+                    // Ignore errors in continuation from within the callback.
+                }
             }));
     }
     break;

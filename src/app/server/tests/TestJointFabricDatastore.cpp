@@ -161,11 +161,12 @@ TEST(JointFabricDatastoreTest, RefreshNodeUpdatesExistingNode)
     DummyListener listener;
     DummyDelegate delegate;
 
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     store.AddListener(listener);
 
     // Add initial pending node
-    CHIP_ERROR err = store.AddPendingNode(123, CharSpan::fromCharString("controller-a"));
+    err = store.AddPendingNode(123, CharSpan::fromCharString("controller-a"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(listener.mNotified);
 
@@ -183,11 +184,12 @@ TEST(JointFabricDatastoreTest, RefreshNonExistentNodeFails)
     DummyListener listener;
     DummyDelegate delegate;
 
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     store.AddListener(listener);
 
     // Attempt to refresh a node that doesn't exist
-    CHIP_ERROR err = store.RefreshNode(999);
+    err = store.RefreshNode(999);
     EXPECT_NE(err, CHIP_NO_ERROR);
     EXPECT_FALSE(listener.mNotified);
 }
@@ -198,10 +200,11 @@ TEST(JointFabricDatastoreTest, UpdateNodeChangesNameAndNotifies)
     DummyListener listener;
     DummyDelegate delegate;
 
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     store.AddListener(listener);
 
-    CHIP_ERROR err = store.AddPendingNode(123, CharSpan::fromCharString("original-name"));
+    err = store.AddPendingNode(123, CharSpan::fromCharString("original-name"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     listener.Reset();
 
@@ -216,10 +219,11 @@ TEST(JointFabricDatastoreTest, RemoveNodeDeletesAndNotifies)
     DummyListener listener;
     DummyDelegate delegate;
 
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     store.AddListener(listener);
 
-    CHIP_ERROR err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     listener.Reset();
 
@@ -232,12 +236,13 @@ TEST(JointFabricDatastoreTest, AddGroupKeySetEntry)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type keySet;
     keySet.groupKeySetID = 1;
 
-    CHIP_ERROR err = store.AddGroupKeySetEntry(keySet);
+    err = store.AddGroupKeySetEntry(keySet);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -245,11 +250,12 @@ TEST(JointFabricDatastoreTest, RemoveGroupKeySetEntry)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type keySet;
     keySet.groupKeySetID = 1;
-    CHIP_ERROR err       = store.AddGroupKeySetEntry(keySet);
+    err                  = store.AddGroupKeySetEntry(keySet);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = store.RemoveGroupKeySetEntry(1);
@@ -260,12 +266,13 @@ TEST(JointFabricDatastoreTest, UpdateGroupKeySetEntry)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     GroupId groupId        = 1;
     uint16_t groupKeySetId = 1;
     NodeId nodeId          = 123;
-    CHIP_ERROR err         = store.TestAddNodeKeySetEntry(groupId, groupKeySetId, nodeId);
+    err                    = store.TestAddNodeKeySetEntry(groupId, groupKeySetId, nodeId);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type keySet;
@@ -281,12 +288,13 @@ TEST(JointFabricDatastoreTest, AddAndRemoveAdmin)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type admin;
     admin.nodeID = 100;
 
-    CHIP_ERROR err = store.AddAdmin(admin);
+    err = store.AddAdmin(admin);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = store.RemoveAdmin(100);
@@ -297,11 +305,12 @@ TEST(JointFabricDatastoreTest, UpdateAdmin)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type admin;
-    admin.nodeID   = 100;
-    CHIP_ERROR err = store.AddAdmin(admin);
+    admin.nodeID = 100;
+    err          = store.AddAdmin(admin);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     uint8_t icacData[] = { 0x01, 0x02 };
@@ -313,14 +322,15 @@ TEST(JointFabricDatastoreTest, RemoveGroupIDFromEndpoint)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EndpointId endpointId  = 1;
     GroupId groupId        = 10;
     uint16_t groupKeySetId = 1;
     NodeId nodeId          = 123;
 
-    CHIP_ERROR err = store.TestAddNodeKeySetEntry(groupId, groupKeySetId, nodeId);
+    err = store.TestAddNodeKeySetEntry(groupId, groupKeySetId, nodeId);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("test-endpoint"));
@@ -346,12 +356,13 @@ TEST(JointFabricDatastoreTest, AddGroup)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType commandData;
     // Note: You'll need to populate commandData fields based on the actual struct definition
 
-    CHIP_ERROR err = store.AddGroup(commandData);
+    err = store.AddGroup(commandData);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -359,10 +370,11 @@ TEST(JointFabricDatastoreTest, UpdateGroup)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addData;
-    CHIP_ERROR err = store.AddGroup(addData);
+    err = store.AddGroup(addData);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Commands::UpdateGroup::DecodableType updateData;
@@ -374,10 +386,11 @@ TEST(JointFabricDatastoreTest, RemoveGroup)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addData;
-    CHIP_ERROR err = store.AddGroup(addData);
+    err = store.AddGroup(addData);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Commands::RemoveGroup::DecodableType removeData;
@@ -389,12 +402,13 @@ TEST(JointFabricDatastoreTest, UpdateEndpointForNode)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     NodeId nodeId         = 123;
     EndpointId endpointId = 1;
 
-    CHIP_ERROR err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("initial-endpoint"));
@@ -408,9 +422,10 @@ TEST(JointFabricDatastoreTest, UpdateEndpointForNonExistentNodeFails)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    CHIP_ERROR err = store.UpdateEndpointForNode(999, 1, CharSpan::fromCharString("endpoint-name"));
+    err = store.UpdateEndpointForNode(999, 1, CharSpan::fromCharString("endpoint-name"));
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
@@ -418,12 +433,13 @@ TEST(JointFabricDatastoreTest, AddBindingToEndpointForNode)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     NodeId nodeId         = 123;
     EndpointId endpointId = 1;
 
-    CHIP_ERROR err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("test-endpoint"));
@@ -438,13 +454,14 @@ TEST(JointFabricDatastoreTest, RemoveBindingFromEndpointForNode)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     NodeId nodeId         = 123;
     EndpointId endpointId = 1;
     uint16_t listId       = 0;
 
-    CHIP_ERROR err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(nodeId, CharSpan::fromCharString("test-node"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = store.TestAddEndpointEntry(endpointId, nodeId, CharSpan::fromCharString("test-endpoint"));
@@ -462,9 +479,10 @@ TEST(JointFabricDatastoreTest, RemoveBindingFromNonExistentNodeFails)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    CHIP_ERROR err = store.RemoveBindingFromEndpointForNode(0, 999, 1);
+    err = store.RemoveBindingFromEndpointForNode(0, 999, 1);
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
@@ -472,9 +490,10 @@ TEST(JointFabricDatastoreTest, AddACLToNode)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    CHIP_ERROR err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
@@ -486,10 +505,11 @@ TEST(JointFabricDatastoreTest, AddACLToNonExistentNodeFails)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
-    CHIP_ERROR err = store.AddACLToNode(999, aclEntry);
+    err = store.AddACLToNode(999, aclEntry);
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
@@ -497,9 +517,10 @@ TEST(JointFabricDatastoreTest, RemoveACLFromNode)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    CHIP_ERROR err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
+    err = store.AddPendingNode(123, CharSpan::fromCharString("test-node"));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
@@ -514,9 +535,10 @@ TEST(JointFabricDatastoreTest, RemoveACLFromNonExistentNodeFails)
 {
     JointFabricDatastore store;
     DummyDelegate delegate;
-    TEMPORARY_RETURN_IGNORED(store.SetDelegate(&delegate));
+    CHIP_ERROR err = store.SetDelegate(&delegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    CHIP_ERROR err = store.RemoveACLFromNode(0, 999);
+    err = store.RemoveACLFromNode(0, 999);
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
