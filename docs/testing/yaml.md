@@ -444,10 +444,22 @@ CI:
 ```
 
 Application names are supported placeholders that will be replaced with the full
-application path. Example supported applications (see `test_definition.py` for
-a full list): - `all-clusters` - `bridge` - `closure` - `energy-gateway` -
-`energy-management` - `fabric-sync` - `lit-icd` - `lock` - `microwave-oven` -
-`network-manager` - `ota-requestor` - `rvc` - `tv`
+application path. Example supported applications (see `test_definition.py` for a
+full list):
+
+-   `all-clusters`
+-   `bridge`
+-   `closure`
+-   `energy-gateway`
+-   `energy-management`
+-   `fabric-sync`
+-   `lit-icd`
+-   `lock`
+-   `microwave-oven`
+-   `network-manager`
+-   `ota-requestor`
+-   `rvc`
+-   `tv`
 
 ### Running in the TH
 
