@@ -39,12 +39,15 @@ import logging
 
 from mobly import asserts
 
-import matter.clusters as Clusters
 from matter.clusters import ClusterObjects
+import matter.clusters as Clusters
 from matter.testing import matter_asserts
+from matter.testing.conformance import is_provisional
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main, TestStep
+from matter.testing.spec_parsing import build_xml_clusters, PrebuiltDataModelDirectory
+from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
@@ -65,50 +68,60 @@ class TC_DISHALM_2_1(MatterBaseTest):
             TestStep(2, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(6, "Validate that alarm attributes are within the defined set",
-                     "Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
+            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value. Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
         ]
 
     def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = False) -> int:
         """
         Get the valid alarm bitmap mask from the DishwasherAlarm cluster specification.
 
-        According to Matter spec (Dishwasher Alarm cluster 0x005D), the AlarmBitmap defines:
-        - Bit 0 (0x01): InflowError
-        - Bit 1 (0x02): DrainError
-        - Bit 2 (0x04): DoorError
-        - Bit 3 (0x08): TempTooLow
-        - Bit 4 (0x10): TempTooHigh
-        - Bit 5 (0x20): WaterLevelError
+        This method reads the AlarmBitmap definition from the data model XML files to
+        determine which bits are valid and which are provisional.
 
         Args:
             allow_provisional: If True, include provisional alarm bits (for testing/verification)
 
         Returns:
-            Bitmask with all valid alarm bits set
+            Bitmask with all valid alarm bits set (excluding provisional if allow_provisional is False)
         """
-        # Standard alarms defined in Matter 1.x specification
-        alarm_bitmap = self.cluster.Bitmaps.AlarmBitmap
+        # Get cluster ID for DishwasherAlarm (0x005D)
+        dishwasher_alarm_cluster_id = uint(Clusters.DishwasherAlarm.id)
 
-        STANDARD_ALARMS = (
-            alarm_bitmap.kInflowError |   # Bit 0: InflowError
-            alarm_bitmap.kDrainError |    # Bit 1: DrainError
-            alarm_bitmap.kDoorError |     # Bit 2: DoorError
-            alarm_bitmap.kTempTooLow |    # Bit 3: TempTooLow
-            alarm_bitmap.kTempTooHigh |   # Bit 4: TempTooHigh
-            alarm_bitmap.kWaterLevelError  # Bit 5: WaterLevelError
-        )
+        # Build XML clusters from the latest data model
+        xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
 
-        # Provisional alarms (future spec versions, certification testing)
-        PROVISIONAL_ALARMS = 0x00000000  # No provisional alarms currently defined
+        # Get the DishwasherAlarm cluster from parsed XML
+        asserts.assert_in(dishwasher_alarm_cluster_id, xml_clusters,
+                          f"DishwasherAlarm cluster (0x{dishwasher_alarm_cluster_id:04X}) not found in data model XML")
+        xml_cluster = xml_clusters[dishwasher_alarm_cluster_id]
 
-        valid_mask = STANDARD_ALARMS
-        if allow_provisional:
-            valid_mask |= PROVISIONAL_ALARMS
+        # Get the AlarmBitmap from the cluster's bitmaps
+        asserts.assert_in("AlarmBitmap", xml_cluster.bitmaps,
+                          "AlarmBitmap not found in DishwasherAlarm cluster bitmaps")
+        alarm_bitmap = xml_cluster.bitmaps["AlarmBitmap"]
 
-        logger.info(f"Valid alarm bitmap mask:  0x{valid_mask:08X} (allow_provisional={allow_provisional})")
-        return valid_mask
+        mask = 0
+        provisional_bits = []
+        non_provisional_bits = []
+
+        # Iterate through all bitmap components (bitfields) and build the mask
+        for bit_value, component in alarm_bitmap.components.items():
+            bit_mask = 1 << bit_value
+            if is_provisional(component.conformance):
+                provisional_bits.append(component.name)
+                if allow_provisional:
+                    mask |= bit_mask
+            else:
+                non_provisional_bits.append(component.name)
+                mask |= bit_mask
+
+        logger.info(f"Non-provisional alarm bits: {non_provisional_bits}")
+        logger.info(f"Provisional alarm bits: {provisional_bits}")
+        logger.info(f"Valid alarm bitmap mask: 0x{mask:08X} (allow_provisional={allow_provisional})")
+
+        asserts.assert_true(mask != 0, "No valid alarm bits found in AlarmBitmap specification")
+
+        return mask
 
     def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
                                valid_mask: int, supported_value: int = None):
@@ -142,7 +155,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
             unsupported_bits = bitmap_value & ~supported_value
             if unsupported_bits != 0:
                 asserts_fail_msg = (
-                    f"{attribute_name} attribute contains bits not present in Supported attribute."
+                    f"{attribute_name} attribute contains bits not present in Supported attribute. "
                     f"Value: 0x{bitmap_value:08X}, Supported: 0x{supported_value:08X}, "
                     f"Unsupported bits: 0x{unsupported_bits:08X}"
                 )
@@ -150,25 +163,25 @@ class TC_DISHALM_2_1(MatterBaseTest):
 
         logger.info(f"{attribute_name} bitmap validation passed: 0x{bitmap_value:08X}")
 
-    async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: ClusterObjects.ClusterAttributeDescriptor):
+    async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> int:
         resp = await self.read_single_attribute_check_success(
             cluster=self.cluster,
             attribute=attribute
         )
 
-        matter_asserts.assert_valid_uint32(resp, str(attribute))
+        matter_asserts.assert_valid_uint32(resp, attribute.__name__)
 
         logger.info(f"Reading attribute: {attribute}, response: {resp}")
-        return resp
+        return int(resp)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))
+    @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))  # type: ignore[arg-type]
     async def test_TC_DISHALM_2_1(self):
 
         self.cluster = Clusters.DishwasherAlarm
         self.endpoint = self.get_endpoint()
 
         # Get test parameter for allowing provisional alarms (default: False for certification)
-        allow_provisional = self.user_params.get("allow_provisional", False)
+        allow_provisional = self.user_params.get("allow_provisional_alarms", False)
         logger.info(f"Test running with allow_provisional={allow_provisional}")
 
         self.step(1)
@@ -191,7 +204,6 @@ class TC_DISHALM_2_1(MatterBaseTest):
         supported_attribute = Clusters.DishwasherAlarm.Attributes.Supported
         supported_value = await self.read_and_check_attributes_from_dishwasher_alarm(supported_attribute)
 
-        self.step(6)
         valid_mask = self._get_valid_alarm_bitmap_mask(allow_provisional)
 
         # Validate Supported attribute contains only spec-defined bits
