@@ -25,9 +25,7 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <app/server/Server.h>
 #include <credentials/CHIPCert.h>
-#include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TimeUtils.h>
@@ -56,10 +54,12 @@ CHIP_ERROR GenerateTestCertificate(MutableByteSpan & certSpan)
     ReturnErrorOnFailure(keypair.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     // Set up certificate parameters with valid dates
-    // Using timestamps from 2020 to 2060 which should cover test execution time
-    // These are CHIP epoch timestamps (seconds since 2000-01-01 00:00:00 UTC)
-    uint32_t validityStart = 631152000;  // 2020-01-01 00:00:00 UTC
-    uint32_t validityEnd   = 1893456000; // 2060-01-01 00:00:00 UTC
+    // validityStart = 1: Just after CHIP epoch (2000-01-01 00:00:01 UTC) - always in the past
+    //                    Note: 0 is special (kNullCertTime) and maps to 9999-12-31, which would fail
+    // validityEnd = 0:   kNullCertTime maps to 9999-12-31 23:59:59 UTC - always in the future
+    // This ensures the certificate passes IsCertificateValidAtCurrentTime regardless of system time
+    uint32_t validityStart = 1;
+    uint32_t validityEnd   = kNullCertTime;
 
     ChipDN subjectDN;
     ReturnErrorOnFailure(subjectDN.AddAttribute_MatterRCACId(0x1234ABCD));
@@ -456,7 +456,6 @@ struct TestTlsCertificateManagementCluster : public ::testing::Test
 
     void SetUp() override
     {
-        Server::GetInstance().GetFabricTable().Reset();
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
 
@@ -537,12 +536,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestProvisionRootCertificateSuccess)
     uint8_t certBuffer[Credentials::kMaxDERCertLength];
     MutableByteSpan certSpan(certBuffer);
     CHIP_ERROR certGenErr = GenerateTestCertificate(certSpan);
-    EXPECT_EQ(certGenErr, CHIP_NO_ERROR);
-    if (certGenErr != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to generate test certificate: %" CHIP_ERROR_FORMAT, certGenErr.Format());
-        return;
-    }
+    ASSERT_EQ(certGenErr, CHIP_NO_ERROR);
     EXPECT_GT(certSpan.size(), 0u);
     ChipLogProgress(Zcl, "Generated certificate of size %u", static_cast<unsigned>(certSpan.size()));
 
@@ -550,6 +544,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestProvisionRootCertificateSuccess)
     request.certificate = certSpan;
 
     auto result = mClusterTester.Invoke<Commands::ProvisionRootCertificate::Type>(request);
+    EXPECT_TRUE(result.IsSuccess());
     if (!result.IsSuccess())
     {
         if (result.status.has_value())
@@ -562,7 +557,6 @@ TEST_F(TestTlsCertificateManagementCluster, TestProvisionRootCertificateSuccess)
             ChipLogError(Zcl, "ProvisionRootCertificate failed with no status code");
         }
     }
-    EXPECT_TRUE(result.IsSuccess());
 
     if (result.response.has_value())
     {
@@ -593,10 +587,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestFindRootCertificateSuccess)
     ASSERT_TRUE(provisionResult.response.has_value());
 
     TLSCAID provisionedId = 0;
-    if (provisionResult.response.has_value())
-    {
-        provisionedId = provisionResult.response.value().caid;
-    }
+    provisionedId         = provisionResult.response.value().caid;
 
     // Now find it
     Commands::FindRootCertificate::Type findReq;
@@ -643,10 +634,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestRemoveRootCertificateSuccess)
     ASSERT_TRUE(provisionResult.response.has_value());
 
     TLSCAID provisionedId = 0;
-    if (provisionResult.response.has_value())
-    {
-        provisionedId = provisionResult.response.value().caid;
-    }
+    provisionedId         = provisionResult.response.value().caid;
 
     EXPECT_EQ(mMockDelegate.rootCerts.size(), 1u);
 

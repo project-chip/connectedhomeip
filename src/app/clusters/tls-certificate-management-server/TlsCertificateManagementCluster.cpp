@@ -77,9 +77,6 @@ TlsCertificateManagementCluster::~TlsCertificateManagementCluster()
 {
     // null out the ref to us on the delegate
     mDelegate.SetTlsCertificateManagementCluster(nullptr);
-
-    mCertificateTable.Finish();
-    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 }
 
 CHIP_ERROR TlsCertificateManagementCluster::Startup(ServerClusterContext & context)
@@ -106,8 +103,6 @@ void TlsCertificateManagementCluster::Shutdown(ClusterShutdownType shutdownType)
 DataModel::ActionReturnStatus TlsCertificateManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & encoder)
 {
-    VerifyOrDie(request.path.mClusterId == TlsCertificateManagement::Id);
-
     TlsCertificateManagementCluster * server = this;
     auto matterEndpoint                      = request.path.mEndpointId;
     auto fabric                              = request.GetAccessingFabricIndex();
@@ -179,9 +174,6 @@ std::optional<DataModel::ActionReturnStatus>
 TlsCertificateManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                CommandHandler * handler)
 {
-    VerifyOrDie(handler != nullptr);
-    VerifyOrDie(request.path.mClusterId == TlsCertificateManagement::Id);
-
     FabricIndex accessingFabricIndex = handler->GetAccessingFabricIndex();
 
     switch (request.path.mCommandId)
@@ -251,41 +243,27 @@ TlsCertificateManagementCluster::HandleProvisionRootCertificate(CommandHandler &
         return CHIP_NO_ERROR;
     });
 
-    if (lookupResult != CHIP_ERROR_NOT_FOUND)
-    {
-        return Status::AlreadyExists;
-    }
+    VerifyOrReturnError(lookupResult == CHIP_ERROR_NOT_FOUND, Status::AlreadyExists);
 
     if (req.caid.IsNull())
     {
         uint8_t numRootCerts;
-        if (mCertificateTable.GetRootCertificateCount(fabric, numRootCerts) != CHIP_NO_ERROR)
-        {
-            return Status::Failure;
-        }
-        if (numRootCerts >= mMaxRootCertificates)
-        {
-            return Status::ResourceExhausted;
-        }
+        VerifyOrReturnError(mCertificateTable.GetRootCertificateCount(fabric, numRootCerts) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(numRootCerts < mMaxRootCertificates, Status::ResourceExhausted);
     }
     else
     {
         auto caid = req.caid.Value();
-        if (caid > kMaxRootCertId)
-        {
-            return Status::ConstraintError;
-        }
-
-        if (mCertificateTable.HasRootCertificateEntry(fabric, caid) != CHIP_NO_ERROR)
-        {
-            return Status::NotFound;
-        }
+        VerifyOrReturnError(caid <= kMaxRootCertId, Status::ConstraintError);
+        VerifyOrReturnError(mCertificateTable.HasRootCertificateEntry(fabric, caid) == CHIP_NO_ERROR, Status::NotFound);
     }
 
+#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
     if (Crypto::IsCertificateValidAtCurrentTime(req.certificate) != CHIP_NO_ERROR)
     {
         return Status::DynamicConstraintError;
     }
+#endif
 
     ProvisionRootCertificateResponse::Type response;
     auto status = mDelegate.ProvisionRootCert(mPath.mEndpointId, fabric, req, response.caid);
@@ -294,7 +272,7 @@ TlsCertificateManagementCluster::HandleProvisionRootCertificate(CommandHandler &
         return status;
     }
 
-    VerifyOrDieWithMsg(response.caid <= kMaxRootCertId, NotSpecified, "Spec requires CAID to be < kMaxRootCertId");
+    VerifyOrDieWithMsg(response.caid <= kMaxRootCertId, NotSpecified, "Spec requires CAID to be <= kMaxRootCertId");
 
     ConcreteCommandPath responsePath(mPath.mEndpointId, TlsCertificateManagement::Id, Commands::ProvisionRootCertificate::Id);
     commandHandler.AddResponse(responsePath, response);
@@ -328,10 +306,7 @@ TlsCertificateManagementCluster::HandleFindRootCertificate(CommandHandler & comm
     }
     else
     {
-        if (req.caid.Value() > kMaxRootCertId)
-        {
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError(req.caid.Value() <= kMaxRootCertId, Status::ConstraintError);
 
         result = mDelegate.FindRootCert(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.caid.Value(),
                                         [&](auto & certificate) -> CHIP_ERROR {
@@ -344,14 +319,13 @@ TlsCertificateManagementCluster::HandleFindRootCertificate(CommandHandler & comm
                                             return CHIP_NO_ERROR;
                                         });
     }
+
     if (result == CHIP_ERROR_NOT_FOUND)
     {
         return Status::NotFound;
     }
-    if (result != CHIP_NO_ERROR)
-    {
-        return Status::Failure;
-    }
+
+    VerifyOrReturnError(result == CHIP_NO_ERROR, Status::Failure);
     return std::nullopt;
 }
 
@@ -360,10 +334,8 @@ TlsCertificateManagementCluster::HandleLookupRootCertificate(CommandHandler & co
                                                              const LookupRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupRootCertificate");
-    if (req.fingerprint.size() > kSpecMaxFingerprintBytes)
-    {
-        return Status::ConstraintError;
-    }
+
+    VerifyOrReturnError(req.fingerprint.size() <= kSpecMaxFingerprintBytes, Status::ConstraintError);
 
     auto result = mDelegate.LookupRootCertByFingerprint(
         mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
@@ -373,14 +345,13 @@ TlsCertificateManagementCluster::HandleLookupRootCertificate(CommandHandler & co
             commandHandler.AddResponse(responsePath, response);
             return CHIP_NO_ERROR;
         });
+
     if (result == CHIP_ERROR_NOT_FOUND)
     {
         return Status::NotFound;
     }
-    if (result != CHIP_NO_ERROR)
-    {
-        return Status::Failure;
-    }
+
+    VerifyOrReturnError(result == CHIP_NO_ERROR, Status::Failure);
     return std::nullopt;
 }
 
@@ -390,16 +361,10 @@ TlsCertificateManagementCluster::HandleRemoveRootCertificate(CommandHandler & co
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveRootCertificate");
 
-    if (req.caid > kMaxRootCertId)
-    {
-        return Status::ConstraintError;
-    }
-
-    if (mDependencyChecker.RootCertCanBeRemoved(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.caid) !=
-        CHIP_NO_ERROR)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(req.caid <= kMaxRootCertId, Status::ConstraintError);
+    VerifyOrReturnError(mDependencyChecker.RootCertCanBeRemoved(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(),
+                                                                req.caid) == CHIP_NO_ERROR,
+                        Status::InvalidInState);
 
     auto status = mDelegate.RemoveRootCert(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.caid);
 
@@ -416,10 +381,7 @@ TlsCertificateManagementCluster::HandleGenerateClientCsr(CommandHandler & comman
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ClientCSR");
 
-    if (req.nonce.size() != kNonceBytes)
-    {
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError(req.nonce.size() == kNonceBytes, Status::ConstraintError);
 
     auto fabric = commandHandler.GetAccessingFabricIndex();
 
@@ -427,14 +389,8 @@ TlsCertificateManagementCluster::HandleGenerateClientCsr(CommandHandler & comman
     if (req.ccdid.IsNull())
     {
         uint8_t numClientCerts;
-        if (mCertificateTable.GetClientCertificateCount(fabric, numClientCerts) != CHIP_NO_ERROR)
-        {
-            return Status::Failure;
-        }
-        if (numClientCerts >= mMaxClientCertificates)
-        {
-            return Status::ResourceExhausted;
-        }
+        VerifyOrReturnError(mCertificateTable.GetClientCertificateCount(fabric, numClientCerts) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(numClientCerts < mMaxClientCertificates, Status::ResourceExhausted);
     }
 
     auto status = mDelegate.GenerateClientCsr(mPath.mEndpointId, fabric, req, [&](auto & response) -> Status {
@@ -461,51 +417,28 @@ TlsCertificateManagementCluster::HandleProvisionClientCertificate(CommandHandler
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: ProvisionClientCertificate");
 
-    if (req.ccdid > kMaxClientCertId)
-    {
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError(req.ccdid <= kMaxClientCertId, Status::ConstraintError);
+    VerifyOrReturnError(req.clientCertificate.size() <= kSpecMaxCertBytes, Status::ConstraintError);
 
-    if (req.clientCertificate.size() > kSpecMaxCertBytes)
-    {
-        return Status::ConstraintError;
-    }
-
+#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
     if (Crypto::IsCertificateValidAtCurrentTime(req.clientCertificate) != CHIP_NO_ERROR)
     {
         return Status::DynamicConstraintError;
     }
+#endif
 
     size_t intermediateSize;
-    if (req.intermediateCertificates.ComputeSize(&intermediateSize) != CHIP_NO_ERROR)
-    {
-        return Status::InvalidCommand;
-    }
-
-    if (intermediateSize > kMaxIntermediateCertificates)
-    {
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError(req.intermediateCertificates.ComputeSize(&intermediateSize) == CHIP_NO_ERROR, Status::InvalidCommand);
+    VerifyOrReturnError(intermediateSize <= kMaxIntermediateCertificates, Status::ConstraintError);
 
     auto srcIter = req.intermediateCertificates.begin();
     while (srcIter.Next())
     {
         auto & cert = srcIter.GetValue();
-        if (cert.size() > kSpecMaxCertBytes)
-        {
-            return Status::ConstraintError;
-        }
-
-        if (Crypto::IsCertificateValidAtCurrentTime(cert) != CHIP_NO_ERROR)
-        {
-            return Status::DynamicConstraintError;
-        }
+        VerifyOrReturnError(cert.size() <= kSpecMaxCertBytes, Status::ConstraintError);
+        VerifyOrReturnError(Crypto::IsCertificateValidAtCurrentTime(cert) == CHIP_NO_ERROR, Status::DynamicConstraintError);
     }
-
-    if (srcIter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return Status::InvalidAction;
-    }
+    VerifyOrReturnError(srcIter.GetStatus() == CHIP_NO_ERROR, Status::InvalidAction);
 
     auto fabric = commandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCCDID> foundId;
@@ -515,15 +448,8 @@ TlsCertificateManagementCluster::HandleProvisionClientCertificate(CommandHandler
             return CHIP_NO_ERROR;
         });
 
-    if (lookupResult != CHIP_ERROR_NOT_FOUND)
-    {
-        return Status::AlreadyExists;
-    }
-
-    if (mCertificateTable.HasClientCertificateEntry(fabric, req.ccdid) != CHIP_NO_ERROR)
-    {
-        return Status::NotFound;
-    }
+    VerifyOrReturnError(lookupResult == CHIP_ERROR_NOT_FOUND, Status::AlreadyExists);
+    VerifyOrReturnError(mCertificateTable.HasClientCertificateEntry(fabric, req.ccdid) == CHIP_NO_ERROR, Status::NotFound);
 
     auto status = mDelegate.ProvisionClientCert(mPath.mEndpointId, fabric, req);
 
@@ -545,10 +471,7 @@ TlsCertificateManagementCluster::HandleFindClientCertificate(CommandHandler & co
     {
         result = mDelegate.ClientCertsForFabric(
             mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), [&](auto & certs) -> CHIP_ERROR {
-                if (certs.size() == 0)
-                {
-                    return CHIP_ERROR_NOT_FOUND;
-                }
+                VerifyOrReturnError(certs.size() > 0, CHIP_ERROR_NOT_FOUND);
                 FindClientCertificateResponse::Type response;
                 response.certificateDetails = certs;
                 ConcreteCommandPath responsePath(mPath.mEndpointId, TlsCertificateManagement::Id,
@@ -559,10 +482,7 @@ TlsCertificateManagementCluster::HandleFindClientCertificate(CommandHandler & co
     }
     else
     {
-        if (req.ccdid.Value() > kMaxClientCertId)
-        {
-            return Status::ConstraintError;
-        }
+        VerifyOrReturnError(req.ccdid.Value() <= kMaxClientCertId, Status::ConstraintError);
 
         result = mDelegate.FindClientCert(
             mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.ccdid.Value(), [&](auto & certificate) -> CHIP_ERROR {
@@ -575,16 +495,13 @@ TlsCertificateManagementCluster::HandleFindClientCertificate(CommandHandler & co
                 return CHIP_NO_ERROR;
             });
     }
+
     if (result == CHIP_ERROR_NOT_FOUND)
     {
         return Status::NotFound;
     }
 
-    if (result != CHIP_NO_ERROR)
-    {
-        return Status::Failure;
-    }
-
+    VerifyOrReturnError(result == CHIP_NO_ERROR, Status::Failure);
     return std::nullopt;
 }
 
@@ -594,10 +511,7 @@ TlsCertificateManagementCluster::HandleLookupClientCertificate(CommandHandler & 
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupClientCertificate");
 
-    if (req.fingerprint.size() > kSpecMaxFingerprintBytes)
-    {
-        return Status::ConstraintError;
-    }
+    VerifyOrReturnError(req.fingerprint.size() <= kSpecMaxFingerprintBytes, Status::ConstraintError);
 
     auto result = mDelegate.LookupClientCertByFingerprint(
         mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
@@ -608,16 +522,13 @@ TlsCertificateManagementCluster::HandleLookupClientCertificate(CommandHandler & 
             commandHandler.AddResponse(responsePath, response);
             return CHIP_NO_ERROR;
         });
+
     if (result == CHIP_ERROR_NOT_FOUND)
     {
         return Status::NotFound;
     }
 
-    if (result != CHIP_NO_ERROR)
-    {
-        return Status::Failure;
-    }
-
+    VerifyOrReturnError(result == CHIP_NO_ERROR, Status::Failure);
     return std::nullopt;
 }
 
@@ -627,16 +538,10 @@ TlsCertificateManagementCluster::HandleRemoveClientCertificate(CommandHandler & 
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveClientCertificate");
 
-    if (req.ccdid > kMaxClientCertId)
-    {
-        return Status::ConstraintError;
-    }
-
-    if (mDependencyChecker.ClientCertCanBeRemoved(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.ccdid) !=
-        CHIP_NO_ERROR)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(req.ccdid <= kMaxClientCertId, Status::ConstraintError);
+    VerifyOrReturnError(mDependencyChecker.ClientCertCanBeRemoved(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(),
+                                                                  req.ccdid) == CHIP_NO_ERROR,
+                        Status::InvalidInState);
 
     auto status = mDelegate.RemoveClientCert(mPath.mEndpointId, commandHandler.GetAccessingFabricIndex(), req.ccdid);
 

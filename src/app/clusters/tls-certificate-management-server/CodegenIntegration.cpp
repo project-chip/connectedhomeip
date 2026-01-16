@@ -86,8 +86,7 @@ void MatterTlsCertificateManagementClusterInitCallback(EndpointId endpointId)
     // Only create once - avoid double initialization if callback is called multiple times
     if (gClusterInstance.IsConstructed())
     {
-        ChipLogError(Zcl,
-                     "TLS Certificate Management Cluster already initialized on endpoint 0. Ignoring duplicate initialization.");
+        ChipLogError(Zcl, "TLS Certificate Management Cluster already initialized. Ignoring duplicate initialization.");
         return;
     }
 
