@@ -77,6 +77,9 @@ TlsCertificateManagementCluster::~TlsCertificateManagementCluster()
 {
     // null out the ref to us on the delegate
     mDelegate.SetTlsCertificateManagementCluster(nullptr);
+
+    mCertificateTable.Finish();
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 }
 
 CHIP_ERROR TlsCertificateManagementCluster::Startup(ServerClusterContext & context)
@@ -92,9 +95,6 @@ CHIP_ERROR TlsCertificateManagementCluster::Startup(ServerClusterContext & conte
 void TlsCertificateManagementCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     ChipLogProgress(DataManagement, "TlsCertificateManagementCluster: shutdown");
-
-    mCertificateTable.Finish();
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 
     DefaultServerCluster::Shutdown(shutdownType);
 }
