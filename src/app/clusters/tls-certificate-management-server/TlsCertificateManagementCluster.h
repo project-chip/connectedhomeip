@@ -67,7 +67,7 @@ public:
     /**
      * @return The endpoint ID.
      */
-    EndpointId GetEndpointId() { return mPath.mEndpointId; }
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     Tls::CertificateTable & GetCertificateTable() { return mCertificateTable; }
 
