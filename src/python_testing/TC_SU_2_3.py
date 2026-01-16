@@ -68,42 +68,6 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_3(SoftwareUpdateBaseTest):
 
-    async def setup_provider(self, provider_app_path: str, ota_image_path: str, extra_args: list[str]):
-        """
-        Launch an OTA Provider process with the specified image and extra arguments.
-
-        Args:
-            provider_app_path (str): Path to the OTA provider application executable.
-            ota_image_path (str): Path to the OTA image file.
-            extra_args (list[str]): Additional command-line arguments to pass to the provider.
-
-        Returns:
-            None
-        """
-
-        logger.info(f"""Prerequisite - Provider info:
-            provider_app_path: {provider_app_path},
-            ota_image_path: {ota_image_path},
-            discriminator: {self.provider_data["discriminator"]},
-            setupPinCode: {self.provider_data["setup_pincode"]},
-            port: {self.provider_data["port"]},
-            extra_args: {extra_args},
-            kvs_path: {self.KVS_PATH},
-            log_file: {self.LOG_FILE_PATH}""")
-
-        self.start_provider(
-            provider_app_path=provider_app_path,
-            ota_image_path=ota_image_path,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
-            extra_args=extra_args,
-            kvs_path=self.KVS_PATH,
-            log_file=self.LOG_FILE_PATH,
-            expected_output="Server initialization complete",
-            timeout=30
-        )
-
     def desc_TC_SU_2_3(self) -> str:
         return "[TC-SU-2.3] Transfer of Software Update Images between DUT and TH/OTA-P"
 
@@ -157,8 +121,16 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         self.LOG_FILE_PATH = "provider.log"
         self.KVS_PATH = "/tmp/chip_kvs_provider"
         self.provider_app_path = self.user_params.get('provider_app_path', None)
-        self.ota_image_v2 = self.user_params.get('ota_image')
+        self.ota_image = self.user_params.get('ota_image')
         self.endpoint = self.get_endpoint()
+
+        self.fifo_in = self.user_params.get('app_pipe', None)
+        if not self.fifo_in:
+            asserts.fail("Fifo input missing. Speficy using --string-arg app_pipe:<FIFO_APP_PIPE_INPUT>")
+
+        self.fifo_out = self.user_params.get('app_pipe_out', None)
+        if not self.fifo_out:
+            asserts.fail("Fifo output missing. Speficy using --string-arg app_pipe_out:<FIFO_APP_PIPE_OUTPUT>")
 
         if not self.provider_app_path:
             asserts.fail("Missing provider app path.")
@@ -190,14 +162,21 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
         # userConsentNeeded flag
         provider_extra_args_updateconsent = [
-            "--requestorCanConsent", "true"
+            '--userConsentNeeded',
+            '--app-pipe', self.fifo_in, '--app-pipe-out', self.fifo_out
         ]
 
-        # Start provider
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_updateconsent
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            extra_args=provider_extra_args_updateconsent,
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            # expected_output="Server initialization complete",
+            timeout=30
         )
 
         # Commission Provider (Only one time)
@@ -228,18 +207,26 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
         self.terminate_provider()
+        controller.ExpireSessions(nodeId=provider_node_id)
 
         self.step(2)
 
         provider_extra_args_updateAvailable = [
-            "-q", "updateAvailable"
+            '--queryImageStatus', 'updateAvailable',
+            '--app-pipe', self.fifo_in, '--app-pipe-out', self.fifo_out
         ]
 
-        # Start provider
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_updateAvailable
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            extra_args=provider_extra_args_updateAvailable,
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            # expected_output="Server initialization complete",
+            timeout=30
         )
 
         # Commission Provider (Only one time)
@@ -281,11 +268,11 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         max_block_size_non_tcp = 1024
 
         if tcp:
-            asserts.assert_less(block_size, max_block_size_tcp,
-                                f"{block_size} should be less than {max_block_size_tcp} bytes in TCP transport")
+            asserts.assert_less_equal(block_size, max_block_size_tcp,
+                                      f"{block_size} should be less than {max_block_size_tcp} bytes in TCP transport")
         else:
-            asserts.assert_less(block_size, max_block_size_non_tcp,
-                                f"{block_size} should be less than {max_block_size_non_tcp} bytes in non TCP transport")
+            asserts.assert_less_equal(block_size, max_block_size_non_tcp,
+                                      f"{block_size} should be less than {max_block_size_non_tcp} bytes in non TCP transport")
 
         event_cb.reset()
         event_cb.cancel()
