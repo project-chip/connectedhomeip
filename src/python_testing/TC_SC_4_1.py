@@ -622,7 +622,8 @@ class TC_SC_4_1(MatterBaseTest):
             ph_val = int(ph_key)
             mandatory_pi_bits = [4, 8, 10, 12, 15, 17, 19, 20, 21, 22]
             if any((ph_val & (1 << bit)) for bit in mandatory_pi_bits):
-                asserts.assert_in('PI', txt_record.txt, "'PI' key must be present if any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set in 'PH' key.")
+                asserts.assert_in(
+                    'PI', txt_record.txt, "'PI' key must be present if any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set in 'PH' key.")
 
         # *** PI KEY ***
         # If the PI key is present
