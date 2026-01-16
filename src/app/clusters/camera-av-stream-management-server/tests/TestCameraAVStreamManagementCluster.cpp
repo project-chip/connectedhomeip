@@ -71,8 +71,8 @@ static std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoin
 static std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities()
 {
     static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {
-        { { 640, 480 }, 30, ImageCodecEnum::kJpeg, false, chip::MakeOptional(static_cast<bool>(false)) },
-        { { 1280, 720 }, 30, ImageCodecEnum::kJpeg, true, chip::MakeOptional(static_cast<bool>(true)) },
+        { { 640, 480 }, 30, ImageCodecEnum::kJpeg, false, chip::MakeOptional(false) },
+        { { 1280, 720 }, 30, ImageCodecEnum::kJpeg, true, chip::MakeOptional(true) },
     };
     return snapshotCapabilities;
 }
@@ -97,16 +97,8 @@ public:
 
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
-        bool codecSupported = false;
-        for (const auto & tradeOffPoint : GetRateDistortionTradeOffPoints())
-        {
-            if (tradeOffPoint.codec == allocateArgs.videoCodec)
-            {
-                codecSupported = true;
-                break;
-            }
-        }
-        if (!codecSupported)
+        if (!std::any_of(GetRateDistortionTradeOffPoints().begin(), GetRateDistortionTradeOffPoints().end(),
+                         [&](const auto & tradeOffPoint) { return tradeOffPoint.codec == allocateArgs.videoCodec; }))
         {
             return Protocols::InteractionModel::Status::DynamicConstraintError;
         }
@@ -145,44 +137,20 @@ public:
 
         auto & audioCapabilities = GetAudioCapabilities();
 
-        bool codecSupported = false;
-        for (auto & codec : audioCapabilities.supportedCodecs)
-        {
-            if (codec == allocateArgs.audioCodec)
-            {
-                codecSupported = true;
-                break;
-            }
-        }
-        if (!codecSupported)
+        if (!std::any_of(audioCapabilities.supportedCodecs.begin(), audioCapabilities.supportedCodecs.end(),
+                         [&](const auto & codec) { return codec == allocateArgs.audioCodec; }))
         {
             return Protocols::InteractionModel::Status::DynamicConstraintError;
         }
 
-        bool sampleRateSupported = false;
-        for (auto & sampleRate : audioCapabilities.supportedSampleRates)
-        {
-            if (sampleRate == allocateArgs.sampleRate)
-            {
-                sampleRateSupported = true;
-                break;
-            }
-        }
-        if (!sampleRateSupported)
+        if (!std::any_of(audioCapabilities.supportedSampleRates.begin(), audioCapabilities.supportedSampleRates.end(),
+                         [&](const auto & sampleRate) { return sampleRate == allocateArgs.sampleRate; }))
         {
             return Protocols::InteractionModel::Status::DynamicConstraintError;
         }
 
-        bool bitDepthSupported = false;
-        for (auto & bitDepth : audioCapabilities.supportedBitDepths)
-        {
-            if (bitDepth == allocateArgs.bitDepth)
-            {
-                bitDepthSupported = true;
-                break;
-            }
-        }
-        if (!bitDepthSupported)
+        if (!std::any_of(audioCapabilities.supportedBitDepths.begin(), audioCapabilities.supportedBitDepths.end(),
+                         [&](const auto & bitDepth) { return bitDepth == allocateArgs.bitDepth; }))
         {
             return Protocols::InteractionModel::Status::DynamicConstraintError;
         }
@@ -201,22 +169,15 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                uint16_t & outStreamID) override
+
     {
         if (mSnapshotStreamCount >= 1)
         {
             return Protocols::InteractionModel::Status::ResourceExhausted;
         }
 
-        bool codecSupported = false;
-        for (const auto & capability : GetSnapshotCapabilities())
-        {
-            if (capability.imageCodec == allocateArgs.imageCodec)
-            {
-                codecSupported = true;
-                break;
-            }
-        }
-        if (!codecSupported)
+        if (!std::any_of(GetSnapshotCapabilities().begin(), GetSnapshotCapabilities().end(),
+                         [&](const auto & capability) { return capability.imageCodec == allocateArgs.imageCodec; }))
         {
             return Protocols::InteractionModel::Status::DynamicConstraintError;
         }
@@ -826,9 +787,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteSpeakerVolumeLevel)
     EXPECT_EQ(speakerVolumeLevel, maxLevel);
 
     // Test out of bounds
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) (minLevel - 1)),
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) (0)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) (maxLevel + 1)),
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) (255)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SpeakerVolumeLevel::Id, (uint8_t) 1), CHIP_NO_ERROR); // Restore default
@@ -887,9 +848,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteMicrophoneVolumeLevel)
     EXPECT_EQ(microphoneVolumeLevel, maxLevel);
 
     // Test out of bounds
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) (minLevel - 1)),
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) (0)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) (maxLevel + 1)),
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) (255)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::MicrophoneVolumeLevel::Id, (uint8_t) 1), CHIP_NO_ERROR); // Restore default
