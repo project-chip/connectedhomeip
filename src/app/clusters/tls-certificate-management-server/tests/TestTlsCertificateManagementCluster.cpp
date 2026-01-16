@@ -586,7 +586,11 @@ TEST_F(TestTlsCertificateManagementCluster, TestFindRootCertificateSuccess)
     EXPECT_TRUE(provisionResult.IsSuccess());
     ASSERT_TRUE(provisionResult.response.has_value());
 
-    TLSCAID provisionedId = provisionResult.response.value().caid;
+    TLSCAID provisionedId = 0;
+    if (provisionResult.response.has_value())
+    {
+        provisionedId = provisionResult.response.value().caid;
+    }
 
     // Now find it
     Commands::FindRootCertificate::Type findReq;
@@ -632,7 +636,11 @@ TEST_F(TestTlsCertificateManagementCluster, TestRemoveRootCertificateSuccess)
     EXPECT_TRUE(provisionResult.IsSuccess());
     ASSERT_TRUE(provisionResult.response.has_value());
 
-    TLSCAID provisionedId = provisionResult.response.value().caid;
+    TLSCAID provisionedId = 0;
+    if (provisionResult.response.has_value())
+    {
+        provisionedId = provisionResult.response.value().caid;
+    }
 
     EXPECT_EQ(mMockDelegate.rootCerts.size(), 1u);
 
