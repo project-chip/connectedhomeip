@@ -221,7 +221,8 @@ TEST_F(TestTCPConnection, TestUnauthenticatedSessionReleaseOnConnectionClose)
         mSessionManager.OnMessageReceived(peerAddr, std::move(msgBuf), &ctxt);
     }
 
-    // Release local handle to close TCP connection
+    // Close TCP connection & release local handle
+    connHandle->ForceDisconnect();
     connHandle.Release();
 
     // Drive IO to process TCP closure
