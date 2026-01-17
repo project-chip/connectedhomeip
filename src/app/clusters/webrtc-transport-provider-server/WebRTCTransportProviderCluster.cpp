@@ -247,31 +247,21 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderCluster::Inv
 
     switch (request.path.mCommandId)
     {
-    case Commands::SolicitOffer::Id: {
-        Commands::SolicitOffer::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleSolicitOffer(*handler, req);
-    }
-    case Commands::ProvideOffer::Id: {
-        Commands::ProvideOffer::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleProvideOffer(*handler, req);
-    }
-    case Commands::ProvideAnswer::Id: {
-        Commands::ProvideAnswer::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleProvideAnswer(*handler, req);
-    }
-    case Commands::ProvideICECandidates::Id: {
-        Commands::ProvideICECandidates::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleProvideICECandidates(*handler, req);
-    }
-    case Commands::EndSession::Id: {
-        Commands::EndSession::DecodableType req;
-        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
-        return HandleEndSession(*handler, req);
-    }
+    case Commands::SolicitOffer::Id:
+        return HandleCommand<Commands::SolicitOffer::DecodableType>(input_arguments, accessingFabricIndex, *handler,
+                                                                    &WebRTCTransportProviderCluster::HandleSolicitOffer);
+    case Commands::ProvideOffer::Id:
+        return HandleCommand<Commands::ProvideOffer::DecodableType>(input_arguments, accessingFabricIndex, *handler,
+                                                                    &WebRTCTransportProviderCluster::HandleProvideOffer);
+    case Commands::ProvideAnswer::Id:
+        return HandleCommand<Commands::ProvideAnswer::DecodableType>(input_arguments, accessingFabricIndex, *handler,
+                                                                     &WebRTCTransportProviderCluster::HandleProvideAnswer);
+    case Commands::ProvideICECandidates::Id:
+        return HandleCommand<Commands::ProvideICECandidates::DecodableType>(
+            input_arguments, accessingFabricIndex, *handler, &WebRTCTransportProviderCluster::HandleProvideICECandidates);
+    case Commands::EndSession::Id:
+        return HandleCommand<Commands::EndSession::DecodableType>(input_arguments, accessingFabricIndex, *handler,
+                                                                  &WebRTCTransportProviderCluster::HandleEndSession);
     default:
         return Status::UnsupportedCommand;
     }
