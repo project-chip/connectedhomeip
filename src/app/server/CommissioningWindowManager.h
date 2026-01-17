@@ -31,6 +31,9 @@
 #include <system/SystemClock.h>
 
 namespace chip {
+namespace app {
+class FailSafeContext;
+}
 
 enum class CommissioningWindowAdvertisement
 {
@@ -137,6 +140,7 @@ public:
      * happening over the PASE session, and not for some unrelated non-commissioning activity.
      */
     void ExpireFailSafeIfHeldByOpenPASESession();
+    app::FailSafeContext & GetFailSafeContext() const;
 
 private:
     //////////// SessionDelegate Implementation ///////////////
