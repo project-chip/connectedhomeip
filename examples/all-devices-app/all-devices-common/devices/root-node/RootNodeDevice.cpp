@@ -67,10 +67,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     mAdministratorCommissioningCluster.Create(
         endpointId, BitFlags<AdministratorCommissioning::Feature>{},
-        AdministratorCommissioningCluster::Context{ .commissioningWindowManager =
-                                                        Server::GetInstance().GetCommissioningWindowManager(),
-                                                    .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                    .failSafeContext = Server::GetInstance().GetFailSafeContext() });
+        AdministratorCommissioningCluster::Context{
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .fabricTable                = Server::GetInstance().GetFabricTable(),
+            .failSafeContext            = Server::GetInstance().GetCommissioningWindowManager().GetFailSafeContext() });
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
