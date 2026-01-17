@@ -8532,8 +8532,7 @@ public class ClusterIDMapping {
             JoinGroup(0L),
             LeaveGroup(1L),
             UpdateGroupKey(3L),
-            ExpireGracePeriod(4L),
-            ConfigureAuxiliaryACL(5L),;
+            ConfigureAuxiliaryACL(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8551,7 +8550,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeyID(2),Key(3),GracePeriod(4),UseAuxiliaryACL(5),;
+        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeySetID(2),Key(3),UseAuxiliaryACL(4),ReplaceEndpoints(5),;
                     private final int id;
                     JoinGroupCommandField(int id) {
                         this.id = id;
@@ -8585,7 +8584,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UpdateGroupKeyCommandField {GroupID(0),KeyID(1),Key(2),GracePeriod(3),;
+                }public enum UpdateGroupKeyCommandField {GroupID(0),KeySetID(1),Key(2),;
                     private final int id;
                     UpdateGroupKeyCommandField(int id) {
                         this.id = id;
@@ -8596,23 +8595,6 @@ public class ClusterIDMapping {
                     }
                     public static UpdateGroupKeyCommandField value(int id) throws NoSuchFieldError {
                         for (UpdateGroupKeyCommandField field : UpdateGroupKeyCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ExpireGracePeriodCommandField {GroupID(0),;
-                    private final int id;
-                    ExpireGracePeriodCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ExpireGracePeriodCommandField value(int id) throws NoSuchFieldError {
-                        for (ExpireGracePeriodCommandField field : ExpireGracePeriodCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -18693,7 +18675,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),SFrameConfig(7),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),SFrameConfig(7),VideoStreams(8),AudioStreams(9),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -18710,7 +18692,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),SFrameConfig(9),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),SFrameConfig(9),VideoStreams(10),AudioStreams(11),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;

@@ -21,6 +21,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/UnitLocalization/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -31,13 +32,10 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
-CHIP_ERROR UnitLocalizationCluster::Init()
+CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
-    return Startup();
-}
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-CHIP_ERROR UnitLocalizationCluster::Startup()
-{
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
 
@@ -52,6 +50,7 @@ CHIP_ERROR UnitLocalizationCluster::Startup()
     {
         ChipLogDetail(Zcl, "UnitLocalization ep0 set default TemperatureUnit: %u", to_underlying(mTemperatureUnit));
     }
+
     return err;
 }
 
@@ -71,55 +70,37 @@ CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationCluster::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+DataModel::ActionReturnStatus UnitLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                      AttributeValueDecoder & decoder)
 {
-    return WriteImpl(aPath, aDecoder);
-}
-
-CHIP_ERROR UnitLocalizationCluster::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    if (aPath.mClusterId != UnitLocalization::Id)
-    {
-        return CHIP_ERROR_INVALID_PATH_LIST;
-    }
-
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
     {
     case TemperatureUnit::Id: {
         TempUnitEnum newTempUnit = TempUnitEnum::kCelsius;
-        ReturnErrorOnFailure(aDecoder.Decode(newTempUnit));
-        ReturnErrorOnFailure(SetTemperatureUnit(newTempUnit));
-        return CHIP_NO_ERROR;
+        ReturnErrorOnFailure(decoder.Decode(newTempUnit));
+        return SetTemperatureUnit(newTempUnit);
     }
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UnitLocalizationCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                     AttributeValueEncoder & encoder)
 {
-    if (aPath.mClusterId != UnitLocalization::Id)
+    switch (request.path.mAttributeId)
     {
-        return CHIP_ERROR_INVALID_PATH_LIST;
-    }
-
-    switch (aPath.mAttributeId)
-    {
-    case TemperatureUnit::Id: {
-        return aEncoder.Encode(mTemperatureUnit);
-    }
-    case SupportedTemperatureUnits::Id: {
-        return aEncoder.Encode(GetSupportedTemperatureUnits());
-    }
-    case ClusterRevision::Id: {
-        return aEncoder.Encode(kRevision);
-    }
+    case TemperatureUnit::Id:
+        return encoder.Encode(mTemperatureUnit);
+    case SupportedTemperatureUnits::Id:
+        return encoder.Encode(GetSupportedTemperatureUnits());
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatures);
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
@@ -137,8 +118,21 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
     VerifyOrReturnError(isValid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnValue(mTemperatureUnit != newTempUnit, CHIP_NO_ERROR);
     mTemperatureUnit = newTempUnit;
-    MatterReportingAttributeChangeCallback(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id);
+    NotifyAttributeChanged(TemperatureUnit::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        { mFeatures.Has(Feature::kTemperatureUnit), Attributes::TemperatureUnit::kMetadataEntry },
+        { mFeatures.Has(Feature::kTemperatureUnit), Attributes::SupportedTemperatureUnits::kMetadataEntry }
+    };
+
+    return listBuilder.Append(Span(UnitLocalization::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
