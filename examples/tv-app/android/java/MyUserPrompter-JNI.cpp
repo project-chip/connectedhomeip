@@ -110,8 +110,9 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionOKPermissionMethod,
@@ -153,12 +154,13 @@ void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t 
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
-        jstring jpairingInstruction = env->NewStringUTF(pairingInstruction);
-        VerifyOrExit(jpairingInstruction != nullptr, ChipLogError(Zcl, "Could not create pairingInstruction jstring");
-                     err = CHIP_ERROR_INTERNAL);
+        jstring jpairingInstruction = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(pairingInstruction, strlen(pairingInstruction)), reinterpret_cast<jobject&>(jpairingInstruction));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create pairingInstruction jstring"));
 
         ChipLogError(Zcl, "JNIMyUserPrompter::PromptForCommissionPasscode length=%d", static_cast<uint16_t>(passcodeLength));
 
@@ -201,8 +203,9 @@ void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productI
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mHidePromptsOnCancelMethod, static_cast<jint>(vendorId),
@@ -255,11 +258,13 @@ void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
-        jstring jpairingInstruction = env->NewStringUTF(pairingInstruction);
-        VerifyOrExit(jpairingInstruction != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jpairingInstruction = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(pairingInstruction, strlen(pairingInstruction)), reinterpret_cast<jobject&>(jpairingInstruction));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptWithCommissionerPasscodeMethod,
@@ -299,8 +304,9 @@ void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t p
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningStartedMethod, static_cast<jint>(vendorId),
@@ -336,8 +342,9 @@ void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningSucceededMethod, static_cast<jint>(vendorId),
@@ -374,11 +381,13 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jstring jcommissioneeError = env->NewStringUTF(error.AsString());
-        VerifyOrExit(jcommissioneeError != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeError = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(error.AsString(), strlen(error.AsString())), reinterpret_cast<jobject&>(jcommissioneeError));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
-        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
-        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+        jstring jcommissioneeName = nullptr;
+        err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(commissioneeName, strlen(commissioneeName)), reinterpret_cast<jobject&>(jcommissioneeName));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not create jstring"));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningFailedMethod, jcommissioneeName,
