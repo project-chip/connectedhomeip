@@ -58,3 +58,9 @@ tests:
                 value: "data response"
               - name: "Status"
                 value: 0
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv
