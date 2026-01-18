@@ -90,6 +90,7 @@ PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
+    LogErrorOnFailure(mCluster->LoadCurrentConnections());
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
@@ -137,6 +138,7 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
         result = UpsertResultEnum::kInserted;
     }
 
+    if (mCluster) { LogErrorOnFailure(mCluster->PersistAndNotify()); }
     MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
                                            PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
@@ -157,6 +159,7 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
     // If a connection was removed, the size will be smaller.
     if (mCurrentConnections.size() < originalSize)
     {
+        if (mCluster) { LogErrorOnFailure(mCluster->PersistAndNotify()); }
         // Notify the stack that the CurrentConnections attribute has changed.
         MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
                                                PushAvStreamTransport::Attributes::CurrentConnections::Id);
@@ -1728,6 +1731,82 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
     // Generate the PushTransportEnd event
     return GeneratePushTransportEndEvent(connectionID);
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::PersistAndNotify()
+{
+    ReturnErrorAndLogOnFailure(StoreCurrentConnections(), Zcl,
+                               "PushAVStreamTransport[ep=%d]: Failed to persist current connections", mLogic.mEndpointId);
+
+    MatterReportingAttributeChangeCallback(mLogic.mEndpointId, PushAvStreamTransport::Id,
+                                           PushAvStreamTransport::Attributes::CurrentConnections::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
+{
+    uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    for (const auto & connection : mLogic.mCurrentConnections)
+    {
+        ReturnErrorOnFailure(connection.Encode(writer, TLV::AnonymousTag()));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    size_t len = writer.GetLengthWritten();
+
+    auto path = ConcreteAttributePath(mLogic.mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
+
+    ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mLogic.mCurrentConnections.size()));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
+{
+    uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
+    MutableByteSpan span(buffer);
+
+    auto path = ConcreteAttributePath(mLogic.mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadValue(path, span);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        mLogic.mCurrentConnections.clear();
+        ChipLogProgress(Zcl, "No persisted CurrentConnections found.");
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(span);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    mLogic.mCurrentConnections.clear();
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TransportConfigurationStorage connection;
+        ReturnErrorOnFailure(connection.Decode(reader));
+        mLogic.mCurrentConnections.push_back(connection);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    ChipLogProgress(Zcl, "Loaded %u CurrentConnections", static_cast<unsigned int>(mLogic.mCurrentConnections.size()));
+
+    return reader.VerifyEndOfContainer();
 }
 
 } // namespace Clusters
