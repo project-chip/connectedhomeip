@@ -103,10 +103,7 @@ public:
             return Protocols::InteractionModel::Status::DynamicConstraintError;
         }
 
-        if (mVideoStreamCount >= 1)
-        {
-            return Protocols::InteractionModel::Status::ResourceExhausted;
-        }
+        VerifyOrReturnError(mVideoStreamCount < 1, Protocols::InteractionModel::Status::ResourceExhausted);
 
         outStreamID = static_cast<uint16_t>(mAllocatedVideoStreams->size() + 1);
         mAllocatedVideoStreams->push_back(allocateArgs);
@@ -130,10 +127,7 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID) override
     {
-        if (mAudioStreamCount >= 1)
-        {
-            return Protocols::InteractionModel::Status::ResourceExhausted;
-        }
+        VerifyOrReturnError(mAudioStreamCount < 1, Protocols::InteractionModel::Status::ResourceExhausted);
 
         auto & audioCapabilities = GetAudioCapabilities();
 
@@ -169,12 +163,8 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                uint16_t & outStreamID) override
-
     {
-        if (mSnapshotStreamCount >= 1)
-        {
-            return Protocols::InteractionModel::Status::ResourceExhausted;
-        }
+        VerifyOrReturnError(mSnapshotStreamCount < 1, Protocols::InteractionModel::Status::ResourceExhausted);
 
         if (!std::any_of(GetSnapshotCapabilities().begin(), GetSnapshotCapabilities().end(),
                          [&](const auto & capability) { return capability.imageCodec == allocateArgs.imageCodec; }))
@@ -222,7 +212,6 @@ public:
                                                         const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override
     {
-
         outImageSnapshot.imageCodec    = ImageCodecEnum::kJpeg;
         outImageSnapshot.imageRes      = resolution;
         const uint8_t dummyImageData[] = { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00,
