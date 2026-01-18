@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com'
+    namespace 'com.chip.casting'
     compileSdk 34
 
     defaultConfig {
