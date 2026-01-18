@@ -36,11 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-<<<<<<< HEAD
-            image: ghcr.io/project-chip/chip-build-android:140
-=======
             image: ghcr.io/project-chip/chip-build-android:160
->>>>>>> b0f0177242 ([Android]upgrade gradle plugin with 8.5.1 (#40505))
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
